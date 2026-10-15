@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -25093,11 +25093,11 @@ or set <code>$GPORTAL_USERNAME</code> / <code>$GPORTAL_PASSWORD</code>; for <cod
 
 
         <p>Reader for the bundled JAXA dataset catalog.</p>
-<p>Subclasses :class:<code>AbstractCatalog</code> so the dict-like surface
+<p>Subclasses <code>AbstractCatalog</code> so the dict-like surface
 (<code>cat["aw3d30"]</code>, <code>"aw3d30" in cat</code>, <code>len(cat)</code>) comes for free. The
 <code>resolve</code> method maps a friendly alias (<code>"elevation"</code>) to its canonical
-key (<code>"aw3d30"</code>); :meth:<code>by_protocol</code> lists the keys filtered by
-protocol; :meth:<code>get</code> is a thin alias for <code>get_dataset</code>.</p>
+key (<code>"aw3d30"</code>); <code>by_protocol</code> lists the keys filtered by
+protocol; <code>get</code> is a thin alias for <code>get_dataset</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -25117,7 +25117,7 @@ protocol; :meth:<code>get</code> is a thin alias for <code>get_dataset</code>.</
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from canonical key to its :class:<code>Dataset</code> row.</p>
+                <p>Map from canonical key to its <code>Dataset</code> row.</p>
               </div>
             </td>
           </tr>
@@ -25436,14 +25436,14 @@ protocol; :meth:<code>get</code> is a thin alias for <code>get_dataset</code>.</
 <span class="normal"><a href="#__codelineno-0-476">476</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]):</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Reader for the bundled JAXA dataset catalog.</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">    Subclasses :class:`AbstractCatalog` so the dict-like surface</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">    Subclasses `AbstractCatalog` so the dict-like surface</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">    (`cat[&quot;aw3d30&quot;]`, `&quot;aw3d30&quot; in cat`, `len(cat)`) comes for free. The</span>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">    `resolve` method maps a friendly alias (`&quot;elevation&quot;`) to its canonical</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">    key (`&quot;aw3d30&quot;`); :meth:`by_protocol` lists the keys filtered by</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">    protocol; :meth:`get` is a thin alias for `get_dataset`.</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">    key (`&quot;aw3d30&quot;`); `by_protocol` lists the keys filtered by</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">    protocol; `get` is a thin alias for `get_dataset`.</span>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        datasets: Map from canonical key to its :class:`Dataset` row.</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        datasets: Map from canonical key to its `Dataset` row.</span>
 <a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        available_datasets: Sorted canonical keys.</span>
 <a id="__codelineno-0-212" name="__codelineno-0-212"></a>
 <a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">    Examples:</span>
@@ -25467,7 +25467,7 @@ protocol; :meth:<code>get</code> is a thin alias for <code>get_dataset</code>.</
 <a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no datasets were supplied.</span>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        `Catalog()` with no args reads `CATALOG_PATH` (cached by</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">        `(path, mtime)`); passing `datasets=...` skips the disk read (used</span>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        in tests). Either way the `aliases` map is derived from the loaded</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        rows. `available_datasets` is populated from the YAML&#39;s optional</span>
@@ -25506,10 +25506,10 @@ protocol; :meth:<code>get</code> is a thin alias for <code>get_dataset</code>.</
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">            catalog_path: Path to the catalog directory (the sharded</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">                default) or a single YAML file (tests / legacy). Defaults</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">                to the module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">                to the module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a>
 <a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">            A fully-populated :class:`Catalog` merged across every</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">            A fully-populated `Catalog` merged across every</span>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">            contributing file.</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        Raises:</span>
@@ -25525,13 +25525,13 @@ protocol; :meth:<code>get</code> is a thin alias for <code>get_dataset</code>.</
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">payload</span><span class="p">)</span>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Dataset` for `key` (canonical, alias, or raw id).</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for `key` (canonical, alias, or raw id).</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Resolves `key` through :meth:`resolve` first, then returns the</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Resolves `key` through `resolve` first, then returns the</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        matching curated row when one exists. **Raw G-Portal numeric ids**</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        (e.g. ``&quot;11001002&quot;``) and **raw jaxa.earth STAC collection names**</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        (e.g. ``&quot;JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.daytime.v4_global_yearly&quot;``)</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        pass through unmapped: a passthrough :class:`Dataset` row is</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        pass through unmapped: a passthrough `Dataset` row is</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        synthesized on the fly with the right protocol so the backend</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        dispatches correctly — the full 799-entry G-Portal universe + the</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        ~119-entry JAXA Earth STAC catalogue are usable without bloating</span>
@@ -25668,7 +25668,7 @@ protocol; :meth:<code>get</code> is a thin alias for <code>get_dataset</code>.</
 <a id="__codelineno-0-432" name="__codelineno-0-432"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;`name in cat` — accept both canonical keys and friendly aliases.</span>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        Overrides :meth:`AbstractCatalog.__contains__`, which only checks</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        Overrides `AbstractCatalog.__contains__`, which only checks</span>
 <a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        `self.datasets`, so the alias surface (`&quot;elevation&quot; in cat`)</span>
 <a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        matches what `cat.get(&quot;elevation&quot;)` already accepts.</span>
 <a id="__codelineno-0-438" name="__codelineno-0-438"></a>
@@ -25691,10 +25691,10 @@ protocol; :meth:<code>get</code> is a thin alias for <code>get_dataset</code>.</
 <a id="__codelineno-0-455" name="__codelineno-0-455"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;`cat[name]` — accept both canonical keys and friendly aliases.</span>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        Overrides :meth:`AbstractCatalog.__getitem__` so dict-style</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">        lookup matches the same alias surface as :meth:`get`. Raises</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">        :class:`KeyError` on miss (the dict-style contract; callers that</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">        want a did-you-mean hint use :meth:`get` instead).</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        Overrides `AbstractCatalog.__getitem__` so dict-style</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">        lookup matches the same alias surface as `get`. Raises</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">        `KeyError` on miss (the dict-style contract; callers that</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">        want a did-you-mean hint use `get` instead).</span>
 <a id="__codelineno-0-462" name="__codelineno-0-462"></a>
 <a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">        Examples:</span>
 <a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">            - Lookup by alias returns the canonical row:</span>
@@ -25738,7 +25738,7 @@ protocol; :meth:<code>get</code> is a thin alias for <code>get_dataset</code>.</
     <div class="doc doc-contents ">
 
         <p><code>name in cat</code> — accept both canonical keys and friendly aliases.</p>
-<p>Overrides :meth:<code>AbstractCatalog.__contains__</code>, which only checks
+<p>Overrides <code>AbstractCatalog.__contains__</code>, which only checks
 <code>self.datasets</code>, so the alias surface (<code>"elevation" in cat</code>)
 matches what <code>cat.get("elevation")</code> already accepts.</p>
 
@@ -25784,7 +25784,7 @@ matches what <code>cat.get("elevation")</code> already accepts.</p>
 <span class="normal"><a href="#__codelineno-0-453">453</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;`name in cat` — accept both canonical keys and friendly aliases.</span>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">    Overrides :meth:`AbstractCatalog.__contains__`, which only checks</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">    Overrides `AbstractCatalog.__contains__`, which only checks</span>
 <a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">    `self.datasets`, so the alias surface (`&quot;elevation&quot; in cat`)</span>
 <a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">    matches what `cat.get(&quot;elevation&quot;)` already accepts.</span>
 <a id="__codelineno-0-438" name="__codelineno-0-438"></a>
@@ -25821,10 +25821,10 @@ matches what <code>cat.get("elevation")</code> already accepts.</p>
     <div class="doc doc-contents ">
 
         <p><code>cat[name]</code> — accept both canonical keys and friendly aliases.</p>
-<p>Overrides :meth:<code>AbstractCatalog.__getitem__</code> so dict-style
-lookup matches the same alias surface as :meth:<code>get</code>. Raises
-:class:<code>KeyError</code> on miss (the dict-style contract; callers that
-want a did-you-mean hint use :meth:<code>get</code> instead).</p>
+<p>Overrides <code>AbstractCatalog.__getitem__</code> so dict-style
+lookup matches the same alias surface as <code>get</code>. Raises
+<code>KeyError</code> on miss (the dict-style contract; callers that
+want a did-you-mean hint use <code>get</code> instead).</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -25864,10 +25864,10 @@ want a did-you-mean hint use :meth:<code>get</code> instead).</p>
 <span class="normal"><a href="#__codelineno-0-476">476</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;`cat[name]` — accept both canonical keys and friendly aliases.</span>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">    Overrides :meth:`AbstractCatalog.__getitem__` so dict-style</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">    lookup matches the same alias surface as :meth:`get`. Raises</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">    :class:`KeyError` on miss (the dict-style contract; callers that</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">    want a did-you-mean hint use :meth:`get` instead).</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">    Overrides `AbstractCatalog.__getitem__` so dict-style</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">    lookup matches the same alias surface as `get`. Raises</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">    `KeyError` on miss (the dict-style contract; callers that</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">    want a did-you-mean hint use `get` instead).</span>
 <a id="__codelineno-0-462" name="__codelineno-0-462"></a>
 <a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">        - Lookup by alias returns the canonical row:</span>
@@ -26044,12 +26044,12 @@ want a did-you-mean hint use :meth:<code>get</code> instead).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the :class:<code>Dataset</code> for <code>key</code> (canonical, alias, or raw id).</p>
-<p>Resolves <code>key</code> through :meth:<code>resolve</code> first, then returns the
+        <p>Return the <code>Dataset</code> for <code>key</code> (canonical, alias, or raw id).</p>
+<p>Resolves <code>key</code> through <code>resolve</code> first, then returns the
 matching curated row when one exists. <strong>Raw G-Portal numeric ids</strong>
 (e.g. <code>"11001002"</code>) and <strong>raw jaxa.earth STAC collection names</strong>
 (e.g. <code>"JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.daytime.v4_global_yearly"</code>)
-pass through unmapped: a passthrough :class:<code>Dataset</code> row is
+pass through unmapped: a passthrough <code>Dataset</code> row is
 synthesized on the fly with the right protocol so the backend
 dispatches correctly — the full 799-entry G-Portal universe + the
 ~119-entry JAXA Earth STAC catalogue are usable without bloating
@@ -26237,13 +26237,13 @@ valid raw id.</p>
 <span class="normal"><a href="#__codelineno-0-351">351</a></span>
 <span class="normal"><a href="#__codelineno-0-352">352</a></span>
 <span class="normal"><a href="#__codelineno-0-353">353</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Dataset` for `key` (canonical, alias, or raw id).</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for `key` (canonical, alias, or raw id).</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    Resolves `key` through :meth:`resolve` first, then returns the</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    Resolves `key` through `resolve` first, then returns the</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">    matching curated row when one exists. **Raw G-Portal numeric ids**</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    (e.g. ``&quot;11001002&quot;``) and **raw jaxa.earth STAC collection names**</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    (e.g. ``&quot;JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.daytime.v4_global_yearly&quot;``)</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">    pass through unmapped: a passthrough :class:`Dataset` row is</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">    pass through unmapped: a passthrough `Dataset` row is</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">    synthesized on the fly with the right protocol so the backend</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">    dispatches correctly — the full 799-entry G-Portal universe + the</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    ~119-entry JAXA Earth STAC catalogue are usable without bloating</span>
@@ -26345,7 +26345,7 @@ valid raw id.</p>
               <div class="doc-md-description">
                 <p>Path to the catalog directory (the sharded
 default) or a single YAML file (tests / legacy). Defaults
-to the module-level :data:<code>CATALOG_PATH</code>.</p>
+to the module-level <code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -26371,7 +26371,7 @@ to the module-level :data:<code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code> merged across every</p>
+                <p>A fully-populated <code>Catalog</code> merged across every</p>
               </div>
             </td>
           </tr>
@@ -26449,10 +26449,10 @@ with the wheel.</p>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        catalog_path: Path to the catalog directory (the sharded</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            default) or a single YAML file (tests / legacy). Defaults</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">            to the module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">            to the module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a>
 <a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        A fully-populated :class:`Catalog` merged across every</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        A fully-populated `Catalog` merged across every</span>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        contributing file.</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">    Raises:</span>
@@ -26484,7 +26484,7 @@ with the wheel.</p>
     <div class="doc doc-contents ">
 
         <p>Auto-load the bundled catalog when no datasets were supplied.</p>
-<p><code>Catalog()</code> with no args reads :data:<code>CATALOG_PATH</code> (cached by
+<p><code>Catalog()</code> with no args reads <code>CATALOG_PATH</code> (cached by
 <code>(path, mtime)</code>); passing <code>datasets=...</code> skips the disk read (used
 in tests). Either way the <code>aliases</code> map is derived from the loaded
 rows. <code>available_datasets</code> is populated from the YAML's optional
@@ -26533,7 +26533,7 @@ works.</p>
 <span class="normal"><a href="#__codelineno-0-264">264</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no datasets were supplied.</span>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    `Catalog()` with no args reads `CATALOG_PATH` (cached by</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">    `(path, mtime)`); passing `datasets=...` skips the disk read (used</span>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    in tests). Either way the `aliases` map is derived from the loaded</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    rows. `available_datasets` is populated from the YAML&#39;s optional</span>
@@ -27755,7 +27755,7 @@ the output as gridded artefacts.</p>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a>    <span class="nd">@property</span>
 <a id="__codelineno-0-211" name="__codelineno-0-211"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">auth</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JaxaAuth</span><span class="p">:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The :class:`JaxaAuth` bound to this request.</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The `JaxaAuth` bound to this request.</span>
 <a id="__codelineno-0-213" name="__codelineno-0-213"></a>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            JaxaAuth: The optional-credentials auth object. `configure()`</span>
@@ -27979,7 +27979,7 @@ the output as gridded artefacts.</p>
 
     <div class="doc doc-contents ">
 
-        <p>The :class:<code>JaxaAuth</code> bound to this request.</p>
+        <p>The <code>JaxaAuth</code> bound to this request.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -28906,10 +28906,10 @@ calls) act on the right side. <code>JaxaAuth(creds, protocol="jaxa-earth")</code
 makes <code>configure()</code> a no-op; <code>JaxaAuth(creds, protocol="gportal")</code> or
 <code>JaxaAuth(creds, protocol="ptree")</code> resolves the matching username +
 password from explicit credentials or the protocol's env-var pair,
-raising :class:<code>AuthenticationError</code> on miss.</p>
+raising <code>AuthenticationError</code> on miss.</p>
 <p>After a successful <code>configure()</code> on a credentialed protocol, the
-resolved values are available via :attr:<code>username</code> and
-:attr:<code>password</code> so the branch can pass them straight into its
+resolved values are available via <code>username</code> and
+<code>password</code> so the branch can pass them straight into its
 transport client (<code>gportal.download(username=, password=)</code>,
 <code>ftplib.FTP.login(...)</code>, <code>paramiko.Transport.connect(...)</code>) instead of
 mutating any SDK's module-level globals.</p>
@@ -28931,7 +28931,7 @@ mutating any SDK's module-level globals.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The :class:<code>JaxaCredentials</code> passed at construction.</p>
+                <p>The <code>JaxaCredentials</code> passed at construction.</p>
               </div>
             </td>
           </tr>
@@ -29152,17 +29152,17 @@ or <code>"ptree"</code>.</p>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">    makes `configure()` a no-op; `JaxaAuth(creds, protocol=&quot;gportal&quot;)` or</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">    `JaxaAuth(creds, protocol=&quot;ptree&quot;)` resolves the matching username +</span>
 <a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">    password from explicit credentials or the protocol&#39;s env-var pair,</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">    raising :class:`AuthenticationError` on miss.</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">    raising `AuthenticationError` on miss.</span>
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">    After a successful `configure()` on a credentialed protocol, the</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">    resolved values are available via :attr:`username` and</span>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">    :attr:`password` so the branch can pass them straight into its</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">    resolved values are available via `username` and</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">    `password` so the branch can pass them straight into its</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">    transport client (`gportal.download(username=, password=)`,</span>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">    `ftplib.FTP.login(...)`, `paramiko.Transport.connect(...)`) instead of</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">    mutating any SDK&#39;s module-level globals.</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a>
 <a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        _creds: The :class:`JaxaCredentials` passed at construction.</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        _creds: The `JaxaCredentials` passed at construction.</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">        _protocol: The bound protocol — one of `&quot;jaxa-earth&quot;`, `&quot;gportal&quot;`</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">            or `&quot;ptree&quot;`.</span>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a>
@@ -29186,10 +29186,10 @@ or <code>"ptree"</code>.</p>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Bind the protocol; does not resolve credentials yet.</span>
 <a id="__codelineno-0-215" name="__codelineno-0-215"></a>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            credentials: The :class:`JaxaCredentials` value object carrying</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            credentials: The `JaxaCredentials` value object carrying</span>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">                the optional G-Portal and P-Tree username / password pairs.</span>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">            protocol: The protocol this auth instance targets. The</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">                parent&#39;s no-arg :meth:`configure` dispatches on this so</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">                parent&#39;s no-arg `configure` dispatches on this so</span>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">                `AbstractDataSource.authenticate()` fails fast for missing</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">                credentials on either credentialed branch.</span>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a>
@@ -29222,7 +29222,7 @@ or <code>"ptree"</code>.</p>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">password</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SecretStr</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved password (still wrapped in `SecretStr`).</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        Returns `None` until :meth:`configure` runs. Callers that need</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        Returns `None` until `configure` runs. Callers that need</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        the raw string call `.get_secret_value()` themselves at the call</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        site — the wrapper stays on `JaxaAuth` so it never lands in a</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        `repr` or a log line.</span>
@@ -29238,7 +29238,7 @@ or <code>"ptree"</code>.</p>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        variables (`$GPORTAL_USERNAME` / `$GPORTAL_PASSWORD` and</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        `$JAXA_PTREE_USERNAME` / `$JAXA_PTREE_PASSWORD` respectively) as</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">        fallback, and caches them on the instance for the branch to read</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        through :attr:`username` / :attr:`password`. Idempotent — a</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        through `username` / `password`. Idempotent — a</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">        second call after `is_authenticated()` returns `True`</span>
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        short-circuits.</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a>
@@ -29344,7 +29344,7 @@ or <code>"ptree"</code>.</p>
     <div class="doc doc-contents ">
 
         <p>The resolved password (still wrapped in <code>SecretStr</code>).</p>
-<p>Returns <code>None</code> until :meth:<code>configure</code> runs. Callers that need
+<p>Returns <code>None</code> until <code>configure</code> runs. Callers that need
 the raw string call <code>.get_secret_value()</code> themselves at the call
 site — the wrapper stays on <code>JaxaAuth</code> so it never lands in a
 <code>repr</code> or a log line.</p>
@@ -29434,7 +29434,7 @@ site — the wrapper stays on <code>JaxaAuth</code> so it never lands in a
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The :class:<code>JaxaCredentials</code> value object carrying
+                <p>The <code>JaxaCredentials</code> value object carrying
 the optional G-Portal and P-Tree username / password pairs.</p>
               </div>
             </td>
@@ -29452,7 +29452,7 @@ the optional G-Portal and P-Tree username / password pairs.</p>
             <td>
               <div class="doc-md-description">
                 <p>The protocol this auth instance targets. The
-parent's no-arg :meth:<code>configure</code> dispatches on this so
+parent's no-arg <code>configure</code> dispatches on this so
 <code>AbstractDataSource.authenticate()</code> fails fast for missing
 credentials on either credentialed branch.</p>
               </div>
@@ -29527,10 +29527,10 @@ values.</p>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Bind the protocol; does not resolve credentials yet.</span>
 <a id="__codelineno-0-215" name="__codelineno-0-215"></a>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">        credentials: The :class:`JaxaCredentials` value object carrying</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">        credentials: The `JaxaCredentials` value object carrying</span>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">            the optional G-Portal and P-Tree username / password pairs.</span>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">        protocol: The protocol this auth instance targets. The</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">            parent&#39;s no-arg :meth:`configure` dispatches on this so</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">            parent&#39;s no-arg `configure` dispatches on this so</span>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">            `AbstractDataSource.authenticate()` fails fast for missing</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">            credentials on either credentialed branch.</span>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a>
@@ -29572,7 +29572,7 @@ explicit credentials (preferred) or the protocol's environment
 variables (<code>$GPORTAL_USERNAME</code> / <code>$GPORTAL_PASSWORD</code> and
 <code>$JAXA_PTREE_USERNAME</code> / <code>$JAXA_PTREE_PASSWORD</code> respectively) as
 fallback, and caches them on the instance for the branch to read
-through :attr:<code>username</code> / :attr:<code>password</code>. Idempotent — a
+through <code>username</code> / <code>password</code>. Idempotent — a
 second call after <code>is_authenticated()</code> returns <code>True</code>
 short-circuits.</p>
 
@@ -29736,7 +29736,7 @@ for the protocol that failed to resolve.</p>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    variables (`$GPORTAL_USERNAME` / `$GPORTAL_PASSWORD` and</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">    `$JAXA_PTREE_USERNAME` / `$JAXA_PTREE_PASSWORD` respectively) as</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">    fallback, and caches them on the instance for the branch to read</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    through :attr:`username` / :attr:`password`. Idempotent — a</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    through `username` / `password`. Idempotent — a</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">    second call after `is_authenticated()` returns `True`</span>
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">    short-circuits.</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a>
@@ -29845,11 +29845,11 @@ for the protocol that failed to resolve.</p>
 
         <p>Frozen value object holding the credentialed-branch secrets.</p>
 <p>All fields are optional at construction time: <code>None</code> means "resolve
-from the corresponding environment variable at :meth:<code>JaxaAuth.configure</code>
+from the corresponding environment variable at <code>JaxaAuth.configure</code>
 time". The real "are credentials available?" gate is
-:meth:<code>JaxaAuth.configure</code>, not this model.</p>
+<code>JaxaAuth.configure</code>, not this model.</p>
 <p>G-Portal and P-Tree credentials are stored side-by-side because a
-single :class:<code>JAXA</code> instance is bound to one protocol per call — the
+single <code>JAXA</code> instance is bound to one protocol per call — the
 unused pair is simply ignored.</p>
 
 
@@ -30014,12 +30014,12 @@ defers to <code>$JAXA_PTREE_PASSWORD</code>.</p>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Frozen value object holding the credentialed-branch secrets.</span>
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">    All fields are optional at construction time: `None` means &quot;resolve</span>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    from the corresponding environment variable at :meth:`JaxaAuth.configure`</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    from the corresponding environment variable at `JaxaAuth.configure`</span>
 <a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    time&quot;. The real &quot;are credentials available?&quot; gate is</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    :meth:`JaxaAuth.configure`, not this model.</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    `JaxaAuth.configure`, not this model.</span>
 <a id="__codelineno-0-80" name="__codelineno-0-80"></a>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">    G-Portal and P-Tree credentials are stored side-by-side because a</span>
-<a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">    single :class:`JAXA` instance is bound to one protocol per call — the</span>
+<a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">    single `JAXA` instance is bound to one protocol per call — the</span>
 <a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    unused pair is simply ignored.</span>
 <a id="__codelineno-0-84" name="__codelineno-0-84"></a>
 <a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">    Attributes:</span>
@@ -30820,7 +30820,7 @@ the output as gridded artefacts.</p>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a>    <span class="nd">@property</span>
 <a id="__codelineno-0-211" name="__codelineno-0-211"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">auth</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JaxaAuth</span><span class="p">:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The :class:`JaxaAuth` bound to this request.</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The `JaxaAuth` bound to this request.</span>
 <a id="__codelineno-0-213" name="__codelineno-0-213"></a>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            JaxaAuth: The optional-credentials auth object. `configure()`</span>
@@ -31044,7 +31044,7 @@ the output as gridded artefacts.</p>
 
     <div class="doc doc-contents ">
 
-        <p>The :class:<code>JaxaAuth</code> bound to this request.</p>
+        <p>The <code>JaxaAuth</code> bound to this request.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -31968,7 +31968,7 @@ request order.</p>
     <div class="doc doc-contents first">
 
         <p>Dataset catalog for the JAXA backend.</p>
-<p>Hosts :class:<code>Catalog</code>, the pydantic-backed reader for the bundled JAXA
+<p>Hosts <code>Catalog</code>, the pydantic-backed reader for the bundled JAXA
 catalog. The catalog ships as a directory of per-mission YAML files at
 <code>src/earthlens/jaxa/catalog/</code> (<code>jaxa-earth.yaml</code>, <code>sgli.yaml</code>,
 <code>amsr.yaml</code>, <code>alos-palsar.yaml</code>, <code>earthcare.yaml</code>,
@@ -31983,13 +31983,13 @@ G-Portal numeric dataset id for <code>"gportal"</code>, or a P-Tree product toke
 <code>by_protocol(...)</code> view + dataset-level validator together let the
 backend route a request to the right branch without re-parsing the
 YAML at every fetch.</p>
-<p>The aliases map is a separate small index resolved by :meth:<code>Catalog.resolve</code>,
+<p>The aliases map is a separate small index resolved by <code>Catalog.resolve</code>,
 giving every dataset a friendly key (<code>"elevation"</code> → <code>"aw3d30"</code>) on top
 of its canonical key. The model is <code>extra="forbid"</code> so typos in the bundled
 YAML fail loudly on first load rather than silently being ignored.</p>
 <p><code>CATALOG_PATH</code> points at the bundled catalog directory (or, for tests
-that monkey-patch it, a single <code>*.yaml</code> file); :func:<code>clear_catalog_cache</code>
-empties the <code>(path, mtime)</code> parse cache used by :meth:<code>Catalog.load</code>.</p>
+that monkey-patch it, a single <code>*.yaml</code> file); <code>clear_catalog_cache</code>
+empties the <code>(path, mtime)</code> parse cache used by <code>Catalog.load</code>.</p>
 
 
 
@@ -32028,11 +32028,11 @@ empties the <code>(path, mtime)</code> parse cache used by :meth:<code>Catalog.l
 
 
         <p>Reader for the bundled JAXA dataset catalog.</p>
-<p>Subclasses :class:<code>AbstractCatalog</code> so the dict-like surface
+<p>Subclasses <code>AbstractCatalog</code> so the dict-like surface
 (<code>cat["aw3d30"]</code>, <code>"aw3d30" in cat</code>, <code>len(cat)</code>) comes for free. The
 <code>resolve</code> method maps a friendly alias (<code>"elevation"</code>) to its canonical
-key (<code>"aw3d30"</code>); :meth:<code>by_protocol</code> lists the keys filtered by
-protocol; :meth:<code>get</code> is a thin alias for <code>get_dataset</code>.</p>
+key (<code>"aw3d30"</code>); <code>by_protocol</code> lists the keys filtered by
+protocol; <code>get</code> is a thin alias for <code>get_dataset</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -32052,7 +32052,7 @@ protocol; :meth:<code>get</code> is a thin alias for <code>get_dataset</code>.</
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from canonical key to its :class:<code>Dataset</code> row.</p>
+                <p>Map from canonical key to its <code>Dataset</code> row.</p>
               </div>
             </td>
           </tr>
@@ -32371,14 +32371,14 @@ protocol; :meth:<code>get</code> is a thin alias for <code>get_dataset</code>.</
 <span class="normal"><a href="#__codelineno-0-476">476</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]):</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Reader for the bundled JAXA dataset catalog.</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">    Subclasses :class:`AbstractCatalog` so the dict-like surface</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">    Subclasses `AbstractCatalog` so the dict-like surface</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">    (`cat[&quot;aw3d30&quot;]`, `&quot;aw3d30&quot; in cat`, `len(cat)`) comes for free. The</span>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">    `resolve` method maps a friendly alias (`&quot;elevation&quot;`) to its canonical</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">    key (`&quot;aw3d30&quot;`); :meth:`by_protocol` lists the keys filtered by</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">    protocol; :meth:`get` is a thin alias for `get_dataset`.</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">    key (`&quot;aw3d30&quot;`); `by_protocol` lists the keys filtered by</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">    protocol; `get` is a thin alias for `get_dataset`.</span>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        datasets: Map from canonical key to its :class:`Dataset` row.</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        datasets: Map from canonical key to its `Dataset` row.</span>
 <a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        available_datasets: Sorted canonical keys.</span>
 <a id="__codelineno-0-212" name="__codelineno-0-212"></a>
 <a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">    Examples:</span>
@@ -32402,7 +32402,7 @@ protocol; :meth:<code>get</code> is a thin alias for <code>get_dataset</code>.</
 <a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no datasets were supplied.</span>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        `Catalog()` with no args reads `CATALOG_PATH` (cached by</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">        `(path, mtime)`); passing `datasets=...` skips the disk read (used</span>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        in tests). Either way the `aliases` map is derived from the loaded</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        rows. `available_datasets` is populated from the YAML&#39;s optional</span>
@@ -32441,10 +32441,10 @@ protocol; :meth:<code>get</code> is a thin alias for <code>get_dataset</code>.</
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">            catalog_path: Path to the catalog directory (the sharded</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">                default) or a single YAML file (tests / legacy). Defaults</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">                to the module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">                to the module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a>
 <a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">            A fully-populated :class:`Catalog` merged across every</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">            A fully-populated `Catalog` merged across every</span>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">            contributing file.</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        Raises:</span>
@@ -32460,13 +32460,13 @@ protocol; :meth:<code>get</code> is a thin alias for <code>get_dataset</code>.</
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">payload</span><span class="p">)</span>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Dataset` for `key` (canonical, alias, or raw id).</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for `key` (canonical, alias, or raw id).</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Resolves `key` through :meth:`resolve` first, then returns the</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Resolves `key` through `resolve` first, then returns the</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        matching curated row when one exists. **Raw G-Portal numeric ids**</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        (e.g. ``&quot;11001002&quot;``) and **raw jaxa.earth STAC collection names**</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        (e.g. ``&quot;JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.daytime.v4_global_yearly&quot;``)</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        pass through unmapped: a passthrough :class:`Dataset` row is</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        pass through unmapped: a passthrough `Dataset` row is</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        synthesized on the fly with the right protocol so the backend</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        dispatches correctly — the full 799-entry G-Portal universe + the</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        ~119-entry JAXA Earth STAC catalogue are usable without bloating</span>
@@ -32603,7 +32603,7 @@ protocol; :meth:<code>get</code> is a thin alias for <code>get_dataset</code>.</
 <a id="__codelineno-0-432" name="__codelineno-0-432"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;`name in cat` — accept both canonical keys and friendly aliases.</span>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        Overrides :meth:`AbstractCatalog.__contains__`, which only checks</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        Overrides `AbstractCatalog.__contains__`, which only checks</span>
 <a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        `self.datasets`, so the alias surface (`&quot;elevation&quot; in cat`)</span>
 <a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        matches what `cat.get(&quot;elevation&quot;)` already accepts.</span>
 <a id="__codelineno-0-438" name="__codelineno-0-438"></a>
@@ -32626,10 +32626,10 @@ protocol; :meth:<code>get</code> is a thin alias for <code>get_dataset</code>.</
 <a id="__codelineno-0-455" name="__codelineno-0-455"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;`cat[name]` — accept both canonical keys and friendly aliases.</span>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        Overrides :meth:`AbstractCatalog.__getitem__` so dict-style</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">        lookup matches the same alias surface as :meth:`get`. Raises</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">        :class:`KeyError` on miss (the dict-style contract; callers that</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">        want a did-you-mean hint use :meth:`get` instead).</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        Overrides `AbstractCatalog.__getitem__` so dict-style</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">        lookup matches the same alias surface as `get`. Raises</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">        `KeyError` on miss (the dict-style contract; callers that</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">        want a did-you-mean hint use `get` instead).</span>
 <a id="__codelineno-0-462" name="__codelineno-0-462"></a>
 <a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">        Examples:</span>
 <a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">            - Lookup by alias returns the canonical row:</span>
@@ -32673,7 +32673,7 @@ protocol; :meth:<code>get</code> is a thin alias for <code>get_dataset</code>.</
     <div class="doc doc-contents ">
 
         <p><code>name in cat</code> — accept both canonical keys and friendly aliases.</p>
-<p>Overrides :meth:<code>AbstractCatalog.__contains__</code>, which only checks
+<p>Overrides <code>AbstractCatalog.__contains__</code>, which only checks
 <code>self.datasets</code>, so the alias surface (<code>"elevation" in cat</code>)
 matches what <code>cat.get("elevation")</code> already accepts.</p>
 
@@ -32719,7 +32719,7 @@ matches what <code>cat.get("elevation")</code> already accepts.</p>
 <span class="normal"><a href="#__codelineno-0-453">453</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;`name in cat` — accept both canonical keys and friendly aliases.</span>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">    Overrides :meth:`AbstractCatalog.__contains__`, which only checks</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">    Overrides `AbstractCatalog.__contains__`, which only checks</span>
 <a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">    `self.datasets`, so the alias surface (`&quot;elevation&quot; in cat`)</span>
 <a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">    matches what `cat.get(&quot;elevation&quot;)` already accepts.</span>
 <a id="__codelineno-0-438" name="__codelineno-0-438"></a>
@@ -32756,10 +32756,10 @@ matches what <code>cat.get("elevation")</code> already accepts.</p>
     <div class="doc doc-contents ">
 
         <p><code>cat[name]</code> — accept both canonical keys and friendly aliases.</p>
-<p>Overrides :meth:<code>AbstractCatalog.__getitem__</code> so dict-style
-lookup matches the same alias surface as :meth:<code>get</code>. Raises
-:class:<code>KeyError</code> on miss (the dict-style contract; callers that
-want a did-you-mean hint use :meth:<code>get</code> instead).</p>
+<p>Overrides <code>AbstractCatalog.__getitem__</code> so dict-style
+lookup matches the same alias surface as <code>get</code>. Raises
+<code>KeyError</code> on miss (the dict-style contract; callers that
+want a did-you-mean hint use <code>get</code> instead).</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -32799,10 +32799,10 @@ want a did-you-mean hint use :meth:<code>get</code> instead).</p>
 <span class="normal"><a href="#__codelineno-0-476">476</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;`cat[name]` — accept both canonical keys and friendly aliases.</span>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">    Overrides :meth:`AbstractCatalog.__getitem__` so dict-style</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">    lookup matches the same alias surface as :meth:`get`. Raises</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">    :class:`KeyError` on miss (the dict-style contract; callers that</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">    want a did-you-mean hint use :meth:`get` instead).</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">    Overrides `AbstractCatalog.__getitem__` so dict-style</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">    lookup matches the same alias surface as `get`. Raises</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">    `KeyError` on miss (the dict-style contract; callers that</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">    want a did-you-mean hint use `get` instead).</span>
 <a id="__codelineno-0-462" name="__codelineno-0-462"></a>
 <a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">        - Lookup by alias returns the canonical row:</span>
@@ -32979,12 +32979,12 @@ want a did-you-mean hint use :meth:<code>get</code> instead).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the :class:<code>Dataset</code> for <code>key</code> (canonical, alias, or raw id).</p>
-<p>Resolves <code>key</code> through :meth:<code>resolve</code> first, then returns the
+        <p>Return the <code>Dataset</code> for <code>key</code> (canonical, alias, or raw id).</p>
+<p>Resolves <code>key</code> through <code>resolve</code> first, then returns the
 matching curated row when one exists. <strong>Raw G-Portal numeric ids</strong>
 (e.g. <code>"11001002"</code>) and <strong>raw jaxa.earth STAC collection names</strong>
 (e.g. <code>"JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.daytime.v4_global_yearly"</code>)
-pass through unmapped: a passthrough :class:<code>Dataset</code> row is
+pass through unmapped: a passthrough <code>Dataset</code> row is
 synthesized on the fly with the right protocol so the backend
 dispatches correctly — the full 799-entry G-Portal universe + the
 ~119-entry JAXA Earth STAC catalogue are usable without bloating
@@ -33172,13 +33172,13 @@ valid raw id.</p>
 <span class="normal"><a href="#__codelineno-0-351">351</a></span>
 <span class="normal"><a href="#__codelineno-0-352">352</a></span>
 <span class="normal"><a href="#__codelineno-0-353">353</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Dataset` for `key` (canonical, alias, or raw id).</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Dataset` for `key` (canonical, alias, or raw id).</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    Resolves `key` through :meth:`resolve` first, then returns the</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    Resolves `key` through `resolve` first, then returns the</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">    matching curated row when one exists. **Raw G-Portal numeric ids**</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    (e.g. ``&quot;11001002&quot;``) and **raw jaxa.earth STAC collection names**</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    (e.g. ``&quot;JAXA.G-Portal_GCOM-W.AMSR2_standard.L3-SSW.daytime.v4_global_yearly&quot;``)</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">    pass through unmapped: a passthrough :class:`Dataset` row is</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">    pass through unmapped: a passthrough `Dataset` row is</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">    synthesized on the fly with the right protocol so the backend</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">    dispatches correctly — the full 799-entry G-Portal universe + the</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    ~119-entry JAXA Earth STAC catalogue are usable without bloating</span>
@@ -33280,7 +33280,7 @@ valid raw id.</p>
               <div class="doc-md-description">
                 <p>Path to the catalog directory (the sharded
 default) or a single YAML file (tests / legacy). Defaults
-to the module-level :data:<code>CATALOG_PATH</code>.</p>
+to the module-level <code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -33306,7 +33306,7 @@ to the module-level :data:<code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code> merged across every</p>
+                <p>A fully-populated <code>Catalog</code> merged across every</p>
               </div>
             </td>
           </tr>
@@ -33384,10 +33384,10 @@ with the wheel.</p>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        catalog_path: Path to the catalog directory (the sharded</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            default) or a single YAML file (tests / legacy). Defaults</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">            to the module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">            to the module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a>
 <a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        A fully-populated :class:`Catalog` merged across every</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        A fully-populated `Catalog` merged across every</span>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        contributing file.</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">    Raises:</span>
@@ -33419,7 +33419,7 @@ with the wheel.</p>
     <div class="doc doc-contents ">
 
         <p>Auto-load the bundled catalog when no datasets were supplied.</p>
-<p><code>Catalog()</code> with no args reads :data:<code>CATALOG_PATH</code> (cached by
+<p><code>Catalog()</code> with no args reads <code>CATALOG_PATH</code> (cached by
 <code>(path, mtime)</code>); passing <code>datasets=...</code> skips the disk read (used
 in tests). Either way the <code>aliases</code> map is derived from the loaded
 rows. <code>available_datasets</code> is populated from the YAML's optional
@@ -33468,7 +33468,7 @@ works.</p>
 <span class="normal"><a href="#__codelineno-0-264">264</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no datasets were supplied.</span>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    `Catalog()` with no args reads `CATALOG_PATH` (cached by</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">    `(path, mtime)`); passing `datasets=...` skips the disk read (used</span>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    in tests). Either way the `aliases` map is derived from the loaded</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    rows. `available_datasets` is populated from the YAML&#39;s optional</span>
@@ -34257,14 +34257,14 @@ thing per protocol:</p>
 <li><code>JaxaAuth(creds, protocol="gportal")</code> makes <code>configure()</code> resolve and
   store the username + password from explicit credentials or from
   <code>$GPORTAL_USERNAME</code> / <code>$GPORTAL_PASSWORD</code>, raising
-  :class:<code>AuthenticationError</code> on miss.</li>
+  <code>AuthenticationError</code> on miss.</li>
 <li><code>JaxaAuth(creds, protocol="ptree")</code> does the same for P-Tree, reading
   <code>ptree_username</code> / <code>ptree_password</code> off the credentials or falling back
   to <code>$JAXA_PTREE_USERNAME</code> / <code>$JAXA_PTREE_PASSWORD</code>. The two credential
   pairs never share values — P-Tree registration is separate from G-Portal.</li>
 </ul>
-<p>The resolved username / password are exposed as :attr:<code>JaxaAuth.username</code>
-and :attr:<code>JaxaAuth.password</code> (the latter is a :class:<code>pydantic.SecretStr</code>)
+<p>The resolved username / password are exposed as <code>JaxaAuth.username</code>
+and <code>JaxaAuth.password</code> (the latter is a <code>pydantic.SecretStr</code>)
 so each credentialed branch can pass them straight to its transport client
 as kwargs — no module-level mutation of the SDK is required.</p>
 
@@ -34372,10 +34372,10 @@ calls) act on the right side. <code>JaxaAuth(creds, protocol="jaxa-earth")</code
 makes <code>configure()</code> a no-op; <code>JaxaAuth(creds, protocol="gportal")</code> or
 <code>JaxaAuth(creds, protocol="ptree")</code> resolves the matching username +
 password from explicit credentials or the protocol's env-var pair,
-raising :class:<code>AuthenticationError</code> on miss.</p>
+raising <code>AuthenticationError</code> on miss.</p>
 <p>After a successful <code>configure()</code> on a credentialed protocol, the
-resolved values are available via :attr:<code>username</code> and
-:attr:<code>password</code> so the branch can pass them straight into its
+resolved values are available via <code>username</code> and
+<code>password</code> so the branch can pass them straight into its
 transport client (<code>gportal.download(username=, password=)</code>,
 <code>ftplib.FTP.login(...)</code>, <code>paramiko.Transport.connect(...)</code>) instead of
 mutating any SDK's module-level globals.</p>
@@ -34397,7 +34397,7 @@ mutating any SDK's module-level globals.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The :class:<code>JaxaCredentials</code> passed at construction.</p>
+                <p>The <code>JaxaCredentials</code> passed at construction.</p>
               </div>
             </td>
           </tr>
@@ -34618,17 +34618,17 @@ or <code>"ptree"</code>.</p>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">    makes `configure()` a no-op; `JaxaAuth(creds, protocol=&quot;gportal&quot;)` or</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">    `JaxaAuth(creds, protocol=&quot;ptree&quot;)` resolves the matching username +</span>
 <a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">    password from explicit credentials or the protocol&#39;s env-var pair,</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">    raising :class:`AuthenticationError` on miss.</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">    raising `AuthenticationError` on miss.</span>
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">    After a successful `configure()` on a credentialed protocol, the</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">    resolved values are available via :attr:`username` and</span>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">    :attr:`password` so the branch can pass them straight into its</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">    resolved values are available via `username` and</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">    `password` so the branch can pass them straight into its</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">    transport client (`gportal.download(username=, password=)`,</span>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">    `ftplib.FTP.login(...)`, `paramiko.Transport.connect(...)`) instead of</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">    mutating any SDK&#39;s module-level globals.</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a>
 <a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        _creds: The :class:`JaxaCredentials` passed at construction.</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        _creds: The `JaxaCredentials` passed at construction.</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">        _protocol: The bound protocol — one of `&quot;jaxa-earth&quot;`, `&quot;gportal&quot;`</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">            or `&quot;ptree&quot;`.</span>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a>
@@ -34652,10 +34652,10 @@ or <code>"ptree"</code>.</p>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Bind the protocol; does not resolve credentials yet.</span>
 <a id="__codelineno-0-215" name="__codelineno-0-215"></a>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            credentials: The :class:`JaxaCredentials` value object carrying</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            credentials: The `JaxaCredentials` value object carrying</span>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">                the optional G-Portal and P-Tree username / password pairs.</span>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">            protocol: The protocol this auth instance targets. The</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">                parent&#39;s no-arg :meth:`configure` dispatches on this so</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">                parent&#39;s no-arg `configure` dispatches on this so</span>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">                `AbstractDataSource.authenticate()` fails fast for missing</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">                credentials on either credentialed branch.</span>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a>
@@ -34688,7 +34688,7 @@ or <code>"ptree"</code>.</p>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">password</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SecretStr</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved password (still wrapped in `SecretStr`).</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        Returns `None` until :meth:`configure` runs. Callers that need</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        Returns `None` until `configure` runs. Callers that need</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        the raw string call `.get_secret_value()` themselves at the call</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        site — the wrapper stays on `JaxaAuth` so it never lands in a</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        `repr` or a log line.</span>
@@ -34704,7 +34704,7 @@ or <code>"ptree"</code>.</p>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        variables (`$GPORTAL_USERNAME` / `$GPORTAL_PASSWORD` and</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        `$JAXA_PTREE_USERNAME` / `$JAXA_PTREE_PASSWORD` respectively) as</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">        fallback, and caches them on the instance for the branch to read</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        through :attr:`username` / :attr:`password`. Idempotent — a</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        through `username` / `password`. Idempotent — a</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">        second call after `is_authenticated()` returns `True`</span>
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        short-circuits.</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a>
@@ -34810,7 +34810,7 @@ or <code>"ptree"</code>.</p>
     <div class="doc doc-contents ">
 
         <p>The resolved password (still wrapped in <code>SecretStr</code>).</p>
-<p>Returns <code>None</code> until :meth:<code>configure</code> runs. Callers that need
+<p>Returns <code>None</code> until <code>configure</code> runs. Callers that need
 the raw string call <code>.get_secret_value()</code> themselves at the call
 site — the wrapper stays on <code>JaxaAuth</code> so it never lands in a
 <code>repr</code> or a log line.</p>
@@ -34900,7 +34900,7 @@ site — the wrapper stays on <code>JaxaAuth</code> so it never lands in a
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The :class:<code>JaxaCredentials</code> value object carrying
+                <p>The <code>JaxaCredentials</code> value object carrying
 the optional G-Portal and P-Tree username / password pairs.</p>
               </div>
             </td>
@@ -34918,7 +34918,7 @@ the optional G-Portal and P-Tree username / password pairs.</p>
             <td>
               <div class="doc-md-description">
                 <p>The protocol this auth instance targets. The
-parent's no-arg :meth:<code>configure</code> dispatches on this so
+parent's no-arg <code>configure</code> dispatches on this so
 <code>AbstractDataSource.authenticate()</code> fails fast for missing
 credentials on either credentialed branch.</p>
               </div>
@@ -34993,10 +34993,10 @@ values.</p>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Bind the protocol; does not resolve credentials yet.</span>
 <a id="__codelineno-0-215" name="__codelineno-0-215"></a>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">        credentials: The :class:`JaxaCredentials` value object carrying</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">        credentials: The `JaxaCredentials` value object carrying</span>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">            the optional G-Portal and P-Tree username / password pairs.</span>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">        protocol: The protocol this auth instance targets. The</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">            parent&#39;s no-arg :meth:`configure` dispatches on this so</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">            parent&#39;s no-arg `configure` dispatches on this so</span>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">            `AbstractDataSource.authenticate()` fails fast for missing</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">            credentials on either credentialed branch.</span>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a>
@@ -35038,7 +35038,7 @@ explicit credentials (preferred) or the protocol's environment
 variables (<code>$GPORTAL_USERNAME</code> / <code>$GPORTAL_PASSWORD</code> and
 <code>$JAXA_PTREE_USERNAME</code> / <code>$JAXA_PTREE_PASSWORD</code> respectively) as
 fallback, and caches them on the instance for the branch to read
-through :attr:<code>username</code> / :attr:<code>password</code>. Idempotent — a
+through <code>username</code> / <code>password</code>. Idempotent — a
 second call after <code>is_authenticated()</code> returns <code>True</code>
 short-circuits.</p>
 
@@ -35202,7 +35202,7 @@ for the protocol that failed to resolve.</p>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    variables (`$GPORTAL_USERNAME` / `$GPORTAL_PASSWORD` and</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">    `$JAXA_PTREE_USERNAME` / `$JAXA_PTREE_PASSWORD` respectively) as</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">    fallback, and caches them on the instance for the branch to read</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    through :attr:`username` / :attr:`password`. Idempotent — a</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    through `username` / `password`. Idempotent — a</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">    second call after `is_authenticated()` returns `True`</span>
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">    short-circuits.</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a>
@@ -35311,11 +35311,11 @@ for the protocol that failed to resolve.</p>
 
         <p>Frozen value object holding the credentialed-branch secrets.</p>
 <p>All fields are optional at construction time: <code>None</code> means "resolve
-from the corresponding environment variable at :meth:<code>JaxaAuth.configure</code>
+from the corresponding environment variable at <code>JaxaAuth.configure</code>
 time". The real "are credentials available?" gate is
-:meth:<code>JaxaAuth.configure</code>, not this model.</p>
+<code>JaxaAuth.configure</code>, not this model.</p>
 <p>G-Portal and P-Tree credentials are stored side-by-side because a
-single :class:<code>JAXA</code> instance is bound to one protocol per call — the
+single <code>JAXA</code> instance is bound to one protocol per call — the
 unused pair is simply ignored.</p>
 
 
@@ -35480,12 +35480,12 @@ defers to <code>$JAXA_PTREE_PASSWORD</code>.</p>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Frozen value object holding the credentialed-branch secrets.</span>
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">    All fields are optional at construction time: `None` means &quot;resolve</span>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    from the corresponding environment variable at :meth:`JaxaAuth.configure`</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    from the corresponding environment variable at `JaxaAuth.configure`</span>
 <a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    time&quot;. The real &quot;are credentials available?&quot; gate is</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    :meth:`JaxaAuth.configure`, not this model.</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    `JaxaAuth.configure`, not this model.</span>
 <a id="__codelineno-0-80" name="__codelineno-0-80"></a>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">    G-Portal and P-Tree credentials are stored side-by-side because a</span>
-<a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">    single :class:`JAXA` instance is bound to one protocol per call — the</span>
+<a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">    single `JAXA` instance is bound to one protocol per call — the</span>
 <a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    unused pair is simply ignored.</span>
 <a id="__codelineno-0-84" name="__codelineno-0-84"></a>
 <a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">    Attributes:</span>

@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -25192,15 +25192,15 @@ or admin code:</p>
   <code>vector</code>.</li>
 </ul>
 <p>Output is <strong>per instance</strong>: a dataset's <code>output_kind</code> decides whether
-:meth:<code>~earthlens.risk_indicators.backend.RiskIndicators.download</code> returns a
-:class:<code>pandas.DataFrame</code> (<code>tabular</code>) or a pyramids
-:class:<code>~pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>). Auth is
-<strong>per source</strong> — only a <code>gfw</code> dataset builds a :class:<code>GfwAuth</code>; ThinkHazard and
+<code>download</code> returns a
+<code>pandas.DataFrame</code> (<code>tabular</code>) or a pyramids
+<code>FeatureCollection</code> (<code>vector</code>). Auth is
+<strong>per source</strong> — only a <code>gfw</code> dataset builds a <code>GfwAuth</code>; ThinkHazard and
 INFORM stay keyless. Every parse is REST JSON -&gt; pandas / FeatureCollection, with
 no gridded-array dependency in this subpackage.</p>
-<p>The public surface is the :class:<code>Catalog</code> (dataset id -&gt; provider + output kind
+<p>The public surface is the <code>Catalog</code> (dataset id -&gt; provider + output kind
 + request detail, plus an ISO3 -&gt; ThinkHazard ADM0 code lookup) and its
-:class:<code>Dataset</code> rows, the GFW-only :class:<code>GfwAuth</code> / :class:<code>GfwCredentials</code>,
+<code>Dataset</code> rows, the GFW-only <code>GfwAuth</code> / <code>GfwCredentials</code>,
 and the pure query/parse helpers.</p>
 
 
@@ -25243,7 +25243,7 @@ and the pure query/parse helpers.</p>
 <p>Carries a message that names a fix: pass <code>api_key=</code> to
 <code>EarthLens("gfw", ...)</code>, set the <code>GFW_API_KEY</code> environment variable, or
 create a free key via a MyGFW account. A subclass of the cross-backend
-:class:<code>earthlens.base.AuthenticationError</code> so callers can catch every
+<code>earthlens.base.AuthenticationError</code> so callers can catch every
 backend's auth failure with one <code>except</code> clause.</p>
 
 
@@ -25269,7 +25269,7 @@ backend's auth failure with one <code>except</code> clause.</p>
 <a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    Carries a message that names a fix: pass `api_key=` to</span>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    `EarthLens(&quot;gfw&quot;, ...)`, set the `GFW_API_KEY` environment variable, or</span>
 <a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="sd">    create a free key via a MyGFW account. A subclass of the cross-backend</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    :class:`earthlens.base.AuthenticationError` so callers can catch every</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    `earthlens.base.AuthenticationError` so callers can catch every</span>
 <a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">    backend&#39;s auth failure with one `except` clause.</span>
 <a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
@@ -25298,11 +25298,11 @@ backend's auth failure with one <code>except</code> clause.</p>
 
         <p>Dataset catalog for the risk-indicators backend.</p>
 <p>Reads the bundled <code>risk_indicators_data_catalog.yaml</code> (shipped as package
-data) and exposes its <code>datasets:</code> block as a map of :class:<code>Dataset</code> rows
+data) and exposes its <code>datasets:</code> block as a map of <code>Dataset</code> rows
 keyed by id, plus an <code>admin_codes:</code> ISO3 -&gt; ADM0 lookup. Instantiate with no
-arguments (<code>Catalog()</code>). Resolve one row with :meth:<code>get</code>, list the shipped
-ids with :meth:<code>available</code>, and turn a country ISO3 into a ThinkHazard
-division code with :meth:<code>resolve_admin</code>.</p>
+arguments (<code>Catalog()</code>). Resolve one row with <code>get</code>, list the shipped
+ids with <code>available</code>, and turn a country ISO3 into a ThinkHazard
+division code with <code>resolve_admin</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -25322,7 +25322,7 @@ division code with :meth:<code>resolve_admin</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from dataset id to its :class:<code>Dataset</code> row.</p>
+                <p>Map from dataset id to its <code>Dataset</code> row.</p>
               </div>
             </td>
           </tr>
@@ -25523,14 +25523,14 @@ code (== FAO GAUL 2015 ADM0 code).</p>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset catalog for the risk-indicators backend.</span>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">    Reads the bundled `risk_indicators_data_catalog.yaml` (shipped as package</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    data) and exposes its `datasets:` block as a map of :class:`Dataset` rows</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    data) and exposes its `datasets:` block as a map of `Dataset` rows</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">    keyed by id, plus an `admin_codes:` ISO3 -&gt; ADM0 lookup. Instantiate with no</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    arguments (`Catalog()`). Resolve one row with :meth:`get`, list the shipped</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    ids with :meth:`available`, and turn a country ISO3 into a ThinkHazard</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    division code with :meth:`resolve_admin`.</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    arguments (`Catalog()`). Resolve one row with `get`, list the shipped</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    ids with `available`, and turn a country ISO3 into a ThinkHazard</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    division code with `resolve_admin`.</span>
 <a id="__codelineno-0-231" name="__codelineno-0-231"></a>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        datasets: Map from dataset id to its :class:`Dataset` row.</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        datasets: Map from dataset id to its `Dataset` row.</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        admin_codes: Map from ISO3 country code to ThinkHazard ADM0 division</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">            code (== FAO GAUL 2015 ADM0 code).</span>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a>
@@ -25561,8 +25561,8 @@ code (== FAO GAUL 2015 ADM0 code).</p>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;risk-indicators catalog&quot;</span>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;datasets&quot;</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="c1">#: The dataset rows live in the base :attr:`datasets` field so the inherited</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="c1">#: dict surface (`len`, `in`, `[]`, iteration) and :meth:`get_dataset`&#39;s</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="c1">#: The dataset rows live in the base `datasets` field so the inherited</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="c1">#: dict surface (`len`, `in`, `[]`, iteration) and `get_dataset`&#39;s</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="c1">#: did-you-mean hint work unchanged.</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>
@@ -25589,10 +25589,10 @@ code (== FAO GAUL 2015 ADM0 code).</p>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">                `CATALOG_PATH`.</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            ValueError: If the file has no `datasets:` block, or a row fails</span>
@@ -25603,9 +25603,9 @@ code (== FAO GAUL 2015 ADM0 code).</p>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span> <span class="n">admin_codes</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">admin_codes</span><span class="p">))</span>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its :class:`Dataset` row.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its `Dataset` row.</span>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        Args:</span>
@@ -25752,8 +25752,8 @@ code (== FAO GAUL 2015 ADM0 code).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Resolve a dataset id to its :class:<code>Dataset</code> row.</p>
-<p>Thin wrapper over the inherited :meth:<code>get_dataset</code>, which raises a
+        <p>Resolve a dataset id to its <code>Dataset</code> row.</p>
+<p>Thin wrapper over the inherited <code>get_dataset</code>, which raises a
 <code>ValueError</code> with a did-you-mean hint on an unknown id.</p>
 
 
@@ -25856,9 +25856,9 @@ did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-320">320</a></span>
 <span class="normal"><a href="#__codelineno-0-321">321</a></span>
 <span class="normal"><a href="#__codelineno-0-322">322</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its :class:`Dataset` row.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its `Dataset` row.</span>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Args:</span>
@@ -25918,7 +25918,7 @@ did-you-mean hint.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the module-level
-:data:<code>CATALOG_PATH</code>.</p>
+<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -25944,7 +25944,7 @@ did-you-mean hint.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code>.</p>
+                <p>A fully-populated <code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -26001,10 +26001,10 @@ validation.</p>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            `CATALOG_PATH`.</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        ValueError: If the file has no `datasets:` block, or a row fails</span>
@@ -26241,10 +26241,10 @@ sub-national division, pass a raw <code>admin_code=</code> to the backend instea
 
 
         <p>One risk-indicators catalog row.</p>
-<p>The dataset id is the parent key in :attr:<code>Catalog.datasets</code> and is also
-stored on the row as :attr:<code>id</code> so a resolved :class:<code>Dataset</code> is
+<p>The dataset id is the parent key in <code>Catalog.datasets</code> and is also
+stored on the row as <code>id</code> so a resolved <code>Dataset</code> is
 self-describing. Which provider-specific fields are populated depends on
-:attr:<code>provider</code>; a cross-field validator enforces that the right ones are
+<code>provider</code>; a cross-field validator enforces that the right ones are
 present.</p>
 
 
@@ -26564,10 +26564,10 @@ it can only be read from the API.</p>
 <span class="normal"><a href="#__codelineno-0-219">219</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="k">class</span><span class="w"> </span><span class="nc">Dataset</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One risk-indicators catalog row.</span>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">    The dataset id is the parent key in :attr:`Catalog.datasets` and is also</span>
-<a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">    stored on the row as :attr:`id` so a resolved :class:`Dataset` is</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">    The dataset id is the parent key in `Catalog.datasets` and is also</span>
+<a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">    stored on the row as `id` so a resolved `Dataset` is</span>
 <a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    self-describing. Which provider-specific fields are populated depends on</span>
-<a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">    :attr:`provider`; a cross-field validator enforces that the right ones are</span>
+<a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">    `provider`; a cross-field validator enforces that the right ones are</span>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">    present.</span>
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a>
 <a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="sd">    Attributes:</span>
@@ -26715,13 +26715,13 @@ it can only be read from the API.</p>
 
 
         <p>Resolve and hold the Global Forest Watch API key.</p>
-<p>Implements the :class:<code>earthlens.base.SingleSecretAuth</code> contract for a
+<p>Implements the <code>earthlens.base.SingleSecretAuth</code> contract for a
 single-secret source: it declares its env var and provider name and
 supplies <code>_explicit_credential</code> / <code>_connect</code>, while the inherited
-:meth:<code>configure</code> performs the resolution and is idempotent. After a
-successful <code>configure()</code>, the key is available via the :attr:<code>api_key</code>
+<code>configure</code> performs the resolution and is idempotent. After a
+successful <code>configure()</code>, the key is available via the <code>api_key</code>
 property for the HTTP helpers to attach as the <code>x-api-key</code> header.</p>
-<p>The class is a context manager (inherited from :class:<code>AbstractAuth</code>):
+<p>The class is a context manager (inherited from <code>AbstractAuth</code>):
 <code>with GfwAuth(creds) as auth: ...</code> calls <code>configure()</code> on enter and the
 default no-op <code>close()</code> on exit — there is no per-instance resource to
 release.</p>
@@ -26743,7 +26743,7 @@ release.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The :class:<code>GfwCredentials</code> passed at construction.</p>
+                <p>The <code>GfwCredentials</code> passed at construction.</p>
               </div>
             </td>
           </tr>
@@ -26845,20 +26845,20 @@ release.</p>
 <span class="normal"><a href="#__codelineno-0-162">162</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="k">class</span><span class="w"> </span><span class="nc">GfwAuth</span><span class="p">(</span><span class="n">SingleSecretAuth</span><span class="p">[</span><span class="n">GfwCredentials</span><span class="p">]):</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve and hold the Global Forest Watch API key.</span>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a>
-<a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    Implements the :class:`earthlens.base.SingleSecretAuth` contract for a</span>
+<a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    Implements the `earthlens.base.SingleSecretAuth` contract for a</span>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    single-secret source: it declares its env var and provider name and</span>
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">    supplies `_explicit_credential` / `_connect`, while the inherited</span>
-<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    :meth:`configure` performs the resolution and is idempotent. After a</span>
-<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    successful `configure()`, the key is available via the :attr:`api_key`</span>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    `configure` performs the resolution and is idempotent. After a</span>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    successful `configure()`, the key is available via the `api_key`</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    property for the HTTP helpers to attach as the `x-api-key` header.</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>
-<a id="__codelineno-0-105" name="__codelineno-0-105"></a><span class="sd">    The class is a context manager (inherited from :class:`AbstractAuth`):</span>
+<a id="__codelineno-0-105" name="__codelineno-0-105"></a><span class="sd">    The class is a context manager (inherited from `AbstractAuth`):</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">    `with GfwAuth(creds) as auth: ...` calls `configure()` on enter and the</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">    default no-op `close()` on exit — there is no per-instance resource to</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">    release.</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">        _creds: The :class:`GfwCredentials` passed at construction.</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">        _creds: The `GfwCredentials` passed at construction.</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a>
 <a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">        - Resolve an explicit key:</span>
@@ -26896,13 +26896,13 @@ release.</p>
 <a id="__codelineno-0-146" name="__codelineno-0-146"></a>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a>    <span class="nd">@property</span>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">api_key</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved API key; valid only after :meth:`configure`.</span>
+<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved API key; valid only after `configure`.</span>
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a>
 <a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">            str: The GFW `x-api-key` string.</span>
 <a id="__codelineno-0-153" name="__codelineno-0-153"></a>
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">            AuthenticationError: When read before :meth:`configure` has</span>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">            AuthenticationError: When read before `configure` has</span>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">                resolved a key.</span>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -26939,7 +26939,7 @@ release.</p>
 
     <div class="doc doc-contents ">
 
-        <p>The resolved API key; valid only after :meth:<code>configure</code>.</p>
+        <p>The resolved API key; valid only after <code>configure</code>.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -26980,7 +26980,7 @@ release.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>When read before :meth:<code>configure</code> has
+                <p>When read before <code>configure</code> has
 resolved a key.</p>
               </div>
             </td>
@@ -27022,8 +27022,8 @@ resolved a key.</p>
 
         <p>Frozen value object holding the GFW API key.</p>
 <p>The key is optional at construction time: <code>None</code> means "resolve from the
-<code>GFW_API_KEY</code> environment variable at :meth:<code>GfwAuth.configure</code> time". The
-real "is there a usable key?" gate is :meth:<code>GfwAuth.configure</code>, not this
+<code>GFW_API_KEY</code> environment variable at <code>GfwAuth.configure</code> time". The
+real "is there a usable key?" gate is <code>GfwAuth.configure</code>, not this
 model.</p>
 
 
@@ -27044,7 +27044,7 @@ model.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The GFW <code>x-api-key</code>, stored as a :class:<code>pydantic.SecretStr</code>
+                <p>The GFW <code>x-api-key</code>, stored as a <code>pydantic.SecretStr</code>
 so it is never echoed by <code>repr(creds)</code> or in logs. <code>None</code> defers
 resolution to the environment variable.</p>
               </div>
@@ -27119,12 +27119,12 @@ resolution to the environment variable.</p>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Frozen value object holding the GFW API key.</span>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">    The key is optional at construction time: `None` means &quot;resolve from the</span>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    `GFW_API_KEY` environment variable at :meth:`GfwAuth.configure` time&quot;. The</span>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">    real &quot;is there a usable key?&quot; gate is :meth:`GfwAuth.configure`, not this</span>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    `GFW_API_KEY` environment variable at `GfwAuth.configure` time&quot;. The</span>
+<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">    real &quot;is there a usable key?&quot; gate is `GfwAuth.configure`, not this</span>
 <a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    model.</span>
 <a id="__codelineno-0-64" name="__codelineno-0-64"></a>
 <a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">        api_key: The GFW `x-api-key`, stored as a :class:`pydantic.SecretStr`</span>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">        api_key: The GFW `x-api-key`, stored as a `pydantic.SecretStr`</span>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">            so it is never echoed by `repr(creds)` or in logs. `None` defers</span>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">            resolution to the environment variable.</span>
 <a id="__codelineno-0-69" name="__codelineno-0-69"></a>
@@ -27195,12 +27195,12 @@ resolution to the environment variable.</p>
         <p>Country/admin-indexed risk-indicator backend (mixed output).</p>
 <p>Resolves one dataset id to its catalog row, routes the request to that
 row's provider (ThinkHazard / INFORM / GFW), and returns a
-:class:<code>pandas.DataFrame</code> (<code>tabular</code>) or a
-:class:<code>~pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>) per the
-row's <code>output_kind</code>. The query is a search/fetch split: :meth:<code>_search</code>
-pins the one product (dataset + resolved selector), and :meth:<code>_fetch</code>
+<code>pandas.DataFrame</code> (<code>tabular</code>) or a
+<code>FeatureCollection</code> (<code>vector</code>) per the
+row's <code>output_kind</code>. The query is a search/fetch split: <code>_search</code>
+pins the one product (dataset + resolved selector), and <code>_fetch</code>
 issues the provider call and parses it.</p>
-<p>Auth is conditional: only a <code>gfw</code> dataset builds a :class:<code>GfwAuth</code> (<code>G3</code>);
+<p>Auth is conditional: only a <code>gfw</code> dataset builds a <code>GfwAuth</code> (<code>G3</code>);
 ThinkHazard / INFORM need no credentials. <code>aggregate=</code> is rejected — these
 are pre-computed indices, not gridded rasters (<code>G8</code>).</p>
 <p>An INFORM row has two channels: the release workbook JRC publishes on its
@@ -27230,7 +27230,7 @@ the 2026 release.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Set <strong>per instance</strong> in :meth:<code>__init__</code> from the resolved
+                <p>Set <strong>per instance</strong> in <code>__init__</code> from the resolved
 dataset's <code>output_kind</code> (<code>"tabular"</code> or <code>"vector"</code>). The facade
 reads it to gate <code>aggregate=</code> and to know the return shape.</p>
               </div>
@@ -27875,13 +27875,13 @@ reads it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">    Resolves one dataset id to its catalog row, routes the request to that</span>
 <a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">    row&#39;s provider (ThinkHazard / INFORM / GFW), and returns a</span>
-<a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">    :class:`pandas.DataFrame` (`tabular`) or a</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">    :class:`~pyramids.feature.collection.FeatureCollection` (`vector`) per the</span>
-<a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">    row&#39;s `output_kind`. The query is a search/fetch split: :meth:`_search`</span>
-<a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">    pins the one product (dataset + resolved selector), and :meth:`_fetch`</span>
+<a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">    `pandas.DataFrame` (`tabular`) or a</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">    `FeatureCollection` (`vector`) per the</span>
+<a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">    row&#39;s `output_kind`. The query is a search/fetch split: `_search`</span>
+<a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">    pins the one product (dataset + resolved selector), and `_fetch`</span>
 <a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">    issues the provider call and parses it.</span>
 <a id="__codelineno-0-145" name="__codelineno-0-145"></a>
-<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">    Auth is conditional: only a `gfw` dataset builds a :class:`GfwAuth` (`G3`);</span>
+<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">    Auth is conditional: only a `gfw` dataset builds a `GfwAuth` (`G3`);</span>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="sd">    ThinkHazard / INFORM need no credentials. `aggregate=` is rejected — these</span>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">    are pre-computed indices, not gridded rasters (`G8`).</span>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a>
@@ -27895,7 +27895,7 @@ reads it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    the 2026 release.</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in :meth:`__init__` from the resolved</span>
+<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in `__init__` from the resolved</span>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">            dataset&#39;s `output_kind` (`&quot;tabular&quot;` or `&quot;vector&quot;`). The facade</span>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">            reads it to gate `aggregate=` and to know the return shape.</span>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a>
@@ -28125,7 +28125,7 @@ reads it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a>                <span class="p">)</span>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a global :class:`SpatialExtent` (spatial args ignored, `G7`).</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a global `SpatialExtent` (spatial args ignored, `G7`).</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">            lat_lim: Ignored.</span>
@@ -28143,7 +28143,7 @@ reads it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-406" name="__codelineno-0-406"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-407" name="__codelineno-0-407"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a `TemporalExtent`.</span>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a>
 <a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        Dates are not part of the request (these datasets are country-indexed),</span>
 <a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        so `None` bounds are allowed and yield a `None`-dated extent.</span>
@@ -28194,12 +28194,12 @@ reads it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Route each product to its provider and parse the response.</span>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a>
 <a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">            products: The list from :meth:`_search` (one product).</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">            products: The list from `_search` (one product).</span>
 <a id="__codelineno-0-460" name="__codelineno-0-460"></a>
 <a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">            list: One element per product — a :class:`pandas.DataFrame` for a</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">            list: One element per product — a `pandas.DataFrame` for a</span>
 <a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">                `tabular` dataset, a</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">                :class:`~pyramids.feature.collection.FeatureCollection` for a</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">                `FeatureCollection` for a</span>
 <a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">                `vector` one.</span>
 <a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-467" name="__codelineno-0-467"></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_one</span><span class="p">(</span><span class="n">product</span><span class="p">)</span> <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">]</span>
@@ -28208,7 +28208,7 @@ reads it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch and parse one product per its provider.</span>
 <a id="__codelineno-0-471" name="__codelineno-0-471"></a>
 <a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">            product: One `RemoteProduct` from `_search`.</span>
 <a id="__codelineno-0-474" name="__codelineno-0-474"></a>
 <a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">            A `DataFrame` (tabular) or `FeatureCollection` (vector).</span>
@@ -28274,9 +28274,9 @@ reads it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">                so this is a no-op.</span>
 <a id="__codelineno-0-537" name="__codelineno-0-537"></a>
 <a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            A :class:`pandas.DataFrame` (written to `root_dir` too) for a</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            A `pandas.DataFrame` (written to `root_dir` too) for a</span>
 <a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">            `tabular` dataset, or an in-memory</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">            :class:`~pyramids.feature.collection.FeatureCollection` for a</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">            `FeatureCollection` for a</span>
 <a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">            `vector` one.</span>
 <a id="__codelineno-0-543" name="__codelineno-0-543"></a>
 <a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">        Raises:</span>
@@ -28323,7 +28323,7 @@ reads it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">        is the current published release — but an explicit `workflow_id=` names</span>
 <a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">        an API workflow, so it keeps the API. `&quot;release&quot;` and `&quot;api&quot;` force the</span>
 <a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">        choice; the combinations neither channel can honour are rejected in</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">        :meth:`_validate_source`, so this only reports the decision.</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">        `_validate_source`, so this only reports the decision.</span>
 <a id="__codelineno-0-589" name="__codelineno-0-589"></a>
 <a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">            bool: True when the release workbook is the source for this request.</span>
@@ -28341,7 +28341,7 @@ reads it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-603" name="__codelineno-0-603"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read this dataset&#39;s scores from the published release workbook.</span>
 <a id="__codelineno-0-604" name="__codelineno-0-604"></a>
 <a id="__codelineno-0-605" name="__codelineno-0-605"></a><span class="sd">        Discovers the newest workbook on the JRC results page, caches the</span>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="sd">        download under :attr:`_cache_root`, and reshapes one score column into</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="sd">        download under `_cache_root`, and reshapes one score column into</span>
 <a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">        the canonical table.</span>
 <a id="__codelineno-0-608" name="__codelineno-0-608"></a>
 <a id="__codelineno-0-609" name="__codelineno-0-609"></a><span class="sd">        Args:</span>
@@ -29093,23 +29093,23 @@ so this is a no-op.</p>
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
+          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>A</code></td>            <td>
+            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>class:<code>pandas.DataFrame</code> (written to <code>root_dir</code> too) for a</p>
+                <p>A <code>pandas.DataFrame</code> (written to <code>root_dir</code> too) for a</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
@@ -29119,17 +29119,17 @@ so this is a no-op.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>class:<code>~pyramids.feature.collection.FeatureCollection</code> for a</p>
+                <p><code>FeatureCollection</code> for a</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
@@ -29217,9 +29217,9 @@ so this is a no-op.</p>
 <a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">            so this is a no-op.</span>
 <a id="__codelineno-0-537" name="__codelineno-0-537"></a>
 <a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">        A :class:`pandas.DataFrame` (written to `root_dir` too) for a</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">        A `pandas.DataFrame` (written to `root_dir` too) for a</span>
 <a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">        `tabular` dataset, or an in-memory</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">        :class:`~pyramids.feature.collection.FeatureCollection` for a</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">        `FeatureCollection` for a</span>
 <a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">        `vector` one.</span>
 <a id="__codelineno-0-543" name="__codelineno-0-543"></a>
 <a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">    Raises:</span>
@@ -29600,7 +29600,7 @@ the all-empty fallback used when a query matched nothing.</p>
 <p>The geostore response nests the boundary at <code>data.attributes.geojson</code>; this
 digs it out with a descriptive error (rather than a bare <code>KeyError</code>) when an
 unexpected payload shape comes back, then delegates to
-:func:<code>to_feature_collection</code>.</p>
+<code>to_feature_collection</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -29623,7 +29623,7 @@ unexpected payload shape comes back, then delegates to
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The parsed JSON from :func:<code>gfw_geostore</code>.</p>
+                <p>The parsed JSON from <code>gfw_geostore</code>.</p>
               </div>
             </td>
             <td>
@@ -29713,10 +29713,10 @@ unexpected payload shape comes back, then delegates to
 <a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">    The geostore response nests the boundary at `data.attributes.geojson`; this</span>
 <a id="__codelineno-0-772" name="__codelineno-0-772"></a><span class="sd">    digs it out with a descriptive error (rather than a bare `KeyError`) when an</span>
 <a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">    unexpected payload shape comes back, then delegates to</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="sd">    :func:`to_feature_collection`.</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="sd">    `to_feature_collection`.</span>
 <a id="__codelineno-0-775" name="__codelineno-0-775"></a>
 <a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="sd">        payload: The parsed JSON from :func:`gfw_geostore`.</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="sd">        payload: The parsed JSON from `gfw_geostore`.</span>
 <a id="__codelineno-0-778" name="__codelineno-0-778"></a>
 <a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-780" name="__codelineno-0-780"></a><span class="sd">        FeatureCollection: The admin-boundary features tagged `EPSG:4326`.</span>
@@ -30226,7 +30226,7 @@ rather than being indistinguishable from a pull of any other.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The score rows from :func:<code>inform_query</code>.</p>
+                <p>The score rows from <code>inform_query</code>.</p>
               </div>
             </td>
             <td>
@@ -30286,7 +30286,7 @@ the <code>workflow_id</code> column; <code>None</code> leaves the column empty.<
             </td>
             <td>
               <div class="doc-md-description">
-                <p>pd.DataFrame: Columns :data:<code>INFORM_COLUMNS</code> — one row per country (or
+                <p>pd.DataFrame: Columns <code>INFORM_COLUMNS</code> — one row per country (or
 one row for the filtered country).</p>
               </div>
             </td>
@@ -30345,14 +30345,14 @@ one row for the filtered country).</p>
 <a id="__codelineno-0-736" name="__codelineno-0-736"></a><span class="sd">    rather than being indistinguishable from a pull of any other.</span>
 <a id="__codelineno-0-737" name="__codelineno-0-737"></a>
 <a id="__codelineno-0-738" name="__codelineno-0-738"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-739" name="__codelineno-0-739"></a><span class="sd">        payload: The score rows from :func:`inform_query`.</span>
+<a id="__codelineno-0-739" name="__codelineno-0-739"></a><span class="sd">        payload: The score rows from `inform_query`.</span>
 <a id="__codelineno-0-740" name="__codelineno-0-740"></a><span class="sd">        country: Optional ISO3 to filter to a single country (case-insensitive);</span>
 <a id="__codelineno-0-741" name="__codelineno-0-741"></a><span class="sd">            `None` keeps every country.</span>
 <a id="__codelineno-0-742" name="__codelineno-0-742"></a><span class="sd">        workflow_id: The WorkflowId the payload was fetched with, recorded in</span>
 <a id="__codelineno-0-743" name="__codelineno-0-743"></a><span class="sd">            the `workflow_id` column; `None` leaves the column empty.</span>
 <a id="__codelineno-0-744" name="__codelineno-0-744"></a>
 <a id="__codelineno-0-745" name="__codelineno-0-745"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">        pd.DataFrame: Columns :data:`INFORM_COLUMNS` — one row per country (or</span>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">        pd.DataFrame: Columns `INFORM_COLUMNS` — one row per country (or</span>
 <a id="__codelineno-0-747" name="__codelineno-0-747"></a><span class="sd">            one row for the filtered country).</span>
 <a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-749" name="__codelineno-0-749"></a>    <span class="n">records</span> <span class="o">=</span> <span class="p">[</span>
@@ -30390,9 +30390,9 @@ one row for the filtered country).</p>
     <div class="doc doc-contents ">
 
         <p>Turn a country ISO3 into the ThinkHazard ADM0 division code.</p>
-<p>Convenience wrapper over :meth:<code>earthlens.risk_indicators.catalog.Catalog.resolve_admin</code>
+<p>Convenience wrapper over <code>earthlens.risk_indicators.catalog.Catalog.resolve_admin</code>
 that loads the bundled catalog itself, so callers can resolve a code without
-holding a :class:<code>~earthlens.risk_indicators.catalog.Catalog</code>.</p>
+holding a <code>Catalog</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -30531,9 +30531,9 @@ holding a :class:<code>~earthlens.risk_indicators.catalog.Catalog</code>.</p>
 <span class="normal"><a href="#__codelineno-0-855">855</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve_admin</span><span class="p">(</span><span class="n">country</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Turn a country ISO3 into the ThinkHazard ADM0 division code.</span>
 <a id="__codelineno-0-829" name="__codelineno-0-829"></a>
-<a id="__codelineno-0-830" name="__codelineno-0-830"></a><span class="sd">    Convenience wrapper over :meth:`earthlens.risk_indicators.catalog.Catalog.resolve_admin`</span>
+<a id="__codelineno-0-830" name="__codelineno-0-830"></a><span class="sd">    Convenience wrapper over `earthlens.risk_indicators.catalog.Catalog.resolve_admin`</span>
 <a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">    that loads the bundled catalog itself, so callers can resolve a code without</span>
-<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">    holding a :class:`~earthlens.risk_indicators.catalog.Catalog`.</span>
+<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">    holding a `Catalog`.</span>
 <a id="__codelineno-0-833" name="__codelineno-0-833"></a>
 <a id="__codelineno-0-834" name="__codelineno-0-834"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-835" name="__codelineno-0-835"></a><span class="sd">        country: An ISO3 country code (`&quot;KEN&quot;`).</span>
@@ -30716,7 +30716,7 @@ holding a :class:<code>~earthlens.risk_indicators.catalog.Catalog</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>If the endpoint returns a non-2xx status after
-retries. A <code>404</code> is retried (see :data:<code>THINKHAZARD_RETRY_STATUSES</code>),
+retries. A <code>404</code> is retried (see <code>THINKHAZARD_RETRY_STATUSES</code>),
 because the report endpoints flap it, and raises only if it persists.</p>
               </div>
             </td>
@@ -30784,7 +30784,7 @@ because the report endpoints flap it, and raises only if it persists.</p>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        requests.HTTPError: If the endpoint returns a non-2xx status after</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            retries. A `404` is retried (see :data:`THINKHAZARD_RETRY_STATUSES`),</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            retries. A `404` is retried (see `THINKHAZARD_RETRY_STATUSES`),</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            because the report endpoints flap it, and raises only if it persists.</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">hazard</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">hazard</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
@@ -30839,7 +30839,7 @@ because the report endpoints flap it, and raises only if it persists.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The JSON returned by :func:<code>thinkhazard_query</code>.</p>
+                <p>The JSON returned by <code>thinkhazard_query</code>.</p>
               </div>
             </td>
             <td>
@@ -30915,7 +30915,7 @@ all-hazards list (each row carries its own).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>pd.DataFrame: Columns :data:<code>THINKHAZARD_COLUMNS</code> — one row per hazard.</p>
+                <p>pd.DataFrame: Columns <code>THINKHAZARD_COLUMNS</code> — one row per hazard.</p>
               </div>
             </td>
           </tr>
@@ -30990,7 +30990,7 @@ all-hazards list (each row carries its own).</p>
 <a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">    `hazard_category`.</span>
 <a id="__codelineno-0-686" name="__codelineno-0-686"></a>
 <a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">        payload: The JSON returned by :func:`thinkhazard_query`.</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">        payload: The JSON returned by `thinkhazard_query`.</span>
 <a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="sd">        admin_code: The division code the report was fetched for (stamped onto</span>
 <a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">            every row).</span>
 <a id="__codelineno-0-691" name="__codelineno-0-691"></a><span class="sd">        hazard: The hazard mnemonic for a single-hazard report; ignored for the</span>
@@ -30998,7 +30998,7 @@ all-hazards list (each row carries its own).</p>
 <a id="__codelineno-0-693" name="__codelineno-0-693"></a><span class="sd">        country: Optional ISO3 to stamp onto every row.</span>
 <a id="__codelineno-0-694" name="__codelineno-0-694"></a>
 <a id="__codelineno-0-695" name="__codelineno-0-695"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a><span class="sd">        pd.DataFrame: Columns :data:`THINKHAZARD_COLUMNS` — one row per hazard.</span>
+<a id="__codelineno-0-696" name="__codelineno-0-696"></a><span class="sd">        pd.DataFrame: Columns `THINKHAZARD_COLUMNS` — one row per hazard.</span>
 <a id="__codelineno-0-697" name="__codelineno-0-697"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-698" name="__codelineno-0-698"></a>    <span class="n">records</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 <a id="__codelineno-0-699" name="__codelineno-0-699"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -31203,7 +31203,7 @@ all-hazards list (each row carries its own).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Build a flat :class:<code>pandas.DataFrame</code> from a JSON rows payload.</p>
+        <p>Build a flat <code>pandas.DataFrame</code> from a JSON rows payload.</p>
 <p>Accepts either a GFW-style <code>{"data": [...]}</code> envelope or a bare list of row
 dicts; a single dict (not under <code>data</code>) becomes a one-row frame.</p>
 
@@ -31306,7 +31306,7 @@ rows and <code>columns</code> is given).</p>
 <span class="normal"><a href="#__codelineno-0-669">669</a></span>
 <span class="normal"><a href="#__codelineno-0-670">670</a></span>
 <span class="normal"><a href="#__codelineno-0-671">671</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="k">def</span><span class="w"> </span><span class="nf">to_frame</span><span class="p">(</span><span class="n">payload</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="nb">list</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a flat :class:`pandas.DataFrame` from a JSON rows payload.</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a flat `pandas.DataFrame` from a JSON rows payload.</span>
 <a id="__codelineno-0-650" name="__codelineno-0-650"></a>
 <a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">    Accepts either a GFW-style `{&quot;data&quot;: [...]}` envelope or a bare list of row</span>
 <a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">    dicts; a single dict (not under `data`) becomes a one-row frame.</span>
@@ -31366,12 +31366,12 @@ accepts the country to build its SQL / geostore call.</p>
 <ul>
 <li><strong>Per-instance <code>OUTPUT_KIND</code> (<code>G1</code>).</strong> The resolved dataset's <code>output_kind</code>
   is copied onto <code>self.OUTPUT_KIND</code> in <code>__init__</code>: <code>tabular</code> returns a
-  :class:<code>pandas.DataFrame</code>, <code>vector</code> returns a pyramids
-  :class:<code>~pyramids.feature.collection.FeatureCollection</code>. The
-  :class:<code>earthlens.earthlens.EarthLens</code> facade reads the instance attribute to
+  <code>pandas.DataFrame</code>, <code>vector</code> returns a pyramids
+  <code>FeatureCollection</code>. The
+  <code>earthlens.earthlens.EarthLens</code> facade reads the instance attribute to
   gate <code>aggregate=</code> (rejected for both) and to know the return shape.</li>
 <li><strong>Conditional, per-source auth (<code>G3</code>).</strong> Only a dataset whose provider is
-  <code>gfw</code> builds and configures a :class:<code>GfwAuth</code>; ThinkHazard and INFORM stay
+  <code>gfw</code> builds and configures a <code>GfwAuth</code>; ThinkHazard and INFORM stay
   keyless. A missing GFW key surfaces as an <code>AuthenticationError</code> naming
   <code>GFW_API_KEY</code> on construction of a gfw request.</li>
 </ul>
@@ -31417,12 +31417,12 @@ the parse uses no gridded-array dependency.</p>
         <p>Country/admin-indexed risk-indicator backend (mixed output).</p>
 <p>Resolves one dataset id to its catalog row, routes the request to that
 row's provider (ThinkHazard / INFORM / GFW), and returns a
-:class:<code>pandas.DataFrame</code> (<code>tabular</code>) or a
-:class:<code>~pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>) per the
-row's <code>output_kind</code>. The query is a search/fetch split: :meth:<code>_search</code>
-pins the one product (dataset + resolved selector), and :meth:<code>_fetch</code>
+<code>pandas.DataFrame</code> (<code>tabular</code>) or a
+<code>FeatureCollection</code> (<code>vector</code>) per the
+row's <code>output_kind</code>. The query is a search/fetch split: <code>_search</code>
+pins the one product (dataset + resolved selector), and <code>_fetch</code>
 issues the provider call and parses it.</p>
-<p>Auth is conditional: only a <code>gfw</code> dataset builds a :class:<code>GfwAuth</code> (<code>G3</code>);
+<p>Auth is conditional: only a <code>gfw</code> dataset builds a <code>GfwAuth</code> (<code>G3</code>);
 ThinkHazard / INFORM need no credentials. <code>aggregate=</code> is rejected — these
 are pre-computed indices, not gridded rasters (<code>G8</code>).</p>
 <p>An INFORM row has two channels: the release workbook JRC publishes on its
@@ -31452,7 +31452,7 @@ the 2026 release.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Set <strong>per instance</strong> in :meth:<code>__init__</code> from the resolved
+                <p>Set <strong>per instance</strong> in <code>__init__</code> from the resolved
 dataset's <code>output_kind</code> (<code>"tabular"</code> or <code>"vector"</code>). The facade
 reads it to gate <code>aggregate=</code> and to know the return shape.</p>
               </div>
@@ -32097,13 +32097,13 @@ reads it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">    Resolves one dataset id to its catalog row, routes the request to that</span>
 <a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">    row&#39;s provider (ThinkHazard / INFORM / GFW), and returns a</span>
-<a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">    :class:`pandas.DataFrame` (`tabular`) or a</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">    :class:`~pyramids.feature.collection.FeatureCollection` (`vector`) per the</span>
-<a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">    row&#39;s `output_kind`. The query is a search/fetch split: :meth:`_search`</span>
-<a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">    pins the one product (dataset + resolved selector), and :meth:`_fetch`</span>
+<a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">    `pandas.DataFrame` (`tabular`) or a</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">    `FeatureCollection` (`vector`) per the</span>
+<a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">    row&#39;s `output_kind`. The query is a search/fetch split: `_search`</span>
+<a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">    pins the one product (dataset + resolved selector), and `_fetch`</span>
 <a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">    issues the provider call and parses it.</span>
 <a id="__codelineno-0-145" name="__codelineno-0-145"></a>
-<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">    Auth is conditional: only a `gfw` dataset builds a :class:`GfwAuth` (`G3`);</span>
+<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">    Auth is conditional: only a `gfw` dataset builds a `GfwAuth` (`G3`);</span>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="sd">    ThinkHazard / INFORM need no credentials. `aggregate=` is rejected — these</span>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">    are pre-computed indices, not gridded rasters (`G8`).</span>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a>
@@ -32117,7 +32117,7 @@ reads it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    the 2026 release.</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in :meth:`__init__` from the resolved</span>
+<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in `__init__` from the resolved</span>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">            dataset&#39;s `output_kind` (`&quot;tabular&quot;` or `&quot;vector&quot;`). The facade</span>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">            reads it to gate `aggregate=` and to know the return shape.</span>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a>
@@ -32347,7 +32347,7 @@ reads it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a>                <span class="p">)</span>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a global :class:`SpatialExtent` (spatial args ignored, `G7`).</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a global `SpatialExtent` (spatial args ignored, `G7`).</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">            lat_lim: Ignored.</span>
@@ -32365,7 +32365,7 @@ reads it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-406" name="__codelineno-0-406"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-407" name="__codelineno-0-407"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a `TemporalExtent`.</span>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a>
 <a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        Dates are not part of the request (these datasets are country-indexed),</span>
 <a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        so `None` bounds are allowed and yield a `None`-dated extent.</span>
@@ -32416,12 +32416,12 @@ reads it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Route each product to its provider and parse the response.</span>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a>
 <a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">            products: The list from :meth:`_search` (one product).</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">            products: The list from `_search` (one product).</span>
 <a id="__codelineno-0-460" name="__codelineno-0-460"></a>
 <a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">            list: One element per product — a :class:`pandas.DataFrame` for a</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">            list: One element per product — a `pandas.DataFrame` for a</span>
 <a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">                `tabular` dataset, a</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">                :class:`~pyramids.feature.collection.FeatureCollection` for a</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">                `FeatureCollection` for a</span>
 <a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">                `vector` one.</span>
 <a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-467" name="__codelineno-0-467"></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_one</span><span class="p">(</span><span class="n">product</span><span class="p">)</span> <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">]</span>
@@ -32430,7 +32430,7 @@ reads it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch and parse one product per its provider.</span>
 <a id="__codelineno-0-471" name="__codelineno-0-471"></a>
 <a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">            product: One `RemoteProduct` from `_search`.</span>
 <a id="__codelineno-0-474" name="__codelineno-0-474"></a>
 <a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">            A `DataFrame` (tabular) or `FeatureCollection` (vector).</span>
@@ -32496,9 +32496,9 @@ reads it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">                so this is a no-op.</span>
 <a id="__codelineno-0-537" name="__codelineno-0-537"></a>
 <a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            A :class:`pandas.DataFrame` (written to `root_dir` too) for a</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            A `pandas.DataFrame` (written to `root_dir` too) for a</span>
 <a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">            `tabular` dataset, or an in-memory</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">            :class:`~pyramids.feature.collection.FeatureCollection` for a</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">            `FeatureCollection` for a</span>
 <a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">            `vector` one.</span>
 <a id="__codelineno-0-543" name="__codelineno-0-543"></a>
 <a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">        Raises:</span>
@@ -32545,7 +32545,7 @@ reads it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">        is the current published release — but an explicit `workflow_id=` names</span>
 <a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">        an API workflow, so it keeps the API. `&quot;release&quot;` and `&quot;api&quot;` force the</span>
 <a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">        choice; the combinations neither channel can honour are rejected in</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">        :meth:`_validate_source`, so this only reports the decision.</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">        `_validate_source`, so this only reports the decision.</span>
 <a id="__codelineno-0-589" name="__codelineno-0-589"></a>
 <a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">            bool: True when the release workbook is the source for this request.</span>
@@ -32563,7 +32563,7 @@ reads it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-603" name="__codelineno-0-603"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read this dataset&#39;s scores from the published release workbook.</span>
 <a id="__codelineno-0-604" name="__codelineno-0-604"></a>
 <a id="__codelineno-0-605" name="__codelineno-0-605"></a><span class="sd">        Discovers the newest workbook on the JRC results page, caches the</span>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="sd">        download under :attr:`_cache_root`, and reshapes one score column into</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="sd">        download under `_cache_root`, and reshapes one score column into</span>
 <a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">        the canonical table.</span>
 <a id="__codelineno-0-608" name="__codelineno-0-608"></a>
 <a id="__codelineno-0-609" name="__codelineno-0-609"></a><span class="sd">        Args:</span>
@@ -33315,23 +33315,23 @@ so this is a no-op.</p>
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
+          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>A</code></td>            <td>
+            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>class:<code>pandas.DataFrame</code> (written to <code>root_dir</code> too) for a</p>
+                <p>A <code>pandas.DataFrame</code> (written to <code>root_dir</code> too) for a</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
@@ -33341,17 +33341,17 @@ so this is a no-op.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>class:<code>~pyramids.feature.collection.FeatureCollection</code> for a</p>
+                <p><code>FeatureCollection</code> for a</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
@@ -33439,9 +33439,9 @@ so this is a no-op.</p>
 <a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">            so this is a no-op.</span>
 <a id="__codelineno-0-537" name="__codelineno-0-537"></a>
 <a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">        A :class:`pandas.DataFrame` (written to `root_dir` too) for a</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">        A `pandas.DataFrame` (written to `root_dir` too) for a</span>
 <a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">        `tabular` dataset, or an in-memory</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">        :class:`~pyramids.feature.collection.FeatureCollection` for a</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">        `FeatureCollection` for a</span>
 <a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">        `vector` one.</span>
 <a id="__codelineno-0-543" name="__codelineno-0-543"></a>
 <a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">    Raises:</span>
@@ -33510,15 +33510,15 @@ Forest Watch Data API. This module is the bridge from a dataset id
 (<code>"thinkhazard:flood_river"</code>, <code>"inform:risk"</code>, <code>"gfw:tree_cover_loss"</code>, …) to
 the provider, the output kind, and the provider-specific request detail needed
 to fetch it.</p>
-<p>:class:<code>Catalog</code> is a thin :class:<code>earthlens.base.AbstractCatalog</code> subclass that
+<p><code>Catalog</code> is a thin <code>earthlens.base.AbstractCatalog</code> subclass that
 loads the bundled <code>risk_indicators_data_catalog.yaml</code> and exposes each row as a
-:class:<code>Dataset</code>. The YAML also ships an <code>admin_codes:</code> block — an ISO3 -&gt;
+<code>Dataset</code>. The YAML also ships an <code>admin_codes:</code> block — an ISO3 -&gt;
 ThinkHazard ADM0 division code (== FAO GAUL 2015 ADM0 code) lookup — which
-:meth:<code>Catalog.resolve_admin</code> reads to turn a <code>country=</code> ISO3 into the numeric
+<code>Catalog.resolve_admin</code> reads to turn a <code>country=</code> ISO3 into the numeric
 division code ThinkHazard's API keys on. Resolve one dataset with
-:meth:<code>Catalog.get</code> (a did-you-mean hint on an unknown id); list the shipped
-ids with :meth:<code>Catalog.available</code>.</p>
-<p>:data:<code>CATALOG_PATH</code> is the path to the bundled YAML.</p>
+<code>Catalog.get</code> (a did-you-mean hint on an unknown id); list the shipped
+ids with <code>Catalog.available</code>.</p>
+<p><code>CATALOG_PATH</code> is the path to the bundled YAML.</p>
 
 
 
@@ -33558,11 +33558,11 @@ ids with :meth:<code>Catalog.available</code>.</p>
 
         <p>Dataset catalog for the risk-indicators backend.</p>
 <p>Reads the bundled <code>risk_indicators_data_catalog.yaml</code> (shipped as package
-data) and exposes its <code>datasets:</code> block as a map of :class:<code>Dataset</code> rows
+data) and exposes its <code>datasets:</code> block as a map of <code>Dataset</code> rows
 keyed by id, plus an <code>admin_codes:</code> ISO3 -&gt; ADM0 lookup. Instantiate with no
-arguments (<code>Catalog()</code>). Resolve one row with :meth:<code>get</code>, list the shipped
-ids with :meth:<code>available</code>, and turn a country ISO3 into a ThinkHazard
-division code with :meth:<code>resolve_admin</code>.</p>
+arguments (<code>Catalog()</code>). Resolve one row with <code>get</code>, list the shipped
+ids with <code>available</code>, and turn a country ISO3 into a ThinkHazard
+division code with <code>resolve_admin</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -33582,7 +33582,7 @@ division code with :meth:<code>resolve_admin</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from dataset id to its :class:<code>Dataset</code> row.</p>
+                <p>Map from dataset id to its <code>Dataset</code> row.</p>
               </div>
             </td>
           </tr>
@@ -33783,14 +33783,14 @@ code (== FAO GAUL 2015 ADM0 code).</p>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset catalog for the risk-indicators backend.</span>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">    Reads the bundled `risk_indicators_data_catalog.yaml` (shipped as package</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    data) and exposes its `datasets:` block as a map of :class:`Dataset` rows</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    data) and exposes its `datasets:` block as a map of `Dataset` rows</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">    keyed by id, plus an `admin_codes:` ISO3 -&gt; ADM0 lookup. Instantiate with no</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    arguments (`Catalog()`). Resolve one row with :meth:`get`, list the shipped</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    ids with :meth:`available`, and turn a country ISO3 into a ThinkHazard</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    division code with :meth:`resolve_admin`.</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    arguments (`Catalog()`). Resolve one row with `get`, list the shipped</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    ids with `available`, and turn a country ISO3 into a ThinkHazard</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    division code with `resolve_admin`.</span>
 <a id="__codelineno-0-231" name="__codelineno-0-231"></a>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        datasets: Map from dataset id to its :class:`Dataset` row.</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        datasets: Map from dataset id to its `Dataset` row.</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        admin_codes: Map from ISO3 country code to ThinkHazard ADM0 division</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">            code (== FAO GAUL 2015 ADM0 code).</span>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a>
@@ -33821,8 +33821,8 @@ code (== FAO GAUL 2015 ADM0 code).</p>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;risk-indicators catalog&quot;</span>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;datasets&quot;</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="c1">#: The dataset rows live in the base :attr:`datasets` field so the inherited</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="c1">#: dict surface (`len`, `in`, `[]`, iteration) and :meth:`get_dataset`&#39;s</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="c1">#: The dataset rows live in the base `datasets` field so the inherited</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="c1">#: dict surface (`len`, `in`, `[]`, iteration) and `get_dataset`&#39;s</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="c1">#: did-you-mean hint work unchanged.</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>
@@ -33849,10 +33849,10 @@ code (== FAO GAUL 2015 ADM0 code).</p>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">                `CATALOG_PATH`.</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            ValueError: If the file has no `datasets:` block, or a row fails</span>
@@ -33863,9 +33863,9 @@ code (== FAO GAUL 2015 ADM0 code).</p>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span> <span class="n">admin_codes</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">admin_codes</span><span class="p">))</span>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its :class:`Dataset` row.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its `Dataset` row.</span>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        Args:</span>
@@ -34012,8 +34012,8 @@ code (== FAO GAUL 2015 ADM0 code).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Resolve a dataset id to its :class:<code>Dataset</code> row.</p>
-<p>Thin wrapper over the inherited :meth:<code>get_dataset</code>, which raises a
+        <p>Resolve a dataset id to its <code>Dataset</code> row.</p>
+<p>Thin wrapper over the inherited <code>get_dataset</code>, which raises a
 <code>ValueError</code> with a did-you-mean hint on an unknown id.</p>
 
 
@@ -34116,9 +34116,9 @@ did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-320">320</a></span>
 <span class="normal"><a href="#__codelineno-0-321">321</a></span>
 <span class="normal"><a href="#__codelineno-0-322">322</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its :class:`Dataset` row.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its `Dataset` row.</span>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Args:</span>
@@ -34178,7 +34178,7 @@ did-you-mean hint.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the module-level
-:data:<code>CATALOG_PATH</code>.</p>
+<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -34204,7 +34204,7 @@ did-you-mean hint.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code>.</p>
+                <p>A fully-populated <code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -34261,10 +34261,10 @@ validation.</p>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            `CATALOG_PATH`.</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        ValueError: If the file has no `datasets:` block, or a row fails</span>
@@ -34501,10 +34501,10 @@ sub-national division, pass a raw <code>admin_code=</code> to the backend instea
 
 
         <p>One risk-indicators catalog row.</p>
-<p>The dataset id is the parent key in :attr:<code>Catalog.datasets</code> and is also
-stored on the row as :attr:<code>id</code> so a resolved :class:<code>Dataset</code> is
+<p>The dataset id is the parent key in <code>Catalog.datasets</code> and is also
+stored on the row as <code>id</code> so a resolved <code>Dataset</code> is
 self-describing. Which provider-specific fields are populated depends on
-:attr:<code>provider</code>; a cross-field validator enforces that the right ones are
+<code>provider</code>; a cross-field validator enforces that the right ones are
 present.</p>
 
 
@@ -34824,10 +34824,10 @@ it can only be read from the API.</p>
 <span class="normal"><a href="#__codelineno-0-219">219</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="k">class</span><span class="w"> </span><span class="nc">Dataset</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One risk-indicators catalog row.</span>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">    The dataset id is the parent key in :attr:`Catalog.datasets` and is also</span>
-<a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">    stored on the row as :attr:`id` so a resolved :class:`Dataset` is</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">    The dataset id is the parent key in `Catalog.datasets` and is also</span>
+<a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">    stored on the row as `id` so a resolved `Dataset` is</span>
 <a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    self-describing. Which provider-specific fields are populated depends on</span>
-<a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">    :attr:`provider`; a cross-field validator enforces that the right ones are</span>
+<a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">    `provider`; a cross-field validator enforces that the right ones are</span>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">    present.</span>
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a>
 <a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="sd">    Attributes:</span>
@@ -35019,31 +35019,31 @@ file's <code>st_mtime_ns</code>, so any real edit invalidates the entry on its o
     <div class="doc doc-contents first">
 
         <p>Credentials and API-key resolution for the GFW datasets of the risk backend.</p>
-<p>Hosts :class:<code>GfwAuth</code>, an :class:<code>earthlens.base.SingleSecretAuth</code> subclass that
+<p>Hosts <code>GfwAuth</code>, an <code>earthlens.base.SingleSecretAuth</code> subclass that
 resolves a single Global Forest Watch <strong><code>x-api-key</code></strong> from, in priority order,
 an explicit <code>api_key=</code> argument or the <code>GFW_API_KEY</code> environment variable. The
 GFW Data API requires a key on every <code>query/json</code> and geostore request; there
 is no username/password, so this is the simplest auth shape — a single secret
-string, mirrored on the :class:<code>earthlens.openaq.OpenaqAuth</code> resolution chain.</p>
+string, mirrored on the <code>earthlens.openaq.OpenaqAuth</code> resolution chain.</p>
 <p>The wrinkle this module exists for: auth in <code>earthlens.risk_indicators</code> is
 <strong>per source, not backend-global</strong>. ThinkHazard! and INFORM are public and
 construct no auth at all; only a dataset whose <code>provider</code> is <code>gfw</code> builds and
-configures a :class:<code>GfwAuth</code>. So this surface is reached <em>conditionally</em>.</p>
+configures a <code>GfwAuth</code>. So this surface is reached <em>conditionally</em>.</p>
 <p>The shape:</p>
 <ul>
-<li>:class:<code>GfwCredentials</code> is a frozen pydantic value object carrying the
-  optional API key as a :class:<code>pydantic.SecretStr</code>.</li>
-<li>:class:<code>GfwAuth</code> binds those credentials and lets the shared
-  :meth:<code>earthlens.base.SingleSecretAuth.configure</code> resolve the key — explicit
+<li><code>GfwCredentials</code> is a frozen pydantic value object carrying the
+  optional API key as a <code>pydantic.SecretStr</code>.</li>
+<li><code>GfwAuth</code> binds those credentials and lets the shared
+  <code>earthlens.base.SingleSecretAuth.configure</code> resolve the key — explicit
   key first, then the <code>GFW_API_KEY</code> environment variable, then a clear
-  :class:<code>AuthenticationError</code> naming how to create a key (never an interactive
+  <code>AuthenticationError</code> naming how to create a key (never an interactive
   prompt).</li>
 <li><code>configure()</code> is idempotent — a second call after
-  :meth:<code>GfwAuth.is_authenticated</code> returns <code>True</code> short-circuits.</li>
+  <code>GfwAuth.is_authenticated</code> returns <code>True</code> short-circuits.</li>
 </ul>
-<p>The resolved key is read back via the :attr:<code>GfwAuth.api_key</code> property and
+<p>The resolved key is read back via the <code>GfwAuth.api_key</code> property and
 attached as the <code>x-api-key</code> header by
-:func:<code>earthlens.risk_indicators._helpers.gfw_query</code>.</p>
+<code>earthlens.risk_indicators._helpers.gfw_query</code>.</p>
 
 
 
@@ -35085,7 +35085,7 @@ attached as the <code>x-api-key</code> header by
 <p>Carries a message that names a fix: pass <code>api_key=</code> to
 <code>EarthLens("gfw", ...)</code>, set the <code>GFW_API_KEY</code> environment variable, or
 create a free key via a MyGFW account. A subclass of the cross-backend
-:class:<code>earthlens.base.AuthenticationError</code> so callers can catch every
+<code>earthlens.base.AuthenticationError</code> so callers can catch every
 backend's auth failure with one <code>except</code> clause.</p>
 
 
@@ -35111,7 +35111,7 @@ backend's auth failure with one <code>except</code> clause.</p>
 <a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    Carries a message that names a fix: pass `api_key=` to</span>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    `EarthLens(&quot;gfw&quot;, ...)`, set the `GFW_API_KEY` environment variable, or</span>
 <a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="sd">    create a free key via a MyGFW account. A subclass of the cross-backend</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    :class:`earthlens.base.AuthenticationError` so callers can catch every</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    `earthlens.base.AuthenticationError` so callers can catch every</span>
 <a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">    backend&#39;s auth failure with one `except` clause.</span>
 <a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
@@ -35139,13 +35139,13 @@ backend's auth failure with one <code>except</code> clause.</p>
 
 
         <p>Resolve and hold the Global Forest Watch API key.</p>
-<p>Implements the :class:<code>earthlens.base.SingleSecretAuth</code> contract for a
+<p>Implements the <code>earthlens.base.SingleSecretAuth</code> contract for a
 single-secret source: it declares its env var and provider name and
 supplies <code>_explicit_credential</code> / <code>_connect</code>, while the inherited
-:meth:<code>configure</code> performs the resolution and is idempotent. After a
-successful <code>configure()</code>, the key is available via the :attr:<code>api_key</code>
+<code>configure</code> performs the resolution and is idempotent. After a
+successful <code>configure()</code>, the key is available via the <code>api_key</code>
 property for the HTTP helpers to attach as the <code>x-api-key</code> header.</p>
-<p>The class is a context manager (inherited from :class:<code>AbstractAuth</code>):
+<p>The class is a context manager (inherited from <code>AbstractAuth</code>):
 <code>with GfwAuth(creds) as auth: ...</code> calls <code>configure()</code> on enter and the
 default no-op <code>close()</code> on exit — there is no per-instance resource to
 release.</p>
@@ -35167,7 +35167,7 @@ release.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The :class:<code>GfwCredentials</code> passed at construction.</p>
+                <p>The <code>GfwCredentials</code> passed at construction.</p>
               </div>
             </td>
           </tr>
@@ -35269,20 +35269,20 @@ release.</p>
 <span class="normal"><a href="#__codelineno-0-162">162</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="k">class</span><span class="w"> </span><span class="nc">GfwAuth</span><span class="p">(</span><span class="n">SingleSecretAuth</span><span class="p">[</span><span class="n">GfwCredentials</span><span class="p">]):</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve and hold the Global Forest Watch API key.</span>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a>
-<a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    Implements the :class:`earthlens.base.SingleSecretAuth` contract for a</span>
+<a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    Implements the `earthlens.base.SingleSecretAuth` contract for a</span>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    single-secret source: it declares its env var and provider name and</span>
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">    supplies `_explicit_credential` / `_connect`, while the inherited</span>
-<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    :meth:`configure` performs the resolution and is idempotent. After a</span>
-<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    successful `configure()`, the key is available via the :attr:`api_key`</span>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    `configure` performs the resolution and is idempotent. After a</span>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    successful `configure()`, the key is available via the `api_key`</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    property for the HTTP helpers to attach as the `x-api-key` header.</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>
-<a id="__codelineno-0-105" name="__codelineno-0-105"></a><span class="sd">    The class is a context manager (inherited from :class:`AbstractAuth`):</span>
+<a id="__codelineno-0-105" name="__codelineno-0-105"></a><span class="sd">    The class is a context manager (inherited from `AbstractAuth`):</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">    `with GfwAuth(creds) as auth: ...` calls `configure()` on enter and the</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">    default no-op `close()` on exit — there is no per-instance resource to</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">    release.</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">        _creds: The :class:`GfwCredentials` passed at construction.</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">        _creds: The `GfwCredentials` passed at construction.</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a>
 <a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">        - Resolve an explicit key:</span>
@@ -35320,13 +35320,13 @@ release.</p>
 <a id="__codelineno-0-146" name="__codelineno-0-146"></a>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a>    <span class="nd">@property</span>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">api_key</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved API key; valid only after :meth:`configure`.</span>
+<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved API key; valid only after `configure`.</span>
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a>
 <a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">            str: The GFW `x-api-key` string.</span>
 <a id="__codelineno-0-153" name="__codelineno-0-153"></a>
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">            AuthenticationError: When read before :meth:`configure` has</span>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">            AuthenticationError: When read before `configure` has</span>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">                resolved a key.</span>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -35363,7 +35363,7 @@ release.</p>
 
     <div class="doc doc-contents ">
 
-        <p>The resolved API key; valid only after :meth:<code>configure</code>.</p>
+        <p>The resolved API key; valid only after <code>configure</code>.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -35404,7 +35404,7 @@ release.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>When read before :meth:<code>configure</code> has
+                <p>When read before <code>configure</code> has
 resolved a key.</p>
               </div>
             </td>
@@ -35446,8 +35446,8 @@ resolved a key.</p>
 
         <p>Frozen value object holding the GFW API key.</p>
 <p>The key is optional at construction time: <code>None</code> means "resolve from the
-<code>GFW_API_KEY</code> environment variable at :meth:<code>GfwAuth.configure</code> time". The
-real "is there a usable key?" gate is :meth:<code>GfwAuth.configure</code>, not this
+<code>GFW_API_KEY</code> environment variable at <code>GfwAuth.configure</code> time". The
+real "is there a usable key?" gate is <code>GfwAuth.configure</code>, not this
 model.</p>
 
 
@@ -35468,7 +35468,7 @@ model.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The GFW <code>x-api-key</code>, stored as a :class:<code>pydantic.SecretStr</code>
+                <p>The GFW <code>x-api-key</code>, stored as a <code>pydantic.SecretStr</code>
 so it is never echoed by <code>repr(creds)</code> or in logs. <code>None</code> defers
 resolution to the environment variable.</p>
               </div>
@@ -35543,12 +35543,12 @@ resolution to the environment variable.</p>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Frozen value object holding the GFW API key.</span>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">    The key is optional at construction time: `None` means &quot;resolve from the</span>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    `GFW_API_KEY` environment variable at :meth:`GfwAuth.configure` time&quot;. The</span>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">    real &quot;is there a usable key?&quot; gate is :meth:`GfwAuth.configure`, not this</span>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    `GFW_API_KEY` environment variable at `GfwAuth.configure` time&quot;. The</span>
+<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">    real &quot;is there a usable key?&quot; gate is `GfwAuth.configure`, not this</span>
 <a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    model.</span>
 <a id="__codelineno-0-64" name="__codelineno-0-64"></a>
 <a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">        api_key: The GFW `x-api-key`, stored as a :class:`pydantic.SecretStr`</span>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">        api_key: The GFW `x-api-key`, stored as a `pydantic.SecretStr`</span>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">            so it is never echoed by `repr(creds)` or in logs. `None` defers</span>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">            resolution to the environment variable.</span>
 <a id="__codelineno-0-69" name="__codelineno-0-69"></a>
@@ -35622,20 +35622,20 @@ resolution to the environment variable.</p>
 
         <p>Pure per-source HTTP query builders and JSON parsers for risk-indicators.</p>
 <p>Every risk source here is a REST endpoint returning JSON, parsed into a
-:class:<code>pandas.DataFrame</code> (ThinkHazard / INFORM / GFW table) or a pyramids
-:class:<code>~pyramids.feature.collection.FeatureCollection</code> (GFW geometry). These are
+<code>pandas.DataFrame</code> (ThinkHazard / INFORM / GFW table) or a pyramids
+<code>FeatureCollection</code> (GFW geometry). These are
 pre-computed country/admin-indexed indices and SQL queries, so this subpackage
 uses <strong>no gridded-array dependency</strong> by design — the parse is pure pandas /
 geopandas text-and-JSON.</p>
 <p>The module groups three concerns, none of which holds state:</p>
 <ul>
-<li><strong>Query builders</strong> — :func:<code>thinkhazard_query</code>, :func:<code>inform_query</code>,
-  :func:<code>gfw_query</code>, :func:<code>gfw_geostore</code> issue one GET each and return parsed
+<li><strong>Query builders</strong> — <code>thinkhazard_query</code>, <code>inform_query</code>,
+  <code>gfw_query</code>, <code>gfw_geostore</code> issue one GET each and return parsed
   JSON. Only the GFW calls attach the <code>x-api-key</code> header.</li>
-<li><strong>Parsers</strong> — :func:<code>thinkhazard_to_frame</code>, :func:<code>inform_to_frame</code>,
-  :func:<code>to_frame</code>, :func:<code>to_feature_collection</code> turn a source's JSON into the
+<li><strong>Parsers</strong> — <code>thinkhazard_to_frame</code>, <code>inform_to_frame</code>,
+  <code>to_frame</code>, <code>to_feature_collection</code> turn a source's JSON into the
   canonical tabular / vector shape.</li>
-<li><strong>Resolution</strong> — :func:<code>resolve_admin</code> turns a country ISO3 into the
+<li><strong>Resolution</strong> — <code>resolve_admin</code> turns a country ISO3 into the
   ThinkHazard ADM0 division code via the catalog's shipped lookup table.</li>
 </ul>
 <p>Endpoints / response shapes were live-verified 2026-06-27 (see
@@ -36150,7 +36150,7 @@ the all-empty fallback used when a query matched nothing.</p>
 <p>The geostore response nests the boundary at <code>data.attributes.geojson</code>; this
 digs it out with a descriptive error (rather than a bare <code>KeyError</code>) when an
 unexpected payload shape comes back, then delegates to
-:func:<code>to_feature_collection</code>.</p>
+<code>to_feature_collection</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -36173,7 +36173,7 @@ unexpected payload shape comes back, then delegates to
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The parsed JSON from :func:<code>gfw_geostore</code>.</p>
+                <p>The parsed JSON from <code>gfw_geostore</code>.</p>
               </div>
             </td>
             <td>
@@ -36263,10 +36263,10 @@ unexpected payload shape comes back, then delegates to
 <a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">    The geostore response nests the boundary at `data.attributes.geojson`; this</span>
 <a id="__codelineno-0-772" name="__codelineno-0-772"></a><span class="sd">    digs it out with a descriptive error (rather than a bare `KeyError`) when an</span>
 <a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">    unexpected payload shape comes back, then delegates to</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="sd">    :func:`to_feature_collection`.</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="sd">    `to_feature_collection`.</span>
 <a id="__codelineno-0-775" name="__codelineno-0-775"></a>
 <a id="__codelineno-0-776" name="__codelineno-0-776"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="sd">        payload: The parsed JSON from :func:`gfw_geostore`.</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="sd">        payload: The parsed JSON from `gfw_geostore`.</span>
 <a id="__codelineno-0-778" name="__codelineno-0-778"></a>
 <a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-780" name="__codelineno-0-780"></a><span class="sd">        FeatureCollection: The admin-boundary features tagged `EPSG:4326`.</span>
@@ -36572,7 +36572,7 @@ release lands beside the old one instead of having to invalidate it.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The workbook URL from :func:<code>inform_release_url</code>.</p>
+                <p>The workbook URL from <code>inform_release_url</code>.</p>
               </div>
             </td>
             <td>
@@ -36719,7 +36719,7 @@ release lands beside the old one instead of having to invalidate it.</p>
 <a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">    release lands beside the old one instead of having to invalidate it.</span>
 <a id="__codelineno-0-448" name="__codelineno-0-448"></a>
 <a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        url: The workbook URL from :func:`inform_release_url`.</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        url: The workbook URL from `inform_release_url`.</span>
 <a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">        dest: Local path to write. An existing, valid file is reused.</span>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">        timeout: Per-request timeout in seconds.</span>
 <a id="__codelineno-0-453" name="__codelineno-0-453"></a>
@@ -37085,7 +37085,7 @@ omitted.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>pd.DataFrame: Columns :data:<code>INFORM_COLUMNS</code>, one row per country.</p>
+                <p>pd.DataFrame: Columns <code>INFORM_COLUMNS</code>, one row per country.</p>
               </div>
             </td>
           </tr>
@@ -37238,7 +37238,7 @@ omitted.</p>
 <a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">            omitted.</span>
 <a id="__codelineno-0-517" name="__codelineno-0-517"></a>
 <a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">        pd.DataFrame: Columns :data:`INFORM_COLUMNS`, one row per country.</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">        pd.DataFrame: Columns `INFORM_COLUMNS`, one row per country.</span>
 <a id="__codelineno-0-520" name="__codelineno-0-520"></a>
 <a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">        ValueError: If no country sheet matches, or the sheet has no `column`.</span>
@@ -37316,7 +37316,7 @@ omitted.</p>
 
         <p>Find the newest INFORM Risk release workbook published on the JRC site.</p>
 <p>The answer is memoised per page for the life of the process
-(:func:<code>clear_release_cache</code> forgets it): a run pulling all four Risk
+(<code>clear_release_cache</code> forgets it): a run pulling all four Risk
 datasets would otherwise hit the results page four times, and the host drops
 connections under rapid repeat requests.</p>
 
@@ -37477,7 +37477,7 @@ revisiting, or if a link points off the INFORM site.</p>
 <a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find the newest INFORM Risk release workbook published on the JRC site.</span>
 <a id="__codelineno-0-397" name="__codelineno-0-397"></a>
 <a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">    The answer is memoised per page for the life of the process</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">    (:func:`clear_release_cache` forgets it): a run pulling all four Risk</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">    (`clear_release_cache` forgets it): a run pulling all four Risk</span>
 <a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">    datasets would otherwise hit the results page four times, and the host drops</span>
 <a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">    connections under rapid repeat requests.</span>
 <a id="__codelineno-0-402" name="__codelineno-0-402"></a>
@@ -37559,7 +37559,7 @@ rather than being indistinguishable from a pull of any other.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The score rows from :func:<code>inform_query</code>.</p>
+                <p>The score rows from <code>inform_query</code>.</p>
               </div>
             </td>
             <td>
@@ -37619,7 +37619,7 @@ the <code>workflow_id</code> column; <code>None</code> leaves the column empty.<
             </td>
             <td>
               <div class="doc-md-description">
-                <p>pd.DataFrame: Columns :data:<code>INFORM_COLUMNS</code> — one row per country (or
+                <p>pd.DataFrame: Columns <code>INFORM_COLUMNS</code> — one row per country (or
 one row for the filtered country).</p>
               </div>
             </td>
@@ -37678,14 +37678,14 @@ one row for the filtered country).</p>
 <a id="__codelineno-0-736" name="__codelineno-0-736"></a><span class="sd">    rather than being indistinguishable from a pull of any other.</span>
 <a id="__codelineno-0-737" name="__codelineno-0-737"></a>
 <a id="__codelineno-0-738" name="__codelineno-0-738"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-739" name="__codelineno-0-739"></a><span class="sd">        payload: The score rows from :func:`inform_query`.</span>
+<a id="__codelineno-0-739" name="__codelineno-0-739"></a><span class="sd">        payload: The score rows from `inform_query`.</span>
 <a id="__codelineno-0-740" name="__codelineno-0-740"></a><span class="sd">        country: Optional ISO3 to filter to a single country (case-insensitive);</span>
 <a id="__codelineno-0-741" name="__codelineno-0-741"></a><span class="sd">            `None` keeps every country.</span>
 <a id="__codelineno-0-742" name="__codelineno-0-742"></a><span class="sd">        workflow_id: The WorkflowId the payload was fetched with, recorded in</span>
 <a id="__codelineno-0-743" name="__codelineno-0-743"></a><span class="sd">            the `workflow_id` column; `None` leaves the column empty.</span>
 <a id="__codelineno-0-744" name="__codelineno-0-744"></a>
 <a id="__codelineno-0-745" name="__codelineno-0-745"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">        pd.DataFrame: Columns :data:`INFORM_COLUMNS` — one row per country (or</span>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">        pd.DataFrame: Columns `INFORM_COLUMNS` — one row per country (or</span>
 <a id="__codelineno-0-747" name="__codelineno-0-747"></a><span class="sd">            one row for the filtered country).</span>
 <a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-749" name="__codelineno-0-749"></a>    <span class="n">records</span> <span class="o">=</span> <span class="p">[</span>
@@ -37826,9 +37826,9 @@ one row for the filtered country).</p>
     <div class="doc doc-contents ">
 
         <p>Turn a country ISO3 into the ThinkHazard ADM0 division code.</p>
-<p>Convenience wrapper over :meth:<code>earthlens.risk_indicators.catalog.Catalog.resolve_admin</code>
+<p>Convenience wrapper over <code>earthlens.risk_indicators.catalog.Catalog.resolve_admin</code>
 that loads the bundled catalog itself, so callers can resolve a code without
-holding a :class:<code>~earthlens.risk_indicators.catalog.Catalog</code>.</p>
+holding a <code>Catalog</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -37967,9 +37967,9 @@ holding a :class:<code>~earthlens.risk_indicators.catalog.Catalog</code>.</p>
 <span class="normal"><a href="#__codelineno-0-855">855</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve_admin</span><span class="p">(</span><span class="n">country</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Turn a country ISO3 into the ThinkHazard ADM0 division code.</span>
 <a id="__codelineno-0-829" name="__codelineno-0-829"></a>
-<a id="__codelineno-0-830" name="__codelineno-0-830"></a><span class="sd">    Convenience wrapper over :meth:`earthlens.risk_indicators.catalog.Catalog.resolve_admin`</span>
+<a id="__codelineno-0-830" name="__codelineno-0-830"></a><span class="sd">    Convenience wrapper over `earthlens.risk_indicators.catalog.Catalog.resolve_admin`</span>
 <a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">    that loads the bundled catalog itself, so callers can resolve a code without</span>
-<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">    holding a :class:`~earthlens.risk_indicators.catalog.Catalog`.</span>
+<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">    holding a `Catalog`.</span>
 <a id="__codelineno-0-833" name="__codelineno-0-833"></a>
 <a id="__codelineno-0-834" name="__codelineno-0-834"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-835" name="__codelineno-0-835"></a><span class="sd">        country: An ISO3 country code (`&quot;KEN&quot;`).</span>
@@ -38152,7 +38152,7 @@ holding a :class:<code>~earthlens.risk_indicators.catalog.Catalog</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>If the endpoint returns a non-2xx status after
-retries. A <code>404</code> is retried (see :data:<code>THINKHAZARD_RETRY_STATUSES</code>),
+retries. A <code>404</code> is retried (see <code>THINKHAZARD_RETRY_STATUSES</code>),
 because the report endpoints flap it, and raises only if it persists.</p>
               </div>
             </td>
@@ -38220,7 +38220,7 @@ because the report endpoints flap it, and raises only if it persists.</p>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        requests.HTTPError: If the endpoint returns a non-2xx status after</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            retries. A `404` is retried (see :data:`THINKHAZARD_RETRY_STATUSES`),</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            retries. A `404` is retried (see `THINKHAZARD_RETRY_STATUSES`),</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            because the report endpoints flap it, and raises only if it persists.</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="n">suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">hazard</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">hazard</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
@@ -38275,7 +38275,7 @@ because the report endpoints flap it, and raises only if it persists.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The JSON returned by :func:<code>thinkhazard_query</code>.</p>
+                <p>The JSON returned by <code>thinkhazard_query</code>.</p>
               </div>
             </td>
             <td>
@@ -38351,7 +38351,7 @@ all-hazards list (each row carries its own).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>pd.DataFrame: Columns :data:<code>THINKHAZARD_COLUMNS</code> — one row per hazard.</p>
+                <p>pd.DataFrame: Columns <code>THINKHAZARD_COLUMNS</code> — one row per hazard.</p>
               </div>
             </td>
           </tr>
@@ -38426,7 +38426,7 @@ all-hazards list (each row carries its own).</p>
 <a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">    `hazard_category`.</span>
 <a id="__codelineno-0-686" name="__codelineno-0-686"></a>
 <a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">        payload: The JSON returned by :func:`thinkhazard_query`.</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">        payload: The JSON returned by `thinkhazard_query`.</span>
 <a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="sd">        admin_code: The division code the report was fetched for (stamped onto</span>
 <a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">            every row).</span>
 <a id="__codelineno-0-691" name="__codelineno-0-691"></a><span class="sd">        hazard: The hazard mnemonic for a single-hazard report; ignored for the</span>
@@ -38434,7 +38434,7 @@ all-hazards list (each row carries its own).</p>
 <a id="__codelineno-0-693" name="__codelineno-0-693"></a><span class="sd">        country: Optional ISO3 to stamp onto every row.</span>
 <a id="__codelineno-0-694" name="__codelineno-0-694"></a>
 <a id="__codelineno-0-695" name="__codelineno-0-695"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a><span class="sd">        pd.DataFrame: Columns :data:`THINKHAZARD_COLUMNS` — one row per hazard.</span>
+<a id="__codelineno-0-696" name="__codelineno-0-696"></a><span class="sd">        pd.DataFrame: Columns `THINKHAZARD_COLUMNS` — one row per hazard.</span>
 <a id="__codelineno-0-697" name="__codelineno-0-697"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-698" name="__codelineno-0-698"></a>    <span class="n">records</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 <a id="__codelineno-0-699" name="__codelineno-0-699"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -38639,7 +38639,7 @@ all-hazards list (each row carries its own).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Build a flat :class:<code>pandas.DataFrame</code> from a JSON rows payload.</p>
+        <p>Build a flat <code>pandas.DataFrame</code> from a JSON rows payload.</p>
 <p>Accepts either a GFW-style <code>{"data": [...]}</code> envelope or a bare list of row
 dicts; a single dict (not under <code>data</code>) becomes a one-row frame.</p>
 
@@ -38742,7 +38742,7 @@ rows and <code>columns</code> is given).</p>
 <span class="normal"><a href="#__codelineno-0-669">669</a></span>
 <span class="normal"><a href="#__codelineno-0-670">670</a></span>
 <span class="normal"><a href="#__codelineno-0-671">671</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="k">def</span><span class="w"> </span><span class="nf">to_frame</span><span class="p">(</span><span class="n">payload</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="nb">list</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a flat :class:`pandas.DataFrame` from a JSON rows payload.</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a flat `pandas.DataFrame` from a JSON rows payload.</span>
 <a id="__codelineno-0-650" name="__codelineno-0-650"></a>
 <a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">    Accepts either a GFW-style `{&quot;data&quot;: [...]}` envelope or a bare list of row</span>
 <a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">    dicts; a single dict (not under `data`) becomes a one-row frame.</span>

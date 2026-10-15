@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -25413,7 +25413,7 @@ value is an <code>EumetsatDataset</code>.</p>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key, optionally disambiguated by group.</span>
 <a id="__codelineno-0-435" name="__codelineno-0-435"></a>
 <a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        Most keys map one-to-one to a curated row; the inherited</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        :meth:`get_dataset` (with its did-you-mean) handles those. The</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        `get_dataset` (with its did-you-mean) handles those. The</span>
 <a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">        `group=` filter additionally asserts which Data Store group the</span>
 <a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">        resolved dataset belongs to (`G2`) — the EUMETSAT analog of the</span>
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">        Earthdata backend&#39;s `daac=` filter.</span>
@@ -25621,7 +25621,7 @@ value is an <code>EumetsatDataset</code>.</p>
 
         <p>Resolve a dataset key, optionally disambiguated by group.</p>
 <p>Most keys map one-to-one to a curated row; the inherited
-:meth:<code>get_dataset</code> (with its did-you-mean) handles those. The
+<code>get_dataset</code> (with its did-you-mean) handles those. The
 <code>group=</code> filter additionally asserts which Data Store group the
 resolved dataset belongs to (<code>G2</code>) — the EUMETSAT analog of the
 Earthdata backend's <code>daac=</code> filter.</p>
@@ -25781,7 +25781,7 @@ or <code>group=</code> is given but does not match the row's group.</p>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key, optionally disambiguated by group.</span>
 <a id="__codelineno-0-435" name="__codelineno-0-435"></a>
 <a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">    Most keys map one-to-one to a curated row; the inherited</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">    :meth:`get_dataset` (with its did-you-mean) handles those. The</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">    `get_dataset` (with its did-you-mean) handles those. The</span>
 <a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">    `group=` filter additionally asserts which Data Store group the</span>
 <a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">    resolved dataset belongs to (`G2`) — the EUMETSAT analog of the</span>
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">    Earthdata backend&#39;s `daac=` filter.</span>
@@ -26889,7 +26889,7 @@ gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">        instance, so the parent class binds no opaque `self.client`. The</span>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        token minting (`EumetsatAuth.configure`, which contacts the auth</span>
 <a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">        server) is deferred out of construction: it runs on the first</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        :meth:`_search` (the `eumdac` collection search authenticates via</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        `_search` (the `eumdac` collection search authenticates via</span>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        the idempotent `configure()`), so constructing the backend never</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        authenticates — but note that a dry-run `search()` does, since the</span>
 <a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">        `eumdac` data store needs a token.</span>
@@ -28186,7 +28186,7 @@ internally. The <code>datastore</code> / <code>datatailor</code> helpers build t
 <code>eumdac</code> clients from the live token.</p>
 <p>Each half is resolved on its own, so a pair may be assembled from two
 sources — an explicit key with a secret from the environment. This
-matches :class:<code>~earthlens.base.auth.SingleSecretAuth</code> and the other
+matches <code>SingleSecretAuth</code> and the other
 backends; it read the environment first until #1184, which meant an
 explicit <code>consumer_key=</code> was silently discarded whenever
 <code>EUMETSAT_CONSUMER_KEY</code> happened to be set.</p>
@@ -28496,7 +28496,7 @@ write-once.</p>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    Each half is resolved on its own, so a pair may be assembled from two</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">    sources — an explicit key with a secret from the environment. This</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">    matches :class:`~earthlens.base.auth.SingleSecretAuth` and the other</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">    matches `SingleSecretAuth` and the other</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">    backends; it read the environment first until #1184, which meant an</span>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">    explicit `consumer_key=` was silently discarded whenever</span>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">    `EUMETSAT_CONSUMER_KEY` happened to be set.</span>
@@ -33635,7 +33635,7 @@ gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">        instance, so the parent class binds no opaque `self.client`. The</span>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        token minting (`EumetsatAuth.configure`, which contacts the auth</span>
 <a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">        server) is deferred out of construction: it runs on the first</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        :meth:`_search` (the `eumdac` collection search authenticates via</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        `_search` (the `eumdac` collection search authenticates via</span>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        the idempotent `configure()`), so constructing the backend never</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        authenticates — but note that a dry-run `search()` does, since the</span>
 <a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">        `eumdac` data store needs a token.</span>
@@ -35239,7 +35239,7 @@ value is an <code>EumetsatDataset</code>.</p>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key, optionally disambiguated by group.</span>
 <a id="__codelineno-0-435" name="__codelineno-0-435"></a>
 <a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        Most keys map one-to-one to a curated row; the inherited</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        :meth:`get_dataset` (with its did-you-mean) handles those. The</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        `get_dataset` (with its did-you-mean) handles those. The</span>
 <a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">        `group=` filter additionally asserts which Data Store group the</span>
 <a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">        resolved dataset belongs to (`G2`) — the EUMETSAT analog of the</span>
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">        Earthdata backend&#39;s `daac=` filter.</span>
@@ -35447,7 +35447,7 @@ value is an <code>EumetsatDataset</code>.</p>
 
         <p>Resolve a dataset key, optionally disambiguated by group.</p>
 <p>Most keys map one-to-one to a curated row; the inherited
-:meth:<code>get_dataset</code> (with its did-you-mean) handles those. The
+<code>get_dataset</code> (with its did-you-mean) handles those. The
 <code>group=</code> filter additionally asserts which Data Store group the
 resolved dataset belongs to (<code>G2</code>) — the EUMETSAT analog of the
 Earthdata backend's <code>daac=</code> filter.</p>
@@ -35607,7 +35607,7 @@ or <code>group=</code> is given but does not match the row's group.</p>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset key, optionally disambiguated by group.</span>
 <a id="__codelineno-0-435" name="__codelineno-0-435"></a>
 <a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">    Most keys map one-to-one to a curated row; the inherited</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">    :meth:`get_dataset` (with its did-you-mean) handles those. The</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">    `get_dataset` (with its did-you-mean) handles those. The</span>
 <a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">    `group=` filter additionally asserts which Data Store group the</span>
 <a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">    resolved dataset belongs to (`G2`) — the EUMETSAT analog of the</span>
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">    Earthdata backend&#39;s `daac=` filter.</span>
@@ -36779,7 +36779,7 @@ internally. The <code>datastore</code> / <code>datatailor</code> helpers build t
 <code>eumdac</code> clients from the live token.</p>
 <p>Each half is resolved on its own, so a pair may be assembled from two
 sources — an explicit key with a secret from the environment. This
-matches :class:<code>~earthlens.base.auth.SingleSecretAuth</code> and the other
+matches <code>SingleSecretAuth</code> and the other
 backends; it read the environment first until #1184, which meant an
 explicit <code>consumer_key=</code> was silently discarded whenever
 <code>EUMETSAT_CONSUMER_KEY</code> happened to be set.</p>
@@ -37089,7 +37089,7 @@ write-once.</p>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    Each half is resolved on its own, so a pair may be assembled from two</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">    sources — an explicit key with a secret from the environment. This</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">    matches :class:`~earthlens.base.auth.SingleSecretAuth` and the other</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">    matches `SingleSecretAuth` and the other</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">    backends; it read the environment first until #1184, which meant an</span>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">    explicit `consumer_key=` was silently discarded whenever</span>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">    `EUMETSAT_CONSUMER_KEY` happened to be set.</span>

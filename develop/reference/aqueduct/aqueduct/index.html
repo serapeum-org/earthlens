@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24368,8 +24368,8 @@ area</strong> to river flooding, aggregated by admin unit — <strong>country</s
 baseline, and seven 2030 climate × socio-economic scenarios (RCP4.5 / RCP8.5 ×
 SSP2 / SSP3). The admin polygons carry the risk attributes, so this is a
 <code>vector</code> backend: <code>download()</code> returns a pyramids
-:class:<code>~pyramids.feature.collection.FeatureCollection</code> (or a geometry-dropped
-<code>pandas.DataFrame</code>), and the :class:<code>earthlens.earthlens.EarthLens</code> facade
+<code>FeatureCollection</code> (or a geometry-dropped
+<code>pandas.DataFrame</code>), and the <code>earthlens.earthlens.EarthLens</code> facade
 rejects an <code>aggregate=</code> argument.</p>
 <p>This is the flood <strong>impact / exposure</strong> layer. It is distinct from the Aqueduct
 flood <strong>hazard</strong> depth rasters, which are already reachable through the <code>gee</code>
@@ -24378,16 +24378,16 @@ product (coastal flooding, 2050 / 2080, city level, pre-integrated
 expected-annual damage) is not freely downloadable and is out of scope.</p>
 <p>Public surface (re-exported from this package):</p>
 <ul>
-<li>:class:<code>Aqueduct</code> — the backend; instantiate with an <code>admin_level</code> / <code>metric</code>
+<li><code>Aqueduct</code> — the backend; instantiate with an <code>admin_level</code> / <code>metric</code>
   / <code>year</code> / <code>scenario</code> / <code>return_period</code> selection and call
-  :meth:<code>Aqueduct.download</code>.</li>
-<li>:class:<code>Catalog</code> — loader for the bundled <code>aqueduct_data_catalog.yaml</code> (admin
+  <code>Aqueduct.download</code>.</li>
+<li><code>Catalog</code> — loader for the bundled <code>aqueduct_data_catalog.yaml</code> (admin
   levels + the indicator / year / scenario / return-period vocabularies).</li>
-<li>:class:<code>AdminLevel</code> — one admin level's download + shapefile spec.</li>
-<li>:class:<code>Scenario</code> — one scenario's code and valid years.</li>
-<li>:data:<code>CATALOG_PATH</code> — path to the bundled catalog YAML; monkey-patchable in
+<li><code>AdminLevel</code> — one admin level's download + shapefile spec.</li>
+<li><code>Scenario</code> — one scenario's code and valid years.</li>
+<li><code>CATALOG_PATH</code> — path to the bundled catalog YAML; monkey-patchable in
   tests.</li>
-<li>:func:<code>clear_catalog_cache</code> — drop the module-level catalog parse cache.</li>
+<li><code>clear_catalog_cache</code> — drop the module-level catalog parse cache.</li>
 </ul>
 
 
@@ -24428,8 +24428,8 @@ expected-annual damage) is not freely downloadable and is out of scope.</p>
 
         <p>One admin level's download + shapefile spec.</p>
 <p>The admin-level name (<code>"country"</code> / <code>"state"</code> / <code>"basin"</code>) is the parent key
-in :attr:<code>Catalog.datasets</code>; the loader copies it onto the row as
-:attr:<code>level</code> so a resolved level is self-describing.</p>
+in <code>Catalog.datasets</code>; the loader copies it onto the row as
+<code>level</code> so a resolved level is self-describing.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -24465,7 +24465,7 @@ rejected at load time, and the field is excluded from
             <td>
               <div class="doc-md-description">
                 <p>The zip file name the shapefile lives in — a direct download under
-<code>base_url</code> when :attr:<code>container_zip</code> is <code>None</code>, otherwise the entry
+<code>base_url</code> when <code>container_zip</code> is <code>None</code>, otherwise the entry
 to extract from that outer bundle first.</p>
               </div>
             </td>
@@ -24490,7 +24490,7 @@ to extract from that outer bundle first.</p>
             <td>
               <div class="doc-md-description">
                 <p>For an admin level with no standalone URL (<code>state</code>), the
-outer bundle to download; :attr:<code>zip</code> is then extracted from it. <code>None</code>
+outer bundle to download; <code>zip</code> is then extracted from it. <code>None</code>
 for a directly-downloadable level (<code>country</code>, <code>basin</code>).</p>
               </div>
             </td>
@@ -24573,8 +24573,8 @@ for a directly-downloadable level (<code>country</code>, <code>basin</code>).</p
 <a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One admin level&#39;s download + shapefile spec.</span>
 <a id="__codelineno-0-52" name="__codelineno-0-52"></a>
 <a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">    The admin-level name (`&quot;country&quot;` / `&quot;state&quot;` / `&quot;basin&quot;`) is the parent key</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    in :attr:`Catalog.datasets`; the loader copies it onto the row as</span>
-<a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">    :attr:`level` so a resolved level is self-describing.</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    in `Catalog.datasets`; the loader copies it onto the row as</span>
+<a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">    `level` so a resolved level is self-describing.</span>
 <a id="__codelineno-0-56" name="__codelineno-0-56"></a>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">        level: The admin-level name, taken from the catalog key. Empty only</span>
@@ -24583,12 +24583,12 @@ for a directly-downloadable level (<code>country</code>, <code>basin</code>).</p
 <a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">            rejected at load time, and the field is excluded from</span>
 <a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">            `model_dump()` so it does not repeat the row&#39;s own key.</span>
 <a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">        zip: The zip file name the shapefile lives in — a direct download under</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">            `base_url` when :attr:`container_zip` is `None`, otherwise the entry</span>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">            `base_url` when `container_zip` is `None`, otherwise the entry</span>
 <a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">            to extract from that outer bundle first.</span>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">        shapefile_stem: The shapefile name (without extension) inside `zip`; the</span>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">            `.shp` and its sidecars (`.dbf` / `.shx` / `.prj`) all share it.</span>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">        container_zip: For an admin level with no standalone URL (`state`), the</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">            outer bundle to download; :attr:`zip` is then extracted from it. `None`</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">            outer bundle to download; `zip` is then extracted from it. `None`</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">            for a directly-downloadable level (`country`, `basin`).</span>
 <a id="__codelineno-0-71" name="__codelineno-0-71"></a>
 <a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    Examples:</span>
@@ -24664,8 +24664,8 @@ for a directly-downloadable level (<code>country</code>, <code>basin</code>).</p
 selection, downloads and caches the admin level's shapefile, reads it with
 pyramids, and returns the admin polygons carrying the per-return-period
 exposure columns (<code>rp_&lt;n&gt;</code>). The query is a search/fetch split:
-:meth:<code>_search</code> pins the one product (admin level + resolved column names),
-and :meth:<code>_fetch</code> downloads, extracts, reads, and filters it.</p>
+<code>_search</code> pins the one product (admin level + resolved column names),
+and <code>_fetch</code> downloads, extracts, reads, and filters it.</p>
 <p>Needs no credentials. <code>aggregate=</code> is rejected — the data is an
 admin-aggregated exposure table, not a gridded raster.</p>
 
@@ -25066,8 +25066,8 @@ shape.</p>
 <a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    selection, downloads and caches the admin level&#39;s shapefile, reads it with</span>
 <a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">    pyramids, and returns the admin polygons carrying the per-return-period</span>
 <a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    exposure columns (`rp_&lt;n&gt;`). The query is a search/fetch split:</span>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    :meth:`_search` pins the one product (admin level + resolved column names),</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    and :meth:`_fetch` downloads, extracts, reads, and filters it.</span>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    `_search` pins the one product (admin level + resolved column names),</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    and `_fetch` downloads, extracts, reads, and filters it.</span>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a>
 <a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    Needs no credentials. `aggregate=` is rejected — the data is an</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    admin-aggregated exposure table, not a gridded raster.</span>
@@ -25224,7 +25224,7 @@ shape.</p>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the base static-snapshot extent (the product has no time axis).</span>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        Delegates to :meth:`~earthlens.base.AbstractDataSource._static_extent`,</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        Delegates to `_static_extent`,</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        the shared factory for no-time-axis backends, so `start` / `end` / `fmt`</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        are ignored — there is no window to parse.</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a>
@@ -25258,12 +25258,12 @@ shape.</p>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download + read the shapefile and build the filtered collection.</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        Widens the inherited `-&gt; list[Path]` contract: a vector backend returns</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        an in-memory :class:`FeatureCollection`. The download is cached under</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        :attr:`cache_dir`, so a repeat request for the same admin level reuses</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        an in-memory `FeatureCollection`. The download is cached under</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        `cache_dir`, so a repeat request for the same admin level reuses</span>
 <a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        the zip.</span>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">            products: The single-element list from :meth:`_search`.</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">            products: The single-element list from `_search`.</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">            list[FeatureCollection]: One trimmed, filtered collection.</span>
@@ -25301,7 +25301,7 @@ shape.</p>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the local zip path, downloading it on a cache miss.</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">            product: The product from :meth:`_search` (carries the download URL</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">            product: The product from `_search` (carries the download URL</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">                in `href`).</span>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        Returns:</span>
@@ -25349,9 +25349,9 @@ shape.</p>
 <a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">                this is a no-op.</span>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">            A :class:`~pyramids.feature.collection.FeatureCollection` (also</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">            A `FeatureCollection` (also</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">            written to `root_dir`) or, when `geometry=False`, a</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">            :class:`pandas.DataFrame` of the units and their `rp_&lt;n&gt;` columns.</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">            `pandas.DataFrame` of the units and their `rp_&lt;n&gt;` columns.</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a>
 <a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">            requests.HTTPError: If the download returns a non-2xx status.</span>
@@ -26042,23 +26042,23 @@ this is a no-op.</p>
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
+          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>A</code></td>            <td>
+            <td>
                   <code><span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span> | <span title="pandas.DataFrame">DataFrame</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>class:<code>~pyramids.feature.collection.FeatureCollection</code> (also</p>
+                <p>A <code>FeatureCollection</code> (also</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span> | <span title="pandas.DataFrame">DataFrame</span></code>
             </td>
             <td>
@@ -26068,12 +26068,12 @@ this is a no-op.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span> | <span title="pandas.DataFrame">DataFrame</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>class:<code>pandas.DataFrame</code> of the units and their <code>rp_&lt;n&gt;</code> columns.</p>
+                <p><code>pandas.DataFrame</code> of the units and their <code>rp_&lt;n&gt;</code> columns.</p>
               </div>
             </td>
           </tr>
@@ -26165,9 +26165,9 @@ this is a no-op.</p>
 <a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">            this is a no-op.</span>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        A :class:`~pyramids.feature.collection.FeatureCollection` (also</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        A `FeatureCollection` (also</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        written to `root_dir`) or, when `geometry=False`, a</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        :class:`pandas.DataFrame` of the units and their `rp_&lt;n&gt;` columns.</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        `pandas.DataFrame` of the units and their `rp_&lt;n&gt;` columns.</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a>
 <a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        requests.HTTPError: If the download returns a non-2xx status.</span>
@@ -26226,12 +26226,12 @@ this is a no-op.</p>
 
         <p>Catalog for the Aqueduct riverine flood-risk backend.</p>
 <p>Reads the bundled <code>aqueduct_data_catalog.yaml</code> (shipped as package data) and
-exposes its <code>admin_levels:</code> block as a map of :class:<code>AdminLevel</code> rows keyed
-by name under the inherited :attr:<code>datasets</code> field, plus the <code>base_url</code>,
+exposes its <code>admin_levels:</code> block as a map of <code>AdminLevel</code> rows keyed
+by name under the inherited <code>datasets</code> field, plus the <code>base_url</code>,
 <code>license</code>, <code>attribution</code>, and the <code>indicators</code> / <code>years</code> / <code>scenarios</code> /
 <code>return_periods</code> vocabularies. Instantiate with no arguments (<code>Catalog()</code>);
-resolve one admin level with :meth:<code>get</code>, list them with :meth:<code>available</code>,
-and build the download URL for a level with :meth:<code>download_url</code>.</p>
+resolve one admin level with <code>get</code>, list them with <code>available</code>,
+and build the download URL for a level with <code>download_url</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -26252,7 +26252,7 @@ and build the download URL for a level with :meth:<code>download_url</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>Map from admin-level name (<code>"country"</code> / <code>"state"</code> / <code>"basin"</code>)
-to its :class:<code>AdminLevel</code> row.</p>
+to its <code>AdminLevel</code> row.</p>
               </div>
             </td>
           </tr>
@@ -26319,7 +26319,7 @@ to its :class:<code>AdminLevel</code> row.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Scenario name -&gt; its :class:<code>Scenario</code> (code + valid years).</p>
+                <p>Scenario name -&gt; its <code>Scenario</code> (code + valid years).</p>
               </div>
             </td>
           </tr>
@@ -26517,23 +26517,23 @@ to its :class:<code>AdminLevel</code> row.</p>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Catalog for the Aqueduct riverine flood-risk backend.</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    Reads the bundled `aqueduct_data_catalog.yaml` (shipped as package data) and</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    exposes its `admin_levels:` block as a map of :class:`AdminLevel` rows keyed</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    by name under the inherited :attr:`datasets` field, plus the `base_url`,</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    exposes its `admin_levels:` block as a map of `AdminLevel` rows keyed</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    by name under the inherited `datasets` field, plus the `base_url`,</span>
 <a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    `license`, `attribution`, and the `indicators` / `years` / `scenarios` /</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    `return_periods` vocabularies. Instantiate with no arguments (`Catalog()`);</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    resolve one admin level with :meth:`get`, list them with :meth:`available`,</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    and build the download URL for a level with :meth:`download_url`.</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    resolve one admin level with `get`, list them with `available`,</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    and build the download URL for a level with `download_url`.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        datasets: Map from admin-level name (`&quot;country&quot;` / `&quot;state&quot;` / `&quot;basin&quot;`)</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">            to its :class:`AdminLevel` row.</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">            to its `AdminLevel` row.</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        base_url: Host prefix every download URL is built on.</span>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        license: SPDX-style redistribution licence (`&quot;CC-BY-4.0&quot;`).</span>
 <a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        attribution: Required attribution string.</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        indicators: Public metric name -&gt; `.dbf` column prefix (`gdp_affected`</span>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            -&gt; `G`).</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        years: Year -&gt; column code (`&quot;2010&quot;` -&gt; `&quot;10&quot;`).</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        scenarios: Scenario name -&gt; its :class:`Scenario` (code + valid years).</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        scenarios: Scenario name -&gt; its `Scenario` (code + valid years).</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        return_periods: Return period (years, int) -&gt; column code (`1000` -&gt;</span>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            `&quot;1T&quot;`).</span>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a>
@@ -26600,10 +26600,10 @@ to its :class:<code>AdminLevel</code> row.</p>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">                `CATALOG_PATH`.</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            ValueError: If the file has no `admin_levels:` block, or a row /</span>
@@ -26613,9 +26613,9 @@ to its :class:<code>AdminLevel</code> row.</p>
 <a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">))</span>
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">admin_level</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AdminLevel</span><span class="p">:</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve an admin-level name to its :class:`AdminLevel` row.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve an admin-level name to its `AdminLevel` row.</span>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown name.</span>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        Args:</span>
@@ -26878,8 +26878,8 @@ come from <code>base_url</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Resolve an admin-level name to its :class:<code>AdminLevel</code> row.</p>
-<p>Thin wrapper over the inherited :meth:<code>get_dataset</code>, which raises a
+        <p>Resolve an admin-level name to its <code>AdminLevel</code> row.</p>
+<p>Thin wrapper over the inherited <code>get_dataset</code>, which raises a
 <code>ValueError</code> with a did-you-mean hint on an unknown name.</p>
 
 
@@ -26980,9 +26980,9 @@ come from <code>base_url</code>.</p>
 <span class="normal"><a href="#__codelineno-0-338">338</a></span>
 <span class="normal"><a href="#__codelineno-0-339">339</a></span>
 <span class="normal"><a href="#__codelineno-0-340">340</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">admin_level</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AdminLevel</span><span class="p">:</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve an admin-level name to its :class:`AdminLevel` row.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve an admin-level name to its `AdminLevel` row.</span>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown name.</span>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    Args:</span>
@@ -27041,7 +27041,7 @@ come from <code>base_url</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the module-level
-:data:<code>CATALOG_PATH</code>.</p>
+<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -27067,7 +27067,7 @@ come from <code>base_url</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code>.</p>
+                <p>A fully-populated <code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -27123,10 +27123,10 @@ scenario fails validation.</p>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            `CATALOG_PATH`.</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        ValueError: If the file has no `admin_levels:` block, or a row /</span>
@@ -27357,11 +27357,11 @@ scenario fails validation.</p>
 credentials), reads it with pyramids, selects one metric / year / scenario
 across the requested flood return periods, filters by unit name and/or bbox, and
 returns the admin polygons carrying the selected exposure columns as a
-:class:<code>~pyramids.feature.collection.FeatureCollection</code> (or, with
-<code>geometry=False</code>, a geometry-dropped :class:<code>pandas.DataFrame</code>).</p>
+<code>FeatureCollection</code> (or, with
+<code>geometry=False</code>, a geometry-dropped <code>pandas.DataFrame</code>).</p>
 <p>This is a static, country/state/basin-indexed product with no time axis, so a
 missing <code>start</code> / <code>end</code> is legal (<code>REQUIRES_TIME_WINDOW = False</code>). It is a
-<code>vector</code> backend: the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects an
+<code>vector</code> backend: the <code>earthlens.earthlens.EarthLens</code> facade rejects an
 <code>aggregate=</code> argument — there is no meaningful gridded reduction of an
 admin-aggregated exposure table.</p>
 <p>Only the free <strong>riverine</strong> 2015 product is served here; <code>hazard="coastal"</code> (part
@@ -27411,8 +27411,8 @@ requests for the same admin level reuse it.</p>
 selection, downloads and caches the admin level's shapefile, reads it with
 pyramids, and returns the admin polygons carrying the per-return-period
 exposure columns (<code>rp_&lt;n&gt;</code>). The query is a search/fetch split:
-:meth:<code>_search</code> pins the one product (admin level + resolved column names),
-and :meth:<code>_fetch</code> downloads, extracts, reads, and filters it.</p>
+<code>_search</code> pins the one product (admin level + resolved column names),
+and <code>_fetch</code> downloads, extracts, reads, and filters it.</p>
 <p>Needs no credentials. <code>aggregate=</code> is rejected — the data is an
 admin-aggregated exposure table, not a gridded raster.</p>
 
@@ -27813,8 +27813,8 @@ shape.</p>
 <a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    selection, downloads and caches the admin level&#39;s shapefile, reads it with</span>
 <a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">    pyramids, and returns the admin polygons carrying the per-return-period</span>
 <a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    exposure columns (`rp_&lt;n&gt;`). The query is a search/fetch split:</span>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    :meth:`_search` pins the one product (admin level + resolved column names),</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    and :meth:`_fetch` downloads, extracts, reads, and filters it.</span>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    `_search` pins the one product (admin level + resolved column names),</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    and `_fetch` downloads, extracts, reads, and filters it.</span>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a>
 <a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    Needs no credentials. `aggregate=` is rejected — the data is an</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    admin-aggregated exposure table, not a gridded raster.</span>
@@ -27971,7 +27971,7 @@ shape.</p>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the base static-snapshot extent (the product has no time axis).</span>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        Delegates to :meth:`~earthlens.base.AbstractDataSource._static_extent`,</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        Delegates to `_static_extent`,</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        the shared factory for no-time-axis backends, so `start` / `end` / `fmt`</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        are ignored — there is no window to parse.</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a>
@@ -28005,12 +28005,12 @@ shape.</p>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download + read the shapefile and build the filtered collection.</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        Widens the inherited `-&gt; list[Path]` contract: a vector backend returns</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        an in-memory :class:`FeatureCollection`. The download is cached under</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        :attr:`cache_dir`, so a repeat request for the same admin level reuses</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        an in-memory `FeatureCollection`. The download is cached under</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        `cache_dir`, so a repeat request for the same admin level reuses</span>
 <a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        the zip.</span>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">            products: The single-element list from :meth:`_search`.</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">            products: The single-element list from `_search`.</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">            list[FeatureCollection]: One trimmed, filtered collection.</span>
@@ -28048,7 +28048,7 @@ shape.</p>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the local zip path, downloading it on a cache miss.</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">            product: The product from :meth:`_search` (carries the download URL</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">            product: The product from `_search` (carries the download URL</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">                in `href`).</span>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        Returns:</span>
@@ -28096,9 +28096,9 @@ shape.</p>
 <a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">                this is a no-op.</span>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">            A :class:`~pyramids.feature.collection.FeatureCollection` (also</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">            A `FeatureCollection` (also</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">            written to `root_dir`) or, when `geometry=False`, a</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">            :class:`pandas.DataFrame` of the units and their `rp_&lt;n&gt;` columns.</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">            `pandas.DataFrame` of the units and their `rp_&lt;n&gt;` columns.</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a>
 <a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">            requests.HTTPError: If the download returns a non-2xx status.</span>
@@ -28789,23 +28789,23 @@ this is a no-op.</p>
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
+          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>A</code></td>            <td>
+            <td>
                   <code><span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span> | <span title="pandas.DataFrame">DataFrame</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>class:<code>~pyramids.feature.collection.FeatureCollection</code> (also</p>
+                <p>A <code>FeatureCollection</code> (also</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span> | <span title="pandas.DataFrame">DataFrame</span></code>
             </td>
             <td>
@@ -28815,12 +28815,12 @@ this is a no-op.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span> | <span title="pandas.DataFrame">DataFrame</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>class:<code>pandas.DataFrame</code> of the units and their <code>rp_&lt;n&gt;</code> columns.</p>
+                <p><code>pandas.DataFrame</code> of the units and their <code>rp_&lt;n&gt;</code> columns.</p>
               </div>
             </td>
           </tr>
@@ -28912,9 +28912,9 @@ this is a no-op.</p>
 <a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">            this is a no-op.</span>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        A :class:`~pyramids.feature.collection.FeatureCollection` (also</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        A `FeatureCollection` (also</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        written to `root_dir`) or, when `geometry=False`, a</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        :class:`pandas.DataFrame` of the units and their `rp_&lt;n&gt;` columns.</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        `pandas.DataFrame` of the units and their `rp_&lt;n&gt;` columns.</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a>
 <a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        requests.HTTPError: If the download returns a non-2xx status.</span>
@@ -28986,14 +28986,14 @@ column-grammar vocabularies (<code>indicators</code> / <code>years</code> / <cod
 <code>return_periods</code>) that name a <code>.dbf</code> column: an attribute column is
 <code>f"{indicator}{year}_{scenario}_{return_period}"</code>, e.g. <code>"P30_28_100"</code> for
 population affected, 2030, SSP2-RCP8.5, 100-year flood.</p>
-<p>:class:<code>Catalog</code> is a thin :class:<code>earthlens.base.AbstractCatalog</code> subclass that
+<p><code>Catalog</code> is a thin <code>earthlens.base.AbstractCatalog</code> subclass that
 loads the bundled <code>aqueduct_data_catalog.yaml</code> and exposes its <code>admin_levels:</code>
-block as a map of :class:<code>AdminLevel</code> rows under the inherited :attr:<code>datasets</code>
+block as a map of <code>AdminLevel</code> rows under the inherited <code>datasets</code>
 field (so <code>cat["country"]</code> / <code>"country" in cat</code> / <code>len(cat)</code> and the
 did-you-mean error come for free), alongside the <code>base_url</code>, <code>license</code>,
 <code>attribution</code>, and the three code-map vocabularies. Resolve one admin level with
-:meth:<code>get</code>, list them with :meth:<code>available</code>.</p>
-<p>:data:<code>CATALOG_PATH</code> is the path to the bundled YAML; it is monkey-patchable in
+<code>get</code>, list them with <code>available</code>.</p>
+<p><code>CATALOG_PATH</code> is the path to the bundled YAML; it is monkey-patchable in
 tests.</p>
 
 
@@ -29034,8 +29034,8 @@ tests.</p>
 
         <p>One admin level's download + shapefile spec.</p>
 <p>The admin-level name (<code>"country"</code> / <code>"state"</code> / <code>"basin"</code>) is the parent key
-in :attr:<code>Catalog.datasets</code>; the loader copies it onto the row as
-:attr:<code>level</code> so a resolved level is self-describing.</p>
+in <code>Catalog.datasets</code>; the loader copies it onto the row as
+<code>level</code> so a resolved level is self-describing.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -29071,7 +29071,7 @@ rejected at load time, and the field is excluded from
             <td>
               <div class="doc-md-description">
                 <p>The zip file name the shapefile lives in — a direct download under
-<code>base_url</code> when :attr:<code>container_zip</code> is <code>None</code>, otherwise the entry
+<code>base_url</code> when <code>container_zip</code> is <code>None</code>, otherwise the entry
 to extract from that outer bundle first.</p>
               </div>
             </td>
@@ -29096,7 +29096,7 @@ to extract from that outer bundle first.</p>
             <td>
               <div class="doc-md-description">
                 <p>For an admin level with no standalone URL (<code>state</code>), the
-outer bundle to download; :attr:<code>zip</code> is then extracted from it. <code>None</code>
+outer bundle to download; <code>zip</code> is then extracted from it. <code>None</code>
 for a directly-downloadable level (<code>country</code>, <code>basin</code>).</p>
               </div>
             </td>
@@ -29179,8 +29179,8 @@ for a directly-downloadable level (<code>country</code>, <code>basin</code>).</p
 <a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One admin level&#39;s download + shapefile spec.</span>
 <a id="__codelineno-0-52" name="__codelineno-0-52"></a>
 <a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">    The admin-level name (`&quot;country&quot;` / `&quot;state&quot;` / `&quot;basin&quot;`) is the parent key</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    in :attr:`Catalog.datasets`; the loader copies it onto the row as</span>
-<a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">    :attr:`level` so a resolved level is self-describing.</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    in `Catalog.datasets`; the loader copies it onto the row as</span>
+<a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">    `level` so a resolved level is self-describing.</span>
 <a id="__codelineno-0-56" name="__codelineno-0-56"></a>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">        level: The admin-level name, taken from the catalog key. Empty only</span>
@@ -29189,12 +29189,12 @@ for a directly-downloadable level (<code>country</code>, <code>basin</code>).</p
 <a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">            rejected at load time, and the field is excluded from</span>
 <a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">            `model_dump()` so it does not repeat the row&#39;s own key.</span>
 <a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">        zip: The zip file name the shapefile lives in — a direct download under</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">            `base_url` when :attr:`container_zip` is `None`, otherwise the entry</span>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">            `base_url` when `container_zip` is `None`, otherwise the entry</span>
 <a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">            to extract from that outer bundle first.</span>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">        shapefile_stem: The shapefile name (without extension) inside `zip`; the</span>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">            `.shp` and its sidecars (`.dbf` / `.shx` / `.prj`) all share it.</span>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">        container_zip: For an admin level with no standalone URL (`state`), the</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">            outer bundle to download; :attr:`zip` is then extracted from it. `None`</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">            outer bundle to download; `zip` is then extracted from it. `None`</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">            for a directly-downloadable level (`country`, `basin`).</span>
 <a id="__codelineno-0-71" name="__codelineno-0-71"></a>
 <a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    Examples:</span>
@@ -29267,12 +29267,12 @@ for a directly-downloadable level (<code>country</code>, <code>basin</code>).</p
 
         <p>Catalog for the Aqueduct riverine flood-risk backend.</p>
 <p>Reads the bundled <code>aqueduct_data_catalog.yaml</code> (shipped as package data) and
-exposes its <code>admin_levels:</code> block as a map of :class:<code>AdminLevel</code> rows keyed
-by name under the inherited :attr:<code>datasets</code> field, plus the <code>base_url</code>,
+exposes its <code>admin_levels:</code> block as a map of <code>AdminLevel</code> rows keyed
+by name under the inherited <code>datasets</code> field, plus the <code>base_url</code>,
 <code>license</code>, <code>attribution</code>, and the <code>indicators</code> / <code>years</code> / <code>scenarios</code> /
 <code>return_periods</code> vocabularies. Instantiate with no arguments (<code>Catalog()</code>);
-resolve one admin level with :meth:<code>get</code>, list them with :meth:<code>available</code>,
-and build the download URL for a level with :meth:<code>download_url</code>.</p>
+resolve one admin level with <code>get</code>, list them with <code>available</code>,
+and build the download URL for a level with <code>download_url</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -29293,7 +29293,7 @@ and build the download URL for a level with :meth:<code>download_url</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>Map from admin-level name (<code>"country"</code> / <code>"state"</code> / <code>"basin"</code>)
-to its :class:<code>AdminLevel</code> row.</p>
+to its <code>AdminLevel</code> row.</p>
               </div>
             </td>
           </tr>
@@ -29360,7 +29360,7 @@ to its :class:<code>AdminLevel</code> row.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Scenario name -&gt; its :class:<code>Scenario</code> (code + valid years).</p>
+                <p>Scenario name -&gt; its <code>Scenario</code> (code + valid years).</p>
               </div>
             </td>
           </tr>
@@ -29558,23 +29558,23 @@ to its :class:<code>AdminLevel</code> row.</p>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Catalog for the Aqueduct riverine flood-risk backend.</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    Reads the bundled `aqueduct_data_catalog.yaml` (shipped as package data) and</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    exposes its `admin_levels:` block as a map of :class:`AdminLevel` rows keyed</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    by name under the inherited :attr:`datasets` field, plus the `base_url`,</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    exposes its `admin_levels:` block as a map of `AdminLevel` rows keyed</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    by name under the inherited `datasets` field, plus the `base_url`,</span>
 <a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    `license`, `attribution`, and the `indicators` / `years` / `scenarios` /</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    `return_periods` vocabularies. Instantiate with no arguments (`Catalog()`);</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    resolve one admin level with :meth:`get`, list them with :meth:`available`,</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    and build the download URL for a level with :meth:`download_url`.</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    resolve one admin level with `get`, list them with `available`,</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    and build the download URL for a level with `download_url`.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        datasets: Map from admin-level name (`&quot;country&quot;` / `&quot;state&quot;` / `&quot;basin&quot;`)</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">            to its :class:`AdminLevel` row.</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">            to its `AdminLevel` row.</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        base_url: Host prefix every download URL is built on.</span>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        license: SPDX-style redistribution licence (`&quot;CC-BY-4.0&quot;`).</span>
 <a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        attribution: Required attribution string.</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        indicators: Public metric name -&gt; `.dbf` column prefix (`gdp_affected`</span>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            -&gt; `G`).</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        years: Year -&gt; column code (`&quot;2010&quot;` -&gt; `&quot;10&quot;`).</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        scenarios: Scenario name -&gt; its :class:`Scenario` (code + valid years).</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        scenarios: Scenario name -&gt; its `Scenario` (code + valid years).</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        return_periods: Return period (years, int) -&gt; column code (`1000` -&gt;</span>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            `&quot;1T&quot;`).</span>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a>
@@ -29641,10 +29641,10 @@ to its :class:<code>AdminLevel</code> row.</p>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">                `CATALOG_PATH`.</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            ValueError: If the file has no `admin_levels:` block, or a row /</span>
@@ -29654,9 +29654,9 @@ to its :class:<code>AdminLevel</code> row.</p>
 <a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">))</span>
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">admin_level</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AdminLevel</span><span class="p">:</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve an admin-level name to its :class:`AdminLevel` row.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve an admin-level name to its `AdminLevel` row.</span>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown name.</span>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        Args:</span>
@@ -29919,8 +29919,8 @@ come from <code>base_url</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Resolve an admin-level name to its :class:<code>AdminLevel</code> row.</p>
-<p>Thin wrapper over the inherited :meth:<code>get_dataset</code>, which raises a
+        <p>Resolve an admin-level name to its <code>AdminLevel</code> row.</p>
+<p>Thin wrapper over the inherited <code>get_dataset</code>, which raises a
 <code>ValueError</code> with a did-you-mean hint on an unknown name.</p>
 
 
@@ -30021,9 +30021,9 @@ come from <code>base_url</code>.</p>
 <span class="normal"><a href="#__codelineno-0-338">338</a></span>
 <span class="normal"><a href="#__codelineno-0-339">339</a></span>
 <span class="normal"><a href="#__codelineno-0-340">340</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">admin_level</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AdminLevel</span><span class="p">:</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve an admin-level name to its :class:`AdminLevel` row.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve an admin-level name to its `AdminLevel` row.</span>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown name.</span>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    Args:</span>
@@ -30082,7 +30082,7 @@ come from <code>base_url</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the module-level
-:data:<code>CATALOG_PATH</code>.</p>
+<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -30108,7 +30108,7 @@ come from <code>base_url</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code>.</p>
+                <p>A fully-populated <code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -30164,10 +30164,10 @@ scenario fails validation.</p>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            `CATALOG_PATH`.</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        ValueError: If the file has no `admin_levels:` block, or a row /</span>

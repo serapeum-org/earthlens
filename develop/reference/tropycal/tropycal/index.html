@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24860,11 +24860,11 @@ rendered API. tropycal fetches public best-track files, so there is no
 <p>Thin wrapper over <code>tropycal.tracks.TrackDataset</code> that returns tropical-
 cyclone best tracks — from IBTrACS (global, 1848-present) or HURDAT2
 (NHC North Atlantic / East Pacific reanalysis) — as a pyramids
-:class:<code>~pyramids.feature.collection.FeatureCollection</code> of track features
+<code>FeatureCollection</code> of track features
 (CRS <code>EPSG:4326</code>).</p>
 <p>This is a <code>vector</code> backend: the result is a table of track features, not
-a gridded array, so :data:<code>TropicalCyclone.OUTPUT_KIND</code> is <code>"vector"</code> and
-the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code>
+a gridded array, so <code>TropicalCyclone.OUTPUT_KIND</code> is <code>"vector"</code> and
+the <code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code>
 argument for it. The default geometry is one <code>Point</code> per 6-hourly fix; a
 <code>geometry="track"</code> kwarg returns one <code>LineString</code> per storm with summary
 attributes.</p>
@@ -24877,22 +24877,22 @@ codes — <code>variables=["north_atlantic"]</code>, <code>variables=["north_atl
 "east_pacific"]</code> — <strong>not</strong> data-variable names. This is an intentional,
 documented overload (the facade makes <code>variables</code> a required argument).
 The data source (<code>"ibtracs"</code>/<code>"hurdat"</code>), geometry mode, and filters
-arrive as explicit :class:<code>TropicalCyclone</code> constructor keyword
+arrive as explicit <code>TropicalCyclone</code> constructor keyword
 arguments. Best-track only — realtime / operational / forecast products
 are out of scope.</p>
 <p>Public surface (re-exported from this package):</p>
 <ul>
-<li>:class:<code>TropicalCyclone</code> — the backend; instantiate with a date range,
+<li><code>TropicalCyclone</code> — the backend; instantiate with a date range,
   a bbox, and <code>variables=[basin, ...]</code>, then call
-  :meth:<code>TropicalCyclone.download</code>.</li>
-<li>:class:<code>Catalog</code> — pydantic-backed loader for the bundled
+  <code>TropicalCyclone.download</code>.</li>
+<li><code>Catalog</code> — pydantic-backed loader for the bundled
   <code>tropycal_data_catalog.yaml</code> basin -&gt; track-field catalog.</li>
-<li>:class:<code>Basin</code> — one basin's catalog row (<code>name</code>, <code>sources</code>,
+<li><code>Basin</code> — one basin's catalog row (<code>name</code>, <code>sources</code>,
   <code>fields</code>).</li>
-<li>:class:<code>TrackField</code> — one per-fix track field (<code>units</code>, <code>long_name</code>).</li>
-<li>:func:<code>frame_to_fc</code> / :func:<code>empty_fc</code> — the storm-frame -&gt;
+<li><code>TrackField</code> — one per-fix track field (<code>units</code>, <code>long_name</code>).</li>
+<li><code>frame_to_fc</code> / <code>empty_fc</code> — the storm-frame -&gt;
   FeatureCollection mapper and its empty-result counterpart.</li>
-<li>:data:<code>CATALOG_PATH</code> — path to the bundled basin YAML;
+<li><code>CATALOG_PATH</code> — path to the bundled basin YAML;
   monkey-patchable in tests.</li>
 </ul>
 
@@ -24945,7 +24945,7 @@ are out of scope.</p>
 
 
         <p>One ocean basin's catalog row (the "Dataset" analog).</p>
-<p>The basin code is the parent key in :attr:<code>Catalog.datasets</code> and is
+<p>The basin code is the parent key in <code>Catalog.datasets</code> and is
 not stored on the row.</p>
 
 
@@ -25058,7 +25058,7 @@ short code (<code>"vmax"</code>, <code>"mslp"</code>, <code>"category"</code>).<
 <span class="normal"><a href="#__codelineno-0-176">176</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="k">class</span><span class="w"> </span><span class="nc">Basin</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One ocean basin&#39;s catalog row (the &quot;Dataset&quot; analog).</span>
 <a id="__codelineno-0-144" name="__codelineno-0-144"></a>
-<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">    The basin code is the parent key in :attr:`Catalog.datasets` and is</span>
+<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">    The basin code is the parent key in `Catalog.datasets` and is</span>
 <a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">    not stored on the row.</span>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">    Attributes:</span>
@@ -25133,13 +25133,13 @@ short code (<code>"vmax"</code>, <code>"mslp"</code>, <code>"category"</code>).<
 
         <p>Basin -&gt; track-field catalog for the Tropycal backend.</p>
 <p>Reads the bundled <code>tropycal_data_catalog.yaml</code> (shipped as package
-data) and exposes its <code>basins:</code> block as a map of :class:<code>Basin</code>
-rows, keyed by basin code under the inherited :attr:<code>datasets</code>
+data) and exposes its <code>basins:</code> block as a map of <code>Basin</code>
+rows, keyed by basin code under the inherited <code>datasets</code>
 field. Instantiate with no arguments (<code>Catalog()</code>);
-:func:<code>model_post_init</code> loads and validates the YAML in one pass.
-Resolve a basin with :meth:<code>get_basin</code> (a thin alias over
-:meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>) and a single
-track field with :meth:<code>get_field</code>.</p>
+<code>model_post_init</code> loads and validates the YAML in one pass.
+Resolve a basin with <code>get_basin</code> (a thin alias over
+<code>get_dataset</code>) and a single
+track field with <code>get_field</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -25159,7 +25159,7 @@ track field with :meth:<code>get_field</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from the basin code to its :class:<code>Basin</code> row.</p>
+                <p>Map from the basin code to its <code>Basin</code> row.</p>
               </div>
             </td>
           </tr>
@@ -25452,16 +25452,16 @@ track field with :meth:<code>get_field</code>.</p>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Basin -&gt; track-field catalog for the Tropycal backend.</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a>
 <a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">    Reads the bundled `tropycal_data_catalog.yaml` (shipped as package</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">    data) and exposes its `basins:` block as a map of :class:`Basin`</span>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">    rows, keyed by basin code under the inherited :attr:`datasets`</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">    data) and exposes its `basins:` block as a map of `Basin`</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">    rows, keyed by basin code under the inherited `datasets`</span>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">    field. Instantiate with no arguments (`Catalog()`);</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">    :func:`model_post_init` loads and validates the YAML in one pass.</span>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">    Resolve a basin with :meth:`get_basin` (a thin alias over</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`) and a single</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">    track field with :meth:`get_field`.</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">    `model_post_init` loads and validates the YAML in one pass.</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">    Resolve a basin with `get_basin` (a thin alias over</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">    `get_dataset`) and a single</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">    track field with `get_field`.</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">        datasets: Map from the basin code to its :class:`Basin` row.</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">        datasets: Map from the basin code to its `Basin` row.</span>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">        - List basin codes and resolve one:</span>
@@ -25495,13 +25495,13 @@ track field with :meth:<code>get_field</code>.</p>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no basins were supplied.</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        `Catalog()` with no args reads :data:`CATALOG_PATH` (through the</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        `Catalog()` with no args reads `CATALOG_PATH` (through the</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        `(path, mtime_ns)` cache); passing `datasets=...` skips the disk</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        read (used in tests). Either way, :attr:`available_datasets` is</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        read (used in tests). Either way, `available_datasets` is</span>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">        populated with the basin codes — the whole tropycal universe.</span>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a>
 <a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">            ValueError: Propagated from :meth:`load` when the YAML is</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">            ValueError: Propagated from `load` when the YAML is</span>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">                missing, empty, or has a malformed basin row.</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
@@ -25516,25 +25516,25 @@ track field with :meth:<code>get_field</code>.</p>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a>
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            A fully-populated :class:`Catalog` with `datasets` and the</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            A fully-populated `Catalog` with `datasets` and the</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            `available_datasets` index set.</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">            ValueError: If the file has no `basins:` block, or a row</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">                fails :class:`Basin` validation.</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">                fails `Basin` validation.</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>        <span class="n">basins</span> <span class="o">=</span> <span class="n">_load_basins</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">basins</span><span class="p">),</span> <span class="n">available_datasets</span><span class="o">=</span><span class="nb">sorted</span><span class="p">(</span><span class="n">basins</span><span class="p">))</span>
 <a id="__codelineno-0-260" name="__codelineno-0-260"></a>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_basin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Basin</span><span class="p">:</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Basin` for `code`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Basin` for `code`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        Thin alias over</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        `get_dataset`.</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">            code: A tropycal basin code (`&quot;north_atlantic&quot;`, …).</span>
@@ -25576,7 +25576,7 @@ track field with :meth:<code>get_field</code>.</p>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TrackField</span><span class="p">:</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Leaf accessor for the shared two-arg get_variable contract.</span>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        Alias of :meth:`get_field` so the tropycal leaf is reachable</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        Alias of `get_field` so the tropycal leaf is reachable</span>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        under the same `get_variable(dataset_key, variable_name)` verb</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        the other two-level catalogs use.</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>
@@ -25616,7 +25616,7 @@ track field with :meth:<code>get_field</code>.</p>
 <a id="__codelineno-0-344" name="__codelineno-0-344"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a structured introspection record for a basin.</span>
 <a id="__codelineno-0-346" name="__codelineno-0-346"></a>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        Mirrors :meth:`earthlens.ecmwf.Catalog.describe`: a runtime &quot;what</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        Mirrors `earthlens.ecmwf.Catalog.describe`: a runtime &quot;what</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        does basin X expose?&quot; helper a CLI / notebook can dump without</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        walking the YAML.</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a>
@@ -25656,8 +25656,8 @@ track field with :meth:<code>get_field</code>.</p>
 <a id="__codelineno-0-384" name="__codelineno-0-384"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Report structural hygiene issues across the loaded catalog.</span>
 <a id="__codelineno-0-386" name="__codelineno-0-386"></a>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        Mirrors :meth:`earthlens.ecmwf.Catalog.health` /</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        :meth:`earthlens.gee.Catalog.health`: returns a mapping</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        Mirrors `earthlens.ecmwf.Catalog.health` /</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        `earthlens.gee.Catalog.health`: returns a mapping</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">        `check_name -&gt; sorted list of offenders`. An empty list means the</span>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        check passes; an empty dict means the catalog is clean. Schema-level</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        invariants (duplicate keys, unknown fields) are already enforced at</span>
@@ -25789,7 +25789,7 @@ track field with :meth:<code>get_field</code>.</p>
     <div class="doc doc-contents ">
 
         <p>Return a structured introspection record for a basin.</p>
-<p>Mirrors :meth:<code>earthlens.ecmwf.Catalog.describe</code>: a runtime "what
+<p>Mirrors <code>earthlens.ecmwf.Catalog.describe</code>: a runtime "what
 does basin X expose?" helper a CLI / notebook can dump without
 walking the YAML.</p>
 
@@ -25949,7 +25949,7 @@ walking the YAML.</p>
 <span class="normal"><a href="#__codelineno-0-382">382</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="k">def</span><span class="w"> </span><span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a structured introspection record for a basin.</span>
 <a id="__codelineno-0-346" name="__codelineno-0-346"></a>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">    Mirrors :meth:`earthlens.ecmwf.Catalog.describe`: a runtime &quot;what</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">    Mirrors `earthlens.ecmwf.Catalog.describe`: a runtime &quot;what</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    does basin X expose?&quot; helper a CLI / notebook can dump without</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">    walking the YAML.</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a>
@@ -26002,9 +26002,9 @@ walking the YAML.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the :class:<code>Basin</code> for <code>code</code>, with a did-you-mean hint.</p>
+        <p>Return the <code>Basin</code> for <code>code</code>, with a did-you-mean hint.</p>
 <p>Thin alias over
-:meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>.</p>
+<code>get_dataset</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -26102,10 +26102,10 @@ walking the YAML.</p>
 <span class="normal"><a href="#__codelineno-0-274">274</a></span>
 <span class="normal"><a href="#__codelineno-0-275">275</a></span>
 <span class="normal"><a href="#__codelineno-0-276">276</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_basin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Basin</span><span class="p">:</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Basin` for `code`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Basin` for `code`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">    Thin alias over</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">    `get_dataset`.</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">        code: A tropycal basin code (`&quot;north_atlantic&quot;`, …).</span>
@@ -26320,7 +26320,7 @@ walking the YAML.</p>
     <div class="doc doc-contents ">
 
         <p>Leaf accessor for the shared two-arg get_variable contract.</p>
-<p>Alias of :meth:<code>get_field</code> so the tropycal leaf is reachable
+<p>Alias of <code>get_field</code> so the tropycal leaf is reachable
 under the same <code>get_variable(dataset_key, variable_name)</code> verb
 the other two-level catalogs use.</p>
 
@@ -26414,7 +26414,7 @@ the other two-level catalogs use.</p>
 <span class="normal"><a href="#__codelineno-0-318">318</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TrackField</span><span class="p">:</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Leaf accessor for the shared two-arg get_variable contract.</span>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">    Alias of :meth:`get_field` so the tropycal leaf is reachable</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">    Alias of `get_field` so the tropycal leaf is reachable</span>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    under the same `get_variable(dataset_key, variable_name)` verb</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    the other two-level catalogs use.</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>
@@ -26444,8 +26444,8 @@ the other two-level catalogs use.</p>
     <div class="doc doc-contents ">
 
         <p>Report structural hygiene issues across the loaded catalog.</p>
-<p>Mirrors :meth:<code>earthlens.ecmwf.Catalog.health</code> /
-:meth:<code>earthlens.gee.Catalog.health</code>: returns a mapping
+<p>Mirrors <code>earthlens.ecmwf.Catalog.health</code> /
+<code>earthlens.gee.Catalog.health</code>: returns a mapping
 <code>check_name -&gt; sorted list of offenders</code>. An empty list means the
 check passes; an empty dict means the catalog is clean. Schema-level
 invariants (duplicate keys, unknown fields) are already enforced at
@@ -26545,8 +26545,8 @@ schema cannot express.</p>
 <span class="normal"><a href="#__codelineno-0-430">430</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Report structural hygiene issues across the loaded catalog.</span>
 <a id="__codelineno-0-386" name="__codelineno-0-386"></a>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">    Mirrors :meth:`earthlens.ecmwf.Catalog.health` /</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">    :meth:`earthlens.gee.Catalog.health`: returns a mapping</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">    Mirrors `earthlens.ecmwf.Catalog.health` /</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">    `earthlens.gee.Catalog.health`: returns a mapping</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">    `check_name -&gt; sorted list of offenders`. An empty list means the</span>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">    check passes; an empty dict means the catalog is clean. Schema-level</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">    invariants (duplicate keys, unknown fields) are already enforced at</span>
@@ -26634,7 +26634,7 @@ schema cannot express.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the
-module-level :data:<code>CATALOG_PATH</code>.</p>
+module-level <code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -26660,7 +26660,7 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code> with <code>datasets</code> and the</p>
+                <p>A fully-populated <code>Catalog</code> with <code>datasets</code> and the</p>
               </div>
             </td>
           </tr>
@@ -26694,7 +26694,7 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>If the file has no <code>basins:</code> block, or a row
-fails :class:<code>Basin</code> validation.</p>
+fails <code>Basin</code> validation.</p>
               </div>
             </td>
           </tr>
@@ -26728,15 +26728,15 @@ fails :class:<code>Basin</code> validation.</p>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a>
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        A fully-populated :class:`Catalog` with `datasets` and the</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        A fully-populated `Catalog` with `datasets` and the</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        `available_datasets` index set.</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        ValueError: If the file has no `basins:` block, or a row</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">            fails :class:`Basin` validation.</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">            fails `Basin` validation.</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="n">basins</span> <span class="o">=</span> <span class="n">_load_basins</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
@@ -26759,9 +26759,9 @@ fails :class:<code>Basin</code> validation.</p>
     <div class="doc doc-contents ">
 
         <p>Auto-load the bundled catalog when no basins were supplied.</p>
-<p><code>Catalog()</code> with no args reads :data:<code>CATALOG_PATH</code> (through the
+<p><code>Catalog()</code> with no args reads <code>CATALOG_PATH</code> (through the
 <code>(path, mtime_ns)</code> cache); passing <code>datasets=...</code> skips the disk
-read (used in tests). Either way, :attr:<code>available_datasets</code> is
+read (used in tests). Either way, <code>available_datasets</code> is
 populated with the basin codes — the whole tropycal universe.</p>
 
 
@@ -26780,7 +26780,7 @@ populated with the basin codes — the whole tropycal universe.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Propagated from :meth:<code>load</code> when the YAML is
+                <p>Propagated from <code>load</code> when the YAML is
 missing, empty, or has a malformed basin row.</p>
               </div>
             </td>
@@ -26810,13 +26810,13 @@ missing, empty, or has a malformed basin row.</p>
 <span class="normal"><a href="#__codelineno-0-239">239</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no basins were supplied.</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    `Catalog()` with no args reads :data:`CATALOG_PATH` (through the</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    `Catalog()` with no args reads `CATALOG_PATH` (through the</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">    `(path, mtime_ns)` cache); passing `datasets=...` skips the disk</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    read (used in tests). Either way, :attr:`available_datasets` is</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    read (used in tests). Either way, `available_datasets` is</span>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    populated with the basin codes — the whole tropycal universe.</span>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a>
 <a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        ValueError: Propagated from :meth:`load` when the YAML is</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        ValueError: Propagated from `load` when the YAML is</span>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">            missing, empty, or has a malformed basin row.</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
@@ -26983,7 +26983,7 @@ missing, empty, or has a malformed basin row.</p>
 
 
         <p>One per-fix track field (the "Variable" analog).</p>
-<p>The field's short code is the parent key in :attr:<code>Basin.fields</code> and
+<p>The field's short code is the parent key in <code>Basin.fields</code> and
 is not stored on the row.</p>
 
 
@@ -27074,7 +27074,7 @@ is not stored on the row.</p>
 <span class="normal"><a href="#__codelineno-0-139">139</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="k">class</span><span class="w"> </span><span class="nc">TrackField</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One per-fix track field (the &quot;Variable&quot; analog).</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a>
-<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    The field&#39;s short code is the parent key in :attr:`Basin.fields` and</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    The field&#39;s short code is the parent key in `Basin.fields` and</span>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">    is not stored on the row.</span>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a>
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">    Attributes:</span>
@@ -27148,7 +27148,7 @@ space/time window of cyclone best tracks through the same
 <code>download()</code> shape every other earthlens backend uses. Each basin
 code in <code>variables</code> becomes one (slow, cached) <code>TrackDataset</code> load;
 the storms in the requested seasons are filtered to the window + bbox
-and mapped to a :class:<code>~pyramids.feature.collection.FeatureCollection</code>,
+and mapped to a <code>FeatureCollection</code>,
 and the basins' results are unioned into the single FeatureCollection
 <code>download()</code> returns.</p>
 <p>Four products, selected with <code>product=</code>: <code>besttrack</code> (the default),
@@ -27996,7 +27996,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">    `download()` shape every other earthlens backend uses. Each basin</span>
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">    code in `variables` becomes one (slow, cached) `TrackDataset` load;</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    the storms in the requested seasons are filtered to the window + bbox</span>
-<a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">    and mapped to a :class:`~pyramids.feature.collection.FeatureCollection`,</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">    and mapped to a `FeatureCollection`,</span>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    and the basins&#39; results are unioned into the single FeatureCollection</span>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    `download()` returns.</span>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a>
@@ -28183,7 +28183,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-280" name="__codelineno-0-280"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a `TemporalExtent`.</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        tropycal is queried per season (calendar year) and filtered at the</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        fix level, so there is no per-date loop. The resolution is kept as</span>
@@ -28207,7 +28207,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_whole_window_extent</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;One :class:`RemoteProduct` per requested unit.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;One `RemoteProduct` per requested unit.</span>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        For `product=&quot;besttrack&quot;` that is one product per basin (each</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        basin/source pair validated against the catalog). For</span>
@@ -28251,11 +28251,11 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Load each basin&#39;s TrackDataset and map it to a FeatureCollection.</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        Widens the inherited `-&gt; list[Path]` contract: a vector backend</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        returns in-memory :class:`FeatureCollection`s, not file paths. One</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        returns in-memory `FeatureCollection`s, not file paths. One</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        collection per product, in request order.</span>
 <a id="__codelineno-0-353" name="__codelineno-0-353"></a>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            products: The list returned by :meth:`_search`.</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            products: The list returned by `_search`.</span>
 <a id="__codelineno-0-356" name="__codelineno-0-356"></a>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">            list[FeatureCollection]: One collection per basin, same order.</span>
@@ -28274,11 +28274,11 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        Iterates the requested seasons (`start.year .. end.year`), pulls</span>
 <a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        each storm&#39;s `to_dataframe(attrs_as_columns=True)`, applies the</span>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        optional `storm_type` / `min_category` fix filters, and hands the</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        per-storm frames to :func:`earthlens.tropycal.events.frame_to_fc`</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        per-storm frames to `earthlens.tropycal.events.frame_to_fc`</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        for the window + bbox filter and geometry mapping.</span>
 <a id="__codelineno-0-376" name="__codelineno-0-376"></a>
 <a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`;</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">            product: One `RemoteProduct` from `_search`;</span>
 <a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">                `product.id` is the basin code.</span>
 <a id="__codelineno-0-380" name="__codelineno-0-380"></a>
 <a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        Returns:</span>
@@ -28319,10 +28319,10 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        recon sub-product (`hdobs` / `dropsondes` / `vdms`) for it, and maps</span>
 <a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        the observation DataFrame to a window+bbox-filtered point</span>
 <a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">        FeatureCollection via</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">        :func:`earthlens.tropycal.events.recon_to_fc`.</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">        `earthlens.tropycal.events.recon_to_fc`.</span>
 <a id="__codelineno-0-420" name="__codelineno-0-420"></a>
 <a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">            product: A :class:`RemoteProduct` from :meth:`_search`;</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">            product: A `RemoteProduct` from `_search`;</span>
 <a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">                `product.id` is the storm identifier.</span>
 <a id="__codelineno-0-424" name="__codelineno-0-424"></a>
 <a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        Returns:</span>
@@ -28515,7 +28515,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">        Each basin in `self.vars` is loaded once; its matched features are</span>
 <a id="__codelineno-0-613" name="__codelineno-0-613"></a><span class="sd">        written to one vector file under `path` (named after the basin),</span>
 <a id="__codelineno-0-614" name="__codelineno-0-614"></a><span class="sd">        and the per-basin results are concatenated into the single</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">        :class:`FeatureCollection` returned. An all-empty result returns a</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">        `FeatureCollection` returned. An all-empty result returns a</span>
 <a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">        schema-correct empty FeatureCollection and writes nothing.</span>
 <a id="__codelineno-0-617" name="__codelineno-0-617"></a>
 <a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">        Args:</span>
@@ -29539,7 +29539,7 @@ is given no <code>ships_time</code>.</p>
 <p>Each basin in <code>self.vars</code> is loaded once; its matched features are
 written to one vector file under <code>path</code> (named after the basin),
 and the per-basin results are concatenated into the single
-:class:<code>FeatureCollection</code> returned. An all-empty result returns a
+<code>FeatureCollection</code> returned. An all-empty result returns a
 schema-correct empty FeatureCollection and writes nothing.</p>
 
 
@@ -29719,7 +29719,7 @@ basin's track features, CRS <code>EPSG:4326</code>. Empty
 <a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">    Each basin in `self.vars` is loaded once; its matched features are</span>
 <a id="__codelineno-0-613" name="__codelineno-0-613"></a><span class="sd">    written to one vector file under `path` (named after the basin),</span>
 <a id="__codelineno-0-614" name="__codelineno-0-614"></a><span class="sd">    and the per-basin results are concatenated into the single</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">    :class:`FeatureCollection` returned. An all-empty result returns a</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">    `FeatureCollection` returned. An all-empty result returns a</span>
 <a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">    schema-correct empty FeatureCollection and writes nothing.</span>
 <a id="__codelineno-0-617" name="__codelineno-0-617"></a>
 <a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">    Args:</span>
@@ -29866,8 +29866,8 @@ result is a legitimate answer, not an error.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>"point"</code> (:data:<code>POINT_COLUMNS</code>) or <code>"track"</code>
-(:data:<code>TRACK_COLUMNS</code>).</p>
+                <p><code>"point"</code> (<code>POINT_COLUMNS</code>) or <code>"track"</code>
+(<code>TRACK_COLUMNS</code>).</p>
               </div>
             </td>
             <td>
@@ -29965,8 +29965,8 @@ declared dtypes, an empty <code>geometry</code> column, CRS
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">    result is a legitimate answer, not an error.</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        geometry: `&quot;point&quot;` (:data:`POINT_COLUMNS`) or `&quot;track&quot;`</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            (:data:`TRACK_COLUMNS`).</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        geometry: `&quot;point&quot;` (`POINT_COLUMNS`) or `&quot;track&quot;`</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            (`TRACK_COLUMNS`).</span>
 <a id="__codelineno-0-276" name="__codelineno-0-276"></a>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        FeatureCollection: Zero rows, the mode&#39;s columns with their</span>
@@ -30030,7 +30030,7 @@ declared dtypes, an empty <code>geometry</code> column, CRS
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Zero rows, the :data:<code>RECON_COLUMNS</code> columns with
+                <p>Zero rows, the <code>RECON_COLUMNS</code> columns with
 their dtypes, an empty <code>geometry</code>, CRS <code>EPSG:4326</code>.</p>
               </div>
             </td>
@@ -30083,7 +30083,7 @@ their dtypes, an empty <code>geometry</code>, CRS <code>EPSG:4326</code>.</p>
 <a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return an empty recon-observation `FeatureCollection` (schema-correct).</span>
 <a id="__codelineno-0-424" name="__codelineno-0-424"></a>
 <a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">        FeatureCollection: Zero rows, the :data:`RECON_COLUMNS` columns with</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">        FeatureCollection: Zero rows, the `RECON_COLUMNS` columns with</span>
 <a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">            their dtypes, an empty `geometry`, CRS `EPSG:4326`.</span>
 <a id="__codelineno-0-428" name="__codelineno-0-428"></a>
 <a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">    Examples:</span>
@@ -30126,7 +30126,7 @@ their dtypes, an empty <code>geometry</code>, CRS <code>EPSG:4326</code>.</p>
 <p>Each input frame is one storm's <code>Storm.to_dataframe(attrs_as_columns=
 True)</code> output (so it carries <code>id</code> / <code>name</code> alongside the per-fix
 <code>time</code> / <code>lat</code> / <code>lon</code> / <code>vmax</code> / <code>mslp</code> / <code>type</code> columns). Fixes are
-filtered to the window + bbox per :mod:<code>earthlens.tropycal.events</code>
+filtered to the window + bbox per <code>earthlens.tropycal.events</code>
 module docs, then mapped to the chosen geometry.</p>
 
 
@@ -30432,7 +30432,7 @@ stamped on every row.</p>
 <a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    Each input frame is one storm&#39;s `Storm.to_dataframe(attrs_as_columns=</span>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">    True)` output (so it carries `id` / `name` alongside the per-fix</span>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    `time` / `lat` / `lon` / `vmax` / `mslp` / `type` columns). Fixes are</span>
-<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">    filtered to the window + bbox per :mod:`earthlens.tropycal.events`</span>
+<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">    filtered to the window + bbox per `earthlens.tropycal.events`</span>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">    module docs, then mapped to the chosen geometry.</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">    Args:</span>
@@ -30561,8 +30561,8 @@ stamped on every row.</p>
 columns (<code>wspd</code>, <code>p_sfc</code>, <code>temp</code>) are read defensively since they differ
 by sub-product. Observations are filtered to the window + bbox at the
 point level (same loose rule as best-track fixes) and mapped to the
-:data:<code>RECON_COLUMNS</code> schema. A <code>None</code>/empty frame (a storm with no recon
-data — most storms) returns :func:<code>empty_recon_fc</code>.</p>
+<code>RECON_COLUMNS</code> schema. A <code>None</code>/empty frame (a storm with no recon
+data — most storms) returns <code>empty_recon_fc</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -30827,8 +30827,8 @@ every row.</p>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">    columns (`wspd`, `p_sfc`, `temp`) are read defensively since they differ</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    by sub-product. Observations are filtered to the window + bbox at the</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">    point level (same loose rule as best-track fixes) and mapped to the</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">    :data:`RECON_COLUMNS` schema. A `None`/empty frame (a storm with no recon</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">    data — most storms) returns :func:`empty_recon_fc`.</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">    `RECON_COLUMNS` schema. A `None`/empty frame (a storm with no recon</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">    data — most storms) returns `empty_recon_fc`.</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a>
 <a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        frame: The recon sub-product `.data` frame, or `None`.</span>
@@ -30930,18 +30930,18 @@ IBTrACS (global) or HURDAT2 (North Atlantic / East Pacific reanalysis) —
 through the same <code>download()</code> shape every other earthlens backend uses.
 Each basin code in <code>variables</code> becomes one <code>TrackDataset</code> load; the
 storms in the requested seasons are mapped to a pyramids
-:class:<code>~pyramids.feature.collection.FeatureCollection</code> by
-:mod:<code>earthlens.tropycal.events</code>.</p>
+<code>FeatureCollection</code> by
+<code>earthlens.tropycal.events</code>.</p>
 <p>This is a <code>vector</code> backend: the result is a table of track features
 (per-fix <code>Point</code>s by default, or one <code>LineString</code> per storm with
 <code>geometry="track"</code>), not a gridded array, so <code>OUTPUT_KIND = "vector"</code> and
-the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code>
+the <code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code>
 argument. <code>download()</code> returns the in-memory FeatureCollection (the union
 across requested basins) and writes one vector file per basin to <code>path</code>.</p>
 <p>tropycal needs <strong>no credentials</strong> — it fetches best-track files from
 NCEI / NHC over HTTPS itself — so there is no <code>auth.py</code>. It is an
 optional dependency (the <code>[tropycal]</code> extra), imported lazily inside
-:meth:<code>_get_track_dataset</code> so the package imports without it.</p>
+<code>_get_track_dataset</code> so the package imports without it.</p>
 <p>Basin selection follows the vector-backend reading of <code>variables</code>: it is
 a <code>list[str]</code> of basin codes (<code>["north_atlantic"]</code>,
 <code>["north_atlantic", "east_pacific"]</code>), <strong>not</strong> data-variable names. The
@@ -30992,7 +30992,7 @@ space/time window of cyclone best tracks through the same
 <code>download()</code> shape every other earthlens backend uses. Each basin
 code in <code>variables</code> becomes one (slow, cached) <code>TrackDataset</code> load;
 the storms in the requested seasons are filtered to the window + bbox
-and mapped to a :class:<code>~pyramids.feature.collection.FeatureCollection</code>,
+and mapped to a <code>FeatureCollection</code>,
 and the basins' results are unioned into the single FeatureCollection
 <code>download()</code> returns.</p>
 <p>Four products, selected with <code>product=</code>: <code>besttrack</code> (the default),
@@ -31840,7 +31840,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">    `download()` shape every other earthlens backend uses. Each basin</span>
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">    code in `variables` becomes one (slow, cached) `TrackDataset` load;</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    the storms in the requested seasons are filtered to the window + bbox</span>
-<a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">    and mapped to a :class:`~pyramids.feature.collection.FeatureCollection`,</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">    and mapped to a `FeatureCollection`,</span>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    and the basins&#39; results are unioned into the single FeatureCollection</span>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    `download()` returns.</span>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a>
@@ -32027,7 +32027,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-280" name="__codelineno-0-280"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a `TemporalExtent`.</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        tropycal is queried per season (calendar year) and filtered at the</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        fix level, so there is no per-date loop. The resolution is kept as</span>
@@ -32051,7 +32051,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_whole_window_extent</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;One :class:`RemoteProduct` per requested unit.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;One `RemoteProduct` per requested unit.</span>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        For `product=&quot;besttrack&quot;` that is one product per basin (each</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        basin/source pair validated against the catalog). For</span>
@@ -32095,11 +32095,11 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Load each basin&#39;s TrackDataset and map it to a FeatureCollection.</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        Widens the inherited `-&gt; list[Path]` contract: a vector backend</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        returns in-memory :class:`FeatureCollection`s, not file paths. One</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        returns in-memory `FeatureCollection`s, not file paths. One</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        collection per product, in request order.</span>
 <a id="__codelineno-0-353" name="__codelineno-0-353"></a>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            products: The list returned by :meth:`_search`.</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            products: The list returned by `_search`.</span>
 <a id="__codelineno-0-356" name="__codelineno-0-356"></a>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">            list[FeatureCollection]: One collection per basin, same order.</span>
@@ -32118,11 +32118,11 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        Iterates the requested seasons (`start.year .. end.year`), pulls</span>
 <a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        each storm&#39;s `to_dataframe(attrs_as_columns=True)`, applies the</span>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        optional `storm_type` / `min_category` fix filters, and hands the</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        per-storm frames to :func:`earthlens.tropycal.events.frame_to_fc`</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        per-storm frames to `earthlens.tropycal.events.frame_to_fc`</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        for the window + bbox filter and geometry mapping.</span>
 <a id="__codelineno-0-376" name="__codelineno-0-376"></a>
 <a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`;</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">            product: One `RemoteProduct` from `_search`;</span>
 <a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">                `product.id` is the basin code.</span>
 <a id="__codelineno-0-380" name="__codelineno-0-380"></a>
 <a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        Returns:</span>
@@ -32163,10 +32163,10 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        recon sub-product (`hdobs` / `dropsondes` / `vdms`) for it, and maps</span>
 <a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        the observation DataFrame to a window+bbox-filtered point</span>
 <a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">        FeatureCollection via</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">        :func:`earthlens.tropycal.events.recon_to_fc`.</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">        `earthlens.tropycal.events.recon_to_fc`.</span>
 <a id="__codelineno-0-420" name="__codelineno-0-420"></a>
 <a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">            product: A :class:`RemoteProduct` from :meth:`_search`;</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">            product: A `RemoteProduct` from `_search`;</span>
 <a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">                `product.id` is the storm identifier.</span>
 <a id="__codelineno-0-424" name="__codelineno-0-424"></a>
 <a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        Returns:</span>
@@ -32359,7 +32359,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">        Each basin in `self.vars` is loaded once; its matched features are</span>
 <a id="__codelineno-0-613" name="__codelineno-0-613"></a><span class="sd">        written to one vector file under `path` (named after the basin),</span>
 <a id="__codelineno-0-614" name="__codelineno-0-614"></a><span class="sd">        and the per-basin results are concatenated into the single</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">        :class:`FeatureCollection` returned. An all-empty result returns a</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">        `FeatureCollection` returned. An all-empty result returns a</span>
 <a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">        schema-correct empty FeatureCollection and writes nothing.</span>
 <a id="__codelineno-0-617" name="__codelineno-0-617"></a>
 <a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">        Args:</span>
@@ -33383,7 +33383,7 @@ is given no <code>ships_time</code>.</p>
 <p>Each basin in <code>self.vars</code> is loaded once; its matched features are
 written to one vector file under <code>path</code> (named after the basin),
 and the per-basin results are concatenated into the single
-:class:<code>FeatureCollection</code> returned. An all-empty result returns a
+<code>FeatureCollection</code> returned. An all-empty result returns a
 schema-correct empty FeatureCollection and writes nothing.</p>
 
 
@@ -33563,7 +33563,7 @@ basin's track features, CRS <code>EPSG:4326</code>. Empty
 <a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">    Each basin in `self.vars` is loaded once; its matched features are</span>
 <a id="__codelineno-0-613" name="__codelineno-0-613"></a><span class="sd">    written to one vector file under `path` (named after the basin),</span>
 <a id="__codelineno-0-614" name="__codelineno-0-614"></a><span class="sd">    and the per-basin results are concatenated into the single</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">    :class:`FeatureCollection` returned. An all-empty result returns a</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">    `FeatureCollection` returned. An all-empty result returns a</span>
 <a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">    schema-correct empty FeatureCollection and writes nothing.</span>
 <a id="__codelineno-0-617" name="__codelineno-0-617"></a>
 <a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">    Args:</span>
@@ -33660,17 +33660,17 @@ columns for every basin — so the catalog's value is recording the valid
 basin codes and which <code>source</code>s serve each one.</p>
 <p><code>Basin</code> is the "Dataset" analog (<code>name</code>, <code>sources</code>, <code>fields</code>);
 <code>TrackField</code> is the "Variable" analog (<code>units</code>, <code>long_name</code>).
-:class:<code>Catalog</code> is an :class:<code>earthlens.base.AbstractCatalog</code> subclass
+<code>Catalog</code> is an <code>earthlens.base.AbstractCatalog</code> subclass
 that loads the bundled <code>tropycal_data_catalog.yaml</code> and stores the basin
 map under the inherited <code>datasets</code> field — which gives it the
 <code>cat["north_atlantic"]</code> / <code>"north_atlantic" in cat</code> / <code>len(cat)</code>
 dict-like surface and the did-you-mean error for free.</p>
 <p>It mirrors the ECMWF / GEE catalogs' shape: it exposes an
-:attr:<code>Catalog.available_datasets</code> index (every basin tropycal serves —
+<code>Catalog.available_datasets</code> index (every basin tropycal serves —
 here that <em>is</em> the curated set, since the basins are the whole universe),
-a :meth:<code>Catalog.health</code> hygiene report, and a <code>(path, mtime_ns)</code> parse
-cache (see :func:<code>clear_catalog_cache</code>) so repeated <code>Catalog()</code>
-construction is ~1 ms. :data:<code>CATALOG_PATH</code> is the path to the bundled
+a <code>Catalog.health</code> hygiene report, and a <code>(path, mtime_ns)</code> parse
+cache (see <code>clear_catalog_cache</code>) so repeated <code>Catalog()</code>
+construction is ~1 ms. <code>CATALOG_PATH</code> is the path to the bundled
 YAML and is monkey-patchable in tests.</p>
 
 
@@ -33710,7 +33710,7 @@ YAML and is monkey-patchable in tests.</p>
 
 
         <p>One ocean basin's catalog row (the "Dataset" analog).</p>
-<p>The basin code is the parent key in :attr:<code>Catalog.datasets</code> and is
+<p>The basin code is the parent key in <code>Catalog.datasets</code> and is
 not stored on the row.</p>
 
 
@@ -33823,7 +33823,7 @@ short code (<code>"vmax"</code>, <code>"mslp"</code>, <code>"category"</code>).<
 <span class="normal"><a href="#__codelineno-0-176">176</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="k">class</span><span class="w"> </span><span class="nc">Basin</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One ocean basin&#39;s catalog row (the &quot;Dataset&quot; analog).</span>
 <a id="__codelineno-0-144" name="__codelineno-0-144"></a>
-<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">    The basin code is the parent key in :attr:`Catalog.datasets` and is</span>
+<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">    The basin code is the parent key in `Catalog.datasets` and is</span>
 <a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">    not stored on the row.</span>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">    Attributes:</span>
@@ -33898,13 +33898,13 @@ short code (<code>"vmax"</code>, <code>"mslp"</code>, <code>"category"</code>).<
 
         <p>Basin -&gt; track-field catalog for the Tropycal backend.</p>
 <p>Reads the bundled <code>tropycal_data_catalog.yaml</code> (shipped as package
-data) and exposes its <code>basins:</code> block as a map of :class:<code>Basin</code>
-rows, keyed by basin code under the inherited :attr:<code>datasets</code>
+data) and exposes its <code>basins:</code> block as a map of <code>Basin</code>
+rows, keyed by basin code under the inherited <code>datasets</code>
 field. Instantiate with no arguments (<code>Catalog()</code>);
-:func:<code>model_post_init</code> loads and validates the YAML in one pass.
-Resolve a basin with :meth:<code>get_basin</code> (a thin alias over
-:meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>) and a single
-track field with :meth:<code>get_field</code>.</p>
+<code>model_post_init</code> loads and validates the YAML in one pass.
+Resolve a basin with <code>get_basin</code> (a thin alias over
+<code>get_dataset</code>) and a single
+track field with <code>get_field</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -33924,7 +33924,7 @@ track field with :meth:<code>get_field</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from the basin code to its :class:<code>Basin</code> row.</p>
+                <p>Map from the basin code to its <code>Basin</code> row.</p>
               </div>
             </td>
           </tr>
@@ -34217,16 +34217,16 @@ track field with :meth:<code>get_field</code>.</p>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Basin -&gt; track-field catalog for the Tropycal backend.</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a>
 <a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">    Reads the bundled `tropycal_data_catalog.yaml` (shipped as package</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">    data) and exposes its `basins:` block as a map of :class:`Basin`</span>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">    rows, keyed by basin code under the inherited :attr:`datasets`</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">    data) and exposes its `basins:` block as a map of `Basin`</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">    rows, keyed by basin code under the inherited `datasets`</span>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">    field. Instantiate with no arguments (`Catalog()`);</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">    :func:`model_post_init` loads and validates the YAML in one pass.</span>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">    Resolve a basin with :meth:`get_basin` (a thin alias over</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`) and a single</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">    track field with :meth:`get_field`.</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">    `model_post_init` loads and validates the YAML in one pass.</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">    Resolve a basin with `get_basin` (a thin alias over</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">    `get_dataset`) and a single</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">    track field with `get_field`.</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">        datasets: Map from the basin code to its :class:`Basin` row.</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">        datasets: Map from the basin code to its `Basin` row.</span>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">        - List basin codes and resolve one:</span>
@@ -34260,13 +34260,13 @@ track field with :meth:<code>get_field</code>.</p>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no basins were supplied.</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        `Catalog()` with no args reads :data:`CATALOG_PATH` (through the</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        `Catalog()` with no args reads `CATALOG_PATH` (through the</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        `(path, mtime_ns)` cache); passing `datasets=...` skips the disk</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        read (used in tests). Either way, :attr:`available_datasets` is</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        read (used in tests). Either way, `available_datasets` is</span>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">        populated with the basin codes — the whole tropycal universe.</span>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a>
 <a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">            ValueError: Propagated from :meth:`load` when the YAML is</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">            ValueError: Propagated from `load` when the YAML is</span>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">                missing, empty, or has a malformed basin row.</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
@@ -34281,25 +34281,25 @@ track field with :meth:<code>get_field</code>.</p>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a>
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            A fully-populated :class:`Catalog` with `datasets` and the</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            A fully-populated `Catalog` with `datasets` and the</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            `available_datasets` index set.</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">            ValueError: If the file has no `basins:` block, or a row</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">                fails :class:`Basin` validation.</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">                fails `Basin` validation.</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>        <span class="n">basins</span> <span class="o">=</span> <span class="n">_load_basins</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">basins</span><span class="p">),</span> <span class="n">available_datasets</span><span class="o">=</span><span class="nb">sorted</span><span class="p">(</span><span class="n">basins</span><span class="p">))</span>
 <a id="__codelineno-0-260" name="__codelineno-0-260"></a>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_basin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Basin</span><span class="p">:</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Basin` for `code`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Basin` for `code`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        Thin alias over</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        `get_dataset`.</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">            code: A tropycal basin code (`&quot;north_atlantic&quot;`, …).</span>
@@ -34341,7 +34341,7 @@ track field with :meth:<code>get_field</code>.</p>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TrackField</span><span class="p">:</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Leaf accessor for the shared two-arg get_variable contract.</span>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        Alias of :meth:`get_field` so the tropycal leaf is reachable</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        Alias of `get_field` so the tropycal leaf is reachable</span>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        under the same `get_variable(dataset_key, variable_name)` verb</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        the other two-level catalogs use.</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>
@@ -34381,7 +34381,7 @@ track field with :meth:<code>get_field</code>.</p>
 <a id="__codelineno-0-344" name="__codelineno-0-344"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a structured introspection record for a basin.</span>
 <a id="__codelineno-0-346" name="__codelineno-0-346"></a>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        Mirrors :meth:`earthlens.ecmwf.Catalog.describe`: a runtime &quot;what</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        Mirrors `earthlens.ecmwf.Catalog.describe`: a runtime &quot;what</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        does basin X expose?&quot; helper a CLI / notebook can dump without</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        walking the YAML.</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a>
@@ -34421,8 +34421,8 @@ track field with :meth:<code>get_field</code>.</p>
 <a id="__codelineno-0-384" name="__codelineno-0-384"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Report structural hygiene issues across the loaded catalog.</span>
 <a id="__codelineno-0-386" name="__codelineno-0-386"></a>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        Mirrors :meth:`earthlens.ecmwf.Catalog.health` /</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        :meth:`earthlens.gee.Catalog.health`: returns a mapping</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        Mirrors `earthlens.ecmwf.Catalog.health` /</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        `earthlens.gee.Catalog.health`: returns a mapping</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">        `check_name -&gt; sorted list of offenders`. An empty list means the</span>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        check passes; an empty dict means the catalog is clean. Schema-level</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        invariants (duplicate keys, unknown fields) are already enforced at</span>
@@ -34554,7 +34554,7 @@ track field with :meth:<code>get_field</code>.</p>
     <div class="doc doc-contents ">
 
         <p>Return a structured introspection record for a basin.</p>
-<p>Mirrors :meth:<code>earthlens.ecmwf.Catalog.describe</code>: a runtime "what
+<p>Mirrors <code>earthlens.ecmwf.Catalog.describe</code>: a runtime "what
 does basin X expose?" helper a CLI / notebook can dump without
 walking the YAML.</p>
 
@@ -34714,7 +34714,7 @@ walking the YAML.</p>
 <span class="normal"><a href="#__codelineno-0-382">382</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="k">def</span><span class="w"> </span><span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a structured introspection record for a basin.</span>
 <a id="__codelineno-0-346" name="__codelineno-0-346"></a>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">    Mirrors :meth:`earthlens.ecmwf.Catalog.describe`: a runtime &quot;what</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">    Mirrors `earthlens.ecmwf.Catalog.describe`: a runtime &quot;what</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    does basin X expose?&quot; helper a CLI / notebook can dump without</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">    walking the YAML.</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a>
@@ -34767,9 +34767,9 @@ walking the YAML.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the :class:<code>Basin</code> for <code>code</code>, with a did-you-mean hint.</p>
+        <p>Return the <code>Basin</code> for <code>code</code>, with a did-you-mean hint.</p>
 <p>Thin alias over
-:meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>.</p>
+<code>get_dataset</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -34867,10 +34867,10 @@ walking the YAML.</p>
 <span class="normal"><a href="#__codelineno-0-274">274</a></span>
 <span class="normal"><a href="#__codelineno-0-275">275</a></span>
 <span class="normal"><a href="#__codelineno-0-276">276</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_basin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Basin</span><span class="p">:</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Basin` for `code`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Basin` for `code`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">    Thin alias over</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">    `get_dataset`.</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">        code: A tropycal basin code (`&quot;north_atlantic&quot;`, …).</span>
@@ -35085,7 +35085,7 @@ walking the YAML.</p>
     <div class="doc doc-contents ">
 
         <p>Leaf accessor for the shared two-arg get_variable contract.</p>
-<p>Alias of :meth:<code>get_field</code> so the tropycal leaf is reachable
+<p>Alias of <code>get_field</code> so the tropycal leaf is reachable
 under the same <code>get_variable(dataset_key, variable_name)</code> verb
 the other two-level catalogs use.</p>
 
@@ -35179,7 +35179,7 @@ the other two-level catalogs use.</p>
 <span class="normal"><a href="#__codelineno-0-318">318</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TrackField</span><span class="p">:</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Leaf accessor for the shared two-arg get_variable contract.</span>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">    Alias of :meth:`get_field` so the tropycal leaf is reachable</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">    Alias of `get_field` so the tropycal leaf is reachable</span>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    under the same `get_variable(dataset_key, variable_name)` verb</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    the other two-level catalogs use.</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>
@@ -35209,8 +35209,8 @@ the other two-level catalogs use.</p>
     <div class="doc doc-contents ">
 
         <p>Report structural hygiene issues across the loaded catalog.</p>
-<p>Mirrors :meth:<code>earthlens.ecmwf.Catalog.health</code> /
-:meth:<code>earthlens.gee.Catalog.health</code>: returns a mapping
+<p>Mirrors <code>earthlens.ecmwf.Catalog.health</code> /
+<code>earthlens.gee.Catalog.health</code>: returns a mapping
 <code>check_name -&gt; sorted list of offenders</code>. An empty list means the
 check passes; an empty dict means the catalog is clean. Schema-level
 invariants (duplicate keys, unknown fields) are already enforced at
@@ -35310,8 +35310,8 @@ schema cannot express.</p>
 <span class="normal"><a href="#__codelineno-0-430">430</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Report structural hygiene issues across the loaded catalog.</span>
 <a id="__codelineno-0-386" name="__codelineno-0-386"></a>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">    Mirrors :meth:`earthlens.ecmwf.Catalog.health` /</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">    :meth:`earthlens.gee.Catalog.health`: returns a mapping</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">    Mirrors `earthlens.ecmwf.Catalog.health` /</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">    `earthlens.gee.Catalog.health`: returns a mapping</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">    `check_name -&gt; sorted list of offenders`. An empty list means the</span>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">    check passes; an empty dict means the catalog is clean. Schema-level</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">    invariants (duplicate keys, unknown fields) are already enforced at</span>
@@ -35399,7 +35399,7 @@ schema cannot express.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the
-module-level :data:<code>CATALOG_PATH</code>.</p>
+module-level <code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -35425,7 +35425,7 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code> with <code>datasets</code> and the</p>
+                <p>A fully-populated <code>Catalog</code> with <code>datasets</code> and the</p>
               </div>
             </td>
           </tr>
@@ -35459,7 +35459,7 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>If the file has no <code>basins:</code> block, or a row
-fails :class:<code>Basin</code> validation.</p>
+fails <code>Basin</code> validation.</p>
               </div>
             </td>
           </tr>
@@ -35493,15 +35493,15 @@ fails :class:<code>Basin</code> validation.</p>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a>
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        A fully-populated :class:`Catalog` with `datasets` and the</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        A fully-populated `Catalog` with `datasets` and the</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        `available_datasets` index set.</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        ValueError: If the file has no `basins:` block, or a row</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">            fails :class:`Basin` validation.</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">            fails `Basin` validation.</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="n">basins</span> <span class="o">=</span> <span class="n">_load_basins</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
@@ -35524,9 +35524,9 @@ fails :class:<code>Basin</code> validation.</p>
     <div class="doc doc-contents ">
 
         <p>Auto-load the bundled catalog when no basins were supplied.</p>
-<p><code>Catalog()</code> with no args reads :data:<code>CATALOG_PATH</code> (through the
+<p><code>Catalog()</code> with no args reads <code>CATALOG_PATH</code> (through the
 <code>(path, mtime_ns)</code> cache); passing <code>datasets=...</code> skips the disk
-read (used in tests). Either way, :attr:<code>available_datasets</code> is
+read (used in tests). Either way, <code>available_datasets</code> is
 populated with the basin codes — the whole tropycal universe.</p>
 
 
@@ -35545,7 +35545,7 @@ populated with the basin codes — the whole tropycal universe.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Propagated from :meth:<code>load</code> when the YAML is
+                <p>Propagated from <code>load</code> when the YAML is
 missing, empty, or has a malformed basin row.</p>
               </div>
             </td>
@@ -35575,13 +35575,13 @@ missing, empty, or has a malformed basin row.</p>
 <span class="normal"><a href="#__codelineno-0-239">239</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no basins were supplied.</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    `Catalog()` with no args reads :data:`CATALOG_PATH` (through the</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    `Catalog()` with no args reads `CATALOG_PATH` (through the</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">    `(path, mtime_ns)` cache); passing `datasets=...` skips the disk</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    read (used in tests). Either way, :attr:`available_datasets` is</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    read (used in tests). Either way, `available_datasets` is</span>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    populated with the basin codes — the whole tropycal universe.</span>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a>
 <a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        ValueError: Propagated from :meth:`load` when the YAML is</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        ValueError: Propagated from `load` when the YAML is</span>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">            missing, empty, or has a malformed basin row.</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
@@ -35748,7 +35748,7 @@ missing, empty, or has a malformed basin row.</p>
 
 
         <p>One per-fix track field (the "Variable" analog).</p>
-<p>The field's short code is the parent key in :attr:<code>Basin.fields</code> and
+<p>The field's short code is the parent key in <code>Basin.fields</code> and
 is not stored on the row.</p>
 
 
@@ -35839,7 +35839,7 @@ is not stored on the row.</p>
 <span class="normal"><a href="#__codelineno-0-139">139</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="k">class</span><span class="w"> </span><span class="nc">TrackField</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One per-fix track field (the &quot;Variable&quot; analog).</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a>
-<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    The field&#39;s short code is the parent key in :attr:`Basin.fields` and</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    The field&#39;s short code is the parent key in `Basin.fields` and</span>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">    is not stored on the row.</span>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a>
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">    Attributes:</span>
@@ -35961,14 +35961,14 @@ handling inside pyramids primitives: earthlens assembles the plain
 attribute rows from each storm's <code>Storm.to_dataframe(attrs_as_columns=
 True)</code> frame, builds the geometry column (one <code>Point</code> per 6-hourly fix,
 or one <code>LineString</code> per storm), and hands the result to
-:class:<code>pyramids.feature.collection.FeatureCollection</code> (a
+<code>pyramids.feature.collection.FeatureCollection</code> (a
 <code>geopandas.GeoDataFrame</code> subclass) tagged <code>EPSG:4326</code>.</p>
 <p>Two output geometries are supported (the <code>geometry=</code> backend kwarg):</p>
 <ul>
 <li><strong>point</strong> (default) — one row per track fix, schema
-  :data:<code>POINT_COLUMNS</code>.</li>
+  <code>POINT_COLUMNS</code>.</li>
 <li><strong>track</strong> — one row per storm, the whole path as a <code>LineString</code>,
-  schema :data:<code>TRACK_COLUMNS</code>, with per-storm summary attributes
+  schema <code>TRACK_COLUMNS</code>, with per-storm summary attributes
   (max wind, min pressure, max category, ACE, start/end time).</li>
 </ul>
 <p>Filtering is fix-level and "loose" (<code>G4</code>): a fix is kept when its time is
@@ -35978,7 +35978,7 @@ a storm is included when <strong>any</strong> fix falls in the window+bbox, and 
 rendered <code>LineString</code> is built from its <strong>in-window</strong> fixes (so the drawn
 track is clipped to the time window, not the bbox).</p>
 <p>Tropycal's <code>to_dataframe()</code> exposes no Saffir-Simpson <code>category</code> column,
-so it is derived from <code>vmax</code> here via :func:<code>saffir_simpson_category</code>
+so it is derived from <code>vmax</code> here via <code>saffir_simpson_category</code>
 (the SSHWS wind thresholds, in knots). This keeps the module free of any
 <code>tropycal</code> import, so unit tests can drive it with hand-built frames.</p>
 
@@ -36014,7 +36014,7 @@ so it is derived from <code>vmax</code> here via :func:<code>saffir_simpson_cate
     <div class="doc doc-contents ">
 
         <p>Concatenate per-basin FeatureCollections into one.</p>
-<p>Skips empty inputs; returns :func:<code>empty_fc</code> when every input is
+<p>Skips empty inputs; returns <code>empty_fc</code> when every input is
 empty (or the list is empty) so the result is always a
 schema-correct FeatureCollection.</p>
 
@@ -36040,7 +36040,7 @@ schema-correct FeatureCollection.</p>
             <td>
               <div class="doc-md-description">
                 <p>Per-basin FeatureCollections, each produced by
-:func:<code>frame_to_fc</code> in the same geometry mode (so all share
+<code>frame_to_fc</code> in the same geometry mode (so all share
 the schema and CRS).</p>
               </div>
             </td>
@@ -36124,13 +36124,13 @@ empty-result schema when every input is empty.</p>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Concatenate per-basin FeatureCollections into one.</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Skips empty inputs; returns :func:`empty_fc` when every input is</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Skips empty inputs; returns `empty_fc` when every input is</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    empty (or the list is empty) so the result is always a</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    schema-correct FeatureCollection.</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a>
 <a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        collections: Per-basin FeatureCollections, each produced by</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            :func:`frame_to_fc` in the same geometry mode (so all share</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            `frame_to_fc` in the same geometry mode (so all share</span>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            the schema and CRS).</span>
 <a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        geometry: The mode the inputs were built in, used to pick the</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            empty-result schema when every input is empty.</span>
@@ -36227,8 +36227,8 @@ result is a legitimate answer, not an error.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>"point"</code> (:data:<code>POINT_COLUMNS</code>) or <code>"track"</code>
-(:data:<code>TRACK_COLUMNS</code>).</p>
+                <p><code>"point"</code> (<code>POINT_COLUMNS</code>) or <code>"track"</code>
+(<code>TRACK_COLUMNS</code>).</p>
               </div>
             </td>
             <td>
@@ -36326,8 +36326,8 @@ declared dtypes, an empty <code>geometry</code> column, CRS
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">    result is a legitimate answer, not an error.</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        geometry: `&quot;point&quot;` (:data:`POINT_COLUMNS`) or `&quot;track&quot;`</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            (:data:`TRACK_COLUMNS`).</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        geometry: `&quot;point&quot;` (`POINT_COLUMNS`) or `&quot;track&quot;`</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            (`TRACK_COLUMNS`).</span>
 <a id="__codelineno-0-276" name="__codelineno-0-276"></a>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        FeatureCollection: Zero rows, the mode&#39;s columns with their</span>
@@ -36391,7 +36391,7 @@ declared dtypes, an empty <code>geometry</code> column, CRS
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Zero rows, the :data:<code>RECON_COLUMNS</code> columns with
+                <p>Zero rows, the <code>RECON_COLUMNS</code> columns with
 their dtypes, an empty <code>geometry</code>, CRS <code>EPSG:4326</code>.</p>
               </div>
             </td>
@@ -36444,7 +36444,7 @@ their dtypes, an empty <code>geometry</code>, CRS <code>EPSG:4326</code>.</p>
 <a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return an empty recon-observation `FeatureCollection` (schema-correct).</span>
 <a id="__codelineno-0-424" name="__codelineno-0-424"></a>
 <a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">        FeatureCollection: Zero rows, the :data:`RECON_COLUMNS` columns with</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">        FeatureCollection: Zero rows, the `RECON_COLUMNS` columns with</span>
 <a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">            their dtypes, an empty `geometry`, CRS `EPSG:4326`.</span>
 <a id="__codelineno-0-428" name="__codelineno-0-428"></a>
 <a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">    Examples:</span>
@@ -36487,7 +36487,7 @@ their dtypes, an empty <code>geometry</code>, CRS <code>EPSG:4326</code>.</p>
 <p>Each input frame is one storm's <code>Storm.to_dataframe(attrs_as_columns=
 True)</code> output (so it carries <code>id</code> / <code>name</code> alongside the per-fix
 <code>time</code> / <code>lat</code> / <code>lon</code> / <code>vmax</code> / <code>mslp</code> / <code>type</code> columns). Fixes are
-filtered to the window + bbox per :mod:<code>earthlens.tropycal.events</code>
+filtered to the window + bbox per <code>earthlens.tropycal.events</code>
 module docs, then mapped to the chosen geometry.</p>
 
 
@@ -36793,7 +36793,7 @@ stamped on every row.</p>
 <a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    Each input frame is one storm&#39;s `Storm.to_dataframe(attrs_as_columns=</span>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">    True)` output (so it carries `id` / `name` alongside the per-fix</span>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    `time` / `lat` / `lon` / `vmax` / `mslp` / `type` columns). Fixes are</span>
-<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">    filtered to the window + bbox per :mod:`earthlens.tropycal.events`</span>
+<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">    filtered to the window + bbox per `earthlens.tropycal.events`</span>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">    module docs, then mapped to the chosen geometry.</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">    Args:</span>
@@ -36922,8 +36922,8 @@ stamped on every row.</p>
 columns (<code>wspd</code>, <code>p_sfc</code>, <code>temp</code>) are read defensively since they differ
 by sub-product. Observations are filtered to the window + bbox at the
 point level (same loose rule as best-track fixes) and mapped to the
-:data:<code>RECON_COLUMNS</code> schema. A <code>None</code>/empty frame (a storm with no recon
-data — most storms) returns :func:<code>empty_recon_fc</code>.</p>
+<code>RECON_COLUMNS</code> schema. A <code>None</code>/empty frame (a storm with no recon
+data — most storms) returns <code>empty_recon_fc</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -37188,8 +37188,8 @@ every row.</p>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">    columns (`wspd`, `p_sfc`, `temp`) are read defensively since they differ</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    by sub-product. Observations are filtered to the window + bbox at the</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">    point level (same loose rule as best-track fixes) and mapped to the</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">    :data:`RECON_COLUMNS` schema. A `None`/empty frame (a storm with no recon</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">    data — most storms) returns :func:`empty_recon_fc`.</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">    `RECON_COLUMNS` schema. A `None`/empty frame (a storm with no recon</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">    data — most storms) returns `empty_recon_fc`.</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a>
 <a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        frame: The recon sub-product `.data` frame, or `None`.</span>

@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23976,7 +23976,7 @@ backend that has not wired the reducer is refused for that reason instead. Eithe
 
 
 
-        <p>Frozen request shape consumed by :func:<code>aggregate_netcdf</code>.</p>
+        <p>Frozen request shape consumed by <code>aggregate_netcdf</code>.</p>
 <p>Carries the windowing frequency, reduction operator, and output
 location. Frozen + <code>extra="forbid"</code> so a typo in a field name
 (e.g. <code>freqency=</code>) fails loud at construction time rather than
@@ -24056,7 +24056,7 @@ this value, and it is not encoded in the filename.</p>
             <td>
               <div class="doc-md-description">
                 <p>When the NetCDF has a <code>pressure_level</code> dimension, pin
-this level via :meth:<code>pyramids.netcdf.NetCDF.sel</code>. <code>None</code>
+this level via <code>pyramids.netcdf.NetCDF.sel</code>. <code>None</code>
 (default) requires a 3-D NetCDF; pass an explicit level
 (e.g. <code>1000</code>) to aggregate a single 4-D layer.</p>
               </div>
@@ -24234,7 +24234,7 @@ NaN. <code>None</code> (default) means no minimum.</p>
 <span class="normal"><a href="#__codelineno-0-598">598</a></span>
 <span class="normal"><a href="#__codelineno-0-599">599</a></span>
 <span class="normal"><a href="#__codelineno-0-600">600</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="k">class</span><span class="w"> </span><span class="nc">AggregationConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Frozen request shape consumed by :func:`aggregate_netcdf`.</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Frozen request shape consumed by `aggregate_netcdf`.</span>
 <a id="__codelineno-0-511" name="__codelineno-0-511"></a>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">    Carries the windowing frequency, reduction operator, and output</span>
 <a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">    location. Frozen + `extra=&quot;forbid&quot;` so a typo in a field name</span>
@@ -24258,7 +24258,7 @@ NaN. <code>None</code> (default) means no minimum.</p>
 <a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">            written to each GeoTIFF is read off the NetCDF, not from</span>
 <a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">            this value, and it is not encoded in the filename.</span>
 <a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">        level: When the NetCDF has a `pressure_level` dimension, pin</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">            this level via :meth:`pyramids.netcdf.NetCDF.sel`. `None`</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">            this level via `pyramids.netcdf.NetCDF.sel`. `None`</span>
 <a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">            (default) requires a 3-D NetCDF; pass an explicit level</span>
 <a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">            (e.g. `1000`) to aggregate a single 4-D layer.</span>
 <a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">        skipna: When `True`, the reduction is NaN-aware</span>
@@ -24409,7 +24409,7 @@ further processing without re-opening the files.</p>
 to pick the variable from the NetCDF
 (<code>var_info.nc_variable</code>), seed the output filename
 (<code>var_info.cds_variable</code>, plus <code>dataset_id</code> for a curated
-override — see :func:<code>_output_stem</code>), and resolve <code>op="auto"</code>
+override — see <code>_output_stem</code>), and resolve <code>op="auto"</code>
 (<code>var_info.is_flux</code>).</p>
               </div>
             </td>
@@ -24426,7 +24426,7 @@ override — see :func:<code>_output_stem</code>), and resolve <code>op="auto"</
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Frozen :class:<code>AggregationConfig</code> describing the
+                <p>Frozen <code>AggregationConfig</code> describing the
 window, reduction, and output location.</p>
               </div>
             </td>
@@ -24548,7 +24548,7 @@ every sample.</p>
             <td>
               <div class="doc-md-description">
                 <p>If the NetCDF has no recognised time variable
-(<code>valid_time</code> / <code>time</code>); see :func:<code>_read_time_axis</code>.</p>
+(<code>valid_time</code> / <code>time</code>); see <code>_read_time_axis</code>.</p>
               </div>
             </td>
           </tr>
@@ -24560,7 +24560,7 @@ every sample.</p>
               <div class="doc-md-description">
                 <p>If <code>config.level</code> is set but the NetCDF has no
 pressure-level dimension, or vice versa; see
-:func:<code>_resolve_pressure_level</code>. Also raised by pandas
+<code>_resolve_pressure_level</code>. Also raised by pandas
 when <code>config.freq</code> is not a recognised offset alias.</p>
               </div>
             </td>
@@ -24572,9 +24572,9 @@ when <code>config.freq</code> is not a recognised offset alias.</p>
 <details class="see-also" open>
   <summary>See Also</summary>
   <ul>
-<li>:class:<code>AggregationConfig</code>: the frozen request payload.</li>
-<li>:class:<code>earthlens.ecmwf.Catalog</code>: resolves <code>(dataset, code)</code>
-  pairs to the :class:<code>earthlens.ecmwf.Variable</code> rows that
+<li><code>AggregationConfig</code>: the frozen request payload.</li>
+<li><code>earthlens.ecmwf.Catalog</code>: resolves <code>(dataset, code)</code>
+  pairs to the <code>earthlens.ecmwf.Variable</code> rows that
   drive <code>var_info.is_flux</code> and the output filename.</li>
 <li><code>examples/post_process_ecmwf_netcdf.py</code>: thin CLI demo of
   this function (after task L1).</li>
@@ -24663,9 +24663,9 @@ when <code>config.freq</code> is not a recognised offset alias.</p>
 <a id="__codelineno-0-791" name="__codelineno-0-791"></a><span class="sd">            to pick the variable from the NetCDF</span>
 <a id="__codelineno-0-792" name="__codelineno-0-792"></a><span class="sd">            (`var_info.nc_variable`), seed the output filename</span>
 <a id="__codelineno-0-793" name="__codelineno-0-793"></a><span class="sd">            (`var_info.cds_variable`, plus `dataset_id` for a curated</span>
-<a id="__codelineno-0-794" name="__codelineno-0-794"></a><span class="sd">            override — see :func:`_output_stem`), and resolve `op=&quot;auto&quot;`</span>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a><span class="sd">            override — see `_output_stem`), and resolve `op=&quot;auto&quot;`</span>
 <a id="__codelineno-0-795" name="__codelineno-0-795"></a><span class="sd">            (`var_info.is_flux`).</span>
-<a id="__codelineno-0-796" name="__codelineno-0-796"></a><span class="sd">        config: Frozen :class:`AggregationConfig` describing the</span>
+<a id="__codelineno-0-796" name="__codelineno-0-796"></a><span class="sd">        config: Frozen `AggregationConfig` describing the</span>
 <a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="sd">            window, reduction, and output location.</span>
 <a id="__codelineno-0-798" name="__codelineno-0-798"></a><span class="sd">        date_range: Optional inclusive `(start, end)` bounds. When set,</span>
 <a id="__codelineno-0-799" name="__codelineno-0-799"></a><span class="sd">            samples outside the range are dropped before windowing, so the</span>
@@ -24684,16 +24684,16 @@ when <code>config.freq</code> is not a recognised offset alias.</p>
 <a id="__codelineno-0-812" name="__codelineno-0-812"></a>
 <a id="__codelineno-0-813" name="__codelineno-0-813"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="sd">        KeyError: If the NetCDF has no recognised time variable</span>
-<a id="__codelineno-0-815" name="__codelineno-0-815"></a><span class="sd">            (`valid_time` / `time`); see :func:`_read_time_axis`.</span>
+<a id="__codelineno-0-815" name="__codelineno-0-815"></a><span class="sd">            (`valid_time` / `time`); see `_read_time_axis`.</span>
 <a id="__codelineno-0-816" name="__codelineno-0-816"></a><span class="sd">        ValueError: If `config.level` is set but the NetCDF has no</span>
 <a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="sd">            pressure-level dimension, or vice versa; see</span>
-<a id="__codelineno-0-818" name="__codelineno-0-818"></a><span class="sd">            :func:`_resolve_pressure_level`. Also raised by pandas</span>
+<a id="__codelineno-0-818" name="__codelineno-0-818"></a><span class="sd">            `_resolve_pressure_level`. Also raised by pandas</span>
 <a id="__codelineno-0-819" name="__codelineno-0-819"></a><span class="sd">            when `config.freq` is not a recognised offset alias.</span>
 <a id="__codelineno-0-820" name="__codelineno-0-820"></a>
 <a id="__codelineno-0-821" name="__codelineno-0-821"></a><span class="sd">    See Also:</span>
-<a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="sd">        - :class:`AggregationConfig`: the frozen request payload.</span>
-<a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">        - :class:`earthlens.ecmwf.Catalog`: resolves `(dataset, code)`</span>
-<a id="__codelineno-0-824" name="__codelineno-0-824"></a><span class="sd">          pairs to the :class:`earthlens.ecmwf.Variable` rows that</span>
+<a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="sd">        - `AggregationConfig`: the frozen request payload.</span>
+<a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">        - `earthlens.ecmwf.Catalog`: resolves `(dataset, code)`</span>
+<a id="__codelineno-0-824" name="__codelineno-0-824"></a><span class="sd">          pairs to the `earthlens.ecmwf.Variable` rows that</span>
 <a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">          drive `var_info.is_flux` and the output filename.</span>
 <a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">        - `examples/post_process_ecmwf_netcdf.py`: thin CLI demo of</span>
 <a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">          this function (after task L1).</span>
@@ -24724,8 +24724,8 @@ on a long time series.</p>
 
     <div class="doc doc-contents first">
 
-        <p>Yield one :class:<code>AggregatedWindow</code> per time window, streaming.</p>
-<p>The streaming counterpart to :func:<code>aggregate_netcdf</code>, and the
+        <p>Yield one <code>AggregatedWindow</code> per time window, streaming.</p>
+<p>The streaming counterpart to <code>aggregate_netcdf</code>, and the
 implementation it is built on. Two properties make it usable on cubes
 that do not fit in memory:</p>
 <ul>
@@ -24801,7 +24801,7 @@ plus <code>dataset_id</code> for a curated override), and resolve
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Frozen :class:<code>AggregationConfig</code> describing the window,
+                <p>Frozen <code>AggregationConfig</code> describing the window,
 reduction, output location, and whether to retain arrays.</p>
               </div>
             </td>
@@ -24822,7 +24822,7 @@ reduction, output location, and whether to retain arrays.</p>
 the range are dropped before windowing, so the streamed windows
 match the requested span even when the source cube over-covers it;
 a window left empty by the filter is skipped. <code>None</code> keeps every
-sample. See :func:<code>_date_range_mask</code>.</p>
+sample. See <code>_date_range_mask</code>.</p>
               </div>
             </td>
             <td>
@@ -24877,7 +24877,7 @@ sample. See :func:<code>_date_range_mask</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>If the NetCDF has no recognised time variable
-(<code>valid_time</code> / <code>time</code>); see :func:<code>_read_time_axis</code>.</p>
+(<code>valid_time</code> / <code>time</code>); see <code>_read_time_axis</code>.</p>
               </div>
             </td>
           </tr>
@@ -24889,7 +24889,7 @@ sample. See :func:<code>_date_range_mask</code>.</p>
               <div class="doc-md-description">
                 <p>If <code>config.level</code> is set but the NetCDF has no
 pressure-level dimension, or vice versa; see
-:func:<code>_resolve_pressure_level</code>. Also raised by pandas when
+<code>_resolve_pressure_level</code>. Also raised by pandas when
 <code>config.freq</code> is not a recognised offset alias.</p>
               </div>
             </td>
@@ -24901,8 +24901,8 @@ pressure-level dimension, or vice versa; see
 <details class="see-also" open>
   <summary>See Also</summary>
   <ul>
-<li>:func:<code>aggregate_netcdf</code>: the eager <code>list</code> form of this function.</li>
-<li>:class:<code>AggregationConfig</code>: the frozen request payload.</li>
+<li><code>aggregate_netcdf</code>: the eager <code>list</code> form of this function.</li>
+<li><code>AggregationConfig</code>: the frozen request payload.</li>
 </ul>
 </details>
 
@@ -25040,9 +25040,9 @@ pressure-level dimension, or vice versa; see
 <a id="__codelineno-0-840" name="__codelineno-0-840"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span><span class="p">,</span>
 <a id="__codelineno-0-841" name="__codelineno-0-841"></a>    <span class="n">date_range</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-842" name="__codelineno-0-842"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">AggregatedWindow</span><span class="p">]:</span>
-<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield one :class:`AggregatedWindow` per time window, streaming.</span>
+<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield one `AggregatedWindow` per time window, streaming.</span>
 <a id="__codelineno-0-844" name="__codelineno-0-844"></a>
-<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">    The streaming counterpart to :func:`aggregate_netcdf`, and the</span>
+<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">    The streaming counterpart to `aggregate_netcdf`, and the</span>
 <a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">    implementation it is built on. Two properties make it usable on cubes</span>
 <a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">    that do not fit in memory:</span>
 <a id="__codelineno-0-848" name="__codelineno-0-848"></a>
@@ -25068,28 +25068,28 @@ pressure-level dimension, or vice versa; see
 <a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">            seed the output filename (`_output_stem` — `var_info.cds_variable`,</span>
 <a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">            plus `dataset_id` for a curated override), and resolve</span>
 <a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="sd">            `op=&quot;auto&quot;` (`var_info.is_flux`).</span>
-<a id="__codelineno-0-871" name="__codelineno-0-871"></a><span class="sd">        config: Frozen :class:`AggregationConfig` describing the window,</span>
+<a id="__codelineno-0-871" name="__codelineno-0-871"></a><span class="sd">        config: Frozen `AggregationConfig` describing the window,</span>
 <a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">            reduction, output location, and whether to retain arrays.</span>
 <a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="sd">        date_range: Optional inclusive `(start, end)` bounds. Samples outside</span>
 <a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="sd">            the range are dropped before windowing, so the streamed windows</span>
 <a id="__codelineno-0-875" name="__codelineno-0-875"></a><span class="sd">            match the requested span even when the source cube over-covers it;</span>
 <a id="__codelineno-0-876" name="__codelineno-0-876"></a><span class="sd">            a window left empty by the filter is skipped. `None` keeps every</span>
-<a id="__codelineno-0-877" name="__codelineno-0-877"></a><span class="sd">            sample. See :func:`_date_range_mask`.</span>
+<a id="__codelineno-0-877" name="__codelineno-0-877"></a><span class="sd">            sample. See `_date_range_mask`.</span>
 <a id="__codelineno-0-878" name="__codelineno-0-878"></a>
 <a id="__codelineno-0-879" name="__codelineno-0-879"></a><span class="sd">    Yields:</span>
 <a id="__codelineno-0-880" name="__codelineno-0-880"></a><span class="sd">        AggregatedWindow: One per window, in time order.</span>
 <a id="__codelineno-0-881" name="__codelineno-0-881"></a>
 <a id="__codelineno-0-882" name="__codelineno-0-882"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-883" name="__codelineno-0-883"></a><span class="sd">        KeyError: If the NetCDF has no recognised time variable</span>
-<a id="__codelineno-0-884" name="__codelineno-0-884"></a><span class="sd">            (`valid_time` / `time`); see :func:`_read_time_axis`.</span>
+<a id="__codelineno-0-884" name="__codelineno-0-884"></a><span class="sd">            (`valid_time` / `time`); see `_read_time_axis`.</span>
 <a id="__codelineno-0-885" name="__codelineno-0-885"></a><span class="sd">        ValueError: If `config.level` is set but the NetCDF has no</span>
 <a id="__codelineno-0-886" name="__codelineno-0-886"></a><span class="sd">            pressure-level dimension, or vice versa; see</span>
-<a id="__codelineno-0-887" name="__codelineno-0-887"></a><span class="sd">            :func:`_resolve_pressure_level`. Also raised by pandas when</span>
+<a id="__codelineno-0-887" name="__codelineno-0-887"></a><span class="sd">            `_resolve_pressure_level`. Also raised by pandas when</span>
 <a id="__codelineno-0-888" name="__codelineno-0-888"></a><span class="sd">            `config.freq` is not a recognised offset alias.</span>
 <a id="__codelineno-0-889" name="__codelineno-0-889"></a>
 <a id="__codelineno-0-890" name="__codelineno-0-890"></a><span class="sd">    See Also:</span>
-<a id="__codelineno-0-891" name="__codelineno-0-891"></a><span class="sd">        - :func:`aggregate_netcdf`: the eager `list` form of this function.</span>
-<a id="__codelineno-0-892" name="__codelineno-0-892"></a><span class="sd">        - :class:`AggregationConfig`: the frozen request payload.</span>
+<a id="__codelineno-0-891" name="__codelineno-0-891"></a><span class="sd">        - `aggregate_netcdf`: the eager `list` form of this function.</span>
+<a id="__codelineno-0-892" name="__codelineno-0-892"></a><span class="sd">        - `AggregationConfig`: the frozen request payload.</span>
 <a id="__codelineno-0-893" name="__codelineno-0-893"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-894" name="__codelineno-0-894"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
 <a id="__codelineno-0-895" name="__codelineno-0-895"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
@@ -25188,7 +25188,7 @@ pressure-level dimension, or vice versa; see
 
 
         <p>One reduced time window: its label, its array, and where it was written.</p>
-<p>Yielded by :func:<code>iter_aggregate_netcdf</code>. <code>array</code> is <code>None</code> when the
+<p>Yielded by <code>iter_aggregate_netcdf</code>. <code>array</code> is <code>None</code> when the
 request set <code>keep_arrays=False</code> and the window was written to disk — the
 point of that mode is that a long run does not accumulate every window in
 memory alongside the GeoTIFFs it has already produced.</p>
@@ -25356,7 +25356,7 @@ retain it.</p>
 <a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="k">class</span><span class="w"> </span><span class="nc">AggregatedWindow</span><span class="p">:</span>
 <a id="__codelineno-0-605" name="__codelineno-0-605"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One reduced time window: its label, its array, and where it was written.</span>
 <a id="__codelineno-0-606" name="__codelineno-0-606"></a>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">    Yielded by :func:`iter_aggregate_netcdf`. `array` is `None` when the</span>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">    Yielded by `iter_aggregate_netcdf`. `array` is `None` when the</span>
 <a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">    request set `keep_arrays=False` and the window was written to disk — the</span>
 <a id="__codelineno-0-609" name="__codelineno-0-609"></a><span class="sd">    point of that mode is that a long run does not accumulate every window in</span>
 <a id="__codelineno-0-610" name="__codelineno-0-610"></a><span class="sd">    memory alongside the GeoTIFFs it has already produced.</span>
@@ -25839,8 +25839,8 @@ no data for.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Time coordinate as a :class:<code>pandas.DatetimeIndex</code>.
-Typically the result of :func:<code>_read_time_axis</code>.</p>
+                <p>Time coordinate as a <code>pandas.DatetimeIndex</code>.
+Typically the result of <code>_read_time_axis</code>.</p>
               </div>
             </td>
             <td>
@@ -25857,7 +25857,7 @@ Typically the result of :func:<code>_read_time_axis</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>Pandas offset alias (<code>"1D"</code>, <code>"7D"</code>, <code>"1MS"</code>, <code>"QS-DEC"</code>,
-<code>"AS"</code>, ...). Anything :class:<code>pandas.Grouper</code> accepts.</p>
+<code>"AS"</code>, ...). Anything <code>pandas.Grouper</code> accepts.</p>
               </div>
             </td>
             <td>
@@ -26018,10 +26018,10 @@ Typically the result of :func:<code>_read_time_axis</code>.</p>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    no data for.</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        time_axis: Time coordinate as a :class:`pandas.DatetimeIndex`.</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">            Typically the result of :func:`_read_time_axis`.</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        time_axis: Time coordinate as a `pandas.DatetimeIndex`.</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">            Typically the result of `_read_time_axis`.</span>
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        freq: Pandas offset alias (`&quot;1D&quot;`, `&quot;7D&quot;`, `&quot;1MS&quot;`, `&quot;QS-DEC&quot;`,</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            `&quot;AS&quot;`, ...). Anything :class:`pandas.Grouper` accepts.</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">            `&quot;AS&quot;`, ...). Anything `pandas.Grouper` accepts.</span>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">    Yields:</span>
 <a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        tuple[pd.Timestamp, np.ndarray]: For each non-empty window:</span>

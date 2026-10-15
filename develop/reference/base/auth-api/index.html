@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24148,7 +24148,7 @@ their SDK globally; subclasses that genuinely hold a closeable
 resource (e.g. an HTTP session, a boto3 client) override
 <code>close</code> to release it.</p>
 <p>This class fixes <strong>no</strong> credential-resolution precedence in code, but
-the package convention is the one :class:<code>SingleSecretAuth</code> implements
+the package convention is the one <code>SingleSecretAuth</code> implements
 and every backend now follows: <strong>an explicit argument wins over the
 environment, which wins over any credentials file</strong>. Subclass
 <code>SingleSecretAuth</code> when a single secret is involved and get that for
@@ -24423,7 +24423,7 @@ secret is not).</p>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">    `close` to release it.</span>
 <a id="__codelineno-0-113" name="__codelineno-0-113"></a>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">    This class fixes **no** credential-resolution precedence in code, but</span>
-<a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">    the package convention is the one :class:`SingleSecretAuth` implements</span>
+<a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">    the package convention is the one `SingleSecretAuth` implements</span>
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">    and every backend now follows: **an explicit argument wins over the</span>
 <a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="sd">    environment, which wins over any credentials file**. Subclass</span>
 <a id="__codelineno-0-118" name="__codelineno-0-118"></a><span class="sd">    `SingleSecretAuth` when a single secret is involved and get that for</span>
@@ -24487,8 +24487,8 @@ secret is not).</p>
 <a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-178" name="__codelineno-0-178"></a>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a>    <span class="c1">#: Set to `True` by :meth:`mark_configured`; read by the default</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a>    <span class="c1">#: :meth:`is_authenticated`. Class-level so an instance that never</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a>    <span class="c1">#: Set to `True` by `mark_configured`; read by the default</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a>    <span class="c1">#: `is_authenticated`. Class-level so an instance that never</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a>    <span class="c1">#: configured still answers `False` without an `__init__` of its own.</span>
 <a id="__codelineno-0-182" name="__codelineno-0-182"></a>    <span class="n">_configured</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <a id="__codelineno-0-183" name="__codelineno-0-183"></a>
@@ -24510,7 +24510,7 @@ secret is not).</p>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">        Subclasses implement this to (e.g.) call `ee.Initialize`,</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        write a credentials file, or mint an OAuth bearer. Must be</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">        idempotent: a second call after :meth:`is_authenticated`</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">        idempotent: a second call after `is_authenticated`</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">        returns `True` is a no-op (typical implementation is an</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">        early-return guarded by `if self.is_authenticated(): return`).</span>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a>
@@ -24520,10 +24520,10 @@ secret is not).</p>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a>
 <a id="__codelineno-0-211" name="__codelineno-0-211"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">mark_configured</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Record that :meth:`configure` completed, for the default predicate.</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Record that `configure` completed, for the default predicate.</span>
 <a id="__codelineno-0-213" name="__codelineno-0-213"></a>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        Call this at the end of a successful `configure()` so the inherited</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        :meth:`is_authenticated` starts returning `True` and the next</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        `is_authenticated` starts returning `True` and the next</span>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">        `configure()` short-circuits.</span>
 <a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_configured</span> <span class="o">=</span> <span class="kc">True</span>
@@ -24532,10 +24532,10 @@ secret is not).</p>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return `True` when the in-process state has working credentials.</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        Cheap predicate — must not call the network. Used by</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        :meth:`configure` for idempotency and by callers that want to</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        `configure` for idempotency and by callers that want to</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        skip a redundant setup pass.</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        The default reports whether :meth:`mark_configured` has run, which is</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        The default reports whether `mark_configured` has run, which is</span>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        the &quot;did `configure()` succeed?&quot; flag the majority of the auth classes</span>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">        each declared by hand. Override it when the real answer lives elsewhere</span>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        — an SDK&#39;s own session object (asf), a token expiry, or a backend whose</span>
@@ -24544,7 +24544,7 @@ secret is not).</p>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configured</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Release any resource held by :meth:`configure`.</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Release any resource held by `configure`.</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">        Default: no-op. Backends whose `configure()` opens a</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        long-lived HTTP session, boto3 client, or background thread</span>
@@ -24668,7 +24668,7 @@ Type-parameterised on the concrete subclass so
 
     <div class="doc doc-contents ">
 
-        <p>Release any resource held by :meth:<code>configure</code>.</p>
+        <p>Release any resource held by <code>configure</code>.</p>
 <p>Default: no-op. Backends whose <code>configure()</code> opens a
 long-lived HTTP session, boto3 client, or background thread
 override this to close it. Most backends configure their SDK
@@ -24685,7 +24685,7 @@ globally and have nothing to release here.</p>
 <span class="normal"><a href="#__codelineno-0-240">240</a></span>
 <span class="normal"><a href="#__codelineno-0-241">241</a></span>
 <span class="normal"><a href="#__codelineno-0-242">242</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Release any resource held by :meth:`configure`.</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Release any resource held by `configure`.</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">    Default: no-op. Backends whose `configure()` opens a</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">    long-lived HTTP session, boto3 client, or background thread</span>
@@ -24716,7 +24716,7 @@ globally and have nothing to release here.</p>
         <p>Perform the one-time setup so subsequent calls work without re-auth.</p>
 <p>Subclasses implement this to (e.g.) call <code>ee.Initialize</code>,
 write a credentials file, or mint an OAuth bearer. Must be
-idempotent: a second call after :meth:<code>is_authenticated</code>
+idempotent: a second call after <code>is_authenticated</code>
 returns <code>True</code> is a no-op (typical implementation is an
 early-return guarded by <code>if self.is_authenticated(): return</code>).</p>
 
@@ -24766,7 +24766,7 @@ missing/invalid or the backend rejects them.</p>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">    Subclasses implement this to (e.g.) call `ee.Initialize`,</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">    write a credentials file, or mint an OAuth bearer. Must be</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">    idempotent: a second call after :meth:`is_authenticated`</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">    idempotent: a second call after `is_authenticated`</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">    returns `True` is a no-op (typical implementation is an</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">    early-return guarded by `if self.is_authenticated(): return`).</span>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a>
@@ -24793,9 +24793,9 @@ missing/invalid or the backend rejects them.</p>
 
         <p>Return <code>True</code> when the in-process state has working credentials.</p>
 <p>Cheap predicate — must not call the network. Used by
-:meth:<code>configure</code> for idempotency and by callers that want to
+<code>configure</code> for idempotency and by callers that want to
 skip a redundant setup pass.</p>
-<p>The default reports whether :meth:<code>mark_configured</code> has run, which is
+<p>The default reports whether <code>mark_configured</code> has run, which is
 the "did <code>configure()</code> succeed?" flag the majority of the auth classes
 each declared by hand. Override it when the real answer lives elsewhere
 — an SDK's own session object (asf), a token expiry, or a backend whose
@@ -24821,10 +24821,10 @@ credentials are always present (ghsl, worldpop return <code>True</code>).</p>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return `True` when the in-process state has working credentials.</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">    Cheap predicate — must not call the network. Used by</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">    :meth:`configure` for idempotency and by callers that want to</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">    `configure` for idempotency and by callers that want to</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">    skip a redundant setup pass.</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">    The default reports whether :meth:`mark_configured` has run, which is</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">    The default reports whether `mark_configured` has run, which is</span>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    the &quot;did `configure()` succeed?&quot; flag the majority of the auth classes</span>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    each declared by hand. Override it when the real answer lives elsewhere</span>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    — an SDK&#39;s own session object (asf), a token expiry, or a backend whose</span>
@@ -24848,9 +24848,9 @@ credentials are always present (ghsl, worldpop return <code>True</code>).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Record that :meth:<code>configure</code> completed, for the default predicate.</p>
+        <p>Record that <code>configure</code> completed, for the default predicate.</p>
 <p>Call this at the end of a successful <code>configure()</code> so the inherited
-:meth:<code>is_authenticated</code> starts returning <code>True</code> and the next
+<code>is_authenticated</code> starts returning <code>True</code> and the next
 <code>configure()</code> short-circuits.</p>
 
 
@@ -24864,10 +24864,10 @@ credentials are always present (ghsl, worldpop return <code>True</code>).</p>
 <span class="normal"><a href="#__codelineno-0-216">216</a></span>
 <span class="normal"><a href="#__codelineno-0-217">217</a></span>
 <span class="normal"><a href="#__codelineno-0-218">218</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="k">def</span><span class="w"> </span><span class="nf">mark_configured</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Record that :meth:`configure` completed, for the default predicate.</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Record that `configure` completed, for the default predicate.</span>
 <a id="__codelineno-0-213" name="__codelineno-0-213"></a>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">    Call this at the end of a successful `configure()` so the inherited</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">    :meth:`is_authenticated` starts returning `True` and the next</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">    `is_authenticated` starts returning `True` and the next</span>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">    `configure()` short-circuits.</span>
 <a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_configured</span> <span class="o">=</span> <span class="kc">True</span>
@@ -25046,11 +25046,11 @@ public buckets) and <code>dem</code> (Copernicus DEM). The other bucket-backed b
 
 
         <p>Build an unsigned (or profile-signed) <code>boto3</code> S3 client lazily.</p>
-<p>Implements the :class:<code>~earthlens.base.AbstractAuth</code> contract for
+<p>Implements the <code>AbstractAuth</code> contract for
 public AWS Open-Data buckets. <code>configure()</code> constructs the client on
 first use (importing <code>boto3</code> lazily so the package imports without
 the <code>[s3]</code> extra); <code>is_authenticated()</code> reports whether the client
-exists; :meth:<code>client</code> is the accessor the backend's fetch step
+exists; <code>client</code> is the accessor the backend's fetch step
 calls.</p>
 <p>Because the target buckets are public, "authenticated" simply means
 "a client has been built" — there is no token to mint or expire.</p>
@@ -25164,11 +25164,11 @@ calls.</p>
 <span class="normal"><a href="#__codelineno-0-158">158</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="k">class</span><span class="w"> </span><span class="nc">S3Auth</span><span class="p">(</span><span class="n">AbstractAuth</span><span class="p">[</span><span class="n">S3Credentials</span><span class="p">]):</span>
 <a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build an unsigned (or profile-signed) `boto3` S3 client lazily.</span>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">    Implements the :class:`~earthlens.base.AbstractAuth` contract for</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">    Implements the `AbstractAuth` contract for</span>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">    public AWS Open-Data buckets. `configure()` constructs the client on</span>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    first use (importing `boto3` lazily so the package imports without</span>
 <a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    the `[s3]` extra); `is_authenticated()` reports whether the client</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    exists; :meth:`client` is the accessor the backend&#39;s fetch step</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    exists; `client` is the accessor the backend&#39;s fetch step</span>
 <a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    calls.</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">    Because the target buckets are public, &quot;authenticated&quot; simply means</span>
@@ -25189,7 +25189,7 @@ calls.</p>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store credentials and reset the (lazily built) client.</span>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">            credentials: The :class:`S3Credentials` to use. `None`</span>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">            credentials: The `S3Credentials` to use. `None`</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">                defaults to unsigned public access.</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span> <span class="ow">or</span> <span class="n">S3Credentials</span><span class="p">())</span>
@@ -25198,7 +25198,7 @@ calls.</p>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the `boto3` S3 client if it does not exist yet.</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a>
-<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">        Idempotent: returns immediately once :meth:`is_authenticated`</span>
+<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">        Idempotent: returns immediately once `is_authenticated`</span>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">        is `True`. Imports `boto3` / `botocore` lazily so importing the</span>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">        package without the `[s3]` extra does not fail.</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a>
@@ -25298,7 +25298,7 @@ calls.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The :class:<code>S3Credentials</code> to use. <code>None</code>
+                <p>The <code>S3Credentials</code> to use. <code>None</code>
 defaults to unsigned public access.</p>
               </div>
             </td>
@@ -25324,7 +25324,7 @@ defaults to unsigned public access.</p>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Store credentials and reset the (lazily built) client.</span>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">        credentials: The :class:`S3Credentials` to use. `None`</span>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">        credentials: The `S3Credentials` to use. `None`</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">            defaults to unsigned public access.</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span> <span class="ow">or</span> <span class="n">S3Credentials</span><span class="p">())</span>
@@ -25434,7 +25434,7 @@ defaults to unsigned public access.</p>
     <div class="doc doc-contents ">
 
         <p>Build the <code>boto3</code> S3 client if it does not exist yet.</p>
-<p>Idempotent: returns immediately once :meth:<code>is_authenticated</code>
+<p>Idempotent: returns immediately once <code>is_authenticated</code>
 is <code>True</code>. Imports <code>boto3</code> / <code>botocore</code> lazily so importing the
 package without the <code>[s3]</code> extra does not fail.</p>
 
@@ -25503,7 +25503,7 @@ installed. The message names <code>earthlens[s3]</code>.</p>
 <span class="normal"><a href="#__codelineno-0-141">141</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the `boto3` S3 client if it does not exist yet.</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a>
-<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">    Idempotent: returns immediately once :meth:`is_authenticated`</span>
+<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">    Idempotent: returns immediately once `is_authenticated`</span>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">    is `True`. Imports `boto3` / `botocore` lazily so importing the</span>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">    package without the `[s3]` extra does not fail.</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a>

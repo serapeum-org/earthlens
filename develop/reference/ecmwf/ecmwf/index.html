@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24039,13 +24039,13 @@
 
         <p>ECMWF / Copernicus Climate Data Store backend.</p>
 <p>Downloads ERA5 reanalysis (and ERA5-Land where the catalog
-indicates) via :class:<code>cdsapi.Client</code>. The user-friendly variable
+indicates) via <code>cdsapi.Client</code>. The user-friendly variable
 short codes (e.g. <code>"2m-temperature"</code>, <code>"total-precipitation"</code>) are resolved through
-:class:<code>Catalog</code>, which loads the per-variable metadata from the
+<code>Catalog</code>, which loads the per-variable metadata from the
 bundled CDS catalog (the <code>catalog/</code> directory).</p>
 <p>The download pipeline (per variable) is a single step:</p>
 <ul>
-<li>:meth:<code>_api</code> — build the cdsapi request dict (daily / monthly
+<li><code>_api</code> — build the cdsapi request dict (daily / monthly
   branch on <code>temporal_resolution</code>) and submit it via
   <code>client.retrieve(dataset, request, target)</code>. Returns the
   absolute path to the NetCDF that CDS wrote.</li>
@@ -24057,9 +24057,9 @@ runnable script that consumes the NetCDF this method writes.</p>
 <p>The valid <code>temporal_resolution</code> values are <code>"daily"</code> and
 <code>"monthly"</code>. <code>_check_input_dates</code> raises <code>ValueError</code> for
 anything else; that is the authoritative gate. Spatial cell
-size lives on :attr:<code>SpatialExtent.resolution</code> (populated by
-:meth:<code>_create_grid</code>) and is the request's native grid spacing —
-:data:<code>ERA5_GRID_DEGREES</code> (0.125°) for regular CDS datasets, or a
+size lives on <code>SpatialExtent.resolution</code> (populated by
+<code>_create_grid</code>) and is the request's native grid spacing —
+<code>ERA5_GRID_DEGREES</code> (0.125°) for regular CDS datasets, or a
 dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 
 
@@ -25256,14 +25256,14 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-614" name="__codelineno-0-614"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;ECMWF / Copernicus Climate Data Store backend.</span>
 <a id="__codelineno-0-615" name="__codelineno-0-615"></a>
 <a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">    Downloads ERA5 reanalysis (and ERA5-Land where the catalog</span>
-<a id="__codelineno-0-617" name="__codelineno-0-617"></a><span class="sd">    indicates) via :class:`cdsapi.Client`. The user-friendly variable</span>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a><span class="sd">    indicates) via `cdsapi.Client`. The user-friendly variable</span>
 <a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">    short codes (e.g. `&quot;2m-temperature&quot;`, `&quot;total-precipitation&quot;`) are resolved through</span>
-<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="sd">    :class:`Catalog`, which loads the per-variable metadata from the</span>
+<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="sd">    `Catalog`, which loads the per-variable metadata from the</span>
 <a id="__codelineno-0-620" name="__codelineno-0-620"></a><span class="sd">    bundled CDS catalog (the `catalog/` directory).</span>
 <a id="__codelineno-0-621" name="__codelineno-0-621"></a>
 <a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">    The download pipeline (per variable) is a single step:</span>
 <a id="__codelineno-0-623" name="__codelineno-0-623"></a>
-<a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">    * :meth:`_api` — build the cdsapi request dict (daily / monthly</span>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">    * `_api` — build the cdsapi request dict (daily / monthly</span>
 <a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">      branch on `temporal_resolution`) and submit it via</span>
 <a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="sd">      `client.retrieve(dataset, request, target)`. Returns the</span>
 <a id="__codelineno-0-627" name="__codelineno-0-627"></a><span class="sd">      absolute path to the NetCDF that CDS wrote.</span>
@@ -25276,9 +25276,9 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">    The valid `temporal_resolution` values are `&quot;daily&quot;` and</span>
 <a id="__codelineno-0-635" name="__codelineno-0-635"></a><span class="sd">    `&quot;monthly&quot;`. `_check_input_dates` raises `ValueError` for</span>
 <a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">    anything else; that is the authoritative gate. Spatial cell</span>
-<a id="__codelineno-0-637" name="__codelineno-0-637"></a><span class="sd">    size lives on :attr:`SpatialExtent.resolution` (populated by</span>
-<a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="sd">    :meth:`_create_grid`) and is the request&#39;s native grid spacing —</span>
-<a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="sd">    :data:`ERA5_GRID_DEGREES` (0.125°) for regular CDS datasets, or a</span>
+<a id="__codelineno-0-637" name="__codelineno-0-637"></a><span class="sd">    size lives on `SpatialExtent.resolution` (populated by</span>
+<a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="sd">    `_create_grid`) and is the request&#39;s native grid spacing —</span>
+<a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="sd">    `ERA5_GRID_DEGREES` (0.125°) for regular CDS datasets, or a</span>
 <a id="__codelineno-0-640" name="__codelineno-0-640"></a><span class="sd">    dataset&#39;s own `grid_resolution` (e.g. GloFAS&#39;s 0.05° on EWDS).</span>
 <a id="__codelineno-0-641" name="__codelineno-0-641"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-642" name="__codelineno-0-642"></a>
@@ -25314,10 +25314,10 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-672" name="__codelineno-0-672"></a>    <span class="p">):</span>
 <a id="__codelineno-0-673" name="__codelineno-0-673"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize an ECMWF backend instance.</span>
 <a id="__codelineno-0-674" name="__codelineno-0-674"></a>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">        Forwards every argument to :class:`AbstractDataSource`, which</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">        Forwards every argument to `AbstractDataSource`, which</span>
 <a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">        captures the bbox/date dict into `self.space` / `self.time`. The</span>
 <a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">        cdsapi client is built lazily on first access to `self.client`</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">        (via :meth:`_open_client`), so construction never authenticates.</span>
+<a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">        (via `_open_client`), so construction never authenticates.</span>
 <a id="__codelineno-0-679" name="__codelineno-0-679"></a>
 <a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">            start: Inclusive start date as a string (parsed with</span>
@@ -25327,7 +25327,7 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">                of variable codes drawn from that dataset, e.g.</span>
 <a id="__codelineno-0-686" name="__codelineno-0-686"></a><span class="sd">                `{&quot;reanalysis-era5-single-levels&quot;: [&quot;2m-temperature&quot;,</span>
 <a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">                &quot;total-precipitation&quot;]}`. The dataset name must be a</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">                key of :attr:`Catalog.datasets`; each variable name</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">                key of `Catalog.datasets`; each variable name</span>
 <a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="sd">                must appear under that dataset&#39;s `variables:` block.</span>
 <a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">                See the bundled CDS catalog (`catalog/`) for the keys.</span>
 <a id="__codelineno-0-691" name="__codelineno-0-691"></a><span class="sd">                Required.</span>
@@ -25462,8 +25462,8 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-820" name="__codelineno-0-820"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the date range and produce the iteration index.</span>
 <a id="__codelineno-0-821" name="__codelineno-0-821"></a>
 <a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="sd">        Returned dict is captured by</span>
-<a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">        :meth:`AbstractDataSource.__init__` into `self.time` so</span>
-<a id="__codelineno-0-824" name="__codelineno-0-824"></a><span class="sd">        :meth:`_api` can access the parsed bounds and the per-date</span>
+<a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">        `AbstractDataSource.__init__` into `self.time` so</span>
+<a id="__codelineno-0-824" name="__codelineno-0-824"></a><span class="sd">        `_api` can access the parsed bounds and the per-date</span>
 <a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">        pandas range without re-parsing.</span>
 <a id="__codelineno-0-826" name="__codelineno-0-826"></a>
 <a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">        Args:</span>
@@ -25479,7 +25479,7 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-837" name="__codelineno-0-837"></a><span class="sd">            TemporalExtent: Frozen pydantic model with `start_date`,</span>
 <a id="__codelineno-0-838" name="__codelineno-0-838"></a><span class="sd">            `end_date`, `resolution` (pandas frequency alias —</span>
 <a id="__codelineno-0-839" name="__codelineno-0-839"></a><span class="sd">            `&quot;D&quot;` for daily, `&quot;MS&quot;` for month-start), and</span>
-<a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="sd">            `dates` (the :class:`pandas.DatetimeIndex` the</span>
+<a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="sd">            `dates` (the `pandas.DatetimeIndex` the</span>
 <a id="__codelineno-0-841" name="__codelineno-0-841"></a><span class="sd">            download loop iterates).</span>
 <a id="__codelineno-0-842" name="__codelineno-0-842"></a>
 <a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">        Raises:</span>
@@ -25509,16 +25509,16 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-867" name="__codelineno-0-867"></a>        <span class="p">)</span>
 <a id="__codelineno-0-868" name="__codelineno-0-868"></a>
 <a id="__codelineno-0-869" name="__codelineno-0-869"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_open_client</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cds&quot;</span><span class="p">):</span>
-<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct a :class:`cdsapi.Client` for the named CADS endpoint.</span>
+<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct a `cdsapi.Client` for the named CADS endpoint.</span>
 <a id="__codelineno-0-871" name="__codelineno-0-871"></a>
-<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">        Delegates to :func:`earthlens.ecmwf.endpoints.open_client`, which maps</span>
+<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">        Delegates to `earthlens.ecmwf.endpoints.open_client`, which maps</span>
 <a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="sd">        the endpoint slug (`&quot;cds&quot;` / `&quot;ads&quot;` / `&quot;ewds&quot;`) to its URL and resolves</span>
 <a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="sd">        the token (the endpoint&#39;s own `&lt;ENDPOINT&gt;_KEY`, else the shared CDS</span>
 <a id="__codelineno-0-875" name="__codelineno-0-875"></a><span class="sd">        Personal Access Token from `CDSAPI_KEY` / `~/.cdsapirc`). Missing-CDS-</span>
-<a id="__codelineno-0-876" name="__codelineno-0-876"></a><span class="sd">        credential errors are re-raised as :class:`AuthenticationError` with a</span>
+<a id="__codelineno-0-876" name="__codelineno-0-876"></a><span class="sd">        credential errors are re-raised as `AuthenticationError` with a</span>
 <a id="__codelineno-0-877" name="__codelineno-0-877"></a><span class="sd">        message telling the user where to put their token. Called via</span>
-<a id="__codelineno-0-878" name="__codelineno-0-878"></a><span class="sd">        :meth:`_client_for` (and, for the default endpoint, by the</span>
-<a id="__codelineno-0-879" name="__codelineno-0-879"></a><span class="sd">        :class:`~earthlens.base.LazyClientMixin` `client` property).</span>
+<a id="__codelineno-0-878" name="__codelineno-0-878"></a><span class="sd">        `_client_for` (and, for the default endpoint, by the</span>
+<a id="__codelineno-0-879" name="__codelineno-0-879"></a><span class="sd">        `LazyClientMixin` `client` property).</span>
 <a id="__codelineno-0-880" name="__codelineno-0-880"></a>
 <a id="__codelineno-0-881" name="__codelineno-0-881"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-882" name="__codelineno-0-882"></a><span class="sd">            endpoint: CADS instance slug. Defaults to `&quot;cds&quot;`.</span>
@@ -25578,7 +25578,7 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-936" name="__codelineno-0-936"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <a id="__codelineno-0-937" name="__codelineno-0-937"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The default (CDS) cdsapi client — opened lazily and cached per endpoint.</span>
 <a id="__codelineno-0-938" name="__codelineno-0-938"></a>
-<a id="__codelineno-0-939" name="__codelineno-0-939"></a><span class="sd">        Overrides :class:`~earthlens.base.LazyClientMixin` so that reading</span>
+<a id="__codelineno-0-939" name="__codelineno-0-939"></a><span class="sd">        Overrides `LazyClientMixin` so that reading</span>
 <a id="__codelineno-0-940" name="__codelineno-0-940"></a><span class="sd">        `self.client` (e.g. via `authenticate()`) routes through the same</span>
 <a id="__codelineno-0-941" name="__codelineno-0-941"></a><span class="sd">        per-endpoint cache as a retrieve, rather than seeding a shared slot that</span>
 <a id="__codelineno-0-942" name="__codelineno-0-942"></a><span class="sd">        would then be returned for every endpoint. Resolves the `&quot;cds&quot;` client;</span>
@@ -25595,7 +25595,7 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-953" name="__codelineno-0-953"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Bind a client used for every endpoint (a deliberate override).</span>
 <a id="__codelineno-0-954" name="__codelineno-0-954"></a>
 <a id="__codelineno-0-955" name="__codelineno-0-955"></a><span class="sd">        A client set here overrides endpoint routing and is returned by</span>
-<a id="__codelineno-0-956" name="__codelineno-0-956"></a><span class="sd">        :meth:`_client_for` for all endpoints — unlike a lazily-built endpoint</span>
+<a id="__codelineno-0-956" name="__codelineno-0-956"></a><span class="sd">        `_client_for` for all endpoints — unlike a lazily-built endpoint</span>
 <a id="__codelineno-0-957" name="__codelineno-0-957"></a><span class="sd">        client, which is cached per endpoint and never treated as injected.</span>
 <a id="__codelineno-0-958" name="__codelineno-0-958"></a>
 <a id="__codelineno-0-959" name="__codelineno-0-959"></a><span class="sd">        Args:</span>
@@ -25631,7 +25631,7 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-989" name="__codelineno-0-989"></a>
 <a id="__codelineno-0-990" name="__codelineno-0-990"></a><span class="sd">        Reads the requested datasets from `self.vars` and returns the finest</span>
 <a id="__codelineno-0-991" name="__codelineno-0-991"></a><span class="sd">        (smallest) `grid_resolution` declared among them in the catalog,</span>
-<a id="__codelineno-0-992" name="__codelineno-0-992"></a><span class="sd">        falling back to :data:`ERA5_GRID_DEGREES` for any dataset that declares</span>
+<a id="__codelineno-0-992" name="__codelineno-0-992"></a><span class="sd">        falling back to `ERA5_GRID_DEGREES` for any dataset that declares</span>
 <a id="__codelineno-0-993" name="__codelineno-0-993"></a><span class="sd">        none. When `self.vars` is absent (a bare instance with no requested</span>
 <a id="__codelineno-0-994" name="__codelineno-0-994"></a><span class="sd">        datasets) or the catalog lookup fails, the ERA5 default is used — so</span>
 <a id="__codelineno-0-995" name="__codelineno-0-995"></a><span class="sd">        regular CDS datasets keep their historic 0.125° snap while an EWDS</span>
@@ -25672,7 +25672,7 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-1030" name="__codelineno-0-1030"></a>
 <a id="__codelineno-0-1031" name="__codelineno-0-1031"></a><span class="sd">        Floors the south/west limits and ceils the north/east limits to the</span>
 <a id="__codelineno-0-1032" name="__codelineno-0-1032"></a><span class="sd">        nearest multiple of the request&#39;s grid spacing (see</span>
-<a id="__codelineno-0-1033" name="__codelineno-0-1033"></a><span class="sd">        :meth:`_grid_resolution_for_request`) — :data:`ERA5_GRID_DEGREES`</span>
+<a id="__codelineno-0-1033" name="__codelineno-0-1033"></a><span class="sd">        `_grid_resolution_for_request`) — `ERA5_GRID_DEGREES`</span>
 <a id="__codelineno-0-1034" name="__codelineno-0-1034"></a><span class="sd">        (0.125°) for regular CDS datasets, or a dataset&#39;s own</span>
 <a id="__codelineno-0-1035" name="__codelineno-0-1035"></a><span class="sd">        `grid_resolution` (e.g. GloFAS&#39;s 0.05° on EWDS) — so every retrieve</span>
 <a id="__codelineno-0-1036" name="__codelineno-0-1036"></a><span class="sd">        aligns with the native grid and no cell straddles the requested area</span>
@@ -25685,7 +25685,7 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-1043" name="__codelineno-0-1043"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-1044" name="__codelineno-0-1044"></a><span class="sd">            SpatialExtent: Grid-aligned bounding box with `resolution` set to</span>
 <a id="__codelineno-0-1045" name="__codelineno-0-1045"></a><span class="sd">            the request&#39;s native grid spacing (see</span>
-<a id="__codelineno-0-1046" name="__codelineno-0-1046"></a><span class="sd">            :meth:`_grid_resolution_for_request`) — the ERA5 default or a</span>
+<a id="__codelineno-0-1046" name="__codelineno-0-1046"></a><span class="sd">            `_grid_resolution_for_request`) — the ERA5 default or a</span>
 <a id="__codelineno-0-1047" name="__codelineno-0-1047"></a><span class="sd">            dataset&#39;s `grid_resolution`.</span>
 <a id="__codelineno-0-1048" name="__codelineno-0-1048"></a>
 <a id="__codelineno-0-1049" name="__codelineno-0-1049"></a><span class="sd">        Examples:</span>
@@ -25734,17 +25734,17 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-1092" name="__codelineno-0-1092"></a>
 <a id="__codelineno-0-1093" name="__codelineno-0-1093"></a><span class="sd">        Iterates the user-supplied `variables` mapping (CDS dataset</span>
 <a id="__codelineno-0-1094" name="__codelineno-0-1094"></a><span class="sd">        short name → list of variable codes) and, for each pair,</span>
-<a id="__codelineno-0-1095" name="__codelineno-0-1095"></a><span class="sd">        looks the variable up in the CDS :class:`Catalog` and</span>
-<a id="__codelineno-0-1096" name="__codelineno-0-1096"></a><span class="sd">        delegates to :meth:`_download_dataset`.</span>
+<a id="__codelineno-0-1095" name="__codelineno-0-1095"></a><span class="sd">        looks the variable up in the CDS `Catalog` and</span>
+<a id="__codelineno-0-1096" name="__codelineno-0-1096"></a><span class="sd">        delegates to `_download_dataset`.</span>
 <a id="__codelineno-0-1097" name="__codelineno-0-1097"></a>
 <a id="__codelineno-0-1098" name="__codelineno-0-1098"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-1099" name="__codelineno-0-1099"></a><span class="sd">            progress_bar: Reserved; currently unused since the</span>
 <a id="__codelineno-0-1100" name="__codelineno-0-1100"></a><span class="sd">                slicing pipeline that previously consumed it has</span>
 <a id="__codelineno-0-1101" name="__codelineno-0-1101"></a><span class="sd">                been moved out of the package. Defaults to `True`</span>
 <a id="__codelineno-0-1102" name="__codelineno-0-1102"></a><span class="sd">                so existing callers keep working.</span>
-<a id="__codelineno-0-1103" name="__codelineno-0-1103"></a><span class="sd">            aggregate: Optional :class:`earthlens.aggregate.AggregationConfig`.</span>
+<a id="__codelineno-0-1103" name="__codelineno-0-1103"></a><span class="sd">            aggregate: Optional `earthlens.aggregate.AggregationConfig`.</span>
 <a id="__codelineno-0-1104" name="__codelineno-0-1104"></a><span class="sd">                When provided, every retrieved NetCDF is fed through</span>
-<a id="__codelineno-0-1105" name="__codelineno-0-1105"></a><span class="sd">                :func:`earthlens.aggregate.aggregate_netcdf` immediately</span>
+<a id="__codelineno-0-1105" name="__codelineno-0-1105"></a><span class="sd">                `earthlens.aggregate.aggregate_netcdf` immediately</span>
 <a id="__codelineno-0-1106" name="__codelineno-0-1106"></a><span class="sd">                after `_api()` returns. When the config&#39;s `out_dir`</span>
 <a id="__codelineno-0-1107" name="__codelineno-0-1107"></a><span class="sd">                is `None`, it is defaulted to</span>
 <a id="__codelineno-0-1108" name="__codelineno-0-1108"></a><span class="sd">                `&lt;self.root_dir&gt;/aggregated/`. Aggregation failures</span>
@@ -25815,7 +25815,7 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-1173" name="__codelineno-0-1173"></a><span class="sd">            default `errors=&quot;warn&quot;`, variables whose download (or</span>
 <a id="__codelineno-0-1174" name="__codelineno-0-1174"></a><span class="sd">            aggregate) failed are logged and omitted from the returned</span>
 <a id="__codelineno-0-1175" name="__codelineno-0-1175"></a><span class="sd">            list rather than aborting the batch. A store-level refusal is</span>
-<a id="__codelineno-0-1176" name="__codelineno-0-1176"></a><span class="sd">            the exception to that — see :class:`CadsUnavailableError`</span>
+<a id="__codelineno-0-1176" name="__codelineno-0-1176"></a><span class="sd">            the exception to that — see `CadsUnavailableError`</span>
 <a id="__codelineno-0-1177" name="__codelineno-0-1177"></a><span class="sd">            under `Raises:`.</span>
 <a id="__codelineno-0-1178" name="__codelineno-0-1178"></a>
 <a id="__codelineno-0-1179" name="__codelineno-0-1179"></a><span class="sd">        Raises:</span>
@@ -25833,12 +25833,12 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-1191" name="__codelineno-0-1191"></a><span class="sd">                as every variable having no data.</span>
 <a id="__codelineno-0-1192" name="__codelineno-0-1192"></a><span class="sd">            PermissionError: The dataset&#39;s licence has not been accepted</span>
 <a id="__codelineno-0-1193" name="__codelineno-0-1193"></a><span class="sd">                on the Copernicus account.</span>
-<a id="__codelineno-0-1194" name="__codelineno-0-1194"></a><span class="sd">            Exception: Any error :meth:`_api` propagates from</span>
-<a id="__codelineno-0-1195" name="__codelineno-0-1195"></a><span class="sd">                :meth:`cdsapi.Client.retrieve`.</span>
+<a id="__codelineno-0-1194" name="__codelineno-0-1194"></a><span class="sd">            Exception: Any error `_api` propagates from</span>
+<a id="__codelineno-0-1195" name="__codelineno-0-1195"></a><span class="sd">                `cdsapi.Client.retrieve`.</span>
 <a id="__codelineno-0-1196" name="__codelineno-0-1196"></a>
 <a id="__codelineno-0-1197" name="__codelineno-0-1197"></a><span class="sd">        Examples:</span>
 <a id="__codelineno-0-1198" name="__codelineno-0-1198"></a><span class="sd">            - End-to-end download via the user-facing</span>
-<a id="__codelineno-0-1199" name="__codelineno-0-1199"></a><span class="sd">              :class:`EarthLens` facade. Marked</span>
+<a id="__codelineno-0-1199" name="__codelineno-0-1199"></a><span class="sd">              `EarthLens` facade. Marked</span>
 <a id="__codelineno-0-1200" name="__codelineno-0-1200"></a><span class="sd">              `# doctest: +SKIP` because it requires a configured</span>
 <a id="__codelineno-0-1201" name="__codelineno-0-1201"></a><span class="sd">              `~/.cdsapirc` and several minutes of CDS queue time:</span>
 <a id="__codelineno-0-1202" name="__codelineno-0-1202"></a>
@@ -25863,10 +25863,10 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-1221" name="__codelineno-0-1221"></a><span class="sd">                ```</span>
 <a id="__codelineno-0-1222" name="__codelineno-0-1222"></a>
 <a id="__codelineno-0-1223" name="__codelineno-0-1223"></a><span class="sd">        See Also:</span>
-<a id="__codelineno-0-1224" name="__codelineno-0-1224"></a><span class="sd">            :meth:`_download_dataset`: Per-variable download +</span>
+<a id="__codelineno-0-1224" name="__codelineno-0-1224"></a><span class="sd">            `_download_dataset`: Per-variable download +</span>
 <a id="__codelineno-0-1225" name="__codelineno-0-1225"></a><span class="sd">                post-processing.</span>
-<a id="__codelineno-0-1226" name="__codelineno-0-1226"></a><span class="sd">            :meth:`_api`: Builds and submits the cdsapi request.</span>
-<a id="__codelineno-0-1227" name="__codelineno-0-1227"></a><span class="sd">            :class:`Catalog`: Resolves `(dataset, code)` pairs to</span>
+<a id="__codelineno-0-1226" name="__codelineno-0-1226"></a><span class="sd">            `_api`: Builds and submits the cdsapi request.</span>
+<a id="__codelineno-0-1227" name="__codelineno-0-1227"></a><span class="sd">            `Catalog`: Resolves `(dataset, code)` pairs to</span>
 <a id="__codelineno-0-1228" name="__codelineno-0-1228"></a><span class="sd">                per-variable metadata.</span>
 <a id="__codelineno-0-1229" name="__codelineno-0-1229"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1230" name="__codelineno-0-1230"></a>        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_passthrough&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -25985,7 +25985,7 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-1343" name="__codelineno-0-1343"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <a id="__codelineno-0-1344" name="__codelineno-0-1344"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve which store hosts `dataset` for a passthrough retrieve.</span>
 <a id="__codelineno-0-1345" name="__codelineno-0-1345"></a>
-<a id="__codelineno-0-1346" name="__codelineno-0-1346"></a><span class="sd">        Delegates to :func:`earthlens.ecmwf._helpers.endpoint_for`, the one</span>
+<a id="__codelineno-0-1346" name="__codelineno-0-1346"></a><span class="sd">        Delegates to `earthlens.ecmwf._helpers.endpoint_for`, the one</span>
 <a id="__codelineno-0-1347" name="__codelineno-0-1347"></a><span class="sd">        resolver the CLI tooling shares: a curated row&#39;s `endpoint` wins, then</span>
 <a id="__codelineno-0-1348" name="__codelineno-0-1348"></a><span class="sd">        the per-store availability index, then `&quot;cds&quot;` with a warning.</span>
 <a id="__codelineno-0-1349" name="__codelineno-0-1349"></a>
@@ -26101,8 +26101,8 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-1459" name="__codelineno-0-1459"></a>    <span class="p">):</span>
 <a id="__codelineno-0-1460" name="__codelineno-0-1460"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download a single variable from CDS.</span>
 <a id="__codelineno-0-1461" name="__codelineno-0-1461"></a>
-<a id="__codelineno-0-1462" name="__codelineno-0-1462"></a><span class="sd">        Thin wrapper around :meth:`_api` — builds the cdsapi request,</span>
-<a id="__codelineno-0-1463" name="__codelineno-0-1463"></a><span class="sd">        submits it, and returns the absolute :class:`pathlib.Path`</span>
+<a id="__codelineno-0-1462" name="__codelineno-0-1462"></a><span class="sd">        Thin wrapper around `_api` — builds the cdsapi request,</span>
+<a id="__codelineno-0-1463" name="__codelineno-0-1463"></a><span class="sd">        submits it, and returns the absolute `pathlib.Path`</span>
 <a id="__codelineno-0-1464" name="__codelineno-0-1464"></a><span class="sd">        to the NetCDF that CDS wrote.</span>
 <a id="__codelineno-0-1465" name="__codelineno-0-1465"></a>
 <a id="__codelineno-0-1466" name="__codelineno-0-1466"></a><span class="sd">        Per-date GeoTIFF slicing is **not** done here. Users who</span>
@@ -26111,7 +26111,7 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-1469" name="__codelineno-0-1469"></a><span class="sd">        returned NetCDF.</span>
 <a id="__codelineno-0-1470" name="__codelineno-0-1470"></a>
 <a id="__codelineno-0-1471" name="__codelineno-0-1471"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-1472" name="__codelineno-0-1472"></a><span class="sd">            var_info: Catalog row for the variable. See :meth:`_api`</span>
+<a id="__codelineno-0-1472" name="__codelineno-0-1472"></a><span class="sd">            var_info: Catalog row for the variable. See `_api`</span>
 <a id="__codelineno-0-1473" name="__codelineno-0-1473"></a><span class="sd">                for the attributes consumed.</span>
 <a id="__codelineno-0-1474" name="__codelineno-0-1474"></a><span class="sd">            progress_bar: Reserved; currently unused since the</span>
 <a id="__codelineno-0-1475" name="__codelineno-0-1475"></a><span class="sd">                slicing pipeline that previously consumed it has</span>
@@ -26122,9 +26122,9 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-1480" name="__codelineno-0-1480"></a><span class="sd">            pathlib.Path: Absolute path to the downloaded NetCDF.</span>
 <a id="__codelineno-0-1481" name="__codelineno-0-1481"></a>
 <a id="__codelineno-0-1482" name="__codelineno-0-1482"></a><span class="sd">        See Also:</span>
-<a id="__codelineno-0-1483" name="__codelineno-0-1483"></a><span class="sd">            :meth:`_api`: Builds and submits the CDS request, returns</span>
+<a id="__codelineno-0-1483" name="__codelineno-0-1483"></a><span class="sd">            `_api`: Builds and submits the CDS request, returns</span>
 <a id="__codelineno-0-1484" name="__codelineno-0-1484"></a><span class="sd">                the path to the NetCDF.</span>
-<a id="__codelineno-0-1485" name="__codelineno-0-1485"></a><span class="sd">            :class:`Catalog`: Loads `Variable` instances from the</span>
+<a id="__codelineno-0-1485" name="__codelineno-0-1485"></a><span class="sd">            `Catalog`: Loads `Variable` instances from the</span>
 <a id="__codelineno-0-1486" name="__codelineno-0-1486"></a><span class="sd">                bundled CDS catalog (`catalog/`).</span>
 <a id="__codelineno-0-1487" name="__codelineno-0-1487"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1488" name="__codelineno-0-1488"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">(</span><span class="n">var_info</span><span class="p">)</span>
@@ -26135,24 +26135,24 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-1493" name="__codelineno-0-1493"></a><span class="sd">        Five-stage pipeline:</span>
 <a id="__codelineno-0-1494" name="__codelineno-0-1494"></a>
 <a id="__codelineno-0-1495" name="__codelineno-0-1495"></a><span class="sd">        1. Derive the dataset name from `var_info.cds_dataset`.</span>
-<a id="__codelineno-0-1496" name="__codelineno-0-1496"></a><span class="sd">        2. Delegate request-dict assembly to :meth:`_build_request`.</span>
+<a id="__codelineno-0-1496" name="__codelineno-0-1496"></a><span class="sd">        2. Delegate request-dict assembly to `_build_request`.</span>
 <a id="__codelineno-0-1497" name="__codelineno-0-1497"></a><span class="sd">        3. Pre-flight the request via</span>
-<a id="__codelineno-0-1498" name="__codelineno-0-1498"></a><span class="sd">           :class:`earthlens.ecmwf.constraints.RequestValidator`</span>
+<a id="__codelineno-0-1498" name="__codelineno-0-1498"></a><span class="sd">           `earthlens.ecmwf.constraints.RequestValidator`</span>
 <a id="__codelineno-0-1499" name="__codelineno-0-1499"></a><span class="sd">           (skipped when the constructor was given</span>
 <a id="__codelineno-0-1500" name="__codelineno-0-1500"></a><span class="sd">           `skip_constraints=True`).</span>
-<a id="__codelineno-0-1501" name="__codelineno-0-1501"></a><span class="sd">        4. Submit via :meth:`cdsapi.Client.retrieve`. The call blocks</span>
+<a id="__codelineno-0-1501" name="__codelineno-0-1501"></a><span class="sd">        4. Submit via `cdsapi.Client.retrieve`. The call blocks</span>
 <a id="__codelineno-0-1502" name="__codelineno-0-1502"></a><span class="sd">           until CDS has served the request and written the NetCDF</span>
 <a id="__codelineno-0-1503" name="__codelineno-0-1503"></a><span class="sd">           — typically minutes due to CDS queue times.</span>
 <a id="__codelineno-0-1504" name="__codelineno-0-1504"></a><span class="sd">        5. On failure, rewrite licence-not-accepted exceptions into a</span>
-<a id="__codelineno-0-1505" name="__codelineno-0-1505"></a><span class="sd">           :class:`PermissionError` carrying the dataset&#39;s licence</span>
+<a id="__codelineno-0-1505" name="__codelineno-0-1505"></a><span class="sd">           `PermissionError` carrying the dataset&#39;s licence</span>
 <a id="__codelineno-0-1506" name="__codelineno-0-1506"></a><span class="sd">           page URL. All other exceptions propagate untouched.</span>
 <a id="__codelineno-0-1507" name="__codelineno-0-1507"></a>
 <a id="__codelineno-0-1508" name="__codelineno-0-1508"></a><span class="sd">        Output filename:</span>
 <a id="__codelineno-0-1509" name="__codelineno-0-1509"></a><span class="sd">        `&lt;self.root_dir&gt;/&lt;cds_variable&gt;_&lt;cds_dataset&gt;.nc`.</span>
 <a id="__codelineno-0-1510" name="__codelineno-0-1510"></a>
 <a id="__codelineno-0-1511" name="__codelineno-0-1511"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-1512" name="__codelineno-0-1512"></a><span class="sd">            var_info: Catalog row resolved by :class:`Catalog`.</span>
-<a id="__codelineno-0-1513" name="__codelineno-0-1513"></a><span class="sd">                See :meth:`_build_request` for the full list of</span>
+<a id="__codelineno-0-1512" name="__codelineno-0-1512"></a><span class="sd">            var_info: Catalog row resolved by `Catalog`.</span>
+<a id="__codelineno-0-1513" name="__codelineno-0-1513"></a><span class="sd">                See `_build_request` for the full list of</span>
 <a id="__codelineno-0-1514" name="__codelineno-0-1514"></a><span class="sd">                fields consumed during request assembly. `_api`</span>
 <a id="__codelineno-0-1515" name="__codelineno-0-1515"></a><span class="sd">                itself reads `cds_dataset` (the retrieve target) and</span>
 <a id="__codelineno-0-1516" name="__codelineno-0-1516"></a><span class="sd">                `cds_variable` / `dataset_id` (the output filename stem).</span>
@@ -26167,13 +26167,13 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-1525" name="__codelineno-0-1525"></a><span class="sd">                user&#39;s CDS account. Message links to the dataset&#39;s</span>
 <a id="__codelineno-0-1526" name="__codelineno-0-1526"></a><span class="sd">                licence page.</span>
 <a id="__codelineno-0-1527" name="__codelineno-0-1527"></a><span class="sd">            ValueError: Propagated from</span>
-<a id="__codelineno-0-1528" name="__codelineno-0-1528"></a><span class="sd">                :class:`earthlens.ecmwf.constraints.RequestValidator`</span>
+<a id="__codelineno-0-1528" name="__codelineno-0-1528"></a><span class="sd">                `earthlens.ecmwf.constraints.RequestValidator`</span>
 <a id="__codelineno-0-1529" name="__codelineno-0-1529"></a><span class="sd">                when the assembled request fails the pre-flight</span>
 <a id="__codelineno-0-1530" name="__codelineno-0-1530"></a><span class="sd">                check (variable typo, unknown extras, malformed</span>
 <a id="__codelineno-0-1531" name="__codelineno-0-1531"></a><span class="sd">                date / area, ...). Skipped entirely when</span>
 <a id="__codelineno-0-1532" name="__codelineno-0-1532"></a><span class="sd">                `skip_constraints=True`.</span>
 <a id="__codelineno-0-1533" name="__codelineno-0-1533"></a><span class="sd">            Exception: Other transport-level errors from</span>
-<a id="__codelineno-0-1534" name="__codelineno-0-1534"></a><span class="sd">                :meth:`cdsapi.Client.retrieve` (authentication</span>
+<a id="__codelineno-0-1534" name="__codelineno-0-1534"></a><span class="sd">                `cdsapi.Client.retrieve` (authentication</span>
 <a id="__codelineno-0-1535" name="__codelineno-0-1535"></a><span class="sd">                failures, transient CDS 5xx, network drops)</span>
 <a id="__codelineno-0-1536" name="__codelineno-0-1536"></a><span class="sd">                propagate untouched.</span>
 <a id="__codelineno-0-1537" name="__codelineno-0-1537"></a>
@@ -26195,7 +26195,7 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-1553" name="__codelineno-0-1553"></a>
 <a id="__codelineno-0-1554" name="__codelineno-0-1554"></a><span class="sd">                ```</span>
 <a id="__codelineno-0-1555" name="__codelineno-0-1555"></a><span class="sd">            - Submit the request through the user-facing</span>
-<a id="__codelineno-0-1556" name="__codelineno-0-1556"></a><span class="sd">              :class:`EarthLens` facade. Marked</span>
+<a id="__codelineno-0-1556" name="__codelineno-0-1556"></a><span class="sd">              `EarthLens` facade. Marked</span>
 <a id="__codelineno-0-1557" name="__codelineno-0-1557"></a><span class="sd">              `# doctest: +SKIP` because it requires a configured</span>
 <a id="__codelineno-0-1558" name="__codelineno-0-1558"></a><span class="sd">              `~/.cdsapirc` and several minutes of CDS queue time:</span>
 <a id="__codelineno-0-1559" name="__codelineno-0-1559"></a>
@@ -26218,15 +26218,15 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-1576" name="__codelineno-0-1576"></a><span class="sd">                ```</span>
 <a id="__codelineno-0-1577" name="__codelineno-0-1577"></a>
 <a id="__codelineno-0-1578" name="__codelineno-0-1578"></a><span class="sd">        See Also:</span>
-<a id="__codelineno-0-1579" name="__codelineno-0-1579"></a><span class="sd">            :meth:`_build_request`: Assembles the CDS request dict</span>
+<a id="__codelineno-0-1579" name="__codelineno-0-1579"></a><span class="sd">            `_build_request`: Assembles the CDS request dict</span>
 <a id="__codelineno-0-1580" name="__codelineno-0-1580"></a><span class="sd">                this method submits — the pure-builder collaborator.</span>
-<a id="__codelineno-0-1581" name="__codelineno-0-1581"></a><span class="sd">            :class:`earthlens.ecmwf.constraints.RequestValidator`: The</span>
+<a id="__codelineno-0-1581" name="__codelineno-0-1581"></a><span class="sd">            `earthlens.ecmwf.constraints.RequestValidator`: The</span>
 <a id="__codelineno-0-1582" name="__codelineno-0-1582"></a><span class="sd">                pre-flight check applied to the assembled request.</span>
-<a id="__codelineno-0-1583" name="__codelineno-0-1583"></a><span class="sd">            :meth:`_download_dataset`: Thin pass-through wrapper —</span>
+<a id="__codelineno-0-1583" name="__codelineno-0-1583"></a><span class="sd">            `_download_dataset`: Thin pass-through wrapper —</span>
 <a id="__codelineno-0-1584" name="__codelineno-0-1584"></a><span class="sd">                calls this method and returns the same path.</span>
-<a id="__codelineno-0-1585" name="__codelineno-0-1585"></a><span class="sd">            :class:`Catalog`: Resolves `(dataset, variable)` pairs</span>
-<a id="__codelineno-0-1586" name="__codelineno-0-1586"></a><span class="sd">                to :class:`Variable` rows.</span>
-<a id="__codelineno-0-1587" name="__codelineno-0-1587"></a><span class="sd">            :class:`earthlens.earthlens.EarthLens`: User-facing facade</span>
+<a id="__codelineno-0-1585" name="__codelineno-0-1585"></a><span class="sd">            `Catalog`: Resolves `(dataset, variable)` pairs</span>
+<a id="__codelineno-0-1586" name="__codelineno-0-1586"></a><span class="sd">                to `Variable` rows.</span>
+<a id="__codelineno-0-1587" name="__codelineno-0-1587"></a><span class="sd">            `earthlens.earthlens.EarthLens`: User-facing facade</span>
 <a id="__codelineno-0-1588" name="__codelineno-0-1588"></a><span class="sd">                that wires this method into the `download()` flow.</span>
 <a id="__codelineno-0-1589" name="__codelineno-0-1589"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1590" name="__codelineno-0-1590"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="n">var_info</span><span class="o">.</span><span class="n">cds_dataset</span>
@@ -26321,8 +26321,8 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-1679" name="__codelineno-0-1679"></a><span class="sd">        Pure function over `var_info`, `self.time.dates`,</span>
 <a id="__codelineno-0-1680" name="__codelineno-0-1680"></a><span class="sd">        `self.space`, and `self.temporal_resolution`. No I/O, no</span>
 <a id="__codelineno-0-1681" name="__codelineno-0-1681"></a><span class="sd">        validation, no client calls — just dictionary assembly.</span>
-<a id="__codelineno-0-1682" name="__codelineno-0-1682"></a><span class="sd">        :meth:`_api` consumes the result and submits it via</span>
-<a id="__codelineno-0-1683" name="__codelineno-0-1683"></a><span class="sd">        :meth:`cdsapi.Client.retrieve`.</span>
+<a id="__codelineno-0-1682" name="__codelineno-0-1682"></a><span class="sd">        `_api` consumes the result and submits it via</span>
+<a id="__codelineno-0-1683" name="__codelineno-0-1683"></a><span class="sd">        `cdsapi.Client.retrieve`.</span>
 <a id="__codelineno-0-1684" name="__codelineno-0-1684"></a>
 <a id="__codelineno-0-1685" name="__codelineno-0-1685"></a><span class="sd">        Build order (later steps override earlier ones):</span>
 <a id="__codelineno-0-1686" name="__codelineno-0-1686"></a>
@@ -26358,7 +26358,7 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-1716" name="__codelineno-0-1716"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-1717" name="__codelineno-0-1717"></a><span class="sd">            dict[str, Any]: Request dict ready to pass as the</span>
 <a id="__codelineno-0-1718" name="__codelineno-0-1718"></a><span class="sd">            second positional argument to</span>
-<a id="__codelineno-0-1719" name="__codelineno-0-1719"></a><span class="sd">            :meth:`cdsapi.Client.retrieve`.</span>
+<a id="__codelineno-0-1719" name="__codelineno-0-1719"></a><span class="sd">            `cdsapi.Client.retrieve`.</span>
 <a id="__codelineno-0-1720" name="__codelineno-0-1720"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1721" name="__codelineno-0-1721"></a>        <span class="k">if</span> <span class="p">(</span>
 <a id="__codelineno-0-1722" name="__codelineno-0-1722"></a>            <span class="n">var_info</span><span class="o">.</span><span class="n">request_kind</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;glofas&quot;</span><span class="p">,</span> <span class="s2">&quot;glofas_hindcast&quot;</span><span class="p">)</span>
@@ -26465,7 +26465,7 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
     <div class="doc doc-contents ">
 
         <p>The default (CDS) cdsapi client — opened lazily and cached per endpoint.</p>
-<p>Overrides :class:<code>~earthlens.base.LazyClientMixin</code> so that reading
+<p>Overrides <code>LazyClientMixin</code> so that reading
 <code>self.client</code> (e.g. via <code>authenticate()</code>) routes through the same
 per-endpoint cache as a retrieve, rather than seeding a shared slot that
 would then be returned for every endpoint. Resolves the <code>"cds"</code> client;
@@ -26514,10 +26514,10 @@ endpoint (e.g. EWDS for GloFAS) is built lazily on its first retrieve.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize an ECMWF backend instance.</p>
-<p>Forwards every argument to :class:<code>AbstractDataSource</code>, which
+<p>Forwards every argument to <code>AbstractDataSource</code>, which
 captures the bbox/date dict into <code>self.space</code> / <code>self.time</code>. The
 cdsapi client is built lazily on first access to <code>self.client</code>
-(via :meth:<code>_open_client</code>), so construction never authenticates.</p>
+(via <code>_open_client</code>), so construction never authenticates.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -26577,7 +26577,7 @@ cdsapi client is built lazily on first access to <code>self.client</code>
 of variable codes drawn from that dataset, e.g.
 <code>{"reanalysis-era5-single-levels": ["2m-temperature",
 "total-precipitation"]}</code>. The dataset name must be a
-key of :attr:<code>Catalog.datasets</code>; each variable name
+key of <code>Catalog.datasets</code>; each variable name
 must appear under that dataset's <code>variables:</code> block.
 See the bundled CDS catalog (<code>catalog/</code>) for the keys.
 Required.</p>
@@ -26927,10 +26927,10 @@ accepted and never consulted.</p>
 <a id="__codelineno-0-672" name="__codelineno-0-672"></a><span class="p">):</span>
 <a id="__codelineno-0-673" name="__codelineno-0-673"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize an ECMWF backend instance.</span>
 <a id="__codelineno-0-674" name="__codelineno-0-674"></a>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">    Forwards every argument to :class:`AbstractDataSource`, which</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">    Forwards every argument to `AbstractDataSource`, which</span>
 <a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">    captures the bbox/date dict into `self.space` / `self.time`. The</span>
 <a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">    cdsapi client is built lazily on first access to `self.client`</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">    (via :meth:`_open_client`), so construction never authenticates.</span>
+<a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">    (via `_open_client`), so construction never authenticates.</span>
 <a id="__codelineno-0-679" name="__codelineno-0-679"></a>
 <a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">        start: Inclusive start date as a string (parsed with</span>
@@ -26940,7 +26940,7 @@ accepted and never consulted.</p>
 <a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">            of variable codes drawn from that dataset, e.g.</span>
 <a id="__codelineno-0-686" name="__codelineno-0-686"></a><span class="sd">            `{&quot;reanalysis-era5-single-levels&quot;: [&quot;2m-temperature&quot;,</span>
 <a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">            &quot;total-precipitation&quot;]}`. The dataset name must be a</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">            key of :attr:`Catalog.datasets`; each variable name</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">            key of `Catalog.datasets`; each variable name</span>
 <a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="sd">            must appear under that dataset&#39;s `variables:` block.</span>
 <a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">            See the bundled CDS catalog (`catalog/`) for the keys.</span>
 <a id="__codelineno-0-691" name="__codelineno-0-691"></a><span class="sd">            Required.</span>
@@ -27088,8 +27088,8 @@ accepted and never consulted.</p>
         <p>Download every <code>(dataset, variable)</code> pair in <code>self.vars</code> from CDS.</p>
 <p>Iterates the user-supplied <code>variables</code> mapping (CDS dataset
 short name → list of variable codes) and, for each pair,
-looks the variable up in the CDS :class:<code>Catalog</code> and
-delegates to :meth:<code>_download_dataset</code>.</p>
+looks the variable up in the CDS <code>Catalog</code> and
+delegates to <code>_download_dataset</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -27131,9 +27131,9 @@ so existing callers keep working.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional :class:<code>earthlens.aggregate.AggregationConfig</code>.
+                <p>Optional <code>earthlens.aggregate.AggregationConfig</code>.
 When provided, every retrieved NetCDF is fed through
-:func:<code>earthlens.aggregate.aggregate_netcdf</code> immediately
+<code>earthlens.aggregate.aggregate_netcdf</code> immediately
 after <code>_api()</code> returns. When the config's <code>out_dir</code>
 is <code>None</code>, it is defaulted to
 <code>&lt;self.root_dir&gt;/aggregated/</code>. Aggregation failures
@@ -27211,7 +27211,7 @@ a daily total).</p>
     default <code>errors="warn"</code>, variables whose download (or
     aggregate) failed are logged and omitted from the returned
     list rather than aborting the batch. A store-level refusal is
-    the exception to that — see :class:<code>CadsUnavailableError</code>
+    the exception to that — see <code>CadsUnavailableError</code>
     under <code>Raises:</code>.</p>
 
 
@@ -27280,8 +27280,8 @@ on the Copernicus account.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Any error :meth:<code>_api</code> propagates from
-:meth:<code>cdsapi.Client.retrieve</code>.</p>
+                <p>Any error <code>_api</code> propagates from
+<code>cdsapi.Client.retrieve</code>.</p>
               </div>
             </td>
           </tr>
@@ -27293,7 +27293,7 @@ on the Copernicus account.</p>
     <ul>
 <li>
 <p>End-to-end download via the user-facing
-  :class:<code>EarthLens</code> facade. Marked
+  <code>EarthLens</code> facade. Marked
   <code># doctest: +SKIP</code> because it requires a configured
   <code>~/.cdsapirc</code> and several minutes of CDS queue time:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
@@ -27319,10 +27319,10 @@ on the Copernicus account.</p>
 
 <details class="see-also" open>
   <summary>See Also</summary>
-  <p>:meth:<code>_download_dataset</code>: Per-variable download +
+  <p><code>_download_dataset</code>: Per-variable download +
     post-processing.
-:meth:<code>_api</code>: Builds and submits the cdsapi request.
-:class:<code>Catalog</code>: Resolves <code>(dataset, code)</code> pairs to
+<code>_api</code>: Builds and submits the cdsapi request.
+<code>Catalog</code>: Resolves <code>(dataset, code)</code> pairs to
     per-variable metadata.</p>
 </details>
 
@@ -27523,17 +27523,17 @@ on the Copernicus account.</p>
 <a id="__codelineno-0-1092" name="__codelineno-0-1092"></a>
 <a id="__codelineno-0-1093" name="__codelineno-0-1093"></a><span class="sd">    Iterates the user-supplied `variables` mapping (CDS dataset</span>
 <a id="__codelineno-0-1094" name="__codelineno-0-1094"></a><span class="sd">    short name → list of variable codes) and, for each pair,</span>
-<a id="__codelineno-0-1095" name="__codelineno-0-1095"></a><span class="sd">    looks the variable up in the CDS :class:`Catalog` and</span>
-<a id="__codelineno-0-1096" name="__codelineno-0-1096"></a><span class="sd">    delegates to :meth:`_download_dataset`.</span>
+<a id="__codelineno-0-1095" name="__codelineno-0-1095"></a><span class="sd">    looks the variable up in the CDS `Catalog` and</span>
+<a id="__codelineno-0-1096" name="__codelineno-0-1096"></a><span class="sd">    delegates to `_download_dataset`.</span>
 <a id="__codelineno-0-1097" name="__codelineno-0-1097"></a>
 <a id="__codelineno-0-1098" name="__codelineno-0-1098"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-1099" name="__codelineno-0-1099"></a><span class="sd">        progress_bar: Reserved; currently unused since the</span>
 <a id="__codelineno-0-1100" name="__codelineno-0-1100"></a><span class="sd">            slicing pipeline that previously consumed it has</span>
 <a id="__codelineno-0-1101" name="__codelineno-0-1101"></a><span class="sd">            been moved out of the package. Defaults to `True`</span>
 <a id="__codelineno-0-1102" name="__codelineno-0-1102"></a><span class="sd">            so existing callers keep working.</span>
-<a id="__codelineno-0-1103" name="__codelineno-0-1103"></a><span class="sd">        aggregate: Optional :class:`earthlens.aggregate.AggregationConfig`.</span>
+<a id="__codelineno-0-1103" name="__codelineno-0-1103"></a><span class="sd">        aggregate: Optional `earthlens.aggregate.AggregationConfig`.</span>
 <a id="__codelineno-0-1104" name="__codelineno-0-1104"></a><span class="sd">            When provided, every retrieved NetCDF is fed through</span>
-<a id="__codelineno-0-1105" name="__codelineno-0-1105"></a><span class="sd">            :func:`earthlens.aggregate.aggregate_netcdf` immediately</span>
+<a id="__codelineno-0-1105" name="__codelineno-0-1105"></a><span class="sd">            `earthlens.aggregate.aggregate_netcdf` immediately</span>
 <a id="__codelineno-0-1106" name="__codelineno-0-1106"></a><span class="sd">            after `_api()` returns. When the config&#39;s `out_dir`</span>
 <a id="__codelineno-0-1107" name="__codelineno-0-1107"></a><span class="sd">            is `None`, it is defaulted to</span>
 <a id="__codelineno-0-1108" name="__codelineno-0-1108"></a><span class="sd">            `&lt;self.root_dir&gt;/aggregated/`. Aggregation failures</span>
@@ -27604,7 +27604,7 @@ on the Copernicus account.</p>
 <a id="__codelineno-0-1173" name="__codelineno-0-1173"></a><span class="sd">        default `errors=&quot;warn&quot;`, variables whose download (or</span>
 <a id="__codelineno-0-1174" name="__codelineno-0-1174"></a><span class="sd">        aggregate) failed are logged and omitted from the returned</span>
 <a id="__codelineno-0-1175" name="__codelineno-0-1175"></a><span class="sd">        list rather than aborting the batch. A store-level refusal is</span>
-<a id="__codelineno-0-1176" name="__codelineno-0-1176"></a><span class="sd">        the exception to that — see :class:`CadsUnavailableError`</span>
+<a id="__codelineno-0-1176" name="__codelineno-0-1176"></a><span class="sd">        the exception to that — see `CadsUnavailableError`</span>
 <a id="__codelineno-0-1177" name="__codelineno-0-1177"></a><span class="sd">        under `Raises:`.</span>
 <a id="__codelineno-0-1178" name="__codelineno-0-1178"></a>
 <a id="__codelineno-0-1179" name="__codelineno-0-1179"></a><span class="sd">    Raises:</span>
@@ -27622,12 +27622,12 @@ on the Copernicus account.</p>
 <a id="__codelineno-0-1191" name="__codelineno-0-1191"></a><span class="sd">            as every variable having no data.</span>
 <a id="__codelineno-0-1192" name="__codelineno-0-1192"></a><span class="sd">        PermissionError: The dataset&#39;s licence has not been accepted</span>
 <a id="__codelineno-0-1193" name="__codelineno-0-1193"></a><span class="sd">            on the Copernicus account.</span>
-<a id="__codelineno-0-1194" name="__codelineno-0-1194"></a><span class="sd">        Exception: Any error :meth:`_api` propagates from</span>
-<a id="__codelineno-0-1195" name="__codelineno-0-1195"></a><span class="sd">            :meth:`cdsapi.Client.retrieve`.</span>
+<a id="__codelineno-0-1194" name="__codelineno-0-1194"></a><span class="sd">        Exception: Any error `_api` propagates from</span>
+<a id="__codelineno-0-1195" name="__codelineno-0-1195"></a><span class="sd">            `cdsapi.Client.retrieve`.</span>
 <a id="__codelineno-0-1196" name="__codelineno-0-1196"></a>
 <a id="__codelineno-0-1197" name="__codelineno-0-1197"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-1198" name="__codelineno-0-1198"></a><span class="sd">        - End-to-end download via the user-facing</span>
-<a id="__codelineno-0-1199" name="__codelineno-0-1199"></a><span class="sd">          :class:`EarthLens` facade. Marked</span>
+<a id="__codelineno-0-1199" name="__codelineno-0-1199"></a><span class="sd">          `EarthLens` facade. Marked</span>
 <a id="__codelineno-0-1200" name="__codelineno-0-1200"></a><span class="sd">          `# doctest: +SKIP` because it requires a configured</span>
 <a id="__codelineno-0-1201" name="__codelineno-0-1201"></a><span class="sd">          `~/.cdsapirc` and several minutes of CDS queue time:</span>
 <a id="__codelineno-0-1202" name="__codelineno-0-1202"></a>
@@ -27652,10 +27652,10 @@ on the Copernicus account.</p>
 <a id="__codelineno-0-1221" name="__codelineno-0-1221"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-1222" name="__codelineno-0-1222"></a>
 <a id="__codelineno-0-1223" name="__codelineno-0-1223"></a><span class="sd">    See Also:</span>
-<a id="__codelineno-0-1224" name="__codelineno-0-1224"></a><span class="sd">        :meth:`_download_dataset`: Per-variable download +</span>
+<a id="__codelineno-0-1224" name="__codelineno-0-1224"></a><span class="sd">        `_download_dataset`: Per-variable download +</span>
 <a id="__codelineno-0-1225" name="__codelineno-0-1225"></a><span class="sd">            post-processing.</span>
-<a id="__codelineno-0-1226" name="__codelineno-0-1226"></a><span class="sd">        :meth:`_api`: Builds and submits the cdsapi request.</span>
-<a id="__codelineno-0-1227" name="__codelineno-0-1227"></a><span class="sd">        :class:`Catalog`: Resolves `(dataset, code)` pairs to</span>
+<a id="__codelineno-0-1226" name="__codelineno-0-1226"></a><span class="sd">        `_api`: Builds and submits the cdsapi request.</span>
+<a id="__codelineno-0-1227" name="__codelineno-0-1227"></a><span class="sd">        `Catalog`: Resolves `(dataset, code)` pairs to</span>
 <a id="__codelineno-0-1228" name="__codelineno-0-1228"></a><span class="sd">            per-variable metadata.</span>
 <a id="__codelineno-0-1229" name="__codelineno-0-1229"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1230" name="__codelineno-0-1230"></a>    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_passthrough&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -27734,10 +27734,10 @@ on the Copernicus account.</p>
 <p>Reads the bundled CDS catalog (the <code>catalog/</code> directory, shipped as
 package data) and exposes its consumed top-level sections as typed
 pydantic fields.
-Instantiate with no arguments (<code>Catalog()</code>) — :func:<code>model_post_init</code>
+Instantiate with no arguments (<code>Catalog()</code>) — <code>model_post_init</code>
 parses the YAML and populates every field in one pass.</p>
 <p>Variables are addressed by the <code>(dataset_name, variable_name)</code>
-pair via :meth:<code>get_variable</code>; there is no flat per-code lookup.
+pair via <code>get_variable</code>; there is no flat per-code lookup.
 The same short code can legitimately appear under more than one
 dataset (e.g. <code>"2m-temperature"</code> lives in both
 <code>reanalysis-era5-single-levels</code> and <code>reanalysis-era5-land</code>), so
@@ -27776,7 +27776,7 @@ code does not consume it.</p>
             <td>
               <div class="doc-md-description">
                 <p>Structural map keyed by CDS dataset short name. Each
-value is a :class:<code>Dataset</code> carrying that dataset's
+value is a <code>Dataset</code> carrying that dataset's
 monthly-aggregate variant and its per-variable map. The
 authoritative store: every catalog lookup goes through
 it.</p>
@@ -27801,7 +27801,7 @@ it.</p>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="s1">&#39;t2m&#39;</span>
 </code></pre></div>
 - The same short code under a different dataset is a
-  different :class:<code>Variable</code>:</p>
+  different <code>Variable</code>:</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ecmwf</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="o">...</span>     <span class="s2">&quot;reanalysis-era5-land&quot;</span><span class="p">,</span> <span class="s2">&quot;2m-temperature&quot;</span>
@@ -28295,11 +28295,11 @@ it.</p>
 <a id="__codelineno-0-971" name="__codelineno-0-971"></a><span class="sd">    Reads the bundled CDS catalog (the `catalog/` directory, shipped as</span>
 <a id="__codelineno-0-972" name="__codelineno-0-972"></a><span class="sd">    package data) and exposes its consumed top-level sections as typed</span>
 <a id="__codelineno-0-973" name="__codelineno-0-973"></a><span class="sd">    pydantic fields.</span>
-<a id="__codelineno-0-974" name="__codelineno-0-974"></a><span class="sd">    Instantiate with no arguments (`Catalog()`) — :func:`model_post_init`</span>
+<a id="__codelineno-0-974" name="__codelineno-0-974"></a><span class="sd">    Instantiate with no arguments (`Catalog()`) — `model_post_init`</span>
 <a id="__codelineno-0-975" name="__codelineno-0-975"></a><span class="sd">    parses the YAML and populates every field in one pass.</span>
 <a id="__codelineno-0-976" name="__codelineno-0-976"></a>
 <a id="__codelineno-0-977" name="__codelineno-0-977"></a><span class="sd">    Variables are addressed by the `(dataset_name, variable_name)`</span>
-<a id="__codelineno-0-978" name="__codelineno-0-978"></a><span class="sd">    pair via :meth:`get_variable`; there is no flat per-code lookup.</span>
+<a id="__codelineno-0-978" name="__codelineno-0-978"></a><span class="sd">    pair via `get_variable`; there is no flat per-code lookup.</span>
 <a id="__codelineno-0-979" name="__codelineno-0-979"></a><span class="sd">    The same short code can legitimately appear under more than one</span>
 <a id="__codelineno-0-980" name="__codelineno-0-980"></a><span class="sd">    dataset (e.g. `&quot;2m-temperature&quot;` lives in both</span>
 <a id="__codelineno-0-981" name="__codelineno-0-981"></a><span class="sd">    `reanalysis-era5-single-levels` and `reanalysis-era5-land`), so</span>
@@ -28311,7 +28311,7 @@ it.</p>
 <a id="__codelineno-0-987" name="__codelineno-0-987"></a><span class="sd">            per-store `available_datasets:` block in `_index.yaml`; runtime</span>
 <a id="__codelineno-0-988" name="__codelineno-0-988"></a><span class="sd">            code does not consume it.</span>
 <a id="__codelineno-0-989" name="__codelineno-0-989"></a><span class="sd">        datasets: Structural map keyed by CDS dataset short name. Each</span>
-<a id="__codelineno-0-990" name="__codelineno-0-990"></a><span class="sd">            value is a :class:`Dataset` carrying that dataset&#39;s</span>
+<a id="__codelineno-0-990" name="__codelineno-0-990"></a><span class="sd">            value is a `Dataset` carrying that dataset&#39;s</span>
 <a id="__codelineno-0-991" name="__codelineno-0-991"></a><span class="sd">            monthly-aggregate variant and its per-variable map. The</span>
 <a id="__codelineno-0-992" name="__codelineno-0-992"></a><span class="sd">            authoritative store: every catalog lookup goes through</span>
 <a id="__codelineno-0-993" name="__codelineno-0-993"></a><span class="sd">            it.</span>
@@ -28331,7 +28331,7 @@ it.</p>
 <a id="__codelineno-0-1007" name="__codelineno-0-1007"></a>
 <a id="__codelineno-0-1008" name="__codelineno-0-1008"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-1009" name="__codelineno-0-1009"></a><span class="sd">        - The same short code under a different dataset is a</span>
-<a id="__codelineno-0-1010" name="__codelineno-0-1010"></a><span class="sd">          different :class:`Variable`:</span>
+<a id="__codelineno-0-1010" name="__codelineno-0-1010"></a><span class="sd">          different `Variable`:</span>
 <a id="__codelineno-0-1011" name="__codelineno-0-1011"></a>
 <a id="__codelineno-0-1012" name="__codelineno-0-1012"></a><span class="sd">            ```python</span>
 <a id="__codelineno-0-1013" name="__codelineno-0-1013"></a><span class="sd">            &gt;&gt;&gt; from earthlens.ecmwf import Catalog</span>
@@ -28425,23 +28425,23 @@ it.</p>
 <a id="__codelineno-0-1101" name="__codelineno-0-1101"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
 <a id="__codelineno-0-1102" name="__codelineno-0-1102"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the CDS catalog + providers registry from disk (cached).</span>
 <a id="__codelineno-0-1103" name="__codelineno-0-1103"></a>
-<a id="__codelineno-0-1104" name="__codelineno-0-1104"></a><span class="sd">        Mirrors :meth:`earthlens.gee.Catalog.load` so the two backends</span>
+<a id="__codelineno-0-1104" name="__codelineno-0-1104"></a><span class="sd">        Mirrors `earthlens.gee.Catalog.load` so the two backends</span>
 <a id="__codelineno-0-1105" name="__codelineno-0-1105"></a><span class="sd">        feel identical. Validates that every `Dataset.provider` slug</span>
 <a id="__codelineno-0-1106" name="__codelineno-0-1106"></a><span class="sd">        is in the registry; an unregistered slug is a load-time error.</span>
 <a id="__codelineno-0-1107" name="__codelineno-0-1107"></a>
 <a id="__codelineno-0-1108" name="__codelineno-0-1108"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-1109" name="__codelineno-0-1109"></a><span class="sd">            catalog_path: Path to a catalog directory (of per-family</span>
 <a id="__codelineno-0-1110" name="__codelineno-0-1110"></a><span class="sd">                `*.yaml` files) or a single YAML file. Defaults to</span>
-<a id="__codelineno-0-1111" name="__codelineno-0-1111"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-1111" name="__codelineno-0-1111"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-1112" name="__codelineno-0-1112"></a><span class="sd">            providers_path: Path to `providers.yaml`. Defaults to</span>
-<a id="__codelineno-0-1113" name="__codelineno-0-1113"></a><span class="sd">                module-level :data:`PROVIDERS_PATH`.</span>
+<a id="__codelineno-0-1113" name="__codelineno-0-1113"></a><span class="sd">                module-level `PROVIDERS_PATH`.</span>
 <a id="__codelineno-0-1114" name="__codelineno-0-1114"></a>
 <a id="__codelineno-0-1115" name="__codelineno-0-1115"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-1116" name="__codelineno-0-1116"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-1116" name="__codelineno-0-1116"></a><span class="sd">            A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-1117" name="__codelineno-0-1117"></a>
 <a id="__codelineno-0-1118" name="__codelineno-0-1118"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-1119" name="__codelineno-0-1119"></a><span class="sd">            ValueError: Propagated from :func:`_load_catalog_data` or</span>
-<a id="__codelineno-0-1120" name="__codelineno-0-1120"></a><span class="sd">                :func:`earthlens.base.providers.load_providers`, plus</span>
+<a id="__codelineno-0-1119" name="__codelineno-0-1119"></a><span class="sd">            ValueError: Propagated from `_load_catalog_data` or</span>
+<a id="__codelineno-0-1120" name="__codelineno-0-1120"></a><span class="sd">                `earthlens.base.providers.load_providers`, plus</span>
 <a id="__codelineno-0-1121" name="__codelineno-0-1121"></a><span class="sd">                an unregistered-slug error if the YAML references a</span>
 <a id="__codelineno-0-1122" name="__codelineno-0-1122"></a><span class="sd">                provider not in the registry.</span>
 <a id="__codelineno-0-1123" name="__codelineno-0-1123"></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -28474,11 +28474,11 @@ it.</p>
 <a id="__codelineno-0-1150" name="__codelineno-0-1150"></a>        <span class="p">)</span>
 <a id="__codelineno-0-1151" name="__codelineno-0-1151"></a>
 <a id="__codelineno-0-1152" name="__codelineno-0-1152"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
-<a id="__codelineno-0-1153" name="__codelineno-0-1153"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Variable` for a `(dataset, code)` pair.</span>
+<a id="__codelineno-0-1153" name="__codelineno-0-1153"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Variable` for a `(dataset, code)` pair.</span>
 <a id="__codelineno-0-1154" name="__codelineno-0-1154"></a>
 <a id="__codelineno-0-1155" name="__codelineno-0-1155"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-1156" name="__codelineno-0-1156"></a><span class="sd">            dataset_name: CDS dataset short name as it appears as a</span>
-<a id="__codelineno-0-1157" name="__codelineno-0-1157"></a><span class="sd">                key in :attr:`datasets` (e.g.</span>
+<a id="__codelineno-0-1157" name="__codelineno-0-1157"></a><span class="sd">                key in `datasets` (e.g.</span>
 <a id="__codelineno-0-1158" name="__codelineno-0-1158"></a><span class="sd">                `&quot;reanalysis-era5-single-levels&quot;`).</span>
 <a id="__codelineno-0-1159" name="__codelineno-0-1159"></a><span class="sd">            variable_name: Short variable code as it appears as a</span>
 <a id="__codelineno-0-1160" name="__codelineno-0-1160"></a><span class="sd">                YAML key under that dataset (e.g.</span>
@@ -28547,7 +28547,7 @@ it.</p>
 <a id="__codelineno-0-1223" name="__codelineno-0-1223"></a>    <span class="c1"># `get_dataset(name)` (with the did-you-mean hint) and the dict-like</span>
 <a id="__codelineno-0-1224" name="__codelineno-0-1224"></a>    <span class="c1"># `__getitem__` / `__contains__` / `__iter__` / `__len__` / `__repr__`</span>
 <a id="__codelineno-0-1225" name="__codelineno-0-1225"></a>    <span class="c1"># / `__str__` dunders are inherited from</span>
-<a id="__codelineno-0-1226" name="__codelineno-0-1226"></a>    <span class="c1"># :class:`earthlens.base.AbstractCatalog` (M1 in</span>
+<a id="__codelineno-0-1226" name="__codelineno-0-1226"></a>    <span class="c1"># `earthlens.base.AbstractCatalog` (M1 in</span>
 <a id="__codelineno-0-1227" name="__codelineno-0-1227"></a>    <span class="c1"># the cross-backend catalog comparison).</span>
 <a id="__codelineno-0-1228" name="__codelineno-0-1228"></a>
 <a id="__codelineno-0-1229" name="__codelineno-0-1229"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
@@ -28602,7 +28602,7 @@ it.</p>
 <a id="__codelineno-0-1278" name="__codelineno-0-1278"></a>
 <a id="__codelineno-0-1279" name="__codelineno-0-1279"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-1280" name="__codelineno-0-1280"></a><span class="sd">            dataset_name: CDS dataset short name as it appears as a</span>
-<a id="__codelineno-0-1281" name="__codelineno-0-1281"></a><span class="sd">                key in :attr:`datasets` (e.g.</span>
+<a id="__codelineno-0-1281" name="__codelineno-0-1281"></a><span class="sd">                key in `datasets` (e.g.</span>
 <a id="__codelineno-0-1282" name="__codelineno-0-1282"></a><span class="sd">                `&quot;reanalysis-era5-land&quot;`).</span>
 <a id="__codelineno-0-1283" name="__codelineno-0-1283"></a>
 <a id="__codelineno-0-1284" name="__codelineno-0-1284"></a><span class="sd">        Returns:</span>
@@ -28615,7 +28615,7 @@ it.</p>
 <a id="__codelineno-0-1291" name="__codelineno-0-1291"></a>
 <a id="__codelineno-0-1292" name="__codelineno-0-1292"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-1293" name="__codelineno-0-1293"></a><span class="sd">            KeyError: If `dataset_name` is not a curated dataset</span>
-<a id="__codelineno-0-1294" name="__codelineno-0-1294"></a><span class="sd">                (i.e. not present in :attr:`datasets`).</span>
+<a id="__codelineno-0-1294" name="__codelineno-0-1294"></a><span class="sd">                (i.e. not present in `datasets`).</span>
 <a id="__codelineno-0-1295" name="__codelineno-0-1295"></a>
 <a id="__codelineno-0-1296" name="__codelineno-0-1296"></a><span class="sd">        Examples:</span>
 <a id="__codelineno-0-1297" name="__codelineno-0-1297"></a><span class="sd">            - Describe ERA5-Land at a glance:</span>
@@ -28651,7 +28651,7 @@ it.</p>
 <a id="__codelineno-0-1327" name="__codelineno-0-1327"></a><span class="sd">        request dict with one value per selector. Useful for:</span>
 <a id="__codelineno-0-1328" name="__codelineno-0-1328"></a>
 <a id="__codelineno-0-1329" name="__codelineno-0-1329"></a><span class="sd">        * verifying a CDS account is set up correctly (submit the</span>
-<a id="__codelineno-0-1330" name="__codelineno-0-1330"></a><span class="sd">          returned dict via :meth:`cdsapi.Client.retrieve` and watch</span>
+<a id="__codelineno-0-1330" name="__codelineno-0-1330"></a><span class="sd">          returned dict via `cdsapi.Client.retrieve` and watch</span>
 <a id="__codelineno-0-1331" name="__codelineno-0-1331"></a><span class="sd">          for a NetCDF rather than a 400),</span>
 <a id="__codelineno-0-1332" name="__codelineno-0-1332"></a><span class="sd">        * seeing what a valid extras schema looks like for a new</span>
 <a id="__codelineno-0-1333" name="__codelineno-0-1333"></a><span class="sd">          dataset before authoring catalog rows,</span>
@@ -28662,12 +28662,12 @@ it.</p>
 <a id="__codelineno-0-1338" name="__codelineno-0-1338"></a>
 <a id="__codelineno-0-1339" name="__codelineno-0-1339"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-1340" name="__codelineno-0-1340"></a><span class="sd">            dataset_name: CDS dataset short name. Does not need to be</span>
-<a id="__codelineno-0-1341" name="__codelineno-0-1341"></a><span class="sd">                in :attr:`datasets` — the constraints endpoint is</span>
+<a id="__codelineno-0-1341" name="__codelineno-0-1341"></a><span class="sd">                in `datasets` — the constraints endpoint is</span>
 <a id="__codelineno-0-1342" name="__codelineno-0-1342"></a><span class="sd">                hit directly so any addressable dataset works.</span>
 <a id="__codelineno-0-1343" name="__codelineno-0-1343"></a>
 <a id="__codelineno-0-1344" name="__codelineno-0-1344"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-1345" name="__codelineno-0-1345"></a><span class="sd">            dict[str, Any]: A request dict ready to pass to</span>
-<a id="__codelineno-0-1346" name="__codelineno-0-1346"></a><span class="sd">            :meth:`cdsapi.Client.retrieve`. Empty dict (besides</span>
+<a id="__codelineno-0-1346" name="__codelineno-0-1346"></a><span class="sd">            `cdsapi.Client.retrieve`. Empty dict (besides</span>
 <a id="__codelineno-0-1347" name="__codelineno-0-1347"></a><span class="sd">            `data_format`) when the dataset&#39;s constraints are</span>
 <a id="__codelineno-0-1348" name="__codelineno-0-1348"></a><span class="sd">            empty / unreachable.</span>
 <a id="__codelineno-0-1349" name="__codelineno-0-1349"></a>
@@ -28725,7 +28725,7 @@ it.</p>
 <a id="__codelineno-0-1401" name="__codelineno-0-1401"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the user&#39;s recent CDS retrieval jobs.</span>
 <a id="__codelineno-0-1402" name="__codelineno-0-1402"></a>
 <a id="__codelineno-0-1403" name="__codelineno-0-1403"></a><span class="sd">        Thin wrapper that delegates to</span>
-<a id="__codelineno-0-1404" name="__codelineno-0-1404"></a><span class="sd">        :func:`earthlens.ecmwf.jobs.list_recent_jobs` (N3); see that</span>
+<a id="__codelineno-0-1404" name="__codelineno-0-1404"></a><span class="sd">        `earthlens.ecmwf.jobs.list_recent_jobs` (N3); see that</span>
 <a id="__codelineno-0-1405" name="__codelineno-0-1405"></a><span class="sd">        for the full docstring. Kept on `Catalog` as a convenience so</span>
 <a id="__codelineno-0-1406" name="__codelineno-0-1406"></a><span class="sd">        `Catalog().list_recent_jobs(...)` keeps working.</span>
 <a id="__codelineno-0-1407" name="__codelineno-0-1407"></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -28742,7 +28742,7 @@ it.</p>
 <a id="__codelineno-0-1418" name="__codelineno-0-1418"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download the result asset of a successful CDS job.</span>
 <a id="__codelineno-0-1419" name="__codelineno-0-1419"></a>
 <a id="__codelineno-0-1420" name="__codelineno-0-1420"></a><span class="sd">        Thin wrapper that delegates to</span>
-<a id="__codelineno-0-1421" name="__codelineno-0-1421"></a><span class="sd">        :func:`earthlens.ecmwf.jobs.download_job` (N3); see that for</span>
+<a id="__codelineno-0-1421" name="__codelineno-0-1421"></a><span class="sd">        `earthlens.ecmwf.jobs.download_job` (N3); see that for</span>
 <a id="__codelineno-0-1422" name="__codelineno-0-1422"></a><span class="sd">        the full docstring.</span>
 <a id="__codelineno-0-1423" name="__codelineno-0-1423"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1424" name="__codelineno-0-1424"></a>        <span class="k">return</span> <span class="n">_download_job_impl</span><span class="p">(</span><span class="n">job_id</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="n">chunk_size</span><span class="p">)</span>
@@ -28800,7 +28800,7 @@ the result without needing to walk the YAML themselves.</p>
             <td>
               <div class="doc-md-description">
                 <p>CDS dataset short name as it appears as a
-key in :attr:<code>datasets</code> (e.g.
+key in <code>datasets</code> (e.g.
 <code>"reanalysis-era5-land"</code>).</p>
               </div>
             </td>
@@ -28901,7 +28901,7 @@ key in :attr:<code>datasets</code> (e.g.
             <td>
               <div class="doc-md-description">
                 <p>If <code>dataset_name</code> is not a curated dataset
-(i.e. not present in :attr:<code>datasets</code>).</p>
+(i.e. not present in <code>datasets</code>).</p>
               </div>
             </td>
           </tr>
@@ -28987,7 +28987,7 @@ key in :attr:<code>datasets</code> (e.g.
 <a id="__codelineno-0-1278" name="__codelineno-0-1278"></a>
 <a id="__codelineno-0-1279" name="__codelineno-0-1279"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-1280" name="__codelineno-0-1280"></a><span class="sd">        dataset_name: CDS dataset short name as it appears as a</span>
-<a id="__codelineno-0-1281" name="__codelineno-0-1281"></a><span class="sd">            key in :attr:`datasets` (e.g.</span>
+<a id="__codelineno-0-1281" name="__codelineno-0-1281"></a><span class="sd">            key in `datasets` (e.g.</span>
 <a id="__codelineno-0-1282" name="__codelineno-0-1282"></a><span class="sd">            `&quot;reanalysis-era5-land&quot;`).</span>
 <a id="__codelineno-0-1283" name="__codelineno-0-1283"></a>
 <a id="__codelineno-0-1284" name="__codelineno-0-1284"></a><span class="sd">    Returns:</span>
@@ -29000,7 +29000,7 @@ key in :attr:<code>datasets</code> (e.g.
 <a id="__codelineno-0-1291" name="__codelineno-0-1291"></a>
 <a id="__codelineno-0-1292" name="__codelineno-0-1292"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-1293" name="__codelineno-0-1293"></a><span class="sd">        KeyError: If `dataset_name` is not a curated dataset</span>
-<a id="__codelineno-0-1294" name="__codelineno-0-1294"></a><span class="sd">            (i.e. not present in :attr:`datasets`).</span>
+<a id="__codelineno-0-1294" name="__codelineno-0-1294"></a><span class="sd">            (i.e. not present in `datasets`).</span>
 <a id="__codelineno-0-1295" name="__codelineno-0-1295"></a>
 <a id="__codelineno-0-1296" name="__codelineno-0-1296"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-1297" name="__codelineno-0-1297"></a><span class="sd">        - Describe ERA5-Land at a glance:</span>
@@ -29046,7 +29046,7 @@ key in :attr:<code>datasets</code> (e.g.
 
         <p>Download the result asset of a successful CDS job.</p>
 <p>Thin wrapper that delegates to
-:func:<code>earthlens.ecmwf.jobs.download_job</code> (N3); see that for
+<code>earthlens.ecmwf.jobs.download_job</code> (N3); see that for
 the full docstring.</p>
 
 
@@ -29073,7 +29073,7 @@ the full docstring.</p>
 <a id="__codelineno-0-1418" name="__codelineno-0-1418"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Download the result asset of a successful CDS job.</span>
 <a id="__codelineno-0-1419" name="__codelineno-0-1419"></a>
 <a id="__codelineno-0-1420" name="__codelineno-0-1420"></a><span class="sd">    Thin wrapper that delegates to</span>
-<a id="__codelineno-0-1421" name="__codelineno-0-1421"></a><span class="sd">    :func:`earthlens.ecmwf.jobs.download_job` (N3); see that for</span>
+<a id="__codelineno-0-1421" name="__codelineno-0-1421"></a><span class="sd">    `earthlens.ecmwf.jobs.download_job` (N3); see that for</span>
 <a id="__codelineno-0-1422" name="__codelineno-0-1422"></a><span class="sd">    the full docstring.</span>
 <a id="__codelineno-0-1423" name="__codelineno-0-1423"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1424" name="__codelineno-0-1424"></a>    <span class="k">return</span> <span class="n">_download_job_impl</span><span class="p">(</span><span class="n">job_id</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="n">chunk_size</span><span class="p">)</span>
@@ -29094,7 +29094,7 @@ the full docstring.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the :class:<code>Variable</code> for a <code>(dataset, code)</code> pair.</p>
+        <p>Return the <code>Variable</code> for a <code>(dataset, code)</code> pair.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -29118,7 +29118,7 @@ the full docstring.</p>
             <td>
               <div class="doc-md-description">
                 <p>CDS dataset short name as it appears as a
-key in :attr:<code>datasets</code> (e.g.
+key in <code>datasets</code> (e.g.
 <code>"reanalysis-era5-single-levels"</code>).</p>
               </div>
             </td>
@@ -29320,11 +29320,11 @@ YAML key under that dataset (e.g.
 <span class="normal"><a href="#__codelineno-0-1219">1219</a></span>
 <span class="normal"><a href="#__codelineno-0-1220">1220</a></span>
 <span class="normal"><a href="#__codelineno-0-1221">1221</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1152" name="__codelineno-0-1152"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
-<a id="__codelineno-0-1153" name="__codelineno-0-1153"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Variable` for a `(dataset, code)` pair.</span>
+<a id="__codelineno-0-1153" name="__codelineno-0-1153"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Variable` for a `(dataset, code)` pair.</span>
 <a id="__codelineno-0-1154" name="__codelineno-0-1154"></a>
 <a id="__codelineno-0-1155" name="__codelineno-0-1155"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-1156" name="__codelineno-0-1156"></a><span class="sd">        dataset_name: CDS dataset short name as it appears as a</span>
-<a id="__codelineno-0-1157" name="__codelineno-0-1157"></a><span class="sd">            key in :attr:`datasets` (e.g.</span>
+<a id="__codelineno-0-1157" name="__codelineno-0-1157"></a><span class="sd">            key in `datasets` (e.g.</span>
 <a id="__codelineno-0-1158" name="__codelineno-0-1158"></a><span class="sd">            `&quot;reanalysis-era5-single-levels&quot;`).</span>
 <a id="__codelineno-0-1159" name="__codelineno-0-1159"></a><span class="sd">        variable_name: Short variable code as it appears as a</span>
 <a id="__codelineno-0-1160" name="__codelineno-0-1160"></a><span class="sd">            YAML key under that dataset (e.g.</span>
@@ -29529,7 +29529,7 @@ that can't be expressed in the pydantic schema.</p>
 
         <p>Return the user's recent CDS retrieval jobs.</p>
 <p>Thin wrapper that delegates to
-:func:<code>earthlens.ecmwf.jobs.list_recent_jobs</code> (N3); see that
+<code>earthlens.ecmwf.jobs.list_recent_jobs</code> (N3); see that
 for the full docstring. Kept on <code>Catalog</code> as a convenience so
 <code>Catalog().list_recent_jobs(...)</code> keeps working.</p>
 
@@ -29560,7 +29560,7 @@ for the full docstring. Kept on <code>Catalog</code> as a convenience so
 <a id="__codelineno-0-1401" name="__codelineno-0-1401"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the user&#39;s recent CDS retrieval jobs.</span>
 <a id="__codelineno-0-1402" name="__codelineno-0-1402"></a>
 <a id="__codelineno-0-1403" name="__codelineno-0-1403"></a><span class="sd">    Thin wrapper that delegates to</span>
-<a id="__codelineno-0-1404" name="__codelineno-0-1404"></a><span class="sd">    :func:`earthlens.ecmwf.jobs.list_recent_jobs` (N3); see that</span>
+<a id="__codelineno-0-1404" name="__codelineno-0-1404"></a><span class="sd">    `earthlens.ecmwf.jobs.list_recent_jobs` (N3); see that</span>
 <a id="__codelineno-0-1405" name="__codelineno-0-1405"></a><span class="sd">    for the full docstring. Kept on `Catalog` as a convenience so</span>
 <a id="__codelineno-0-1406" name="__codelineno-0-1406"></a><span class="sd">    `Catalog().list_recent_jobs(...)` keeps working.</span>
 <a id="__codelineno-0-1407" name="__codelineno-0-1407"></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -29589,7 +29589,7 @@ for the full docstring. Kept on <code>Catalog</code> as a convenience so
     <div class="doc doc-contents ">
 
         <p>Read the CDS catalog + providers registry from disk (cached).</p>
-<p>Mirrors :meth:<code>earthlens.gee.Catalog.load</code> so the two backends
+<p>Mirrors <code>earthlens.gee.Catalog.load</code> so the two backends
 feel identical. Validates that every <code>Dataset.provider</code> slug
 is in the registry; an unregistered slug is a load-time error.</p>
 
@@ -29616,7 +29616,7 @@ is in the registry; an unregistered slug is a load-time error.</p>
               <div class="doc-md-description">
                 <p>Path to a catalog directory (of per-family
 <code>*.yaml</code> files) or a single YAML file. Defaults to
-module-level :data:<code>CATALOG_PATH</code>.</p>
+module-level <code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -29633,7 +29633,7 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to <code>providers.yaml</code>. Defaults to
-module-level :data:<code>PROVIDERS_PATH</code>.</p>
+module-level <code>PROVIDERS_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -29659,7 +29659,7 @@ module-level :data:<code>PROVIDERS_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code>.</p>
+                <p>A fully-populated <code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -29682,8 +29682,8 @@ module-level :data:<code>PROVIDERS_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Propagated from :func:<code>_load_catalog_data</code> or
-:func:<code>earthlens.base.providers.load_providers</code>, plus
+                <p>Propagated from <code>_load_catalog_data</code> or
+<code>earthlens.base.providers.load_providers</code>, plus
 an unregistered-slug error if the YAML references a
 provider not in the registry.</p>
               </div>
@@ -29757,23 +29757,23 @@ provider not in the registry.</p>
 <a id="__codelineno-0-1101" name="__codelineno-0-1101"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
 <a id="__codelineno-0-1102" name="__codelineno-0-1102"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the CDS catalog + providers registry from disk (cached).</span>
 <a id="__codelineno-0-1103" name="__codelineno-0-1103"></a>
-<a id="__codelineno-0-1104" name="__codelineno-0-1104"></a><span class="sd">    Mirrors :meth:`earthlens.gee.Catalog.load` so the two backends</span>
+<a id="__codelineno-0-1104" name="__codelineno-0-1104"></a><span class="sd">    Mirrors `earthlens.gee.Catalog.load` so the two backends</span>
 <a id="__codelineno-0-1105" name="__codelineno-0-1105"></a><span class="sd">    feel identical. Validates that every `Dataset.provider` slug</span>
 <a id="__codelineno-0-1106" name="__codelineno-0-1106"></a><span class="sd">    is in the registry; an unregistered slug is a load-time error.</span>
 <a id="__codelineno-0-1107" name="__codelineno-0-1107"></a>
 <a id="__codelineno-0-1108" name="__codelineno-0-1108"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-1109" name="__codelineno-0-1109"></a><span class="sd">        catalog_path: Path to a catalog directory (of per-family</span>
 <a id="__codelineno-0-1110" name="__codelineno-0-1110"></a><span class="sd">            `*.yaml` files) or a single YAML file. Defaults to</span>
-<a id="__codelineno-0-1111" name="__codelineno-0-1111"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-1111" name="__codelineno-0-1111"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-1112" name="__codelineno-0-1112"></a><span class="sd">        providers_path: Path to `providers.yaml`. Defaults to</span>
-<a id="__codelineno-0-1113" name="__codelineno-0-1113"></a><span class="sd">            module-level :data:`PROVIDERS_PATH`.</span>
+<a id="__codelineno-0-1113" name="__codelineno-0-1113"></a><span class="sd">            module-level `PROVIDERS_PATH`.</span>
 <a id="__codelineno-0-1114" name="__codelineno-0-1114"></a>
 <a id="__codelineno-0-1115" name="__codelineno-0-1115"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-1116" name="__codelineno-0-1116"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-1116" name="__codelineno-0-1116"></a><span class="sd">        A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-1117" name="__codelineno-0-1117"></a>
 <a id="__codelineno-0-1118" name="__codelineno-0-1118"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-1119" name="__codelineno-0-1119"></a><span class="sd">        ValueError: Propagated from :func:`_load_catalog_data` or</span>
-<a id="__codelineno-0-1120" name="__codelineno-0-1120"></a><span class="sd">            :func:`earthlens.base.providers.load_providers`, plus</span>
+<a id="__codelineno-0-1119" name="__codelineno-0-1119"></a><span class="sd">        ValueError: Propagated from `_load_catalog_data` or</span>
+<a id="__codelineno-0-1120" name="__codelineno-0-1120"></a><span class="sd">            `earthlens.base.providers.load_providers`, plus</span>
 <a id="__codelineno-0-1121" name="__codelineno-0-1121"></a><span class="sd">            an unregistered-slug error if the YAML references a</span>
 <a id="__codelineno-0-1122" name="__codelineno-0-1122"></a><span class="sd">            provider not in the registry.</span>
 <a id="__codelineno-0-1123" name="__codelineno-0-1123"></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -29827,7 +29827,7 @@ per-process) and returns the first entry expanded into a
 request dict with one value per selector. Useful for:</p>
 <ul>
 <li>verifying a CDS account is set up correctly (submit the
-  returned dict via :meth:<code>cdsapi.Client.retrieve</code> and watch
+  returned dict via <code>cdsapi.Client.retrieve</code> and watch
   for a NetCDF rather than a 400),</li>
 <li>seeing what a valid extras schema looks like for a new
   dataset before authoring catalog rows,</li>
@@ -29858,7 +29858,7 @@ the rest is whatever the first constraint entry enumerates.</p>
             <td>
               <div class="doc-md-description">
                 <p>CDS dataset short name. Does not need to be
-in :attr:<code>datasets</code> — the constraints endpoint is
+in <code>datasets</code> — the constraints endpoint is
 hit directly so any addressable dataset works.</p>
               </div>
             </td>
@@ -29895,7 +29895,7 @@ hit directly so any addressable dataset works.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>meth:<code>cdsapi.Client.retrieve</code>. Empty dict (besides</p>
+                <p><code>cdsapi.Client.retrieve</code>. Empty dict (besides</p>
               </div>
             </td>
           </tr>
@@ -30021,7 +30021,7 @@ hit directly so any addressable dataset works.</p>
 <a id="__codelineno-0-1327" name="__codelineno-0-1327"></a><span class="sd">    request dict with one value per selector. Useful for:</span>
 <a id="__codelineno-0-1328" name="__codelineno-0-1328"></a>
 <a id="__codelineno-0-1329" name="__codelineno-0-1329"></a><span class="sd">    * verifying a CDS account is set up correctly (submit the</span>
-<a id="__codelineno-0-1330" name="__codelineno-0-1330"></a><span class="sd">      returned dict via :meth:`cdsapi.Client.retrieve` and watch</span>
+<a id="__codelineno-0-1330" name="__codelineno-0-1330"></a><span class="sd">      returned dict via `cdsapi.Client.retrieve` and watch</span>
 <a id="__codelineno-0-1331" name="__codelineno-0-1331"></a><span class="sd">      for a NetCDF rather than a 400),</span>
 <a id="__codelineno-0-1332" name="__codelineno-0-1332"></a><span class="sd">    * seeing what a valid extras schema looks like for a new</span>
 <a id="__codelineno-0-1333" name="__codelineno-0-1333"></a><span class="sd">      dataset before authoring catalog rows,</span>
@@ -30032,12 +30032,12 @@ hit directly so any addressable dataset works.</p>
 <a id="__codelineno-0-1338" name="__codelineno-0-1338"></a>
 <a id="__codelineno-0-1339" name="__codelineno-0-1339"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-1340" name="__codelineno-0-1340"></a><span class="sd">        dataset_name: CDS dataset short name. Does not need to be</span>
-<a id="__codelineno-0-1341" name="__codelineno-0-1341"></a><span class="sd">            in :attr:`datasets` — the constraints endpoint is</span>
+<a id="__codelineno-0-1341" name="__codelineno-0-1341"></a><span class="sd">            in `datasets` — the constraints endpoint is</span>
 <a id="__codelineno-0-1342" name="__codelineno-0-1342"></a><span class="sd">            hit directly so any addressable dataset works.</span>
 <a id="__codelineno-0-1343" name="__codelineno-0-1343"></a>
 <a id="__codelineno-0-1344" name="__codelineno-0-1344"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-1345" name="__codelineno-0-1345"></a><span class="sd">        dict[str, Any]: A request dict ready to pass to</span>
-<a id="__codelineno-0-1346" name="__codelineno-0-1346"></a><span class="sd">        :meth:`cdsapi.Client.retrieve`. Empty dict (besides</span>
+<a id="__codelineno-0-1346" name="__codelineno-0-1346"></a><span class="sd">        `cdsapi.Client.retrieve`. Empty dict (besides</span>
 <a id="__codelineno-0-1347" name="__codelineno-0-1347"></a><span class="sd">        `data_format`) when the dataset&#39;s constraints are</span>
 <a id="__codelineno-0-1348" name="__codelineno-0-1348"></a><span class="sd">        empty / unreachable.</span>
 <a id="__codelineno-0-1349" name="__codelineno-0-1349"></a>

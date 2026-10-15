@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24253,7 +24253,7 @@ duplicate-key checks.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The module's :class:<code>CatalogParseCache</code>.</p>
+                <p>The module's <code>CatalogParseCache</code>.</p>
               </div>
             </td>
             <td>
@@ -24351,7 +24351,7 @@ catalog. Called only on a cache miss.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>path</code> does not exist (see :func:<code>yaml_files_for</code>).</p>
+                <p>If <code>path</code> does not exist (see <code>yaml_files_for</code>).</p>
               </div>
             </td>
           </tr>
@@ -24461,7 +24461,7 @@ catalog. Called only on a cache miss.</p>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        path: The catalog directory or single YAML file.</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        cache: The module&#39;s :class:`CatalogParseCache`.</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        cache: The module&#39;s `CatalogParseCache`.</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">        parse: Callable taking the contributing files and returning the parsed</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">            catalog. Called only on a cache miss.</span>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        provider: Provider name for the not-found error.</span>
@@ -24471,7 +24471,7 @@ catalog. Called only on a cache miss.</p>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        Whatever `parse` returned, from the cache when the mtimes are unchanged.</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">        ValueError: If `path` does not exist (see :func:`yaml_files_for`).</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">        ValueError: If `path` does not exist (see `yaml_files_for`).</span>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a>
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        - The parse runs once, then the cached value is reused:</span>
@@ -25661,7 +25661,7 @@ lines can depend on its exact text.</p>
 <a id="__codelineno-0-280" name="__codelineno-0-280"></a>    <span class="c1">#: beyond the class name, which is the honest answer for a row that has</span>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a>    <span class="c1">#: not declared one. A subclass declaration **replaces** its parent&#39;s</span>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a>    <span class="c1">#: rather than extending it — to keep a parent&#39;s fragments, override</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>    <span class="c1">#: :meth:`summary_parts` and call `super()`, as `FluxableLeaf` does.</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>    <span class="c1">#: `summary_parts` and call `super()`, as `FluxableLeaf` does.</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="n">_summary_fields</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="p">()</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a>    <span class="nd">@classmethod</span>
@@ -25755,7 +25755,7 @@ lines can depend on its exact text.</p>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">            str: The one-line summary. The row&#39;s own text is reproduced as</span>
 <a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">            itself, so a title carrying `—` or `≥` keeps it — the same choice</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">            :meth:`earthlens.base.AbstractCatalog.__str__` makes, since</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">            `earthlens.base.AbstractCatalog.__str__` makes, since</span>
 <a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">            escaping the text into ASCII sequences is what actually makes a</span>
 <a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">            summary unreadable. A console on a narrow codepage (`cp1252`) can</span>
 <a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">            therefore still raise `UnicodeEncodeError` on `print(row)`; that</span>
@@ -26028,7 +26028,7 @@ attribute, i.e. annotated without <code>ClassVar</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>meth:<code>earthlens.base.AbstractCatalog.__str__</code> makes, since</p>
+                <p><code>earthlens.base.AbstractCatalog.__str__</code> makes, since</p>
               </div>
             </td>
           </tr>
@@ -26149,7 +26149,7 @@ attribute, i.e. annotated without <code>ClassVar</code>.</p>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        str: The one-line summary. The row&#39;s own text is reproduced as</span>
 <a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        itself, so a title carrying `—` or `≥` keeps it — the same choice</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">        :meth:`earthlens.base.AbstractCatalog.__str__` makes, since</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">        `earthlens.base.AbstractCatalog.__str__` makes, since</span>
 <a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">        escaping the text into ASCII sequences is what actually makes a</span>
 <a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        summary unreadable. A console on a narrow codepage (`cp1252`) can</span>
 <a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        therefore still raise `UnicodeEncodeError` on `print(row)`; that</span>
@@ -26381,14 +26381,14 @@ class's contribution is kept.</p>
 
 
         <p>Catalog row that flags whether its quantity accumulates over time.</p>
-<p>Both ECMWF :class:<code>earthlens.ecmwf.Variable</code> and CHIRPS
-:class:<code>earthlens.chc.Variable</code> carry an identical <code>types</code> field
+<p>Both ECMWF <code>earthlens.ecmwf.Variable</code> and CHIRPS
+<code>earthlens.chc.Variable</code> carry an identical <code>types</code> field
 plus <code>is_flux</code> property — flux quantities (precipitation,
 evapotranspiration, radiation) are accumulated per timestep on
 the server side, so monthly aggregation has to multiply by the
 number of days in the month. State / instantaneous values
 (temperature, pressure) don't need that scaling.</p>
-<p>GEE :class:<code>earthlens.gee.Band</code> does NOT inherit from this — its
+<p>GEE <code>earthlens.gee.Band</code> does NOT inherit from this — its
 raster bands don't carry flux semantics (cloud-screened optical
 reflectance, NDVI, etc.).</p>
 
@@ -26561,15 +26561,15 @@ other values.</p>
 <span class="normal"><a href="#__codelineno-0-522">522</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="k">class</span><span class="w"> </span><span class="nc">FluxableLeaf</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Catalog row that flags whether its quantity accumulates over time.</span>
 <a id="__codelineno-0-422" name="__codelineno-0-422"></a>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">    Both ECMWF :class:`earthlens.ecmwf.Variable` and CHIRPS</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">    :class:`earthlens.chc.Variable` carry an identical `types` field</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">    Both ECMWF `earthlens.ecmwf.Variable` and CHIRPS</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">    `earthlens.chc.Variable` carry an identical `types` field</span>
 <a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">    plus `is_flux` property — flux quantities (precipitation,</span>
 <a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">    evapotranspiration, radiation) are accumulated per timestep on</span>
 <a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">    the server side, so monthly aggregation has to multiply by the</span>
 <a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">    number of days in the month. State / instantaneous values</span>
 <a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">    (temperature, pressure) don&#39;t need that scaling.</span>
 <a id="__codelineno-0-430" name="__codelineno-0-430"></a>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">    GEE :class:`earthlens.gee.Band` does NOT inherit from this — its</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">    GEE `earthlens.gee.Band` does NOT inherit from this — its</span>
 <a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">    raster bands don&#39;t carry flux semantics (cloud-screened optical</span>
 <a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">    reflectance, NDVI, etc.).</span>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a>
