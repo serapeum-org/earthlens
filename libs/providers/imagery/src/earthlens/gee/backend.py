@@ -1475,6 +1475,49 @@ class GEE(LazyClientMixin, AbstractDataSource):
             return written
         return self._materialise(written)
 
+    def analyze(
+        self,
+        ops: Any,
+        *,
+        write_to: str | Path | None = None,
+        progress_bar: bool = True,
+    ) -> list[Any]:
+        """Download, then run client-side raster operations on what came back.
+
+        The operations run *after* the fetch, on the in-memory pyramids object,
+        so they are invisible to the engine-eligibility gate: a raw EEDAI read
+        stays eligible and the analysis happens locally. That is the whole
+        reason this is a separate step rather than more `ee` shaping.
+
+        The download is made with `materialize=True` regardless of the
+        constructor's setting, because an analysis needs the object rather than
+        the path.
+
+        Args:
+            ops: One `RasterOperation`, a chain, or a sequence of them.
+            write_to: When given, a directory; each derived raster is written
+                there as a GeoTIFF and its path returned instead of the object.
+            progress_bar: Whether the download shows a progress bar.
+
+        Returns:
+            One derived `pyramids.dataset.Dataset` per downloaded raster, or one
+            `pathlib.Path` each when `write_to` is given.
+
+        Examples:
+            - Composite, fetch, and take NDVI of what arrived:
+                ```python
+                >>> from earthlens.gee import GEE  # doctest: +SKIP
+                >>> from earthlens.gee.analysis import Ndvi  # doctest: +SKIP
+                >>> gee = GEE(...)  # doctest: +SKIP
+                >>> ndvi = gee.analyze(Ndvi(nir=0, red=1))  # doctest: +SKIP
+                ```
+        """
+        from earthlens.gee.analysis import RasterAnalysis
+
+        analysis = RasterAnalysis.of(ops)
+        result = self.download(progress_bar=progress_bar, materialize=True)
+        return analysis.run_on_result(result, write_to=write_to)
+
     def _materialise(self, written: list[Any]) -> DownloadResult:
         """Read each written raster back as an in-memory pyramids object.
 
