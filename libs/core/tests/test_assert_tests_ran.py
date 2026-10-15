@@ -502,10 +502,13 @@ class TestDeadBackendDetection:
 
     def test_an_exempt_backend_alone_still_leaves_the_lane_green(self, guard, tmp_path):
         """An exemption is per backend, so a second exempt backend is exempt too."""
-        assert "osm" in guard._EXPECTED_EMPTY, "osm should be a declared exemption"
+        for backend in ("mswep", "wdpa"):
+            assert backend in guard._EXPECTED_EMPTY, (
+                f"{backend} should be a declared exemption"
+            )
         report = _backend_report(
             tmp_path / "r.xml",
-            ("osm", "a", "pytest.skip"),
+            ("mswep", "a", "pytest.skip"),
             ("wdpa", "b", "pytest.skip"),
             ("erddap", "c", None),
         )
