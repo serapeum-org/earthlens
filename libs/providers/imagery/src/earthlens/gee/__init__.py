@@ -46,35 +46,52 @@ Public surface (re-exported from this package):
   `ee.FeatureCollection`s to pandas / GeoPandas (sync + parallel +
   small-FC `getInfo()` paths).
 
-The object surface behind the string constructor params — every
-`reducer=` / `engine=` / `export_via=` name resolves to one of these,
-and they are re-exported so a caller can pass or inspect the object
-instead of the string:
+Object surface (also re-exported) — the strategy objects and frozen
+value objects the backend is built from. Two constructor params,
+`reducer=` and `engine=`, accept an instance in place of their string;
+the rest of these are config, payload and return types rather than
+anything a string names:
 
 * :class:`Reducer`, with :data:`REDUCERS` and :func:`resolve_reducer`
-  — the temporal-compositing strategies :class:`Mean` /
-  :class:`Median` / :class:`Min` / :class:`Max` / :class:`Sum` /
-  :class:`Mosaic` / :class:`Mode`, plus the parameterised
-  :class:`Percentile` the string form reaches as
-  `reducer="percentile:90"`.
+  — the reduction strategies. `GEE(reducer=...)` accepts a name, a spec
+  string or an instance: `"mean"`, `Mean()`, `"percentile:90"` and
+  `Percentile(q=90)` all work. The seven that reduce a time
+  bucket's images are :class:`Mean` / :class:`Median` / :class:`Min` /
+  :class:`Max` / :class:`Sum` / :class:`Mosaic` / :class:`Mode`, which
+  `reducers.collection_reducers()` names. :data:`REDUCERS` is the whole
+  registry, so it also holds the region-only `first` / `stdDev` /
+  `variance` / `count` that :func:`sample_points` uses and that
+  `GEE(reducer=...)` refuses with `ValueError` ("reduces pixels in a
+  region, not images in a collection"). :class:`Percentile` is
+  deliberately **not** in the registry — it needs a parameter — so it
+  is reachable only as a spec string or an instance.
 * :class:`Engine`, with :data:`ENGINES` and :func:`resolve_engine` —
-  what materialises the pixels: :class:`EeEngine` (`getDownloadURL`),
-  :class:`PixelsEngine` (`computePixels`, optionally against
-  :data:`HIGH_VOLUME_ENDPOINT`), :class:`EedaiEngine` (the pyramids-eo
-  reader) and :class:`AutoEngine`, which chooses between them and owns
-  the fallback.
-* :class:`EnginePlan` (back-compat alias :class:`EedaiPlan`) — the
-  frozen routing verdict an engine returns, carrying the reason when a
-  route is declined.
+  what materialises the pixels. `engine="auto"` routes between
+  :class:`EedaiEngine` (the pyramids-eo reader) and :class:`EeEngine`
+  (`getDownloadURL`), falling back to the latter whenever the reader
+  declines. :class:`PixelsEngine` (`computePixels`, optionally against
+  :data:`HIGH_VOLUME_ENDPOINT`) is opt-in via `engine="pixels"` and is
+  never selected by `auto`. :class:`AutoEngine` is that routing
+  decision as an object.
+* :class:`EnginePlan` (back-compat alias `EedaiPlan`) — the frozen
+  routing verdict an engine returns, carrying the reason when a route
+  is declined.
 * :class:`Sink`, with :data:`SINKS` and :func:`resolve_sink` — where
   the artifact goes: :class:`UrlSink`, :class:`DriveSink`,
-  :class:`GcsSink`, :class:`AssetSink`.
-* :class:`WorkUnit` / :class:`RasterWorkUnit` /
-  :class:`FeatureWorkUnit` — one time bucket's payload; and
-  :class:`Artifact` / :class:`DownloadResult` — what `download()`
-  returns under `materialize=True` instead of written paths.
-* :class:`ExportConfig` / :class:`EngineConfig` — the frozen
-  configuration objects `GEE.__init__` composes itself from.
+  :class:`GcsSink`, :class:`AssetSink`. Unlike `reducer=` / `engine=`,
+  `GEE(export_via=...)` takes the **name** only; pass an instance and
+  :class:`ExportConfig` rejects it. Call :func:`resolve_sink` yourself
+  when you want the object.
+* :class:`WorkUnit` / :class:`RasterWorkUnit` — one time bucket's
+  payload. :class:`FeatureWorkUnit` is the vector/tabular seam for the
+  later epics; nothing produces one yet.
+* :class:`Artifact` / :class:`DownloadResult` — what `download()`
+  returns under `materialize=True`: the in-memory pyramids object
+  *alongside* the written file, iterating and indexing like the list of
+  paths the method returns without it.
+* :class:`ExportConfig`, composed in `GEE.__init__`, and
+  :class:`EngineConfig`, derived on each read from the live attributes
+  so a reassigned `crs` or `scale` cannot go stale behind it.
 * :class:`OutputGrid` — the one owner of the AOI-to-grid derivation
   (dimensions, affine transform, lattice snapping, tiling).
 * :class:`EedaiReader` — the adapter wrapping the optional pyramids-eo
