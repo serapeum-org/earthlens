@@ -28,8 +28,29 @@ operation, so a chain is accepted anywhere a single one is.
 from __future__ import annotations
 
 from earthlens.gee.analysis.base import OperationChain, RasterOperation
+from earthlens.gee.analysis.focal import (
+    FocalApply,
+    FocalMean,
+    FocalMedian,
+    FocalStd,
+)
+from earthlens.gee.analysis.indices import Ndbi, Ndvi, Ndwi, NormalizedDifference
+from earthlens.gee.analysis.proximity import Proximity
+from earthlens.gee.analysis.terrain import Aspect, Hillshade, Slope
 
 __all__ = [
+    "Aspect",
+    "FocalApply",
+    "FocalMean",
+    "FocalMedian",
+    "FocalStd",
+    "Hillshade",
+    "Ndbi",
+    "Ndvi",
+    "Ndwi",
+    "NormalizedDifference",
     "OperationChain",
+    "Proximity",
     "RasterOperation",
+    "Slope",
 ]
