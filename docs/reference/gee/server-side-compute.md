@@ -17,22 +17,36 @@ computation is available at all.
 | A per-image transform — masking, rescaling, dB conversion | `cloud_mask=` |
 | Anything else Earth Engine can do | `el.datasource.client` — the raw `ee` module, already authenticated |
 
-Using `filters=` or `cloud_mask=` moves the request onto the Earth Engine engine. That is not a
-limitation to work around; it is the only engine that can run a graph.
+Using `filters=` or `cloud_mask=` moves the request onto an Earth Engine engine. That is not a
+limitation to work around; those are the only engines that can run a graph.
 
-## The two engines
+## The three engines
 
 `engine=` selects **who materialises the pixels** for `export_via="url"`. It does not change the AOI,
 the CRS, or the values you asked for.
 
-| | `engine="ee"` | `engine="eedai"` |
-|---|---|---|
-| Path | `ee.Image.getDownloadURL` | GDAL's `EEDAI` driver via pyramids-eo |
-| Server-side compute | **Yes** — the full Earth Engine graph | **No** — it reads stored pixels |
-| Size cap | 32768 px per axis (`auto_split=True` tiles around it) | none; oversize windows stream to disk in tiles |
-| Round-trip | HTTP + zip | direct read from the asset |
-| Extra needed | `[gee]` | `[gee]` **and** `[eedai]` |
-| Temporal composite | server-side | client-side, per time bucket |
+| | `engine="ee"` | `engine="pixels"` | `engine="eedai"` |
+|---|---|---|---|
+| Path | `ee.Image.getDownloadURL` | `ee.data.computePixels` | GDAL's `EEDAI` driver via pyramids-eo |
+| Server-side compute | **Yes** — the full Earth Engine graph | **Yes** — the expression is the graph | **No** — it reads stored pixels |
+| Size cap | 32768 px per axis (`auto_split=True` tiles around it) | the same 32768 px per axis, same remedy | none; oversize windows stream to disk in tiles |
+| Round-trip | HTTP + zip | the GeoTIFF bytes, directly | direct read from the asset |
+| Extra needed | `[gee]` | `[gee]` | `[gee]` **and** `[eedai]` |
+| Temporal composite | server-side | server-side | client-side, per time bucket |
+
+`"pixels"` is the engine for a request that needs a graph and wants Earth Engine's current extraction API for
+it: the GeoTIFF bytes come back directly, with no URL to expire and no zip to unpack, from a grid the request
+states outright. It does **not** buy a bigger output — the per-axis cap is the same, and `auto_split=True` is what
+gets past it on either path. It is never chosen automatically: `"auto"` keeps preferring the reader and then
+`"ee"`, so the preference order is a separate, reviewable decision rather than a side effect of adding an engine.
+
+One sampling difference is worth knowing, and it is deliberate. `"pixels"` sends an explicit grid, so it sizes on
+the **metre** convention — square metres on the ground, shortening longitude by `cos(latitude)`, the same rule the
+EEDAI reader uses — while `"ee"` lets Earth Engine read `scale` in a geographic CRS as a uniform
+degree-equivalent. Away from the equator the two therefore return **different column counts** for one AOI at one
+`scale`: at 30° N a degree of longitude is about 13% shorter than a degree of latitude. The AOI, the CRS and the
+values agree (a live e2e compares their elevation distributions on the same SRTM window); the grid does not. Pass
+`crs_transform=` when the grid itself has to be identical.
 
 `engine="auto"` (the default) picks `eedai` when the request is a *raw read* and the extra is installed,
 otherwise `ee`. A request is a raw read when **all** of these hold:
@@ -310,6 +324,8 @@ blocking; `list_recent_tasks`, `get_task_status`, `wait_for_task_id`, `cancel_ta
 | Situation | Engine |
 |---|---|
 | Any `cloud_mask` / `filters` / computed graph | `ee` (forced) |
+| A computed graph *and* an AOI over 32768 px | `ee` or `pixels`, either with `auto_split=True`, or `drive` |
+| An output grid that must align with an earlier download | `ee` or `pixels` with `crs_transform=` |
 | Raw pixels from one asset, large AOI | `eedai` — no 32768-px cap, no zip round-trip |
 | A composite whose masking must match Earth Engine exactly | `ee` |
 | Long time series over a small AOI | `eedai`, watching the scene cap |
@@ -324,8 +340,21 @@ blocking; `list_recent_tasks`, `get_task_status`, `wait_for_task_id`, `cancel_ta
   Earth Engine error at download time.
 - **Mixed-resolution band requests** (10 m `B4` + 20 m `B11` + 60 m `B1` in one call) are a sharp edge on
   the EEDAI path. Request one resolution group at a time, or use `engine="ee"`.
-- **`cog=True` and `resample=`** apply to the EEDAI path only; the Earth Engine paths ignore them.
-- **`auto_split=True`** is only meaningful for `engine="ee"`, where the 32768-px cap exists.
+- **`cog=True`** applies to the paths that write the raster themselves — the EEDAI reader and
+  `engine="pixels"`. `getDownloadURL` and the batch sinks ignore it, and so does `resample=`, which is the
+  EEDAI reader's warp kernel alone.
+- **`nodata=`** is honoured by `engine="pixels"` on the `"url"` sink (the expression is unmasked with it and
+  the written raster declares it) and by `export_via="drive"` / `"gcs"` (Earth Engine's own
+  `GeoTiffImageExportOptions.noData`). It is **not** a field on the pixel API's request — a body carrying one
+  is refused with `Unknown name "nodata" at 'grid'` — and an asset export has no file format at all, so
+  that sink and `getDownloadURL` ignore it and warn. Without it, a masked composite's pixels come back as 0
+  with nothing declared.
+- **`high_volume=`** is `engine="pixels"` only; any other engine warns and initialises against the regular
+  endpoint.
+- **`auto_split=True`** applies to `engine="ee"` and `engine="pixels"`, which share Earth Engine's
+  32768-px per-axis cap. Measured, because the guide implies otherwise: a `computePixels` request of
+  39,479 × 12 px comes back as `Pixel grid dimensions (39479x12) must be less than or equal to
+  32768`. The reader has no such cap, so `auto_split` means nothing to it.
 - **Credentials are always needed**, even for `engine="eedai"`: the request is built through `ee` before
   its pixels are fetched.
 - **No Sentinel-1 preprocessing** ships in the backend — no speckle filter, no terrain correction. Note

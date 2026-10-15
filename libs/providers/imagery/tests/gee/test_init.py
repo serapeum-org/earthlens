@@ -22,6 +22,52 @@ from earthlens.gee import (
 )
 
 _EXPECTED_EXPORTS = {
+    # Epic 1 Task 1.1 - the reducer strategy objects and their registry.
+    "Reducer",
+    "Mean",
+    "Median",
+    "Min",
+    "Max",
+    "Mode",
+    "Mosaic",
+    "Sum",
+    "Percentile",
+    "REDUCERS",
+    "resolve_reducer",
+    # Epic 1 Task 1.6 - the promoted routing verdict.
+    "EnginePlan",
+    "EedaiPlan",
+    # Epic 1 Task 1.12 - the output grid value object.
+    "OutputGrid",
+    # Epic 1 Task 1.9 - the strategy configs.
+    "ExportConfig",
+    "EngineConfig",
+    # Epic 1 Task 1.3 - the engine strategy objects.
+    "Engine",
+    "EeEngine",
+    "EedaiEngine",
+    "AutoEngine",
+    "ENGINES",
+    "resolve_engine",
+    # Epic 1 Task 1.4 - the destination strategy objects.
+    "Sink",
+    "UrlSink",
+    "DriveSink",
+    "GcsSink",
+    "AssetSink",
+    "SINKS",
+    "resolve_sink",
+    # Epic 1 Task 1.5 - the EEDAI reader adapter.
+    "EedaiReader",
+    # Epic 1 Tasks 1.7/1.8 - the payload and return types.
+    "WorkUnit",
+    "RasterWorkUnit",
+    "FeatureWorkUnit",
+    "Artifact",
+    "DownloadResult",
+    # Epic 1 Task 1.13 - the computePixels engine.
+    "PixelsEngine",
+    "HIGH_VOLUME_ENDPOINT",
     "GEE",
     "AuthenticationError",
     "CloudMask",

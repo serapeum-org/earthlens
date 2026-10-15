@@ -237,7 +237,130 @@ so `auto_split` is unnecessary. What to know before switching:
 - **`cog=True` applies to this path only.** A request served by Earth
   Engine writes a plain GeoTIFF (and logs that it did).
 
-## 5. Via the `EarthLens` facade
+## 5. The object API
+
+Every knob above is a string, and every string still works — that is the contract. Behind them the backend now
+resolves each one to a strategy object, and you can pass the object instead wherever you want something the string
+cannot express.
+
+```python
+from earthlens.gee import GEE, Percentile
+
+# The string form, unchanged.
+GEE(..., reducer="median", engine="auto", export_via="url")
+
+# The object form, for a reducer no name can express.
+GEE(..., reducer=Percentile(q=90))
+
+# Or the parameterised spelling, if you prefer strings.
+GEE(..., reducer="percentile:90")
+```
+
+**Reducers.** `mean`, `median`, `min`, `max`, `mode`, `mosaic` and `sum` dispatch to Earth Engine's convenience
+methods, which preserve band names. `Percentile` has to use `reduce`, which suffixes them, so it renames them back —
+making it interchangeable with the rest. `resolve_reducer` accepts a name, a `percentile:<q>` spec or an instance,
+and resolves once per request, so a bad percentile fails before any bucket exports rather than part-way through.
+
+**Engines.** `engine=` resolves to an `Engine`, and there are four:
+
+| `engine=` | Transport | Runs a computation graph? | Per-axis cap |
+|---|---|---|---|
+| `"auto"` (default) | the reader when the request qualifies, else Earth Engine | only on the Earth Engine side | 32768 px |
+| `"ee"` | `ee.Image.getDownloadURL` | yes | 32768 px |
+| `"eedai"` | the pyramids-eo EEDAI reader, forced | no — raises if the request needs one | none |
+| `"pixels"` | `ee.data.computePixels` | yes | 32768 px (`auto_split=True` tiles it) |
+
+`"pixels"` is the one to reach for when a request needs **both** server-side compute and the modern extraction
+API: it evaluates the graph, so a `cloud_mask` or `filters` survives, and it returns the GeoTIFF bytes directly, so
+there is no URL to expire and no zip to unpack. It applies to `export_via="url"` only — it is a pull, so it has
+nothing to say about a queued export, and a batch sink ignores it.
+
+**It is capped per axis like the thumbnail path**, which the Earth Engine guide's "can scale to larger workloads"
+framing does not say: a 39,479 × 12 px request is refused with `Pixel grid dimensions (39479x12) must be
+less than or equal to 32768`. So `auto_split=True` means the same thing here as on the `"ee"` path — tile the
+AOI, fetch each tile, mosaic — and without it an oversize request is refused up front, naming that remedy.
+Each tile is sized through the engine, so a grid pinned with `crs_transform=` stays on its lattice across tiles,
+and the split is computed from the pinned pixel rather than from `scale` - otherwise a transform finer than `scale`
+would be split as though it were coarse, and each tile would still be over the cap. Every tile is checked against
+the cap before it is requested, so an AOI that cannot be brought under it is refused here rather than by Earth
+Engine.
+
+`"eedai"` remains the fastest path for a *raw* read of a stored asset, because it streams the pixels without
+evaluating anything. `"auto"` prefers it and falls back to Earth Engine on any decline.
+
+**Grids.** `OutputGrid` is where the AOI, `crs` and `scale` become a pixel grid, with one constructor per
+convention: `for_metre_grid` sizes for square metres on the ground (the reader's rule, shortening longitude by
+`cos(latitude)`), `for_earth_engine` reads `scale` as a uniform degree-equivalent (Earth Engine's rule), and
+`from_crs_transform` pins the grid origin so stacked dates align without a resample. Away from the equator the first
+two disagree on the column count — that is real, documented, and now visible in one place rather than implied by two
+method families.
+
+The third one is what `crs_transform=` selects:
+
+```python
+# A 10 m grid in UTM 36N, pinned to a round origin rather than to the AOI.
+GEE(..., crs="EPSG:32636", crs_transform=(10, 0, 300_000, 0, -10, 3_400_000))
+```
+
+Six terms, `(x_scale, x_shear, x_origin, y_shear, y_scale, y_origin)`, in the units of `crs` — the order
+Earth Engine's own `crsTransform` uses. It pins the pixel size **and** the origin, so two downloads over different
+AOIs land on the same pixel boundaries and differencing them needs no resample. Earth Engine treats it as an
+alternative to `scale`, not an addition, so a pinned request sends the transform and no scale: `getDownloadURL` and
+the batch sinks take it directly, and `engine="pixels"` sends it as the request's `affineTransform`. The EEDAI reader
+sizes its own metre grid and takes no transform, so a pinned request is never routed to it and `engine="eedai"`
+raises. You still need a resolvable `scale` (from `scale=` or the catalog row), because the routing and naming
+decisions are made on it — it simply is not sent. The per-axis cap is checked against the pinned grid,
+so a transform finer than `scale` cannot slip an oversized request past it.
+
+**In-memory results.** `materialize=True` returns a `DownloadResult` carrying the pyramids object alongside each
+written path, instead of only the paths:
+
+```python
+result = GEE(..., engine="ee").download(materialize=True)
+result.paths     # the written files
+result.objects   # the in-memory pyramids Datasets
+list(result)     # the objects - materialising is what you asked for
+```
+
+Note the one place the stand-in is not transparent: when you materialise, each artifact's value *is* the object, so
+`result` iterates and compares as the list of **objects**, not of paths. `result.paths` is how you get the files.
+Without `materialize=` nothing changes — `download()` returns the same plain list of paths it always did.
+
+It needs pixels on disk, so it is only meaningful for `export_via="url"`; a batch sink raises rather than handing
+back destinations with no objects.
+
+**The pixel API's own two knobs.** Both are honoured by `engine="pixels"` and by nothing else, because the
+`computePixels` request body and its endpoint are the only places they can be expressed. Passing either to another
+engine logs a warning at construction and changes nothing — an argument that quietly does nothing is worse than
+one that says so.
+
+```python
+# Masked pixels come back as -9999 and the raster declares it; the high-volume
+# host serves the request.
+GEE(..., engine="pixels", nodata=-9999, high_volume=True)
+
+# Or let Earth Engine declare it on a queued export instead.
+GEE(..., export_via="drive", drive_folder="out", nodata=-9999)
+```
+
+`nodata=` is the fill value for pixels Earth Engine masked. It is worth knowing what happens without it:
+a masked composite comes back with those pixels as **0** and no no-data declared — measured on a CHIRPS window over
+the Arabian Sea, where the sea read as 0 mm of rain rather than as absent. Setting `nodata=-9999` unmasks the
+image with that value server-side and declares it on the written raster, so a reader honours it.
+
+It is *not* a field on the pixel API's request. Earth Engine's `PixelGrid` is `dimensions` / `affineTransform` /
+`crsCode` / `crsWkt`, and a body carrying a `nodata` is refused outright with
+`Unknown name "nodata" at 'grid'`. The one place the API takes a fill value directly is
+`GeoTiffImageExportOptions.noData`, so `export_via="drive"` / `"gcs"` pass it there. `export_via="asset"` creates
+an asset with no file format, and `getDownloadURL` has no such argument, so both of those ignore it and say so. `high_volume=True` initialises Earth Engine against the
+[high-volume endpoint](https://developers.google.com/earth-engine/cloud/highvolume), documented for many parallel
+requests; its trade-off is real (less caching, and complex queries cost more EECU-time there), which is why it is
+per-backend rather than global. `ee` keeps one session per process, so the last backend to open its connection
+decides the host for the others too. `ExportConfig.dtype` is still unreachable on purpose: `computePixels` takes a
+`dataType`, but the dtype a caller asks for and the dtype pyramids writes have to agree, and that pairing is not
+built.
+
+## 6. Via the `EarthLens` facade
 
 Once the GEE backend is registered in the facade you'll also be able to
 do `EarthLens(data_source="gee", variables={...}, ...).download()`; until

@@ -14,7 +14,7 @@ from __future__ import annotations
 import math
 import time
 from collections.abc import Callable
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from tqdm import tqdm
 
@@ -28,12 +28,44 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
 # "Pixel grid dimensions (WxH) must be less than or equal to 32768.").
 EE_MAX_DIMENSION: int = 32768
 
+
 # Earth Engine `ee.ImageCollection` reducers exposed as convenience
 # methods that preserve the original band names (unlike
 # `ImageCollection.reduce(ee.Reducer.X())`, which appends `_X`).
-_COLLECTION_REDUCERS: frozenset[str] = frozenset(
-    {"mean", "median", "min", "max", "mode", "mosaic", "sum"}
-)
+def _collection_reducer_names() -> frozenset[str]:
+    """Return the band-name-preserving reducer names, from the one registry.
+
+    Derived from `earthlens.gee.reducers.collection_reducers` rather than
+    restated, so this module cannot drift from it. It is the *collection*
+    vocabulary specifically: the registry also holds region-only reducers, which
+    have no band-name-preserving collection method and must not appear here.
+    Imported lazily because `reducers` imports pydantic and this module is loaded
+    on every backend import.
+
+    Returns:
+        The registry's collection-capable reducer names.
+    """
+    from earthlens.gee.reducers import collection_reducers
+
+    return collection_reducers()
+
+
+def __getattr__(name: str) -> frozenset[str]:
+    """Keep `_COLLECTION_REDUCERS` readable as a module attribute.
+
+    Args:
+        name: The attribute being looked up.
+
+    Returns:
+        The derived reducer-name set for `_COLLECTION_REDUCERS`.
+
+    Raises:
+        AttributeError: For any other name.
+    """
+    if name == "_COLLECTION_REDUCERS":
+        return _collection_reducer_names()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
 
 # Terminal `ee.batch.Task` states (the bare, upper-cased name — `task.status()`
 # may report e.g. `"COMPLETED"` or `"State.COMPLETED"` depending on SDK
@@ -70,7 +102,7 @@ def slug_asset_id(asset_id: str) -> str:
     return safe_filename(asset_id)
 
 
-def reduce_collection(collection, reducer: str):
+def reduce_collection(collection: Any, reducer: str) -> Any:
     """Collapse an `ee.ImageCollection` to a single `ee.Image` by name.
 
     Dispatches to the matching convenience method on the collection
@@ -88,12 +120,9 @@ def reduce_collection(collection, reducer: str):
     Raises:
         ValueError: If `reducer` is not a supported name.
     """
-    if reducer not in _COLLECTION_REDUCERS:
-        raise ValueError(
-            f"unsupported reducer {reducer!r}; expected one of "
-            f"{sorted(_COLLECTION_REDUCERS)}"
-        )
-    return getattr(collection, reducer)()
+    from earthlens.gee.reducers import resolve_reducer
+
+    return resolve_reducer(reducer)(collection)
 
 
 def task_state_name(status: dict) -> str:
