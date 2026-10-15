@@ -7,7 +7,7 @@ queue entry to inspect. The asynchronous sinks (`"drive"` / `"gcs"` /
 (`ee.batch.Task.*` and the lower-level `ee.data.{listOperations,
 getOperation, cancelOperation}`). This module normalises both shapes
 into a single frozen `TaskInfo` value object and gives the
-caller four operations on top:
+caller five operations on top:
 
 * `list_recent_tasks` — every batch task on the current project,
   with client-side filters by `state` / age / `task_type` /
@@ -17,8 +17,8 @@ caller four operations on top:
 * `wait_for_task_id` — id-based blocking poll until the task
   reaches a terminal state.
 * `resolve_destination` — return the `destination_uris` of a
-  completed task as a list (does *not* auto-download Drive / GCS
-  payloads — that's `L2` in the GEE jobs tracking plan).
+  completed task as a list, and with `download_to=` pull the
+  Drive / GCS payloads behind them down to local files.
 
 These mirror `earthlens.ecmwf.jobs` so a user juggling both
 backends sees the same surface.
@@ -472,12 +472,14 @@ def get_task_status(task_id: str, project: str | None = None) -> TaskInfo:
 def cancel_task(task_id: str, project: str | None = None) -> None:
     """Cancel a queued or running task by id.
 
-    A no-op (logs at INFO + returns) when the task is already in a
-    terminal state. Google Cloud's Long-Running-Operations API
-    returns `FAILED_PRECONDITION` (HTTP 400) when asked to cancel an
-    already-finished operation; the wrapper catches that path so a
-    cleanup loop over `list_recent_tasks` can call `cancel_task` on
-    every match without special-casing the terminal ones.
+    A no-op when the task is already in a terminal state, so a cleanup
+    loop over `list_recent_tasks` can call this on every match without
+    special-casing the ones that finished in between. Earth Engine's
+    Long-Running-Operations endpoint provides that itself: cancelling an
+    operation already in `SUCCEEDED` or `CANCELLED` returns normally
+    rather than failing. The `except` clause here is a fallback for an
+    endpoint that answers such a cancel with an error instead, and it
+    downgrades that to an INFO log.
 
     Args:
         task_id: The bare task id or full operation name (see
@@ -489,12 +491,18 @@ def cancel_task(task_id: str, project: str | None = None) -> None:
             current Earth Engine project cannot be resolved from the SDK. The
             message names `project=` and `ee.Initialize(project=...)` as the
             two remedies.
-        ee.EEException: Propagated from `ee.data.cancelOperation`, which the
-            SDK translates the transport error into. Two cases are swallowed
-            instead of raised, whatever their type: an HTTP 400, and any
-            failure whose text carries `FAILED_PRECONDITION`, which is what an
-            already-terminal task answers with — both are downgraded to an
-            INFO log, because cancelling a finished task is not an error.
+        ee.EEException: Propagated from `ee.data.cancelOperation` — most
+            commonly a 404 when the id is unknown to Earth Engine. The SDK
+            translates the transport error on the way out
+            (`ee.data._execute_cloud_call` catches
+            `googleapiclient.errors.HttpError` and re-raises `EEException`),
+            so that is the type a caller sees. Two answers are swallowed
+            instead of raised, whatever their type: one carrying
+            `resp.status == 400`, and one whose text carries
+            `FAILED_PRECONDITION`. Neither is what the SDK hands over today —
+            the translation keeps only the error message, dropping both the
+            response object and the status field — so they stand as the
+            fallback described above rather than as the terminal-task path.
 
     Examples:
         - Cancel one task by id (needs an initialised `ee`):
@@ -520,9 +528,11 @@ def cancel_task(task_id: str, project: str | None = None) -> None:
     try:
         ee.data.cancelOperation(op_name)
     except Exception as exc:  # noqa: BLE001 - inspect the HTTP status below
-        # `googleapiclient.errors.HttpError` carries `.resp.status`; on
-        # an already-terminal op we get a 400. Anything else is the
-        # user's problem.
+        # A fallback for an endpoint that errors on an already-terminal
+        # cancel; the live one does not. `googleapiclient.errors.HttpError`
+        # would carry `.resp.status`, but `ee.data` translates it into an
+        # `EEException` holding only the message, so neither test below
+        # matches what the SDK raises. Anything else is the user's problem.
         status = getattr(getattr(exc, "resp", None), "status", None)
         if status == 400 or "FAILED_PRECONDITION" in str(exc):
             logger.info(
@@ -680,6 +690,9 @@ def resolve_destination(
     Any URI that matches none of the above is surfaced as-is and
     logged at WARNING so the caller can decide what to do with it.
 
+    Failures from the GCS / Drive clients themselves are not caught, so a
+    download error reaches the caller as whatever that client raised.
+
     Args:
         task_info: A terminal-state `TaskInfo` (typically from
             `get_task_status` after `wait_for_task_id`).
@@ -695,12 +708,13 @@ def resolve_destination(
         `download_to is None`). Ordering matches
         `task_info.destination_uris`.
 
-    Failures from the GCS / Drive clients themselves are not caught, so a
-    download error reaches the caller as whatever that client raised.
-
     Raises:
-        ImportError: If the optional GCS / Drive client dependency the
-            destination needs is not installed.
+        ImportError: If the GCS / Drive client the destination needs cannot
+            be imported — `google-cloud-storage` for a `gs://` URI,
+            `google-api-python-client` for a Drive one. Both are declared on
+            the `[gee]` extra, and both are required by `earthengine-api`,
+            whose `ee` this module imports at load, so the path is only
+            reachable on a partially-uninstalled environment.
 
     Examples:
         - Look at where a finished task wrote, without downloading anything:

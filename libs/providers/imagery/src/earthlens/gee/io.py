@@ -170,14 +170,14 @@ def feature_collection_to_dataframe(
       `getDownloadURL` and return whatever EE returns; no columns
       are dropped on the client side.
 
+    Nothing is caught on the way: an Earth Engine failure building the
+    download URL, an HTTP failure fetching it, and a parse failure reading
+    the CSV all reach the caller as whatever the underlying library raised.
+
     Args:
         fc: The Earth Engine `FeatureCollection` to download.
         selectors: Optional iterable of property names to include.
             See semantic note above. Defaults to `None`.
-
-    Nothing is caught on the way: an Earth Engine failure building the
-    download URL, an HTTP failure fetching it, and a parse failure reading
-    the CSV all reach the caller as whatever the underlying library raised.
 
     Returns:
         A `DataFrame` with one row per feature, in the order Earth Engine
