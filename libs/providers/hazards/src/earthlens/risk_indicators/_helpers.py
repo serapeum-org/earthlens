@@ -433,6 +433,37 @@ def inform_release_url(
             layout changed and the pattern needs revisiting, or if a link
             points off the INFORM site.
         requests.RequestException: If the page cannot be fetched.
+
+    Examples:
+        - The read budget and its back-off are module constants, so a caller
+          can work out the worst case before paying for it — three reads with
+          waits of 1s and 2s between them:
+            ```python
+            >>> from earthlens.risk_indicators._helpers import (
+            ...     INFORM_RELEASE_ATTEMPTS,
+            ...     INFORM_RELEASE_BACKOFF_SECONDS,
+            ... )
+            >>> INFORM_RELEASE_ATTEMPTS
+            3
+            >>> [
+            ...     INFORM_RELEASE_BACKOFF_SECONDS * (n + 1)
+            ...     for n in range(INFORM_RELEASE_ATTEMPTS - 1)
+            ... ]
+            [1.0, 2.0]
+
+            ```
+        - Against the live site it answers the newest workbook and its year,
+          which `inform_download_release` then fetches (skipped here because
+          it reads the JRC site):
+            ```python
+            >>> from earthlens.risk_indicators._helpers import inform_release_url
+            >>> url, year = inform_release_url()  # doctest: +SKIP
+            >>> year  # doctest: +SKIP
+            2026
+            >>> url.rsplit("/", 1)[-1]  # doctest: +SKIP
+            'INFORM_Risk_Mid_2026_v073.xlsx'
+
+            ```
     """
     if page in _RELEASE_CACHE:
         return _RELEASE_CACHE[page]
