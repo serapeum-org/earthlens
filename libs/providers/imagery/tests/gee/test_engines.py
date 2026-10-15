@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import sys
 from types import SimpleNamespace
 
 import pytest
@@ -197,6 +198,24 @@ class TestReaderRefusalTypes:
         types = reader_refusal_types()
         assert OSError in types, "the transport error stands without a reader to ask"
         assert all(issubclass(entry, BaseException) for entry in types)
+
+    def test_a_forced_reader_without_the_extra_surfaces_the_install_hint(
+        self, make_gee, fake_ee, monkeypatch
+    ):
+        """`engine="eedai"` with no extra installed ends in the install hint.
+
+        The end-to-end claim behind this branch: what a caller sees is the
+        loader's own `ImportError`, naming the extra to install, and not a
+        second failure raised while evaluating the `except` clause meant to
+        handle it. The extra's absence is simulated at the import system, so
+        the real guarded import runs and every module's bound copy of it
+        behaves exactly as it would on a machine without pyramids-eo.
+        """
+        monkeypatch.setitem(sys.modules, "pyramids_eo", None)
+        monkeypatch.setitem(sys.modules, "pyramids_eo.earthengine", None)
+        gee = make_gee(engine="eedai")
+        with pytest.raises(ImportError, match=r"pip install earthlens\[eedai\]"):
+            gee.download(progress_bar=False)
 
 
 class TestEeEngine:
