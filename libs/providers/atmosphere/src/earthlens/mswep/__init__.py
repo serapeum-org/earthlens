@@ -15,7 +15,7 @@ shares a Drive folder with **their own Google account** plus `rclone`
 instructions. earthlens automates *their* approved download. The folder
 is **link-shared** ("anyone with the link"), so any credential that reads
 Drive works — a user OAuth token, an `rclone` remote, ADC, or a
-service-account key (see :mod:`earthlens.mswep.auth`).
+service-account key (see `earthlens.mswep.auth`).
 
 Bulk transfers stay `rclone`'s job: an hourly year is ~8760 granules.
 This backend is for targeted product / variant / resolution / window
@@ -23,23 +23,23 @@ requests.
 
 Public surface (re-exported from this package):
 
-* :class:`MSWEP` — the backend; instantiate with a date window, a
+* `MSWEP` — the backend; instantiate with a date window, a
   product / variant / resolution and the shared-folder id, then call
-  :meth:`MSWEP.download`.
-* :class:`MswepAuth` / :class:`MswepCredentials` — the Drive credential
+  `MSWEP.download`.
+* `MswepAuth` / `MswepCredentials` — the Drive credential
   ladder (explicit `token.json` → `rclone` remote → environment) and the
   shared-folder id.
-* :class:`AuthenticationError` — raised when no usable credential or
+* `AuthenticationError` — raised when no usable credential or
   folder id resolves; a subclass of
-  :class:`earthlens.base.AuthenticationError`.
-* :data:`DRIVE_SCOPE` — the read-only Drive scope the backend requests.
-* :class:`Catalog` — loader for the bundled `mswep_data_catalog.yaml`.
-* :class:`MswepProduct` / :class:`MswepVersion` / :class:`MswepVariant` /
-  :class:`MswepResolution` / :class:`MswepVariable` — one product row and
+  `earthlens.base.AuthenticationError`.
+* `DRIVE_SCOPE` — the read-only Drive scope the backend requests.
+* `Catalog` — loader for the bundled `mswep_data_catalog.yaml`.
+* `MswepProduct` / `MswepVersion` / `MswepVariant` /
+  `MswepResolution` / `MswepVariable` — one product row and
   its four coordinate maps.
-* :class:`ProvisionalValueError` — raised when a request resolves onto a
+* `ProvisionalValueError` — raised when a request resolves onto a
   catalog value that could not be verified without an approved share.
-* :data:`CATALOG_PATH` — path to the bundled YAML; monkey-patchable in
+* `CATALOG_PATH` — path to the bundled YAML; monkey-patchable in
   tests.
 
 Examples:

@@ -1,6 +1,6 @@
 """Stanza emitters — author a curated `datasets:` row from one upstream id.
 
-The authoring companion to :mod:`earthlens.cli.curate` (which probes a
+The authoring companion to `earthlens.cli.curate` (which probes a
 dataset's schema). Where `probe` prints the per-band/asset *schema seed*,
 `curate` (this module) prints a ready-to-paste curated `datasets:` row:
 it fetches one upstream id's metadata and transcribes the fields the
@@ -11,7 +11,7 @@ port of the `tools/*/refresh_*.py` `add-*` subcommands.
 
 Like `refresh` / `probe`, only providers whose row can be seeded from a
 public (or env-credentialed) source have an emitter wired up; others
-report `unsupported`. Adding one is a single entry in :data:`_EMITTERS`.
+report `unsupported`. Adding one is a single entry in `_EMITTERS`.
 """
 
 from __future__ import annotations
@@ -166,7 +166,7 @@ def emit_stanza(
             `cmr_provider`, usgs `name` / `units` / `services`).
 
     Returns:
-        The :class:`StanzaResult`.
+        The `StanzaResult`.
     """
     resolved_key = key or upstream_id
     emitter = _EMITTERS.get(info.provider)
@@ -255,7 +255,7 @@ def write_stanza(info: BackendInfo, result: StanzaResult, target: str | None) ->
 
     Args:
         info: The backend the row belongs to.
-        result: The `ok` :class:`StanzaResult` to persist.
+        result: The `ok` `StanzaResult` to persist.
         target: The per-family file stem (sharded catalogs only).
 
     Returns:

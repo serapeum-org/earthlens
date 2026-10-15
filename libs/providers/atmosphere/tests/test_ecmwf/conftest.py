@@ -2,19 +2,19 @@
 
 Holds the shared pieces every test in this directory needs:
 
-* :func:`_block_real_cdsapi` — autouse safeguard that prevents any
+* `_block_real_cdsapi` — autouse safeguard that prevents any
   test (other than `TestApiE2E`) from constructing a real
-  :class:`cdsapi.Client`.
-* :func:`single_level_var_info` and :func:`pressure_level_var_info`
-  — :class:`Variable` fixtures used across the api tests.
-* :func:`ecmwf_stub` — a hand-constructed :class:`ECMWF` instance with
+  `cdsapi.Client`.
+* `single_level_var_info` and `pressure_level_var_info`
+  — `Variable` fixtures used across the api tests.
+* `ecmwf_stub` — a hand-constructed `ECMWF` instance with
   the four attributes `_api()` consumes (`self.client`,
   `self.root_dir`, `self.time`, `self.space`) set by hand.
-  Bypasses :meth:`AbstractDataSource.__init__` so unit tests can run
+  Bypasses `AbstractDataSource.__init__` so unit tests can run
   without going through cdsapi or the file system.
-* :func:`download_within_budget` — wraps a **live** retrieve in a
+* `download_within_budget` — wraps a **live** retrieve in a
   wall-clock budget so one wedged job cannot consume the whole e2e
-  lane, skips (via :func:`earthlens.testing.skip_live_unavailable`)
+  lane, skips (via `earthlens.testing.skip_live_unavailable`)
   when the store is throttling, and re-raises anything else. Every
   live retrieve in this directory goes through it.
 """
@@ -55,21 +55,21 @@ _LIVE_CDS_TEST_CLASSES = frozenset(
 
 @pytest.fixture(autouse=True)
 def _block_real_cdsapi(request, monkeypatch):
-    """Fail fast if a test reaches a live :class:`cdsapi.Client`.
+    """Fail fast if a test reaches a live `cdsapi.Client`.
 
     Any test outside the explicit live-CDS allow-list gets a
-    :class:`cdsapi.Client` replacement that raises immediately —
+    `cdsapi.Client` replacement that raises immediately —
     even before the constructor reads `~/.cdsapirc`. Tests that
     need a fake client still call `monkeypatch.setattr(cdsapi,
     "Client", ...)` themselves; that later setattr wins because
     monkeypatch applies fixture-scoped overrides in order.
 
-    The :func:`ecmwf_stub` fixture sets `skip_constraints=True` on
+    The `ecmwf_stub` fixture sets `skip_constraints=True` on
     the synthetic instance so tests that build synthetic requests
     via `_api()` bypass the pre-flight validator (which would
     otherwise hit the live CDS catalogue endpoint). Tests targeting
     the validator itself (in `test_constraints.py`) construct
-    :class:`RequestValidator` directly so this default doesn't
+    `RequestValidator` directly so this default doesn't
     interfere.
 
     Also clears `EARTHLENS_ECMWF_MODERN` so an ambient flag in a
@@ -114,7 +114,7 @@ def download_within_budget():
     A `CadsUnavailableError` **skips** rather than fails: the store refused to
     queue the job on its per-dataset limit, which says nothing about the code
     under test and clears on its own. The skip goes through
-    :func:`earthlens.testing.skip_live_unavailable` so it carries the shared
+    `earthlens.testing.skip_live_unavailable` so it carries the shared
     availability stamp — a bare `pytest.skip` is invisible to the masked-lane
     guard, and a store-wide throttle would then report a lane green having
     exercised nothing.
@@ -226,9 +226,9 @@ def ecmwf_stub(tmp_path):
     """Minimal `ECMWF` instance with the attributes `_api()` consumes.
 
     Skips the full parent `__init__` chain (which would still call
-    :meth:`cdsapi.Client` for real) and instead constructs the
+    `cdsapi.Client` for real) and instead constructs the
     instance via `ECMWF.__new__` and wires up the four attributes
-    :meth:`ECMWF._api` reads — `self.client`, `self.root_dir`,
+    `ECMWF._api` reads — `self.client`, `self.root_dir`,
     `self.time` and `self.space` — by hand.
 
     Args:

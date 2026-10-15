@@ -5,13 +5,13 @@ vector container, so per the pyramids policy it keeps all
 geometry/CRS handling inside pyramids primitives: earthlens assembles
 the plain attribute rows, builds a `Point` geometry column from the
 origin longitude/latitude, and hands the whole thing to
-:class:`pyramids.feature.collection.FeatureCollection` (a
+`pyramids.feature.collection.FeatureCollection` (a
 `geopandas.GeoDataFrame` subclass) tagged `EPSG:4326`.
 
-The canonical event schema lives here as :data:`ATTRIBUTE_COLUMNS`
+The canonical event schema lives here as `ATTRIBUTE_COLUMNS`
 (attribute columns + dtypes) plus the `geometry` column. Both the
-populated path (:func:`catalog_to_fc`) and the empty path
-(:func:`empty_fc`) produce a FeatureCollection with exactly these
+populated path (`catalog_to_fc`) and the empty path
+(`empty_fc`) produce a FeatureCollection with exactly these
 columns and dtypes, so a downstream `pandas.concat` / `to_file` never
 chokes on a schema mismatch between a hit and a miss.
 
@@ -40,7 +40,7 @@ EVENT_CRS = "EPSG:4326"
 
 #: Ordered attribute columns and their pandas dtypes. The `geometry`
 #: column (a `shapely.Point` per row) is added separately by
-#: :func:`catalog_to_fc` / :func:`empty_fc` and is not listed here.
+#: `catalog_to_fc` / `empty_fc` and is not listed here.
 ATTRIBUTE_COLUMNS: dict[str, str] = {
     "event_id": "string",
     "time": "datetime64[ns, UTC]",
@@ -58,14 +58,14 @@ ATTRIBUTE_COLUMNS: dict[str, str] = {
 def catalog_to_fc(catalog: Catalog, provider: str) -> FeatureCollection:
     """Convert an obspy `Catalog` into a `FeatureCollection` of events.
 
-    One row per event, columns per :data:`ATTRIBUTE_COLUMNS` plus a
+    One row per event, columns per `ATTRIBUTE_COLUMNS` plus a
     `geometry` column of `shapely.Point(longitude, latitude)` in
     `EPSG:4326`. An event with no usable origin (no preferred origin
     and an empty `origins` list) still contributes a row, but its
     `geometry` is `None` rather than an invalid `POINT (nan nan)` that
     would corrupt a written GeoPackage/GeoJSON. An empty catalog
     returns an empty FeatureCollection with the same columns/dtypes
-    (see :func:`empty_fc`) so the result type is identical whether or
+    (see `empty_fc`) so the result type is identical whether or
     not the query matched anything.
 
     Args:
@@ -141,7 +141,7 @@ def empty_fc() -> FeatureCollection:
     is a legitimate answer, not an error.
 
     Returns:
-        FeatureCollection: Zero rows, the :data:`ATTRIBUTE_COLUMNS`
+        FeatureCollection: Zero rows, the `ATTRIBUTE_COLUMNS`
             columns with their declared dtypes, an empty `geometry`
             column, CRS `EPSG:4326`.
 
@@ -176,13 +176,13 @@ def empty_fc() -> FeatureCollection:
 def concat_fcs(collections: list[FeatureCollection]) -> FeatureCollection:
     """Concatenate per-provider FeatureCollections into one.
 
-    Skips empty inputs; returns :func:`empty_fc` when every input is
+    Skips empty inputs; returns `empty_fc` when every input is
     empty (or the list is empty) so the result is always a
     schema-correct FeatureCollection.
 
     Args:
         collections: Per-provider FeatureCollections, each produced by
-            :func:`catalog_to_fc` (so all share the schema and CRS).
+            `catalog_to_fc` (so all share the schema and CRS).
 
     Returns:
         FeatureCollection: The row-wise union, CRS `EPSG:4326`.
@@ -210,7 +210,7 @@ def _event_to_row(event: Event, provider: str) -> dict[str, object]:
         provider: The provider key to stamp on the row.
 
     Returns:
-        A dict keyed by :data:`ATTRIBUTE_COLUMNS` (no `geometry`).
+        A dict keyed by `ATTRIBUTE_COLUMNS` (no `geometry`).
     """
     origin = event.preferred_origin() or (event.origins[0] if event.origins else None)
     magnitude = event.preferred_magnitude() or (

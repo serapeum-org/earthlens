@@ -1,7 +1,7 @@
 """CLI demo: aggregate a CDS NetCDF into per-window GeoTIFFs.
 
 This script is a thin wrapper around
-:func:`earthlens.aggregate.aggregate_netcdf`. It exists so users can
+`earthlens.aggregate.aggregate_netcdf`. It exists so users can
 slice a downloaded NetCDF into per-window GeoTIFFs (daily mean,
 monthly sum, weekly mean, seasonal climatology, ...) without writing
 any Python — just:
@@ -14,9 +14,9 @@ any Python — just:
         --freq 1D --op auto
 
 The flags map 1-to-1 to fields on
-:class:`earthlens.aggregate.AggregationConfig`. The catalog lookup
+`earthlens.aggregate.AggregationConfig`. The catalog lookup
 (`Catalog().get_variable(dataset, code)`) supplies the
-:class:`earthlens.ecmwf.Variable` row that drives `op="auto"` (state
+`earthlens.ecmwf.Variable` row that drives `op="auto"` (state
 vs flux) and the output filename stem.
 
 Aggregation can also run as part of the download in one call:
@@ -36,7 +36,7 @@ from earthlens.ecmwf import Catalog
 
 
 def _cli() -> None:
-    """Parse argv and run :func:`aggregate_netcdf` once."""
+    """Parse argv and run `aggregate_netcdf` once."""
     parser = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
     parser.add_argument(
         "nc_path",

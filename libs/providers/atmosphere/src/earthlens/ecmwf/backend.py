@@ -1,33 +1,33 @@
-"""ECMWF / Copernicus data-store backend — :class:`ECMWF`, an :class:`AbstractDataSource`.
+"""ECMWF / Copernicus data-store backend — `ECMWF`, an `AbstractDataSource`.
 
 Downloads from the five CADS data stores through one `cdsapi` client:
 the Copernicus trio (CDS, ADS, EWDS) and the two ECMWF-hosted stores
 (ECDS, XDS). A request is `{dataset: [variable, ...], ...}` plus a date
 range, a bbox and a temporal resolution; the dataset ids, variable
 metadata and per-store routing all come from
-:class:`earthlens.ecmwf.Catalog` (loaded from the per-family
+`earthlens.ecmwf.Catalog` (loaded from the per-family
 `catalog/*.yaml` shards). Nothing about a dataset is hardcoded here.
 
 Each row's `endpoint` picks the store, resolved to an API root and a
-credential by :mod:`earthlens.ecmwf.endpoints`; one client is cached per
-endpoint, so a single :meth:`ECMWF.download` may span several stores.
+credential by `earthlens.ecmwf.endpoints`; one client is cached per
+endpoint, so a single `ECMWF.download` may span several stores.
 
 The pipeline (per `(dataset, variable)` pair) is:
 
-1. :meth:`ECMWF._build_request` — build the request from the catalog row,
+1. `ECMWF._build_request` — build the request from the catalog row,
    then shape its date keys by `request_kind` (see
-   :data:`_REQUEST_KIND_STRIPS`): kinds strip the template fields their
+   `_REQUEST_KIND_STRIPS`): kinds strip the template fields their
    dataset rejects, and the reforecast kinds rewrite the date axes —
    `glofas_hindcast` *renames* `year`/`month`/`day` to the `h*` keys,
    while `s2s_reforecast` *copies* them, keeping both dates.
-2. :class:`earthlens.ecmwf.constraints.RequestValidator` — pre-flight the
+2. `earthlens.ecmwf.constraints.RequestValidator` — pre-flight the
    request against the store's `constraints.json` before anything is queued.
-3. :meth:`ECMWF._api` — submit through `cdsapi`, then normalise the
+3. `ECMWF._api` — submit through `cdsapi`, then normalise the
    response: a zipped or archived NetCDF is unpacked
-   (:func:`_unpack_netcdf_archive`) so `download()` always returns the
+   (`_unpack_netcdf_archive`) so `download()` always returns the
    written data files.
 
-Authentication failures are surfaced as :class:`AuthenticationError`,
+Authentication failures are surfaced as `AuthenticationError`,
 which distinguishes missing credentials from an unaccepted licence — the
 two most common ways a retrieve is refused.
 """
@@ -77,7 +77,7 @@ ERA5_GRID_DEGREES: float = 0.125
 
 # Per-request-kind keys to drop from the request dict before the
 # retrieve call. The keys here name the *template defaults* (built
-# unconditionally by :meth:`ECMWF._api`) that are invalid for the
+# unconditionally by `ECMWF._api`) that are invalid for the
 # named request kind. Per-row `extras` are still merged on top, so
 # users can supply alternative values for any stripped key.
 # `product_type` is catalog-driven (see `Variable.product_type`) and
@@ -137,10 +137,10 @@ _REQUEST_KIND_STRIPS: dict[str, tuple[str, ...]] = {
 class AuthenticationError(_BaseAuthenticationError):
     """Raised when cdsapi cannot authenticate against the Climate Data Store.
 
-    The ECMWF backend uses :class:`cdsapi.Client` to talk to CDS. The
+    The ECMWF backend uses `cdsapi.Client` to talk to CDS. The
     client reads its credentials from `~/.cdsapirc` (or the
     `CDSAPI_URL` / `CDSAPI_KEY` environment variables). If the
-    config is missing or malformed, :meth:`ECMWF._initialize` wraps the
+    config is missing or malformed, `ECMWF._initialize` wraps the
     underlying error in this exception so callers can distinguish auth
     problems from generic CDS server errors.
 
@@ -168,7 +168,7 @@ def _looks_like_missing_credentials(exc: BaseException) -> bool:
 
     Returns:
         True when the failure looks like a credential / config-file
-        problem (so it is safe to wrap as :class:`AuthenticationError`),
+        problem (so it is safe to wrap as `AuthenticationError`),
         False for transport / network / library errors that should
         propagate untouched.
     """
@@ -569,7 +569,7 @@ def _normalize_pressure_level(
 
     CDS spells a level as a string, but hPa reads as a number, so `500` and
     `[500]` are both natural things to write. Each level is rendered by
-    :func:`_render_level` from the number it parses to rather than echoed, and
+    `_render_level` from the number it parses to rather than echoed, and
     a lone level is wrapped so the single-level case needs no brackets. Any
     ordered iterable of levels is accepted, a numpy array included.
 
@@ -584,7 +584,7 @@ def _normalize_pressure_level(
             of levels. A mapping, a set and a `bytes` are refused by name
             rather than iterated — they yield keys, an unspecified order, and
             byte values respectively — and a bool is refused by
-            :func:`_render_level` as a `numbers.Real`.
+            `_render_level` as a `numbers.Real`.
         ValueError: If given an empty sequence, or a level that does not read
             as a number. `pressure_level: []` is not a valid request and asking
             for no levels is not what any caller means; `None` is how a caller
@@ -614,14 +614,14 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
     """ECMWF / Copernicus Climate Data Store backend.
 
     Downloads ERA5 reanalysis (and ERA5-Land where the catalog
-    indicates) via :class:`cdsapi.Client`. The user-friendly variable
+    indicates) via `cdsapi.Client`. The user-friendly variable
     short codes (e.g. `"2m-temperature"`, `"total-precipitation"`) are resolved through
-    :class:`Catalog`, which loads the per-variable metadata from the
+    `Catalog`, which loads the per-variable metadata from the
     bundled CDS catalog (the `catalog/` directory).
 
     The download pipeline (per variable) is a single step:
 
-    * :meth:`_api` — build the cdsapi request dict (daily / monthly
+    * `_api` — build the cdsapi request dict (daily / monthly
       branch on `temporal_resolution`) and submit it via
       `client.retrieve(dataset, request, target)`. Returns the
       absolute path to the NetCDF that CDS wrote.
@@ -634,9 +634,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
     The valid `temporal_resolution` values are `"daily"` and
     `"monthly"`. `_check_input_dates` raises `ValueError` for
     anything else; that is the authoritative gate. Spatial cell
-    size lives on :attr:`SpatialExtent.resolution` (populated by
-    :meth:`_create_grid`) and is the request's native grid spacing —
-    :data:`ERA5_GRID_DEGREES` (0.125°) for regular CDS datasets, or a
+    size lives on `SpatialExtent.resolution` (populated by
+    `_create_grid`) and is the request's native grid spacing —
+    `ERA5_GRID_DEGREES` (0.125°) for regular CDS datasets, or a
     dataset's own `grid_resolution` (e.g. GloFAS's 0.05° on EWDS).
     """
 
@@ -672,10 +672,10 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
     ):
         """Initialize an ECMWF backend instance.
 
-        Forwards every argument to :class:`AbstractDataSource`, which
+        Forwards every argument to `AbstractDataSource`, which
         captures the bbox/date dict into `self.space` / `self.time`. The
         cdsapi client is built lazily on first access to `self.client`
-        (via :meth:`_open_client`), so construction never authenticates.
+        (via `_open_client`), so construction never authenticates.
 
         Args:
             start: Inclusive start date as a string (parsed with
@@ -685,7 +685,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 of variable codes drawn from that dataset, e.g.
                 `{"reanalysis-era5-single-levels": ["2m-temperature",
                 "total-precipitation"]}`. The dataset name must be a
-                key of :attr:`Catalog.datasets`; each variable name
+                key of `Catalog.datasets`; each variable name
                 must appear under that dataset's `variables:` block.
                 See the bundled CDS catalog (`catalog/`) for the keys.
                 Required.
@@ -820,8 +820,8 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         """Parse the date range and produce the iteration index.
 
         Returned dict is captured by
-        :meth:`AbstractDataSource.__init__` into `self.time` so
-        :meth:`_api` can access the parsed bounds and the per-date
+        `AbstractDataSource.__init__` into `self.time` so
+        `_api` can access the parsed bounds and the per-date
         pandas range without re-parsing.
 
         Args:
@@ -837,7 +837,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             TemporalExtent: Frozen pydantic model with `start_date`,
             `end_date`, `resolution` (pandas frequency alias —
             `"D"` for daily, `"MS"` for month-start), and
-            `dates` (the :class:`pandas.DatetimeIndex` the
+            `dates` (the `pandas.DatetimeIndex` the
             download loop iterates).
 
         Raises:
@@ -867,16 +867,16 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         )
 
     def _open_client(self, endpoint: str = "cds"):
-        """Construct a :class:`cdsapi.Client` for the named CADS endpoint.
+        """Construct a `cdsapi.Client` for the named CADS endpoint.
 
-        Delegates to :func:`earthlens.ecmwf.endpoints.open_client`, which maps
+        Delegates to `earthlens.ecmwf.endpoints.open_client`, which maps
         the endpoint slug (`"cds"` / `"ads"` / `"ewds"`) to its URL and resolves
         the token (the endpoint's own `<ENDPOINT>_KEY`, else the shared CDS
         Personal Access Token from `CDSAPI_KEY` / `~/.cdsapirc`). Missing-CDS-
-        credential errors are re-raised as :class:`AuthenticationError` with a
+        credential errors are re-raised as `AuthenticationError` with a
         message telling the user where to put their token. Called via
-        :meth:`_client_for` (and, for the default endpoint, by the
-        :class:`~earthlens.base.LazyClientMixin` `client` property).
+        `_client_for` (and, for the default endpoint, by the
+        `LazyClientMixin` `client` property).
 
         Args:
             endpoint: CADS instance slug. Defaults to `"cds"`.
@@ -936,7 +936,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
     def client(self) -> Any:
         """The default (CDS) cdsapi client — opened lazily and cached per endpoint.
 
-        Overrides :class:`~earthlens.base.LazyClientMixin` so that reading
+        Overrides `LazyClientMixin` so that reading
         `self.client` (e.g. via `authenticate()`) routes through the same
         per-endpoint cache as a retrieve, rather than seeding a shared slot that
         would then be returned for every endpoint. Resolves the `"cds"` client;
@@ -953,7 +953,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         """Bind a client used for every endpoint (a deliberate override).
 
         A client set here overrides endpoint routing and is returned by
-        :meth:`_client_for` for all endpoints — unlike a lazily-built endpoint
+        `_client_for` for all endpoints — unlike a lazily-built endpoint
         client, which is cached per endpoint and never treated as injected.
 
         Args:
@@ -989,7 +989,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
 
         Reads the requested datasets from `self.vars` and returns the finest
         (smallest) `grid_resolution` declared among them in the catalog,
-        falling back to :data:`ERA5_GRID_DEGREES` for any dataset that declares
+        falling back to `ERA5_GRID_DEGREES` for any dataset that declares
         none. When `self.vars` is absent (a bare instance with no requested
         datasets) or the catalog lookup fails, the ERA5 default is used — so
         regular CDS datasets keep their historic 0.125° snap while an EWDS
@@ -1030,7 +1030,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
 
         Floors the south/west limits and ceils the north/east limits to the
         nearest multiple of the request's grid spacing (see
-        :meth:`_grid_resolution_for_request`) — :data:`ERA5_GRID_DEGREES`
+        `_grid_resolution_for_request`) — `ERA5_GRID_DEGREES`
         (0.125°) for regular CDS datasets, or a dataset's own
         `grid_resolution` (e.g. GloFAS's 0.05° on EWDS) — so every retrieve
         aligns with the native grid and no cell straddles the requested area
@@ -1043,7 +1043,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         Returns:
             SpatialExtent: Grid-aligned bounding box with `resolution` set to
             the request's native grid spacing (see
-            :meth:`_grid_resolution_for_request`) — the ERA5 default or a
+            `_grid_resolution_for_request`) — the ERA5 default or a
             dataset's `grid_resolution`.
 
         Examples:
@@ -1092,17 +1092,17 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
 
         Iterates the user-supplied `variables` mapping (CDS dataset
         short name → list of variable codes) and, for each pair,
-        looks the variable up in the CDS :class:`Catalog` and
-        delegates to :meth:`_download_dataset`.
+        looks the variable up in the CDS `Catalog` and
+        delegates to `_download_dataset`.
 
         Args:
             progress_bar: Reserved; currently unused since the
                 slicing pipeline that previously consumed it has
                 been moved out of the package. Defaults to `True`
                 so existing callers keep working.
-            aggregate: Optional :class:`earthlens.aggregate.AggregationConfig`.
+            aggregate: Optional `earthlens.aggregate.AggregationConfig`.
                 When provided, every retrieved NetCDF is fed through
-                :func:`earthlens.aggregate.aggregate_netcdf` immediately
+                `earthlens.aggregate.aggregate_netcdf` immediately
                 after `_api()` returns. When the config's `out_dir`
                 is `None`, it is defaulted to
                 `<self.root_dir>/aggregated/`. Aggregation failures
@@ -1173,7 +1173,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             default `errors="warn"`, variables whose download (or
             aggregate) failed are logged and omitted from the returned
             list rather than aborting the batch. A store-level refusal is
-            the exception to that — see :class:`CadsUnavailableError`
+            the exception to that — see `CadsUnavailableError`
             under `Raises:`.
 
         Raises:
@@ -1191,12 +1191,12 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 as every variable having no data.
             PermissionError: The dataset's licence has not been accepted
                 on the Copernicus account.
-            Exception: Any error :meth:`_api` propagates from
-                :meth:`cdsapi.Client.retrieve`.
+            Exception: Any error `_api` propagates from
+                `cdsapi.Client.retrieve`.
 
         Examples:
             - End-to-end download via the user-facing
-              :class:`EarthLens` facade. Marked
+              `EarthLens` facade. Marked
               `# doctest: +SKIP` because it requires a configured
               `~/.cdsapirc` and several minutes of CDS queue time:
 
@@ -1221,10 +1221,10 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 ```
 
         See Also:
-            :meth:`_download_dataset`: Per-variable download +
+            `_download_dataset`: Per-variable download +
                 post-processing.
-            :meth:`_api`: Builds and submits the cdsapi request.
-            :class:`Catalog`: Resolves `(dataset, code)` pairs to
+            `_api`: Builds and submits the cdsapi request.
+            `Catalog`: Resolves `(dataset, code)` pairs to
                 per-variable metadata.
         """
         if getattr(self, "_passthrough", None) is not None:
@@ -1343,7 +1343,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
     def _resolve_endpoint(self, dataset: str) -> str:
         """Resolve which store hosts `dataset` for a passthrough retrieve.
 
-        Delegates to :func:`earthlens.ecmwf._helpers.endpoint_for`, the one
+        Delegates to `earthlens.ecmwf._helpers.endpoint_for`, the one
         resolver the CLI tooling shares: a curated row's `endpoint` wins, then
         the per-store availability index, then `"cds"` with a warning.
 
@@ -1459,8 +1459,8 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
     ):
         """Download a single variable from CDS.
 
-        Thin wrapper around :meth:`_api` — builds the cdsapi request,
-        submits it, and returns the absolute :class:`pathlib.Path`
+        Thin wrapper around `_api` — builds the cdsapi request,
+        submits it, and returns the absolute `pathlib.Path`
         to the NetCDF that CDS wrote.
 
         Per-date GeoTIFF slicing is **not** done here. Users who
@@ -1469,7 +1469,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         returned NetCDF.
 
         Args:
-            var_info: Catalog row for the variable. See :meth:`_api`
+            var_info: Catalog row for the variable. See `_api`
                 for the attributes consumed.
             progress_bar: Reserved; currently unused since the
                 slicing pipeline that previously consumed it has
@@ -1480,9 +1480,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             pathlib.Path: Absolute path to the downloaded NetCDF.
 
         See Also:
-            :meth:`_api`: Builds and submits the CDS request, returns
+            `_api`: Builds and submits the CDS request, returns
                 the path to the NetCDF.
-            :class:`Catalog`: Loads `Variable` instances from the
+            `Catalog`: Loads `Variable` instances from the
                 bundled CDS catalog (`catalog/`).
         """
         return self._api(var_info)
@@ -1493,24 +1493,24 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         Five-stage pipeline:
 
         1. Derive the dataset name from `var_info.cds_dataset`.
-        2. Delegate request-dict assembly to :meth:`_build_request`.
+        2. Delegate request-dict assembly to `_build_request`.
         3. Pre-flight the request via
-           :class:`earthlens.ecmwf.constraints.RequestValidator`
+           `earthlens.ecmwf.constraints.RequestValidator`
            (skipped when the constructor was given
            `skip_constraints=True`).
-        4. Submit via :meth:`cdsapi.Client.retrieve`. The call blocks
+        4. Submit via `cdsapi.Client.retrieve`. The call blocks
            until CDS has served the request and written the NetCDF
            — typically minutes due to CDS queue times.
         5. On failure, rewrite licence-not-accepted exceptions into a
-           :class:`PermissionError` carrying the dataset's licence
+           `PermissionError` carrying the dataset's licence
            page URL. All other exceptions propagate untouched.
 
         Output filename:
         `<self.root_dir>/<cds_variable>_<cds_dataset>.nc`.
 
         Args:
-            var_info: Catalog row resolved by :class:`Catalog`.
-                See :meth:`_build_request` for the full list of
+            var_info: Catalog row resolved by `Catalog`.
+                See `_build_request` for the full list of
                 fields consumed during request assembly. `_api`
                 itself reads `cds_dataset` (the retrieve target) and
                 `cds_variable` / `dataset_id` (the output filename stem).
@@ -1525,13 +1525,13 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 user's CDS account. Message links to the dataset's
                 licence page.
             ValueError: Propagated from
-                :class:`earthlens.ecmwf.constraints.RequestValidator`
+                `earthlens.ecmwf.constraints.RequestValidator`
                 when the assembled request fails the pre-flight
                 check (variable typo, unknown extras, malformed
                 date / area, ...). Skipped entirely when
                 `skip_constraints=True`.
             Exception: Other transport-level errors from
-                :meth:`cdsapi.Client.retrieve` (authentication
+                `cdsapi.Client.retrieve` (authentication
                 failures, transient CDS 5xx, network drops)
                 propagate untouched.
 
@@ -1553,7 +1553,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
 
                 ```
             - Submit the request through the user-facing
-              :class:`EarthLens` facade. Marked
+              `EarthLens` facade. Marked
               `# doctest: +SKIP` because it requires a configured
               `~/.cdsapirc` and several minutes of CDS queue time:
 
@@ -1576,15 +1576,15 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 ```
 
         See Also:
-            :meth:`_build_request`: Assembles the CDS request dict
+            `_build_request`: Assembles the CDS request dict
                 this method submits — the pure-builder collaborator.
-            :class:`earthlens.ecmwf.constraints.RequestValidator`: The
+            `earthlens.ecmwf.constraints.RequestValidator`: The
                 pre-flight check applied to the assembled request.
-            :meth:`_download_dataset`: Thin pass-through wrapper —
+            `_download_dataset`: Thin pass-through wrapper —
                 calls this method and returns the same path.
-            :class:`Catalog`: Resolves `(dataset, variable)` pairs
-                to :class:`Variable` rows.
-            :class:`earthlens.earthlens.EarthLens`: User-facing facade
+            `Catalog`: Resolves `(dataset, variable)` pairs
+                to `Variable` rows.
+            `earthlens.earthlens.EarthLens`: User-facing facade
                 that wires this method into the `download()` flow.
         """
         dataset = var_info.cds_dataset
@@ -1679,8 +1679,8 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         Pure function over `var_info`, `self.time.dates`,
         `self.space`, and `self.temporal_resolution`. No I/O, no
         validation, no client calls — just dictionary assembly.
-        :meth:`_api` consumes the result and submits it via
-        :meth:`cdsapi.Client.retrieve`.
+        `_api` consumes the result and submits it via
+        `cdsapi.Client.retrieve`.
 
         Build order (later steps override earlier ones):
 
@@ -1716,7 +1716,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         Returns:
             dict[str, Any]: Request dict ready to pass as the
             second positional argument to
-            :meth:`cdsapi.Client.retrieve`.
+            `cdsapi.Client.retrieve`.
         """
         if (
             var_info.request_kind in ("glofas", "glofas_hindcast")

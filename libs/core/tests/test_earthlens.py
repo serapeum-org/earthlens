@@ -36,7 +36,7 @@ cdsapi = pytest.importorskip("cdsapi")
 
 
 class _SentinelClient:
-    """Stand-in for :class:`cdsapi.Client` used in facade tests."""
+    """Stand-in for `cdsapi.Client` used in facade tests."""
 
 
 @pytest.mark.chc
@@ -199,7 +199,7 @@ class TestECMWFBackend:
     """
 
     def test_ecmwf_is_registered_in_data_sources(self):
-        """`EarthLens.DataSources` maps `"ecmwf"` to :class:`ECMWF`."""
+        """`EarthLens.DataSources` maps `"ecmwf"` to `ECMWF`."""
         assert "ecmwf" in EarthLens.DataSources, (
             f"'ecmwf' missing from DataSources keys: {sorted(EarthLens.DataSources)}"
         )

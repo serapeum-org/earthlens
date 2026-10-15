@@ -14,7 +14,7 @@ import pytest
 from earthlens.testing import seed_s3
 
 #: The CloudFerro endpoint the toolbox reads from. Not an AWS host, which is
-#: the whole difficulty — see :func:`seed_cmems_s3`.
+#: the whole difficulty — see `seed_cmems_s3`.
 CMEMS_ENDPOINT = "https://s3.waw3-1.cloudferro.com"
 
 #: Recorded objects, one directory per bucket, kept as files rather than

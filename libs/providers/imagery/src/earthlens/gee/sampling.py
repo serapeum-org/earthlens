@@ -1,6 +1,6 @@
 """Sample raster values at point locations via Google Earth Engine.
 
-The single public entry point, :func:`sample_points`, takes an
+The single public entry point, `sample_points`, takes an
 `ee.Image` and a `GeoDataFrame` of point geometries and returns an
 `ee.FeatureCollection` where each input point carries the reduced
 raster value(s) from its surrounding pixels as feature properties.
@@ -45,7 +45,7 @@ def _reducer_whitelist() -> frozenset[str]:
     the registry itself: `mosaic` is an `ImageCollection` method and
     `ee.Reducer.mosaic` does not exist, so taking every registry name here sent
     `reducer="mosaic"` into an `AttributeError` instead of the refusal
-    :func:`_resolve_reducer` raises.
+    `_resolve_reducer` raises.
 
     Returns:
         The registry names that stand for an `ee.Reducer`.
@@ -81,7 +81,7 @@ def _resolve_reducer(name: str):
     Args:
         name: A reducer name (e.g. `"mean"`), or the parameterised
             `"percentile:<q>"` spec. A bare name must be one of
-            :data:`_REDUCER_WHITELIST`.
+            `_REDUCER_WHITELIST`.
 
     Returns:
         The `ee.Reducer` the registry builds for `name`, e.g.
@@ -89,7 +89,7 @@ def _resolve_reducer(name: str):
         `percentile:<q>` spec.
 
     Raises:
-        ValueError: If `name` is neither in :data:`_REDUCER_WHITELIST` nor a
+        ValueError: If `name` is neither in `_REDUCER_WHITELIST` nor a
             `percentile` spec, or if it is `"percentile"` without a numeric
             percentile between 0 and 100.
     """
@@ -129,7 +129,7 @@ def sample_points(
         scale_m: The pixel scale (metres) passed to
             `image.reduceRegions(scale=...)`.
         reducer: The name of an `ee.Reducer` factory; must be one of the
-            supported reducers (see :data:`_REDUCER_WHITELIST`), or the
+            supported reducers (see `_REDUCER_WHITELIST`), or the
             parameterised `"percentile:<q>"` spec, which is the one reducer
             that cannot be named on its own. Defaults to `"first"`.
 
@@ -138,7 +138,7 @@ def sample_points(
         the reduced band value(s).
 
     Raises:
-        ValueError: If `reducer` is neither in :data:`_REDUCER_WHITELIST` nor a
+        ValueError: If `reducer` is neither in `_REDUCER_WHITELIST` nor a
             valid `"percentile:<q>"` spec,
             if `gdf` is empty, or if any geometry is not a `Point` /
             `MultiPoint` (sampling at a polygon would silently
@@ -193,21 +193,21 @@ def sample_points_to_gdf(
 ) -> gpd.GeoDataFrame:
     """Sample an Earth Engine image at points and return a `GeoDataFrame`.
 
-    Thin composition of :func:`sample_points` and
-    :func:`earthlens.gee.io.feature_collection_to_gdf` — call
+    Thin composition of `sample_points` and
+    `earthlens.gee.io.feature_collection_to_gdf` — call
     `sample_points` for the leaf-batched `reduceRegions` work, then
     pull the result with a single `getInfo()` and reshape into a
     `GeoDataFrame`. Suitable for small to medium point sets (the
     `getInfo()` upper bound is ~5000 features / ~10 MB); for larger
     jobs, call `sample_points` directly and pipe its output through
-    :func:`earthlens.gee.io.feature_collections_to_dataframe` instead.
+    `earthlens.gee.io.feature_collections_to_dataframe` instead.
 
     Args:
         image: The `ee.Image` to sample.
         gdf: A `GeoDataFrame` of point geometries.
         scale_m: The pixel scale (metres) passed to
             `image.reduceRegions(scale=...)`.
-        reducer: The reducer name; one of :data:`_REDUCER_WHITELIST`, or a
+        reducer: The reducer name; one of `_REDUCER_WHITELIST`, or a
             `"percentile:<q>"` spec. Defaults to `"first"`.
         crs: The CRS to stamp onto the output `GeoDataFrame`. Defaults
             to `4326`.
@@ -217,7 +217,7 @@ def sample_points_to_gdf(
         input properties plus the reduced band value(s).
 
     Raises:
-        ValueError: If `reducer` is neither in :data:`_REDUCER_WHITELIST` nor a
+        ValueError: If `reducer` is neither in `_REDUCER_WHITELIST` nor a
             valid `"percentile:<q>"` spec, or if `gdf` is empty.
     """
     fc = sample_points(image, gdf, scale_m=scale_m, reducer=reducer)

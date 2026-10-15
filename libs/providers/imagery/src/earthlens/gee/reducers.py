@@ -14,7 +14,7 @@ state rather than needing a second argument threaded through every call site.
 The seven original names keep their exact semantics: they dispatch to Earth
 Engine's convenience methods, which **preserve band names**, where
 `collection.reduce(ee.Reducer.mean())` would rename `B4` to `B4_mean`.
-:class:`Percentile` has to use `reduce`, so it renames the bands back.
+`Percentile` has to use `reduce`, so it renames the bands back.
 
 Two capabilities, not one. A reducer can collapse a **collection** (what
 `GEE(reducer=...)` asks for) and/or stand for an **`ee.Reducer`** (what
@@ -23,11 +23,11 @@ Two capabilities, not one. A reducer can collapse a **collection** (what
 `variance`, `count` and `first` are region reducers this backend does not offer
 as temporal composites. So each reducer declares both - `collection_capable`
 and `ee_factory` - and the two vocabularies are *derived* from the registry by
-:func:`collection_reducers` and :func:`sampling_reducers` rather than restated.
+`collection_reducers` and `sampling_reducers` rather than restated.
 Deriving one set for both is what briefly let `sample_points(reducer="mosaic")`
 past the whitelist and into `AttributeError`.
 
-Resolve a name (or an already-built object) through :func:`resolve_reducer`:
+Resolve a name (or an already-built object) through `resolve_reducer`:
 
 ```python
 >>> resolve_reducer("median").name
@@ -75,7 +75,7 @@ class Reducer(ABC):
     A subclass declares which of the two it supports: collapsing an
     `ee.ImageCollection` into a single `ee.Image` (calling the instance) and/or
     standing for an `ee.Reducer` that collapses pixels inside a region
-    (:meth:`as_ee_reducer`). Most support both, so an instance can be passed
+    (`as_ee_reducer`). Most support both, so an instance can be passed
     anywhere the backend accepts a `collection -> image` operation; a
     region-only one refuses the call instead.
 
@@ -304,7 +304,7 @@ class Percentile(BaseModel, Reducer):
         log line or a notebook said nothing about *which* reducer it was.
 
         Returns:
-            The same text as :meth:`__repr__`.
+            The same text as `__repr__`.
         """
         return repr(self)
 
@@ -380,7 +380,7 @@ class Count(_RegionReducer):
 
 #: Every reducer addressable by name. `percentile` is absent deliberately: it
 #: needs a parameter, so it is reachable only through the `percentile:<q>`
-#: spelling that :func:`resolve_reducer` understands, or by passing an instance.
+#: spelling that `resolve_reducer` understands, or by passing an instance.
 REDUCERS: dict[str, type[Reducer]] = {
     cls.name: cls
     for cls in (
@@ -424,7 +424,7 @@ def sampling_reducers() -> frozenset[str]:
     """Return the names that stand for an `ee.Reducer`.
 
     The vocabulary a *region* reduction accepts. It is not the same set as
-    :func:`collection_reducers`: `mosaic` has no `ee.Reducer` factory, and the
+    `collection_reducers`: `mosaic` has no `ee.Reducer` factory, and the
     region-only reducers have no collection form.
 
     Returns:

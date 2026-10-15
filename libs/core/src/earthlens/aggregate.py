@@ -14,8 +14,8 @@ chains it via `ECMWF.download(aggregate=...)` for the
 "download-and-aggregate-in-one-call" path; standalone callers use
 `aggregate_netcdf` directly.
 
-The two headline public symbols are :class:`AggregationConfig` (the
-frozen request shape) and :func:`aggregate_netcdf` (the function). They
+The two headline public symbols are `AggregationConfig` (the
+frozen request shape) and `aggregate_netcdf` (the function). They
 are also re-exported from `earthlens` so callers can write
 `from earthlens.core import AggregationConfig, aggregate_netcdf`.
 
@@ -25,9 +25,9 @@ outputs that are not CDS NetCDF cubes (ghsl reduces a stack of per-epoch
 GeoTIFFs, and the same shape suits stac's per-date COGs and
 sentinel_hub's rendered windows):
 
-* :func:`window_groups` — bucket a `DatetimeIndex` into
+* `window_groups` — bucket a `DatetimeIndex` into
   `(window_label, mask)` pairs by a pandas offset alias.
-* :func:`reduce_time_axis` — reduce a `(time, y, x)` stack along axis 0
+* `reduce_time_axis` — reduce a `(time, y, x)` stack along axis 0
   with a named op, honouring `skipna` / `min_count`.
 
 They are supported API, not internals: `earthlens-core` and the five
@@ -132,23 +132,23 @@ _TIME_VAR_CANDIDATES: tuple[str, ...] = ("valid_time", "time")
 
 
 def _read_time_axis(nc: NetCDF) -> pd.DatetimeIndex:
-    """Return a NetCDF's time coordinate as a :class:`pandas.DatetimeIndex`.
+    """Return a NetCDF's time coordinate as a `pandas.DatetimeIndex`.
 
-    Tries each name in :data:`_TIME_VAR_CANDIDATES` in order
+    Tries each name in `_TIME_VAR_CANDIDATES` in order
     (`"valid_time"` first to cover CDS-Beta NetCDFs, then `"time"`
     for legacy CDS). The first candidate that resolves to a non-empty
     list of date strings via
-    :meth:`pyramids.netcdf.NetCDF.get_time_variable` is returned as a
-    :class:`pandas.DatetimeIndex`.
+    `pyramids.netcdf.NetCDF.get_time_variable` is returned as a
+    `pandas.DatetimeIndex`.
 
-    pyramids' :meth:`get_time_variable` already parses the CF
+    pyramids' `get_time_variable` already parses the CF
     `"<unit> since <epoch>"` units string for us through
     `create_time_conversion_func`; this helper just chooses the
     candidate name and converts the formatted strings back to
-    timestamps with :func:`pandas.to_datetime`.
+    timestamps with `pandas.to_datetime`.
 
     Args:
-        nc: An open :class:`pyramids.netcdf.NetCDF` instance pointed
+        nc: An open `pyramids.netcdf.NetCDF` instance pointed
             at the source file.
 
     Returns:
@@ -156,7 +156,7 @@ def _read_time_axis(nc: NetCDF) -> pd.DatetimeIndex:
         time dimension.
 
     Raises:
-        KeyError: If none of :data:`_TIME_VAR_CANDIDATES` is present
+        KeyError: If none of `_TIME_VAR_CANDIDATES` is present
             on the NetCDF as a parseable time variable.
     """
     for name in _TIME_VAR_CANDIDATES:
@@ -177,14 +177,14 @@ def _find_level_dim(nc: NetCDF) -> str | None:
     """Return the pressure-level dimension name, or `None` for 3-D files.
 
     Walks `nc.dimension_names` looking for any of
-    :data:`_LEVEL_DIM_CANDIDATES`. CDS pressure-level NetCDFs use
+    `_LEVEL_DIM_CANDIDATES`. CDS pressure-level NetCDFs use
     `pressure_level`; some derived datasets use plain `level`. The
     first match wins.
 
     Args:
-        nc: An open :class:`pyramids.netcdf.NetCDF` instance — either
+        nc: An open `pyramids.netcdf.NetCDF` instance — either
             the root MDIM container or a variable subset returned by
-            :meth:`NetCDF.get_variable`. Both surfaces expose the
+            `NetCDF.get_variable`. Both surfaces expose the
             full dim list under `dimension_names`.
 
     Returns:
@@ -215,11 +215,11 @@ def _resolve_pressure_level(
 
     Args:
         nc: The NetCDF to examine.
-        level: The :attr:`AggregationConfig.level` value.
+        level: The `AggregationConfig.level` value.
 
     Returns:
         NetCDF: Either the original `nc` (3-D pass-through) or a new
-        instance from :meth:`pyramids.netcdf.NetCDF.sel` with the
+        instance from `pyramids.netcdf.NetCDF.sel` with the
         chosen level pinned.
 
     Raises:
@@ -266,10 +266,10 @@ def window_groups(
     no data for.
 
     Args:
-        time_axis: Time coordinate as a :class:`pandas.DatetimeIndex`.
-            Typically the result of :func:`_read_time_axis`.
+        time_axis: Time coordinate as a `pandas.DatetimeIndex`.
+            Typically the result of `_read_time_axis`.
         freq: Pandas offset alias (`"1D"`, `"7D"`, `"1MS"`, `"QS-DEC"`,
-            `"AS"`, ...). Anything :class:`pandas.Grouper` accepts.
+            `"AS"`, ...). Anything `pandas.Grouper` accepts.
 
     Yields:
         tuple[pd.Timestamp, np.ndarray]: For each non-empty window:
@@ -449,14 +449,14 @@ def _resolve_op(op: OperationLiteral, var_info: Variable) -> str:
     correct per-window total in both cases.
 
     Args:
-        op: The :attr:`AggregationConfig.op` value, possibly `"auto"`.
+        op: The `AggregationConfig.op` value, possibly `"auto"`.
         var_info: Catalog entry for the variable being aggregated.
             Only `is_pre_aggregated` (if present) and `is_flux` are
             consulted; the rest is ignored.
 
     Returns:
         str: The concrete operator name (`"mean"`, `"sum"`, `"min"`,
-        `"max"`, or `"std"`) ready for :func:`reduce_time_axis`.
+        `"max"`, or `"std"`) ready for `reduce_time_axis`.
 
     Examples:
         - State variable with `is_flux=False` resolves to `"mean"`:
@@ -507,7 +507,7 @@ def _resolve_op(op: OperationLiteral, var_info: Variable) -> str:
 
 
 class AggregationConfig(BaseModel):
-    """Frozen request shape consumed by :func:`aggregate_netcdf`.
+    """Frozen request shape consumed by `aggregate_netcdf`.
 
     Carries the windowing frequency, reduction operator, and output
     location. Frozen + `extra="forbid"` so a typo in a field name
@@ -531,7 +531,7 @@ class AggregationConfig(BaseModel):
             written to each GeoTIFF is read off the NetCDF, not from
             this value, and it is not encoded in the filename.
         level: When the NetCDF has a `pressure_level` dimension, pin
-            this level via :meth:`pyramids.netcdf.NetCDF.sel`. `None`
+            this level via `pyramids.netcdf.NetCDF.sel`. `None`
             (default) requires a 3-D NetCDF; pass an explicit level
             (e.g. `1000`) to aggregate a single 4-D layer.
         skipna: When `True`, the reduction is NaN-aware
@@ -604,7 +604,7 @@ class AggregationConfig(BaseModel):
 class AggregatedWindow:
     """One reduced time window: its label, its array, and where it was written.
 
-    Yielded by :func:`iter_aggregate_netcdf`. `array` is `None` when the
+    Yielded by `iter_aggregate_netcdf`. `array` is `None` when the
     request set `keep_arrays=False` and the window was written to disk — the
     point of that mode is that a long run does not accumulate every window in
     memory alongside the GeoTIFFs it has already produced.
@@ -791,9 +791,9 @@ def aggregate_netcdf(
             to pick the variable from the NetCDF
             (`var_info.nc_variable`), seed the output filename
             (`var_info.cds_variable`, plus `dataset_id` for a curated
-            override — see :func:`_output_stem`), and resolve `op="auto"`
+            override — see `_output_stem`), and resolve `op="auto"`
             (`var_info.is_flux`).
-        config: Frozen :class:`AggregationConfig` describing the
+        config: Frozen `AggregationConfig` describing the
             window, reduction, and output location.
         date_range: Optional inclusive `(start, end)` bounds. When set,
             samples outside the range are dropped before windowing, so the
@@ -812,16 +812,16 @@ def aggregate_netcdf(
 
     Raises:
         KeyError: If the NetCDF has no recognised time variable
-            (`valid_time` / `time`); see :func:`_read_time_axis`.
+            (`valid_time` / `time`); see `_read_time_axis`.
         ValueError: If `config.level` is set but the NetCDF has no
             pressure-level dimension, or vice versa; see
-            :func:`_resolve_pressure_level`. Also raised by pandas
+            `_resolve_pressure_level`. Also raised by pandas
             when `config.freq` is not a recognised offset alias.
 
     See Also:
-        - :class:`AggregationConfig`: the frozen request payload.
-        - :class:`earthlens.ecmwf.Catalog`: resolves `(dataset, code)`
-          pairs to the :class:`earthlens.ecmwf.Variable` rows that
+        - `AggregationConfig`: the frozen request payload.
+        - `earthlens.ecmwf.Catalog`: resolves `(dataset, code)`
+          pairs to the `earthlens.ecmwf.Variable` rows that
           drive `var_info.is_flux` and the output filename.
         - `examples/post_process_ecmwf_netcdf.py`: thin CLI demo of
           this function (after task L1).
@@ -840,9 +840,9 @@ def iter_aggregate_netcdf(
     config: AggregationConfig,
     date_range: tuple[Any, Any] | None = None,
 ) -> Iterator[AggregatedWindow]:
-    """Yield one :class:`AggregatedWindow` per time window, streaming.
+    """Yield one `AggregatedWindow` per time window, streaming.
 
-    The streaming counterpart to :func:`aggregate_netcdf`, and the
+    The streaming counterpart to `aggregate_netcdf`, and the
     implementation it is built on. Two properties make it usable on cubes
     that do not fit in memory:
 
@@ -868,28 +868,28 @@ def iter_aggregate_netcdf(
             seed the output filename (`_output_stem` — `var_info.cds_variable`,
             plus `dataset_id` for a curated override), and resolve
             `op="auto"` (`var_info.is_flux`).
-        config: Frozen :class:`AggregationConfig` describing the window,
+        config: Frozen `AggregationConfig` describing the window,
             reduction, output location, and whether to retain arrays.
         date_range: Optional inclusive `(start, end)` bounds. Samples outside
             the range are dropped before windowing, so the streamed windows
             match the requested span even when the source cube over-covers it;
             a window left empty by the filter is skipped. `None` keeps every
-            sample. See :func:`_date_range_mask`.
+            sample. See `_date_range_mask`.
 
     Yields:
         AggregatedWindow: One per window, in time order.
 
     Raises:
         KeyError: If the NetCDF has no recognised time variable
-            (`valid_time` / `time`); see :func:`_read_time_axis`.
+            (`valid_time` / `time`); see `_read_time_axis`.
         ValueError: If `config.level` is set but the NetCDF has no
             pressure-level dimension, or vice versa; see
-            :func:`_resolve_pressure_level`. Also raised by pandas when
+            `_resolve_pressure_level`. Also raised by pandas when
             `config.freq` is not a recognised offset alias.
 
     See Also:
-        - :func:`aggregate_netcdf`: the eager `list` form of this function.
-        - :class:`AggregationConfig`: the frozen request payload.
+        - `aggregate_netcdf`: the eager `list` form of this function.
+        - `AggregationConfig`: the frozen request payload.
     """
     from pyramids.dataset import Dataset, GeoReference
     from pyramids.netcdf import NetCDF

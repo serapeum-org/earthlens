@@ -63,7 +63,7 @@ class _FakeImageCollection:
 
     Chain methods (`filterDate`, `filterBounds`, `select`) return a new
     instance carrying the accumulated call log; the reducer convenience
-    methods (`mean`/`median`/`mosaic`/...) return a :class:`_FakeImage`.
+    methods (`mean`/`median`/`mosaic`/...) return a `_FakeImage`.
     """
 
     def __init__(self, source, calls: list | None = None):
@@ -2152,18 +2152,15 @@ def fake_reader(monkeypatch):
     # Patched on the reader module, which is where the import now happens: the
     # backend reaches pyramids-eo through `EedaiReader`, so that adapter owns
     # the lock and the identity check around every call.
-    #
-    # `engines` holds a second reference to the same loader, used by
-    # `reader_refusal_types()` to name the exception types to catch around an
-    # export. Faking only the first leaves that one reaching the real
-    # pyramids-eo, which passes wherever the `eedai` extra happens to be
-    # installed and raises `ImportError` where it is not — `all` deliberately
-    # omits it, so the wheel lane is exactly where that shows up.
-    from earthlens.gee import engines as engines_module
     from earthlens.gee import reader as reader_module
 
-    for module in (reader_module, engines_module):
-        monkeypatch.setattr(module, "import_earthengine_reader", lambda: reader)
+    monkeypatch.setattr(reader_module, "import_earthengine_reader", lambda: reader)
+    # `engines.reader_refusal_types()` deliberately runs for real here, rather
+    # than against this fake. It is total since it learned to catch the loader's
+    # ImportError, so it resolves with or without the `[eedai]` extra, and
+    # leaving it unpatched means these tests exercise the production refusal
+    # types instead of a stand-in — the expression whose breakage started this
+    # branch is then covered by every test that reaches a late refusal.
     reader.credential_builds = []
     monkeypatch.setattr(
         backend_module,

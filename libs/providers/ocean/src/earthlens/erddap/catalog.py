@@ -1,6 +1,6 @@
 """Server catalog loader for the generic ERDDAP backend.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
+Hosts `Catalog`, the pydantic-backed reader for the bundled
 multi-server ERDDAP catalog. ERDDAP is a protocol spoken by hundreds of
 independent servers, so the catalog is a curated map of concrete
 `(server_url, dataset_id, protocol)` rows rather than one provider's
@@ -8,18 +8,18 @@ dataset list. It ships as a sharded directory of per-slice YAML files at
 `src/earthlens/erddap/catalog/` (`coral-reef-watch.yaml`,
 `coastwatch.yaml`, …) plus a single `_index.yaml` carrying the
 informational `available_datasets:` list, mirroring the
-:mod:`earthlens.cmems.catalog` layout. Each per-slice file contributes
-its `datasets:` block; the loader unions them into one :class:`Catalog`
+`earthlens.cmems.catalog` layout. Each per-slice file contributes
+its `datasets:` block; the loader unions them into one `Catalog`
 at construction time.
 
-A `dataset=<id>` request resolves to a :class:`Dataset` via
-:meth:`Catalog.get` (a thin wrapper over the shared
-:meth:`~earthlens.base.AbstractCatalog.get_dataset` did-you-mean
+A `dataset=<id>` request resolves to a `Dataset` via
+`Catalog.get` (a thin wrapper over the shared
+`get_dataset` did-you-mean
 lookup). The row's `protocol` decides the backend's per-instance output
 shape: `griddap` → raster NetCDF, `tabledap` → tabular `DataFrame`.
 
 The path to the bundled catalog directory lives at
-:data:`CATALOG_PATH`; tests can monkey-patch that module attribute to
+`CATALOG_PATH`; tests can monkey-patch that module attribute to
 redirect the loader at a temporary directory or single YAML file.
 """
 
@@ -154,7 +154,7 @@ class Dataset(SummarisedLeaf):
 
     Mirrors a single `datasets.<dataset_id>:` block in one of the
     per-slice `catalog/*.yaml` files. The block key is the ERDDAP
-    `dataset_id`; it is echoed into :attr:`dataset_id` by the loader so
+    `dataset_id`; it is echoed into `dataset_id` by the loader so
     the row is self-describing.
 
     Attributes:
@@ -223,7 +223,7 @@ class Catalog(AbstractCatalog[Dataset]):
 
     Reads the bundled `catalog/` directory (shipped as package data) and
     exposes its curated rows as a typed `datasets` map. Instantiate with
-    no arguments (`Catalog()`) — :func:`model_post_init` parses the YAML
+    no arguments (`Catalog()`) — `model_post_init` parses the YAML
     and populates every field in one pass through a `(path, mtime)`-keyed
     cache.
 
@@ -236,7 +236,7 @@ class Catalog(AbstractCatalog[Dataset]):
             download code does not consume it; the `datasets` map is the
             curated subset that carries the per-dataset request metadata.
         datasets: Structural map keyed by ERDDAP dataset id; each value
-            is a :class:`Dataset` row.
+            is a `Dataset` row.
 
     Examples:
         - Resolve a dataset and read its protocol:
@@ -275,13 +275,13 @@ class Catalog(AbstractCatalog[Dataset]):
         Args:
             catalog_path: Path to the `catalog/` directory or a single
                 `*.yaml` file. Defaults to module-level
-                :data:`CATALOG_PATH`.
+                `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
-            ValueError: Propagated from :func:`_load_catalog_data`.
+            ValueError: Propagated from `_load_catalog_data`.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         available_datasets, datasets = _load_catalog_data(catalog_path)
@@ -294,15 +294,15 @@ class Catalog(AbstractCatalog[Dataset]):
         )
 
     def get(self, dataset_id: str) -> Dataset:
-        """Return the :class:`Dataset` row for `dataset_id`.
+        """Return the `Dataset` row for `dataset_id`.
 
         Thin typed wrapper over the shared
-        :meth:`~earthlens.base.AbstractCatalog.get_dataset`, which raises
+        `get_dataset`, which raises
         `ValueError` with a did-you-mean hint on an unknown id.
 
         Args:
             dataset_id: ERDDAP dataset id as it appears as a key in
-                :attr:`datasets` (e.g. `"NOAA_DHW"`).
+                `datasets` (e.g. `"NOAA_DHW"`).
 
         Returns:
             Dataset: The curated row.

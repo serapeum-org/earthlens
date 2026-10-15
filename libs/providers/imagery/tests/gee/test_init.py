@@ -146,3 +146,18 @@ class TestPublicSurface:
         """The package has a module docstring describing the backend."""
         doc = importlib.import_module("earthlens.gee").__doc__ or ""
         assert "Earth Engine" in doc and len(doc) > 100
+
+    def test_every_public_name_is_documented(self):
+        """Each `__all__` entry is named in the module docstring.
+
+        Epic 1 added nine modules' worth of public symbols to `__all__` while
+        the docstring's surface list went unchanged, so the whole object API
+        was importable but absent from the package's own front door. Nothing
+        caught that, which is why this holds the two together.
+        """
+        package = importlib.import_module("earthlens.gee")
+        doc = package.__doc__ or ""
+        undocumented = [name for name in package.__all__ if f"`{name}`" not in doc]
+        assert undocumented == [], (
+            f"in __all__ but not in the docstring: {undocumented}"
+        )

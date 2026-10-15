@@ -21,10 +21,10 @@ def unpooled_http_transport(monkeypatch: pytest.MonkeyPatch) -> None:
     `requests.get` — 161 tests would fall through to the real network.
 
     So for the duration of a test the default becomes
-    :class:`~earthlens.base.http.RequestsGet`, which re-resolves `requests` per
+    `RequestsGet`, which re-resolves `requests` per
     call. Every module-level fake keeps driving the transport while production
     keeps its pooled session. A test that needs the shipped default asks for
-    :func:`real_pooled_session`, which switches it back.
+    `real_pooled_session`, which switches it back.
 
     Args:
         monkeypatch: pytest's patcher, so the seam is undone per test.

@@ -324,7 +324,7 @@ class TestRedact:
 
 
 class TestAuthenticationError:
-    """Tests for the :class:`AuthenticationError` exception type."""
+    """Tests for the `AuthenticationError` exception type."""
 
     def test_is_exception_subclass(self):
         """`AuthenticationError` is a plain `Exception` subclass."""

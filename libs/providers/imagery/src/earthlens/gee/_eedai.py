@@ -7,7 +7,7 @@ scene id, removing the `getDownloadURL` size cap and HTTP/zip round-trip. It
 ships behind the `[eedai]` extra, not in the base install, so the backend
 reaches it lazily.
 
-Import it through :func:`import_earthengine_reader` so a missing install
+Import it through `import_earthengine_reader` so a missing install
 surfaces as one clear, actionable error at the fetch seam rather than a bare
 `ModuleNotFoundError` from deep in the pipeline.
 
@@ -80,7 +80,7 @@ def eedai_available() -> bool:
 
     A cheap, side-effect-free probe (it swallows the import error) for code
     that wants to choose the fast-path only when the extra is installed,
-    without forcing the caller to handle :class:`ImportError`.
+    without forcing the caller to handle `ImportError`.
 
     Returns:
         `True` if `pyramids_eo.earthengine` imports, `False` otherwise.

@@ -23,9 +23,9 @@ from earthlens.base.http import HttpClient
 def read_cdsapirc() -> dict[str, str]:
     """Parse `~/.cdsapirc` into a `{url, key}` dict.
 
-    Used by :func:`list_recent_jobs` and :func:`download_job` to
+    Used by `list_recent_jobs` and `download_job` to
     authenticate the bare HTTP calls without spinning up a full
-    :class:`cdsapi.Client`.
+    `cdsapi.Client`.
     """
     cfg: dict[str, str] = {}
     for line in (Path.home() / ".cdsapirc").read_text().splitlines():
@@ -105,7 +105,7 @@ def download_job(
 
     Args:
         job_id: CDS job identifier (e.g. as returned by
-            :func:`list_recent_jobs`).
+            `list_recent_jobs`).
         target: Destination path. Parents are created.
         chunk_size: Streaming chunk size in bytes. Defaults to 1 MiB.
 

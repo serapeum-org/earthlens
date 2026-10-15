@@ -1,26 +1,26 @@
 """Track Earth Engine batch tasks the way `earthlens.ecmwf.jobs` tracks CDS jobs.
 
-The synchronous `export_via="url"` path of :class:`earthlens.gee.GEE`
+The synchronous `export_via="url"` path of `earthlens.gee.GEE`
 produces nothing trackable — once the GeoTIFF arrives there is no
 queue entry to inspect. The asynchronous sinks (`"drive"` / `"gcs"` /
 `"asset"`) do, and Earth Engine exposes two stacked APIs over them
 (`ee.batch.Task.*` and the lower-level `ee.data.{listOperations,
 getOperation, cancelOperation}`). This module normalises both shapes
-into a single frozen :class:`TaskInfo` value object and gives the
-caller four operations on top:
+into a single frozen `TaskInfo` value object and gives the
+caller five operations on top:
 
-* :func:`list_recent_tasks` — every batch task on the current project,
+* `list_recent_tasks` — every batch task on the current project,
   with client-side filters by `state` / age / `task_type` /
   description prefix.
-* :func:`get_task_status` — one task by id.
-* :func:`cancel_task` — cancel a queued or running task by id.
-* :func:`wait_for_task_id` — id-based blocking poll until the task
+* `get_task_status` — one task by id.
+* `cancel_task` — cancel a queued or running task by id.
+* `wait_for_task_id` — id-based blocking poll until the task
   reaches a terminal state.
-* :func:`resolve_destination` — return the `destination_uris` of a
-  completed task as a list (does *not* auto-download Drive / GCS
-  payloads — that's `L2` in the GEE jobs tracking plan).
+* `resolve_destination` — return the `destination_uris` of a
+  completed task as a list, and with `download_to=` pull the
+  Drive / GCS payloads behind them down to local files.
 
-These mirror :mod:`earthlens.ecmwf.jobs` so a user juggling both
+These mirror `earthlens.ecmwf.jobs` so a user juggling both
 backends sees the same surface.
 
 Examples:
@@ -71,8 +71,8 @@ TERMINAL_TASK_STATES: frozenset[str] = frozenset({"COMPLETED", "FAILED", "CANCEL
 #: underlying Google Long-Running-Operations names that
 #: `ee.data.listOperations()` returns (`PENDING` for queued,
 #: `SUCCEEDED` for completed). The adapter folds the LRO names into
-#: their `Task.State` equivalents via :data:`_STATE_ALIASES` so
-#: downstream code sees the single :data:`_VALID_TASK_STATES`
+#: their `Task.State` equivalents via `_STATE_ALIASES` so
+#: downstream code sees the single `_VALID_TASK_STATES`
 #: vocabulary.
 _VALID_TASK_STATES: frozenset[str] = frozenset(
     {
@@ -123,7 +123,7 @@ class TaskInfo(BaseModel):
         description: Human description set when the task was
             submitted (e.g. the `description=` kwarg of
             `ee.batch.Export.image.toDrive`).
-        state: One of :data:`_VALID_TASK_STATES`.
+        state: One of `_VALID_TASK_STATES`.
         task_type: `EXPORT_IMAGE` / `EXPORT_TABLE` / `EXPORT_MAP` /
             `EXPORT_VIDEO` / `EXPORT_CLASSIFIER`.
         create_time: Submission time as a naive UTC datetime.
@@ -241,7 +241,7 @@ def _parse_ms(ms: int | float | None) -> dt.datetime | None:
 
 
 def _op_to_taskinfo(payload: dict[str, Any]) -> TaskInfo:
-    """Build a :class:`TaskInfo` from either of the two EE response shapes.
+    """Build a `TaskInfo` from either of the two EE response shapes.
 
     Two distinguishing markers:
 
@@ -254,11 +254,11 @@ def _op_to_taskinfo(payload: dict[str, Any]) -> TaskInfo:
         payload: One operation dict from either API.
 
     Returns:
-        A :class:`TaskInfo` with normalised fields.
+        A `TaskInfo` with normalised fields.
 
     Raises:
         ValueError: If `payload` is neither shape, or carries a `state`
-            outside :data:`_VALID_TASK_STATES`.
+            outside `_VALID_TASK_STATES`.
     """
     if "metadata" in payload:
         meta = payload.get("metadata") or {}
@@ -375,10 +375,10 @@ def list_recent_tasks(
             caps the returned list, not the underlying pagination.
 
     Returns:
-        A list of :class:`TaskInfo` sorted newest first.
+        A list of `TaskInfo` sorted newest first.
 
     Raises:
-        ValueError: If a passed `state` is not in :data:`_VALID_TASK_STATES`.
+        ValueError: If a passed `state` is not in `_VALID_TASK_STATES`.
     """
     wanted_states: frozenset[str] | None
     if state is None:
@@ -417,7 +417,7 @@ def list_recent_tasks(
 
 
 def get_task_status(task_id: str, project: str | None = None) -> TaskInfo:
-    """Fetch one task by id and return its normalised :class:`TaskInfo`.
+    """Fetch one task by id and return its normalised `TaskInfo`.
 
     Args:
         task_id: The bare task id (e.g. `"SNR3SZ6GNH5LUJQJ52VVNSZT"`)
@@ -426,12 +426,43 @@ def get_task_status(task_id: str, project: str | None = None) -> TaskInfo:
             id. Defaults to the SDK's current project.
 
     Returns:
-        A :class:`TaskInfo`.
+        A `TaskInfo` with the task's `state`, timestamps and, once it has
+        completed, its `destination_uris`.
 
     Raises:
-        Exceptions from the underlying `ee.data.getOperation` call
-        propagate verbatim — most commonly a `googleapiclient.errors.HttpError`
-        with a 404 when the id is unknown to EE.
+        RuntimeError: If `task_id` is a bare id, `project` is `None`, and the
+            current Earth Engine project cannot be resolved from the SDK. The
+            message names `project=` and `ee.Initialize(project=...)` as the
+            two remedies.
+        ee.EEException: Propagated from `ee.data.getOperation` — most commonly
+            a 404 when the id is unknown to Earth Engine. The SDK translates
+            the transport error on the way out (`ee.data._execute_cloud_call`
+            catches `googleapiclient.errors.HttpError` and re-raises
+            `EEException`), so that is the type a caller sees.
+
+    Examples:
+        - Poll one task and read its state (needs an initialised `ee`):
+            ```python
+            >>> from earthlens.gee import get_task_status
+            >>> info = get_task_status("SNR3SZ6GNH5LUJQJ52VVNSZT")  # doctest: +SKIP
+            >>> info.state  # doctest: +SKIP
+            'RUNNING'
+
+            ```
+        - A full operation name is accepted too, and needs no project lookup:
+            ```python
+            >>> from earthlens.gee import get_task_status
+            >>> info = get_task_status(  # doctest: +SKIP
+            ...     "projects/earth-engine-415620/operations/SNR3SZ6GNH5LUJQJ52VVNSZT"
+            ... )
+            >>> info.description  # doctest: +SKIP
+            'srtmgl1_003_elevation_20240101'
+
+            ```
+
+    See Also:
+        wait_for_task_id: Block until the task reaches a terminal state.
+        resolve_destination: Turn a completed task's URIs into local files.
     """
     op_name = _operation_name(task_id, project)
     raw = ee.data.getOperation(op_name)
@@ -441,31 +472,67 @@ def get_task_status(task_id: str, project: str | None = None) -> TaskInfo:
 def cancel_task(task_id: str, project: str | None = None) -> None:
     """Cancel a queued or running task by id.
 
-    A no-op (logs at INFO + returns) when the task is already in a
-    terminal state. Google Cloud's Long-Running-Operations API
-    returns `FAILED_PRECONDITION` (HTTP 400) when asked to cancel an
-    already-finished operation; the wrapper catches that path so a
-    cleanup loop over `list_recent_tasks` can call `cancel_task` on
-    every match without special-casing the terminal ones.
+    A no-op when the task is already in a terminal state, so a cleanup
+    loop over `list_recent_tasks` can call this on every match without
+    special-casing the ones that finished in between. Earth Engine's
+    Long-Running-Operations endpoint provides that itself: cancelling an
+    operation already in `SUCCEEDED` or `CANCELLED` returns normally
+    rather than failing. The `except` clause here is a fallback for an
+    endpoint that answers such a cancel with an error instead, and it
+    downgrades that to an INFO log.
 
     Args:
         task_id: The bare task id or full operation name (see
-            :func:`get_task_status`).
+            `get_task_status`).
         project: Cloud project id to scope to when `task_id` is bare.
 
     Raises:
-        Exceptions from the underlying `ee.data.cancelOperation`
-        propagate verbatim **except** the already-terminal
-        `FAILED_PRECONDITION` HttpError, which is downgraded to an
-        INFO log.
+        RuntimeError: If `task_id` is a bare id, `project` is `None`, and the
+            current Earth Engine project cannot be resolved from the SDK. The
+            message names `project=` and `ee.Initialize(project=...)` as the
+            two remedies.
+        ee.EEException: Propagated from `ee.data.cancelOperation` — most
+            commonly a 404 when the id is unknown to Earth Engine. The SDK
+            translates the transport error on the way out
+            (`ee.data._execute_cloud_call` catches
+            `googleapiclient.errors.HttpError` and re-raises `EEException`),
+            so that is the type a caller sees. Two answers are swallowed
+            instead of raised, whatever their type: one carrying
+            `resp.status == 400`, and one whose text carries
+            `FAILED_PRECONDITION`. Neither is what the SDK hands over today —
+            the translation keeps only the error message, dropping both the
+            response object and the status field — so they stand as the
+            fallback described above rather than as the terminal-task path.
+
+    Examples:
+        - Cancel one task by id (needs an initialised `ee`):
+            ```python
+            >>> from earthlens.gee import cancel_task
+            >>> cancel_task("SNR3SZ6GNH5LUJQJ52VVNSZT")  # doctest: +SKIP
+
+            ```
+        - Sweep every running task without special-casing the ones that
+          finished between the listing and the cancel:
+            ```python
+            >>> from earthlens.gee import cancel_task, list_recent_tasks
+            >>> for task in list_recent_tasks(state="RUNNING"):  # doctest: +SKIP
+            ...     cancel_task(task.id)
+
+            ```
+
+    See Also:
+        list_recent_tasks: Find the ids to cancel.
+        get_task_status: Confirm a task reached `CANCELLED`.
     """
     op_name = _operation_name(task_id, project)
     try:
         ee.data.cancelOperation(op_name)
     except Exception as exc:  # noqa: BLE001 - inspect the HTTP status below
-        # `googleapiclient.errors.HttpError` carries `.resp.status`; on
-        # an already-terminal op we get a 400. Anything else is the
-        # user's problem.
+        # A fallback for an endpoint that errors on an already-terminal
+        # cancel; the live one does not. `googleapiclient.errors.HttpError`
+        # would carry `.resp.status`, but `ee.data` translates it into an
+        # `EEException` holding only the message, so neither test below
+        # matches what the SDK raises. Anything else is the user's problem.
         status = getattr(getattr(exc, "resp", None), "status", None)
         if status == 400 or "FAILED_PRECONDITION" in str(exc):
             logger.info(
@@ -486,7 +553,7 @@ def wait_for_task_id(
 ) -> TaskInfo:
     """Block until a task reaches a terminal state, then return its `TaskInfo`.
 
-    Unlike :func:`earthlens.gee._helpers.wait_for_task` (which needs a
+    Unlike `earthlens.gee._helpers.wait_for_task` (which needs a
     live `ee.batch.Task` handle), this only needs the id, so it works
     for tasks submitted from a previous process / session.
 
@@ -500,7 +567,7 @@ def wait_for_task_id(
         sleep: Sleep implementation (injectable so tests run instantly).
 
     Returns:
-        The final :class:`TaskInfo` (state `"COMPLETED"`).
+        The final `TaskInfo` (state `"COMPLETED"`).
 
     Raises:
         RuntimeError: If the task ends `FAILED` / `CANCELLED` /
@@ -557,7 +624,7 @@ def _pull_gcs(bucket: str, key: str, dest_dir: Path) -> Path:
     — not whatever Application Default Credentials happen to be on
     the box. Requires the EE service account (or whichever identity
     initialised `ee`) to have the `devstorage.full_control` scope;
-    :class:`earthlens.gee.auth.EarthEngineAuth` requests it by
+    `earthlens.gee.auth.EarthEngineAuth` requests it by
     default.
     """
     from google.cloud import storage as _gcs
@@ -623,9 +690,12 @@ def resolve_destination(
     Any URI that matches none of the above is surfaced as-is and
     logged at WARNING so the caller can decide what to do with it.
 
+    Failures from the GCS / Drive clients themselves are not caught, so a
+    download error reaches the caller as whatever that client raised.
+
     Args:
-        task_info: A terminal-state :class:`TaskInfo` (typically from
-            :func:`get_task_status` after :func:`wait_for_task_id`).
+        task_info: A terminal-state `TaskInfo` (typically from
+            `get_task_status` after `wait_for_task_id`).
         download_to: When given, a directory path; downloaded files
             land under it (created on demand). When `None` (the
             default), the helper only returns the URIs verbatim — no
@@ -633,15 +703,53 @@ def resolve_destination(
 
     Returns:
         A list whose entries are either local
-        :class:`pathlib.Path`s (for downloaded files) or URI strings
+        `pathlib.Path`s (for downloaded files) or URI strings
         (for the no-op asset path / unrecognised URIs / when
         `download_to is None`). Ordering matches
         `task_info.destination_uris`.
 
     Raises:
-        Exceptions from the underlying GCS / Drive client calls
-        propagate verbatim. Missing optional deps surface as
-        `ImportError`.
+        ImportError: If the GCS / Drive client the destination needs cannot
+            be imported — `google-cloud-storage` for a `gs://` URI,
+            `google-api-python-client` for a Drive one. Both are declared on
+            the `[gee]` extra, and both are required by `earthengine-api`,
+            whose `ee` this module imports at load, so the path is only
+            reachable on a partially-uninstalled environment.
+
+    Examples:
+        - Look at where a finished task wrote, without downloading anything:
+            ```python
+            >>> from earthlens.gee import get_task_status, resolve_destination
+            >>> info = get_task_status("SNR3SZ6GNH5LUJQJ52VVNSZT")  # doctest: +SKIP
+            >>> resolve_destination(info)  # doctest: +SKIP
+            ['gs://my-bucket/exports/srtm_elevation.tif']
+
+            ```
+        - Pull the same task's files to a local directory and read the first
+          one back:
+            ```python
+            >>> from pathlib import Path
+            >>> from earthlens.gee import get_task_status, resolve_destination
+            >>> info = get_task_status("SNR3SZ6GNH5LUJQJ52VVNSZT")  # doctest: +SKIP
+            >>> paths = resolve_destination(info, download_to="out")  # doctest: +SKIP
+            >>> Path(paths[0]).name  # doctest: +SKIP
+            'srtm_elevation.tif'
+
+            ```
+        - A task that has not finished yet is warned about rather than raised
+          on, and its `destination_uris` are returned as they stand - empty
+          while it is still running, which is why this reads `[]`:
+            ```python
+            >>> from earthlens.gee import get_task_status, resolve_destination
+            >>> running = get_task_status("SNR3SZ6GNH5LUJQJ52VVNSZT")  # doctest: +SKIP
+            >>> resolve_destination(running)  # doctest: +SKIP
+            []
+
+            ```
+
+    See Also:
+        wait_for_task_id: Block until the task is terminal, so the URIs exist.
+        get_task_status: Fetch the `TaskInfo` this takes.
     """
     if task_info.state != "COMPLETED":
         logger.warning(
@@ -728,7 +836,7 @@ def _maybe_initialize_ee() -> None:
 
 
 def _print_task_oneline(t: TaskInfo) -> None:
-    """Render a single :class:`TaskInfo` as one terminal-friendly line.
+    """Render a single `TaskInfo` as one terminal-friendly line.
 
     Uses ASCII `-` for the unstarted-task placeholder so the line
     renders cleanly on Windows `cmd.exe` (cp437 / cp1252), which

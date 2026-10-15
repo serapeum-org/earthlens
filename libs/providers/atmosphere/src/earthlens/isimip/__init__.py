@@ -17,15 +17,15 @@ imports `xarray` / `netCDF4` — reading the NetCDF is pyramids'.
 
 Public surface (re-exported from this package):
 
-* :class:`ISIMIP` — the backend; instantiate with a date window, a bbox, and a
+* `ISIMIP` — the backend; instantiate with a date window, a bbox, and a
   facet set (`dataset` / `gcm` / `scenario` / `variables`), then call
-  :meth:`ISIMIP.download`.
-* :class:`Catalog` — loader for the bundled `isimip_data_catalog.yaml` (config +
+  `ISIMIP.download`.
+* `Catalog` — loader for the bundled `isimip_data_catalog.yaml` (config +
   curated facet vocabulary).
-* :class:`Variable` / :class:`Forcing` / :class:`Scenario` / :class:`Round` — one
+* `Variable` / `Forcing` / `Scenario` / `Round` — one
   curated variable / forcing / scenario / round row.
-* :data:`CATALOG_PATH` — path to the bundled YAML; monkey-patchable in tests.
-* :func:`clear_catalog_cache` — empty the catalog parse cache.
+* `CATALOG_PATH` — path to the bundled YAML; monkey-patchable in tests.
+* `clear_catalog_cache` — empty the catalog parse cache.
 
 Examples:
     - Resolve a curated variable's metadata:

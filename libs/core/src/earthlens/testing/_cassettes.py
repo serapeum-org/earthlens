@@ -12,7 +12,7 @@ Two properties make this safe to keep in the repository:
   silently re-record against the live service; replaying an exchange the
   cassette does not contain is an error, not a quiet network call. Recording
   is a deliberate act (`--record-mode=once`).
-* **Credentials never reach the YAML.** :func:`vcr_config` filters the headers
+* **Credentials never reach the YAML.** `vcr_config` filters the headers
   and query parameters the keyed backends authenticate with, replacing each
   with a placeholder. earthlens backends put keys in both places — wdpa and
   iucn in a header, firms / airnow / nrel in the query string — so both are

@@ -4,7 +4,7 @@
 criteria, population trend, year — from the IUCN Red List v4 API through a
 thin direct `requests` shim (`earthlens.iucn._rest`); there is no mature
 Python v4 client. v4 authenticates with an `Authorization: Bearer <token>`
-header (resolved by :class:`IucnAuth`); the retired v3 `?token=` query param
+header (resolved by `IucnAuth`); the retired v3 `?token=` query param
 is gone.
 
 This is the cluster's only `tabular` backend (`OUTPUT_KIND = "tabular"`):
@@ -185,7 +185,7 @@ class IUCN(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse `[start, end]` into a :class:`TemporalExtent`.
+        """Parse `[start, end]` into a `TemporalExtent`.
 
         The Red List API is not time-filtered, so the window only frames the
         request and the resolution is the sentinel `"all"`.

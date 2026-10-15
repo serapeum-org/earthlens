@@ -3,11 +3,11 @@
 Thin wrapper over the official `argopy` SDK that pulls autonomous-float
 ocean profiles — temperature, salinity, pressure, and (for BGC floats)
 biogeochemical parameters — from the global Argo array, and returns them
-as a long-format :class:`pandas.DataFrame`.
+as a long-format `pandas.DataFrame`.
 
 This is a `tabular` backend: Argo profiles are irregular point data (one
-per float per ~10-day cycle), not a grid, so :data:`ARGO.OUTPUT_KIND` is
-`"tabular"` and the :class:`earthlens.earthlens.EarthLens` facade rejects
+per float per ~10-day cycle), not a grid, so `ARGO.OUTPUT_KIND` is
+`"tabular"` and the `earthlens.earthlens.EarthLens` facade rejects
 an `aggregate=` argument for it (gridded ocean fields are the CMEMS
 path).
 
@@ -21,13 +21,13 @@ is open data — there is no authentication and no `auth` module.
 
 Public surface (re-exported from this package):
 
-* :class:`ARGO` — the backend; instantiate with a date range, a bbox
+* `ARGO` — the backend; instantiate with a date range, a bbox
   (or a `float:` / `profile:` selector in `variables`), then call
-  :meth:`ARGO.download`.
-* :class:`Catalog` — pydantic-backed loader for the bundled
+  `ARGO.download`.
+* `Catalog` — pydantic-backed loader for the bundled
   `argo_data_catalog.yaml` parameter-family vocabulary.
-* :class:`Family` — one dataset family's parameter row.
-* :data:`CATALOG_PATH` — path to the bundled catalog YAML.
+* `Family` — one dataset family's parameter row.
+* `CATALOG_PATH` — path to the bundled catalog YAML.
 """
 
 from __future__ import annotations

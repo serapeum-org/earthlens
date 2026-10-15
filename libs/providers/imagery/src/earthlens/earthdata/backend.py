@@ -14,7 +14,7 @@ vector (GEDI L4A, ICESat-2), and tabular (some ORNL CSV). Every other
 earthlens backend fixes one `OUTPUT_KIND` as a class attribute; this
 one resolves the requested dataset row(s) in `__init__` and copies the
 row's `output_kind` onto `self.OUTPUT_KIND`. The
-:class:`earthlens.earthlens.EarthLens` facade reads that per-instance
+`earthlens.earthlens.EarthLens` facade reads that per-instance
 value at `download()` time to gate `aggregate=` (`G6`): forwarded for
 `"raster"`, rejected for `"vector"` / `"tabular"`.
 
@@ -64,7 +64,7 @@ class Earthdata(AbstractDataSource):
 
     Attributes:
         OUTPUT_KIND: Class default `"raster"`, **overridden per
-            instance** in :meth:`__init__` from the resolved dataset
+            instance** in `__init__` from the resolved dataset
             row's `output_kind` (`G1`). The facade reads this instance
             value to gate `aggregate=`.
     """
@@ -98,8 +98,8 @@ class Earthdata(AbstractDataSource):
 
         Resolves every requested dataset key against the catalog
         **before** calling the parent constructor, so the per-instance
-        :attr:`OUTPUT_KIND` is set from the resolved row(s). The parent
-        `__init__` runs :meth:`_initialize` first (EDL login), so the
+        `OUTPUT_KIND` is set from the resolved row(s). The parent
+        `__init__` runs `_initialize` first (EDL login), so the
         resolution cannot live there — `self.vars` is not yet set at
         that point.
 
@@ -209,7 +209,7 @@ class Earthdata(AbstractDataSource):
     def _unify_output_kind(datasets: list[EarthdataDataset]) -> OutputKind:
         """Return the single `output_kind` shared by every requested row.
 
-        A backend instance carries exactly one :attr:`OUTPUT_KIND`, so
+        A backend instance carries exactly one `OUTPUT_KIND`, so
         a request mixing (say) a raster and a vector dataset is
         ambiguous and rejected here rather than silently honouring the
         first row's kind.
@@ -235,13 +235,13 @@ class Earthdata(AbstractDataSource):
         return kinds.pop()
 
     def _initialize(self):
-        """Build the :class:`EarthdataAuth`; defer the EDL login.
+        """Build the `EarthdataAuth`; defer the EDL login.
 
         Returns `None` — `earthaccess` keeps the authenticated handle on
-        the :class:`EarthdataAuth` instance (and a persisted token), so
+        the `EarthdataAuth` instance (and a persisted token), so
         the parent class binds no opaque `self.client`. The EDL login
         (`EarthdataAuth.configure`, which contacts the auth server) is
-        deferred out of construction: it runs on the first :meth:`_search`
+        deferred out of construction: it runs on the first `_search`
         (CMR granule search authenticates via the idempotent `configure()`),
         so constructing the backend never authenticates — but note that a
         dry-run `search()` does, since CMR access goes through the same
@@ -263,7 +263,7 @@ class Earthdata(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse the date range into a :class:`TemporalExtent`.
+        """Parse the date range into a `TemporalExtent`.
 
         Args:
             start: Inclusive start date as a string.
@@ -300,8 +300,8 @@ class Earthdata(AbstractDataSource):
         scoped to the request bbox and time window. The bounding box is
         passed as the `(west, south, east, north)` tuple CMR expects
         (lon/lat order). Each returned granule becomes one
-        :class:`RemoteProduct` whose `metadata` carries the raw granule
-        handle and its dataset row, so :meth:`_fetch` can group and
+        `RemoteProduct` whose `metadata` carries the raw granule
+        handle and its dataset row, so `_fetch` can group and
         fetch without re-querying.
 
         Returns:
@@ -368,7 +368,7 @@ class Earthdata(AbstractDataSource):
         cloud-hosted and the caller runs in the DAAC's region.
 
         Args:
-            products: The products from :meth:`_search`.
+            products: The products from `_search`.
 
         Returns:
             list[Path]: Local paths of every fetched granule, in
@@ -396,11 +396,11 @@ class Earthdata(AbstractDataSource):
         """Group granule handles by their dataset row, preserving order.
 
         Returns `(dataset, granules)` pairs rather than a dict because
-        :class:`EarthdataDataset` is not hashable (it carries a `bands`
+        `EarthdataDataset` is not hashable (it carries a `bands`
         mapping), and grouping is by object identity.
 
         Args:
-            products: The products from :meth:`_search`.
+            products: The products from `_search`.
 
         Returns:
             list[tuple[EarthdataDataset, list]]: One pair per dataset,
@@ -468,7 +468,7 @@ class Earthdata(AbstractDataSource):
     ) -> list[Path]:
         """Search CMR, fetch the granules, return their local paths.
 
-        Composes :meth:`_search` and :meth:`_fetch` to pull every
+        Composes `_search` and `_fetch` to pull every
         granule matching the request bbox + window to `self.root_dir`
         (or in-region S3 handles). When `aggregate` is given, the
         fetched granules are reduced per-window via the existing
@@ -481,7 +481,7 @@ class Earthdata(AbstractDataSource):
                 on the download / open call, so `False` suppresses the
                 per-granule progress bar.
             aggregate: Optional
-                :class:`earthlens.aggregate.AggregationConfig`. Only
+                `earthlens.aggregate.AggregationConfig`. Only
                 reached for a `"raster"` instance.
 
         Returns:
@@ -509,12 +509,12 @@ class Earthdata(AbstractDataSource):
         * The common Earthdata case is a **stack of single-timestep
           granules** (one file per overpass / half-hour / day, NetCDF
           *or* COG). That whole stack is windowed by
-          :meth:`pyramids.dataset.DatasetCollection.groupby` (the STAC
+          `pyramids.dataset.DatasetCollection.groupby` (the STAC
           path) — one reduced raster per `config.freq` window.
         * The rarer case is a **single granule that already carries a
           multi-timestep time axis inside it** (one NetCDF cube). Its
           internal `time` axis is collapsed by
-          :meth:`pyramids.netcdf.NetCDF.reduce` (the CMEMS path).
+          `pyramids.netcdf.NetCDF.reduce` (the CMEMS path).
 
         A single COG (one timestep, no internal axis) falls through to
         the stack path as a one-element stack (a single window).
@@ -558,7 +558,7 @@ class Earthdata(AbstractDataSource):
         If the granule has no `time` dimension (a single-timestep file, or
         an HDF-EOS file whose time is not a decodable CF dimension), there
         is nothing to collapse — it is treated as a one-element stack and
-        windowed via :meth:`_reduce_stack` instead of raising.
+        windowed via `_reduce_stack` instead of raising.
 
         Args:
             path: A single NetCDF / HDF granule, ideally carrying a

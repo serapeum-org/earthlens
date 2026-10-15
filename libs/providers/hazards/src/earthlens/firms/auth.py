@@ -1,31 +1,31 @@
 """Credentials and `MAP_KEY` resolution for the NASA FIRMS backend.
 
-Hosts :class:`FirmsAuth`, an :class:`earthlens.base.SingleSecretAuth`
+Hosts `FirmsAuth`, an `earthlens.base.SingleSecretAuth`
 subclass that resolves a single FIRMS **`MAP_KEY`** from, in priority
 order, an explicit `api_key=` argument or the `FIRMS_MAP_KEY`
 environment variable. FIRMS requires a (free) key on every request;
 there is no username/password and no saved config-file dance, so this is
-the same single-secret shape as :class:`earthlens.openaq.OpenaqAuth` —
+the same single-secret shape as `earthlens.openaq.OpenaqAuth` —
 mirrored on the `CmemsAuth` resolution chain but without the toolbox
 login.
 
 Unlike OpenAQ (which attaches its key as an `X-API-Key` header via a
 dedicated client), FIRMS sends the `MAP_KEY` as a **path segment** in
 the request URL, so there is no separate client module: the resolved key
-is read back via the :attr:`FirmsAuth.api_key` property and dropped into
-the URL by :class:`earthlens.firms.FIRMS` directly.
+is read back via the `FirmsAuth.api_key` property and dropped into
+the URL by `earthlens.firms.FIRMS` directly.
 
 The shape:
 
-* :class:`FirmsCredentials` is a frozen pydantic value object carrying
-  the optional key as a :class:`pydantic.SecretStr`.
-* :class:`FirmsAuth` binds those credentials and lets the shared
-  :meth:`earthlens.base.SingleSecretAuth.configure` resolve the key —
+* `FirmsCredentials` is a frozen pydantic value object carrying
+  the optional key as a `pydantic.SecretStr`.
+* `FirmsAuth` binds those credentials and lets the shared
+  `earthlens.base.SingleSecretAuth.configure` resolve the key —
   explicit key first, then the `FIRMS_MAP_KEY` env var, then a clear
-  :class:`AuthenticationError` naming the free-registration URL (never
+  `AuthenticationError` naming the free-registration URL (never
   an interactive prompt).
 * `configure()` is idempotent — a second call after
-  :meth:`FirmsAuth.is_authenticated` returns `True` short-circuits, so
+  `FirmsAuth.is_authenticated` returns `True` short-circuits, so
   it is safe to call from long-lived workers.
 """
 
@@ -47,7 +47,7 @@ class AuthenticationError(_BaseAuthenticationError):
     `EarthLens(...).authenticate()`, set the `FIRMS_MAP_KEY` environment
     variable, or request a free key at
     `firms.modaps.eosdis.nasa.gov/api/map_key/`. A subclass of the
-    cross-backend :class:`earthlens.base.AuthenticationError` so callers
+    cross-backend `earthlens.base.AuthenticationError` so callers
     can catch every backend's auth failure with one `except` clause.
     """
 
@@ -57,12 +57,12 @@ class FirmsCredentials(BaseModel):
 
     The key is optional at construction time: `None` means "resolve from
     the `FIRMS_MAP_KEY` environment variable at
-    :meth:`FirmsAuth.configure` time". The real "is there a usable key?"
-    gate is :meth:`FirmsAuth.configure`, not this model.
+    `FirmsAuth.configure` time". The real "is there a usable key?"
+    gate is `FirmsAuth.configure`, not this model.
 
     Attributes:
         api_key: The FIRMS `MAP_KEY`, stored as a
-            :class:`pydantic.SecretStr` so it is never echoed by
+            `pydantic.SecretStr` so it is never echoed by
             `repr(creds)` or in logs. `None` defers resolution to the
             environment variable.
 
@@ -94,21 +94,21 @@ class FirmsCredentials(BaseModel):
 class FirmsAuth(SingleSecretAuth[FirmsCredentials]):
     """Resolve and hold the FIRMS `MAP_KEY`.
 
-    Implements the :class:`earthlens.base.SingleSecretAuth` contract for
+    Implements the `earthlens.base.SingleSecretAuth` contract for
     a single-secret backend: it declares its env var and provider name
     and supplies `_explicit_credential` / `_connect`, while the inherited
-    :meth:`configure` performs the resolution and is idempotent. After a
+    `configure` performs the resolution and is idempotent. After a
     successful `configure()`, the key is available via the
-    :attr:`api_key` property for the backend to drop into the request
+    `api_key` property for the backend to drop into the request
     URL.
 
     The class is a context manager (inherited from
-    :class:`AbstractAuth`): `with FirmsAuth(creds) as auth: ...` calls
+    `AbstractAuth`): `with FirmsAuth(creds) as auth: ...` calls
     `configure()` on enter and the default no-op `close()` on exit —
     there is no per-instance resource to release.
 
     Attributes:
-        _creds: The :class:`FirmsCredentials` passed at construction.
+        _creds: The `FirmsCredentials` passed at construction.
 
     Examples:
         - Resolve an explicit key:
@@ -146,13 +146,13 @@ class FirmsAuth(SingleSecretAuth[FirmsCredentials]):
 
     @property
     def api_key(self) -> str:
-        """The resolved `MAP_KEY`; valid only after :meth:`configure`.
+        """The resolved `MAP_KEY`; valid only after `configure`.
 
         Returns:
             str: The FIRMS `MAP_KEY` string.
 
         Raises:
-            AuthenticationError: When read before :meth:`configure` has
+            AuthenticationError: When read before `configure` has
                 resolved a key.
         """
         if self._key is None:

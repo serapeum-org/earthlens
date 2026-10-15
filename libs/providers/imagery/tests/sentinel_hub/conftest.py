@@ -1,6 +1,6 @@
 """Shared fakes + fixtures for the Sentinel Hub backend tests (no network, no SDK).
 
-The real `sentinelhub` SDK is replaced in `sys.modules` by :class:`FakeSentinelHub`
+The real `sentinelhub` SDK is replaced in `sys.modules` by `FakeSentinelHub`
 so the backend's lazy `import sentinelhub` returns the fake. The fake records
 every request it builds and writes placeholder GeoTIFFs / returns canned stats so
 the per-plane fetchers can be exercised without touching CDSE.

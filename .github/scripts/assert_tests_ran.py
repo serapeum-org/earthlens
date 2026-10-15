@@ -156,7 +156,7 @@ def _per_backend(report: Path) -> dict[str, tuple[int, int]]:
 def _availability_only_backends(report: Path) -> set[str]:
     """Return backends whose skips are *all* upstream-availability skips.
 
-    A skip whose reason carries :data:`_LIVE_SKIP_PREFIX` means the upstream
+    A skip whose reason carries `_LIVE_SKIP_PREFIX` means the upstream
     service was unreachable, not that the backend was never configured. A
     backend that ran nothing and whose every skip is such an availability skip
     is "reachable-but-down", not "silently unconfigured", so the lane must not

@@ -2353,6 +2353,138 @@ class TestGdalGuardDetection:
         assert not _imports_pyramids(ast.parse(source).body[0])
 
 
+def _seed_a_role_tree(root: Path, self_relative: str) -> None:
+    """Write one file per decision the role scan makes, each carrying a role.
+
+    The scan reports a path relative to the root it walks, so the cases have to
+    be laid out as a real tree rather than assembled in memory.
+    """
+    for relative in (
+        "docs/page.md",
+        "libs/core/src/earthlens/module.py",
+        "examples/notebook.ipynb",
+        "docs/notes.txt",
+        "planning/unsearched.md",
+        self_relative,
+    ):
+        target = root / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text("see :meth:`GEE.download` for the call\n", encoding="utf-8")
+    (root / "docs/plain.md").write_text("`Reducer` is the strategy\n", encoding="utf-8")
+
+
+class TestNoRstRoles:
+    """Docs are rendered as Markdown, so an rST cross-reference role is literal text."""
+
+    #: The roles that were swept out of the repository. mkdocstrings parses
+    #: docstring bodies as Markdown with no rST handler, so `:class:`Foo``
+    #: renders as the text `:class:` followed by inline code - and the three
+    #: hand-written Markdown pages that carried them are in the nav, where a
+    #: reader sees the prefix directly.
+    ROLE = re.compile(r":(?:class|meth|func|data|attr|mod|exc|obj|ref|term):`")
+
+    #: Everything the sweep covered: the six source roots plus the hand-written
+    #: docs, the runnable examples and the CI scripts.
+    SEARCHED = ("libs", "docs", "examples", ".github", "tools")
+
+    SUFFIXES = frozenset({".py", ".md", ".ipynb"})
+
+    #: This module is the one file that must contain the pattern, because its
+    #: negative control below spells out real roles. The exemption is checked
+    #: rather than assumed: `test_the_exemption_is_still_needed` fails if this
+    #: file ever stops carrying one, which would mean the control went missing.
+    SELF = Path(__file__).resolve().relative_to(_ROOT).as_posix()
+
+    def _offenders(self) -> list[str]:
+        """Every file under the searched roots that still carries a role."""
+        found: list[str] = []
+        for root in self.SEARCHED:
+            base = _ROOT / root
+            if not base.exists():
+                continue
+            for path in base.rglob("*"):
+                if not path.is_file() or path.suffix not in self.SUFFIXES:
+                    continue
+                try:
+                    text = path.read_text(encoding="utf-8")
+                except UnicodeDecodeError:
+                    continue
+                relative = path.relative_to(_ROOT).as_posix()
+                if relative != self.SELF and self.ROLE.search(text):
+                    found.append(relative)
+        return sorted(found)
+
+    def test_no_file_carries_an_rst_role(self):
+        """The repository is free of rST roles, and stays that way."""
+        assert self._offenders() == [], (
+            "rST cross-reference roles render as literal text here; use single "
+            f"backticks instead: {self._offenders()}"
+        )
+
+    def test_the_exemption_is_still_needed(self):
+        """The one exempted file must be the one that spells roles out."""
+        text = (_ROOT / self.SELF).read_text(encoding="utf-8")
+        assert self.ROLE.search(text), (
+            f"{self.SELF} no longer carries a role, so its exemption now hides "
+            "whatever else lands there - drop it"
+        )
+
+    def test_the_search_reaches_the_files_it_claims_to(self):
+        """The guard above is only evidence if it actually read the repository."""
+        counted = sum(
+            1
+            for root in self.SEARCHED
+            for path in (_ROOT / root).rglob("*")
+            if (_ROOT / root).exists()
+            and path.is_file()
+            and path.suffix in self.SUFFIXES
+        )
+        assert counted > 1000, f"only {counted} files searched; the roots look wrong"
+
+    def test_the_pattern_matches_a_role_and_spares_plain_code(self):
+        """A negative control, so an empty result cannot come from a dead regex."""
+        assert self.ROLE.search(":class:`Reducer`")
+        assert self.ROLE.search("see :meth:`GEE.download` for the call")
+        assert self.ROLE.search(":py:class:`Reducer`")
+        assert not self.ROLE.search("`Reducer` is the strategy")
+        assert not self.ROLE.search("a dict like {'a': 'b'} and `x`")
+
+    def test_the_scan_reports_the_files_that_carry_a_role(self, monkeypatch, tmp_path):
+        """The empty result is evidence only if the scan can report a hit at all.
+
+        The other tests here each check one part in isolation - that the roots
+        hold files, that the regex still matches. None of them runs the
+        reporting path, so a suffix set that excluded everything, a typo in a
+        root name, or an exemption that swallowed the repository would all pass
+        green.
+        """
+        monkeypatch.setattr(sys.modules[__name__], "_ROOT", tmp_path)
+        _seed_a_role_tree(tmp_path, self.SELF)
+        assert self._offenders() == [
+            "docs/page.md",
+            "examples/notebook.ipynb",
+            "libs/core/src/earthlens/module.py",
+        ], (
+            "the scan must report a role in each searched suffix, and skip the "
+            "unsearched suffix, the unsearched root, the exempted file and the "
+            "file that only uses plain inline code"
+        )
+
+    def test_an_undecodable_file_is_skipped_rather_than_failing_the_sweep(
+        self, monkeypatch, tmp_path
+    ):
+        """One unreadable byte must not take the whole sweep down with it."""
+        monkeypatch.setattr(sys.modules[__name__], "_ROOT", tmp_path)
+        (tmp_path / "docs").mkdir(parents=True)
+        (tmp_path / "docs/page.md").write_text(
+            "see :meth:`GEE.download` for the call\n", encoding="utf-8"
+        )
+        (tmp_path / "docs/latin1.md").write_bytes(b"\xff\xfe :class:`Reducer`\n")
+        assert self._offenders() == ["docs/page.md"], (
+            "a file the scan cannot decode must be passed over, not raise"
+        )
+
+
 # ---------------------------------------------------------------------------
 # Test-suite hygiene: the three rules the live-gating seam replaced an idiom
 # for. Same shape as the GDAL rule above -- walk the source, assert something no

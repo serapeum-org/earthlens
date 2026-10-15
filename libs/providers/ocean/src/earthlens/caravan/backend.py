@@ -1,8 +1,8 @@
 """Backend that fetches Caravan large-sample hydrology from Zenodo.
 
 `Caravan(AbstractDataSource)` assembles per-catchment daily **streamflow** plus
-**ERA5-Land** meteorological forcing into a long :class:`pandas.DataFrame`, so
-`OUTPUT_KIND = "tabular"` and the :class:`earthlens.earthlens.EarthLens` facade
+**ERA5-Land** meteorological forcing into a long `pandas.DataFrame`, so
+`OUTPUT_KIND = "tabular"` and the `earthlens.earthlens.EarthLens` facade
 rejects an `aggregate=` argument.
 
 A request names an extension (`dataset="grdc"`), a set of catchments, a time
@@ -159,14 +159,14 @@ class Caravan(AbstractDataSource):
             with_attributes: Merge the static catchment attributes onto every
                 row.
             with_geometry: Attach the basin polygons, returned alongside the
-                frame on :attr:`geometry`.
+                frame on `geometry`.
             allow_full_download: Permit a release that can only be fetched by
                 downloading the whole multi-gigabyte archive. Required for
                 `base` at its default version.
             write_table: Write the assembled frame to `path`. `False` returns
                 it without touching the filesystem.
             client: Transport to read through; injectable for tests. When
-                `None`, a throttled :class:`HttpClient` is built (see
+                `None`, a throttled `HttpClient` is built (see
                 `min_interval`).
             min_interval: Minimum seconds between requests to Zenodo, which
                 rate-limits anonymous callers. Only used when `client` is
@@ -299,7 +299,7 @@ class Caravan(AbstractDataSource):
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
-        """Parse `[start, end]` into a :class:`TemporalExtent`.
+        """Parse `[start, end]` into a `TemporalExtent`.
 
         Caravan members hold a catchment's whole record in one file, so the
         window is a filter applied after the read rather than a per-date loop.
@@ -583,7 +583,7 @@ class Caravan(AbstractDataSource):
         catchment would be far worse than over-reading.
 
         Args:
-            products: The list returned by :meth:`_search`.
+            products: The list returned by `_search`.
 
         Returns:
             list[pd.DataFrame]: One frame per catchment, in the same order.
@@ -602,7 +602,7 @@ class Caravan(AbstractDataSource):
         """Read one catchment from a range-readable archive.
 
         Args:
-            product: One product from :meth:`_search`.
+            product: One product from `_search`.
 
         Returns:
             pandas.DataFrame: The catchment's rows within the request window,
@@ -631,7 +631,7 @@ class Caravan(AbstractDataSource):
 
         Args:
             archive: The opened tar archive.
-            products: The list returned by :meth:`_search`.
+            products: The list returned by `_search`.
 
         Returns:
             list[pd.DataFrame]: One frame per readable catchment.

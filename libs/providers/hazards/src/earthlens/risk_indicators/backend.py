@@ -11,12 +11,12 @@ Two design points carry this backend:
 
 * **Per-instance `OUTPUT_KIND` (`G1`).** The resolved dataset's `output_kind`
   is copied onto `self.OUTPUT_KIND` in `__init__`: `tabular` returns a
-  :class:`pandas.DataFrame`, `vector` returns a pyramids
-  :class:`~pyramids.feature.collection.FeatureCollection`. The
-  :class:`earthlens.earthlens.EarthLens` facade reads the instance attribute to
+  `pandas.DataFrame`, `vector` returns a pyramids
+  `pyramids.feature.collection.FeatureCollection`. The
+  `earthlens.earthlens.EarthLens` facade reads the instance attribute to
   gate `aggregate=` (rejected for both) and to know the return shape.
 * **Conditional, per-source auth (`G3`).** Only a dataset whose provider is
-  `gfw` builds and configures a :class:`GfwAuth`; ThinkHazard and INFORM stay
+  `gfw` builds and configures a `GfwAuth`; ThinkHazard and INFORM stay
   keyless. A missing GFW key surfaces as an `AuthenticationError` naming
   `GFW_API_KEY` on construction of a gfw request.
 
@@ -137,13 +137,13 @@ class RiskIndicators(AbstractDataSource):
 
     Resolves one dataset id to its catalog row, routes the request to that
     row's provider (ThinkHazard / INFORM / GFW), and returns a
-    :class:`pandas.DataFrame` (`tabular`) or a
-    :class:`~pyramids.feature.collection.FeatureCollection` (`vector`) per the
-    row's `output_kind`. The query is a search/fetch split: :meth:`_search`
-    pins the one product (dataset + resolved selector), and :meth:`_fetch`
+    `pandas.DataFrame` (`tabular`) or a
+    `pyramids.feature.collection.FeatureCollection` (`vector`) per the
+    row's `output_kind`. The query is a search/fetch split: `_search`
+    pins the one product (dataset + resolved selector), and `_fetch`
     issues the provider call and parses it.
 
-    Auth is conditional: only a `gfw` dataset builds a :class:`GfwAuth` (`G3`);
+    Auth is conditional: only a `gfw` dataset builds a `GfwAuth` (`G3`);
     ThinkHazard / INFORM need no credentials. `aggregate=` is rejected — these
     are pre-computed indices, not gridded rasters (`G8`).
 
@@ -157,7 +157,7 @@ class RiskIndicators(AbstractDataSource):
     the 2026 release.
 
     Attributes:
-        OUTPUT_KIND: Set **per instance** in :meth:`__init__` from the resolved
+        OUTPUT_KIND: Set **per instance** in `__init__` from the resolved
             dataset's `output_kind` (`"tabular"` or `"vector"`). The facade
             reads it to gate `aggregate=` and to know the return shape.
 
@@ -387,7 +387,7 @@ class RiskIndicators(AbstractDataSource):
                 )
 
     def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Return a global :class:`SpatialExtent` (spatial args ignored, `G7`).
+        """Return a global `SpatialExtent` (spatial args ignored, `G7`).
 
         Args:
             lat_lim: Ignored.
@@ -405,7 +405,7 @@ class RiskIndicators(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse the optional `[start, end]` window into a :class:`TemporalExtent`.
+        """Parse the optional `[start, end]` window into a `TemporalExtent`.
 
         Dates are not part of the request (these datasets are country-indexed),
         so `None` bounds are allowed and yield a `None`-dated extent.
@@ -456,12 +456,12 @@ class RiskIndicators(AbstractDataSource):
         """Route each product to its provider and parse the response.
 
         Args:
-            products: The list from :meth:`_search` (one product).
+            products: The list from `_search` (one product).
 
         Returns:
-            list: One element per product — a :class:`pandas.DataFrame` for a
+            list: One element per product — a `pandas.DataFrame` for a
                 `tabular` dataset, a
-                :class:`~pyramids.feature.collection.FeatureCollection` for a
+                `pyramids.feature.collection.FeatureCollection` for a
                 `vector` one.
         """
         return [self._fetch_one(product) for product in products]
@@ -470,7 +470,7 @@ class RiskIndicators(AbstractDataSource):
         """Fetch and parse one product per its provider.
 
         Args:
-            product: One :class:`RemoteProduct` from :meth:`_search`.
+            product: One `RemoteProduct` from `_search`.
 
         Returns:
             A `DataFrame` (tabular) or `FeatureCollection` (vector).
@@ -536,9 +536,9 @@ class RiskIndicators(AbstractDataSource):
                 so this is a no-op.
 
         Returns:
-            A :class:`pandas.DataFrame` (written to `root_dir` too) for a
+            A `pandas.DataFrame` (written to `root_dir` too) for a
             `tabular` dataset, or an in-memory
-            :class:`~pyramids.feature.collection.FeatureCollection` for a
+            `pyramids.feature.collection.FeatureCollection` for a
             `vector` one.
 
         Raises:
@@ -585,7 +585,7 @@ class RiskIndicators(AbstractDataSource):
         is the current published release — but an explicit `workflow_id=` names
         an API workflow, so it keeps the API. `"release"` and `"api"` force the
         choice; the combinations neither channel can honour are rejected in
-        :meth:`_validate_source`, so this only reports the decision.
+        `_validate_source`, so this only reports the decision.
 
         Returns:
             bool: True when the release workbook is the source for this request.
@@ -603,7 +603,7 @@ class RiskIndicators(AbstractDataSource):
         """Read this dataset's scores from the published release workbook.
 
         Discovers the newest workbook on the JRC results page, caches the
-        download under :attr:`_cache_root`, and reshapes one score column into
+        download under `_cache_root`, and reshapes one score column into
         the canonical table.
 
         Args:

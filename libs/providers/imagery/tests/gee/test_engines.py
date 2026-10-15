@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import sys
 from types import SimpleNamespace
 
 import pytest
@@ -26,6 +27,11 @@ END = dt.datetime(2020, 7, 1)
 
 class _FakeReaderError(Exception):
     """Stands in for `pyramids_eo.errors.ReaderError`, which may not be installed."""
+
+
+def _raise_missing_extra():
+    """Fail the guarded import the way an uninstalled `[eedai]` extra does."""
+    raise ImportError("the pyramids-eo EEDAI reader is required for this path")
 
 
 class _UnwiredEngine(Engine):
@@ -174,6 +180,42 @@ class TestReaderRefusalTypes:
             engines_module, "import_earthengine_reader", lambda: SimpleNamespace()
         )
         assert AuthenticationError not in reader_refusal_types()
+
+    def test_resolves_when_the_extra_is_absent(self, monkeypatch):
+        """A missing `[eedai]` install yields the transport error, not an `ImportError`.
+
+        The call site is the expression of an `except` clause, reached only
+        after a reader call has already raised. Raising there replaces the
+        reader's own failure with an import failure and leaves the handler
+        unable to match anything, so the resolution has to survive the extra
+        being uninstalled.
+        """
+        from earthlens.gee import engines as engines_module
+
+        monkeypatch.setattr(
+            engines_module, "import_earthengine_reader", _raise_missing_extra
+        )
+        types = reader_refusal_types()
+        assert OSError in types, "the transport error stands without a reader to ask"
+        assert all(issubclass(entry, BaseException) for entry in types)
+
+    def test_a_forced_reader_without_the_extra_surfaces_the_install_hint(
+        self, make_gee, fake_ee, monkeypatch
+    ):
+        """`engine="eedai"` with no extra installed ends in the install hint.
+
+        The end-to-end claim behind this branch: what a caller sees is the
+        loader's own `ImportError`, naming the extra to install, and not a
+        second failure raised while evaluating the `except` clause meant to
+        handle it. The extra's absence is simulated at the import system, so
+        the real guarded import runs and every module's bound copy of it
+        behaves exactly as it would on a machine without pyramids-eo.
+        """
+        monkeypatch.setitem(sys.modules, "pyramids_eo", None)
+        monkeypatch.setitem(sys.modules, "pyramids_eo.earthengine", None)
+        gee = make_gee(engine="eedai")
+        with pytest.raises(ImportError, match=r"pip install earthlens\[eedai\]"):
+            gee.download(progress_bar=False)
 
 
 class TestEeEngine:

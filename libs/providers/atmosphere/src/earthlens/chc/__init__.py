@@ -5,9 +5,9 @@ anonymous FTP — the CHIRPS / CHIRP precipitation series, CHIRTSdaily
 / CHIRTSmonthly temperature & humidity, CHIRPS-GEFS ensemble forecasts,
 CHPclim v2 climatology, WBGT (wet bulb globe temperature), SPI / SPEI
 drought indices, and CHC_CMIP6 scenario deltas. Every dataset is
-discoverable through :class:`Catalog`.
+discoverable through `Catalog`.
 
-The class is named :class:`CHIRPS` for brand-recognition reasons —
+The class is named `CHIRPS` for brand-recognition reasons —
 CHIRPS is by far the best-known CHC product — but the same class
 downloads any CHC dataset addressable through the catalog. Pass the
 dataset key under `variables=` (e.g.
@@ -16,21 +16,21 @@ non-CHIRPS product.
 
 Public surface:
 
-* :class:`CHIRPS` — the backend itself; instantiate with a date range,
-  a bbox, and a `variables` spec, then call :meth:`CHIRPS.download` to
+* `CHIRPS` — the backend itself; instantiate with a date range,
+  a bbox, and a `variables` spec, then call `CHIRPS.download` to
   fetch the data.
-* :class:`Catalog` — pydantic-backed loader for the per-family
+* `Catalog` — pydantic-backed loader for the per-family
   `catalog/*.yaml` files (split GEE-style: `chirps-2.0.yaml`,
   `chirps-v3.yaml`, `chirp.yaml`, `chirts.yaml`, `gefs.yaml`,
   `indices.yaml`, `cmip6.yaml`, `derived.yaml` (the small auxiliary
   product families -- CHPclim, WBGT, CentennialTrends), plus
   `_index.yaml` for the informational index + regions block).
-  Exposes the YAML's structure as :attr:`Catalog.available_datasets`,
-  :attr:`Catalog.available_regions`, and :attr:`Catalog.datasets`.
-* :class:`Dataset` — one CHC dataset's section inside the catalog
+  Exposes the YAML's structure as `Catalog.available_datasets`,
+  `Catalog.available_regions`, and `Catalog.datasets`.
+* `Dataset` — one CHC dataset's section inside the catalog
   (FTP path, spatial/temporal metadata, variables map).
-* :class:`Variable` — one variable's metadata (units, type, description).
-* :data:`CATALOG_PATH` — absolute path to the bundled YAML catalog;
+* `Variable` — one variable's metadata (units, type, description).
+* `CATALOG_PATH` — absolute path to the bundled YAML catalog;
   monkey-patchable to redirect the loader.
 """
 

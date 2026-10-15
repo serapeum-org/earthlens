@@ -9,7 +9,7 @@ cannot be faked with them at all), some return `{}` for a missing JSON body
 where the real `requests` raises.
 
 This is the superset, with the real library's behaviour where the copies
-disagreed. It pairs with :func:`fake_http`, which routes URLs to responses on
+disagreed. It pairs with `fake_http`, which routes URLs to responses on
 the `requests` module seam the autouse transport fixture guarantees.
 
 Import from `earthlens.testing`, not from here.
@@ -35,16 +35,16 @@ class FakeResponse:
     Args:
         status_code: The HTTP status.
         json: The decoded JSON body. `None` means "no JSON body", and
-            :meth:`json` then raises the way `requests` does.
+            `json` then raises the way `requests` does.
         text: The body as text. Defaults to the decoded `content`, or to the
             serialised `json` payload, or `""`.
         content: The body as bytes. Defaults to the encoded `text`.
         headers: Response headers.
         url: The URL the response came from.
         reason: The HTTP reason phrase.
-        chunks: What :meth:`iter_content` should yield, for a streaming body
+        chunks: What `iter_content` should yield, for a streaming body
             whose chunk boundaries matter. Defaults to slicing `content`.
-        raises: An exception :meth:`raise_for_status` should raise instead of
+        raises: An exception `raise_for_status` should raise instead of
             deriving one from the status. Two of the replaced doubles existed
             only to carry a backend's own typed error this way.
 
@@ -191,7 +191,7 @@ class FakeHttp:
             fragment: A substring matched against the requested URL. Routes
                 are tried in registration order, so register the specific
                 ones first.
-            response: A :class:`FakeResponse`, an exception instance to raise,
+            response: A `FakeResponse`, an exception instance to raise,
                 or a callable taking `(url, **kwargs)`.
 
         Returns:
@@ -204,7 +204,7 @@ class FakeHttp:
         """Answer every otherwise-unrouted URL with `response`.
 
         Args:
-            response: As :meth:`route`.
+            response: As `route`.
 
         Returns:
             This router, so it can be chained.

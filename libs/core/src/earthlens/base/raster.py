@@ -124,7 +124,7 @@ def netcdf_variable_to_raster(
         epsg: The EPSG code to tag the raster with; the variable's own `epsg`
             is used when `None`.
         wrap_longitude: When `True`, wrap a whole-globe 0-360 longitude grid to
-            -180..180 (see :func:`array_to_raster`).
+            -180..180 (see `array_to_raster`).
 
     Returns:
         A new `pyramids.Dataset` for the variable.

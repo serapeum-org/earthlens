@@ -1,10 +1,10 @@
 """Pure request helpers for the Argo float backend.
 
-Stateless, network-free helpers the :class:`earthlens.argo.backend.ARGO`
+Stateless, network-free helpers the `earthlens.argo.backend.ARGO`
 backend composes: parsing the selection mode out of `variables`
-(:func:`parse_selection`), building the 8-element `argopy`
-`.region([...])` box (:func:`region_box`), and the zero-row fallback for
-an empty fetch (:func:`empty_canonical`). Keeping these here — free of
+(`parse_selection`), building the 8-element `argopy`
+`.region([...])` box (`region_box`), and the zero-row fallback for
+an empty fetch (`empty_canonical`). Keeping these here — free of
 any `argopy` import — lets them be unit-tested without the optional
 `[argo]` extra installed.
 """
@@ -49,7 +49,7 @@ ARGO_COLUMNS: list[str] = [
 
 @dataclass(frozen=True)
 class Selection:
-    """Which `argopy` selection method :meth:`ARGO._fetch` should call.
+    """Which `argopy` selection method `ARGO._fetch` should call.
 
     Attributes:
         kind: `"region"` (bbox + depth + time), `"float"` (one or more
@@ -184,7 +184,7 @@ def empty_canonical(columns: list[str] = ARGO_COLUMNS) -> pd.DataFrame:
 
     Args:
         columns: The columns to give the empty frame; defaults to
-            :data:`ARGO_COLUMNS`.
+            `ARGO_COLUMNS`.
 
     Returns:
         pd.DataFrame: An empty frame with exactly `columns`.

@@ -3,11 +3,11 @@
 One idiom for "do not run this live test right now", so both masked-lane guards
 can tell an upstream outage from an unconfigured backend:
 
-- :func:`require_reachable` (and the `requires_host` marker that calls it) —
+- `require_reachable` (and the `requires_host` marker that calls it) —
   probe a host once per session and skip, prefixed, when it is unreachable.
-- :func:`skip_on_upstream` — classify an exception a test caught itself and
+- `skip_on_upstream` — classify an exception a test caught itself and
   either skip, prefixed, or re-raise it unchanged.
-- :func:`skip_live_unavailable` — the raw prefixed skip the two above build on.
+- `skip_live_unavailable` — the raw prefixed skip the two above build on.
 
 Split out of the former single-module `earthlens.testing`; import from
 `earthlens.testing`, not from here.
@@ -151,8 +151,8 @@ _LIVE_SKIP_PREFIX = "live e2e skipped — "
 def skip_live_unavailable(reason: str) -> NoReturn:
     """Skip the current live `e2e` test as an upstream-availability failure.
 
-    Stamps the same `_LIVE_SKIP_PREFIX` the automatic :func:`pytest_runtest_call`
-    hook uses, so the masked-lane guard in :func:`pytest_sessionfinish` still
+    Stamps the same `_LIVE_SKIP_PREFIX` the automatic `pytest_runtest_call`
+    hook uses, so the masked-lane guard in `pytest_sessionfinish` still
     counts the skip. A backend that raises a typed availability error which its
     own e2e test catches — rather than letting the shared hook classify the raw
     exception — calls this instead of a bare `pytest.skip`, so the guard stays
@@ -170,7 +170,7 @@ def skip_live_unavailable(reason: str) -> NoReturn:
 def skip_on_upstream(exc: BaseException) -> NoReturn:
     """Re-raise `exc` unless it is an availability failure, which skips, prefixed.
 
-    The counterpart to :func:`require_reachable` for the case a test catches its
+    The counterpart to `require_reachable` for the case a test catches its
     own exception: the host answered, but the call failed. Replaces the
     `pytest.skip(f"… unavailable: {exc}")` idiom, which emits an *unprefixed*
     skip that both masked-lane guards read as "this backend was never
@@ -181,7 +181,7 @@ def skip_on_upstream(exc: BaseException) -> NoReturn:
         exc: The exception the test caught.
 
     Raises:
-        Skipped: When :func:`is_upstream_unavailable` recognises `exc`.
+        Skipped: When `is_upstream_unavailable` recognises `exc`.
         BaseException: `exc` itself, unchanged, when it does not.
 
     Examples:
@@ -391,7 +391,7 @@ def pytest_collection_modifyitems(
     Two jobs in one hook because pytest allows a conftest only one
     `pytest_collection_modifyitems`, and both belong to every member:
 
-    1. :func:`~earthlens.testing.tag_items_by_directory` gives each test its
+    1. `tag_items_by_directory` gives each test its
        backend marker, so `-m <backend>` selects that backend's whole subtree —
        including the `test_cli.py` that used to carry only `cli`.
     2. A `quarantined` test is skipped unless the `-m` expression names the

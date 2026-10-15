@@ -7,8 +7,8 @@ stream gauges and many more groundwater / water-quality sites across the
 United States. A request is a bbox (or explicit `sites=`) + a time
 window + a list of **NWIS parameter codes** (`["00060"]` discharge,
 `["00065"]` gage height, …); the backend returns a per-site time-series
-as a long-format :class:`pandas.DataFrame`, so `OUTPUT_KIND = "tabular"`
-and the :class:`earthlens.earthlens.EarthLens` facade rejects an
+as a long-format `pandas.DataFrame`, so `OUTPUT_KIND = "tabular"`
+and the `earthlens.earthlens.EarthLens` facade rejects an
 `aggregate=` argument (use the server-side `service="statistics"`
 rollup instead).
 
@@ -30,7 +30,7 @@ selects which:
 
 Authentication is an **optional** Personal Access Token (the
 `API_USGS_PAT` env var or the `api_token=` argument); anonymous access
-works at lower rate limits. See :class:`earthlens.usgs_water.auth`.
+works at lower rate limits. See `earthlens.usgs_water.auth`.
 """
 
 from __future__ import annotations
@@ -58,7 +58,7 @@ OutputFormat = Literal["csv", "parquet"]
 
 #: Every NWIS / Water Data service plane the backend can address. The
 #: `service=` argument is validated against this tuple; the per-module
-#: function names live in :data:`earthlens.usgs_water._helpers._SERVICE_FN`.
+#: function names live in `earthlens.usgs_water._helpers._SERVICE_FN`.
 SERVICES: tuple[str, ...] = (
     "daily",
     "instantaneous",
@@ -86,7 +86,7 @@ _SITE_KEYED_SERVICES: frozenset[str] = frozenset({"peaks", "ratings"})
 #: above plus `statistics` (the `get_stats_date_range` / `get_stats`
 #: functions take a site, not a bbox, so a bbox-only statistics request
 #: would be spatially unbounded). `statistics` still uses `variables`
-#: (parameter codes), so it is not in :data:`_SITE_KEYED_SERVICES`.
+#: (parameter codes), so it is not in `_SITE_KEYED_SERVICES`.
 _SITES_REQUIRED_SERVICES: frozenset[str] = _SITE_KEYED_SERVICES | {"statistics"}
 
 #: Default parameter code when `variables` is empty — discharge (cfs).
@@ -130,13 +130,13 @@ class USGSWater(AbstractDataSource):
     Fetches per-site water observations for a bbox / explicit sites /
     date window / parameter-code list through the same `download()`
     shape every other earthlens backend uses, and returns a
-    long-format :class:`pandas.DataFrame` (one row per observation).
-    The query is a search/fetch split: :meth:`_search` enumerates the
-    monitoring locations to pull, and :meth:`_fetch` pulls each
+    long-format `pandas.DataFrame` (one row per observation).
+    The query is a search/fetch split: `_search` enumerates the
+    monitoring locations to pull, and `_fetch` pulls each
     service's observations and normalises them to one tidy long schema.
 
     The `service=` argument selects the NWIS / Water Data plane (see
-    :data:`SERVICES`); `api=` selects the modern / legacy endpoint with
+    `SERVICES`); `api=` selects the modern / legacy endpoint with
     a 429 auto-fallback (see the module docstring). Authentication is
     an optional Personal Access Token.
 
@@ -189,7 +189,7 @@ class USGSWater(AbstractDataSource):
             api_token: Optional USGS Personal Access Token; falls back
                 to the `API_USGS_PAT` env var, then anonymous access.
             service: The NWIS / Water Data plane to query — one of
-                :data:`SERVICES`. Defaults to `"daily"`.
+                `SERVICES`. Defaults to `"daily"`.
             sites: Explicit USGS site number(s) to query, bypassing the
                 bbox site discovery. **Required** for the services that
                 have no spatial (bbox) filter — `peaks`, `ratings`, and
@@ -268,7 +268,7 @@ class USGSWater(AbstractDataSource):
         )
 
     def _initialize(self):
-        """Build :class:`UsgsWaterAuth` and resolve the optional token.
+        """Build `UsgsWaterAuth` and resolve the optional token.
 
         Returns `None` (the SDK has no global client object; the token,
         when present, is exported to `API_USGS_PAT` by the auth).
@@ -290,7 +290,7 @@ class USGSWater(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse the `[start, end]` window into a :class:`TemporalExtent`.
+        """Parse the `[start, end]` window into a `TemporalExtent`.
 
         The whole window is fetched per site in one call (NWIS takes a
         start/end range), so there is no per-date loop; `dates`
@@ -335,7 +335,7 @@ class USGSWater(AbstractDataSource):
         """Return the request bbox as modern `[west, south, east, north]`.
 
         The legacy `"west,south,east,north"` string form is built inline by
-        :func:`earthlens.usgs_water._helpers.query_kwargs` from this list.
+        `earthlens.usgs_water._helpers.query_kwargs` from this list.
         """
         return [self.space.west, self.space.south, self.space.east, self.space.north]
 
@@ -425,10 +425,10 @@ class USGSWater(AbstractDataSource):
 
         Widens the inherited `-> list[Path]` contract: a tabular
         backend returns in-memory long-format frames, not file paths
-        (the write happens in :meth:`download` via :meth:`_write_table`).
+        (the write happens in `download` via `_write_table`).
 
         Args:
-            products: The list returned by :meth:`_search`.
+            products: The list returned by `_search`.
 
         Returns:
             list[pd.DataFrame]: One canonical long-schema frame per
@@ -440,7 +440,7 @@ class USGSWater(AbstractDataSource):
         """Fetch one product's service frame and normalise it.
 
         Args:
-            product: One :class:`RemoteProduct` from :meth:`_search`.
+            product: One `RemoteProduct` from `_search`.
 
         Returns:
             pd.DataFrame: The canonical long-schema frame for this

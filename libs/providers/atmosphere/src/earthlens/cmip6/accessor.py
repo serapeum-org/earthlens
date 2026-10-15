@@ -6,16 +6,16 @@ itself never imports `xarray` / `zarr` / `gcsfs`; pyramids reads the store throu
 GDAL's `/vsigs/` multidimensional driver (no gcsfs needed), and this module only:
 
 * rewrites a `gs://cmip6/<path>/` `zstore` URI to the GDAL `ZARR:"/vsigs/..."`
-  form (:func:`zstore_to_vsi`);
+  form (`zstore_to_vsi`);
 * forces **anonymous** GCS access with `GS_NO_SIGN_REQUEST` around every read
-  (:func:`anonymous_gcs`) — pyramids' `anon=True` only sets the AWS flag, and
+  (`anonymous_gcs`) — pyramids' `anon=True` only sets the AWS flag, and
   this machine may carry ambient GCS credentials, so the flag is set explicitly;
 * maps a CF `[start, end]` **date window to an integer time-index range**
-  (:func:`resolve_time_window`) — the gridded reader selects time by integer
+  (`resolve_time_window`) — the gridded reader selects time by integer
   index, and `LabeledDataset.select_time` is the public path that decodes CF
   time / non-standard calendars;
 * reads the gridded `(time, bbox)` slice and writes it to NetCDF
-  (:func:`write_subset`), a windowed read that fetches only the requested cells.
+  (`write_subset`), a windowed read that fetches only the requested cells.
 
 The pyramids reader classes are imported lazily behind an install-hint so the
 package imports (and the backend constructs) without a read ever happening.
@@ -148,7 +148,7 @@ def resolve_time_window(
 ) -> tuple[int, int] | None:
     """Map a CF `[start, end]` date window to an integer time-index range.
 
-    The gridded reader (:func:`write_subset`) selects time by **integer index**;
+    The gridded reader (`write_subset`) selects time by **integer index**;
     CMIP6 ARCO stores do not surface CF time units through GDAL's multidim path,
     but `LabeledDataset.select_time` decodes the store's own time `units` +
     `calendar` (so `noleap` / `360_day` work). The half-open window is recovered
@@ -229,7 +229,7 @@ def write_subset(
 
     Opens the resolved Zarr store through pyramids' `NetCDF` reader (GDAL
     `/vsigs/`, anonymous) and writes the windowed slice — only the requested
-    cells are fetched. The read + write both run inside :func:`anonymous_gcs`.
+    cells are fetched. The read + write both run inside `anonymous_gcs`.
 
     Args:
         zstore: The `gs://cmip6/...` store URI.

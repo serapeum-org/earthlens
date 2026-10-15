@@ -351,7 +351,7 @@ class SoilGrids(AbstractDataSource):
             product: The `RemoteProduct` whose `metadata` carries the resolved
                 property row + the `(depth, quantile)` cell. The scratch
                 directory the write is staged in before the atomic rename is
-                read from `self._tmp_dir`, which :meth:`_api` creates and
+                read from `self._tmp_dir`, which `_api` creates and
                 removes around the whole batch.
 
         Returns:

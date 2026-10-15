@@ -105,7 +105,7 @@ def _parse_pollutants(files: list[Path]) -> dict[str, Pollutant]:
 
     Raises:
         ValueError: If the `pollutants:` block is missing or empty, or a row
-            fails :class:`Pollutant` validation.
+            fails `Pollutant` validation.
     """
     catalog_path = files[0]
     data = load_yaml_strict(catalog_path) or {}

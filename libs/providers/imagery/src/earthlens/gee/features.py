@@ -43,7 +43,7 @@ def create_geometry(
         NotImplementedError: If `shapely_geometry` is any geometry type
             other than `Polygon` or `Point` (e.g. `LineString`,
             `MultiPoint`, `GeometryCollection`). Use
-            :func:`create_feature` for `MultiPolygon` inputs — it
+            `create_feature` for `MultiPolygon` inputs — it
             explodes them into per-polygon rows before calling this.
 
     Examples:
@@ -100,7 +100,7 @@ def create_feature(
     """Build an `ee.FeatureCollection` from a `GeoDataFrame`.
 
     Each row becomes an `ee.Feature` whose geometry is the converted
-    Shapely geometry (via :func:`create_geometry`) and whose properties
+    Shapely geometry (via `create_geometry`) and whose properties
     are that row's non-geometry columns (optionally narrowed to
     `columns`). A row holding a `MultiPolygon` is exploded into one
     feature per constituent polygon.

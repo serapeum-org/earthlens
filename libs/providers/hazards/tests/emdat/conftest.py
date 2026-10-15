@@ -172,8 +172,8 @@ class FakeHttp:
     """Stand-in for `HttpClient` that serves a canned listing and a local file.
 
     Attributes:
-        json_payload: What :meth:`get_json` returns.
-        source: File copied into place by :meth:`download`.
+        json_payload: What `get_json` returns.
+        source: File copied into place by `download`.
         calls: Every `(method, url)` pair seen, for asserting the request shape.
     """
 
@@ -215,9 +215,9 @@ class FakeEarthaccess:
     """Stand-in for the `earthaccess` module used by the GDIS download path.
 
     Attributes:
-        granules: What :meth:`search_data` returns.
-        source: File copied into `local_path` by :meth:`download`.
-        searched: Keyword arguments seen by :meth:`search_data`.
+        granules: What `search_data` returns.
+        source: File copied into `local_path` by `download`.
+        searched: Keyword arguments seen by `search_data`.
     """
 
     def __init__(self, granules: list[FakeGranule], source: Path | None = None) -> None:

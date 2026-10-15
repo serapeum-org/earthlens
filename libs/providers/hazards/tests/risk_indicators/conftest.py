@@ -79,7 +79,7 @@ def make_release_workbook():
     """Return the stand-in release-workbook builder, for a test that needs its own.
 
     Returns:
-        Callable: :func:`build_release_workbook`.
+        Callable: `build_release_workbook`.
     """
     return build_release_workbook
 

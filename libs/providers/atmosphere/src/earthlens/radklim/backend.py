@@ -116,9 +116,9 @@ class RADKLIM(AbstractDataSource):
                 the current UTC time (matching the naive-UTC granule timestamps);
                 an explicit value pins it (a deterministic clock for reproducible
                 enumeration) and a tz-aware value is normalised to naive UTC.
-            catalog: Optional pre-built :class:`Catalog`; defaults to the bundled
+            catalog: Optional pre-built `Catalog`; defaults to the bundled
                 catalog.
-            client: Optional :class:`~earthlens.base.HttpClient`; defaults to a
+            client: Optional `HttpClient`; defaults to a
                 fresh one. Inject one to share a session or supply a fake
                 transport.
 
@@ -372,7 +372,7 @@ class RADKLIM(AbstractDataSource):
         rotated out mid-run) is logged and skipped.
 
         Args:
-            products: The granules from :meth:`_search`.
+            products: The granules from `_search`.
 
         Returns:
             list[Path]: The written granule paths, in order.
@@ -390,8 +390,8 @@ class RADKLIM(AbstractDataSource):
         """Download one granule, or return `None` when it is not published.
 
         Args:
-            product: One :class:`~earthlens.base.RemoteProduct` from
-                :meth:`_search`.
+            product: One `RemoteProduct` from
+                `_search`.
 
         Returns:
             Path | None: The written path, or `None` when the URL 404s.
@@ -423,7 +423,7 @@ class RADKLIM(AbstractDataSource):
     def download(self, progress_bar: bool = True) -> list[Path]:
         """Fetch the requested granules and return the written paths.
 
-        Runs the cheap :meth:`_search` (granule enumeration) then :meth:`_fetch`,
+        Runs the cheap `_search` (granule enumeration) then `_fetch`,
         streaming each granule to `path`.
 
         Args:

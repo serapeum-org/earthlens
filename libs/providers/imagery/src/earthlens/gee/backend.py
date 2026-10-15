@@ -1,4 +1,4 @@
-"""Google Earth Engine backend — :class:`GEE`, an :class:`AbstractDataSource`.
+"""Google Earth Engine backend — `GEE`, an `AbstractDataSource`.
 
 Downloads imagery from Google Earth Engine. A request is `{asset_id:
 [band, ...], ...}` (the addressable units of an EE dataset are *bands*,
@@ -6,17 +6,17 @@ and one image carries many at once), plus a date range, a bbox (or a
 `GeoDataFrame` region), a temporal-compositing resolution
 (`"raw"`/`"daily"`/`"monthly"`/`"yearly"`), and an output pixel `scale`
 in metres. The asset ids and band metadata are resolved through
-:class:`earthlens.gee.Catalog` (loaded from the per-category YAMLs
+`earthlens.gee.Catalog` (loaded from the per-category YAMLs
 under `src/earthlens/gee/catalog/`).
 
 Per `(asset, band-set, time-bucket)` the pipeline is:
 
-* :meth:`_build_collection` — `ee.ImageCollection(asset_id)` (or the
+* `_build_collection` — `ee.ImageCollection(asset_id)` (or the
   single `ee.Image` wrapped in one), `.filterDate(...)`,
   `.filterBounds(region)`, then any constructor `filters` and the
   per-image `cloud_mask` (`.map`-applied), and finally `.select(bands)`.
   Pure: no I/O.
-* :meth:`_composite` — split the request window into buckets at the
+* `_composite` — split the request window into buckets at the
   requested cadence and collapse each with the dataset's
   `default_reducer` (or the constructor `reducer` override) — `mean`
   for continuous fields / rates, `median` for cloud-screened optical
@@ -25,9 +25,9 @@ Per `(asset, band-set, time-bucket)` the pipeline is:
 * the EEDAI fast-path — a raw read of a materialised asset, or a
   client-side composite of an `ImageCollection`, served by the pyramids-eo
   reader in EPSG:4326 or a metre-based projected CRS; see
-  :meth:`_eedai_eligible` for what qualifies and :meth:`_eedai_verdict` for
+  `_eedai_eligible` for what qualifies and `_eedai_verdict` for
   what it costs.
-* :meth:`_api` — export the bucket image via the configured
+* `_api` — export the bucket image via the configured
   `export_via`: `"url"` (the default) computes the request's pixel
   dimensions and refuses if either axis exceeds Earth Engine's 32768-px
   synchronous limit (a clear, actionable `ValueError`), else
@@ -42,11 +42,11 @@ Per `(asset, band-set, time-bucket)` the pipeline is:
   GCS bucket for the caller to pull).
 
 Authentication is a one-time `ee.Initialize` against a *registered*
-Cloud project, performed by :meth:`_initialize` via
-:class:`earthlens.gee.auth.EarthEngineAuth` (service-account key) or, if
+Cloud project, performed by `_initialize` via
+`earthlens.gee.auth.EarthEngineAuth` (service-account key) or, if
 no key is given, an interactive `ee.Authenticate()` against an explicit
 `project`. Credential / registration failures surface as
-:class:`AuthenticationError`.
+`AuthenticationError`.
 """
 
 from __future__ import annotations
@@ -138,7 +138,7 @@ _DEFAULT_HTTP_TIMEOUT_S: float = 300.0
 _EEDAI_NATIVE_CRS: str = "EPSG:4326"
 
 #: Output pixels per side of one streamed tile when an EEDAI read is too big to
-#: materialise in one piece. It is only a ceiling: :meth:`GEE._eedai_single_image_plan`
+#: materialise in one piece. It is only a ceiling: `GEE._eedai_single_image_plan`
 #: shrinks it until one tile's *native* read fits both budgets below, since the
 #: reader materialises that native window in memory per tile.
 _EEDAI_TILE_PIXELS: int = 2048
@@ -257,7 +257,7 @@ CollectionFilter = Callable[[ee.ImageCollection], ee.ImageCollection]
 # ~2-5 s `reduceColumns(minMax)` round trip per asset — far too
 # expensive to repeat for a second `GEE(...)` construction against the
 # same asset. The cache mirrors `_CATALOG_CACHE` / `_PROVIDERS_CACHE`
-# in `catalog.py`; clear it via :func:`clear_extent_cache` (mostly for
+# in `catalog.py`; clear it via `clear_extent_cache` (mostly for
 # tests).
 _EXTENT_CACHE: dict[str, tuple[dt.datetime | None, dt.datetime | None]] = {}
 
@@ -265,7 +265,7 @@ _EXTENT_CACHE: dict[str, tuple[dt.datetime | None, dt.datetime | None]] = {}
 def clear_extent_cache() -> None:
     """Forget every cached EE-discovered temporal extent.
 
-    Mirrors :func:`earthlens.gee.catalog.clear_catalog_cache` for the
+    Mirrors `earthlens.gee.catalog.clear_catalog_cache` for the
     `discover_extent=True` cache. Primarily useful in tests that need
     a fresh cache between runs (or when the EE-side data was updated
     and the in-process cache has gone stale).
@@ -286,7 +286,7 @@ def _validate_pure_config(
     without it (bad date format, unknown `temporal_resolution`,
     `start > end`) should fail *before* paying that cost — otherwise
     the user waits 3 seconds to learn they typed `"2024-13-01"`. This
-    helper duplicates the cheap checks from :meth:`_check_input_dates`
+    helper duplicates the cheap checks from `_check_input_dates`
     so they fire pre-`super().__init__()`; the parent still runs the
     same checks again, but by then they always pass.
     """
@@ -344,7 +344,7 @@ def _rename_when_unlocked(source: Path, target: Path) -> None:
 def _discard_quietly(path: Path) -> None:
     """Remove a staging file, tolerating a lock that outlives its reader.
 
-    Same lingering-handle hazard as :func:`_rename_when_unlocked`, but the
+    Same lingering-handle hazard as `_rename_when_unlocked`, but the
     stakes are reversed: this runs after the real output is already in place,
     so a failure here costs a stray temp file while raising would mask a
     successful download. Sidecars GDAL may have written next to the raster
@@ -578,7 +578,10 @@ def _reader_errors(reader: Any) -> tuple[type[BaseException], ...]:
         from pyramids_eo.errors import ReaderError
 
         candidates.append(ReaderError)
-    except ImportError:  # pragma: no cover - the extra is installed wherever this runs
+    # Reached whenever the `[eedai]` extra is absent, which is a supported
+    # lane - `earthlens[all]` omits it, so the wheel job runs here - but not
+    # one coverage is measured in, since every dev install pins pyramids-eo.
+    except ImportError:  # pragma: no cover - needs the extra uninstalled
         pass
     for candidate in candidates:
         if isinstance(candidate, type) and issubclass(candidate, BaseException):
@@ -634,7 +637,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         start: Inclusive start date string (parsed with `fmt`).
         end: Inclusive end date string.
         variables: Mapping `{asset_id: [band, ...]}` — each `asset_id`
-            must be a key of :attr:`Catalog.datasets` and each band a
+            must be a key of `Catalog.datasets` and each band a
             band of that dataset (see `src/earthlens/gee/catalog/`).
         lat_lim: `[lat_min, lat_max]` in degrees.
         lon_lim: `[lon_min, lon_max]` in degrees.
@@ -662,7 +665,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             `variance` / `count`, which collapse pixels inside a region rather
             than images in a collection; naming one here is refused at
             construction, since there is nothing for it to composite. Pass
-            those to :func:`~earthlens.gee.sampling.sample_points` instead.
+            those to `sample_points` instead.
         export_via: How to get pixels out — `"url"` (synchronous
             `getDownloadURL`, capped at 32768 px per axis; the default),
             `"drive"` (asynchronous `ee.batch.Export.image.toDrive`;
@@ -704,20 +707,20 @@ class GEE(LazyClientMixin, AbstractDataSource):
             each task reaches a terminal state. Defaults to `True`
             (the historical behaviour — returns the destination
             string). When `False`, each task is started and
-            `download()` returns a list of :class:`TaskInfo` objects
+            `download()` returns a list of `TaskInfo` objects
             so the caller can track them asynchronously via
-            :mod:`earthlens.gee.jobs`. Ignored for `export_via="url"`,
+            `earthlens.gee.jobs`. Ignored for `export_via="url"`,
             which is always synchronous.
         cloud_mask: Optional per-image mask `.map`-applied to every image
             in the stack *before* the reducer, so the composite is built
             from cloud-screened pixels — the usual way to get a clean
             optical mosaic. A callable `ee.Image -> ee.Image`; see
-            :mod:`earthlens.gee.cloud_masks` (`landsat_sr` /
+            `earthlens.gee.cloud_masks` (`landsat_sr` /
             `sentinel2_scl`). It runs before the band `select`, so it may
             read quality bands (`QA_PIXEL` / `SCL`) that are not listed in
             `variables`. Meant for image collections; on a static
             `ee_type="image"` dataset it is applied verbatim and a warning
-            is logged (see :meth:`_build_collection`). Defaults to `None`
+            is logged (see `_build_collection`). Defaults to `None`
             (no masking).
         filters: Optional iterable of `ee.ImageCollection ->
             ee.ImageCollection` filters applied to the stack after the
@@ -725,7 +728,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             for image collections) and before the `cloud_mask` and
             reducer — e.g. a metadata cloud-cover cap. Each entry takes
             the collection and returns it; wrap the
-            :mod:`earthlens.gee.filters` helpers (`by_cloud_cover_lte` /
+            `earthlens.gee.filters` helpers (`by_cloud_cover_lte` /
             `by_property_in` / ...), whose first argument is the
             collection, with `functools.partial` or a lambda —
             `partial(by_cloud_cover_lte, max_pct=60)`. Applied left to
@@ -840,7 +843,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
     Credentials are not constructor arguments — the constructor describes
     only what to fetch. Supply them at the authentication step:
-    :meth:`authenticate` accepts `service_account=` / `service_key=` /
+    `authenticate` accepts `service_account=` / `service_key=` /
     `project=`, each falling back to the `GEE_SERVICE_ACCOUNT` /
     `GEE_SERVICE_KEY` / `GEE_PROJECT` environment variable when omitted.
     `download()` opens the connection lazily (resolving the same way) if
@@ -854,18 +857,18 @@ class GEE(LazyClientMixin, AbstractDataSource):
             `"asset"` without `asset_id`), a `crs_transform` that is not six
             finite terms with non-zero, unsheared pixel sizes, or a `reducer`
             that reduces a region rather than a collection; from the parent on
-            a bad date range; from :meth:`_check_input_dates` on an unknown
-            `temporal_resolution`; from :meth:`_api` on a missing scale or an
+            a bad date range; from `_check_input_dates` on an unknown
+            `temporal_resolution`; from `_api` on a missing scale or an
             oversized `"url"` request on either pull API (unless
-            `auto_split=True`); from :meth:`_download_dataset` on an unknown
+            `auto_split=True`); from `_download_dataset` on an unknown
             asset id or band.
         TypeError: At construction when `cloud_mask` is not callable, when
             `filters` is a `str` / bytes-like / mapping / non-iterable or
             contains a non-callable entry, or when `crs_transform` is not an
             iterable of numbers.
-        NotImplementedError: From :meth:`download` when `aggregate=` is
+        NotImplementedError: From `download` when `aggregate=` is
             passed (not yet supported).
-        RuntimeError: From :meth:`_api` if a `"drive"` / `"gcs"` export
+        RuntimeError: From `_api` if a `"drive"` / `"gcs"` export
             task does not complete.
 
     Examples:
@@ -914,7 +917,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
     @property
     def catalog(self):
-        """The bundled GEE :class:`~earthlens.gee.Catalog` (alias of `_catalog`)."""
+        """The bundled GEE `Catalog` (alias of `_catalog`)."""
         return self._catalog
 
     def __init__(
@@ -1067,10 +1070,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         self.discover_extent = bool(discover_extent)
         self.wait_for_export = bool(wait_for_export)
         #: The per-image `cloud_mask` hook (or `None`), `.map`-applied
-        #: before the reducer in :meth:`_build_collection`.
+        #: before the reducer in `_build_collection`.
         self.cloud_mask = cloud_mask
         #: The validated `filters` as a tuple (empty when none were given),
-        #: applied left to right in :meth:`_build_collection`.
+        #: applied left to right in `_build_collection`.
         self.filters: tuple[CollectionFilter, ...] = collection_filters
         #: Which layer materialises the pixels: `"auto"` (the pyramids-eo
         #: EEDAI reader when the request is eligible and installed, else
@@ -1137,7 +1140,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         """Resolve credentials from explicit values, then the environment.
 
         Each credential piece falls back to its environment variable when
-        not set explicitly (via :meth:`authenticate`): `GEE_SERVICE_ACCOUNT`,
+        not set explicitly (via `authenticate`): `GEE_SERVICE_ACCOUNT`,
         `GEE_SERVICE_KEY`, `GEE_PROJECT`.
 
         Returns:
@@ -1145,7 +1148,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 when neither an explicit value nor its env var is set.
 
         Examples:
-            - Explicit values (set by :meth:`authenticate`) are returned as-is:
+            - Explicit values (set by `authenticate`) are returned as-is:
                 ```python
                 >>> import tempfile
                 >>> from earthlens.gee import GEE
@@ -1249,13 +1252,13 @@ class GEE(LazyClientMixin, AbstractDataSource):
     def _open_client(self) -> Any:
         """Authenticate and initialise the Earth Engine connection (lazily).
 
-        Resolves the credentials (explicit values from :meth:`authenticate`,
+        Resolves the credentials (explicit values from `authenticate`,
         else the `GEE_SERVICE_ACCOUNT` / `GEE_SERVICE_KEY` / `GEE_PROJECT`
         environment variables), then uses a service-account key when a
         `service_account` + `service_key` pair is available (via
-        :class:`EarthEngineAuth`); otherwise runs `ee.Authenticate()` and
+        `EarthEngineAuth`); otherwise runs `ee.Authenticate()` and
         `ee.Initialize(project=...)` against the resolved `project`. The host is
-        whatever the resolved engine's :meth:`~earthlens.gee.engines.Engine.endpoint`
+        whatever the resolved engine's `endpoint`
         returns for this backend's `high_volume` setting — the default for every
         engine but the pixel API's, which can be pointed at the high-volume
         endpoint. `ee` keeps one session per process, so the last backend to
@@ -1264,8 +1267,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         waits for the user to paste a token, so on a headless box (CI,
         Docker, remote shell) it will hang or fail with whatever the EE
         SDK emits natively; use service-account auth for non-interactive
-        use. The resolved project id is stored on :attr:`project`. Called
-        by :attr:`~earthlens.base.LazyClientMixin.client` on first use.
+        use. The resolved project id is stored on `project`. Called
+        by `client` on first use.
 
         Returns:
             The `ee` module (cached as `self.client`).
@@ -1345,7 +1348,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         Returns:
             TemporalExtent: `start_date`, `end_date`, `resolution` (the
-            string passed in), and `dates` — a :class:`pandas.DatetimeIndex`
+            string passed in), and `dates` — a `pandas.DatetimeIndex`
             with one entry per time bucket (a single entry for `"raw"`).
 
         Raises:
@@ -1399,7 +1402,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         Raises:
             ValueError: On an unknown asset id, an unknown band, or an
-                oversized `"url"` request (see :meth:`_api`).
+                oversized `"url"` request (see `_api`).
             RuntimeError: If a `"drive"` / `"gcs"` / `"asset"` export
                 task fails. Only raised when `wait_for_export=True`;
                 in the non-blocking mode the caller handles failures
@@ -1443,7 +1446,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             earthlens.gee.Catalog: Resolves the `{asset_id: [band, ...]}`
                 request against `src/earthlens/gee/catalog/`.
             earthlens.gee.auth.EarthEngineAuth: Performs the one-time
-                `ee.Initialize` used by :meth:`_open_client`.
+                `ee.Initialize` used by `_open_client`.
         """
         # Before anything is exported: the refusal used to arrive after every
         # bucket had been written and polled to completion, which threw away
@@ -1488,7 +1491,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             written: What the sinks returned — paths, destinations or tasks.
 
         Returns:
-            A :class:`~earthlens.gee.work.DownloadResult` carrying one artifact
+            A `DownloadResult` carrying one artifact
             per bucket, with `obj` set for every entry that wrote a file.
 
         Raises:
@@ -1523,7 +1526,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         Validates `asset_id` and every band against the catalog, clamps
         the request window to the dataset's published extent, builds the
         filtered collection, composites it per time bucket, and writes
-        each bucket via :meth:`_api`.
+        each bucket via `_api`.
 
         Args:
             asset_id: An Earth Engine asset id present in the catalog.
@@ -1537,7 +1540,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         Raises:
             ValueError: If `asset_id` or any band is not in the catalog,
-                or if a write fails the size guard (see :meth:`_api`).
+                or if a write fails the size guard (see `_api`).
         """
         var_info = self._catalog.get_dataset(asset_id)
         for band in bands:
@@ -1579,7 +1582,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         in a one-element collection so the rest of the pipeline is
         uniform. `filterDate` uses a half-open `[start, end]` window
         (Earth Engine convention); the `end` passed here is already
-        bumped by one day by :meth:`_clamp_window_to_extent` so the
+        bumped by one day by `_clamp_window_to_extent` so the
         user's inclusive end date is covered.
 
         The pipeline is `filterDate` (image collections only) →
@@ -1644,7 +1647,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         Args:
             collection: The filtered `ee.ImageCollection` from
-                :meth:`_build_collection`.
+                `_build_collection`.
             var_info: The catalog entry (its `default_reducer`).
             start: Inclusive window start (clamped).
             end: Exclusive window end (clamped, already +1 day).
@@ -1653,7 +1656,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             `(timestamp, ee.Image, bucket_start, bucket_end)` tuples —
             `timestamp` is the bucket start (used in the filename), and
             `(bucket_start, bucket_end)` is the bucket's half-open date window
-            (both :class:`datetime.datetime`), which the EEDAI collection path
+            (both `datetime.datetime`), which the EEDAI collection path
             re-composites client-side.
         """
         # Resolved once per request rather than per bucket: a parameterised
@@ -1709,19 +1712,19 @@ class GEE(LazyClientMixin, AbstractDataSource):
         a new EE asset is created at `<asset_id>/<prefix>`.
 
         The write itself is delegated to the resolved
-        :class:`~earthlens.gee.sinks.Sink`, so this method decides only *whether
+        `Sink`, so this method decides only *whether
         the reader serves the bucket* and leaves *where the pixels go* to the
         sink.
 
         `engine="pixels"` replaces `getDownloadURL` on the `"url"` sink with
-        `ee.data.computePixels` (:meth:`_export_via_pixels`). It evaluates the
+        `ee.data.computePixels` (`_export_via_pixels`). It evaluates the
         same composited `image` server-side, and Earth Engine applies the same
         32768-px per-axis cap to it, so the size check and `auto_split` apply
         there too - only the transport differs.
 
         A raw, no-compute request may instead be served by the pyramids-eo
-        EEDAI reader — see :meth:`_try_via_eedai` for when, and
-        :meth:`_export_via_eedai` for what that path does. The composited
+        EEDAI reader — see `_try_via_eedai` for when, and
+        `_export_via_eedai` for what that path does. The composited
         `image` is then unused: the reader materialises the asset's own
         pixels.
 
@@ -1736,11 +1739,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
             bucket_end: Exclusive end of this bucket's date window.
 
         Returns:
-            For `"url"`: the :class:`pathlib.Path` of the written GeoTIFF.
+            For `"url"`: the `pathlib.Path` of the written GeoTIFF.
             For `"drive"` / `"gcs"` / `"asset"`: a destination string
             (`"drive://<folder>/<prefix>"` / `"gs://<bucket>/<prefix>"` /
             `"ee://<asset_id>/<prefix>"`), or a
-            :class:`~earthlens.gee.jobs.TaskInfo` when `wait_for_export=False`
+            `TaskInfo` when `wait_for_export=False`
             left the task running.
 
         Raises:
@@ -1801,7 +1804,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
     ) -> Path | None:
         """Serve one bucket from the EEDAI reader, or decline so Earth Engine does.
 
-        Split out of :meth:`_api` so that method reads as the sink dispatch it
+        Split out of `_api` so that method reads as the sink dispatch it
         is. Every question about routing to the reader is answered here: whether
         this request is the reader's at all, and what a refusal that arrives
         after routing has committed means.
@@ -1821,7 +1824,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             routing under an engine whose refusals are not fatal.
 
         Raises:
-            ValueError: From :meth:`_use_eedai` when `engine="eedai"` was forced
+            ValueError: From `_use_eedai` when `engine="eedai"` was forced
                 and the request cannot be served, and from the reader when a
                 late refusal is fatal.
         """
@@ -1945,7 +1948,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
     def _tiling_scale(self, scale: float) -> float:
         """Return the metre scale the AOI has to be split on.
 
-        :func:`split_aoi_for_url` sizes its tiles at a metre scale, which is the
+        `split_aoi_for_url` sizes its tiles at a metre scale, which is the
         right input only when the request is sized from `scale`. A pinned
         `crs_transform` sets the pixel independently, and it can be far finer -
         so splitting at `scale` asked for too few tiles and each one still went
@@ -1985,7 +1988,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         The pixel API is capped per axis exactly as `getDownloadURL` is, so
         `auto_split=True` means the same thing here: split the AOI with
-        :func:`split_aoi_for_url`, fetch each sub-window, and merge the tiles.
+        `split_aoi_for_url`, fetch each sub-window, and merge the tiles.
         Each tile is sized through the engine, so a pinned grid stays pinned and
         the tiles keep sharing pixel edges.
 
@@ -2161,16 +2164,16 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         Earth Engine returns a single GeoTIFF when one band is exported and
         a zip archive of per-band GeoTIFFs when several are. Both shapes
-        are routed through pyramids: single tifs via :meth:`Dataset.from_bytes`
+        are routed through pyramids: single tifs via `Dataset.from_bytes`
         (writes the in-memory body to a `/vsimem/` path then materialises it
-        on disk), zips via :meth:`Dataset.from_archive` (chained `/vsizip/`,
+        on disk), zips via `Dataset.from_archive` (chained `/vsizip/`,
         merging members into one multi-band tif).
 
-        Oversized AOIs (either axis above :data:`EE_MAX_DIMENSION` px at
+        Oversized AOIs (either axis above `EE_MAX_DIMENSION` px at
         `scale`) take one of two paths: when `auto_split=True` was passed
         to the constructor, the bbox is tiled, each tile is downloaded
         individually, and the tiles are mosaicked into one GeoTIFF via
-        :func:`pyramids.dataset.merge.merge_rasters`; otherwise a
+        `pyramids.dataset.merge.merge_rasters`; otherwise a
         `ValueError` is raised with a coarser-scale / smaller-bbox /
         `export_via="drive"` hint.
 
@@ -2297,7 +2300,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 the whole AOI, which carries its own.
 
         Returns:
-            The pinned :class:`~earthlens.gee.grid.OutputGrid` over that window,
+            The pinned `OutputGrid` over that window,
             or `None` when the grid is sized from `scale`.
 
         Raises:
@@ -2329,7 +2332,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         The output CRS may be `"EPSG:4326"` or a metre-based projected CRS.
         The reader reads `bbox` in the *target* CRS, so this backend reprojects
-        its lat/lon AOI into that CRS first (see :meth:`_eedai_window`); a
+        its lat/lon AOI into that CRS first (see `_eedai_window`); a
         geographic CRS other than EPSG:4326, or a projected one whose axis is
         not in metres, is not sized correctly by the metre `scale` and stays on
         Earth Engine. A pinned `crs_transform` is declined for the same kind of
@@ -2404,7 +2407,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         """Size a pixel grid for `bbox` (already in the output CRS) at `scale`.
 
         Dispatches on the output CRS: EPSG:4326 keeps the geographic grid with
-        its `cos(latitude)` longitude shortening (:meth:`_eedai_grid`); a
+        its `cos(latitude)` longitude shortening (`_eedai_grid`); a
         metre-based projected CRS sizes each axis by its span over the metre
         `scale` directly.
 
@@ -2491,7 +2494,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         count times the AOI's native footprint. Both come from EEDA's own
         per-scene fields via `estimate_earthengine_cost` — a fact about the
         scenes, not a guess from asset metadata. A bucket with more scenes
-        than :data:`_EEDAI_MAX_SCENES`, or whose scenes together exceed the
+        than `_EEDAI_MAX_SCENES`, or whose scenes together exceed the
         single-pass pixel budget, is declined so Earth Engine's server-side
         reduce serves it instead.
 
@@ -2502,7 +2505,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             bucket_end: Exclusive end of the bucket's date window.
 
         Returns:
-            An :class:`EedaiPlan`; a collection is served in one pass
+            An `EedaiPlan`; a collection is served in one pass
             (`tile_size` is `None`) or declined with a reason.
         """
         if bucket_start is None or bucket_end is None:
@@ -2643,8 +2646,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
     ) -> EedaiPlan:
         """Build the serve/decline verdict, dispatching on the asset kind.
 
-        A single image is sized by :meth:`_eedai_single_image_plan`; an image collection is
-        sized by :meth:`_eedai_collection_fits`, which counts the scenes the
+        A single image is sized by `_eedai_single_image_plan`; an image collection is
+        sized by `_eedai_collection_fits`, which counts the scenes the
         reader would fetch and reduce.
 
         Args:
@@ -2654,7 +2657,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             bucket_end: Exclusive end of the bucket window (collections).
 
         Returns:
-            The :class:`EedaiPlan` verdict.
+            The `EedaiPlan` verdict.
         """
         if var_info.is_image_collection:
             return self._eedai_collection_fits(
@@ -2675,11 +2678,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
         * the asset has no catalogued native resolution, so a per-tile read
           cannot be sized;
         * the request is much coarser than the asset (`native_ratio` above
-          :data:`_EEDAI_MAX_TILING_RATIO`), where Earth Engine's server-side
+          `_EEDAI_MAX_TILING_RATIO`), where Earth Engine's server-side
           aggregation returns a small raster instead of fetching `ratio**2`
           native pixels per output pixel;
         * the whole read would still fetch more than
-          :data:`_EEDAI_MAX_NATIVE_PIXELS` — the tile budget bounds memory,
+          `_EEDAI_MAX_NATIVE_PIXELS` — the tile budget bounds memory,
           this bounds the work;
         * `resample` is not `"nearest"`, which upstream refuses because an
           interpolating kernel would disagree at the tile seams;
@@ -2695,7 +2698,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 them all, so they divide the per-tile budget.
 
         Returns:
-            An :class:`EedaiPlan`. `tile_size` is `None` for a single read, and
+            An `EedaiPlan`. `tile_size` is `None` for a single read, and
             `reason` explains a `False` for the fallback log line or the
             forced-engine error.
         """
@@ -2794,7 +2797,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 either ineligible — it needs server-side compute (a
                 `cloud_mask` or `filters`) or targets a CRS the reader cannot
                 size (not EPSG:4326 or a metre-based projected CRS) — or
-                eligible but declined by :meth:`_eedai_verdict`, which the
+                eligible but declined by `_eedai_verdict`, which the
                 message names. For a single image: no native resolution, a
                 polygon cutline, a non-nearest `resample`, or tiling costing
                 more than Earth Engine would. For a collection: an unsupported
@@ -2909,7 +2912,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         The reader sizes its output in the units of the output CRS (degrees
         here), so the metre `scale` has to become an explicit grid. This is
-        deliberately not :meth:`SpatialExtent.estimate_pixel_dims`, which
+        deliberately not `SpatialExtent.estimate_pixel_dims`, which
         pyramids documents as a worst-case *upper bound* for cap pre-checks
         — it over-counts both axes (and unevenly, so a square AOI comes out
         non-square). Here the real span is used, with longitude degrees
@@ -3049,7 +3052,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         per bucket would scatter those across a multi-band, multi-date download.
 
         Returns:
-            The bound :class:`~earthlens.gee.reader.EedaiReader`.
+            The bound `EedaiReader`.
 
         Raises:
             AuthenticationError: If the credential cannot be built.
@@ -3078,7 +3081,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         case that cannot be sized up front.
 
         This answers only "can one pass hold it?". A window that does not fit
-        is not necessarily refused — :meth:`_eedai_single_image_plan` may still serve it by
+        is not necessarily refused — `_eedai_single_image_plan` may still serve it by
         streaming in tiles — so this reports rather than raises.
 
         Args:
@@ -3148,10 +3151,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         The reader sizes its output in the units of `crs` - degrees under
         EPSG:4326, the projection's metres otherwise - whereas `scale` here is
-        always Earth Engine's metres. :meth:`_eedai_output_grid` reconciles the
+        always Earth Engine's metres. `_eedai_output_grid` reconciles the
         two by turning `scale`
         into an explicit `shape` over the same window
-        :meth:`_eedai_window` hands the reader, so the grid and the read
+        `_eedai_window` hands the reader, so the grid and the read
         window always describe the same ground area.
 
         The raster is written as a plain GeoTIFF, or as a Cloud Optimized
@@ -3163,7 +3166,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             bands: Band ids to read.
             scale: Output pixel size in metres.
             prefix: Output filename stem (no extension).
-            plan: The :class:`EedaiPlan` verdict from :meth:`_eedai_verdict`,
+            plan: The `EedaiPlan` verdict from `_eedai_verdict`,
                 computed once by the caller so the routing decision and the
                 read it performs cannot disagree.
             bucket_start: Inclusive start of the bucket's date window. Required
@@ -3172,7 +3175,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             bucket_end: Exclusive end of that window.
 
         Returns:
-            The :class:`pathlib.Path` of the written GeoTIFF.
+            The `pathlib.Path` of the written GeoTIFF.
 
         Raises:
             ImportError: If `pyramids-eo` (the `[eedai]` extra) is missing.
@@ -3357,11 +3360,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
         """Tile an oversized AOI, download each tile, mosaic into one GeoTIFF.
 
         Only reachable when `auto_split=True` was passed to the
-        constructor and the full AOI exceeds :data:`EE_MAX_DIMENSION` px
-        per axis. The bbox is split with :func:`split_aoi_for_url`, each
-        sub-extent is downloaded via :meth:`_download_one_url_tile`, and
+        constructor and the full AOI exceeds `EE_MAX_DIMENSION` px
+        per axis. The bbox is split with `split_aoi_for_url`, each
+        sub-extent is downloaded via `_download_one_url_tile`, and
         the per-tile tifs are mosaicked into `<prefix>.tif` with
-        :func:`pyramids.dataset.merge.merge_rasters`. `no_data_value` is
+        `pyramids.dataset.merge.merge_rasters`. `no_data_value` is
         passed explicitly as the first tile's own marker, so a real value
         it declares carries over. Tiles that declare no no-data of their
         own — the usual case here, since the download path leaves it unset
@@ -3406,9 +3409,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
         When `wait_for_export=True` (the default) blocks until the task
         reaches a terminal state via `wait_for_task` and returns the
         destination URL (`drive://...` / `gs://...` / `ee://...`).
-        When `wait_for_export=False` returns a :class:`TaskInfo`
+        When `wait_for_export=False` returns a `TaskInfo`
         immediately so the caller can track the task asynchronously via
-        :mod:`earthlens.gee.jobs`.
+        `earthlens.gee.jobs`.
 
         A pinned `crs_transform` is sent as the export's `crsTransform` instead
         of `scale`: Earth Engine's export API rejects both together, so this is
@@ -3471,7 +3474,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         """Return the `ee.Geometry` to clip / filter requests to.
 
         Uses the constructor `region` `GeoDataFrame` (converted via
-        :func:`earthlens.gee.features.create_feature`) when given, else a
+        `earthlens.gee.features.create_feature`) when given, else a
         polygon `aoi=` carried on `self.space.geometry` (the unified
         ergonomic channel), and otherwise an `ee.Geometry.Rectangle` built
         from the lat/lon bbox. Computed once and cached.
@@ -3502,7 +3505,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         """Clamp the request window to a dataset's published extent.
 
         Args:
-            var_info: The catalog entry (its :class:`Extent`).
+            var_info: The catalog entry (its `Extent`).
 
         Returns:
             `(start, end_exclusive)` — `start` is the later of the
@@ -3515,7 +3518,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             and the catalog's `end_date` (or `start_date`) is missing,
             the gap is filled by an EE-side
             `reduceColumns(minMax)` over `system:time_start` via
-            :meth:`_discover_ee_extent` (cached per asset for the
+            `_discover_ee_extent` (cached per asset for the
             lifetime of the instance).
         """
         req_start = self.time.start_date
@@ -3569,9 +3572,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
     def _maybe_discover_ee_extent(
         self, var_info: Dataset
     ) -> tuple[dt.datetime | None, dt.datetime | None]:
-        """Cached entry point for :meth:`_discover_ee_extent`.
+        """Cached entry point for `_discover_ee_extent`.
 
-        Reads / writes :data:`_EXTENT_CACHE` (module-level) so a
+        Reads / writes `_EXTENT_CACHE` (module-level) so a
         second `GEE(...)` instance querying the same asset doesn't
         re-issue the 2-5 s `reduceColumns(minMax)` round trip.
         """
@@ -3591,7 +3594,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         Issues one `reduceColumns(ee.Reducer.minMax(), ["system:time_start"])
         .getInfo()` round-trip per asset (callers cache via
-        :meth:`_maybe_discover_ee_extent`). On any EE-side failure
+        `_maybe_discover_ee_extent`). On any EE-side failure
         (network, missing property, image-typed asset) returns
         `(None, None)` and logs a warning — the caller falls back to
         the catalog values or `now()`.

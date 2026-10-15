@@ -7,16 +7,16 @@ Forest Watch Data API. This module is the bridge from a dataset id
 the provider, the output kind, and the provider-specific request detail needed
 to fetch it.
 
-:class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog` subclass that
+`Catalog` is a thin `earthlens.base.AbstractCatalog` subclass that
 loads the bundled `risk_indicators_data_catalog.yaml` and exposes each row as a
-:class:`Dataset`. The YAML also ships an `admin_codes:` block — an ISO3 ->
+`Dataset`. The YAML also ships an `admin_codes:` block — an ISO3 ->
 ThinkHazard ADM0 division code (== FAO GAUL 2015 ADM0 code) lookup — which
-:meth:`Catalog.resolve_admin` reads to turn a `country=` ISO3 into the numeric
+`Catalog.resolve_admin` reads to turn a `country=` ISO3 into the numeric
 division code ThinkHazard's API keys on. Resolve one dataset with
-:meth:`Catalog.get` (a did-you-mean hint on an unknown id); list the shipped
-ids with :meth:`Catalog.available`.
+`Catalog.get` (a did-you-mean hint on an unknown id); list the shipped
+ids with `Catalog.available`.
 
-:data:`CATALOG_PATH` is the path to the bundled YAML.
+`CATALOG_PATH` is the path to the bundled YAML.
 """
 
 from __future__ import annotations
@@ -41,7 +41,7 @@ _CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Dataset], dict[str, int]]]
     CatalogParseCache()
 )
 
-#: The three risk providers a :class:`Dataset` row can name.
+#: The three risk providers a `Dataset` row can name.
 Provider = Literal["thinkhazard", "inform", "gfw"]
 
 #: The two output shapes a risk dataset can emit (tabular -> DataFrame,
@@ -63,10 +63,10 @@ def _load_catalog_data(path: Path) -> tuple[dict[str, Dataset], dict[str, int]]:
     """Parse, validate, and cache the catalog at `path`.
 
     Reads the `datasets:` and `admin_codes:` blocks and validates each dataset
-    row as a :class:`Dataset`.
+    row as a `Dataset`.
 
     Args:
-        path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
+        path: Path to the catalog YAML (default `CATALOG_PATH`).
 
     Returns:
         A `(datasets, admin_codes)` pair: the dataset map keyed by id, and the
@@ -74,7 +74,7 @@ def _load_catalog_data(path: Path) -> tuple[dict[str, Dataset], dict[str, int]]:
 
     Raises:
         ValueError: If the file has no `datasets:` block, or a row fails
-            :class:`Dataset` validation.
+            `Dataset` validation.
     """
     key = catalog_cache_key(path, [path])
     cached = _CATALOG_CACHE.get(key)
@@ -108,10 +108,10 @@ def _load_catalog_data(path: Path) -> tuple[dict[str, Dataset], dict[str, int]]:
 class Dataset(SummarisedLeaf):
     """One risk-indicators catalog row.
 
-    The dataset id is the parent key in :attr:`Catalog.datasets` and is also
-    stored on the row as :attr:`id` so a resolved :class:`Dataset` is
+    The dataset id is the parent key in `Catalog.datasets` and is also
+    stored on the row as `id` so a resolved `Dataset` is
     self-describing. Which provider-specific fields are populated depends on
-    :attr:`provider`; a cross-field validator enforces that the right ones are
+    `provider`; a cross-field validator enforces that the right ones are
     present.
 
     Attributes:
@@ -223,14 +223,14 @@ class Catalog(AbstractCatalog[Dataset]):
     """Dataset catalog for the risk-indicators backend.
 
     Reads the bundled `risk_indicators_data_catalog.yaml` (shipped as package
-    data) and exposes its `datasets:` block as a map of :class:`Dataset` rows
+    data) and exposes its `datasets:` block as a map of `Dataset` rows
     keyed by id, plus an `admin_codes:` ISO3 -> ADM0 lookup. Instantiate with no
-    arguments (`Catalog()`). Resolve one row with :meth:`get`, list the shipped
-    ids with :meth:`available`, and turn a country ISO3 into a ThinkHazard
-    division code with :meth:`resolve_admin`.
+    arguments (`Catalog()`). Resolve one row with `get`, list the shipped
+    ids with `available`, and turn a country ISO3 into a ThinkHazard
+    division code with `resolve_admin`.
 
     Attributes:
-        datasets: Map from dataset id to its :class:`Dataset` row.
+        datasets: Map from dataset id to its `Dataset` row.
         admin_codes: Map from ISO3 country code to ThinkHazard ADM0 division
             code (== FAO GAUL 2015 ADM0 code).
 
@@ -261,8 +261,8 @@ class Catalog(AbstractCatalog[Dataset]):
     _catalog_kind: str = "risk-indicators catalog"
     _entry_noun: str = "datasets"
 
-    #: The dataset rows live in the base :attr:`datasets` field so the inherited
-    #: dict surface (`len`, `in`, `[]`, iteration) and :meth:`get_dataset`'s
+    #: The dataset rows live in the base `datasets` field so the inherited
+    #: dict surface (`len`, `in`, `[]`, iteration) and `get_dataset`'s
     #: did-you-mean hint work unchanged.
     datasets: dict[str, Dataset] = Field(default_factory=dict)
 
@@ -289,10 +289,10 @@ class Catalog(AbstractCatalog[Dataset]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the module-level
-                :data:`CATALOG_PATH`.
+                `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If the file has no `datasets:` block, or a row fails
@@ -303,9 +303,9 @@ class Catalog(AbstractCatalog[Dataset]):
         return cls(datasets=dict(datasets), admin_codes=dict(admin_codes))
 
     def get(self, dataset_id: str) -> Dataset:
-        """Resolve a dataset id to its :class:`Dataset` row.
+        """Resolve a dataset id to its `Dataset` row.
 
-        Thin wrapper over the inherited :meth:`get_dataset`, which raises a
+        Thin wrapper over the inherited `get_dataset`, which raises a
         `ValueError` with a did-you-mean hint on an unknown id.
 
         Args:

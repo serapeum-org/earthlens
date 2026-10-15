@@ -2,7 +2,7 @@
 
 Fetches the FLODIS dataset (Mester, Frieler & Schewe, PIK; Sci Data 10, 482,
 2023) from its pinned static Zenodo record, and returns per-event impact records
-as a :class:`pandas.DataFrame`. FLODIS is the observed hazard-footprint -> impact
+as a `pandas.DataFrame`. FLODIS is the observed hazard-footprint -> impact
 bridge: it links EM-DAT fatalities + economic damages (`dataset="damages"`) and
 IDMC displacements (`dataset="displacement"`) to Global Flood Database satellite
 flood footprints, adding per-event affected population, GDP and
@@ -16,7 +16,7 @@ extents from the shipped `gee` backend (`GLOBAL_FLOOD_DB/MODIS_EVENTS/V1`), join
 on those keys.
 
 This is a `tabular` backend: the result is a table of per-event impact rows, not
-a gridded array, so the :class:`earthlens.earthlens.EarthLens` facade rejects an
+a gridded array, so the `earthlens.earthlens.EarthLens` facade rejects an
 `aggregate=` argument.
 
 FLODIS needs **no credentials** — the Zenodo record is public (CC-BY-4.0) — so
@@ -25,12 +25,12 @@ pandas) are core.
 
 Public surface (re-exported from this package):
 
-* :class:`FLODIS` — the backend; instantiate with `dataset=` and optional
-  `country=` / `gid=` / date filters, then call :meth:`FLODIS.download`.
-* :class:`Catalog` — loader for the bundled `flodis_data_catalog.yaml`.
-* :class:`ZenodoRecord` / :class:`FlodisDataset` — the catalog's frozen row
+* `FLODIS` — the backend; instantiate with `dataset=` and optional
+  `country=` / `gid=` / date filters, then call `FLODIS.download`.
+* `Catalog` — loader for the bundled `flodis_data_catalog.yaml`.
+* `ZenodoRecord` / `FlodisDataset` — the catalog's frozen row
   models.
-* :data:`CATALOG_PATH` — path to the bundled catalog YAML; monkey-patchable in
+* `CATALOG_PATH` — path to the bundled catalog YAML; monkey-patchable in
   tests.
 
 Examples:

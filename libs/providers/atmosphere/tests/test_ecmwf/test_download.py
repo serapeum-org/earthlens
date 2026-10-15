@@ -1,4 +1,4 @@
-"""Unit tests for :meth:`ECMWF.download` and :meth:`ECMWF._download_dataset`.
+"""Unit tests for `ECMWF.download` and `ECMWF._download_dataset`.
 
 Covers the C3 fix (iterate `self.vars` not `self.variables`), the
 H3 cleanup of the hardcoded `data_interim.nc` deletion, the M3
@@ -19,12 +19,12 @@ pytestmark = [pytest.mark.unit]
 
 
 class TestDownloadIteration:
-    """Tests for :meth:`ECMWF.download` iteration (C3, M3, H3)."""
+    """Tests for `ECMWF.download` iteration (C3, M3, H3)."""
 
     def test_download_iterates_self_vars_not_self_variables(self, ecmwf_stub):
         """`download()` iterates `self.vars` (the parent's storage).
 
-        :class:`AbstractDataSource.__init__` stores the user's
+        `AbstractDataSource.__init__` stores the user's
         `variables` mapping as `self.vars`. `download()` walks the
         `(dataset, [vars])` pairs and calls `_download_dataset` once
         per `(dataset, var_code)` pair.
@@ -164,7 +164,7 @@ class TestDownloadIteration:
 
 
 class TestDownloadDataset:
-    """Tests for :meth:`ECMWF._download_dataset` after the C1 call-site fix."""
+    """Tests for `ECMWF._download_dataset` after the C1 call-site fix."""
 
     def test_calls_api_with_var_info_only(self, ecmwf_stub, single_level_var_info):
         """`_download_dataset` invokes `_api(var_info)` with one arg."""
@@ -178,7 +178,7 @@ class TestDownloadDataset:
         assert args == (single_level_var_info,)
 
     def test_returns_path_from_api(self, ecmwf_stub, single_level_var_info):
-        """`_download_dataset` returns the path :meth:`_api` produced."""
+        """`_download_dataset` returns the path `_api` produced."""
         api_target = (
             ecmwf_stub.root_dir / "2m_temperature_reanalysis-era5-single-levels.nc"
         )

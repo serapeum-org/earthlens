@@ -6,17 +6,17 @@ users think in names. This module is the name-to-code bridge plus light
 metadata (units, display name, parameter group, and which services the
 code is valid on).
 
-:class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog`
+`Catalog` is a thin `earthlens.base.AbstractCatalog`
 subclass that loads the bundled `usgs_water_data_catalog.yaml` and
-exposes each row as a :class:`Parameter`. Resolve a single key with
-:meth:`Catalog.resolve` — which accepts either a friendly name
+exposes each row as a `Parameter`. Resolve a single key with
+`Catalog.resolve` — which accepts either a friendly name
 (`"discharge"`) **or** a raw 5-digit code (`"00060"`, passed through
 unmapped), with a did-you-mean hint on an unknown name. The full ~25k
 USGS parameter-code table is *not* hand-curated here; the curated rows
 cover the common codes, and the refresh tool builds an informational
 `available_parameters` index from the live USGS reference table.
 
-:data:`CATALOG_PATH` is the path to the bundled YAML.
+`CATALOG_PATH` is the path to the bundled YAML.
 """
 
 from __future__ import annotations
@@ -58,14 +58,14 @@ def _load_catalog_data(path: Path) -> dict[str, Parameter]:
     """Parse, validate, and cache the parameter catalog at `path`.
 
     Args:
-        path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
+        path: Path to the catalog YAML (default `CATALOG_PATH`).
 
     Returns:
-        Mapping from friendly parameter name to its :class:`Parameter`.
+        Mapping from friendly parameter name to its `Parameter`.
 
     Raises:
         ValueError: If the file has no `parameters:` block, or a row
-            fails :class:`Parameter` validation.
+            fails `Parameter` validation.
     """
     key = catalog_cache_key(path, [path])
     cached = _CATALOG_CACHE.get(key)
@@ -108,8 +108,8 @@ class Parameter(SummarisedLeaf):
     """One NWIS parameter code's catalog row.
 
     The user-facing name is the parent key in
-    :attr:`Catalog.parameters` and is also stored on the row as
-    :attr:`name` so a resolved :class:`Parameter` is self-describing.
+    `Catalog.parameters` and is also stored on the row as
+    `name` so a resolved `Parameter` is self-describing.
 
     Attributes:
         code: The 5-digit NWIS parameter code (`"00060"`).
@@ -117,7 +117,7 @@ class Parameter(SummarisedLeaf):
         units: The reporting units (`"ft3/s"`, `"degC"`).
         group: Coarse USGS classification (`"Physical"`, `"Nutrients"`,
             …).
-        services: The :data:`earthlens.usgs_water.backend.SERVICES`
+        services: The `earthlens.usgs_water.backend.SERVICES`
             this code is typically available on (`["daily",
             "instantaneous"]`).
 
@@ -154,13 +154,13 @@ class Catalog(AbstractCatalog[Parameter]):
 
     Reads the bundled `usgs_water_data_catalog.yaml` (shipped as
     package data) and exposes its `parameters:` block as a map of
-    :class:`Parameter` rows keyed by friendly name. Instantiate with no
+    `Parameter` rows keyed by friendly name. Instantiate with no
     arguments (`Catalog()`). Resolve a name or raw code with
-    :meth:`resolve`, or a single row with :meth:`get_parameter`.
+    `resolve`, or a single row with `get_parameter`.
 
     Attributes:
         parameters: Map from the friendly parameter name to its
-            :class:`Parameter` row.
+            `Parameter` row.
 
     Examples:
         - Resolve a friendly name and a raw code:
@@ -187,10 +187,10 @@ class Catalog(AbstractCatalog[Parameter]):
     _catalog_kind: str = "USGS Water parameter catalog"
     _entry_noun: str = "parameters"
 
-    #: The parameter rows live in the base :attr:`datasets` field so the
+    #: The parameter rows live in the base `datasets` field so the
     #: inherited dict surface (`len`, `in`, `[]`, iteration) and
-    #: :meth:`get_dataset`'s did-you-mean hint work unchanged. The field
-    #: is narrowed here to :class:`Parameter` values; :attr:`parameters`
+    #: `get_dataset`'s did-you-mean hint work unchanged. The field
+    #: is narrowed here to `Parameter` values; `parameters`
     #: is the domain-named read alias.
     datasets: dict[str, Parameter] = Field(default_factory=dict)
 
@@ -218,11 +218,11 @@ class Catalog(AbstractCatalog[Parameter]):
 
     @property
     def parameters(self) -> dict[str, Parameter]:
-        """The parameter map — alias for the base :attr:`datasets` field.
+        """The parameter map — alias for the base `datasets` field.
 
         Returns:
             dict[str, Parameter]: The same mapping stored in
-                :attr:`datasets`.
+                `datasets`.
 
         Examples:
             - The alias and the base field are the same object:
@@ -254,14 +254,14 @@ class Catalog(AbstractCatalog[Parameter]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the
-                module-level :data:`CATALOG_PATH`.
+                module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If the file has no `parameters:` block, or a row
-                fails :class:`Parameter` validation.
+                fails `Parameter` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         return cls(datasets=dict(_load_catalog_data(catalog_path)))
@@ -288,9 +288,9 @@ class Catalog(AbstractCatalog[Parameter]):
         return sorted(self.datasets)
 
     def get_parameter(self, name: str) -> Parameter:
-        """Resolve a friendly name to its :class:`Parameter` row.
+        """Resolve a friendly name to its `Parameter` row.
 
-        Thin wrapper over the inherited :meth:`get_dataset`, which raises
+        Thin wrapper over the inherited `get_dataset`, which raises
         a `ValueError` with a did-you-mean hint on an unknown name.
 
         Args:
@@ -324,7 +324,7 @@ class Catalog(AbstractCatalog[Parameter]):
         A raw 5-digit code (`"00060"`) passes through unmapped — the
         full USGS code table is far larger than the curated catalog, so
         any valid code is accepted directly. A non-code string is
-        looked up as a friendly name via :meth:`get_parameter`.
+        looked up as a friendly name via `get_parameter`.
 
         Args:
             code_or_name: A friendly name (`"discharge"`) or a raw

@@ -7,12 +7,12 @@ API. The request is one taxon/geometry/time window: every entry in
 `variables` resolves to a GBIF backbone `taxonKey`, the bounding box
 becomes a WKT polygon, and `[start, end]` becomes GBIF's `eventDate`
 range. The paginated result is mapped to a pyramids
-:class:`~pyramids.feature.collection.FeatureCollection` of points by the
+`pyramids.feature.collection.FeatureCollection` of points by the
 shared `earthlens.biodiversity` mapper.
 
 This is the reference occurrence backend the OBIS twin mirrors. Like
 FDSN/Overture it is a `vector` backend (`OUTPUT_KIND = "vector"`), so the
-:class:`earthlens.earthlens.EarthLens` facade rejects an `aggregate=`
+`earthlens.earthlens.EarthLens` facade rejects an `aggregate=`
 argument. `download()` returns the in-memory FeatureCollection and, when
 `path` is set, writes it (GeoParquet by default).
 
@@ -86,7 +86,7 @@ class GBIF(AbstractDataSource):
     `download()` shape every other earthlens backend uses. Each entry in
     `variables` resolves to a GBIF backbone `taxonKey`; the bbox becomes a
     WKT polygon; the paginated result is mapped to a points
-    :class:`~pyramids.feature.collection.FeatureCollection`.
+    `pyramids.feature.collection.FeatureCollection`.
 
     Attributes:
         OUTPUT_KIND: `"vector"` — the facade rejects `aggregate=`.
@@ -189,7 +189,7 @@ class GBIF(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse `[start, end]` into a :class:`TemporalExtent`.
+        """Parse `[start, end]` into a `TemporalExtent`.
 
         GBIF issues one search spanning the window, so there is no
         per-date loop and the resolution is the sentinel `"all"`.
@@ -245,7 +245,7 @@ class GBIF(AbstractDataSource):
         Args:
             occ: The `pygbif.occurrences` module (or a stand-in exposing
                 `search(**kwargs)`).
-            params: The `occ.search` kwargs from :meth:`_plan_search`.
+            params: The `occ.search` kwargs from `_plan_search`.
 
         Returns:
             list[dict]: Up to `max_records` occurrence record dicts.

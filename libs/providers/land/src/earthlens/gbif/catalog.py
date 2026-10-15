@@ -8,13 +8,13 @@ name>` lookup. There is no `refresh` / `probe` tooling and no
 `tools/gbif/` directory — the curated rows are a hand-edit of one YAML
 file (`earthlens datasets validate gbif` confirms the keys upstream).
 
-:class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog`
+`Catalog` is a thin `earthlens.base.AbstractCatalog`
 subclass storing the rows in the framework's
-:attr:`~earthlens.base.AbstractCatalog.datasets` field, so the inherited
+`datasets` field, so the inherited
 dict-like surface (`len(cat)`, `name in cat`, `cat[name]`, `iter(cat)`,
-:meth:`get_dataset` with a did-you-mean hint) works. Parsing is cached on
-`(path, mtime)` (see :data:`_CATALOG_CACHE` / :func:`clear_catalog_cache`);
-:data:`CATALOG_PATH` is the bundled YAML and is monkey-patchable in tests.
+`get_dataset` with a did-you-mean hint) works. Parsing is cached on
+`(path, mtime)` (see `_CATALOG_CACHE` / `clear_catalog_cache`);
+`CATALOG_PATH` is the bundled YAML and is monkey-patchable in tests.
 """
 
 from __future__ import annotations
@@ -55,7 +55,7 @@ def _load_catalog_data(path: Path) -> tuple[dict[str, Taxon], list[str]]:
     """Parse, validate, and cache the GBIF taxon catalog at `path`.
 
     Args:
-        path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
+        path: Path to the catalog YAML (default `CATALOG_PATH`).
 
     Returns:
         A pair `(rows, available)` of the friendly-name `Taxon` map and the
@@ -64,7 +64,7 @@ def _load_catalog_data(path: Path) -> tuple[dict[str, Taxon], list[str]]:
 
     Raises:
         ValueError: If the file has no `taxa:` block, or a row fails
-            :class:`Taxon` validation.
+            `Taxon` validation.
     """
     key = catalog_cache_key(path, [path])
     cached = _CATALOG_CACHE.get(key)
@@ -126,7 +126,7 @@ def _name_backbone_key(name: str) -> int:
 class Taxon(SummarisedLeaf):
     """One friendly GBIF taxon's dispatch row.
 
-    The user-facing name is the parent key in :attr:`Catalog.datasets`
+    The user-facing name is the parent key in `Catalog.datasets`
     and is not stored on the row.
 
     Attributes:
@@ -164,14 +164,14 @@ class Catalog(AbstractCatalog[Taxon]):
     """Taxon catalog for the GBIF occurrence backend.
 
     Reads the bundled `gbif_data_catalog.yaml` (shipped as package data)
-    and exposes its `taxa:` block as a map of :class:`Taxon` rows.
-    Instantiate with no arguments (`Catalog()`); :func:`model_post_init`
+    and exposes its `taxa:` block as a map of `Taxon` rows.
+    Instantiate with no arguments (`Catalog()`); `model_post_init`
     loads and validates the YAML (cached) in one pass. The rows live in
-    the framework's :attr:`datasets` field so the inherited dict-like
+    the framework's `datasets` field so the inherited dict-like
     surface behaves like every other backend's catalog.
 
     Attributes:
-        datasets: Map from the friendly taxon name to its :class:`Taxon`
+        datasets: Map from the friendly taxon name to its `Taxon`
             row (the framework field).
 
     Examples:
@@ -231,14 +231,14 @@ class Catalog(AbstractCatalog[Taxon]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the
-                module-level :data:`CATALOG_PATH`.
+                module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If the file has no `taxa:` block, or a row fails
-                :class:`Taxon` validation.
+                `Taxon` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         rows, available = _load_catalog_data(catalog_path)

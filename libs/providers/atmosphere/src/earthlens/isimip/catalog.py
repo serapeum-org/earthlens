@@ -1,6 +1,6 @@
 """Config + curated-vocabulary catalog for the ISIMIP backend.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
+Hosts `Catalog`, the pydantic-backed reader for the bundled
 `isimip_data_catalog.yaml`. ISIMIP is addressed by a *facet set*
 (`simulation_round`, `climate_forcing`, `climate_scenario`, `climate_variable`,
 `time_step`, `product`), which the ISIMIP repository REST API resolves to the
@@ -15,8 +15,8 @@ raising a did-you-mean error on an unknown facet. The blocks cover the
 ISIMIP3b / ISIMIP3a InputData facets; dataset resolution and the authoritative
 per-dataset licence still run against the live API.
 
-:data:`CATALOG_PATH` is the path to the bundled YAML;
-:func:`clear_catalog_cache` empties the `(path, mtime)` parse cache.
+`CATALOG_PATH` is the path to the bundled YAML;
+`clear_catalog_cache` empties the `(path, mtime)` parse cache.
 """
 
 from __future__ import annotations
@@ -208,12 +208,12 @@ class Catalog(AbstractCatalog[Variable]):
     """Config + curated-vocabulary catalog for the ISIMIP backend.
 
     Reads the bundled `isimip_data_catalog.yaml` (shipped as package data) and
-    exposes its `variables:` block as a map of :class:`Variable` rows keyed by
-    `climate_variable` under the inherited :attr:`datasets` field, plus parallel
-    :attr:`forcings`, :attr:`scenarios`, and :attr:`rounds` maps and the API
-    config (:attr:`data_url`, :attr:`files_api_url`, :attr:`products`,
-    :attr:`time_steps`). Instantiate with no arguments (`Catalog()`);
-    :func:`model_post_init` loads and validates the YAML in one pass and caches
+    exposes its `variables:` block as a map of `Variable` rows keyed by
+    `climate_variable` under the inherited `datasets` field, plus parallel
+    `forcings`, `scenarios`, and `rounds` maps and the API
+    config (`data_url`, `files_api_url`, `products`,
+    `time_steps`). Instantiate with no arguments (`Catalog()`);
+    `model_post_init` loads and validates the YAML in one pass and caches
     it by `(path, mtime)`.
 
     Attributes:
@@ -221,10 +221,10 @@ class Catalog(AbstractCatalog[Variable]):
         files_api_url: The ISIMIP files API v2 (the async cutout job endpoint).
         products: The request products (`InputData` / `OutputData`).
         time_steps: The temporal resolutions (`daily` / `monthly`).
-        datasets: Map from `climate_variable` to its :class:`Variable` row.
-        forcings: Map from `climate_forcing` to its :class:`Forcing` row.
-        scenarios: Map from `climate_scenario` to its :class:`Scenario` row.
-        rounds: Map from `simulation_round` to its :class:`Round` row.
+        datasets: Map from `climate_variable` to its `Variable` row.
+        forcings: Map from `climate_forcing` to its `Forcing` row.
+        scenarios: Map from `climate_scenario` to its `Scenario` row.
+        rounds: Map from `simulation_round` to its `Round` row.
 
     Examples:
         - List curated variables and resolve one:
@@ -266,13 +266,13 @@ class Catalog(AbstractCatalog[Variable]):
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no variables were supplied.
 
-        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by
+        `Catalog()` with no args reads `CATALOG_PATH` (cached by
         `(path, mtime)`); passing `datasets=...` skips the disk read (used in
         tests). Either way the `available_datasets` index is derived from the
         loaded variable map.
 
         Raises:
-            ValueError: Propagated from :meth:`load` when the YAML is missing,
+            ValueError: Propagated from `load` when the YAML is missing,
                 empty, or has a malformed row.
         """
         if not self.datasets and not self.data_url:
@@ -293,10 +293,10 @@ class Catalog(AbstractCatalog[Variable]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the module-level
-                :data:`CATALOG_PATH`.
+                `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If `catalog_path` does not exist, or if the file is
@@ -332,7 +332,7 @@ class Catalog(AbstractCatalog[Variable]):
         return out
 
     def get_forcing(self, key: str) -> Forcing:
-        """Return the :class:`Forcing` for `key`, with a did-you-mean hint.
+        """Return the `Forcing` for `key`, with a did-you-mean hint.
 
         Args:
             key: A `climate_forcing` (`"gfdl-esm4"`, `"ukesm1-0-ll"`).
@@ -346,7 +346,7 @@ class Catalog(AbstractCatalog[Variable]):
         return cast("Forcing", self._get_from(self.forcings, key, "forcing"))
 
     def get_scenario(self, key: str) -> Scenario:
-        """Return the :class:`Scenario` for `key`, with a did-you-mean hint.
+        """Return the `Scenario` for `key`, with a did-you-mean hint.
 
         Args:
             key: A `climate_scenario` (`"ssp585"`, `"historical"`).
@@ -360,7 +360,7 @@ class Catalog(AbstractCatalog[Variable]):
         return cast("Scenario", self._get_from(self.scenarios, key, "scenario"))
 
     def get_round(self, key: str) -> Round:
-        """Return the :class:`Round` for `key`, with a did-you-mean hint.
+        """Return the `Round` for `key`, with a did-you-mean hint.
 
         Args:
             key: A `simulation_round` (`"ISIMIP3b"`, `"ISIMIP3a"`).

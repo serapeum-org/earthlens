@@ -26,6 +26,6 @@ def chc_table():
     """A provider-scoped table over the CHC backend only (fast to build).
 
     Returns:
-        The cached :class:`~earthlens.cli.table.CatalogTable` for `chc`.
+        The cached `CatalogTable` for `chc`.
     """
     return build_table(providers=["chc"])

@@ -98,7 +98,7 @@ def seed_s3(
     """Create `bucket` if needed and put every `key -> body` in `objects`.
 
     Args:
-        client: The S3 client from :func:`s3_emulator`.
+        client: The S3 client from `s3_emulator`.
         bucket: Bucket name, created if it does not exist.
         objects: Mapping of key to body.
         region: Region for the bucket. `us-east-1` is special-cased by S3 —
