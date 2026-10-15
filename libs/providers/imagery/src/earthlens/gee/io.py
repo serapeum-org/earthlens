@@ -176,11 +176,45 @@ def feature_collection_to_dataframe(
             See semantic note above. Defaults to `None`.
 
     Returns:
-        A `DataFrame` of the FC's features.
+        A `DataFrame` with one row per feature, in the order Earth Engine
+        wrote the CSV.
 
     Raises:
         Exception: Propagated verbatim from the underlying Earth Engine /
             HTTP / CSV-parsing calls.
+
+    Examples:
+        - Download every property and inspect the frame (needs an
+          initialised `ee`):
+            ```python
+            >>> import ee  # doctest: +SKIP
+            >>> from earthlens.gee import feature_collection_to_dataframe
+            >>> fc = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017")  # doctest: +SKIP
+            >>> df = feature_collection_to_dataframe(fc.limit(3))  # doctest: +SKIP
+            >>> len(df)  # doctest: +SKIP
+            3
+            >>> "system:index" in df.columns  # doctest: +SKIP
+            False
+
+            ```
+        - Ask for two properties only, and get exactly those columns back:
+            ```python
+            >>> import ee  # doctest: +SKIP
+            >>> from earthlens.gee import feature_collection_to_dataframe
+            >>> fc = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017")  # doctest: +SKIP
+            >>> df = feature_collection_to_dataframe(  # doctest: +SKIP
+            ...     fc.limit(3), selectors=["country_na", "wld_rgn"]
+            ... )
+            >>> list(df.columns)  # doctest: +SKIP
+            ['country_na', 'wld_rgn']
+
+            ```
+
+    See Also:
+        feature_collections_to_dataframe: The same download over many
+            collections, in parallel with retries.
+        feature_collection_to_gdf: Geometry-preserving `getInfo()` variant for
+            small collections.
     """
     if selectors is None:
         url = fc.getDownloadURL(filetype="CSV", selectors=None)

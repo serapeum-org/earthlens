@@ -426,12 +426,41 @@ def get_task_status(task_id: str, project: str | None = None) -> TaskInfo:
             id. Defaults to the SDK's current project.
 
     Returns:
-        A `TaskInfo`.
+        A `TaskInfo` with the task's `state`, timestamps and, once it has
+        completed, its `destination_uris`.
 
     Raises:
+        RuntimeError: If `task_id` is a bare id, `project` is `None`, and the
+            current Earth Engine project cannot be resolved from the SDK. The
+            message names `project=` and `ee.Initialize(project=...)` as the
+            two remedies.
         googleapiclient.errors.HttpError: Propagated verbatim from
             `ee.data.getOperation` — most commonly a 404 when the id is
             unknown to Earth Engine.
+
+    Examples:
+        - Poll one task and read its state (needs an initialised `ee`):
+            ```python
+            >>> from earthlens.gee import get_task_status
+            >>> info = get_task_status("SNR3SZ6GNH5LUJQJ52VVNSZT")  # doctest: +SKIP
+            >>> info.state  # doctest: +SKIP
+            'RUNNING'
+
+            ```
+        - A full operation name is accepted too, and needs no project lookup:
+            ```python
+            >>> from earthlens.gee import get_task_status
+            >>> info = get_task_status(  # doctest: +SKIP
+            ...     "projects/earth-engine-415620/operations/SNR3SZ6GNH5LUJQJ52VVNSZT"
+            ... )
+            >>> info.description  # doctest: +SKIP
+            'srtmgl1_003_elevation_20240101'
+
+            ```
+
+    See Also:
+        wait_for_task_id: Block until the task reaches a terminal state.
+        resolve_destination: Turn a completed task's URIs into local files.
     """
     op_name = _operation_name(task_id, project)
     raw = ee.data.getOperation(op_name)
@@ -454,9 +483,33 @@ def cancel_task(task_id: str, project: str | None = None) -> None:
         project: Cloud project id to scope to when `task_id` is bare.
 
     Raises:
+        RuntimeError: If `task_id` is a bare id, `project` is `None`, and the
+            current Earth Engine project cannot be resolved from the SDK. The
+            message names `project=` and `ee.Initialize(project=...)` as the
+            two remedies.
         googleapiclient.errors.HttpError: Propagated verbatim from
             `ee.data.cancelOperation`, **except** the already-terminal
             `FAILED_PRECONDITION` one, which is downgraded to an INFO log.
+
+    Examples:
+        - Cancel one task by id (needs an initialised `ee`):
+            ```python
+            >>> from earthlens.gee import cancel_task
+            >>> cancel_task("SNR3SZ6GNH5LUJQJ52VVNSZT")  # doctest: +SKIP
+
+            ```
+        - Sweep every running task without special-casing the ones that
+          finished between the listing and the cancel:
+            ```python
+            >>> from earthlens.gee import cancel_task, list_recent_tasks
+            >>> for task in list_recent_tasks(state="RUNNING"):  # doctest: +SKIP
+            ...     cancel_task(task.id)
+
+            ```
+
+    See Also:
+        list_recent_tasks: Find the ids to cancel.
+        get_task_status: Confirm a task reached `CANCELLED`.
     """
     op_name = _operation_name(task_id, project)
     try:
@@ -642,6 +695,40 @@ def resolve_destination(
             destination needs is not installed.
         Exception: Propagated verbatim from the underlying GCS / Drive client
             calls.
+
+    Examples:
+        - Look at where a finished task wrote, without downloading anything:
+            ```python
+            >>> from earthlens.gee import get_task_status, resolve_destination
+            >>> info = get_task_status("SNR3SZ6GNH5LUJQJ52VVNSZT")  # doctest: +SKIP
+            >>> resolve_destination(info)  # doctest: +SKIP
+            ['gs://my-bucket/exports/srtm_elevation.tif']
+
+            ```
+        - Pull the same task's files to a local directory and read the first
+          one back:
+            ```python
+            >>> from pathlib import Path
+            >>> from earthlens.gee import get_task_status, resolve_destination
+            >>> info = get_task_status("SNR3SZ6GNH5LUJQJ52VVNSZT")  # doctest: +SKIP
+            >>> paths = resolve_destination(info, download_to="out")  # doctest: +SKIP
+            >>> Path(paths[0]).name  # doctest: +SKIP
+            'srtm_elevation.tif'
+
+            ```
+        - A task that has not finished yet has no destinations, and says so at
+          WARNING rather than raising:
+            ```python
+            >>> from earthlens.gee import get_task_status, resolve_destination
+            >>> running = get_task_status("SNR3SZ6GNH5LUJQJ52VVNSZT")  # doctest: +SKIP
+            >>> resolve_destination(running)  # doctest: +SKIP
+            []
+
+            ```
+
+    See Also:
+        wait_for_task_id: Block until the task is terminal, so the URIs exist.
+        get_task_status: Fetch the `TaskInfo` this takes.
     """
     if task_info.state != "COMPLETED":
         logger.warning(

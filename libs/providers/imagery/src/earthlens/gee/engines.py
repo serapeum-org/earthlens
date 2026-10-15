@@ -426,17 +426,39 @@ def reader_refusal_types() -> tuple[type[BaseException], ...]:
     reader module, which does not re-export `ReaderError`.
 
     Total by construction, because the one call site is the expression of an
-    `except` clause (`GEE._export_via_eedai`). An exception raised while
-    evaluating that expression replaces the reader's own failure and leaves the
-    handler matching nothing, so a missing `[eedai]` extra must not raise here
-    even though the path is only reached after a reader call. It is reachable
-    without the extra: `eedai_available()` gates `AutoEngine.plan` alone, while
-    `engine="eedai"` goes through `EedaiEngine.plan`, which never consults it.
-    With no reader to ask, the transport error still stands on its own.
+    `except` clause: `GEE._try_via_eedai` guards its call to
+    `GEE._export_via_eedai` with it. An exception raised while evaluating that
+    expression replaces the reader's own failure and leaves the handler matching
+    nothing, so a missing `[eedai]` extra must not raise here even though the
+    path is only reached after a reader call. It is reachable without the extra:
+    `eedai_available()` gates `AutoEngine.plan` alone, while `engine="eedai"`
+    goes through `EedaiEngine.plan`, which never consults it. With no reader to
+    ask, the transport error still stands on its own.
 
     Returns:
-        The exception types to catch around a reader export; `(OSError,)` when
-        the extra is absent.
+        The exception types to catch around a reader export: `OSError`, plus the
+        reader's own `ReaderError` when `pyramids_eo.errors` imports. Just
+        `(OSError,)` when the extra is absent, which is why the result is read
+        as a tuple rather than assumed to name the reader's error.
+
+    Examples:
+        - `OSError` is caught whether or not the `[eedai]` extra is installed,
+          so the tuple is never empty:
+            ```python
+            >>> OSError in reader_refusal_types()
+            True
+
+            ```
+        - The result is meant to go straight into an `except` clause, which is
+          the only place it is used:
+            ```python
+            >>> try:
+            ...     raise OSError("the reader refused this band set")
+            ... except reader_refusal_types() as exc:
+            ...     print(exc)
+            the reader refused this band set
+
+            ```
     """
     from earthlens.gee.backend import _reader_errors
 
