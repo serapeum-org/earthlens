@@ -2152,9 +2152,18 @@ def fake_reader(monkeypatch):
     # Patched on the reader module, which is where the import now happens: the
     # backend reaches pyramids-eo through `EedaiReader`, so that adapter owns
     # the lock and the identity check around every call.
+    #
+    # `engines` holds a second reference to the same loader, used by
+    # `reader_refusal_types()` to name the exception types to catch around an
+    # export. Faking only the first leaves that one reaching the real
+    # pyramids-eo, which passes wherever the `eedai` extra happens to be
+    # installed and raises `ImportError` where it is not — `all` deliberately
+    # omits it, so the wheel lane is exactly where that shows up.
+    from earthlens.gee import engines as engines_module
     from earthlens.gee import reader as reader_module
 
-    monkeypatch.setattr(reader_module, "import_earthengine_reader", lambda: reader)
+    for module in (reader_module, engines_module):
+        monkeypatch.setattr(module, "import_earthengine_reader", lambda: reader)
     reader.credential_builds = []
     monkeypatch.setattr(
         backend_module,
