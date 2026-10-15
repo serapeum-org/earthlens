@@ -22,9 +22,9 @@ _LOADER = "import_earthengine_reader"
 _LOADER_OWNERS = frozenset({"_eedai.py", "reader.py"})
 
 #: Every loader-call shape the scan has to tell apart, written to a file
-#: because the scan takes a path and the expected line numbers are of this
-#: literal. Each function's name says which side of the line it belongs on,
-#: and `_SYNTHETIC_OFFENDERS` lists the lines that must be flagged.
+#: because the scan takes a path. Each function's name says which side of the
+#: line it belongs on, and the meta-test below derives what must be flagged
+#: from those names, so adding a shape here extends the expectation with it.
 _SYNTHETIC_CALLERS = '''
 from earthlens.gee._eedai import import_earthengine_reader as load
 
@@ -103,6 +103,47 @@ def guarded_by_a_broad_handler():
 
 def unguarded_through_getattr():
     return getattr(_eedai, "import_earthengine_reader")()
+
+
+def guarded_by_a_bare_handler():
+    try:
+        return import_earthengine_reader()
+    except:
+        return None
+
+
+def guarded_by_a_tuple_handler():
+    try:
+        return import_earthengine_reader()
+    except (OSError, ImportError):
+        return None
+
+
+def unguarded_because_the_tuple_handler_catches_the_wrong_things():
+    try:
+        return import_earthengine_reader()
+    except (OSError, ValueError):
+        return None
+
+
+def unguarded_because_a_lambda_defers_the_call():
+    try:
+        deferred = lambda: import_earthengine_reader()
+    except ImportError:
+        deferred = None
+    return deferred
+
+
+def unguarded_because_a_nested_def_below_the_statement_defers_the_call():
+    try:
+        if _ready:
+
+            def inner():
+                return import_earthengine_reader()
+
+        return None
+    except ImportError:
+        return None
 '''
 
 
@@ -642,9 +683,12 @@ class TestTheBackendReadsThroughTheAdapter:
         would also satisfy, so the production sweep says nothing on its own
         about whether an unguarded call would be caught. The fixture carries
         every spelling the package uses - bare name, aliased import, module
-        attribute, `getattr` - against handlers that absorb, re-raise, chain,
-        or catch the wrong thing, plus a call that only runs after the `try`
-        has exited.
+        attribute, `getattr` - against every handler shape that decides the
+        answer: one that absorbs, re-raises, chains, catches the wrong thing,
+        names nothing at all, or names a tuple that does or does not include
+        the failure. It also carries the three ways a call escapes the handler
+        by running later - a def statement, a def nested below one, and a
+        lambda.
         """
         source = tmp_path / "callers.py"
         source.write_text(_SYNTHETIC_CALLERS, encoding="utf-8")
