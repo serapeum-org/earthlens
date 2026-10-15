@@ -176,10 +176,10 @@ class EngineConfig(SummarisedLeaf):
         discover_extent: Fall back to an Earth Engine-side extent query when the
             catalog row's dates are missing.
         high_volume: Ask for Earth Engine's high-volume endpoint, read by the
-            engines that can use it (see `endpoint`,
-            which only `PixelsEngine` overrides).
-            Less caching, and complex queries cost more EECU-time there, so it
-            is opted into per request rather than switched on globally.
+            engines that can use it (see `endpoint`, which only `PixelsEngine`
+            overrides). Less caching, and complex queries cost more EECU-time
+            there, so it is opted into per request rather than switched on
+            globally.
         crs_transform: A 6-element affine transform pinning the output grid's
             pixel size *and* origin, or `None` to size the grid from `scale`.
             Earth Engine treats the two as an either/or, so a request carrying

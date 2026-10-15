@@ -185,10 +185,9 @@ class TemporalExtent(BaseModel):
 
     Attributes:
         start_date: Inclusive start of the requested window. Typed
-            `typing.Any` because pandas / numpy timestamp types
-            are not native pydantic primitives; the cross-field
-            validator below enforces `start_date <= end_date` for
-            anything that supports comparison.
+            `typing.Any` because pandas / numpy timestamp types are not native
+            pydantic primitives; the cross-field validator below enforces
+            `start_date <= end_date` for anything that supports comparison.
         end_date: Inclusive end of the requested window.
         resolution: Spacing between consecutive entries in
             `dates`, expressed as a pandas frequency alias —

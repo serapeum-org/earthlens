@@ -31,3 +31,13 @@ the rendered API.
 ::: earthlens.gee.grid
 
 ::: earthlens.gee.reader
+
+::: earthlens.gee.cloud_masks
+
+::: earthlens.gee.filters
+
+::: earthlens.gee.sampling
+
+::: earthlens.gee.jobs
+
+::: earthlens.gee.io

@@ -722,8 +722,9 @@ def resolve_destination(
             'srtm_elevation.tif'
 
             ```
-        - A task that has not finished yet has no destinations, and says so at
-          WARNING rather than raising:
+        - A task that has not finished yet is warned about rather than raised
+          on, and its `destination_uris` are returned as they stand - empty
+          while it is still running, which is why this reads `[]`:
             ```python
             >>> from earthlens.gee import get_task_status, resolve_destination
             >>> running = get_task_status("SNR3SZ6GNH5LUJQJ52VVNSZT")  # doctest: +SKIP

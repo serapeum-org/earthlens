@@ -133,9 +133,8 @@ exposes a small set of helpers re-exported from this package:
   destination URIs (Drive / GCS / asset paths) for follow-up
   pulls.
 
-Mirrors `earthlens.ecmwf.jobs` — see also the
-"`Tracking async exports`" notebook under
-`docs/examples/gee/`.
+Mirrors `earthlens.ecmwf.jobs` — see also the "Tracking asynchronous
+Earth Engine exports" notebook, `docs/examples/gee/track-batch-exports.ipynb`.
 
 The Earth Engine SDK (`earthengine-api`, the `[gee]` extra) is imported
 when this package is imported — install `earthlens[gee]` to use it; the

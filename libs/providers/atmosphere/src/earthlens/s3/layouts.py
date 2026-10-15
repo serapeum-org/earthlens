@@ -54,8 +54,7 @@ def plan_products(
 
     Args:
         dataset: The resolved `Dataset`.
-        variables: The resolved `Variable`
-            rows the caller asked for.
+        variables: The resolved `Variable` rows the caller asked for.
         bbox: AOI as `(west, south, east, north)` in degrees (EPSG:4326).
         dates: The request's date index (each item exposes `.year`,
             `.month`, `.day`, `.timetuple()`); ignored for static
