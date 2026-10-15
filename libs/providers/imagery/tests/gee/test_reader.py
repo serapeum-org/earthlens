@@ -17,6 +17,29 @@ from .test_backend import fake_ee, fake_reader, make_gee  # noqa: F401 - fixture
 _GEE_PACKAGE = Path(gee_package.__file__).parent
 _LOADER = "import_earthengine_reader"
 
+#: Three loader calls for the AST scan to tell apart: a bare one, one caught by
+#: `except ImportError`, and one wrapped in a `try` that catches something else
+#: entirely. Written to a file rather than parsed from a string because the scan
+#: takes a path, and the expected line numbers are of this literal.
+_SYNTHETIC_CALLERS = """
+def unguarded():
+    return import_earthengine_reader()
+
+
+def guarded():
+    try:
+        return import_earthengine_reader()
+    except ImportError:
+        return None
+
+
+def guarded_against_the_wrong_thing():
+    try:
+        return import_earthengine_reader()
+    except OSError:
+        return None
+"""
+
 
 def _handles_missing_module(handler: ast.ExceptHandler) -> bool:
     """Whether this handler catches `ImportError` or something broader."""
@@ -425,3 +448,17 @@ class TestTheBackendReadsThroughTheAdapter:
             for line in _unguarded_loader_calls(path)
         ]
         assert offenders == [], f"unguarded import_earthengine_reader() at {offenders}"
+
+    def test_the_scan_flags_a_call_no_handler_catches(self, tmp_path):
+        """The guard above passes vacuously unless the scan can actually fail.
+
+        It asserts an empty list, which a scan that found nothing anywhere
+        would also satisfy, so the production sweep says nothing on its own
+        about whether an unguarded call would be caught.
+        """
+        source = tmp_path / "callers.py"
+        source.write_text(_SYNTHETIC_CALLERS, encoding="utf-8")
+        assert _unguarded_loader_calls(source) == [3, 15], (
+            "the scan must flag the bare call and the one whose handler catches "
+            "the wrong thing, and spare the one caught by `except ImportError`"
+        )
