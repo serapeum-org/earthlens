@@ -24899,15 +24899,15 @@ through pyramids <code>FeatureCollection.read_file</code> and the WGMS path is p
   length change, glacier state) as tabular CSV tables; <code>tabular</code>.</li>
 </ul>
 <p>Output is <strong>per instance</strong>: a dataset's <code>output_kind</code> decides whether
-:meth:<code>~earthlens.glaciers.backend.Glaciers.download</code> returns a pyramids
-:class:<code>~pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>, rgi/glims) or
-a :class:<code>pandas.DataFrame</code> (<code>tabular</code>, wgms). All three sources are open, so the
+<code>download</code> returns a pyramids
+<code>pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>, rgi/glims) or
+a <code>pandas.DataFrame</code> (<code>tabular</code>, wgms). All three sources are open, so the
 backend ships <strong>no auth</strong>. Vector file I/O always goes through pyramids
 <code>FeatureCollection.read_file</code> — never a bare geopandas file read — and the WGMS
 path is pure pandas with no array/NetCDF stack.</p>
-<p>The public surface is the :class:<code>Catalog</code> (dataset id -&gt; source + output kind +
-request detail, plus the GTN-G :class:<code>Region</code> table) and its :class:<code>Dataset</code>
-rows, the backend :class:<code>Glaciers</code>, and the stateless query/read helpers.</p>
+<p>The public surface is the <code>Catalog</code> (dataset id -&gt; source + output kind +
+request detail, plus the GTN-G <code>Region</code> table) and its <code>Dataset</code>
+rows, the backend <code>Glaciers</code>, and the stateless query/read helpers.</p>
 
 
 
@@ -24947,11 +24947,11 @@ rows, the backend :class:<code>Glaciers</code>, and the stateless query/read hel
 
         <p>Dataset + region catalog for the glaciers backend.</p>
 <p>Reads the bundled sharded <code>catalog/</code> directory (shipped as package data) and
-exposes its <code>datasets:</code> blocks as a map of :class:<code>Dataset</code> rows keyed by id,
-plus the GTN-G <code>regions:</code> table as a map of :class:<code>Region</code> rows.
+exposes its <code>datasets:</code> blocks as a map of <code>Dataset</code> rows keyed by id,
+plus the GTN-G <code>regions:</code> table as a map of <code>Region</code> rows.
 Instantiate with no arguments (<code>Catalog()</code>). Resolve one row with
-:meth:<code>get</code>, list the shipped ids with :meth:<code>available</code>, and read the region
-table via :attr:<code>regions</code>.</p>
+<code>get</code>, list the shipped ids with <code>available</code>, and read the region
+table via <code>regions</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -24971,7 +24971,7 @@ table via :attr:<code>regions</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from dataset id to its :class:<code>Dataset</code> row.</p>
+                <p>Map from dataset id to its <code>Dataset</code> row.</p>
               </div>
             </td>
           </tr>
@@ -24982,7 +24982,7 @@ table via :attr:<code>regions</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from GTN-G region id to its :class:<code>Region</code> row.</p>
+                <p>Map from GTN-G region id to its <code>Region</code> row.</p>
               </div>
             </td>
           </tr>
@@ -25136,15 +25136,15 @@ table via :attr:<code>regions</code>.</p>
 <a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset + region catalog for the glaciers backend.</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    Reads the bundled sharded `catalog/` directory (shipped as package data) and</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    exposes its `datasets:` blocks as a map of :class:`Dataset` rows keyed by id,</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">    plus the GTN-G `regions:` table as a map of :class:`Region` rows.</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    exposes its `datasets:` blocks as a map of `Dataset` rows keyed by id,</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">    plus the GTN-G `regions:` table as a map of `Region` rows.</span>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    Instantiate with no arguments (`Catalog()`). Resolve one row with</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">    :meth:`get`, list the shipped ids with :meth:`available`, and read the region</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    table via :attr:`regions`.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">    `get`, list the shipped ids with `available`, and read the region</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    table via `regions`.</span>
 <a id="__codelineno-0-327" name="__codelineno-0-327"></a>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        datasets: Map from dataset id to its :class:`Dataset` row.</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        regions: Map from GTN-G region id to its :class:`Region` row.</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        datasets: Map from dataset id to its `Dataset` row.</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        regions: Map from GTN-G region id to its `Region` row.</span>
 <a id="__codelineno-0-331" name="__codelineno-0-331"></a>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        - Resolve rows and a region:</span>
@@ -25173,12 +25173,12 @@ table via :attr:<code>regions</code>.</p>
 <a id="__codelineno-0-356" name="__codelineno-0-356"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;glaciers catalog&quot;</span>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;datasets&quot;</span>
 <a id="__codelineno-0-358" name="__codelineno-0-358"></a>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="c1">#: The dataset rows live in the base :attr:`datasets` field so the inherited</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>    <span class="c1">#: dict surface (`len`, `in`, `[]`, iteration) and :meth:`get_dataset`&#39;s</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="c1">#: The dataset rows live in the base `datasets` field so the inherited</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>    <span class="c1">#: dict surface (`len`, `in`, `[]`, iteration) and `get_dataset`&#39;s</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a>    <span class="c1">#: did-you-mean hint work unchanged.</span>
 <a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-363" name="__codelineno-0-363"></a>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="c1">#: GTN-G first-order region id -&gt; :class:`Region` (RGI download metadata).</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="c1">#: GTN-G first-order region id -&gt; `Region` (RGI download metadata).</span>
 <a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="n">regions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Region</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-366" name="__codelineno-0-366"></a>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a>    <span class="nd">@classmethod</span>
@@ -25202,10 +25202,10 @@ table via :attr:<code>regions</code>.</p>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a>
 <a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">            catalog_path: Path to the catalog directory or a single YAML.</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">                Defaults to the module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">                Defaults to the module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">            A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">            ValueError: If the catalog has no `datasets:` block, or a row fails</span>
@@ -25220,9 +25220,9 @@ table via :attr:<code>regions</code>.</p>
 <a id="__codelineno-0-403" name="__codelineno-0-403"></a>        <span class="p">)</span>
 <a id="__codelineno-0-404" name="__codelineno-0-404"></a>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its :class:`Dataset` row.</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its `Dataset` row.</span>
 <a id="__codelineno-0-407" name="__codelineno-0-407"></a>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-410" name="__codelineno-0-410"></a>
 <a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        Args:</span>
@@ -25330,8 +25330,8 @@ table via :attr:<code>regions</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Resolve a dataset id to its :class:<code>Dataset</code> row.</p>
-<p>Thin wrapper over the inherited :meth:<code>get_dataset</code>, which raises a
+        <p>Resolve a dataset id to its <code>Dataset</code> row.</p>
+<p>Thin wrapper over the inherited <code>get_dataset</code>, which raises a
 <code>ValueError</code> with a did-you-mean hint on an unknown id.</p>
 
 
@@ -25434,9 +25434,9 @@ did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-420">420</a></span>
 <span class="normal"><a href="#__codelineno-0-421">421</a></span>
 <span class="normal"><a href="#__codelineno-0-422">422</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its :class:`Dataset` row.</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its `Dataset` row.</span>
 <a id="__codelineno-0-407" name="__codelineno-0-407"></a>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-410" name="__codelineno-0-410"></a>
 <a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">    Args:</span>
@@ -25496,7 +25496,7 @@ did-you-mean hint.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog directory or a single YAML.
-Defaults to the module-level :data:<code>CATALOG_PATH</code>.</p>
+Defaults to the module-level <code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -25522,7 +25522,7 @@ Defaults to the module-level :data:<code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code>.</p>
+                <p>A fully-populated <code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -25583,10 +25583,10 @@ validation.</p>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a>
 <a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        catalog_path: Path to the catalog directory or a single YAML.</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">            Defaults to the module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">            Defaults to the module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        ValueError: If the catalog has no `datasets:` block, or a row fails</span>
@@ -25631,10 +25631,10 @@ validation.</p>
 
 
         <p>One glaciers catalog row.</p>
-<p>The dataset id is the parent key in :attr:<code>Catalog.datasets</code> and is also
-stored on the row as :attr:<code>id</code> so a resolved :class:<code>Dataset</code> is
+<p>The dataset id is the parent key in <code>Catalog.datasets</code> and is also
+stored on the row as <code>id</code> so a resolved <code>Dataset</code> is
 self-describing. Which source-specific fields are populated depends on
-:attr:<code>source</code>; a cross-field validator enforces that the right ones are
+<code>source</code>; a cross-field validator enforces that the right ones are
 present.</p>
 
 
@@ -25864,10 +25864,10 @@ present.</p>
 <span class="normal"><a href="#__codelineno-0-257">257</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="k">class</span><span class="w"> </span><span class="nc">Dataset</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One glaciers catalog row.</span>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">    The dataset id is the parent key in :attr:`Catalog.datasets` and is also</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">    stored on the row as :attr:`id` so a resolved :class:`Dataset` is</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">    The dataset id is the parent key in `Catalog.datasets` and is also</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">    stored on the row as `id` so a resolved `Dataset` is</span>
 <a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">    self-describing. Which source-specific fields are populated depends on</span>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">    :attr:`source`; a cross-field validator enforces that the right ones are</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">    `source`; a cross-field validator enforces that the right ones are</span>
 <a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">    present.</span>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">    Attributes:</span>
@@ -25992,10 +25992,10 @@ present.</p>
         <p>Glacier outlines / fluctuations backend (mixed output).</p>
 <p>Resolves one dataset id to its catalog row, routes the request to that row's
 source (RGI / GLIMS / WGMS), and returns a pyramids
-:class:<code>~pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>) or a
-:class:<code>pandas.DataFrame</code> (<code>tabular</code>) per the row's <code>output_kind</code>. The query
-is a search/fetch split: :meth:<code>_search</code> pins the products (one per
-overlapping RGI region, or a single GLIMS / WGMS product) and :meth:<code>_fetch</code>
+<code>pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>) or a
+<code>pandas.DataFrame</code> (<code>tabular</code>) per the row's <code>output_kind</code>. The query
+is a search/fetch split: <code>_search</code> pins the products (one per
+overlapping RGI region, or a single GLIMS / WGMS product) and <code>_fetch</code>
 downloads + reads each.</p>
 <p>All three sources are open, so the backend needs no credentials. <code>aggregate=</code>
 is rejected — outlines / fluctuations are pre-computed inventories, not
@@ -26019,7 +26019,7 @@ gridded rasters (<code>G8</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Set <strong>per instance</strong> in :meth:<code>__init__</code> from the resolved
+                <p>Set <strong>per instance</strong> in <code>__init__</code> from the resolved
 dataset's <code>output_kind</code> (<code>"vector"</code> or <code>"tabular"</code>). The facade reads
 it to gate <code>aggregate=</code> and to know the return shape.</p>
               </div>
@@ -26411,10 +26411,10 @@ it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">    Resolves one dataset id to its catalog row, routes the request to that row&#39;s</span>
 <a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    source (RGI / GLIMS / WGMS), and returns a pyramids</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    :class:`~pyramids.feature.collection.FeatureCollection` (`vector`) or a</span>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">    :class:`pandas.DataFrame` (`tabular`) per the row&#39;s `output_kind`. The query</span>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    is a search/fetch split: :meth:`_search` pins the products (one per</span>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">    overlapping RGI region, or a single GLIMS / WGMS product) and :meth:`_fetch`</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection` (`vector`) or a</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">    `pandas.DataFrame` (`tabular`) per the row&#39;s `output_kind`. The query</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    is a search/fetch split: `_search` pins the products (one per</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">    overlapping RGI region, or a single GLIMS / WGMS product) and `_fetch`</span>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">    downloads + reads each.</span>
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">    All three sources are open, so the backend needs no credentials. `aggregate=`</span>
@@ -26422,7 +26422,7 @@ it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    gridded rasters (`G8`).</span>
 <a id="__codelineno-0-79" name="__codelineno-0-79"></a>
 <a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in :meth:`__init__` from the resolved</span>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in `__init__` from the resolved</span>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">            dataset&#39;s `output_kind` (`&quot;vector&quot;` or `&quot;tabular&quot;`). The facade reads</span>
 <a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">            it to gate `aggregate=` and to know the return shape.</span>
 <a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -26572,7 +26572,7 @@ it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a `TemporalExtent`.</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        Dates are not part of the request (outlines are an inventory), so `None`</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        bounds are allowed and yield a `None`-dated extent.</span>
@@ -26647,12 +26647,12 @@ it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download + read every product `_search` returned.</span>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            products: The list from :meth:`_search`.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            products: The list from `_search`.</span>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            list: One :class:`~pyramids.feature.collection.FeatureCollection`</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            list: One `pyramids.feature.collection.FeatureCollection`</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">                per RGI region / the GLIMS query (`vector`), or a single</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">                :class:`pandas.DataFrame` (`tabular`, wgms).</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">                `pandas.DataFrame` (`tabular`, wgms).</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_one</span><span class="p">(</span><span class="n">product</span><span class="p">)</span> <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">]</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a>
@@ -26660,7 +26660,7 @@ it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch and read one product per its source.</span>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            product: One `RemoteProduct` from `_search`.</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            A `FeatureCollection` (rgi/glims) or a `DataFrame` (wgms).</span>
@@ -26711,9 +26711,9 @@ it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">                fetch is a small loop, so this is a no-op.</span>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">            A pyramids :class:`~pyramids.feature.collection.FeatureCollection`</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">            A pyramids `pyramids.feature.collection.FeatureCollection`</span>
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">            (`vector`, rgi/glims; clipped, EPSG:4326) or a</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">            :class:`pandas.DataFrame` (`tabular`, wgms; also written to</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">            `pandas.DataFrame` (`tabular`, wgms; also written to</span>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">            `root_dir`).</span>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        Raises:</span>
@@ -27330,7 +27330,7 @@ fetch is a small loop, so this is a no-op.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A pyramids :class:<code>~pyramids.feature.collection.FeatureCollection</code></p>
+                <p>A pyramids <code>pyramids.feature.collection.FeatureCollection</code></p>
               </div>
             </td>
           </tr>
@@ -27350,7 +27350,7 @@ fetch is a small loop, so this is a no-op.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>class:<code>pandas.DataFrame</code> (<code>tabular</code>, wgms; also written to</p>
+                <p><code>pandas.DataFrame</code> (<code>tabular</code>, wgms; also written to</p>
               </div>
             </td>
           </tr>
@@ -27446,9 +27446,9 @@ fetch is a small loop, so this is a no-op.</p>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">            fetch is a small loop, so this is a no-op.</span>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        A pyramids :class:`~pyramids.feature.collection.FeatureCollection`</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        A pyramids `pyramids.feature.collection.FeatureCollection`</span>
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        (`vector`, rgi/glims; clipped, EPSG:4326) or a</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        :class:`pandas.DataFrame` (`tabular`, wgms; also written to</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        `pandas.DataFrame` (`tabular`, wgms; also written to</span>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        `root_dir`).</span>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">    Raises:</span>
@@ -27764,7 +27764,7 @@ shapefile zip.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>One :class:<code>FeatureCollection</code> per region (or query).</p>
+                <p>One <code>FeatureCollection</code> per region (or query).</p>
               </div>
             </td>
             <td>
@@ -27851,7 +27851,7 @@ collection when every fragment is empty.</p>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge per-region outline fragments into one collection.</span>
 <a id="__codelineno-0-355" name="__codelineno-0-355"></a>
 <a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        fragments: One :class:`FeatureCollection` per region (or query).</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        fragments: One `FeatureCollection` per region (or query).</span>
 <a id="__codelineno-0-358" name="__codelineno-0-358"></a>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        FeatureCollection: The concatenated collection in EPSG:4326. The first</span>
@@ -28256,7 +28256,7 @@ re-downloading. Retries transient HTTP failures with exponential backoff.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Build an empty EPSG:4326 :class:<code>FeatureCollection</code> (no features).</p>
+        <p>Build an empty EPSG:4326 <code>FeatureCollection</code> (no features).</p>
 <p>Returned by the vector path when a request's bbox overlaps no glacier
 region / matches no outline, so <code>download()</code> always yields a collection.</p>
 
@@ -28298,7 +28298,7 @@ region / matches no outline, so <code>download()</code> always yields a collecti
 <span class="normal"><a href="#__codelineno-0-348">348</a></span>
 <span class="normal"><a href="#__codelineno-0-349">349</a></span>
 <span class="normal"><a href="#__codelineno-0-350">350</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_feature_collection</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build an empty EPSG:4326 :class:`FeatureCollection` (no features).</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build an empty EPSG:4326 `FeatureCollection` (no features).</span>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a>
 <a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">    Returned by the vector path when a request&#39;s bbox overlaps no glacier</span>
 <a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">    region / matches no outline, so `download()` always yields a collection.</span>
@@ -29107,7 +29107,7 @@ member — no reshaping, no array/NetCDF stack.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The cached WGMS FoG <code>.zip</code> (from :func:<code>download_zip</code>).</p>
+                <p>The cached WGMS FoG <code>.zip</code> (from <code>download_zip</code>).</p>
               </div>
             </td>
             <td>
@@ -29217,7 +29217,7 @@ member — no reshaping, no array/NetCDF stack.</p>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">    member — no reshaping, no array/NetCDF stack.</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        zip_path: The cached WGMS FoG `.zip` (from :func:`download_zip`).</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        zip_path: The cached WGMS FoG `.zip` (from `download_zip`).</span>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        table: The table name (`&quot;mass_balance&quot;`, `&quot;front_variation&quot;`,</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">            `&quot;state&quot;`).</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a>
@@ -29280,7 +29280,7 @@ the bbox.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The local RGI region <code>.zip</code> (from :func:<code>download_zip</code>).</p>
+                <p>The local RGI region <code>.zip</code> (from <code>download_zip</code>).</p>
               </div>
             </td>
             <td>
@@ -29384,7 +29384,7 @@ EPSG:4326.</p>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    the bbox.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        zip_path: The local RGI region `.zip` (from :func:`download_zip`).</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        zip_path: The local RGI region `.zip` (from `download_zip`).</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">        bbox: `[west, south, east, north]` AOI in EPSG:4326.</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        inner_shp: The inner `.shp` member name; resolved from the zip when</span>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">            `None`.</span>
@@ -29568,7 +29568,7 @@ bbox intersect-filter needs this small adapter.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The request's :class:<code>~earthlens.base.SpatialExtent</code>.</p>
+                <p>The request's <code>SpatialExtent</code>.</p>
               </div>
             </td>
             <td>
@@ -29623,7 +29623,7 @@ bbox intersect-filter needs this small adapter.</p>
 <a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    bbox intersect-filter needs this small adapter.</span>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a>
 <a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">        space: The request&#39;s :class:`~earthlens.base.SpatialExtent`.</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">        space: The request&#39;s `SpatialExtent`.</span>
 <a id="__codelineno-0-53" name="__codelineno-0-53"></a>
 <a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">        A `shapely.geometry.box(west, south, east, north)` polygon.</span>
@@ -29802,9 +29802,9 @@ glacier / region selector (wgms).</p>
 <ul>
 <li><strong>Per-instance <code>OUTPUT_KIND</code> (<code>G1</code>).</strong> The resolved dataset's <code>output_kind</code> is
   copied onto <code>self.OUTPUT_KIND</code> in <code>__init__</code>: <code>vector</code> returns a pyramids
-  :class:<code>~pyramids.feature.collection.FeatureCollection</code> (rgi/glims outlines),
-  <code>tabular</code> returns a :class:<code>pandas.DataFrame</code> (wgms fluctuations). The
-  :class:<code>earthlens.earthlens.EarthLens</code> facade reads the instance attribute to
+  <code>pyramids.feature.collection.FeatureCollection</code> (rgi/glims outlines),
+  <code>tabular</code> returns a <code>pandas.DataFrame</code> (wgms fluctuations). The
+  <code>earthlens.earthlens.EarthLens</code> facade reads the instance attribute to
   gate <code>aggregate=</code> (rejected for both) and to know the return shape.</li>
 <li><strong>Region-download-then-clip (<code>G6</code>).</strong> RGI ships per GTN-G region; the backend
   maps the request bbox to the overlapping region(s) (a <code>region=</code> override is
@@ -29856,10 +29856,10 @@ pure pandas.</p>
         <p>Glacier outlines / fluctuations backend (mixed output).</p>
 <p>Resolves one dataset id to its catalog row, routes the request to that row's
 source (RGI / GLIMS / WGMS), and returns a pyramids
-:class:<code>~pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>) or a
-:class:<code>pandas.DataFrame</code> (<code>tabular</code>) per the row's <code>output_kind</code>. The query
-is a search/fetch split: :meth:<code>_search</code> pins the products (one per
-overlapping RGI region, or a single GLIMS / WGMS product) and :meth:<code>_fetch</code>
+<code>pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>) or a
+<code>pandas.DataFrame</code> (<code>tabular</code>) per the row's <code>output_kind</code>. The query
+is a search/fetch split: <code>_search</code> pins the products (one per
+overlapping RGI region, or a single GLIMS / WGMS product) and <code>_fetch</code>
 downloads + reads each.</p>
 <p>All three sources are open, so the backend needs no credentials. <code>aggregate=</code>
 is rejected — outlines / fluctuations are pre-computed inventories, not
@@ -29883,7 +29883,7 @@ gridded rasters (<code>G8</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Set <strong>per instance</strong> in :meth:<code>__init__</code> from the resolved
+                <p>Set <strong>per instance</strong> in <code>__init__</code> from the resolved
 dataset's <code>output_kind</code> (<code>"vector"</code> or <code>"tabular"</code>). The facade reads
 it to gate <code>aggregate=</code> and to know the return shape.</p>
               </div>
@@ -30275,10 +30275,10 @@ it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">    Resolves one dataset id to its catalog row, routes the request to that row&#39;s</span>
 <a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    source (RGI / GLIMS / WGMS), and returns a pyramids</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    :class:`~pyramids.feature.collection.FeatureCollection` (`vector`) or a</span>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">    :class:`pandas.DataFrame` (`tabular`) per the row&#39;s `output_kind`. The query</span>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    is a search/fetch split: :meth:`_search` pins the products (one per</span>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">    overlapping RGI region, or a single GLIMS / WGMS product) and :meth:`_fetch`</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection` (`vector`) or a</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">    `pandas.DataFrame` (`tabular`) per the row&#39;s `output_kind`. The query</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    is a search/fetch split: `_search` pins the products (one per</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">    overlapping RGI region, or a single GLIMS / WGMS product) and `_fetch`</span>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">    downloads + reads each.</span>
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">    All three sources are open, so the backend needs no credentials. `aggregate=`</span>
@@ -30286,7 +30286,7 @@ it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    gridded rasters (`G8`).</span>
 <a id="__codelineno-0-79" name="__codelineno-0-79"></a>
 <a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in :meth:`__init__` from the resolved</span>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in `__init__` from the resolved</span>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">            dataset&#39;s `output_kind` (`&quot;vector&quot;` or `&quot;tabular&quot;`). The facade reads</span>
 <a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">            it to gate `aggregate=` and to know the return shape.</span>
 <a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -30436,7 +30436,7 @@ it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a `TemporalExtent`.</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        Dates are not part of the request (outlines are an inventory), so `None`</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        bounds are allowed and yield a `None`-dated extent.</span>
@@ -30511,12 +30511,12 @@ it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download + read every product `_search` returned.</span>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            products: The list from :meth:`_search`.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            products: The list from `_search`.</span>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            list: One :class:`~pyramids.feature.collection.FeatureCollection`</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            list: One `pyramids.feature.collection.FeatureCollection`</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">                per RGI region / the GLIMS query (`vector`), or a single</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">                :class:`pandas.DataFrame` (`tabular`, wgms).</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">                `pandas.DataFrame` (`tabular`, wgms).</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_one</span><span class="p">(</span><span class="n">product</span><span class="p">)</span> <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">]</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a>
@@ -30524,7 +30524,7 @@ it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch and read one product per its source.</span>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            product: One `RemoteProduct` from `_search`.</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            A `FeatureCollection` (rgi/glims) or a `DataFrame` (wgms).</span>
@@ -30575,9 +30575,9 @@ it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">                fetch is a small loop, so this is a no-op.</span>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">            A pyramids :class:`~pyramids.feature.collection.FeatureCollection`</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">            A pyramids `pyramids.feature.collection.FeatureCollection`</span>
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">            (`vector`, rgi/glims; clipped, EPSG:4326) or a</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">            :class:`pandas.DataFrame` (`tabular`, wgms; also written to</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">            `pandas.DataFrame` (`tabular`, wgms; also written to</span>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">            `root_dir`).</span>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        Raises:</span>
@@ -31194,7 +31194,7 @@ fetch is a small loop, so this is a no-op.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A pyramids :class:<code>~pyramids.feature.collection.FeatureCollection</code></p>
+                <p>A pyramids <code>pyramids.feature.collection.FeatureCollection</code></p>
               </div>
             </td>
           </tr>
@@ -31214,7 +31214,7 @@ fetch is a small loop, so this is a no-op.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>class:<code>pandas.DataFrame</code> (<code>tabular</code>, wgms; also written to</p>
+                <p><code>pandas.DataFrame</code> (<code>tabular</code>, wgms; also written to</p>
               </div>
             </td>
           </tr>
@@ -31310,9 +31310,9 @@ fetch is a small loop, so this is a no-op.</p>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">            fetch is a small loop, so this is a no-op.</span>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        A pyramids :class:`~pyramids.feature.collection.FeatureCollection`</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        A pyramids `pyramids.feature.collection.FeatureCollection`</span>
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        (`vector`, rgi/glims; clipped, EPSG:4326) or a</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        :class:`pandas.DataFrame` (`tabular`, wgms; also written to</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        `pandas.DataFrame` (`tabular`, wgms; also written to</span>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        `root_dir`).</span>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">    Raises:</span>
@@ -31385,16 +31385,16 @@ Fluctuations of Glaciers database (<code>wgms</code>, tabular CSV tables). This 
 the bridge from a dataset id (<code>"rgi:outlines"</code>, <code>"glims:outlines"</code>,
 <code>"wgms:mass_balance"</code>, …) to its source, output kind, and the source-specific
 request detail needed to fetch it.</p>
-<p>:class:<code>Catalog</code> is a thin :class:<code>earthlens.base.AbstractCatalog</code> subclass that
+<p><code>Catalog</code> is a thin <code>earthlens.base.AbstractCatalog</code> subclass that
 loads the bundled sharded <code>catalog/</code> directory (<code>rgi.yaml</code> / <code>glims.yaml</code> /
-<code>wgms.yaml</code> + <code>_index.yaml</code>) and exposes each row as a :class:<code>Dataset</code>. The
+<code>wgms.yaml</code> + <code>_index.yaml</code>) and exposes each row as a <code>Dataset</code>. The
 <code>rgi.yaml</code> file also ships a <code>regions:</code> block — the GTN-G first-order region
 table (id → name + bbox(es) + per-region download URL) that drives the
-bbox → region(s) mapping — exposed as :attr:<code>Catalog.regions</code> of
-:class:<code>Region</code> rows. Resolve one dataset with :meth:<code>Catalog.get</code> (a
+bbox → region(s) mapping — exposed as <code>Catalog.regions</code> of
+<code>Region</code> rows. Resolve one dataset with <code>Catalog.get</code> (a
 did-you-mean hint on an unknown id); list the shipped ids with
-:meth:<code>Catalog.available</code>.</p>
-<p>:data:<code>CATALOG_PATH</code> is the path to the bundled <code>catalog/</code> directory; tests may
+<code>Catalog.available</code>.</p>
+<p><code>CATALOG_PATH</code> is the path to the bundled <code>catalog/</code> directory; tests may
 monkey-patch it at a temporary directory or a single YAML file.</p>
 
 
@@ -31435,11 +31435,11 @@ monkey-patch it at a temporary directory or a single YAML file.</p>
 
         <p>Dataset + region catalog for the glaciers backend.</p>
 <p>Reads the bundled sharded <code>catalog/</code> directory (shipped as package data) and
-exposes its <code>datasets:</code> blocks as a map of :class:<code>Dataset</code> rows keyed by id,
-plus the GTN-G <code>regions:</code> table as a map of :class:<code>Region</code> rows.
+exposes its <code>datasets:</code> blocks as a map of <code>Dataset</code> rows keyed by id,
+plus the GTN-G <code>regions:</code> table as a map of <code>Region</code> rows.
 Instantiate with no arguments (<code>Catalog()</code>). Resolve one row with
-:meth:<code>get</code>, list the shipped ids with :meth:<code>available</code>, and read the region
-table via :attr:<code>regions</code>.</p>
+<code>get</code>, list the shipped ids with <code>available</code>, and read the region
+table via <code>regions</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -31459,7 +31459,7 @@ table via :attr:<code>regions</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from dataset id to its :class:<code>Dataset</code> row.</p>
+                <p>Map from dataset id to its <code>Dataset</code> row.</p>
               </div>
             </td>
           </tr>
@@ -31470,7 +31470,7 @@ table via :attr:<code>regions</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from GTN-G region id to its :class:<code>Region</code> row.</p>
+                <p>Map from GTN-G region id to its <code>Region</code> row.</p>
               </div>
             </td>
           </tr>
@@ -31624,15 +31624,15 @@ table via :attr:<code>regions</code>.</p>
 <a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset + region catalog for the glaciers backend.</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    Reads the bundled sharded `catalog/` directory (shipped as package data) and</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    exposes its `datasets:` blocks as a map of :class:`Dataset` rows keyed by id,</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">    plus the GTN-G `regions:` table as a map of :class:`Region` rows.</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    exposes its `datasets:` blocks as a map of `Dataset` rows keyed by id,</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">    plus the GTN-G `regions:` table as a map of `Region` rows.</span>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    Instantiate with no arguments (`Catalog()`). Resolve one row with</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">    :meth:`get`, list the shipped ids with :meth:`available`, and read the region</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    table via :attr:`regions`.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">    `get`, list the shipped ids with `available`, and read the region</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    table via `regions`.</span>
 <a id="__codelineno-0-327" name="__codelineno-0-327"></a>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        datasets: Map from dataset id to its :class:`Dataset` row.</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        regions: Map from GTN-G region id to its :class:`Region` row.</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        datasets: Map from dataset id to its `Dataset` row.</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        regions: Map from GTN-G region id to its `Region` row.</span>
 <a id="__codelineno-0-331" name="__codelineno-0-331"></a>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        - Resolve rows and a region:</span>
@@ -31661,12 +31661,12 @@ table via :attr:<code>regions</code>.</p>
 <a id="__codelineno-0-356" name="__codelineno-0-356"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;glaciers catalog&quot;</span>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;datasets&quot;</span>
 <a id="__codelineno-0-358" name="__codelineno-0-358"></a>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="c1">#: The dataset rows live in the base :attr:`datasets` field so the inherited</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>    <span class="c1">#: dict surface (`len`, `in`, `[]`, iteration) and :meth:`get_dataset`&#39;s</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="c1">#: The dataset rows live in the base `datasets` field so the inherited</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>    <span class="c1">#: dict surface (`len`, `in`, `[]`, iteration) and `get_dataset`&#39;s</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a>    <span class="c1">#: did-you-mean hint work unchanged.</span>
 <a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-363" name="__codelineno-0-363"></a>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="c1">#: GTN-G first-order region id -&gt; :class:`Region` (RGI download metadata).</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="c1">#: GTN-G first-order region id -&gt; `Region` (RGI download metadata).</span>
 <a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="n">regions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Region</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-366" name="__codelineno-0-366"></a>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a>    <span class="nd">@classmethod</span>
@@ -31690,10 +31690,10 @@ table via :attr:<code>regions</code>.</p>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a>
 <a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">            catalog_path: Path to the catalog directory or a single YAML.</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">                Defaults to the module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">                Defaults to the module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">            A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">            ValueError: If the catalog has no `datasets:` block, or a row fails</span>
@@ -31708,9 +31708,9 @@ table via :attr:<code>regions</code>.</p>
 <a id="__codelineno-0-403" name="__codelineno-0-403"></a>        <span class="p">)</span>
 <a id="__codelineno-0-404" name="__codelineno-0-404"></a>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its :class:`Dataset` row.</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its `Dataset` row.</span>
 <a id="__codelineno-0-407" name="__codelineno-0-407"></a>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-410" name="__codelineno-0-410"></a>
 <a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        Args:</span>
@@ -31818,8 +31818,8 @@ table via :attr:<code>regions</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Resolve a dataset id to its :class:<code>Dataset</code> row.</p>
-<p>Thin wrapper over the inherited :meth:<code>get_dataset</code>, which raises a
+        <p>Resolve a dataset id to its <code>Dataset</code> row.</p>
+<p>Thin wrapper over the inherited <code>get_dataset</code>, which raises a
 <code>ValueError</code> with a did-you-mean hint on an unknown id.</p>
 
 
@@ -31922,9 +31922,9 @@ did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-420">420</a></span>
 <span class="normal"><a href="#__codelineno-0-421">421</a></span>
 <span class="normal"><a href="#__codelineno-0-422">422</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its :class:`Dataset` row.</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its `Dataset` row.</span>
 <a id="__codelineno-0-407" name="__codelineno-0-407"></a>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-410" name="__codelineno-0-410"></a>
 <a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">    Args:</span>
@@ -31984,7 +31984,7 @@ did-you-mean hint.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog directory or a single YAML.
-Defaults to the module-level :data:<code>CATALOG_PATH</code>.</p>
+Defaults to the module-level <code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -32010,7 +32010,7 @@ Defaults to the module-level :data:<code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code>.</p>
+                <p>A fully-populated <code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -32071,10 +32071,10 @@ validation.</p>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a>
 <a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        catalog_path: Path to the catalog directory or a single YAML.</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">            Defaults to the module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">            Defaults to the module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        ValueError: If the catalog has no `datasets:` block, or a row fails</span>
@@ -32119,10 +32119,10 @@ validation.</p>
 
 
         <p>One glaciers catalog row.</p>
-<p>The dataset id is the parent key in :attr:<code>Catalog.datasets</code> and is also
-stored on the row as :attr:<code>id</code> so a resolved :class:<code>Dataset</code> is
+<p>The dataset id is the parent key in <code>Catalog.datasets</code> and is also
+stored on the row as <code>id</code> so a resolved <code>Dataset</code> is
 self-describing. Which source-specific fields are populated depends on
-:attr:<code>source</code>; a cross-field validator enforces that the right ones are
+<code>source</code>; a cross-field validator enforces that the right ones are
 present.</p>
 
 
@@ -32352,10 +32352,10 @@ present.</p>
 <span class="normal"><a href="#__codelineno-0-257">257</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="k">class</span><span class="w"> </span><span class="nc">Dataset</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One glaciers catalog row.</span>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">    The dataset id is the parent key in :attr:`Catalog.datasets` and is also</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">    stored on the row as :attr:`id` so a resolved :class:`Dataset` is</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">    The dataset id is the parent key in `Catalog.datasets` and is also</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">    stored on the row as `id` so a resolved `Dataset` is</span>
 <a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">    self-describing. Which source-specific fields are populated depends on</span>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">    :attr:`source`; a cross-field validator enforces that the right ones are</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">    `source`; a cross-field validator enforces that the right ones are</span>
 <a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">    present.</span>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">    Attributes:</span>
@@ -32764,19 +32764,19 @@ entry on its own.</p>
         <p>Stateless helpers for the glaciers backend.</p>
 <p>Grouped by source:</p>
 <ul>
-<li><strong>Spatial / region mapping</strong> — :func:<code>shapely_bbox</code> builds the AOI box that
-  <code>SpatialExtent</code> does not carry, and :func:<code>regions_for_bbox</code> maps a request
+<li><strong>Spatial / region mapping</strong> — <code>shapely_bbox</code> builds the AOI box that
+  <code>SpatialExtent</code> does not carry, and <code>regions_for_bbox</code> maps a request
   bbox to the overlapping GTN-G region id(s) (<code>G4</code> / <code>G6</code>).</li>
-<li><strong>Vector read (rgi/glims)</strong> — :func:<code>download_zip</code> caches a region ZIP the
-  ghsl way; :func:<code>read_outlines</code> reads the inner shapefile via pyramids
+<li><strong>Vector read (rgi/glims)</strong> — <code>download_zip</code> caches a region ZIP the
+  ghsl way; <code>read_outlines</code> reads the inner shapefile via pyramids
   <code>FeatureCollection.read_file("/vsizip/&lt;zip&gt;/&lt;shp&gt;")</code> and clips it to the bbox;
-  :func:<code>fetch_glims</code> issues a GLIMS WFS bbox query, saves the GeoJSON, reads it
+  <code>fetch_glims</code> issues a GLIMS WFS bbox query, saves the GeoJSON, reads it
   via <code>FeatureCollection.read_file</code>, and clips. Vector file I/O always goes
   through pyramids — never a bare geopandas file read (<code>G3</code>).
-  :func:<code>concat_outlines</code> merges per-region fragments.</li>
-<li><strong>Tabular read (wgms)</strong> — :func:<code>parse_wgms_csv</code> reads one FoG table out of the
-  cached zip with pandas (<code>G8</code>); :func:<code>wgms_glacier_table</code> reads the <code>glacier</code>
-  join table (coordinates + region); :func:<code>empty_canonical</code> builds a schema-only
+  <code>concat_outlines</code> merges per-region fragments.</li>
+<li><strong>Tabular read (wgms)</strong> — <code>parse_wgms_csv</code> reads one FoG table out of the
+  cached zip with pandas (<code>G8</code>); <code>wgms_glacier_table</code> reads the <code>glacier</code>
+  join table (coordinates + region); <code>empty_canonical</code> builds a schema-only
   frame. Pure pandas — no array/NetCDF stack.</li>
 </ul>
 
@@ -32834,7 +32834,7 @@ entry on its own.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>One :class:<code>FeatureCollection</code> per region (or query).</p>
+                <p>One <code>FeatureCollection</code> per region (or query).</p>
               </div>
             </td>
             <td>
@@ -32921,7 +32921,7 @@ collection when every fragment is empty.</p>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge per-region outline fragments into one collection.</span>
 <a id="__codelineno-0-355" name="__codelineno-0-355"></a>
 <a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        fragments: One :class:`FeatureCollection` per region (or query).</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        fragments: One `FeatureCollection` per region (or query).</span>
 <a id="__codelineno-0-358" name="__codelineno-0-358"></a>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        FeatureCollection: The concatenated collection in EPSG:4326. The first</span>
@@ -33326,7 +33326,7 @@ re-downloading. Retries transient HTTP failures with exponential backoff.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Build an empty EPSG:4326 :class:<code>FeatureCollection</code> (no features).</p>
+        <p>Build an empty EPSG:4326 <code>FeatureCollection</code> (no features).</p>
 <p>Returned by the vector path when a request's bbox overlaps no glacier
 region / matches no outline, so <code>download()</code> always yields a collection.</p>
 
@@ -33368,7 +33368,7 @@ region / matches no outline, so <code>download()</code> always yields a collecti
 <span class="normal"><a href="#__codelineno-0-348">348</a></span>
 <span class="normal"><a href="#__codelineno-0-349">349</a></span>
 <span class="normal"><a href="#__codelineno-0-350">350</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_feature_collection</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build an empty EPSG:4326 :class:`FeatureCollection` (no features).</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build an empty EPSG:4326 `FeatureCollection` (no features).</span>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a>
 <a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">    Returned by the vector path when a request&#39;s bbox overlaps no glacier</span>
 <a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">    region / matches no outline, so `download()` always yields a collection.</span>
@@ -34177,7 +34177,7 @@ member — no reshaping, no array/NetCDF stack.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The cached WGMS FoG <code>.zip</code> (from :func:<code>download_zip</code>).</p>
+                <p>The cached WGMS FoG <code>.zip</code> (from <code>download_zip</code>).</p>
               </div>
             </td>
             <td>
@@ -34287,7 +34287,7 @@ member — no reshaping, no array/NetCDF stack.</p>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">    member — no reshaping, no array/NetCDF stack.</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        zip_path: The cached WGMS FoG `.zip` (from :func:`download_zip`).</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        zip_path: The cached WGMS FoG `.zip` (from `download_zip`).</span>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        table: The table name (`&quot;mass_balance&quot;`, `&quot;front_variation&quot;`,</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">            `&quot;state&quot;`).</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a>
@@ -34350,7 +34350,7 @@ the bbox.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The local RGI region <code>.zip</code> (from :func:<code>download_zip</code>).</p>
+                <p>The local RGI region <code>.zip</code> (from <code>download_zip</code>).</p>
               </div>
             </td>
             <td>
@@ -34454,7 +34454,7 @@ EPSG:4326.</p>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    the bbox.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        zip_path: The local RGI region `.zip` (from :func:`download_zip`).</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        zip_path: The local RGI region `.zip` (from `download_zip`).</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">        bbox: `[west, south, east, north]` AOI in EPSG:4326.</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        inner_shp: The inner `.shp` member name; resolved from the zip when</span>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">            `None`.</span>
@@ -34638,7 +34638,7 @@ bbox intersect-filter needs this small adapter.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The request's :class:<code>~earthlens.base.SpatialExtent</code>.</p>
+                <p>The request's <code>SpatialExtent</code>.</p>
               </div>
             </td>
             <td>
@@ -34693,7 +34693,7 @@ bbox intersect-filter needs this small adapter.</p>
 <a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    bbox intersect-filter needs this small adapter.</span>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a>
 <a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">        space: The request&#39;s :class:`~earthlens.base.SpatialExtent`.</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">        space: The request&#39;s `SpatialExtent`.</span>
 <a id="__codelineno-0-53" name="__codelineno-0-53"></a>
 <a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">        A `shapely.geometry.box(west, south, east, north)` polygon.</span>

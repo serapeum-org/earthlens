@@ -24597,14 +24597,14 @@ the cfgrib / eccodes stack Herbie's import chain needs) are imported
 lazily, so this package imports without the extra installed.</p>
 <p>Public surface (re-exported from this package):</p>
 <ul>
-<li>:class:<code>NWP</code> — the backend; instantiate with a date range, a bbox,
+<li><code>NWP</code> — the backend; instantiate with a date range, a bbox,
   and a <code>{model_key: [param, ...]}</code> mapping, then call
-  :meth:<code>NWP.download</code>.</li>
-<li>:class:<code>Catalog</code> — pydantic-backed loader for the bundled
+  <code>NWP.download</code>.</li>
+<li><code>Catalog</code> — pydantic-backed loader for the bundled
   <code>nwp_data_catalog.yaml</code>.</li>
-<li>:class:<code>NWPModel</code> — one curated model row (provider, cycles, backend,
+<li><code>NWPModel</code> — one curated model row (provider, cycles, backend,
   mirrors, band → selector map).</li>
-<li>:data:<code>CATALOG_PATH</code> — absolute path to the bundled catalog YAML;
+<li><code>CATALOG_PATH</code> — absolute path to the bundled catalog YAML;
   monkey-patchable to redirect the loader.</li>
 </ul>
 
@@ -24648,8 +24648,8 @@ lazily, so this package imports without the extra installed.</p>
 <p>Reads the bundled <code>nwp_data_catalog.yaml</code> (shipped as package data)
 and exposes its <code>datasets:</code> block as a typed <code>dict[str, NWPModel]</code>.
 Instantiate with no arguments (<code>Catalog()</code>) —
-:func:<code>model_post_init</code> parses the YAML and populates
-:attr:<code>datasets</code> in one pass.</p>
+<code>model_post_init</code> parses the YAML and populates
+<code>datasets</code> in one pass.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -24670,7 +24670,7 @@ Instantiate with no arguments (<code>Catalog()</code>) —
             <td>
               <div class="doc-md-description">
                 <p>Structural map keyed by the model key; each value is
-an :class:<code>NWPModel</code>.</p>
+an <code>NWPModel</code>.</p>
               </div>
             </td>
           </tr>
@@ -24789,12 +24789,12 @@ an :class:<code>NWPModel</code>.</p>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">    Reads the bundled `nwp_data_catalog.yaml` (shipped as package data)</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">    and exposes its `datasets:` block as a typed `dict[str, NWPModel]`.</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">    Instantiate with no arguments (`Catalog()`) —</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    :func:`model_post_init` parses the YAML and populates</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">    :attr:`datasets` in one pass.</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    `model_post_init` parses the YAML and populates</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">    `datasets` in one pass.</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">        datasets: Structural map keyed by the model key; each value is</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">            an :class:`NWPModel`.</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">            an `NWPModel`.</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        - Load the bundled catalog and check which models are present:</span>
@@ -24829,7 +24829,7 @@ an :class:<code>NWPModel</code>.</p>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">CATALOG_PATH</span><span class="p">)}</span>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a model key to its :class:`NWPModel` row.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a model key to its `NWPModel` row.</span>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            model_key: A curated model key (e.g. `&quot;gfs&quot;`,</span>
@@ -24863,7 +24863,7 @@ an :class:<code>NWPModel</code>.</p>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;NWPModel&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">model_key</span><span class="p">))</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a>
 <a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Alias for :meth:`get_model` (matches the other backends&#39; surface).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Alias for `get_model` (matches the other backends&#39; surface).&quot;&quot;&quot;</span>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="n">model_key</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
@@ -24892,7 +24892,7 @@ an :class:<code>NWPModel</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Resolve a model key to its :class:<code>NWPModel</code> row.</p>
+        <p>Resolve a model key to its <code>NWPModel</code> row.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -25026,7 +25026,7 @@ did-you-mean hint from the base class).</p>
 <span class="normal"><a href="#__codelineno-0-335">335</a></span>
 <span class="normal"><a href="#__codelineno-0-336">336</a></span>
 <span class="normal"><a href="#__codelineno-0-337">337</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a model key to its :class:`NWPModel` row.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a model key to its `NWPModel` row.</span>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        model_key: A curated model key (e.g. `&quot;gfs&quot;`,</span>
@@ -25075,7 +25075,7 @@ did-you-mean hint from the base class).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Alias for :meth:<code>get_model</code> (matches the other backends' surface).</p>
+        <p>Alias for <code>get_model</code> (matches the other backends' surface).</p>
 
 
             <details class="mkdocstrings-source">
@@ -25083,7 +25083,7 @@ did-you-mean hint from the base class).</p>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-339">339</a></span>
 <span class="normal"><a href="#__codelineno-0-340">340</a></span>
 <span class="normal"><a href="#__codelineno-0-341">341</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Alias for :meth:`get_model` (matches the other backends&#39; surface).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Alias for `get_model` (matches the other backends&#39; surface).&quot;&quot;&quot;</span>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="n">model_key</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -25849,7 +25849,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">        Resolves every requested model key against the catalog</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">        **before** the parent constructor runs, because the parent</span>
-<a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">        calls :meth:`_initialize` first and `self.vars` is not yet set</span>
+<a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">        calls `_initialize` first and `self.vars` is not yet set</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">        there.</span>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">        Args:</span>
@@ -25889,7 +25889,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">                whole-per-variable, so `mode` is a no-op there.</span>
 <a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">                `&quot;zarr&quot;` is rejected (no `nwp` catalog row carries a</span>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="sd">                `zarr_url`).</span>
-<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">            catalog: Optional pre-built :class:`Catalog` (tests inject</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">            catalog: Optional pre-built `Catalog` (tests inject</span>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">                a faked one); defaults to the bundled catalog.</span>
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a>
 <a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">        Raises:</span>
@@ -25992,7 +25992,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a>
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        Stacklevel attribution: 3 frames is correct for a direct</span>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        `NWP(...)` call (1=this method, 2=`__init__`, 3=caller). The</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        :class:`~earthlens.core.EarthLens` facade adds one frame, so a</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        `EarthLens` facade adds one frame, so a</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        facade-route warning is attributed to `earthlens.py`; users</span>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        wanting a precise call-site should filter on</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        `category=RetentionWarning` rather than module.</span>
@@ -26021,11 +26021,11 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the cycle-date range into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the cycle-date range into a `TemporalExtent`.</span>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        For NWP the `dates` index is the requested **cycle date**</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        range; the per-cycle / per-step expansion happens in</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        :meth:`_search` (`C3`).</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        `_search` (`C3`).</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            start: Inclusive start of the cycle-date range.</span>
@@ -26122,7 +26122,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="k">return</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">members</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
 <a id="__codelineno-0-379" name="__codelineno-0-379"></a>
 <a id="__codelineno-0-380" name="__codelineno-0-380"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_centre_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_NWPCentre</span><span class="p">:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the cached :class:`_NWPCentre` for a catalog `backend:`.</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the cached `_NWPCentre` for a catalog `backend:`.</span>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a>
 <a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">            backend: The model&#39;s `backend:` value (e.g. `&quot;herbie&quot;`).</span>
@@ -26196,12 +26196,12 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">        A single `(cycle, step)` can legitimately be unavailable — the</span>
 <a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">        latest cycle may not be published yet, or a model may not carry</span>
 <a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">        a step on every cycle (`M2`/`M4`). The `errors` policy (set by</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">        :meth:`download`, default `&quot;warn&quot;`) governs that: `&quot;warn&quot;` logs</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">        `download`, default `&quot;warn&quot;`) governs that: `&quot;warn&quot;` logs</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">        the miss and keeps the COGs already produced, `&quot;skip&quot;` drops it</span>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">        silently, and `&quot;raise&quot;` aborts the whole fetch.</span>
 <a id="__codelineno-0-458" name="__codelineno-0-458"></a>
 <a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">            products: The products from :meth:`_search`.</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">            products: The products from `_search`.</span>
 <a id="__codelineno-0-461" name="__codelineno-0-461"></a>
 <a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">            list[Path]: One cropped COG path per successfully fetched</span>
@@ -26246,11 +26246,11 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-502" name="__codelineno-0-502"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
 <a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch + crop + write the COG for one product (no error handling).</span>
 <a id="__codelineno-0-504" name="__codelineno-0-504"></a>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">        Reads the batch context :meth:`_fetch` set up — the crop box and the</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">        Reads the batch context `_fetch` set up — the crop box and the</span>
 <a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">        two pyramids entry points it imported once — from the instance.</span>
 <a id="__codelineno-0-507" name="__codelineno-0-507"></a>
 <a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">            product: One product from :meth:`_search`.</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">            product: One product from `_search`.</span>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a>
 <a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">            pathlib.Path: The written COG path.</span>
@@ -26328,7 +26328,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">            progress_bar: Whether the centres show per-download progress</span>
 <a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">                (threaded into Herbie&#39;s `verbose`).</span>
 <a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">            aggregate: Optional</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">                :class:`earthlens.aggregate.AggregationConfig`; reduces</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">                `earthlens.aggregate.AggregationConfig`; reduces</span>
 <a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">                the `(cycle, step)` COG stack (`C6`).</span>
 <a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">            errors: How to treat a `(cycle, step)` that fails to fetch or</span>
 <a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">                crop (an unpublished cycle, a step the model does not</span>
@@ -26377,7 +26377,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">        mixes its step-dependent windows and can mislead (`M3`).</span>
 <a id="__codelineno-0-634" name="__codelineno-0-634"></a>
 <a id="__codelineno-0-635" name="__codelineno-0-635"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">            paths: The per-`(cycle, step)` COGs from :meth:`_fetch`.</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">            paths: The per-`(cycle, step)` COGs from `_fetch`.</span>
 <a id="__codelineno-0-637" name="__codelineno-0-637"></a><span class="sd">            config: The aggregation request (`freq` window, `op`</span>
 <a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="sd">                reducer, `out_dir`, `skipna`).</span>
 <a id="__codelineno-0-639" name="__codelineno-0-639"></a>
@@ -26486,7 +26486,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
         <p>Initialise an NWP backend instance.</p>
 <p>Resolves every requested model key against the catalog
 <strong>before</strong> the parent constructor runs, because the parent
-calls :meth:<code>_initialize</code> first and <code>self.vars</code> is not yet set
+calls <code>_initialize</code> first and <code>self.vars</code> is not yet set
 there.</p>
 
 
@@ -26741,7 +26741,7 @@ whole-per-variable, so <code>mode</code> is a no-op there.
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional pre-built :class:<code>Catalog</code> (tests inject
+                <p>Optional pre-built <code>Catalog</code> (tests inject
 a faked one); defaults to the bundled catalog.</p>
               </div>
             </td>
@@ -26915,7 +26915,7 @@ model declares an unknown <code>backend:</code>.</p>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">    Resolves every requested model key against the catalog</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">    **before** the parent constructor runs, because the parent</span>
-<a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">    calls :meth:`_initialize` first and `self.vars` is not yet set</span>
+<a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">    calls `_initialize` first and `self.vars` is not yet set</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">    there.</span>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">    Args:</span>
@@ -26955,7 +26955,7 @@ model declares an unknown <code>backend:</code>.</p>
 <a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">            whole-per-variable, so `mode` is a no-op there.</span>
 <a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">            `&quot;zarr&quot;` is rejected (no `nwp` catalog row carries a</span>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="sd">            `zarr_url`).</span>
-<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">        catalog: Optional pre-built :class:`Catalog` (tests inject</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">        catalog: Optional pre-built `Catalog` (tests inject</span>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">            a faked one); defaults to the bundled catalog.</span>
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a>
 <a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">    Raises:</span>
@@ -27065,7 +27065,7 @@ model declares an unknown <code>backend:</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional
-:class:<code>earthlens.aggregate.AggregationConfig</code>; reduces
+<code>earthlens.aggregate.AggregationConfig</code>; reduces
 the <code>(cycle, step)</code> COG stack (<code>C6</code>).</p>
               </div>
             </td>
@@ -27203,7 +27203,7 @@ per-window reduced rasters.</p>
 <a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">        progress_bar: Whether the centres show per-download progress</span>
 <a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">            (threaded into Herbie&#39;s `verbose`).</span>
 <a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">        aggregate: Optional</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">            :class:`earthlens.aggregate.AggregationConfig`; reduces</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">            `earthlens.aggregate.AggregationConfig`; reduces</span>
 <a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">            the `(cycle, step)` COG stack (`C6`).</span>
 <a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">        errors: How to treat a `(cycle, step)` that fails to fetch or</span>
 <a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">            crop (an unpublished cycle, a step the model does not</span>
@@ -27265,7 +27265,7 @@ per-window reduced rasters.</p>
         <p>One curated NWP model row.</p>
 <p>Mirrors a single <code>datasets.&lt;key&gt;:</code> block in
 <code>nwp_data_catalog.yaml</code>. The model key itself is the parent key in
-:attr:<code>Catalog.datasets</code> and is not stored on the row.</p>
+<code>Catalog.datasets</code> and is not stored on the row.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -27408,7 +27408,7 @@ HRRR <code>"wrfsfcf"</code>); <code>None</code> otherwise.</p>
             <td>
               <div class="doc-md-description">
                 <p>Which download path handles this model (see
-:data:<code>BackendLiteral</code>).</p>
+<code>BackendLiteral</code>).</p>
               </div>
             </td>
           </tr>
@@ -27512,7 +27512,7 @@ for an ad-hoc row that has not been curated yet.</p>
 it rolls off the live endpoint. <code>None</code> means archival or
 unspecified (the backend stays silent); a positive integer is
 the rolling-window length in days, and <code>NWP.__init__</code> emits a
-:class:<code>RetentionWarning</code> when the requested <code>start</code> is older
+<code>RetentionWarning</code> when the requested <code>start</code> is older
 than <code>now - retention_days</code> (the #1 confusing failure for
 short-retention providers — DWD keeps roughly one day, MF
 fourteen). Never inferred — populated per row from the
@@ -27750,7 +27750,7 @@ richer field to match against. <code>None</code> for an ad-hoc row.</p>
 <a id="__codelineno-0-117" name="__codelineno-0-117"></a>
 <a id="__codelineno-0-118" name="__codelineno-0-118"></a><span class="sd">    Mirrors a single `datasets.&lt;key&gt;:` block in</span>
 <a id="__codelineno-0-119" name="__codelineno-0-119"></a><span class="sd">    `nwp_data_catalog.yaml`. The model key itself is the parent key in</span>
-<a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="sd">    :attr:`Catalog.datasets` and is not stored on the row.</span>
+<a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="sd">    `Catalog.datasets` and is not stored on the row.</span>
 <a id="__codelineno-0-121" name="__codelineno-0-121"></a>
 <a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">        provider: Provider slug (e.g. `&quot;noaa-nodd&quot;`, `&quot;dwd-opendata&quot;`,</span>
@@ -27776,7 +27776,7 @@ richer field to match against. <code>None</code> for an ad-hoc row.</p>
 <a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">        idx: Whether the source exposes a `.idx` byte-range index (NOAA</span>
 <a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">            / ECMWF yes; DWD no — its files are already per-variable).</span>
 <a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">        backend: Which download path handles this model (see</span>
-<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">            :data:`BackendLiteral`).</span>
+<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">            `BackendLiteral`).</span>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="sd">        mirrors: Ordered list of cloud-mirror keys the model is served</span>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">            from (e.g. `[&quot;aws&quot;, &quot;google&quot;, &quot;azure&quot;]`).</span>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">        url_template: For `direct-*` backends, a `str.format` template</span>
@@ -27810,7 +27810,7 @@ richer field to match against. <code>None</code> for an ad-hoc row.</p>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">            it rolls off the live endpoint. `None` means archival or</span>
 <a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">            unspecified (the backend stays silent); a positive integer is</span>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">            the rolling-window length in days, and `NWP.__init__` emits a</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">            :class:`RetentionWarning` when the requested `start` is older</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">            `RetentionWarning` when the requested `start` is older</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">            than `now - retention_days` (the #1 confusing failure for</span>
 <a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            short-retention providers — DWD keeps roughly one day, MF</span>
 <a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">            fourteen). Never inferred — populated per row from the</span>
@@ -28004,7 +28004,7 @@ per <code>(cycle, step)</code>.</p>
 the GEE / STAC backends). Each <code>param</code> resolves through the catalog to
 the centre's selector — a Herbie <code>search</code> regex or a DWD variable
 token. The download path per model is the catalog <code>backend:</code> value,
-dispatched to a sibling :mod:<code>earthlens.nwp.centres</code> module.</p>
+dispatched to a sibling <code>earthlens.nwp.centres</code> module.</p>
 <p><code>OUTPUT_KIND</code> is fixed <code>"raster"</code>: every centre yields a GRIB2 file
 that the shared pipeline reads with <code>pyramids.grib.open_grib</code>, crops
 to the request bbox, and writes as a COG (<code>C3</code>); <code>aggregate=</code> reduces
@@ -28779,7 +28779,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">        Resolves every requested model key against the catalog</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">        **before** the parent constructor runs, because the parent</span>
-<a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">        calls :meth:`_initialize` first and `self.vars` is not yet set</span>
+<a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">        calls `_initialize` first and `self.vars` is not yet set</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">        there.</span>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">        Args:</span>
@@ -28819,7 +28819,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">                whole-per-variable, so `mode` is a no-op there.</span>
 <a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">                `&quot;zarr&quot;` is rejected (no `nwp` catalog row carries a</span>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="sd">                `zarr_url`).</span>
-<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">            catalog: Optional pre-built :class:`Catalog` (tests inject</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">            catalog: Optional pre-built `Catalog` (tests inject</span>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">                a faked one); defaults to the bundled catalog.</span>
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a>
 <a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">        Raises:</span>
@@ -28922,7 +28922,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a>
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        Stacklevel attribution: 3 frames is correct for a direct</span>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        `NWP(...)` call (1=this method, 2=`__init__`, 3=caller). The</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        :class:`~earthlens.core.EarthLens` facade adds one frame, so a</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        `EarthLens` facade adds one frame, so a</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        facade-route warning is attributed to `earthlens.py`; users</span>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        wanting a precise call-site should filter on</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        `category=RetentionWarning` rather than module.</span>
@@ -28951,11 +28951,11 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the cycle-date range into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the cycle-date range into a `TemporalExtent`.</span>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        For NWP the `dates` index is the requested **cycle date**</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        range; the per-cycle / per-step expansion happens in</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        :meth:`_search` (`C3`).</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        `_search` (`C3`).</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            start: Inclusive start of the cycle-date range.</span>
@@ -29052,7 +29052,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="k">return</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">members</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
 <a id="__codelineno-0-379" name="__codelineno-0-379"></a>
 <a id="__codelineno-0-380" name="__codelineno-0-380"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_centre_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_NWPCentre</span><span class="p">:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the cached :class:`_NWPCentre` for a catalog `backend:`.</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the cached `_NWPCentre` for a catalog `backend:`.</span>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a>
 <a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">            backend: The model&#39;s `backend:` value (e.g. `&quot;herbie&quot;`).</span>
@@ -29126,12 +29126,12 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">        A single `(cycle, step)` can legitimately be unavailable — the</span>
 <a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">        latest cycle may not be published yet, or a model may not carry</span>
 <a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">        a step on every cycle (`M2`/`M4`). The `errors` policy (set by</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">        :meth:`download`, default `&quot;warn&quot;`) governs that: `&quot;warn&quot;` logs</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">        `download`, default `&quot;warn&quot;`) governs that: `&quot;warn&quot;` logs</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">        the miss and keeps the COGs already produced, `&quot;skip&quot;` drops it</span>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">        silently, and `&quot;raise&quot;` aborts the whole fetch.</span>
 <a id="__codelineno-0-458" name="__codelineno-0-458"></a>
 <a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">            products: The products from :meth:`_search`.</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">            products: The products from `_search`.</span>
 <a id="__codelineno-0-461" name="__codelineno-0-461"></a>
 <a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">            list[Path]: One cropped COG path per successfully fetched</span>
@@ -29176,11 +29176,11 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-502" name="__codelineno-0-502"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
 <a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch + crop + write the COG for one product (no error handling).</span>
 <a id="__codelineno-0-504" name="__codelineno-0-504"></a>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">        Reads the batch context :meth:`_fetch` set up — the crop box and the</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">        Reads the batch context `_fetch` set up — the crop box and the</span>
 <a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">        two pyramids entry points it imported once — from the instance.</span>
 <a id="__codelineno-0-507" name="__codelineno-0-507"></a>
 <a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">            product: One product from :meth:`_search`.</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">            product: One product from `_search`.</span>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a>
 <a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">            pathlib.Path: The written COG path.</span>
@@ -29258,7 +29258,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">            progress_bar: Whether the centres show per-download progress</span>
 <a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">                (threaded into Herbie&#39;s `verbose`).</span>
 <a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">            aggregate: Optional</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">                :class:`earthlens.aggregate.AggregationConfig`; reduces</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">                `earthlens.aggregate.AggregationConfig`; reduces</span>
 <a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">                the `(cycle, step)` COG stack (`C6`).</span>
 <a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">            errors: How to treat a `(cycle, step)` that fails to fetch or</span>
 <a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">                crop (an unpublished cycle, a step the model does not</span>
@@ -29307,7 +29307,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
 <a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">        mixes its step-dependent windows and can mislead (`M3`).</span>
 <a id="__codelineno-0-634" name="__codelineno-0-634"></a>
 <a id="__codelineno-0-635" name="__codelineno-0-635"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">            paths: The per-`(cycle, step)` COGs from :meth:`_fetch`.</span>
+<a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">            paths: The per-`(cycle, step)` COGs from `_fetch`.</span>
 <a id="__codelineno-0-637" name="__codelineno-0-637"></a><span class="sd">            config: The aggregation request (`freq` window, `op`</span>
 <a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="sd">                reducer, `out_dir`, `skipna`).</span>
 <a id="__codelineno-0-639" name="__codelineno-0-639"></a>
@@ -29416,7 +29416,7 @@ output, so the facade always forwards <code>aggregate=</code>.</p>
         <p>Initialise an NWP backend instance.</p>
 <p>Resolves every requested model key against the catalog
 <strong>before</strong> the parent constructor runs, because the parent
-calls :meth:<code>_initialize</code> first and <code>self.vars</code> is not yet set
+calls <code>_initialize</code> first and <code>self.vars</code> is not yet set
 there.</p>
 
 
@@ -29671,7 +29671,7 @@ whole-per-variable, so <code>mode</code> is a no-op there.
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional pre-built :class:<code>Catalog</code> (tests inject
+                <p>Optional pre-built <code>Catalog</code> (tests inject
 a faked one); defaults to the bundled catalog.</p>
               </div>
             </td>
@@ -29845,7 +29845,7 @@ model declares an unknown <code>backend:</code>.</p>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">    Resolves every requested model key against the catalog</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">    **before** the parent constructor runs, because the parent</span>
-<a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">    calls :meth:`_initialize` first and `self.vars` is not yet set</span>
+<a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">    calls `_initialize` first and `self.vars` is not yet set</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">    there.</span>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">    Args:</span>
@@ -29885,7 +29885,7 @@ model declares an unknown <code>backend:</code>.</p>
 <a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">            whole-per-variable, so `mode` is a no-op there.</span>
 <a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">            `&quot;zarr&quot;` is rejected (no `nwp` catalog row carries a</span>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="sd">            `zarr_url`).</span>
-<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">        catalog: Optional pre-built :class:`Catalog` (tests inject</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">        catalog: Optional pre-built `Catalog` (tests inject</span>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">            a faked one); defaults to the bundled catalog.</span>
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a>
 <a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">    Raises:</span>
@@ -29995,7 +29995,7 @@ model declares an unknown <code>backend:</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional
-:class:<code>earthlens.aggregate.AggregationConfig</code>; reduces
+<code>earthlens.aggregate.AggregationConfig</code>; reduces
 the <code>(cycle, step)</code> COG stack (<code>C6</code>).</p>
               </div>
             </td>
@@ -30133,7 +30133,7 @@ per-window reduced rasters.</p>
 <a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">        progress_bar: Whether the centres show per-download progress</span>
 <a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">            (threaded into Herbie&#39;s `verbose`).</span>
 <a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">        aggregate: Optional</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">            :class:`earthlens.aggregate.AggregationConfig`; reduces</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">            `earthlens.aggregate.AggregationConfig`; reduces</span>
 <a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">            the `(cycle, step)` COG stack (`C6`).</span>
 <a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">        errors: How to treat a `(cycle, step)` that fails to fetch or</span>
 <a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">            crop (an unpublished cycle, a step the model does not</span>
@@ -30197,21 +30197,21 @@ per-window reduced rasters.</p>
     <div class="doc doc-contents first">
 
         <p>Dataset-catalog loader for the NWP backend.</p>
-<p>Hosts :class:<code>Catalog</code>, the pydantic-backed reader for the bundled
+<p>Hosts <code>Catalog</code>, the pydantic-backed reader for the bundled
 <code>nwp_data_catalog.yaml</code>. Mirrors the shape of
-:mod:<code>earthlens.ecmwf.catalog</code> and :mod:<code>earthlens.gee.catalog</code>: a
+<code>earthlens.ecmwf.catalog</code> and <code>earthlens.gee.catalog</code>: a
 single YAML file with a top-level <code>datasets:</code> block keyed by model key
 (<code>gfs</code>, <code>gefs</code>, <code>hrrr</code>, <code>ifs-hres</code>, <code>icon-global</code>, …). Each block
-parses into an :class:<code>NWPModel</code> carrying the provider, the forecast
+parses into an <code>NWPModel</code> carrying the provider, the forecast
 cadence (<code>cycles_utc</code> / <code>horizon_h</code>), the download <code>backend</code>
 (<code>herbie</code> / <code>ecmwf-opendata</code> / <code>direct-https</code> / <code>direct-boto3</code>), the
 cloud <code>mirrors</code>, the direct-centre <code>url_template</code>, and the
 <code>param → selector</code> band map.</p>
-<p>A model key resolves to an :class:<code>NWPModel</code> via
-:meth:<code>Catalog.get_model</code> / :meth:<code>Catalog.resolve</code> /
+<p>A model key resolves to an <code>NWPModel</code> via
+<code>Catalog.get_model</code> / <code>Catalog.resolve</code> /
 <code>Catalog()["..."]</code>, each with a did-you-mean hint on a miss (inherited
-from :class:<code>earthlens.base.AbstractCatalog</code>). The path to the bundled
-YAML lives at :data:<code>CATALOG_PATH</code>; tests can monkey-patch that module
+from <code>earthlens.base.AbstractCatalog</code>). The path to the bundled
+YAML lives at <code>CATALOG_PATH</code>; tests can monkey-patch that module
 attribute to redirect the loader at a temporary file.</p>
 
 
@@ -30254,8 +30254,8 @@ attribute to redirect the loader at a temporary file.</p>
 <p>Reads the bundled <code>nwp_data_catalog.yaml</code> (shipped as package data)
 and exposes its <code>datasets:</code> block as a typed <code>dict[str, NWPModel]</code>.
 Instantiate with no arguments (<code>Catalog()</code>) —
-:func:<code>model_post_init</code> parses the YAML and populates
-:attr:<code>datasets</code> in one pass.</p>
+<code>model_post_init</code> parses the YAML and populates
+<code>datasets</code> in one pass.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -30276,7 +30276,7 @@ Instantiate with no arguments (<code>Catalog()</code>) —
             <td>
               <div class="doc-md-description">
                 <p>Structural map keyed by the model key; each value is
-an :class:<code>NWPModel</code>.</p>
+an <code>NWPModel</code>.</p>
               </div>
             </td>
           </tr>
@@ -30395,12 +30395,12 @@ an :class:<code>NWPModel</code>.</p>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">    Reads the bundled `nwp_data_catalog.yaml` (shipped as package data)</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">    and exposes its `datasets:` block as a typed `dict[str, NWPModel]`.</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">    Instantiate with no arguments (`Catalog()`) —</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    :func:`model_post_init` parses the YAML and populates</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">    :attr:`datasets` in one pass.</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    `model_post_init` parses the YAML and populates</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">    `datasets` in one pass.</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">        datasets: Structural map keyed by the model key; each value is</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">            an :class:`NWPModel`.</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">            an `NWPModel`.</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        - Load the bundled catalog and check which models are present:</span>
@@ -30435,7 +30435,7 @@ an :class:<code>NWPModel</code>.</p>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">CATALOG_PATH</span><span class="p">)}</span>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a model key to its :class:`NWPModel` row.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a model key to its `NWPModel` row.</span>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            model_key: A curated model key (e.g. `&quot;gfs&quot;`,</span>
@@ -30469,7 +30469,7 @@ an :class:<code>NWPModel</code>.</p>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;NWPModel&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">model_key</span><span class="p">))</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a>
 <a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Alias for :meth:`get_model` (matches the other backends&#39; surface).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Alias for `get_model` (matches the other backends&#39; surface).&quot;&quot;&quot;</span>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="n">model_key</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
@@ -30498,7 +30498,7 @@ an :class:<code>NWPModel</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Resolve a model key to its :class:<code>NWPModel</code> row.</p>
+        <p>Resolve a model key to its <code>NWPModel</code> row.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -30632,7 +30632,7 @@ did-you-mean hint from the base class).</p>
 <span class="normal"><a href="#__codelineno-0-335">335</a></span>
 <span class="normal"><a href="#__codelineno-0-336">336</a></span>
 <span class="normal"><a href="#__codelineno-0-337">337</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a model key to its :class:`NWPModel` row.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a model key to its `NWPModel` row.</span>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        model_key: A curated model key (e.g. `&quot;gfs&quot;`,</span>
@@ -30681,7 +30681,7 @@ did-you-mean hint from the base class).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Alias for :meth:<code>get_model</code> (matches the other backends' surface).</p>
+        <p>Alias for <code>get_model</code> (matches the other backends' surface).</p>
 
 
             <details class="mkdocstrings-source">
@@ -30689,7 +30689,7 @@ did-you-mean hint from the base class).</p>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-339">339</a></span>
 <span class="normal"><a href="#__codelineno-0-340">340</a></span>
 <span class="normal"><a href="#__codelineno-0-341">341</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NWPModel</span><span class="p">:</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Alias for :meth:`get_model` (matches the other backends&#39; surface).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Alias for `get_model` (matches the other backends&#39; surface).&quot;&quot;&quot;</span>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="n">model_key</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -30725,7 +30725,7 @@ did-you-mean hint from the base class).</p>
         <p>One curated NWP model row.</p>
 <p>Mirrors a single <code>datasets.&lt;key&gt;:</code> block in
 <code>nwp_data_catalog.yaml</code>. The model key itself is the parent key in
-:attr:<code>Catalog.datasets</code> and is not stored on the row.</p>
+<code>Catalog.datasets</code> and is not stored on the row.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -30868,7 +30868,7 @@ HRRR <code>"wrfsfcf"</code>); <code>None</code> otherwise.</p>
             <td>
               <div class="doc-md-description">
                 <p>Which download path handles this model (see
-:data:<code>BackendLiteral</code>).</p>
+<code>BackendLiteral</code>).</p>
               </div>
             </td>
           </tr>
@@ -30972,7 +30972,7 @@ for an ad-hoc row that has not been curated yet.</p>
 it rolls off the live endpoint. <code>None</code> means archival or
 unspecified (the backend stays silent); a positive integer is
 the rolling-window length in days, and <code>NWP.__init__</code> emits a
-:class:<code>RetentionWarning</code> when the requested <code>start</code> is older
+<code>RetentionWarning</code> when the requested <code>start</code> is older
 than <code>now - retention_days</code> (the #1 confusing failure for
 short-retention providers — DWD keeps roughly one day, MF
 fourteen). Never inferred — populated per row from the
@@ -31210,7 +31210,7 @@ richer field to match against. <code>None</code> for an ad-hoc row.</p>
 <a id="__codelineno-0-117" name="__codelineno-0-117"></a>
 <a id="__codelineno-0-118" name="__codelineno-0-118"></a><span class="sd">    Mirrors a single `datasets.&lt;key&gt;:` block in</span>
 <a id="__codelineno-0-119" name="__codelineno-0-119"></a><span class="sd">    `nwp_data_catalog.yaml`. The model key itself is the parent key in</span>
-<a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="sd">    :attr:`Catalog.datasets` and is not stored on the row.</span>
+<a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="sd">    `Catalog.datasets` and is not stored on the row.</span>
 <a id="__codelineno-0-121" name="__codelineno-0-121"></a>
 <a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">        provider: Provider slug (e.g. `&quot;noaa-nodd&quot;`, `&quot;dwd-opendata&quot;`,</span>
@@ -31236,7 +31236,7 @@ richer field to match against. <code>None</code> for an ad-hoc row.</p>
 <a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">        idx: Whether the source exposes a `.idx` byte-range index (NOAA</span>
 <a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">            / ECMWF yes; DWD no — its files are already per-variable).</span>
 <a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">        backend: Which download path handles this model (see</span>
-<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">            :data:`BackendLiteral`).</span>
+<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">            `BackendLiteral`).</span>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="sd">        mirrors: Ordered list of cloud-mirror keys the model is served</span>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">            from (e.g. `[&quot;aws&quot;, &quot;google&quot;, &quot;azure&quot;]`).</span>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">        url_template: For `direct-*` backends, a `str.format` template</span>
@@ -31270,7 +31270,7 @@ richer field to match against. <code>None</code> for an ad-hoc row.</p>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">            it rolls off the live endpoint. `None` means archival or</span>
 <a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">            unspecified (the backend stays silent); a positive integer is</span>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">            the rolling-window length in days, and `NWP.__init__` emits a</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">            :class:`RetentionWarning` when the requested `start` is older</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">            `RetentionWarning` when the requested `start` is older</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">            than `now - retention_days` (the #1 confusing failure for</span>
 <a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            short-retention providers — DWD keeps roughly one day, MF</span>
 <a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">            fourteen). Never inferred — populated per row from the</span>
@@ -31444,9 +31444,9 @@ or a plain per-variable HTTPS <code>.bz2</code> fetch. The <code>NWP</code> back
 provider-agnostic half (the cycle-grid walk, the GRIB2→cropped-COG
 pipeline); the per-centre half — "given a model, cycle, step, the
 requested params, and a mirror, put a GRIB2 file on disk" — lives
-behind the :class:<code>_NWPCentre</code> interface implemented by the sibling
+behind the <code>_NWPCentre</code> interface implemented by the sibling
 <code>centres/*.py</code> modules.</p>
-<p>:func:<code>resolve_centre</code> maps a model's catalog <code>backend:</code> value to the
+<p><code>resolve_centre</code> maps a model's catalog <code>backend:</code> value to the
 concrete centre class, importing it lazily so the optional SDK for a
 centre you do not use never has to be installed.</p>
 
@@ -31481,7 +31481,7 @@ centre you do not use never has to be installed.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Construct the :class:<code>_NWPCentre</code> for a catalog <code>backend:</code> value.</p>
+        <p>Construct the <code>_NWPCentre</code> for a catalog <code>backend:</code> value.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -31619,7 +31619,7 @@ optional SDK is not installed (re-raised with a hint).</p>
 <span class="normal"><a href="#__codelineno-0-138">138</a></span>
 <span class="normal"><a href="#__codelineno-0-139">139</a></span>
 <span class="normal"><a href="#__codelineno-0-140">140</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve_centre</span><span class="p">(</span><span class="n">backend</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_NWPCentre</span><span class="p">:</span>
-<a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct the :class:`_NWPCentre` for a catalog `backend:` value.</span>
+<a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct the `_NWPCentre` for a catalog `backend:` value.</span>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a>
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="sd">        backend: The model&#39;s `backend:` value (e.g. `&quot;herbie&quot;`,</span>
@@ -31675,15 +31675,15 @@ optional SDK is not installed (re-raised with a hint).</p>
         <p>NOAA NODD centre — GRIB2 subset fetch via Herbie.</p>
 <p>Herbie owns the <code>.idx</code> byte-range subsetting that cuts &gt;99 % of the
 download volume for the NOAA models (GFS / GEFS / HRRR / RAP / NAM /
-…). :class:<code>NOAACentre</code> is the thin adapter: it maps the requested
+…). <code>NOAACentre</code> is the thin adapter: it maps the requested
 earthlens params to a single Herbie <code>search</code> regex, builds the
 mirror-priority list from the <code>mirror=</code> kwarg, and returns the local
 path of the variable-subset GRIB2 that Herbie wrote.</p>
-<p>Herbie is imported lazily inside :meth:<code>NOAACentre.fetch_one</code> (never at
+<p>Herbie is imported lazily inside <code>NOAACentre.fetch_one</code> (never at
 module import) for two reasons: its import chain pulls <code>cfgrib</code> /
 <code>eccodes</code> (the <code>[nwp]</code> extra + the eccodes binary), and its package
 <code>__init__</code> prints a Unicode banner that crashes a cp1252 Windows
-console — :func:<code>_import_herbie</code> captures that banner and rewrites a
+console — <code>_import_herbie</code> captures that banner and rewrites a
 missing-dependency import into a friendly <code>earthlens[nwp]</code> hint.</p>
 
 
@@ -32196,12 +32196,12 @@ default, or the full field when <code>whole</code> is set.</p>
         <p>ECMWF Open Data centre — IFS GRIB2 fetch via <code>ecmwf-opendata</code>.</p>
 <p>ECMWF publishes IFS HRES / ENS / AIFS forecasts as open data (CC-BY-4.0,
 no auth) and ships the <code>ecmwf-opendata</code> client, which does its own
-index-based parameter subsetting. :class:<code>ECMWFCentre</code> maps the
+index-based parameter subsetting. <code>ECMWFCentre</code> maps the
 requested earthlens params to the client's <code>param</code> tokens (<code>"2t"</code>,
 <code>"tp"</code>, …), selects the mirror <code>source</code>, and returns the local GRIB2
 the client wrote.</p>
 <p><code>ecmwf-opendata</code> is imported lazily inside
-:meth:<code>ECMWFCentre.fetch_one</code> so the package imports without the
+<code>ECMWFCentre.fetch_one</code> so the package imports without the
 <code>[nwp]</code> extra.</p>
 
 
@@ -32797,7 +32797,7 @@ row's configured type (<code>cf</code> for the ENS control).</p>
         <p>DWD Open Data centre — ICON GRIB2 fetch over plain HTTPS.</p>
 <p>DWD publishes ICON forecasts as per-variable, bz2-compressed GRIB2
 files over plain HTTPS (no <code>.idx</code>, no SDK): one file per
-<code>(cycle, step, variable)</code>. :class:<code>DWDCentre</code> builds each variable's
+<code>(cycle, step, variable)</code>. <code>DWDCentre</code> builds each variable's
 URL from the catalog <code>url_template</code>, downloads and decompresses it
 in-flight, and concatenates the decompressed GRIB messages into a
 single <code>.grib2</code> — valid because GRIB is a stream of self-describing
