@@ -2152,16 +2152,15 @@ def fake_reader(monkeypatch):
     # Patched on the reader module, which is where the import now happens: the
     # backend reaches pyramids-eo through `EedaiReader`, so that adapter owns
     # the lock and the identity check around every call.
-    from earthlens.gee import engines as engines_module
     from earthlens.gee import reader as reader_module
 
     monkeypatch.setattr(reader_module, "import_earthengine_reader", lambda: reader)
-    # And on the engines module, which holds its own `from`-imported copy of the
-    # loader for `reader_refusal_types()`. A late refusal is caught through that
-    # function, so leaving this one real made every test reaching it depend on
-    # `pyramids-eo` actually being installed — green wherever the `[eedai]`
-    # extra is present, and an escaping ImportError wherever it is not.
-    monkeypatch.setattr(engines_module, "import_earthengine_reader", lambda: reader)
+    # `engines.reader_refusal_types()` deliberately runs for real here, rather
+    # than against this fake. It is total since it learned to catch the loader's
+    # ImportError, so it resolves with or without the `[eedai]` extra, and
+    # leaving it unpatched means these tests exercise the production refusal
+    # types instead of a stand-in — the expression whose breakage started this
+    # branch is then covered by every test that reaches a late refusal.
     reader.credential_builds = []
     monkeypatch.setattr(
         backend_module,
