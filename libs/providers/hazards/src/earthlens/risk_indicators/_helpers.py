@@ -82,9 +82,16 @@ INFORM_RELEASE_YEARS = range(2010, 2100)
 #: The page intermittently serves a body with no workbook link at all — not a
 #: changed pattern, since the same regex matches both 2026 workbooks seconds
 #: later — and the first such render failed the live e2e and reddened the whole
-#: hazards lane (issue #1227). Re-reading costs one extra request on the rare
+#: hazards lane (issue #1227). Re-reading costs two extra requests on the rare
 #: miss and nothing on the common path, while a genuine layout change still
 #: raises, just a few seconds later.
+#:
+#: Scope, so the next reader does not assume more: the re-read covers a `200`
+#: carrying *no* matching link. A dropped connection or a 5xx is already
+#: retried inside `HttpClient` and never reaches the loop, and a *partial*
+#: render — one that drops the newest anchor but keeps an older one — is not
+#: covered here, because the loop stops at the first non-empty result. That
+#: last case predates this loop and is unchanged by it.
 INFORM_RELEASE_ATTEMPTS: int = 3
 
 #: Linear back-off between those reads: `n * 1s`, so a flap that clears in a
@@ -441,8 +448,17 @@ def inform_release_url(
             if int(hit[1]) in INFORM_RELEASE_YEARS
         ]
         if candidates:
+            if attempt:
+                logger.info(
+                    f"INFORM results page yielded a workbook link on read "
+                    f"{attempt + 1} of {INFORM_RELEASE_ATTEMPTS}."
+                )
             break
         if attempt + 1 < INFORM_RELEASE_ATTEMPTS:
+            logger.warning(
+                f"INFORM results page {page} rendered no workbook link "
+                f"(read {attempt + 1} of {INFORM_RELEASE_ATTEMPTS}); re-reading."
+            )
             time.sleep(INFORM_RELEASE_BACKOFF_SECONDS * (attempt + 1))
     if not candidates:
         raise ValueError(
