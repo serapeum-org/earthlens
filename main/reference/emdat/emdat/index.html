@@ -25015,10 +25015,10 @@ login and is deliberately not used.</p>
   (DOI <code>10.14428/DVN/I0LTPH</code>). Anonymous, no credentials, and the full public
   table: every disaster from 1900 onwards, natural <em>and</em> technological, with
   the human and economic impact columns. EM-DAT's own documentation calls this
-  the preferred route for research. Returns a :class:<code>pandas.DataFrame</code>.</li>
+  the preferred route for research. Returns a <code>pandas.DataFrame</code>.</li>
 <li><strong><code>gdis:points</code></strong> / <strong><code>gdis:polygons</code></strong> — <strong>GDIS</strong> (Geocoded Disasters), the
   CC-BY-4.0 geocoded derivative of EM-DAT <em>natural</em> disasters, 1960-2018, as a
-  pyramids :class:<code>~pyramids.feature.collection.FeatureCollection</code>.
+  pyramids <code>pyramids.feature.collection.FeatureCollection</code>.
   <code>gdis:points</code> is the centroid CSV (about 1 MB, and the only distribution
   carrying <code>year</code> / <code>latitude</code> / <code>longitude</code>); <code>gdis:polygons</code> is the
   admin-unit footprint GeoPackage, which is a <strong>2.2 GB</strong> download and is
@@ -25027,7 +25027,7 @@ login and is deliberately not used.</p>
 <p>Because the two routes emit different shapes, <code>OUTPUT_KIND</code> is set <strong>per
 instance</strong> from the resolved catalog row rather than fixed on the class:
 <code>emdat:events</code> is <code>"tabular"</code>, both <code>gdis:*</code> rows are <code>"vector"</code>. The
-:class:<code>earthlens.earthlens.EarthLens</code> facade reads the instance attribute to
+<code>earthlens.earthlens.EarthLens</code> facade reads the instance attribute to
 know the return shape and to reject <code>aggregate=</code> (these are event records, not
 gridded rasters).</p>
 <p>Licensing differs per route and is not incidental. GDIS is <strong>CC-BY-4.0</strong> and
@@ -25047,18 +25047,18 @@ anonymous. An EDL account must additionally accept the SEDAC data-use agreement
 once, or the download returns a <code>401</code>.</p>
 <p>Public surface (re-exported from this package):</p>
 <ul>
-<li>:class:<code>EMDAT</code> — the backend; instantiate with a dataset id in <code>variables</code>,
-  then call :meth:<code>EMDAT.download</code>.</li>
-<li>:class:<code>Catalog</code> — pydantic-backed loader for the bundled
+<li><code>EMDAT</code> — the backend; instantiate with a dataset id in <code>variables</code>,
+  then call <code>EMDAT.download</code>.</li>
+<li><code>Catalog</code> — pydantic-backed loader for the bundled
   <code>emdat_data_catalog.yaml</code>.</li>
-<li>:class:<code>Dataset</code> — one catalog row (provider, output kind, transport detail,
+<li><code>Dataset</code> — one catalog row (provider, output kind, transport detail,
   licence).</li>
-<li>:class:<code>EmdatAuth</code> / :class:<code>EmdatCredentials</code> — Earthdata Login for the
+<li><code>EmdatAuth</code> / <code>EmdatCredentials</code> — Earthdata Login for the
   <code>gdis:*</code> sources.</li>
-<li>:class:<code>LicenseWarning</code> — re-exported from core so callers can filter the
+<li><code>LicenseWarning</code> — re-exported from core so callers can filter the
   <code>emdat:events</code> restricted-use warning without importing another module.</li>
-<li>:func:<code>clear_catalog_cache</code> — drop the module-level parse cache.</li>
-<li>:data:<code>CATALOG_PATH</code> — path to the bundled catalog YAML.</li>
+<li><code>clear_catalog_cache</code> — drop the module-level parse cache.</li>
+<li><code>CATALOG_PATH</code> — path to the bundled catalog YAML.</li>
 </ul>
 
 
@@ -25099,7 +25099,7 @@ once, or the download returns a <code>401</code>.</p>
 
         <p>Loader for the bundled EM-DAT dataset catalog.</p>
 <p>Reads <code>emdat_data_catalog.yaml</code> on construction (<code>Catalog()</code>) and exposes
-the parsed rows as :class:<code>Dataset</code> models, plus the canonical GDIS hazard
+the parsed rows as <code>Dataset</code> models, plus the canonical GDIS hazard
 vocabulary.</p>
 
 
@@ -25120,7 +25120,7 @@ vocabulary.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from dataset id to its :class:<code>Dataset</code> row.</p>
+                <p>Map from dataset id to its <code>Dataset</code> row.</p>
               </div>
             </td>
           </tr>
@@ -25337,11 +25337,11 @@ hazards.</p>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Loader for the bundled EM-DAT dataset catalog.</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">    Reads `emdat_data_catalog.yaml` on construction (`Catalog()`) and exposes</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    the parsed rows as :class:`Dataset` models, plus the canonical GDIS hazard</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    the parsed rows as `Dataset` models, plus the canonical GDIS hazard</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    vocabulary.</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        datasets: Map from dataset id to its :class:`Dataset` row.</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        datasets: Map from dataset id to its `Dataset` row.</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        hazard_vocabularies: Each named disaster-type vocabulary, lower-case and</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            stripped. `gdis` holds the eight values GDIS ships; `emdat` holds</span>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            EM-DAT&#39;s fuller `Disaster Type` list including technological</span>
@@ -25376,8 +25376,8 @@ hazards.</p>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;EM-DAT catalog&quot;</span>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;datasets&quot;</span>
 <a id="__codelineno-0-334" name="__codelineno-0-334"></a>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="c1">#: The dataset rows live in the base :attr:`datasets` field so the inherited</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="c1">#: dict surface (`len`, `in`, `[]`, iteration) and :meth:`get_dataset`&#39;s</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="c1">#: The dataset rows live in the base `datasets` field so the inherited</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="c1">#: dict surface (`len`, `in`, `[]`, iteration) and `get_dataset`&#39;s</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="c1">#: did-you-mean hint work unchanged.</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-339" name="__codelineno-0-339"></a>
@@ -25404,10 +25404,10 @@ hazards.</p>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">                `CATALOG_PATH`.</span>
 <a id="__codelineno-0-364" name="__codelineno-0-364"></a>
 <a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">            ValueError: If the file has no `datasets:` block, or a row fails</span>
@@ -25418,9 +25418,9 @@ hazards.</p>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span> <span class="n">hazard_vocabularies</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">vocabularies</span><span class="p">))</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a>
 <a id="__codelineno-0-376" name="__codelineno-0-376"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its :class:`Dataset` row.</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its `Dataset` row.</span>
 <a id="__codelineno-0-378" name="__codelineno-0-378"></a>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-381" name="__codelineno-0-381"></a>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        Args:</span>
@@ -25578,8 +25578,8 @@ hazards.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Resolve a dataset id to its :class:<code>Dataset</code> row.</p>
-<p>Thin wrapper over the inherited :meth:<code>get_dataset</code>, which raises a
+        <p>Resolve a dataset id to its <code>Dataset</code> row.</p>
+<p>Thin wrapper over the inherited <code>get_dataset</code>, which raises a
 <code>ValueError</code> with a did-you-mean hint on an unknown id.</p>
 
 
@@ -25682,9 +25682,9 @@ did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-391">391</a></span>
 <span class="normal"><a href="#__codelineno-0-392">392</a></span>
 <span class="normal"><a href="#__codelineno-0-393">393</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its :class:`Dataset` row.</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its `Dataset` row.</span>
 <a id="__codelineno-0-378" name="__codelineno-0-378"></a>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-381" name="__codelineno-0-381"></a>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">    Args:</span>
@@ -25744,7 +25744,7 @@ did-you-mean hint.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the module-level
-:data:<code>CATALOG_PATH</code>.</p>
+<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -25770,7 +25770,7 @@ did-you-mean hint.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code>.</p>
+                <p>A fully-populated <code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -25827,10 +25827,10 @@ validation.</p>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">            `CATALOG_PATH`.</span>
 <a id="__codelineno-0-364" name="__codelineno-0-364"></a>
 <a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        ValueError: If the file has no `datasets:` block, or a row fails</span>
@@ -26169,10 +26169,10 @@ close match exists, adds a did-you-mean hint.</p>
 
 
         <p>One EM-DAT catalog row.</p>
-<p>The dataset id is the parent key in :attr:<code>Catalog.datasets</code> and is also
-stored on the row as :attr:<code>id</code> so a resolved :class:<code>Dataset</code> is
+<p>The dataset id is the parent key in <code>Catalog.datasets</code> and is also
+stored on the row as <code>id</code> so a resolved <code>Dataset</code> is
 self-describing. Which transport fields are populated depends on
-:attr:<code>provider</code>; a cross-field validator enforces that the right ones are
+<code>provider</code>; a cross-field validator enforces that the right ones are
 present.</p>
 
 
@@ -26243,7 +26243,7 @@ instance.</p>
 by <code>earthlens datasets show</code>. It is <em>not</em> what
 <code>earthlens datasets search</code> matches on — that covers provider, id
 and title, and <code>record_title</code> prefers <code>long_name</code> — which is why
-the hazard names live in :attr:<code>long_name</code> as well.</p>
+the hazard names live in <code>long_name</code> as well.</p>
               </div>
             </td>
           </tr>
@@ -26442,7 +26442,7 @@ GeoPackage, which carries no date field at all.</p>
             <td>
               <div class="doc-md-description">
                 <p>Whether the year must be derived from the 4-digit
-prefix of :attr:<code>id_column</code> (the GDIS GeoPackage).</p>
+prefix of <code>id_column</code> (the GDIS GeoPackage).</p>
               </div>
             </td>
           </tr>
@@ -26729,10 +26729,10 @@ free, which triggers a <code>LicenseWarning</code> on download.</p>
 <span class="normal"><a href="#__codelineno-0-289">289</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-121" name="__codelineno-0-121"></a><span class="k">class</span><span class="w"> </span><span class="nc">Dataset</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One EM-DAT catalog row.</span>
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a>
-<a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">    The dataset id is the parent key in :attr:`Catalog.datasets` and is also</span>
-<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">    stored on the row as :attr:`id` so a resolved :class:`Dataset` is</span>
+<a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">    The dataset id is the parent key in `Catalog.datasets` and is also</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">    stored on the row as `id` so a resolved `Dataset` is</span>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">    self-describing. Which transport fields are populated depends on</span>
-<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    :attr:`provider`; a cross-field validator enforces that the right ones are</span>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    `provider`; a cross-field validator enforces that the right ones are</span>
 <a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    present.</span>
 <a id="__codelineno-0-129" name="__codelineno-0-129"></a>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">    Attributes:</span>
@@ -26746,7 +26746,7 @@ free, which triggers a <code>LicenseWarning</code> on download.</p>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">            by `earthlens datasets show`. It is *not* what</span>
 <a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">            `earthlens datasets search` matches on — that covers provider, id</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">            and title, and `record_title` prefers `long_name` — which is why</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">            the hazard names live in :attr:`long_name` as well.</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">            the hazard names live in `long_name` as well.</span>
 <a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">        dataverse_base: Base URL of the Dataverse installation</span>
 <a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">            (`provider=&quot;dataverse&quot;` only).</span>
 <a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">        doi: The archive&#39;s persistent id (`provider=&quot;dataverse&quot;` only).</span>
@@ -26775,7 +26775,7 @@ free, which triggers a <code>LicenseWarning</code> on download.</p>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">            `&quot;Start Year&quot;` for the EM-DAT archive). `None` for the GDIS</span>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">            GeoPackage, which carries no date field at all.</span>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">        year_from_id_prefix: Whether the year must be derived from the 4-digit</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">            prefix of :attr:`id_column` (the GDIS GeoPackage).</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">            prefix of `id_column` (the GDIS GeoPackage).</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">        latitude_column: Column holding the latitude, when present.</span>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">        longitude_column: Column holding the longitude, when present.</span>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        start_year: First year covered by the dataset.</span>
@@ -26890,7 +26890,7 @@ free, which triggers a <code>LicenseWarning</code> on download.</p>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">            filename: A file name from the Dataverse version listing.</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">            bool: `True` when the name matches :attr:`file_pattern`.</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">            bool: `True` when the name matches `file_pattern`.</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_pattern</span><span class="p">)</span> <span class="ow">and</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a>            <span class="n">filename</span><span class="p">,</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_pattern</span><span class="p">)</span>
@@ -26971,7 +26971,7 @@ free, which triggers a <code>LicenseWarning</code> on download.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>True</code> when the name matches :attr:<code>file_pattern</code>.</p>
+                <p><code>True</code> when the name matches <code>file_pattern</code>.</p>
               </div>
             </td>
           </tr>
@@ -26999,7 +26999,7 @@ free, which triggers a <code>LicenseWarning</code> on download.</p>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        filename: A file name from the Dataverse version listing.</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        bool: `True` when the name matches :attr:`file_pattern`.</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        bool: `True` when the name matches `file_pattern`.</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>    <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_pattern</span><span class="p">)</span> <span class="ow">and</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="n">filename</span><span class="p">,</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_pattern</span><span class="p">)</span>
@@ -27037,8 +27037,8 @@ free, which triggers a <code>LicenseWarning</code> on download.</p>
 
         <p>EM-DAT disaster event / location backend (per-instance output kind).</p>
 <p>Resolves one dataset id to its catalog row, fetches it from that row's
-provider, and returns a :class:<code>pandas.DataFrame</code> (<code>tabular</code>) or a
-:class:<code>~pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>) per the
+provider, and returns a <code>pandas.DataFrame</code> (<code>tabular</code>) or a
+<code>pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>) per the
 row's <code>output_kind</code>.</p>
 
 
@@ -27059,7 +27059,7 @@ row's <code>output_kind</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Set <strong>per instance</strong> in :meth:<code>__init__</code> from the resolved
+                <p>Set <strong>per instance</strong> in <code>__init__</code> from the resolved
 dataset's <code>output_kind</code>. The facade reads it to know the return
 shape.</p>
               </div>
@@ -27710,12 +27710,12 @@ shape.</p>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;EM-DAT disaster event / location backend (per-instance output kind).</span>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    Resolves one dataset id to its catalog row, fetches it from that row&#39;s</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    provider, and returns a :class:`pandas.DataFrame` (`tabular`) or a</span>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    :class:`~pyramids.feature.collection.FeatureCollection` (`vector`) per the</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    provider, and returns a `pandas.DataFrame` (`tabular`) or a</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection` (`vector`) per the</span>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">    row&#39;s `output_kind`.</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a>
 <a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in :meth:`__init__` from the resolved</span>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in `__init__` from the resolved</span>
 <a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">            dataset&#39;s `output_kind`. The facade reads it to know the return</span>
 <a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">            shape.</span>
 <a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -27825,7 +27825,7 @@ shape.</p>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="p">)</span>
 <a id="__codelineno-0-241" name="__codelineno-0-241"></a>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Capture the requested bounds as a :class:`SpatialExtent`.</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Capture the requested bounds as a `SpatialExtent`.</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            lat_lim: `[min_lat, max_lat]`.</span>
@@ -27843,7 +27843,7 @@ shape.</p>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a `TemporalExtent`.</span>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        Both routes are indexed by event year and cover a whole archive, so</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        `None` bounds are legal and yield a `None`-dated extent.</span>
@@ -27968,12 +27968,12 @@ shape.</p>
 <a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch each product from its provider and parse it.</span>
 <a id="__codelineno-0-384" name="__codelineno-0-384"></a>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">            products: The list from :meth:`_search` (one product).</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">            products: The list from `_search` (one product).</span>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            list[Any]: One element per product — a :class:`pandas.DataFrame` for a</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            list[Any]: One element per product — a `pandas.DataFrame` for a</span>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">                `tabular` dataset, a</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">                :class:`~pyramids.feature.collection.FeatureCollection` for a</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">                `pyramids.feature.collection.FeatureCollection` for a</span>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">                `vector` one.</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_one</span><span class="p">(</span><span class="n">product</span><span class="p">)</span> <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">]</span>
@@ -27982,7 +27982,7 @@ shape.</p>
 <a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch and parse one product per its provider.</span>
 <a id="__codelineno-0-398" name="__codelineno-0-398"></a>
 <a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">            product: One `RemoteProduct` from `_search`.</span>
 <a id="__codelineno-0-401" name="__codelineno-0-401"></a>
 <a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">            A `DataFrame` (tabular) or `FeatureCollection` (vector).</span>
@@ -27992,7 +27992,7 @@ shape.</p>
 <a id="__codelineno-0-407" name="__codelineno-0-407"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_gdis</span><span class="p">()</span>
 <a id="__codelineno-0-408" name="__codelineno-0-408"></a>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose :meth:`_search` and :meth:`_fetch`.</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch`.</span>
 <a id="__codelineno-0-411" name="__codelineno-0-411"></a>
 <a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            list[Any]: The fetched results.</span>
@@ -28228,9 +28228,9 @@ shape.</p>
 <a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">                through to the transport, so `False` really does silence it.</span>
 <a id="__codelineno-0-644" name="__codelineno-0-644"></a>
 <a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">            A :class:`pandas.DataFrame` for `emdat:events` (also written to</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">            A `pandas.DataFrame` for `emdat:events` (also written to</span>
 <a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">            `root_dir`), or an in-memory</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">            :class:`~pyramids.feature.collection.FeatureCollection` for a</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">            `pyramids.feature.collection.FeatureCollection` for a</span>
 <a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">            `gdis:*` dataset.</span>
 <a id="__codelineno-0-650" name="__codelineno-0-650"></a>
 <a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        Raises:</span>
@@ -28301,7 +28301,7 @@ shape.</p>
 <a id="__codelineno-0-716" name="__codelineno-0-716"></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">.csv&quot;</span>
 <a id="__codelineno-0-717" name="__codelineno-0-717"></a>
 <a id="__codelineno-0-718" name="__codelineno-0-718"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_warn_license</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-719" name="__codelineno-0-719"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Emit a :class:`LicenseWarning` when the dataset&#39;s use is restricted.</span>
+<a id="__codelineno-0-719" name="__codelineno-0-719"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Emit a `LicenseWarning` when the dataset&#39;s use is restricted.</span>
 <a id="__codelineno-0-720" name="__codelineno-0-720"></a>
 <a id="__codelineno-0-721" name="__codelineno-0-721"></a><span class="sd">        GDIS is CC-BY-4.0 and needs only attribution, so it warns about</span>
 <a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="sd">        nothing. The EM-DAT archive is CC-BY-NC-ND under terms that also limit</span>
@@ -28309,7 +28309,7 @@ shape.</p>
 <a id="__codelineno-0-724" name="__codelineno-0-724"></a><span class="sd">        miss.</span>
 <a id="__codelineno-0-725" name="__codelineno-0-725"></a>
 <a id="__codelineno-0-726" name="__codelineno-0-726"></a><span class="sd">        The `stacklevel` targets a call through</span>
-<a id="__codelineno-0-727" name="__codelineno-0-727"></a><span class="sd">        :class:`earthlens.earthlens.EarthLens`, which is what every doc</span>
+<a id="__codelineno-0-727" name="__codelineno-0-727"></a><span class="sd">        `earthlens.earthlens.EarthLens`, which is what every doc</span>
 <a id="__codelineno-0-728" name="__codelineno-0-728"></a><span class="sd">        example, both notebooks and the e2e tests use: `_warn_license` -&gt;</span>
 <a id="__codelineno-0-729" name="__codelineno-0-729"></a><span class="sd">        `download` -&gt; the `_wrap_download` wrapper -&gt; the facade -&gt; the caller.</span>
 <a id="__codelineno-0-730" name="__codelineno-0-730"></a><span class="sd">        A direct `EMDAT(...).download()` is one frame shorter, so the warning</span>
@@ -28969,23 +28969,23 @@ through to the transport, so <code>False</code> really does silence it.</p>
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
+          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>A</code></td>            <td>
+            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>class:<code>pandas.DataFrame</code> for <code>emdat:events</code> (also written to</p>
+                <p>A <code>pandas.DataFrame</code> for <code>emdat:events</code> (also written to</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
@@ -28995,17 +28995,17 @@ through to the transport, so <code>False</code> really does silence it.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>class:<code>~pyramids.feature.collection.FeatureCollection</code> for a</p>
+                <p><code>pyramids.feature.collection.FeatureCollection</code> for a</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
@@ -29098,9 +29098,9 @@ Earthdata Login credentials.</p>
 <a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">            through to the transport, so `False` really does silence it.</span>
 <a id="__codelineno-0-644" name="__codelineno-0-644"></a>
 <a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">        A :class:`pandas.DataFrame` for `emdat:events` (also written to</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">        A `pandas.DataFrame` for `emdat:events` (also written to</span>
 <a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">        `root_dir`), or an in-memory</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">        :class:`~pyramids.feature.collection.FeatureCollection` for a</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">        `pyramids.feature.collection.FeatureCollection` for a</span>
 <a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">        `gdis:*` dataset.</span>
 <a id="__codelineno-0-650" name="__codelineno-0-650"></a>
 <a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">    Raises:</span>
@@ -29159,10 +29159,10 @@ Earthdata Login credentials.</p>
 
 
         <p>Authenticate the GDIS sources against NASA Earthdata Login.</p>
-<p>Construction is side-effect-free; :meth:<code>configure</code> performs the login and
+<p>Construction is side-effect-free; <code>configure</code> performs the login and
 is idempotent, so calling it repeatedly costs nothing after the first
 success. The class is a context manager via
-:class:<code>earthlens.base.AbstractAuth</code>.</p>
+<code>earthlens.base.AbstractAuth</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -29181,8 +29181,8 @@ success. The class is a context manager via
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The :class:<code>EmdatCredentials</code> passed at construction, read by
-:meth:<code>configure</code> to resolve the login strategy.</p>
+                <p>The <code>EmdatCredentials</code> passed at construction, read by
+<code>configure</code> to resolve the login strategy.</p>
               </div>
             </td>
           </tr>
@@ -29194,7 +29194,7 @@ success. The class is a context manager via
             <td>
               <div class="doc-md-description">
                 <p>The <code>earthaccess.Auth</code> handle returned by a successful login, or
-<code>None</code> before :meth:<code>configure</code> runs.</p>
+<code>None</code> before <code>configure</code> runs.</p>
               </div>
             </td>
           </tr>
@@ -29488,16 +29488,16 @@ success. The class is a context manager via
 <span class="normal"><a href="#__codelineno-0-389">389</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="k">class</span><span class="w"> </span><span class="nc">EmdatAuth</span><span class="p">(</span><span class="n">AbstractAuth</span><span class="p">[</span><span class="n">EmdatCredentials</span><span class="p">]):</span>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Authenticate the GDIS sources against NASA Earthdata Login.</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    Construction is side-effect-free; :meth:`configure` performs the login and</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    Construction is side-effect-free; `configure` performs the login and</span>
 <a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">    is idempotent, so calling it repeatedly costs nothing after the first</span>
 <a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">    success. The class is a context manager via</span>
-<a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">    :class:`earthlens.base.AbstractAuth`.</span>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">    `earthlens.base.AbstractAuth`.</span>
 <a id="__codelineno-0-136" name="__codelineno-0-136"></a>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">        _creds: The :class:`EmdatCredentials` passed at construction, read by</span>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">            :meth:`configure` to resolve the login strategy.</span>
+<a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">        _creds: The `EmdatCredentials` passed at construction, read by</span>
+<a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">            `configure` to resolve the login strategy.</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">        _auth: The `earthaccess.Auth` handle returned by a successful login, or</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">            `None` before :meth:`configure` runs.</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">            `None` before `configure` runs.</span>
 <a id="__codelineno-0-142" name="__codelineno-0-142"></a>
 <a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">        - Build, configure, inspect — marked `# doctest: +SKIP` because it</span>
@@ -29517,7 +29517,7 @@ success. The class is a context manager via
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store credentials; does not authenticate.</span>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">            credentials: The :class:`EmdatCredentials` carrying the</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">            credentials: The `EmdatCredentials` carrying the</span>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">                strategy-resolution rules.</span>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
@@ -29542,7 +29542,7 @@ success. The class is a context manager via
 <a id="__codelineno-0-183" name="__codelineno-0-183"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_warn_half_credential</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Warn when only one half of a username/password pair was supplied.</span>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">        A lone `username=` leaves :meth:`_has_explicit_credentials` false, so</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">        A lone `username=` leaves `_has_explicit_credentials` false, so</span>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">        resolution falls through to the `EARTHDATA_*` variables or `~/.netrc`</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">        and may authenticate as an entirely different account. Silently</span>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">        ignoring what the caller passed is the worst of the options.</span>
@@ -29682,7 +29682,7 @@ success. The class is a context manager via
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Authenticate against EDL via `earthaccess.login`.</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        Idempotent — short-circuits when :meth:`is_authenticated` already</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        Idempotent — short-circuits when `is_authenticated` already</span>
 <a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        returns `True`. On the first call, resolves the login strategy, exports</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        any explicit credential to the environment variable `earthaccess`</span>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        reads, logs in with `persist=True`, and keeps the returned handle.</span>
@@ -29796,7 +29796,7 @@ success. The class is a context manager via
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The :class:<code>EmdatCredentials</code> carrying the
+                <p>The <code>EmdatCredentials</code> carrying the
 strategy-resolution rules.</p>
               </div>
             </td>
@@ -29822,7 +29822,7 @@ strategy-resolution rules.</p>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Store credentials; does not authenticate.</span>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">        credentials: The :class:`EmdatCredentials` carrying the</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">        credentials: The `EmdatCredentials` carrying the</span>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">            strategy-resolution rules.</span>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
@@ -29845,7 +29845,7 @@ strategy-resolution rules.</p>
     <div class="doc doc-contents ">
 
         <p>Authenticate against EDL via <code>earthaccess.login</code>.</p>
-<p>Idempotent — short-circuits when :meth:<code>is_authenticated</code> already
+<p>Idempotent — short-circuits when <code>is_authenticated</code> already
 returns <code>True</code>. On the first call, resolves the login strategy, exports
 any explicit credential to the environment variable <code>earthaccess</code>
 reads, logs in with <code>persist=True</code>, and keeps the returned handle.</p>
@@ -29956,7 +29956,7 @@ contacting EDL, or returns an unauthenticated handle.</p>
 <span class="normal"><a href="#__codelineno-0-389">389</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Authenticate against EDL via `earthaccess.login`.</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    Idempotent — short-circuits when :meth:`is_authenticated` already</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    Idempotent — short-circuits when `is_authenticated` already</span>
 <a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">    returns `True`. On the first call, resolves the login strategy, exports</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    any explicit credential to the environment variable `earthaccess`</span>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">    reads, logs in with `persist=True`, and keeps the returned handle.</span>
@@ -30074,7 +30074,7 @@ variables, then <code>~/.netrc</code>, then an interactive prompt.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>EDL username. Paired with :attr:<code>password</code>.</p>
+                <p>EDL username. Paired with <code>password</code>.</p>
               </div>
             </td>
           </tr>
@@ -30191,7 +30191,7 @@ password when both are supplied.</p>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    variables, then `~/.netrc`, then an interactive prompt.</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a>
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">        username: EDL username. Paired with :attr:`password`.</span>
+<a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">        username: EDL username. Paired with `password`.</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">        password: EDL password, held as a `SecretStr` so it stays out of</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">            reprs and logs.</span>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">        token: An EDL bearer token, used in preference to a username and</span>
@@ -30386,13 +30386,13 @@ date-window and bbox filters.</p>
 <ul>
 <li><strong>Per-instance <code>OUTPUT_KIND</code>.</strong> The resolved dataset's <code>output_kind</code> is copied
   onto <code>self.OUTPUT_KIND</code> in <code>__init__</code>: <code>emdat:events</code> is <code>tabular</code> and returns
-  a :class:<code>pandas.DataFrame</code>, both <code>gdis:*</code> rows are <code>vector</code> and return a
-  pyramids :class:<code>~pyramids.feature.collection.FeatureCollection</code>. The
-  :class:<code>earthlens.earthlens.EarthLens</code> facade reads the instance attribute to
+  a <code>pandas.DataFrame</code>, both <code>gdis:*</code> rows are <code>vector</code> and return a
+  pyramids <code>pyramids.feature.collection.FeatureCollection</code>. The
+  <code>earthlens.earthlens.EarthLens</code> facade reads the instance attribute to
   know the return shape.</li>
 <li><strong>Conditional auth.</strong> <code>emdat:events</code> comes from the UCLouvain Dataverse and
   is anonymous. The <code>gdis:*</code> sources moved into NASA Earthdata Cloud when their
-  old SEDAC host went away, so they build an :class:<code>EmdatAuth</code> and need an
+  old SEDAC host went away, so they build an <code>EmdatAuth</code> and need an
   Earthdata Login.</li>
 <li><strong>Size asymmetry.</strong> <code>gdis:points</code> is a 1 MB CSV; <code>gdis:polygons</code> is a 2.2 GB
   GeoPackage. The polygons are never fetched implicitly — the request warns
@@ -30439,8 +30439,8 @@ date-window and bbox filters.</p>
 
         <p>EM-DAT disaster event / location backend (per-instance output kind).</p>
 <p>Resolves one dataset id to its catalog row, fetches it from that row's
-provider, and returns a :class:<code>pandas.DataFrame</code> (<code>tabular</code>) or a
-:class:<code>~pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>) per the
+provider, and returns a <code>pandas.DataFrame</code> (<code>tabular</code>) or a
+<code>pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>) per the
 row's <code>output_kind</code>.</p>
 
 
@@ -30461,7 +30461,7 @@ row's <code>output_kind</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Set <strong>per instance</strong> in :meth:<code>__init__</code> from the resolved
+                <p>Set <strong>per instance</strong> in <code>__init__</code> from the resolved
 dataset's <code>output_kind</code>. The facade reads it to know the return
 shape.</p>
               </div>
@@ -31112,12 +31112,12 @@ shape.</p>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;EM-DAT disaster event / location backend (per-instance output kind).</span>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    Resolves one dataset id to its catalog row, fetches it from that row&#39;s</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    provider, and returns a :class:`pandas.DataFrame` (`tabular`) or a</span>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    :class:`~pyramids.feature.collection.FeatureCollection` (`vector`) per the</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    provider, and returns a `pandas.DataFrame` (`tabular`) or a</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection` (`vector`) per the</span>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">    row&#39;s `output_kind`.</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a>
 <a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in :meth:`__init__` from the resolved</span>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in `__init__` from the resolved</span>
 <a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">            dataset&#39;s `output_kind`. The facade reads it to know the return</span>
 <a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">            shape.</span>
 <a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -31227,7 +31227,7 @@ shape.</p>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="p">)</span>
 <a id="__codelineno-0-241" name="__codelineno-0-241"></a>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Capture the requested bounds as a :class:`SpatialExtent`.</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Capture the requested bounds as a `SpatialExtent`.</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            lat_lim: `[min_lat, max_lat]`.</span>
@@ -31245,7 +31245,7 @@ shape.</p>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a `TemporalExtent`.</span>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        Both routes are indexed by event year and cover a whole archive, so</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        `None` bounds are legal and yield a `None`-dated extent.</span>
@@ -31370,12 +31370,12 @@ shape.</p>
 <a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch each product from its provider and parse it.</span>
 <a id="__codelineno-0-384" name="__codelineno-0-384"></a>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">            products: The list from :meth:`_search` (one product).</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">            products: The list from `_search` (one product).</span>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            list[Any]: One element per product — a :class:`pandas.DataFrame` for a</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            list[Any]: One element per product — a `pandas.DataFrame` for a</span>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">                `tabular` dataset, a</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">                :class:`~pyramids.feature.collection.FeatureCollection` for a</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">                `pyramids.feature.collection.FeatureCollection` for a</span>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">                `vector` one.</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_one</span><span class="p">(</span><span class="n">product</span><span class="p">)</span> <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">]</span>
@@ -31384,7 +31384,7 @@ shape.</p>
 <a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch and parse one product per its provider.</span>
 <a id="__codelineno-0-398" name="__codelineno-0-398"></a>
 <a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">            product: One `RemoteProduct` from `_search`.</span>
 <a id="__codelineno-0-401" name="__codelineno-0-401"></a>
 <a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">            A `DataFrame` (tabular) or `FeatureCollection` (vector).</span>
@@ -31394,7 +31394,7 @@ shape.</p>
 <a id="__codelineno-0-407" name="__codelineno-0-407"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_gdis</span><span class="p">()</span>
 <a id="__codelineno-0-408" name="__codelineno-0-408"></a>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose :meth:`_search` and :meth:`_fetch`.</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch`.</span>
 <a id="__codelineno-0-411" name="__codelineno-0-411"></a>
 <a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            list[Any]: The fetched results.</span>
@@ -31630,9 +31630,9 @@ shape.</p>
 <a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">                through to the transport, so `False` really does silence it.</span>
 <a id="__codelineno-0-644" name="__codelineno-0-644"></a>
 <a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">            A :class:`pandas.DataFrame` for `emdat:events` (also written to</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">            A `pandas.DataFrame` for `emdat:events` (also written to</span>
 <a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">            `root_dir`), or an in-memory</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">            :class:`~pyramids.feature.collection.FeatureCollection` for a</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">            `pyramids.feature.collection.FeatureCollection` for a</span>
 <a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">            `gdis:*` dataset.</span>
 <a id="__codelineno-0-650" name="__codelineno-0-650"></a>
 <a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        Raises:</span>
@@ -31703,7 +31703,7 @@ shape.</p>
 <a id="__codelineno-0-716" name="__codelineno-0-716"></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">.csv&quot;</span>
 <a id="__codelineno-0-717" name="__codelineno-0-717"></a>
 <a id="__codelineno-0-718" name="__codelineno-0-718"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_warn_license</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-719" name="__codelineno-0-719"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Emit a :class:`LicenseWarning` when the dataset&#39;s use is restricted.</span>
+<a id="__codelineno-0-719" name="__codelineno-0-719"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Emit a `LicenseWarning` when the dataset&#39;s use is restricted.</span>
 <a id="__codelineno-0-720" name="__codelineno-0-720"></a>
 <a id="__codelineno-0-721" name="__codelineno-0-721"></a><span class="sd">        GDIS is CC-BY-4.0 and needs only attribution, so it warns about</span>
 <a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="sd">        nothing. The EM-DAT archive is CC-BY-NC-ND under terms that also limit</span>
@@ -31711,7 +31711,7 @@ shape.</p>
 <a id="__codelineno-0-724" name="__codelineno-0-724"></a><span class="sd">        miss.</span>
 <a id="__codelineno-0-725" name="__codelineno-0-725"></a>
 <a id="__codelineno-0-726" name="__codelineno-0-726"></a><span class="sd">        The `stacklevel` targets a call through</span>
-<a id="__codelineno-0-727" name="__codelineno-0-727"></a><span class="sd">        :class:`earthlens.earthlens.EarthLens`, which is what every doc</span>
+<a id="__codelineno-0-727" name="__codelineno-0-727"></a><span class="sd">        `earthlens.earthlens.EarthLens`, which is what every doc</span>
 <a id="__codelineno-0-728" name="__codelineno-0-728"></a><span class="sd">        example, both notebooks and the e2e tests use: `_warn_license` -&gt;</span>
 <a id="__codelineno-0-729" name="__codelineno-0-729"></a><span class="sd">        `download` -&gt; the `_wrap_download` wrapper -&gt; the facade -&gt; the caller.</span>
 <a id="__codelineno-0-730" name="__codelineno-0-730"></a><span class="sd">        A direct `EMDAT(...).download()` is one frame shorter, so the warning</span>
@@ -32371,23 +32371,23 @@ through to the transport, so <code>False</code> really does silence it.</p>
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
+          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>A</code></td>            <td>
+            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>class:<code>pandas.DataFrame</code> for <code>emdat:events</code> (also written to</p>
+                <p>A <code>pandas.DataFrame</code> for <code>emdat:events</code> (also written to</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
@@ -32397,17 +32397,17 @@ through to the transport, so <code>False</code> really does silence it.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>class:<code>~pyramids.feature.collection.FeatureCollection</code> for a</p>
+                <p><code>pyramids.feature.collection.FeatureCollection</code> for a</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
@@ -32500,9 +32500,9 @@ Earthdata Login credentials.</p>
 <a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">            through to the transport, so `False` really does silence it.</span>
 <a id="__codelineno-0-644" name="__codelineno-0-644"></a>
 <a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">        A :class:`pandas.DataFrame` for `emdat:events` (also written to</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">        A `pandas.DataFrame` for `emdat:events` (also written to</span>
 <a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">        `root_dir`), or an in-memory</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">        :class:`~pyramids.feature.collection.FeatureCollection` for a</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">        `pyramids.feature.collection.FeatureCollection` for a</span>
 <a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">        `gdis:*` dataset.</span>
 <a id="__codelineno-0-650" name="__codelineno-0-650"></a>
 <a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">    Raises:</span>
@@ -32569,15 +32569,15 @@ Earthdata Login credentials.</p>
 routes, and this module is the bridge from a dataset id (<code>"emdat:events"</code>,
 <code>"gdis:points"</code>, <code>"gdis:polygons"</code>) to the provider, the output kind, and the
 transport detail needed to fetch it.</p>
-<p>:class:<code>Catalog</code> is a thin :class:<code>earthlens.base.AbstractCatalog</code> subclass that
+<p><code>Catalog</code> is a thin <code>earthlens.base.AbstractCatalog</code> subclass that
 loads the bundled <code>emdat_data_catalog.yaml</code> and exposes each row as a
-:class:<code>Dataset</code>. The YAML also ships a <code>hazard_vocabularies:</code> block — one
-canonical disaster-type list per source — which :meth:<code>Catalog.normalize_hazard</code>
+<code>Dataset</code>. The YAML also ships a <code>hazard_vocabularies:</code> block — one
+canonical disaster-type list per source — which <code>Catalog.normalize_hazard</code>
 uses to turn a caller's spelling into the canonical one for a given dataset.
 Resolve one dataset with
-:meth:<code>Catalog.get</code> (a did-you-mean hint on an unknown id); list the shipped ids
-with :meth:<code>Catalog.available</code>.</p>
-<p>:data:<code>CATALOG_PATH</code> is the path to the bundled YAML.</p>
+<code>Catalog.get</code> (a did-you-mean hint on an unknown id); list the shipped ids
+with <code>Catalog.available</code>.</p>
+<p><code>CATALOG_PATH</code> is the path to the bundled YAML.</p>
 
 
 
@@ -32617,7 +32617,7 @@ with :meth:<code>Catalog.available</code>.</p>
 
         <p>Loader for the bundled EM-DAT dataset catalog.</p>
 <p>Reads <code>emdat_data_catalog.yaml</code> on construction (<code>Catalog()</code>) and exposes
-the parsed rows as :class:<code>Dataset</code> models, plus the canonical GDIS hazard
+the parsed rows as <code>Dataset</code> models, plus the canonical GDIS hazard
 vocabulary.</p>
 
 
@@ -32638,7 +32638,7 @@ vocabulary.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from dataset id to its :class:<code>Dataset</code> row.</p>
+                <p>Map from dataset id to its <code>Dataset</code> row.</p>
               </div>
             </td>
           </tr>
@@ -32855,11 +32855,11 @@ hazards.</p>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Loader for the bundled EM-DAT dataset catalog.</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">    Reads `emdat_data_catalog.yaml` on construction (`Catalog()`) and exposes</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    the parsed rows as :class:`Dataset` models, plus the canonical GDIS hazard</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    the parsed rows as `Dataset` models, plus the canonical GDIS hazard</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    vocabulary.</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        datasets: Map from dataset id to its :class:`Dataset` row.</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        datasets: Map from dataset id to its `Dataset` row.</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        hazard_vocabularies: Each named disaster-type vocabulary, lower-case and</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            stripped. `gdis` holds the eight values GDIS ships; `emdat` holds</span>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">            EM-DAT&#39;s fuller `Disaster Type` list including technological</span>
@@ -32894,8 +32894,8 @@ hazards.</p>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;EM-DAT catalog&quot;</span>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;datasets&quot;</span>
 <a id="__codelineno-0-334" name="__codelineno-0-334"></a>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="c1">#: The dataset rows live in the base :attr:`datasets` field so the inherited</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="c1">#: dict surface (`len`, `in`, `[]`, iteration) and :meth:`get_dataset`&#39;s</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="c1">#: The dataset rows live in the base `datasets` field so the inherited</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="c1">#: dict surface (`len`, `in`, `[]`, iteration) and `get_dataset`&#39;s</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="c1">#: did-you-mean hint work unchanged.</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-339" name="__codelineno-0-339"></a>
@@ -32922,10 +32922,10 @@ hazards.</p>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">                `CATALOG_PATH`.</span>
 <a id="__codelineno-0-364" name="__codelineno-0-364"></a>
 <a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">            ValueError: If the file has no `datasets:` block, or a row fails</span>
@@ -32936,9 +32936,9 @@ hazards.</p>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span> <span class="n">hazard_vocabularies</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">vocabularies</span><span class="p">))</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a>
 <a id="__codelineno-0-376" name="__codelineno-0-376"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its :class:`Dataset` row.</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its `Dataset` row.</span>
 <a id="__codelineno-0-378" name="__codelineno-0-378"></a>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-381" name="__codelineno-0-381"></a>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        Args:</span>
@@ -33096,8 +33096,8 @@ hazards.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Resolve a dataset id to its :class:<code>Dataset</code> row.</p>
-<p>Thin wrapper over the inherited :meth:<code>get_dataset</code>, which raises a
+        <p>Resolve a dataset id to its <code>Dataset</code> row.</p>
+<p>Thin wrapper over the inherited <code>get_dataset</code>, which raises a
 <code>ValueError</code> with a did-you-mean hint on an unknown id.</p>
 
 
@@ -33200,9 +33200,9 @@ did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-391">391</a></span>
 <span class="normal"><a href="#__codelineno-0-392">392</a></span>
 <span class="normal"><a href="#__codelineno-0-393">393</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its :class:`Dataset` row.</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset id to its `Dataset` row.</span>
 <a id="__codelineno-0-378" name="__codelineno-0-378"></a>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-381" name="__codelineno-0-381"></a>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">    Args:</span>
@@ -33262,7 +33262,7 @@ did-you-mean hint.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the module-level
-:data:<code>CATALOG_PATH</code>.</p>
+<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -33288,7 +33288,7 @@ did-you-mean hint.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code>.</p>
+                <p>A fully-populated <code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -33345,10 +33345,10 @@ validation.</p>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">            `CATALOG_PATH`.</span>
 <a id="__codelineno-0-364" name="__codelineno-0-364"></a>
 <a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        ValueError: If the file has no `datasets:` block, or a row fails</span>
@@ -33687,10 +33687,10 @@ close match exists, adds a did-you-mean hint.</p>
 
 
         <p>One EM-DAT catalog row.</p>
-<p>The dataset id is the parent key in :attr:<code>Catalog.datasets</code> and is also
-stored on the row as :attr:<code>id</code> so a resolved :class:<code>Dataset</code> is
+<p>The dataset id is the parent key in <code>Catalog.datasets</code> and is also
+stored on the row as <code>id</code> so a resolved <code>Dataset</code> is
 self-describing. Which transport fields are populated depends on
-:attr:<code>provider</code>; a cross-field validator enforces that the right ones are
+<code>provider</code>; a cross-field validator enforces that the right ones are
 present.</p>
 
 
@@ -33761,7 +33761,7 @@ instance.</p>
 by <code>earthlens datasets show</code>. It is <em>not</em> what
 <code>earthlens datasets search</code> matches on — that covers provider, id
 and title, and <code>record_title</code> prefers <code>long_name</code> — which is why
-the hazard names live in :attr:<code>long_name</code> as well.</p>
+the hazard names live in <code>long_name</code> as well.</p>
               </div>
             </td>
           </tr>
@@ -33960,7 +33960,7 @@ GeoPackage, which carries no date field at all.</p>
             <td>
               <div class="doc-md-description">
                 <p>Whether the year must be derived from the 4-digit
-prefix of :attr:<code>id_column</code> (the GDIS GeoPackage).</p>
+prefix of <code>id_column</code> (the GDIS GeoPackage).</p>
               </div>
             </td>
           </tr>
@@ -34247,10 +34247,10 @@ free, which triggers a <code>LicenseWarning</code> on download.</p>
 <span class="normal"><a href="#__codelineno-0-289">289</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-121" name="__codelineno-0-121"></a><span class="k">class</span><span class="w"> </span><span class="nc">Dataset</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One EM-DAT catalog row.</span>
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a>
-<a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">    The dataset id is the parent key in :attr:`Catalog.datasets` and is also</span>
-<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">    stored on the row as :attr:`id` so a resolved :class:`Dataset` is</span>
+<a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">    The dataset id is the parent key in `Catalog.datasets` and is also</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">    stored on the row as `id` so a resolved `Dataset` is</span>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">    self-describing. Which transport fields are populated depends on</span>
-<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    :attr:`provider`; a cross-field validator enforces that the right ones are</span>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    `provider`; a cross-field validator enforces that the right ones are</span>
 <a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    present.</span>
 <a id="__codelineno-0-129" name="__codelineno-0-129"></a>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">    Attributes:</span>
@@ -34264,7 +34264,7 @@ free, which triggers a <code>LicenseWarning</code> on download.</p>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">            by `earthlens datasets show`. It is *not* what</span>
 <a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">            `earthlens datasets search` matches on — that covers provider, id</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">            and title, and `record_title` prefers `long_name` — which is why</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">            the hazard names live in :attr:`long_name` as well.</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">            the hazard names live in `long_name` as well.</span>
 <a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">        dataverse_base: Base URL of the Dataverse installation</span>
 <a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">            (`provider=&quot;dataverse&quot;` only).</span>
 <a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">        doi: The archive&#39;s persistent id (`provider=&quot;dataverse&quot;` only).</span>
@@ -34293,7 +34293,7 @@ free, which triggers a <code>LicenseWarning</code> on download.</p>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">            `&quot;Start Year&quot;` for the EM-DAT archive). `None` for the GDIS</span>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">            GeoPackage, which carries no date field at all.</span>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">        year_from_id_prefix: Whether the year must be derived from the 4-digit</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">            prefix of :attr:`id_column` (the GDIS GeoPackage).</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">            prefix of `id_column` (the GDIS GeoPackage).</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">        latitude_column: Column holding the latitude, when present.</span>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">        longitude_column: Column holding the longitude, when present.</span>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        start_year: First year covered by the dataset.</span>
@@ -34408,7 +34408,7 @@ free, which triggers a <code>LicenseWarning</code> on download.</p>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">            filename: A file name from the Dataverse version listing.</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">            bool: `True` when the name matches :attr:`file_pattern`.</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">            bool: `True` when the name matches `file_pattern`.</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_pattern</span><span class="p">)</span> <span class="ow">and</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a>            <span class="n">filename</span><span class="p">,</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_pattern</span><span class="p">)</span>
@@ -34489,7 +34489,7 @@ free, which triggers a <code>LicenseWarning</code> on download.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>True</code> when the name matches :attr:<code>file_pattern</code>.</p>
+                <p><code>True</code> when the name matches <code>file_pattern</code>.</p>
               </div>
             </td>
           </tr>
@@ -34517,7 +34517,7 @@ free, which triggers a <code>LicenseWarning</code> on download.</p>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        filename: A file name from the Dataverse version listing.</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        bool: `True` when the name matches :attr:`file_pattern`.</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        bool: `True` when the name matches `file_pattern`.</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>    <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_pattern</span><span class="p">)</span> <span class="ow">and</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="n">filename</span><span class="p">,</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_pattern</span><span class="p">)</span>
@@ -34603,8 +34603,8 @@ be served anonymously from <code>sedac.ciesin.columbia.edu</code>, but that host
 and the granules now live in NASA Earthdata Cloud behind an Earthdata Login
 (EDL), so fetching them needs an EDL account. The <code>emdat:events</code> source — the
 UCLouvain Dataverse archive — is anonymous and never touches this module.</p>
-<p>:class:<code>EmdatAuth</code> wraps :func:<code>earthaccess.login</code> in the
-:class:<code>earthlens.base.AbstractAuth</code> contract, resolving credentials from an
+<p><code>EmdatAuth</code> wraps <code>earthaccess.login</code> in the
+<code>earthlens.base.AbstractAuth</code> contract, resolving credentials from an
 explicit token / username+password, then the <code>EARTHDATA_*</code> environment
 variables, then a <code>~/.netrc</code> entry, then an interactive prompt.</p>
 
@@ -34618,7 +34618,7 @@ depends only on <code>earthlens-core</code>. Importing it would make
 <code>earthlens-hazards</code> drag in the whole imagery tree for one login call.</p>
 </details>        <p>A first download will also fail with a <code>401</code> and <em>"Be sure to agree to the
 EULA"</em> until the account has accepted the SEDAC data licence once, in the
-Earthdata profile — authentication alone is not enough. :meth:<code>EmdatAuth.configure</code>
+Earthdata profile — authentication alone is not enough. <code>EmdatAuth.configure</code>
 surfaces that in its error text.</p>
 <p>Two consequences of <code>earthaccess</code> keeping its authenticated handle in a
 module-level global are worth knowing, and are not things this class can fix:</p>
@@ -34669,10 +34669,10 @@ module-level global are worth knowing, and are not things this class can fix:</p
 
 
         <p>Authenticate the GDIS sources against NASA Earthdata Login.</p>
-<p>Construction is side-effect-free; :meth:<code>configure</code> performs the login and
+<p>Construction is side-effect-free; <code>configure</code> performs the login and
 is idempotent, so calling it repeatedly costs nothing after the first
 success. The class is a context manager via
-:class:<code>earthlens.base.AbstractAuth</code>.</p>
+<code>earthlens.base.AbstractAuth</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -34691,8 +34691,8 @@ success. The class is a context manager via
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The :class:<code>EmdatCredentials</code> passed at construction, read by
-:meth:<code>configure</code> to resolve the login strategy.</p>
+                <p>The <code>EmdatCredentials</code> passed at construction, read by
+<code>configure</code> to resolve the login strategy.</p>
               </div>
             </td>
           </tr>
@@ -34704,7 +34704,7 @@ success. The class is a context manager via
             <td>
               <div class="doc-md-description">
                 <p>The <code>earthaccess.Auth</code> handle returned by a successful login, or
-<code>None</code> before :meth:<code>configure</code> runs.</p>
+<code>None</code> before <code>configure</code> runs.</p>
               </div>
             </td>
           </tr>
@@ -34998,16 +34998,16 @@ success. The class is a context manager via
 <span class="normal"><a href="#__codelineno-0-389">389</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="k">class</span><span class="w"> </span><span class="nc">EmdatAuth</span><span class="p">(</span><span class="n">AbstractAuth</span><span class="p">[</span><span class="n">EmdatCredentials</span><span class="p">]):</span>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Authenticate the GDIS sources against NASA Earthdata Login.</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    Construction is side-effect-free; :meth:`configure` performs the login and</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    Construction is side-effect-free; `configure` performs the login and</span>
 <a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">    is idempotent, so calling it repeatedly costs nothing after the first</span>
 <a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">    success. The class is a context manager via</span>
-<a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">    :class:`earthlens.base.AbstractAuth`.</span>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">    `earthlens.base.AbstractAuth`.</span>
 <a id="__codelineno-0-136" name="__codelineno-0-136"></a>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">        _creds: The :class:`EmdatCredentials` passed at construction, read by</span>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">            :meth:`configure` to resolve the login strategy.</span>
+<a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">        _creds: The `EmdatCredentials` passed at construction, read by</span>
+<a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">            `configure` to resolve the login strategy.</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">        _auth: The `earthaccess.Auth` handle returned by a successful login, or</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">            `None` before :meth:`configure` runs.</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">            `None` before `configure` runs.</span>
 <a id="__codelineno-0-142" name="__codelineno-0-142"></a>
 <a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">        - Build, configure, inspect — marked `# doctest: +SKIP` because it</span>
@@ -35027,7 +35027,7 @@ success. The class is a context manager via
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store credentials; does not authenticate.</span>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">            credentials: The :class:`EmdatCredentials` carrying the</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">            credentials: The `EmdatCredentials` carrying the</span>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">                strategy-resolution rules.</span>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
@@ -35052,7 +35052,7 @@ success. The class is a context manager via
 <a id="__codelineno-0-183" name="__codelineno-0-183"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_warn_half_credential</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Warn when only one half of a username/password pair was supplied.</span>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">        A lone `username=` leaves :meth:`_has_explicit_credentials` false, so</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">        A lone `username=` leaves `_has_explicit_credentials` false, so</span>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">        resolution falls through to the `EARTHDATA_*` variables or `~/.netrc`</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">        and may authenticate as an entirely different account. Silently</span>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">        ignoring what the caller passed is the worst of the options.</span>
@@ -35192,7 +35192,7 @@ success. The class is a context manager via
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Authenticate against EDL via `earthaccess.login`.</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        Idempotent — short-circuits when :meth:`is_authenticated` already</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        Idempotent — short-circuits when `is_authenticated` already</span>
 <a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        returns `True`. On the first call, resolves the login strategy, exports</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        any explicit credential to the environment variable `earthaccess`</span>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        reads, logs in with `persist=True`, and keeps the returned handle.</span>
@@ -35306,7 +35306,7 @@ success. The class is a context manager via
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The :class:<code>EmdatCredentials</code> carrying the
+                <p>The <code>EmdatCredentials</code> carrying the
 strategy-resolution rules.</p>
               </div>
             </td>
@@ -35332,7 +35332,7 @@ strategy-resolution rules.</p>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Store credentials; does not authenticate.</span>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">        credentials: The :class:`EmdatCredentials` carrying the</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">        credentials: The `EmdatCredentials` carrying the</span>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">            strategy-resolution rules.</span>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
@@ -35355,7 +35355,7 @@ strategy-resolution rules.</p>
     <div class="doc doc-contents ">
 
         <p>Authenticate against EDL via <code>earthaccess.login</code>.</p>
-<p>Idempotent — short-circuits when :meth:<code>is_authenticated</code> already
+<p>Idempotent — short-circuits when <code>is_authenticated</code> already
 returns <code>True</code>. On the first call, resolves the login strategy, exports
 any explicit credential to the environment variable <code>earthaccess</code>
 reads, logs in with <code>persist=True</code>, and keeps the returned handle.</p>
@@ -35466,7 +35466,7 @@ contacting EDL, or returns an unauthenticated handle.</p>
 <span class="normal"><a href="#__codelineno-0-389">389</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Authenticate against EDL via `earthaccess.login`.</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    Idempotent — short-circuits when :meth:`is_authenticated` already</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    Idempotent — short-circuits when `is_authenticated` already</span>
 <a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">    returns `True`. On the first call, resolves the login strategy, exports</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    any explicit credential to the environment variable `earthaccess`</span>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">    reads, logs in with `persist=True`, and keeps the returned handle.</span>
@@ -35584,7 +35584,7 @@ variables, then <code>~/.netrc</code>, then an interactive prompt.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>EDL username. Paired with :attr:<code>password</code>.</p>
+                <p>EDL username. Paired with <code>password</code>.</p>
               </div>
             </td>
           </tr>
@@ -35701,7 +35701,7 @@ password when both are supplied.</p>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    variables, then `~/.netrc`, then an interactive prompt.</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a>
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">        username: EDL username. Paired with :attr:`password`.</span>
+<a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">        username: EDL username. Paired with `password`.</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">        password: EDL password, held as a `SecretStr` so it stays out of</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">            reprs and logs.</span>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">        token: An EDL bearer token, used in preference to a username and</span>
@@ -37265,7 +37265,7 @@ resolve to a stale release, or 404.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The listing from :func:<code>dataverse_file_listing</code>.</p>
+                <p>The listing from <code>dataverse_file_listing</code>.</p>
               </div>
             </td>
             <td>
@@ -37391,7 +37391,7 @@ resolve to a stale release, or 404.</p>
 <a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    resolve to a stale release, or 404.</span>
 <a id="__codelineno-0-73" name="__codelineno-0-73"></a>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">        files: The listing from :func:`dataverse_file_listing`.</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">        files: The listing from `dataverse_file_listing`.</span>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">        dataset: The catalog row whose `file_pattern` selects the file.</span>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a>
 <a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    Returns:</span>

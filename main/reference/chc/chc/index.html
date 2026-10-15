@@ -24251,16 +24251,16 @@ pages in this section; this page is the rendered API.</p>
 (<code>data.chc.ucsb.edu</code>) over anonymous FTP. Every dataset's FTP layout,
 spatial / temporal extent, file pattern, available formats, and per-
 variable metadata is sourced from
-:class:<code>~earthlens.chc.Catalog</code>, which loads the bundled per-family
+<code>Catalog</code>, which loads the bundled per-family
 <code>catalog/*.yaml</code> files. No FTP path or filename is hardcoded here.</p>
 <p>The download pipeline (per <code>(dataset, variable, date)</code> triple) is:</p>
 <ol>
-<li>:meth:<code>_api</code> — resolve the remote directory + filename from
+<li><code>_api</code> — resolve the remote directory + filename from
    <code>Dataset.ftp_bases</code> / <code>Dataset.file_patterns</code> after substituting the
    per-date placeholders (<code>{year}</code>, <code>{month}</code>, <code>{day}</code>, <code>{dekad}</code>,
    <code>{pentad}</code>, <code>{hour}</code>, <code>{doy}</code>), fetch the file via FTP, and clip it
    to the user's bbox.</li>
-<li>:meth:<code>_post_process</code> — ungzip (when the format is <code>.gz</code>), read the
+<li><code>_post_process</code> — ungzip (when the format is <code>.gz</code>), read the
    raster with <code>pyramids.Dataset</code>, clip to the bbox using the
    dataset's own geo-affine (no hardcoded 0.05° grid assumption), and
    write the canonical clipped GeoTIFF.</li>
@@ -24269,7 +24269,7 @@ variable metadata is sourced from
 <ul>
 <li><code>list[str]</code> — legacy CHIRPS-2.0 list-of-variables. The dataset key
   is derived from <code>temporal_resolution</code> via
-  :data:<code>_LEGACY_DATASET_KEY</code> (<code>"daily"</code> → <code>"global-daily"</code>,
+  <code>_LEGACY_DATASET_KEY</code> (<code>"daily"</code> → <code>"global-daily"</code>,
   <code>"monthly"</code> → <code>"global-monthly"</code>).</li>
 <li><code>dict[str, list[str]]</code> — mapping of CHIRPS dataset key to a list of
   variable codes, e.g.
@@ -24318,7 +24318,7 @@ variable metadata is sourced from
 <code>variables</code> (either a flat <code>list[str]</code> for the legacy
 CHIRPS-2.0 global path, or <code>dict[str, list[str]]</code> mapping a
 catalog dataset key to variable codes), then call
-:meth:<code>download</code>.</p>
+<code>download</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -24352,7 +24352,7 @@ catalog dataset key to variable codes), then call
             </td>
             <td>
               <div class="doc-md-description">
-                <p>:class:<code>~earthlens.chc.Catalog</code> instance loaded
+                <p><code>Catalog</code> instance loaded
 once at construction; resolves dataset keys to metadata.</p>
               </div>
             </td>
@@ -25262,11 +25262,11 @@ once at construction; resolves dataset keys to metadata.</p>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">    `variables` (either a flat `list[str]` for the legacy</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">    CHIRPS-2.0 global path, or `dict[str, list[str]]` mapping a</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">    catalog dataset key to variable codes), then call</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">    :meth:`download`.</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">    `download`.</span>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a>
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        api_url: FTP hostname. Anonymous login; no credentials.</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        catalog: :class:`~earthlens.chc.Catalog` instance loaded</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        catalog: `Catalog` instance loaded</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">            once at construction; resolves dataset keys to metadata.</span>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>
@@ -25283,7 +25283,7 @@ once at construction; resolves dataset keys to metadata.</p>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="nd">@property</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The bundled CHC :class:`~earthlens.chc.Catalog` (alias of `_catalog`).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The bundled CHC `Catalog` (alias of `_catalog`).&quot;&quot;&quot;</span>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a>
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -25416,7 +25416,7 @@ once at construction; resolves dataset keys to metadata.</p>
 <a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the user&#39;s `[start, end]` window.</span>
 <a id="__codelineno-0-399" name="__codelineno-0-399"></a>
 <a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">        Per-dataset date ranges are derived in</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">        :meth:`_download_dataset` from each dataset&#39;s</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">        `_download_dataset` from each dataset&#39;s</span>
 <a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        `pandas_freq`; this method only stores the outer window so</span>
 <a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">        consumers (and the abstract base&#39;s `self.time`) can see it.</span>
 <a id="__codelineno-0-404" name="__codelineno-0-404"></a>
@@ -25434,9 +25434,9 @@ once at construction; resolves dataset keys to metadata.</p>
 <a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            TemporalExtent: Frozen outer window. Only `start_date` /</span>
 <a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            `end_date` carry meaning — `resolution` is a daily</span>
 <a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">            placeholder and `dates` is an empty</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">            :class:`pandas.DatetimeIndex` because CHIRPS download</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">            `pandas.DatetimeIndex` because CHIRPS download</span>
 <a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">            cadence is per-dataset (`pandas_freq` lives on</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">            :class:`~earthlens.chc.Dataset`, not on the bbox-level</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">            `Dataset`, not on the bbox-level</span>
 <a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">            outer window). A consumer iterating</span>
 <a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">            `self.time.dates` would otherwise get a misleading daily</span>
 <a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">            index for a `monthly` or `6-hourly` dataset.</span>
@@ -25457,7 +25457,7 @@ once at construction; resolves dataset keys to metadata.</p>
 <a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">            SpatialExtent: Frozen bbox with `resolution=0.05`,</span>
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">            CHIRPS&#39;s primary native cell size. (Datasets at coarser</span>
 <a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">            pixels, such as WBGT 1° or africa-6-hourly 0.10°, are</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">            still clipped correctly because :meth:`_clip_to_bbox`</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">            still clipped correctly because `_clip_to_bbox`</span>
 <a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">            reads the actual pixel size from the downloaded raster.)</span>
 <a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-445" name="__codelineno-0-445"></a>        <span class="k">return</span> <span class="n">SpatialExtent</span><span class="o">.</span><span class="n">from_pairs</span><span class="p">(</span>
@@ -25579,11 +25579,11 @@ once at construction; resolves dataset keys to metadata.</p>
 <a id="__codelineno-0-561" name="__codelineno-0-561"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>        <span class="n">cores</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-563" name="__codelineno-0-563"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterate the per-dataset date range and dispatch :meth:`_api`.</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterate the per-dataset date range and dispatch `_api`.</span>
 <a id="__codelineno-0-565" name="__codelineno-0-565"></a>
 <a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">        Branches on `dataset.is_discrete`: datasets that publish a fixed</span>
 <a id="__codelineno-0-567" name="__codelineno-0-567"></a><span class="sd">        set of multi-year archive files (`discrete_files`, e.g. CenTrends)</span>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">        are routed through :meth:`_download_discrete`, which fetches each</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">        are routed through `_download_discrete`, which fetches each</span>
 <a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="sd">        listed filename once instead of doing date substitution.</span>
 <a id="__codelineno-0-570" name="__codelineno-0-570"></a>
 <a id="__codelineno-0-571" name="__codelineno-0-571"></a><span class="sd">        Returns:</span>
@@ -25761,7 +25761,7 @@ once at construction; resolves dataset keys to metadata.</p>
 <a id="__codelineno-0-743" name="__codelineno-0-743"></a><span class="sd">        Post-processing branches on the catalog&#39;s `default_format`:</span>
 <a id="__codelineno-0-744" name="__codelineno-0-744"></a>
 <a id="__codelineno-0-745" name="__codelineno-0-745"></a><span class="sd">        * 2-D raster formats (`tif`, `cog`, `bil`) are clipped to the</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">          user&#39;s bbox in place via :meth:`_clip_raster_in_place`, just</span>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">          user&#39;s bbox in place via `_clip_raster_in_place`, just</span>
 <a id="__codelineno-0-747" name="__codelineno-0-747"></a><span class="sd">          like the per-date `_post_process` path. CHPclim v2 monthly</span>
 <a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="sd">          climatology TIFs flow through here.</span>
 <a id="__codelineno-0-749" name="__codelineno-0-749"></a><span class="sd">        * Multi-dim / opaque formats (`netcdf`, `bin`) are passed</span>
@@ -25796,11 +25796,11 @@ once at construction; resolves dataset keys to metadata.</p>
 <a id="__codelineno-0-778" name="__codelineno-0-778"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_clip_raster_in_place</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read a 2-D raster at `path`, clip to `self.space`, write back.</span>
 <a id="__codelineno-0-780" name="__codelineno-0-780"></a>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a><span class="sd">        Used by :meth:`_download_discrete` for `tif` / `cog` / `bil`</span>
+<a id="__codelineno-0-781" name="__codelineno-0-781"></a><span class="sd">        Used by `_download_discrete` for `tif` / `cog` / `bil`</span>
 <a id="__codelineno-0-782" name="__codelineno-0-782"></a><span class="sd">        outputs. Negative pixels are normalised to -9999 (CHC&#39;s</span>
 <a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="sd">        documented no-data sentinel) and -9999 is declared as the</span>
 <a id="__codelineno-0-784" name="__codelineno-0-784"></a><span class="sd">        output band&#39;s no-data value, mirroring the per-date</span>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="sd">        :meth:`_post_process` behaviour.</span>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="sd">        `_post_process` behaviour.</span>
 <a id="__codelineno-0-786" name="__codelineno-0-786"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-787" name="__codelineno-0-787"></a>        <span class="n">raster</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
 <a id="__codelineno-0-788" name="__codelineno-0-788"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_clip_and_normalise</span><span class="p">(</span><span class="n">raster</span><span class="p">)</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
@@ -25817,8 +25817,8 @@ once at construction; resolves dataset keys to metadata.</p>
 <a id="__codelineno-0-799" name="__codelineno-0-799"></a>
 <a id="__codelineno-0-800" name="__codelineno-0-800"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-801" name="__codelineno-0-801"></a><span class="sd">            ds_key: Catalog dataset key (e.g. `&quot;global-daily&quot;`).</span>
-<a id="__codelineno-0-802" name="__codelineno-0-802"></a><span class="sd">            dataset: The :class:`~earthlens.chc.Dataset` row for `ds_key`.</span>
-<a id="__codelineno-0-803" name="__codelineno-0-803"></a><span class="sd">            var: The :class:`~earthlens.chc.Variable` being downloaded.</span>
+<a id="__codelineno-0-802" name="__codelineno-0-802"></a><span class="sd">            dataset: The `Dataset` row for `ds_key`.</span>
+<a id="__codelineno-0-803" name="__codelineno-0-803"></a><span class="sd">            var: The `Variable` being downloaded.</span>
 <a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">            date: The per-date pandas Timestamp for the request.</span>
 <a id="__codelineno-0-805" name="__codelineno-0-805"></a><span class="sd">            ftp: Optional shared FTP session (L5). When provided, the</span>
 <a id="__codelineno-0-806" name="__codelineno-0-806"></a><span class="sd">                caller (a sequential `_download_dataset` batch) owns</span>
@@ -25895,7 +25895,7 @@ once at construction; resolves dataset keys to metadata.</p>
 <a id="__codelineno-0-877" name="__codelineno-0-877"></a><span class="sd">        For `MS` (month-start) on `2020-01-01` this gives</span>
 <a id="__codelineno-0-878" name="__codelineno-0-878"></a><span class="sd">        `20200101 / 20200131`; for `10D` on `2020-01-01` it gives</span>
 <a id="__codelineno-0-879" name="__codelineno-0-879"></a><span class="sd">        `20200101 / 20200110`. Other placeholders surface as a</span>
-<a id="__codelineno-0-880" name="__codelineno-0-880"></a><span class="sd">        `KeyError` that :meth:`_api` catches and logs</span>
+<a id="__codelineno-0-880" name="__codelineno-0-880"></a><span class="sd">        `KeyError` that `_api` catches and logs</span>
 <a id="__codelineno-0-881" name="__codelineno-0-881"></a><span class="sd">        (`{month_pair}` for CHIRPS v3 2-monthly, `{res}` /</span>
 <a id="__codelineno-0-882" name="__codelineno-0-882"></a><span class="sd">        `{scale}` -- none of those are wired today).</span>
 <a id="__codelineno-0-883" name="__codelineno-0-883"></a>
@@ -26012,7 +26012,7 @@ once at construction; resolves dataset keys to metadata.</p>
 <a id="__codelineno-0-994" name="__codelineno-0-994"></a><span class="sd">        now-declared -9999 no-data.</span>
 <a id="__codelineno-0-995" name="__codelineno-0-995"></a>
 <a id="__codelineno-0-996" name="__codelineno-0-996"></a><span class="sd">        The bbox is snapped **outward** to the granule&#39;s cell edges first (see</span>
-<a id="__codelineno-0-997" name="__codelineno-0-997"></a><span class="sd">        :func:`_snap_bbox_outward`), because `crop_to_aoi(touch=False)` keeps</span>
+<a id="__codelineno-0-997" name="__codelineno-0-997"></a><span class="sd">        `_snap_bbox_outward`), because `crop_to_aoi(touch=False)` keeps</span>
 <a id="__codelineno-0-998" name="__codelineno-0-998"></a><span class="sd">        only cells lying fully inside the box. Passing the raw request would</span>
 <a id="__codelineno-0-999" name="__codelineno-0-999"></a><span class="sd">        drop every partially-covered edge cell, so a CHIRPS output would span</span>
 <a id="__codelineno-0-1000" name="__codelineno-0-1000"></a><span class="sd">        *less* than the extent the caller asked for. Snapping first makes the</span>
@@ -26171,7 +26171,7 @@ once at construction; resolves dataset keys to metadata.</p>
 
     <div class="doc doc-contents ">
 
-        <p>The bundled CHC :class:<code>~earthlens.chc.Catalog</code> (alias of <code>_catalog</code>).</p>
+        <p>The bundled CHC <code>Catalog</code> (alias of <code>_catalog</code>).</p>
 
     </div>
 
@@ -26952,7 +26952,7 @@ failure and continues, <code>"raise"</code> propagates the first one,
     <div class="doc doc-contents first">
 
         <p>Variable-catalog loader for the CHC (Climate Hazards Center) FTP data source.</p>
-<p>Hosts :class:<code>Catalog</code>, the pydantic-backed reader for the per-family
+<p>Hosts <code>Catalog</code>, the pydantic-backed reader for the per-family
 YAML files under <code>&lt;package&gt;/catalog/</code>. Mirrors the GEE backend's
 split-catalog layout (one file per product family + <code>_index.yaml</code>)
 and adapts it for the CHC FTP directory structure.</p>
@@ -26961,19 +26961,19 @@ and adapts it for the CHC FTP directory structure.</p>
 <li><code>_index.yaml</code> — <code>available_datasets:</code> (informational walk-order
   list of every CHC dataset key) and <code>regions:</code> (named
   geographic-coverage profiles keyed by region name). Read into
-  :attr:<code>Catalog.available_datasets</code> and
-  :attr:<code>Catalog.available_regions</code>.</li>
+  <code>Catalog.available_datasets</code> and
+  <code>Catalog.available_regions</code>.</li>
 <li><code>&lt;family&gt;.yaml</code> — one file per product family
   (<code>chirps-2.0.yaml</code>, <code>chirps-v3.yaml</code>, <code>chirp.yaml</code>, <code>chirts.yaml</code>,
   <code>gefs.yaml</code>, <code>indices.yaml</code>, <code>cmip6.yaml</code>, <code>derived.yaml</code>). The
   last file is a bucket for small auxiliary families with 1-2
   datasets each (CHPclim, WBGT, CentennialTrends). Each file carries
   a <code>datasets:</code> block whose entries are merged into
-  :attr:<code>Catalog.datasets</code>. Dataset keys must be unique across files.</li>
+  <code>Catalog.datasets</code>. Dataset keys must be unique across files.</li>
 </ul>
 <p>Variables are addressed by the <code>(dataset_key, variable_name)</code> pair
-via :meth:<code>Catalog.get_variable</code>.</p>
-<p>The bundled-catalog directory lives at :data:<code>CATALOG_PATH</code>; tests
+via <code>Catalog.get_variable</code>.</p>
+<p>The bundled-catalog directory lives at <code>CATALOG_PATH</code>; tests
 can monkey-patch that module attribute to redirect the loader at a
 temporary directory (or, via the back-compat single-file branch, a
 flat legacy YAML).</p>
@@ -27043,10 +27043,10 @@ flat legacy YAML).</p>
         <p>Variable catalog for the CHIRPS FTP data source.</p>
 <p>Reads the per-family <code>catalog/*.yaml</code> files (shipped as package data) and
 exposes its consumed top-level sections as typed pydantic fields.
-Instantiate with no arguments (<code>Catalog()</code>) — :func:<code>model_post_init</code>
+Instantiate with no arguments (<code>Catalog()</code>) — <code>model_post_init</code>
 parses the YAML and populates every field in one pass.</p>
 <p>Variables are addressed by the <code>(dataset_key, variable_name)</code>
-pair via :meth:<code>get_variable</code>. The dataset key is part of the
+pair via <code>get_variable</code>. The dataset key is part of the
 identity because the same variable name (<code>"precipitation"</code>)
 appears under every dataset with different metadata (units,
 FTP path, etc.).</p>
@@ -27097,7 +27097,7 @@ for v1 files.</p>
             <td>
               <div class="doc-md-description">
                 <p>Structural map keyed by dataset identifier. Each
-value is a :class:<code>Dataset</code> carrying spatial / temporal
+value is a <code>Dataset</code> carrying spatial / temporal
 metadata and its per-variable map.</p>
               </div>
             </td>
@@ -27575,11 +27575,11 @@ metadata and its per-variable map.</p>
 <a id="__codelineno-0-644" name="__codelineno-0-644"></a>
 <a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">    Reads the per-family `catalog/*.yaml` files (shipped as package data) and</span>
 <a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">    exposes its consumed top-level sections as typed pydantic fields.</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">    Instantiate with no arguments (`Catalog()`) — :func:`model_post_init`</span>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">    Instantiate with no arguments (`Catalog()`) — `model_post_init`</span>
 <a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">    parses the YAML and populates every field in one pass.</span>
 <a id="__codelineno-0-649" name="__codelineno-0-649"></a>
 <a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">    Variables are addressed by the `(dataset_key, variable_name)`</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">    pair via :meth:`get_variable`. The dataset key is part of the</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">    pair via `get_variable`. The dataset key is part of the</span>
 <a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">    identity because the same variable name (`&quot;precipitation&quot;`)</span>
 <a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">    appears under every dataset with different metadata (units,</span>
 <a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="sd">    FTP path, etc.).</span>
@@ -27593,7 +27593,7 @@ metadata and its per-variable map.</p>
 <a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="sd">            Populated from the `regions:` block (catalog v2+); empty dict</span>
 <a id="__codelineno-0-663" name="__codelineno-0-663"></a><span class="sd">            for v1 files.</span>
 <a id="__codelineno-0-664" name="__codelineno-0-664"></a><span class="sd">        datasets: Structural map keyed by dataset identifier. Each</span>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="sd">            value is a :class:`Dataset` carrying spatial / temporal</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="sd">            value is a `Dataset` carrying spatial / temporal</span>
 <a id="__codelineno-0-666" name="__codelineno-0-666"></a><span class="sd">            metadata and its per-variable map.</span>
 <a id="__codelineno-0-667" name="__codelineno-0-667"></a>
 <a id="__codelineno-0-668" name="__codelineno-0-668"></a><span class="sd">    Examples:</span>
@@ -27659,9 +27659,9 @@ metadata and its per-variable map.</p>
 <a id="__codelineno-0-728" name="__codelineno-0-728"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
 <a id="__codelineno-0-729" name="__codelineno-0-729"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the CHC catalog from disk (cached).</span>
 <a id="__codelineno-0-730" name="__codelineno-0-730"></a>
-<a id="__codelineno-0-731" name="__codelineno-0-731"></a><span class="sd">        Mirrors :meth:`earthlens.gee.Catalog.load` and</span>
-<a id="__codelineno-0-732" name="__codelineno-0-732"></a><span class="sd">        :meth:`earthlens.ecmwf.Catalog.load`. The default resolves</span>
-<a id="__codelineno-0-733" name="__codelineno-0-733"></a><span class="sd">        :data:`CATALOG_PATH` at *call* time so test monkey-patches</span>
+<a id="__codelineno-0-731" name="__codelineno-0-731"></a><span class="sd">        Mirrors `earthlens.gee.Catalog.load` and</span>
+<a id="__codelineno-0-732" name="__codelineno-0-732"></a><span class="sd">        `earthlens.ecmwf.Catalog.load`. The default resolves</span>
+<a id="__codelineno-0-733" name="__codelineno-0-733"></a><span class="sd">        `CATALOG_PATH` at *call* time so test monkey-patches</span>
 <a id="__codelineno-0-734" name="__codelineno-0-734"></a><span class="sd">        take effect.</span>
 <a id="__codelineno-0-735" name="__codelineno-0-735"></a>
 <a id="__codelineno-0-736" name="__codelineno-0-736"></a><span class="sd">        Args:</span>
@@ -27671,13 +27671,13 @@ metadata and its per-variable map.</p>
 <a id="__codelineno-0-740" name="__codelineno-0-740"></a><span class="sd">                default), or a single flat YAML file with</span>
 <a id="__codelineno-0-741" name="__codelineno-0-741"></a><span class="sd">                `available_datasets:` / `regions:` / `datasets:` at</span>
 <a id="__codelineno-0-742" name="__codelineno-0-742"></a><span class="sd">                top level (legacy back-compat). Defaults to</span>
-<a id="__codelineno-0-743" name="__codelineno-0-743"></a><span class="sd">                module-level :data:`CATALOG_PATH` (the directory).</span>
+<a id="__codelineno-0-743" name="__codelineno-0-743"></a><span class="sd">                module-level `CATALOG_PATH` (the directory).</span>
 <a id="__codelineno-0-744" name="__codelineno-0-744"></a>
 <a id="__codelineno-0-745" name="__codelineno-0-745"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">            A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-747" name="__codelineno-0-747"></a>
 <a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-749" name="__codelineno-0-749"></a><span class="sd">            ValueError: Propagated from :func:`_load_catalog_data`.</span>
+<a id="__codelineno-0-749" name="__codelineno-0-749"></a><span class="sd">            ValueError: Propagated from `_load_catalog_data`.</span>
 <a id="__codelineno-0-750" name="__codelineno-0-750"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-751" name="__codelineno-0-751"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-752" name="__codelineno-0-752"></a>        <span class="n">available_datasets</span><span class="p">,</span> <span class="n">regions_map</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
@@ -27688,11 +27688,11 @@ metadata and its per-variable map.</p>
 <a id="__codelineno-0-757" name="__codelineno-0-757"></a>        <span class="p">)</span>
 <a id="__codelineno-0-758" name="__codelineno-0-758"></a>
 <a id="__codelineno-0-759" name="__codelineno-0-759"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
-<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Variable` for a `(dataset, variable)` pair.</span>
+<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Variable` for a `(dataset, variable)` pair.</span>
 <a id="__codelineno-0-761" name="__codelineno-0-761"></a>
 <a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="sd">            dataset_key: CHC dataset identifier as it appears as a</span>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="sd">                key in :attr:`datasets` (e.g. `&quot;global-daily&quot;`).</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="sd">                key in `datasets` (e.g. `&quot;global-daily&quot;`).</span>
 <a id="__codelineno-0-765" name="__codelineno-0-765"></a><span class="sd">            variable_name: Short variable code. Required (M4).</span>
 <a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">                Pre-M4 this defaulted to `&quot;precipitation&quot;`, which</span>
 <a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">                was CHIRPS-2.0-centric and silently `KeyError`d on</span>
@@ -27734,7 +27734,7 @@ metadata and its per-variable map.</p>
 <a id="__codelineno-0-803" name="__codelineno-0-803"></a>
 <a id="__codelineno-0-804" name="__codelineno-0-804"></a>    <span class="c1"># `get_dataset(name)` (with the did-you-mean hint) and the dict-like</span>
 <a id="__codelineno-0-805" name="__codelineno-0-805"></a>    <span class="c1"># dunders are inherited from</span>
-<a id="__codelineno-0-806" name="__codelineno-0-806"></a>    <span class="c1"># :class:`earthlens.base.AbstractCatalog` (M1 in</span>
+<a id="__codelineno-0-806" name="__codelineno-0-806"></a>    <span class="c1"># `earthlens.base.AbstractCatalog` (M1 in</span>
 <a id="__codelineno-0-807" name="__codelineno-0-807"></a>    <span class="c1"># the cross-backend catalog comparison).</span>
 <a id="__codelineno-0-808" name="__codelineno-0-808"></a>
 <a id="__codelineno-0-809" name="__codelineno-0-809"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
@@ -27858,7 +27858,7 @@ metadata and its per-variable map.</p>
 <a id="__codelineno-0-927" name="__codelineno-0-927"></a>
 <a id="__codelineno-0-928" name="__codelineno-0-928"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-929" name="__codelineno-0-929"></a><span class="sd">            dataset_key: CHC dataset identifier as it appears as a</span>
-<a id="__codelineno-0-930" name="__codelineno-0-930"></a><span class="sd">                key in :attr:`datasets`.</span>
+<a id="__codelineno-0-930" name="__codelineno-0-930"></a><span class="sd">                key in `datasets`.</span>
 <a id="__codelineno-0-931" name="__codelineno-0-931"></a>
 <a id="__codelineno-0-932" name="__codelineno-0-932"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-933" name="__codelineno-0-933"></a><span class="sd">            dict with keys `dataset`, `region`,</span>
@@ -28055,7 +28055,7 @@ so consumers can branch on which is set without <code>KeyError</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>CHC dataset identifier as it appears as a
-key in :attr:<code>datasets</code>.</p>
+key in <code>datasets</code>.</p>
               </div>
             </td>
             <td>
@@ -28292,7 +28292,7 @@ key in :attr:<code>datasets</code>.</p>
 <a id="__codelineno-0-927" name="__codelineno-0-927"></a>
 <a id="__codelineno-0-928" name="__codelineno-0-928"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-929" name="__codelineno-0-929"></a><span class="sd">        dataset_key: CHC dataset identifier as it appears as a</span>
-<a id="__codelineno-0-930" name="__codelineno-0-930"></a><span class="sd">            key in :attr:`datasets`.</span>
+<a id="__codelineno-0-930" name="__codelineno-0-930"></a><span class="sd">            key in `datasets`.</span>
 <a id="__codelineno-0-931" name="__codelineno-0-931"></a>
 <a id="__codelineno-0-932" name="__codelineno-0-932"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-933" name="__codelineno-0-933"></a><span class="sd">        dict with keys `dataset`, `region`,</span>
@@ -28577,7 +28577,7 @@ key in :attr:<code>datasets</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the :class:<code>Variable</code> for a <code>(dataset, variable)</code> pair.</p>
+        <p>Return the <code>Variable</code> for a <code>(dataset, variable)</code> pair.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -28601,7 +28601,7 @@ key in :attr:<code>datasets</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>CHC dataset identifier as it appears as a
-key in :attr:<code>datasets</code> (e.g. <code>"global-daily"</code>).</p>
+key in <code>datasets</code> (e.g. <code>"global-daily"</code>).</p>
               </div>
             </td>
             <td>
@@ -28748,11 +28748,11 @@ explicitly.</p>
 <span class="normal"><a href="#__codelineno-0-800">800</a></span>
 <span class="normal"><a href="#__codelineno-0-801">801</a></span>
 <span class="normal"><a href="#__codelineno-0-802">802</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
-<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Variable` for a `(dataset, variable)` pair.</span>
+<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Variable` for a `(dataset, variable)` pair.</span>
 <a id="__codelineno-0-761" name="__codelineno-0-761"></a>
 <a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="sd">        dataset_key: CHC dataset identifier as it appears as a</span>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="sd">            key in :attr:`datasets` (e.g. `&quot;global-daily&quot;`).</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="sd">            key in `datasets` (e.g. `&quot;global-daily&quot;`).</span>
 <a id="__codelineno-0-765" name="__codelineno-0-765"></a><span class="sd">        variable_name: Short variable code. Required (M4).</span>
 <a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">            Pre-M4 this defaulted to `&quot;precipitation&quot;`, which</span>
 <a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">            was CHIRPS-2.0-centric and silently `KeyError`d on</span>
@@ -29278,9 +29278,9 @@ region key so the caller can correct the typo.</p>
     <div class="doc doc-contents ">
 
         <p>Read the CHC catalog from disk (cached).</p>
-<p>Mirrors :meth:<code>earthlens.gee.Catalog.load</code> and
-:meth:<code>earthlens.ecmwf.Catalog.load</code>. The default resolves
-:data:<code>CATALOG_PATH</code> at <em>call</em> time so test monkey-patches
+<p>Mirrors <code>earthlens.gee.Catalog.load</code> and
+<code>earthlens.ecmwf.Catalog.load</code>. The default resolves
+<code>CATALOG_PATH</code> at <em>call</em> time so test monkey-patches
 take effect.</p>
 
 
@@ -29310,7 +29310,7 @@ one or more <code>&lt;family&gt;.yaml</code> siblings (the GEE-style
 default), or a single flat YAML file with
 <code>available_datasets:</code> / <code>regions:</code> / <code>datasets:</code> at
 top level (legacy back-compat). Defaults to
-module-level :data:<code>CATALOG_PATH</code> (the directory).</p>
+module-level <code>CATALOG_PATH</code> (the directory).</p>
               </div>
             </td>
             <td>
@@ -29336,7 +29336,7 @@ module-level :data:<code>CATALOG_PATH</code> (the directory).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code>.</p>
+                <p>A fully-populated <code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -29359,7 +29359,7 @@ module-level :data:<code>CATALOG_PATH</code> (the directory).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Propagated from :func:<code>_load_catalog_data</code>.</p>
+                <p>Propagated from <code>_load_catalog_data</code>.</p>
               </div>
             </td>
           </tr>
@@ -29409,9 +29409,9 @@ module-level :data:<code>CATALOG_PATH</code> (the directory).</p>
 <a id="__codelineno-0-728" name="__codelineno-0-728"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
 <a id="__codelineno-0-729" name="__codelineno-0-729"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the CHC catalog from disk (cached).</span>
 <a id="__codelineno-0-730" name="__codelineno-0-730"></a>
-<a id="__codelineno-0-731" name="__codelineno-0-731"></a><span class="sd">    Mirrors :meth:`earthlens.gee.Catalog.load` and</span>
-<a id="__codelineno-0-732" name="__codelineno-0-732"></a><span class="sd">    :meth:`earthlens.ecmwf.Catalog.load`. The default resolves</span>
-<a id="__codelineno-0-733" name="__codelineno-0-733"></a><span class="sd">    :data:`CATALOG_PATH` at *call* time so test monkey-patches</span>
+<a id="__codelineno-0-731" name="__codelineno-0-731"></a><span class="sd">    Mirrors `earthlens.gee.Catalog.load` and</span>
+<a id="__codelineno-0-732" name="__codelineno-0-732"></a><span class="sd">    `earthlens.ecmwf.Catalog.load`. The default resolves</span>
+<a id="__codelineno-0-733" name="__codelineno-0-733"></a><span class="sd">    `CATALOG_PATH` at *call* time so test monkey-patches</span>
 <a id="__codelineno-0-734" name="__codelineno-0-734"></a><span class="sd">    take effect.</span>
 <a id="__codelineno-0-735" name="__codelineno-0-735"></a>
 <a id="__codelineno-0-736" name="__codelineno-0-736"></a><span class="sd">    Args:</span>
@@ -29421,13 +29421,13 @@ module-level :data:<code>CATALOG_PATH</code> (the directory).</p>
 <a id="__codelineno-0-740" name="__codelineno-0-740"></a><span class="sd">            default), or a single flat YAML file with</span>
 <a id="__codelineno-0-741" name="__codelineno-0-741"></a><span class="sd">            `available_datasets:` / `regions:` / `datasets:` at</span>
 <a id="__codelineno-0-742" name="__codelineno-0-742"></a><span class="sd">            top level (legacy back-compat). Defaults to</span>
-<a id="__codelineno-0-743" name="__codelineno-0-743"></a><span class="sd">            module-level :data:`CATALOG_PATH` (the directory).</span>
+<a id="__codelineno-0-743" name="__codelineno-0-743"></a><span class="sd">            module-level `CATALOG_PATH` (the directory).</span>
 <a id="__codelineno-0-744" name="__codelineno-0-744"></a>
 <a id="__codelineno-0-745" name="__codelineno-0-745"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">        A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-747" name="__codelineno-0-747"></a>
 <a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-749" name="__codelineno-0-749"></a><span class="sd">        ValueError: Propagated from :func:`_load_catalog_data`.</span>
+<a id="__codelineno-0-749" name="__codelineno-0-749"></a><span class="sd">        ValueError: Propagated from `_load_catalog_data`.</span>
 <a id="__codelineno-0-750" name="__codelineno-0-750"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-751" name="__codelineno-0-751"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-752" name="__codelineno-0-752"></a>    <span class="n">available_datasets</span><span class="p">,</span> <span class="n">regions_map</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
@@ -29496,7 +29496,7 @@ strings (e.g. <code>"tif"</code>, <code>"netcdf"</code>, <code>"bil"</code>); va
 FTP directory path relative to the server root, possibly with
 <code>{year}</code> as a placeholder.  At least one entry is always
 present; additional entries are added as their server paths
-are verified. Use :attr:<code>ftp_base</code> for the default path.</p>
+are verified. Use <code>ftp_base</code> for the default path.</p>
               </div>
             </td>
           </tr>
@@ -29510,9 +29510,9 @@ are verified. Use :attr:<code>ftp_base</code> for the default path.</p>
                 <p>Remote filename templates per format code, keyed
 the same way as <code>ftp_bases</code>.  Each value is a Python
 format-string whose placeholders are expanded by
-:meth:<code>earthlens.chc.CHIRPS._placeholders</code>: <code>{year}</code>,
+<code>earthlens.chc.CHIRPS._placeholders</code>: <code>{year}</code>,
 <code>{month}</code>, <code>{day}</code>, <code>{dekad}</code>, <code>{pentad}</code>, <code>{hour}</code>,
-<code>{doy}</code>.  Use :attr:<code>file_pattern</code> for the default pattern.
+<code>{doy}</code>.  Use <code>file_pattern</code> for the default pattern.
 <code>None</code> for datasets that publish a fixed enumerated set
 of files (<code>discrete_files</code>) instead of per-date partitions.</p>
               </div>
@@ -29920,13 +29920,13 @@ that may be revised later.</p>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">            FTP directory path relative to the server root, possibly with</span>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">            `{year}` as a placeholder.  At least one entry is always</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">            present; additional entries are added as their server paths</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">            are verified. Use :attr:`ftp_base` for the default path.</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">            are verified. Use `ftp_base` for the default path.</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">        file_patterns: Remote filename templates per format code, keyed</span>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">            the same way as `ftp_bases`.  Each value is a Python</span>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">            format-string whose placeholders are expanded by</span>
-<a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">            :meth:`earthlens.chc.CHIRPS._placeholders`: `{year}`,</span>
+<a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">            `earthlens.chc.CHIRPS._placeholders`: `{year}`,</span>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">            `{month}`, `{day}`, `{dekad}`, `{pentad}`, `{hour}`,</span>
-<a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">            `{doy}`.  Use :attr:`file_pattern` for the default pattern.</span>
+<a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">            `{doy}`.  Use `file_pattern` for the default pattern.</span>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">            `None` for datasets that publish a fixed enumerated set</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">            of files (`discrete_files`) instead of per-date partitions.</span>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">        discrete_files: Format-keyed map of fixed filenames for datasets</span>
@@ -30056,7 +30056,7 @@ that may be revised later.</p>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="nd">@property</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">primary_spatial_resolution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The first (primary) pixel size from :attr:`spatial_resolution`.</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The first (primary) pixel size from `spatial_resolution`.</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        Convenience accessor for the common single-resolution case.</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        After C3 every shipped dataset has a 1-element list, so this</span>
@@ -30337,7 +30337,7 @@ reads <code>dataset.ftp_base</code> continues to work without changes.</p>
 
     <div class="doc doc-contents ">
 
-        <p>The first (primary) pixel size from :attr:<code>spatial_resolution</code>.</p>
+        <p>The first (primary) pixel size from <code>spatial_resolution</code>.</p>
 <p>Convenience accessor for the common single-resolution case.
 After C3 every shipped dataset has a 1-element list, so this
 is equivalent to <code>ds.spatial_resolution[0]</code> without the
@@ -30429,7 +30429,7 @@ test that ships with the catalog).</p>
 row in a CHC catalog YAML. CHIRPS-the-product only provides
 precipitation, but the typed model keeps the interface symmetric
 with the ECMWF catalog. Inherits <code>types</code> + <code>is_flux</code> from
-:class:<code>earthlens.base.FluxableLeaf</code>.</p>
+<code>earthlens.base.FluxableLeaf</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -30532,7 +30532,7 @@ with the ECMWF catalog. Inherits <code>types</code> + <code>is_flux</code> from
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">    row in a CHC catalog YAML. CHIRPS-the-product only provides</span>
 <a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="sd">    precipitation, but the typed model keeps the interface symmetric</span>
 <a id="__codelineno-0-118" name="__codelineno-0-118"></a><span class="sd">    with the ECMWF catalog. Inherits `types` + `is_flux` from</span>
-<a id="__codelineno-0-119" name="__codelineno-0-119"></a><span class="sd">    :class:`earthlens.base.FluxableLeaf`.</span>
+<a id="__codelineno-0-119" name="__codelineno-0-119"></a><span class="sd">    `earthlens.base.FluxableLeaf`.</span>
 <a id="__codelineno-0-120" name="__codelineno-0-120"></a>
 <a id="__codelineno-0-121" name="__codelineno-0-121"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">        dataset_key: CHIRPS dataset identifier (e.g. `&quot;global-daily&quot;`).</span>

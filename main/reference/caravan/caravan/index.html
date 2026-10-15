@@ -25075,7 +25075,7 @@ pages in this section; this page is the rendered API.</p>
 <strong>ERA5-Land</strong> meteorological forcing, static catchment <strong>attributes</strong> and basin
 <strong>polygons</strong>, published as static archives on Zenodo. This subpackage fetches
 those archives and assembles the requested catchments into a
-:class:<code>pandas.DataFrame</code>.</p>
+<code>pandas.DataFrame</code>.</p>
 <p>Its headline value is the <strong>GRDC-Caravan</strong> extension: the Global Runoff Data
 Centre's raw portal has no API and forbids redistribution, but its openly
 licensed stations are published here under CC-BY-4.0, so this is the legal,
@@ -25086,11 +25086,11 @@ discharge use <code>earthlens.usgs_water</code> (US near-real-time) or GloFAS vi
 <code>earthlens.ecmwf</code>.</p>
 <p>Public surface:</p>
 <ul>
-<li>:class:<code>Caravan</code> — the backend itself.</li>
-<li>:class:<code>Catalog</code> — the bundled extension / variable catalog, plus
-  :class:<code>Extension</code>, :class:<code>Version</code>, :class:<code>ArchiveFile</code>, :class:<code>Source</code>
-  and :class:<code>Variable</code> rows.</li>
-<li>:data:<code>CATALOG_PATH</code> / :func:<code>clear_catalog_cache</code> — the catalog file and its
+<li><code>Caravan</code> — the backend itself.</li>
+<li><code>Catalog</code> — the bundled extension / variable catalog, plus
+  <code>Extension</code>, <code>Version</code>, <code>ArchiveFile</code>, <code>Source</code>
+  and <code>Variable</code> rows.</li>
+<li><code>CATALOG_PATH</code> / <code>clear_catalog_cache</code> — the catalog file and its
   parse-cache control.</li>
 </ul>
 
@@ -26523,14 +26523,14 @@ catchment-days, so the facade refuses an <code>aggregate=</code>.</p>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">            with_attributes: Merge the static catchment attributes onto every</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">                row.</span>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">            with_geometry: Attach the basin polygons, returned alongside the</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">                frame on :attr:`geometry`.</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">                frame on `geometry`.</span>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">            allow_full_download: Permit a release that can only be fetched by</span>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">                downloading the whole multi-gigabyte archive. Required for</span>
 <a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">                `base` at its default version.</span>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">            write_table: Write the assembled frame to `path`. `False` returns</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">                it without touching the filesystem.</span>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">            client: Transport to read through; injectable for tests. When</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">                `None`, a throttled :class:`HttpClient` is built (see</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">                `None`, a throttled `HttpClient` is built (see</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">                `min_interval`).</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">            min_interval: Minimum seconds between requests to Zenodo, which</span>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">                rate-limits anonymous callers. Only used when `client` is</span>
@@ -26663,7 +26663,7 @@ catchment-days, so the facade refuses an <code>aggregate=</code>.</p>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_input_dates</span><span class="p">(</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse `[start, end]` into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse `[start, end]` into a `TemporalExtent`.</span>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        Caravan members hold a catchment&#39;s whole record in one file, so the</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        window is a filter applied after the read rather than a per-date loop.</span>
@@ -26947,7 +26947,7 @@ catchment-days, so the facade refuses an <code>aggregate=</code>.</p>
 <a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">        catchment would be far worse than over-reading.</span>
 <a id="__codelineno-0-584" name="__codelineno-0-584"></a>
 <a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">            products: The list returned by :meth:`_search`.</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">            products: The list returned by `_search`.</span>
 <a id="__codelineno-0-587" name="__codelineno-0-587"></a>
 <a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">            list[pd.DataFrame]: One frame per catchment, in the same order.</span>
@@ -26966,7 +26966,7 @@ catchment-days, so the facade refuses an <code>aggregate=</code>.</p>
 <a id="__codelineno-0-602" name="__codelineno-0-602"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read one catchment from a range-readable archive.</span>
 <a id="__codelineno-0-603" name="__codelineno-0-603"></a>
 <a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a><span class="sd">            product: One product from :meth:`_search`.</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a><span class="sd">            product: One product from `_search`.</span>
 <a id="__codelineno-0-606" name="__codelineno-0-606"></a>
 <a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">            pandas.DataFrame: The catchment&#39;s rows within the request window,</span>
@@ -26995,7 +26995,7 @@ catchment-days, so the facade refuses an <code>aggregate=</code>.</p>
 <a id="__codelineno-0-631" name="__codelineno-0-631"></a>
 <a id="__codelineno-0-632" name="__codelineno-0-632"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">            archive: The opened tar archive.</span>
-<a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">            products: The list returned by :meth:`_search`.</span>
+<a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">            products: The list returned by `_search`.</span>
 <a id="__codelineno-0-635" name="__codelineno-0-635"></a>
 <a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-637" name="__codelineno-0-637"></a><span class="sd">            list[pd.DataFrame]: One frame per readable catchment.</span>
@@ -27675,7 +27675,7 @@ row.</p>
             <td>
               <div class="doc-md-description">
                 <p>Attach the basin polygons, returned alongside the
-frame on :attr:<code>geometry</code>.</p>
+frame on <code>geometry</code>.</p>
               </div>
             </td>
             <td>
@@ -27727,7 +27727,7 @@ it without touching the filesystem.</p>
             <td>
               <div class="doc-md-description">
                 <p>Transport to read through; injectable for tests. When
-<code>None</code>, a throttled :class:<code>HttpClient</code> is built (see
+<code>None</code>, a throttled <code>HttpClient</code> is built (see
 <code>min_interval</code>).</p>
               </div>
             </td>
@@ -28011,14 +28011,14 @@ argument's note.</p>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">        with_attributes: Merge the static catchment attributes onto every</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">            row.</span>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">        with_geometry: Attach the basin polygons, returned alongside the</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">            frame on :attr:`geometry`.</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">            frame on `geometry`.</span>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">        allow_full_download: Permit a release that can only be fetched by</span>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">            downloading the whole multi-gigabyte archive. Required for</span>
 <a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">            `base` at its default version.</span>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">        write_table: Write the assembled frame to `path`. `False` returns</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">            it without touching the filesystem.</span>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">        client: Transport to read through; injectable for tests. When</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">            `None`, a throttled :class:`HttpClient` is built (see</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">            `None`, a throttled `HttpClient` is built (see</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">            `min_interval`).</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">        min_interval: Minimum seconds between requests to Zenodo, which</span>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">            rate-limits anonymous callers. Only used when `client` is</span>
@@ -28379,8 +28379,8 @@ unknown variable, or a release needing <code>allow_full_download</code>.</p>
 
         <p>Extension and variable catalog for the Caravan backend.</p>
 <p>Reads the bundled <code>caravan_data_catalog.yaml</code> (shipped as package data) and
-exposes its <code>extensions:</code> block as :class:<code>Extension</code> rows keyed by the
-<code>dataset=</code> name, plus the shared <code>variables:</code> block as :class:<code>Variable</code>
+exposes its <code>extensions:</code> block as <code>Extension</code> rows keyed by the
+<code>dataset=</code> name, plus the shared <code>variables:</code> block as <code>Variable</code>
 rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
 
 
@@ -28405,7 +28405,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from extension key to its :class:<code>Extension</code> row.</p>
+                <p>Map from extension key to its <code>Extension</code> row.</p>
               </div>
             </td>
           </tr>
@@ -28416,7 +28416,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from friendly variable name to its :class:<code>Variable</code>.</p>
+                <p>Map from friendly variable name to its <code>Variable</code>.</p>
               </div>
             </td>
           </tr>
@@ -28604,13 +28604,13 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Extension and variable catalog for the Caravan backend.</span>
 <a id="__codelineno-0-475" name="__codelineno-0-475"></a>
 <a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">    Reads the bundled `caravan_data_catalog.yaml` (shipped as package data) and</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">    exposes its `extensions:` block as :class:`Extension` rows keyed by the</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">    `dataset=` name, plus the shared `variables:` block as :class:`Variable`</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">    exposes its `extensions:` block as `Extension` rows keyed by the</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">    `dataset=` name, plus the shared `variables:` block as `Variable`</span>
 <a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">    rows. Instantiate with no arguments (`Catalog()`).</span>
 <a id="__codelineno-0-480" name="__codelineno-0-480"></a>
 <a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        extensions: Map from extension key to its :class:`Extension` row.</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        variables: Map from friendly variable name to its :class:`Variable`.</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        extensions: Map from extension key to its `Extension` row.</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        variables: Map from friendly variable name to its `Variable`.</span>
 <a id="__codelineno-0-484" name="__codelineno-0-484"></a>
 <a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">        - Look up an extension and the archive it would read:</span>
@@ -28631,22 +28631,22 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-501" name="__codelineno-0-501"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Caravan catalog&quot;</span>
 <a id="__codelineno-0-502" name="__codelineno-0-502"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;extensions&quot;</span>
 <a id="__codelineno-0-503" name="__codelineno-0-503"></a>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a>    <span class="c1">#: The extension rows live in the base :attr:`datasets` field so the</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a>    <span class="c1">#: The extension rows live in the base `datasets` field so the</span>
 <a id="__codelineno-0-505" name="__codelineno-0-505"></a>    <span class="c1">#: inherited dict surface (`len`, `in`, `[]`, iteration) and</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a>    <span class="c1">#: :meth:`get_dataset`&#39;s did-you-mean hint work unchanged.</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a>    <span class="c1">#: `get_dataset`&#39;s did-you-mean hint work unchanged.</span>
 <a id="__codelineno-0-507" name="__codelineno-0-507"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Extension</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-508" name="__codelineno-0-508"></a>    <span class="n">variables</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Variable</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-509" name="__codelineno-0-509"></a>    <span class="c1">#: The YAML&#39;s informational `available_extensions:` block, including the</span>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a>    <span class="c1">#: records deliberately not wrapped. Named apart from the</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>    <span class="c1">#: :attr:`available_extensions` property, which lists the supported keys.</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>    <span class="c1">#: `available_extensions` property, which lists the supported keys.</span>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a>    <span class="n">extension_index</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
 <a id="__codelineno-0-513" name="__codelineno-0-513"></a>
 <a id="__codelineno-0-514" name="__codelineno-0-514"></a>    <span class="nd">@property</span>
 <a id="__codelineno-0-515" name="__codelineno-0-515"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">extensions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Extension</span><span class="p">]:</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The extension map — alias for the base :attr:`datasets` field.</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The extension map — alias for the base `datasets` field.</span>
 <a id="__codelineno-0-517" name="__codelineno-0-517"></a>
 <a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">            dict[str, Extension]: The same mapping stored in :attr:`datasets`.</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">            dict[str, Extension]: The same mapping stored in `datasets`.</span>
 <a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-521" name="__codelineno-0-521"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 <a id="__codelineno-0-522" name="__codelineno-0-522"></a>
@@ -28666,7 +28666,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-536" name="__codelineno-0-536"></a>
 <a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-540" name="__codelineno-0-540"></a>
 <a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">            Catalog: A fully-populated catalog.</span>
@@ -28690,7 +28690,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-560" name="__codelineno-0-560"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_extension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Extension</span><span class="p">:</span>
 <a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve an extension key to its row.</span>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown key.</span>
 <a id="__codelineno-0-565" name="__codelineno-0-565"></a>
 <a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">        Args:</span>
@@ -28827,7 +28827,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
 
     <div class="doc doc-contents ">
 
-        <p>The extension map — alias for the base :attr:<code>datasets</code> field.</p>
+        <p>The extension map — alias for the base <code>datasets</code> field.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -28845,7 +28845,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>dict[str, Extension]: The same mapping stored in :attr:<code>datasets</code>.</p>
+                <p>dict[str, Extension]: The same mapping stored in <code>datasets</code>.</p>
               </div>
             </td>
           </tr>
@@ -28871,7 +28871,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
     <div class="doc doc-contents ">
 
         <p>Resolve an extension key to its row.</p>
-<p>Thin wrapper over the inherited :meth:<code>get_dataset</code>, which raises a
+<p>Thin wrapper over the inherited <code>get_dataset</code>, which raises a
 <code>ValueError</code> with a did-you-mean hint on an unknown key.</p>
 
 
@@ -28972,7 +28972,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <span class="normal"><a href="#__codelineno-0-575">575</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_extension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Extension</span><span class="p">:</span>
 <a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve an extension key to its row.</span>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown key.</span>
 <a id="__codelineno-0-565" name="__codelineno-0-565"></a>
 <a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">    Args:</span>
@@ -29209,7 +29209,7 @@ Caravan-DE's <code>water_level</code> of the GRDC extension).</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the
-module-level :data:<code>CATALOG_PATH</code>.</p>
+module-level <code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -29291,7 +29291,7 @@ validation.</p>
 <a id="__codelineno-0-536" name="__codelineno-0-536"></a>
 <a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-540" name="__codelineno-0-540"></a>
 <a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">        Catalog: A fully-populated catalog.</span>
@@ -29433,7 +29433,7 @@ from v1.6 onward.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Archive source directory to its :class:<code>Source</code> row.</p>
+                <p>Archive source directory to its <code>Source</code> row.</p>
               </div>
             </td>
           </tr>
@@ -29444,7 +29444,7 @@ from v1.6 onward.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Key into :attr:<code>versions</code> used when none is requested.</p>
+                <p>Key into <code>versions</code> used when none is requested.</p>
               </div>
             </td>
           </tr>
@@ -29455,7 +29455,7 @@ from v1.6 onward.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Version key to its :class:<code>Version</code>.</p>
+                <p>Version key to its <code>Version</code>.</p>
               </div>
             </td>
           </tr>
@@ -29589,9 +29589,9 @@ from v1.6 onward.</p>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        license: SPDX-ish licence id (every current row is `CC-BY-4.0`).</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        attribution: The citation obligation the licence carries.</span>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        license_file: Path to the in-archive licence text.</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        sources: Archive source directory to its :class:`Source` row.</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        default_version: Key into :attr:`versions` used when none is requested.</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        versions: Version key to its :class:`Version`.</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        sources: Archive source directory to its `Source` row.</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        default_version: Key into `versions` used when none is requested.</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        versions: Version key to its `Version`.</span>
 <a id="__codelineno-0-396" name="__codelineno-0-396"></a>
 <a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">        - The default release is the one a bare request resolves to:</span>
@@ -29638,8 +29638,8 @@ from v1.6 onward.</p>
 <a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the requested release, or the row&#39;s default.</span>
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a>
 <a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">            version: A key into :attr:`versions`. `None` (the default) picks</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">                :attr:`default_version`.</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">            version: A key into `versions`. `None` (the default) picks</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">                `default_version`.</span>
 <a id="__codelineno-0-444" name="__codelineno-0-444"></a>
 <a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">            Version: The matching release.</span>
@@ -29762,8 +29762,8 @@ from v1.6 onward.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A key into :attr:<code>versions</code>. <code>None</code> (the default) picks
-:attr:<code>default_version</code>.</p>
+                <p>A key into <code>versions</code>. <code>None</code> (the default) picks
+<code>default_version</code>.</p>
               </div>
             </td>
             <td>
@@ -29871,8 +29871,8 @@ the message lists the valid keys.</p>
 <a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the requested release, or the row&#39;s default.</span>
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a>
 <a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        version: A key into :attr:`versions`. `None` (the default) picks</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">            :attr:`default_version`.</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        version: A key into `versions`. `None` (the default) picks</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">            `default_version`.</span>
 <a id="__codelineno-0-444" name="__codelineno-0-444"></a>
 <a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">        Version: The matching release.</span>
@@ -30315,8 +30315,8 @@ Caravan-DE-only observed columns.</p>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">            column_set: The archive&#39;s column-set variant.</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">            str: :attr:`legacy_column` when the archive is `legacy` and this</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">                variable declares one, otherwise :attr:`column`.</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">            str: `legacy_column` when the archive is `legacy` and this</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">                variable declares one, otherwise `column`.</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">        Examples:</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">            - PET is the one variable whose name changed between eras:</span>
@@ -30413,8 +30413,8 @@ Caravan-DE-only observed columns.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>:attr:<code>legacy_column</code> when the archive is <code>legacy</code> and this
-variable declares one, otherwise :attr:<code>column</code>.</p>
+                <p><code>legacy_column</code> when the archive is <code>legacy</code> and this
+variable declares one, otherwise <code>column</code>.</p>
               </div>
             </td>
           </tr>
@@ -30476,8 +30476,8 @@ variable declares one, otherwise :attr:<code>column</code>.</p>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">        column_set: The archive&#39;s column-set variant.</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">        str: :attr:`legacy_column` when the archive is `legacy` and this</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">            variable declares one, otherwise :attr:`column`.</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">        str: `legacy_column` when the archive is `legacy` and this</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">            variable declares one, otherwise `column`.</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        - PET is the one variable whose name changed between eras:</span>
@@ -30621,7 +30621,7 @@ arithmetic and this is <code>False</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Per timeseries format, the :class:<code>ArchiveFile</code> to read.</p>
+                <p>Per timeseries format, the <code>ArchiveFile</code> to read.</p>
               </div>
             </td>
           </tr>
@@ -30706,7 +30706,7 @@ arithmetic and this is <code>False</code>.</p>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">            and cannot be indexed without downloading it, so its count is</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">            arithmetic and this is `False`.</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        column_set: Which timeseries column-set variant this release ships.</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        files: Per timeseries format, the :class:`ArchiveFile` to read.</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        files: Per timeseries format, the `ArchiveFile` to read.</span>
 <a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a>
 <a id="__codelineno-0-342" name="__codelineno-0-342"></a>    <span class="n">_summary_fields</span> <span class="o">=</span> <span class="p">(</span>
@@ -30967,8 +30967,8 @@ the file's <code>st_mtime_ns</code>, so any real edit invalidates the entry on i
 
         <p>Backend that fetches Caravan large-sample hydrology from Zenodo.</p>
 <p><code>Caravan(AbstractDataSource)</code> assembles per-catchment daily <strong>streamflow</strong> plus
-<strong>ERA5-Land</strong> meteorological forcing into a long :class:<code>pandas.DataFrame</code>, so
-<code>OUTPUT_KIND = "tabular"</code> and the :class:<code>earthlens.earthlens.EarthLens</code> facade
+<strong>ERA5-Land</strong> meteorological forcing into a long <code>pandas.DataFrame</code>, so
+<code>OUTPUT_KIND = "tabular"</code> and the <code>earthlens.earthlens.EarthLens</code> facade
 rejects an <code>aggregate=</code> argument.</p>
 <p>A request names an extension (<code>dataset="grdc"</code>), a set of catchments, a time
 window, and the variables wanted. Catchments are selected explicitly
@@ -32011,14 +32011,14 @@ catchment-days, so the facade refuses an <code>aggregate=</code>.</p>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">            with_attributes: Merge the static catchment attributes onto every</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">                row.</span>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">            with_geometry: Attach the basin polygons, returned alongside the</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">                frame on :attr:`geometry`.</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">                frame on `geometry`.</span>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">            allow_full_download: Permit a release that can only be fetched by</span>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">                downloading the whole multi-gigabyte archive. Required for</span>
 <a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">                `base` at its default version.</span>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">            write_table: Write the assembled frame to `path`. `False` returns</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">                it without touching the filesystem.</span>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">            client: Transport to read through; injectable for tests. When</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">                `None`, a throttled :class:`HttpClient` is built (see</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">                `None`, a throttled `HttpClient` is built (see</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">                `min_interval`).</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">            min_interval: Minimum seconds between requests to Zenodo, which</span>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">                rate-limits anonymous callers. Only used when `client` is</span>
@@ -32151,7 +32151,7 @@ catchment-days, so the facade refuses an <code>aggregate=</code>.</p>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_input_dates</span><span class="p">(</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse `[start, end]` into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse `[start, end]` into a `TemporalExtent`.</span>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        Caravan members hold a catchment&#39;s whole record in one file, so the</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        window is a filter applied after the read rather than a per-date loop.</span>
@@ -32435,7 +32435,7 @@ catchment-days, so the facade refuses an <code>aggregate=</code>.</p>
 <a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">        catchment would be far worse than over-reading.</span>
 <a id="__codelineno-0-584" name="__codelineno-0-584"></a>
 <a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">            products: The list returned by :meth:`_search`.</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">            products: The list returned by `_search`.</span>
 <a id="__codelineno-0-587" name="__codelineno-0-587"></a>
 <a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">            list[pd.DataFrame]: One frame per catchment, in the same order.</span>
@@ -32454,7 +32454,7 @@ catchment-days, so the facade refuses an <code>aggregate=</code>.</p>
 <a id="__codelineno-0-602" name="__codelineno-0-602"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read one catchment from a range-readable archive.</span>
 <a id="__codelineno-0-603" name="__codelineno-0-603"></a>
 <a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a><span class="sd">            product: One product from :meth:`_search`.</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a><span class="sd">            product: One product from `_search`.</span>
 <a id="__codelineno-0-606" name="__codelineno-0-606"></a>
 <a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">            pandas.DataFrame: The catchment&#39;s rows within the request window,</span>
@@ -32483,7 +32483,7 @@ catchment-days, so the facade refuses an <code>aggregate=</code>.</p>
 <a id="__codelineno-0-631" name="__codelineno-0-631"></a>
 <a id="__codelineno-0-632" name="__codelineno-0-632"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">            archive: The opened tar archive.</span>
-<a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">            products: The list returned by :meth:`_search`.</span>
+<a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">            products: The list returned by `_search`.</span>
 <a id="__codelineno-0-635" name="__codelineno-0-635"></a>
 <a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-637" name="__codelineno-0-637"></a><span class="sd">            list[pd.DataFrame]: One frame per readable catchment.</span>
@@ -33163,7 +33163,7 @@ row.</p>
             <td>
               <div class="doc-md-description">
                 <p>Attach the basin polygons, returned alongside the
-frame on :attr:<code>geometry</code>.</p>
+frame on <code>geometry</code>.</p>
               </div>
             </td>
             <td>
@@ -33215,7 +33215,7 @@ it without touching the filesystem.</p>
             <td>
               <div class="doc-md-description">
                 <p>Transport to read through; injectable for tests. When
-<code>None</code>, a throttled :class:<code>HttpClient</code> is built (see
+<code>None</code>, a throttled <code>HttpClient</code> is built (see
 <code>min_interval</code>).</p>
               </div>
             </td>
@@ -33499,14 +33499,14 @@ argument's note.</p>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">        with_attributes: Merge the static catchment attributes onto every</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">            row.</span>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">        with_geometry: Attach the basin polygons, returned alongside the</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">            frame on :attr:`geometry`.</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">            frame on `geometry`.</span>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">        allow_full_download: Permit a release that can only be fetched by</span>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">            downloading the whole multi-gigabyte archive. Required for</span>
 <a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">            `base` at its default version.</span>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">        write_table: Write the assembled frame to `path`. `False` returns</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">            it without touching the filesystem.</span>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">        client: Transport to read through; injectable for tests. When</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">            `None`, a throttled :class:`HttpClient` is built (see</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">            `None`, a throttled `HttpClient` is built (see</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">            `min_interval`).</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">        min_interval: Minimum seconds between requests to Zenodo, which</span>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">            rate-limits anonymous callers. Only used when `client` is</span>
@@ -33877,19 +33877,19 @@ archives actually contain: a pinned Zenodo record, the file to read, how that
 file is packaged, and the real column names inside it.</p>
 <p>Three shapes matter and are modelled separately:</p>
 <ul>
-<li>:class:<code>Extension</code> — one Zenodo record set (<code>base</code>, <code>grdc</code>, <code>germany</code>,
+<li><code>Extension</code> — one Zenodo record set (<code>base</code>, <code>grdc</code>, <code>germany</code>,
   <code>denmark</code>, <code>israel</code>), carrying its licence, its <code>sources:</code> map, and one or
-  more :class:<code>Version</code> entries.</li>
-<li>:class:<code>Version</code> — a specific, reproducible release of an extension. Pinning
+  more <code>Version</code> entries.</li>
+<li><code>Version</code> — a specific, reproducible release of an extension. Pinning
   a version rather than the moving concept DOI is what makes a request
   repeatable, and it is what carries <code>data_period</code> / <code>n_catchments</code> /
   <code>column_set</code>. <code>base</code> has two — the current <code>1.6</code> and the range-readable
   <code>1.2</code> — so the cheap path is data, not a special case in code.</li>
-<li>:class:<code>ArchiveFile</code> — one downloadable artifact with its size, md5, and
+<li><code>ArchiveFile</code> — one downloadable artifact with its size, md5, and
   crucially its <code>archive_format</code>. A <code>zip</code> is read in place over HTTP Range
   requests; a <code>tar.gz</code> is a single gzip stream that must be fetched whole.</li>
 </ul>
-<p>:data:<code>CATALOG_PATH</code> is the path to the bundled YAML.</p>
+<p><code>CATALOG_PATH</code> is the path to the bundled YAML.</p>
 
 
 
@@ -34333,8 +34333,8 @@ seekable over HTTP Range; <code>False</code> for a <code>tar.gz</code>.</p>
 
         <p>Extension and variable catalog for the Caravan backend.</p>
 <p>Reads the bundled <code>caravan_data_catalog.yaml</code> (shipped as package data) and
-exposes its <code>extensions:</code> block as :class:<code>Extension</code> rows keyed by the
-<code>dataset=</code> name, plus the shared <code>variables:</code> block as :class:<code>Variable</code>
+exposes its <code>extensions:</code> block as <code>Extension</code> rows keyed by the
+<code>dataset=</code> name, plus the shared <code>variables:</code> block as <code>Variable</code>
 rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
 
 
@@ -34359,7 +34359,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from extension key to its :class:<code>Extension</code> row.</p>
+                <p>Map from extension key to its <code>Extension</code> row.</p>
               </div>
             </td>
           </tr>
@@ -34370,7 +34370,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from friendly variable name to its :class:<code>Variable</code>.</p>
+                <p>Map from friendly variable name to its <code>Variable</code>.</p>
               </div>
             </td>
           </tr>
@@ -34558,13 +34558,13 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Extension and variable catalog for the Caravan backend.</span>
 <a id="__codelineno-0-475" name="__codelineno-0-475"></a>
 <a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">    Reads the bundled `caravan_data_catalog.yaml` (shipped as package data) and</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">    exposes its `extensions:` block as :class:`Extension` rows keyed by the</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">    `dataset=` name, plus the shared `variables:` block as :class:`Variable`</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">    exposes its `extensions:` block as `Extension` rows keyed by the</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">    `dataset=` name, plus the shared `variables:` block as `Variable`</span>
 <a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">    rows. Instantiate with no arguments (`Catalog()`).</span>
 <a id="__codelineno-0-480" name="__codelineno-0-480"></a>
 <a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        extensions: Map from extension key to its :class:`Extension` row.</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        variables: Map from friendly variable name to its :class:`Variable`.</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        extensions: Map from extension key to its `Extension` row.</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        variables: Map from friendly variable name to its `Variable`.</span>
 <a id="__codelineno-0-484" name="__codelineno-0-484"></a>
 <a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">        - Look up an extension and the archive it would read:</span>
@@ -34585,22 +34585,22 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-501" name="__codelineno-0-501"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Caravan catalog&quot;</span>
 <a id="__codelineno-0-502" name="__codelineno-0-502"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;extensions&quot;</span>
 <a id="__codelineno-0-503" name="__codelineno-0-503"></a>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a>    <span class="c1">#: The extension rows live in the base :attr:`datasets` field so the</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a>    <span class="c1">#: The extension rows live in the base `datasets` field so the</span>
 <a id="__codelineno-0-505" name="__codelineno-0-505"></a>    <span class="c1">#: inherited dict surface (`len`, `in`, `[]`, iteration) and</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a>    <span class="c1">#: :meth:`get_dataset`&#39;s did-you-mean hint work unchanged.</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a>    <span class="c1">#: `get_dataset`&#39;s did-you-mean hint work unchanged.</span>
 <a id="__codelineno-0-507" name="__codelineno-0-507"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Extension</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-508" name="__codelineno-0-508"></a>    <span class="n">variables</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Variable</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-509" name="__codelineno-0-509"></a>    <span class="c1">#: The YAML&#39;s informational `available_extensions:` block, including the</span>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a>    <span class="c1">#: records deliberately not wrapped. Named apart from the</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>    <span class="c1">#: :attr:`available_extensions` property, which lists the supported keys.</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>    <span class="c1">#: `available_extensions` property, which lists the supported keys.</span>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a>    <span class="n">extension_index</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
 <a id="__codelineno-0-513" name="__codelineno-0-513"></a>
 <a id="__codelineno-0-514" name="__codelineno-0-514"></a>    <span class="nd">@property</span>
 <a id="__codelineno-0-515" name="__codelineno-0-515"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">extensions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Extension</span><span class="p">]:</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The extension map — alias for the base :attr:`datasets` field.</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The extension map — alias for the base `datasets` field.</span>
 <a id="__codelineno-0-517" name="__codelineno-0-517"></a>
 <a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">            dict[str, Extension]: The same mapping stored in :attr:`datasets`.</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">            dict[str, Extension]: The same mapping stored in `datasets`.</span>
 <a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-521" name="__codelineno-0-521"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 <a id="__codelineno-0-522" name="__codelineno-0-522"></a>
@@ -34620,7 +34620,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-536" name="__codelineno-0-536"></a>
 <a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-540" name="__codelineno-0-540"></a>
 <a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">            Catalog: A fully-populated catalog.</span>
@@ -34644,7 +34644,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-560" name="__codelineno-0-560"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_extension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Extension</span><span class="p">:</span>
 <a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve an extension key to its row.</span>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown key.</span>
 <a id="__codelineno-0-565" name="__codelineno-0-565"></a>
 <a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">        Args:</span>
@@ -34781,7 +34781,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
 
     <div class="doc doc-contents ">
 
-        <p>The extension map — alias for the base :attr:<code>datasets</code> field.</p>
+        <p>The extension map — alias for the base <code>datasets</code> field.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -34799,7 +34799,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>dict[str, Extension]: The same mapping stored in :attr:<code>datasets</code>.</p>
+                <p>dict[str, Extension]: The same mapping stored in <code>datasets</code>.</p>
               </div>
             </td>
           </tr>
@@ -34825,7 +34825,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
     <div class="doc doc-contents ">
 
         <p>Resolve an extension key to its row.</p>
-<p>Thin wrapper over the inherited :meth:<code>get_dataset</code>, which raises a
+<p>Thin wrapper over the inherited <code>get_dataset</code>, which raises a
 <code>ValueError</code> with a did-you-mean hint on an unknown key.</p>
 
 
@@ -34926,7 +34926,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <span class="normal"><a href="#__codelineno-0-575">575</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_extension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Extension</span><span class="p">:</span>
 <a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve an extension key to its row.</span>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
 <a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown key.</span>
 <a id="__codelineno-0-565" name="__codelineno-0-565"></a>
 <a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">    Args:</span>
@@ -35163,7 +35163,7 @@ Caravan-DE's <code>water_level</code> of the GRDC extension).</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the
-module-level :data:<code>CATALOG_PATH</code>.</p>
+module-level <code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -35245,7 +35245,7 @@ validation.</p>
 <a id="__codelineno-0-536" name="__codelineno-0-536"></a>
 <a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-540" name="__codelineno-0-540"></a>
 <a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">        Catalog: A fully-populated catalog.</span>
@@ -35387,7 +35387,7 @@ from v1.6 onward.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Archive source directory to its :class:<code>Source</code> row.</p>
+                <p>Archive source directory to its <code>Source</code> row.</p>
               </div>
             </td>
           </tr>
@@ -35398,7 +35398,7 @@ from v1.6 onward.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Key into :attr:<code>versions</code> used when none is requested.</p>
+                <p>Key into <code>versions</code> used when none is requested.</p>
               </div>
             </td>
           </tr>
@@ -35409,7 +35409,7 @@ from v1.6 onward.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Version key to its :class:<code>Version</code>.</p>
+                <p>Version key to its <code>Version</code>.</p>
               </div>
             </td>
           </tr>
@@ -35543,9 +35543,9 @@ from v1.6 onward.</p>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        license: SPDX-ish licence id (every current row is `CC-BY-4.0`).</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        attribution: The citation obligation the licence carries.</span>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        license_file: Path to the in-archive licence text.</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        sources: Archive source directory to its :class:`Source` row.</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        default_version: Key into :attr:`versions` used when none is requested.</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        versions: Version key to its :class:`Version`.</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        sources: Archive source directory to its `Source` row.</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        default_version: Key into `versions` used when none is requested.</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        versions: Version key to its `Version`.</span>
 <a id="__codelineno-0-396" name="__codelineno-0-396"></a>
 <a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">        - The default release is the one a bare request resolves to:</span>
@@ -35592,8 +35592,8 @@ from v1.6 onward.</p>
 <a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the requested release, or the row&#39;s default.</span>
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a>
 <a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">            version: A key into :attr:`versions`. `None` (the default) picks</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">                :attr:`default_version`.</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">            version: A key into `versions`. `None` (the default) picks</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">                `default_version`.</span>
 <a id="__codelineno-0-444" name="__codelineno-0-444"></a>
 <a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">            Version: The matching release.</span>
@@ -35716,8 +35716,8 @@ from v1.6 onward.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A key into :attr:<code>versions</code>. <code>None</code> (the default) picks
-:attr:<code>default_version</code>.</p>
+                <p>A key into <code>versions</code>. <code>None</code> (the default) picks
+<code>default_version</code>.</p>
               </div>
             </td>
             <td>
@@ -35825,8 +35825,8 @@ the message lists the valid keys.</p>
 <a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the requested release, or the row&#39;s default.</span>
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a>
 <a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        version: A key into :attr:`versions`. `None` (the default) picks</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">            :attr:`default_version`.</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        version: A key into `versions`. `None` (the default) picks</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">            `default_version`.</span>
 <a id="__codelineno-0-444" name="__codelineno-0-444"></a>
 <a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">        Version: The matching release.</span>
@@ -36269,8 +36269,8 @@ Caravan-DE-only observed columns.</p>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">            column_set: The archive&#39;s column-set variant.</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">            str: :attr:`legacy_column` when the archive is `legacy` and this</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">                variable declares one, otherwise :attr:`column`.</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">            str: `legacy_column` when the archive is `legacy` and this</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">                variable declares one, otherwise `column`.</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">        Examples:</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">            - PET is the one variable whose name changed between eras:</span>
@@ -36367,8 +36367,8 @@ Caravan-DE-only observed columns.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>:attr:<code>legacy_column</code> when the archive is <code>legacy</code> and this
-variable declares one, otherwise :attr:<code>column</code>.</p>
+                <p><code>legacy_column</code> when the archive is <code>legacy</code> and this
+variable declares one, otherwise <code>column</code>.</p>
               </div>
             </td>
           </tr>
@@ -36430,8 +36430,8 @@ variable declares one, otherwise :attr:<code>column</code>.</p>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">        column_set: The archive&#39;s column-set variant.</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">        str: :attr:`legacy_column` when the archive is `legacy` and this</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">            variable declares one, otherwise :attr:`column`.</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">        str: `legacy_column` when the archive is `legacy` and this</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">            variable declares one, otherwise `column`.</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        - PET is the one variable whose name changed between eras:</span>
@@ -36575,7 +36575,7 @@ arithmetic and this is <code>False</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Per timeseries format, the :class:<code>ArchiveFile</code> to read.</p>
+                <p>Per timeseries format, the <code>ArchiveFile</code> to read.</p>
               </div>
             </td>
           </tr>
@@ -36660,7 +36660,7 @@ arithmetic and this is <code>False</code>.</p>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">            and cannot be indexed without downloading it, so its count is</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">            arithmetic and this is `False`.</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        column_set: Which timeseries column-set variant this release ships.</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        files: Per timeseries format, the :class:`ArchiveFile` to read.</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        files: Per timeseries format, the `ArchiveFile` to read.</span>
 <a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a>
 <a id="__codelineno-0-342" name="__codelineno-0-342"></a>    <span class="n">_summary_fields</span> <span class="o">=</span> <span class="p">(</span>

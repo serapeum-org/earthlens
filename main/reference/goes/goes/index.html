@@ -24516,7 +24516,7 @@ pages in this section; this page is the rendered API.</p>
 <p>Fetches GOES-R Advanced Baseline Imager (ABI) imagery from the public,
 anonymous AWS Open-Data buckets <code>noaa-goes19</code> (operational GOES-East),
 <code>noaa-goes18</code> (GOES-West), and <code>noaa-goes16</code> (standby / archive). It is a
-<strong>raster</strong> backend: :meth:<code>GOES.download</code> returns the <code>list[Path]</code> of raw
+<strong>raster</strong> backend: <code>GOES.download</code> returns the <code>list[Path]</code> of raw
 <strong>NetCDF</strong> ABI granules whose scan-start time falls in the requested
 window. It does <strong>not</strong> decode them — reading / reprojecting the
 geostationary NetCDF to arrays is pyramids' (or <code>satpy</code>'s) job downstream,
@@ -24537,13 +24537,13 @@ installed (a friendly <code>ImportError</code> naming <code>earthlens[s3]</code>
 gate, attribution only in the docs.</p>
 <p>Public surface (re-exported from this package):</p>
 <ul>
-<li>:class:<code>GOES</code> — the backend; instantiate with a scan-time window, a
+<li><code>GOES</code> — the backend; instantiate with a scan-time window, a
   bbox, <code>dataset=</code> / <code>variables=</code>, <code>satellite=</code>, and <code>domain=</code>, then call
-  :meth:<code>GOES.download</code>.</li>
-<li>:class:<code>Catalog</code> — loader for the bundled <code>goes_data_catalog.yaml</code>.</li>
-<li>:class:<code>GOESProduct</code> / :class:<code>GOESDomain</code> / :class:<code>GOESChannel</code> — one
+  <code>GOES.download</code>.</li>
+<li><code>Catalog</code> — loader for the bundled <code>goes_data_catalog.yaml</code>.</li>
+<li><code>GOESProduct</code> / <code>GOESDomain</code> / <code>GOESChannel</code> — one
   product row, one scan domain, and one ABI spectral band.</li>
-<li>:data:<code>CATALOG_PATH</code> — path to the bundled YAML; monkey-patchable in
+<li><code>CATALOG_PATH</code> — path to the bundled YAML; monkey-patchable in
   tests.</li>
 </ul>
 
@@ -24595,16 +24595,16 @@ gate, attribution only in the docs.</p>
 
         <p>Product / domain / satellite catalog for the GOES ABI backend.</p>
 <p>Reads the bundled <code>goes_data_catalog.yaml</code> (shipped as package data)
-and exposes its <code>products:</code> block as a map of :class:<code>GOESProduct</code>
-rows keyed by product key under the inherited :attr:<code>datasets</code> field,
-plus parallel :attr:<code>domains</code>, :attr:<code>satellites</code>, and
-:attr:<code>channels</code> maps. Instantiate with no arguments (<code>Catalog()</code>);
-:func:<code>model_post_init</code> loads and validates the YAML in one pass and
+and exposes its <code>products:</code> block as a map of <code>GOESProduct</code>
+rows keyed by product key under the inherited <code>datasets</code> field,
+plus parallel <code>domains</code>, <code>satellites</code>, and
+<code>channels</code> maps. Instantiate with no arguments (<code>Catalog()</code>);
+<code>model_post_init</code> loads and validates the YAML in one pass and
 caches it by <code>(path, mtime)</code>.</p>
-<p>Resolve a product with :meth:<code>get_product</code> (a thin alias over
-:meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>), a domain with
-:meth:<code>get_domain</code>, and a satellite/role to its bucket with
-:meth:<code>bucket_for</code>.</p>
+<p>Resolve a product with <code>get_product</code> (a thin alias over
+<code>get_dataset</code>), a domain with
+<code>get_domain</code>, and a satellite/role to its bucket with
+<code>bucket_for</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -24624,7 +24624,7 @@ caches it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from product key to its :class:<code>GOESProduct</code> row.</p>
+                <p>Map from product key to its <code>GOESProduct</code> row.</p>
               </div>
             </td>
           </tr>
@@ -24636,7 +24636,7 @@ caches it by <code>(path, mtime)</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>Map from domain key (<code>"C"</code>, <code>"F"</code>, <code>"M1"</code>, <code>"M2"</code>) to
-its :class:<code>GOESDomain</code> row.</p>
+its <code>GOESDomain</code> row.</p>
               </div>
             </td>
           </tr>
@@ -24660,7 +24660,7 @@ to its unsigned bucket name.</p>
             <td>
               <div class="doc-md-description">
                 <p>Map from ABI channel token (<code>"C01"</code>) to its
-:class:<code>GOESChannel</code> metadata.</p>
+<code>GOESChannel</code> metadata.</p>
               </div>
             </td>
           </tr>
@@ -24875,26 +24875,26 @@ to its unsigned bucket name.</p>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Product / domain / satellite catalog for the GOES ABI backend.</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">    Reads the bundled `goes_data_catalog.yaml` (shipped as package data)</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">    and exposes its `products:` block as a map of :class:`GOESProduct`</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">    rows keyed by product key under the inherited :attr:`datasets` field,</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    plus parallel :attr:`domains`, :attr:`satellites`, and</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">    :attr:`channels` maps. Instantiate with no arguments (`Catalog()`);</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">    :func:`model_post_init` loads and validates the YAML in one pass and</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">    and exposes its `products:` block as a map of `GOESProduct`</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">    rows keyed by product key under the inherited `datasets` field,</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    plus parallel `domains`, `satellites`, and</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">    `channels` maps. Instantiate with no arguments (`Catalog()`);</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">    `model_post_init` loads and validates the YAML in one pass and</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">    caches it by `(path, mtime)`.</span>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">    Resolve a product with :meth:`get_product` (a thin alias over</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`), a domain with</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    :meth:`get_domain`, and a satellite/role to its bucket with</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">    :meth:`bucket_for`.</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">    Resolve a product with `get_product` (a thin alias over</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    `get_dataset`), a domain with</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    `get_domain`, and a satellite/role to its bucket with</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">    `bucket_for`.</span>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        datasets: Map from product key to its :class:`GOESProduct` row.</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        datasets: Map from product key to its `GOESProduct` row.</span>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        domains: Map from domain key (`&quot;C&quot;`, `&quot;F&quot;`, `&quot;M1&quot;`, `&quot;M2&quot;`) to</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            its :class:`GOESDomain` row.</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            its `GOESDomain` row.</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        satellites: Map from role / satellite number (`&quot;east&quot;`, `&quot;19&quot;`)</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            to its unsigned bucket name.</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        channels: Map from ABI channel token (`&quot;C01&quot;`) to its</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">            :class:`GOESChannel` metadata.</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">            `GOESChannel` metadata.</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        available_datasets: Sorted product keys.</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    Examples:</span>
@@ -24929,13 +24929,13 @@ to its unsigned bucket name.</p>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no products were supplied.</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        `Catalog()` with no args reads `CATALOG_PATH` (cached by</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        `(path, mtime)`); passing `datasets=...` skips the disk read</span>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        (used in tests). Either way the `available_datasets` index is</span>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        derived from the loaded map.</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            ValueError: Propagated from :meth:`load` when the YAML is</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            ValueError: Propagated from `load` when the YAML is</span>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">                missing, empty, or has a malformed row.</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
@@ -24952,10 +24952,10 @@ to its unsigned bucket name.</p>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a>
 <a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file has no</span>
@@ -24967,10 +24967,10 @@ to its unsigned bucket name.</p>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">payload</span><span class="p">)</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESProduct</span><span class="p">:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESProduct` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `GOESProduct` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-340" name="__codelineno-0-340"></a>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">        Thin alias over</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        `get_dataset`.</span>
 <a id="__codelineno-0-343" name="__codelineno-0-343"></a>
 <a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">            key: A product key (`&quot;abi-l2-mcmip&quot;`, `&quot;abi-l1b-rad&quot;`).</span>
@@ -24984,7 +24984,7 @@ to its unsigned bucket name.</p>
 <a id="__codelineno-0-353" name="__codelineno-0-353"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;GOESProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a>
 <a id="__codelineno-0-355" name="__codelineno-0-355"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESDomain</span><span class="p">:</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESDomain` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `GOESDomain` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a>
 <a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">            key: A domain key (`&quot;C&quot;`, `&quot;F&quot;`, `&quot;M1&quot;`, `&quot;M2&quot;`).</span>
@@ -25208,7 +25208,7 @@ to its unsigned bucket name.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the :class:<code>GOESDomain</code> for <code>key</code>, with a did-you-mean hint.</p>
+        <p>Return the <code>GOESDomain</code> for <code>key</code>, with a did-you-mean hint.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -25311,7 +25311,7 @@ to its unsigned bucket name.</p>
 <span class="normal"><a href="#__codelineno-0-373">373</a></span>
 <span class="normal"><a href="#__codelineno-0-374">374</a></span>
 <span class="normal"><a href="#__codelineno-0-375">375</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESDomain</span><span class="p">:</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESDomain` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `GOESDomain` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a>
 <a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        key: A domain key (`&quot;C&quot;`, `&quot;F&quot;`, `&quot;M1&quot;`, `&quot;M2&quot;`).</span>
@@ -25348,9 +25348,9 @@ to its unsigned bucket name.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the :class:<code>GOESProduct</code> for <code>key</code>, with a did-you-mean hint.</p>
+        <p>Return the <code>GOESProduct</code> for <code>key</code>, with a did-you-mean hint.</p>
 <p>Thin alias over
-:meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>.</p>
+<code>get_dataset</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -25448,10 +25448,10 @@ to its unsigned bucket name.</p>
 <span class="normal"><a href="#__codelineno-0-351">351</a></span>
 <span class="normal"><a href="#__codelineno-0-352">352</a></span>
 <span class="normal"><a href="#__codelineno-0-353">353</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESProduct</span><span class="p">:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESProduct` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `GOESProduct` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-340" name="__codelineno-0-340"></a>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">    Thin alias over</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">    `get_dataset`.</span>
 <a id="__codelineno-0-343" name="__codelineno-0-343"></a>
 <a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        key: A product key (`&quot;abi-l2-mcmip&quot;`, `&quot;abi-l1b-rad&quot;`).</span>
@@ -25508,7 +25508,7 @@ to its unsigned bucket name.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the
-module-level :data:<code>CATALOG_PATH</code>.</p>
+module-level <code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -25534,7 +25534,7 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code>.</p>
+                <p>A fully-populated <code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -25593,10 +25593,10 @@ channel row fails validation.</p>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a>
 <a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file has no</span>
@@ -25624,7 +25624,7 @@ channel row fails validation.</p>
     <div class="doc doc-contents ">
 
         <p>Auto-load the bundled catalog when no products were supplied.</p>
-<p><code>Catalog()</code> with no args reads :data:<code>CATALOG_PATH</code> (cached by
+<p><code>Catalog()</code> with no args reads <code>CATALOG_PATH</code> (cached by
 <code>(path, mtime)</code>); passing <code>datasets=...</code> skips the disk read
 (used in tests). Either way the <code>available_datasets</code> index is
 derived from the loaded map.</p>
@@ -25645,7 +25645,7 @@ derived from the loaded map.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Propagated from :meth:<code>load</code> when the YAML is
+                <p>Propagated from <code>load</code> when the YAML is
 missing, empty, or has a malformed row.</p>
               </div>
             </td>
@@ -25677,13 +25677,13 @@ missing, empty, or has a malformed row.</p>
 <span class="normal"><a href="#__codelineno-0-316">316</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no products were supplied.</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    `Catalog()` with no args reads `CATALOG_PATH` (cached by</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    `(path, mtime)`); passing `datasets=...` skips the disk read</span>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">    (used in tests). Either way the `available_datasets` index is</span>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    derived from the loaded map.</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        ValueError: Propagated from :meth:`load` when the YAML is</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        ValueError: Propagated from `load` when the YAML is</span>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            missing, empty, or has a malformed row.</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
@@ -26192,7 +26192,7 @@ need the downstream reader.</p>
 <a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            domain: `&quot;C&quot;` / `&quot;F&quot;` / `&quot;M1&quot;` / `&quot;M2&quot;`. `None` uses the</span>
 <a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">                product&#39;s `default_domain`.</span>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            region: AWS region of the buckets.</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            catalog: Optional pre-built :class:`Catalog` (tests inject</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            catalog: Optional pre-built `Catalog` (tests inject</span>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">                one); defaults to the bundled catalog.</span>
 <a id="__codelineno-0-217" name="__codelineno-0-217"></a>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">        Raises:</span>
@@ -26238,7 +26238,7 @@ need the downstream reader.</p>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_input_dates</span><span class="p">(</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the scan-time window into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the scan-time window into a `TemporalExtent`.</span>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            start: Inclusive window start.</span>
@@ -26385,7 +26385,7 @@ need the downstream reader.</p>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download each granule whole to `self.root_dir` (unsigned boto3).</span>
 <a id="__codelineno-0-406" name="__codelineno-0-406"></a>
 <a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">            products: The granules from :meth:`_search`.</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">            products: The granules from `_search`.</span>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a>
 <a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">            list[Path]: The written NetCDF paths, in order.</span>
@@ -26406,8 +26406,8 @@ need the downstream reader.</p>
 <a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the in-window ABI granules and return the written paths.</span>
 <a id="__codelineno-0-428" name="__codelineno-0-428"></a>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        Runs the cheap :meth:`_search` (key enumeration) then</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">        :meth:`_fetch` (whole-granule download). The granules are raw,</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        Runs the cheap `_search` (key enumeration) then</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">        `_fetch` (whole-granule download). The granules are raw,</span>
 <a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">        undecoded NetCDF — reading / cropping / band extraction is a</span>
 <a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        downstream pyramids (or `satpy`) step.</span>
 <a id="__codelineno-0-433" name="__codelineno-0-433"></a>
@@ -26679,7 +26679,7 @@ product's <code>default_domain</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional pre-built :class:<code>Catalog</code> (tests inject
+                <p>Optional pre-built <code>Catalog</code> (tests inject
 one); defaults to the bundled catalog.</p>
               </div>
             </td>
@@ -26852,7 +26852,7 @@ is not published by the product.</p>
 <a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        domain: `&quot;C&quot;` / `&quot;F&quot;` / `&quot;M1&quot;` / `&quot;M2&quot;`. `None` uses the</span>
 <a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            product&#39;s `default_domain`.</span>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        region: AWS region of the buckets.</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        catalog: Optional pre-built :class:`Catalog` (tests inject</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        catalog: Optional pre-built `Catalog` (tests inject</span>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">            one); defaults to the bundled catalog.</span>
 <a id="__codelineno-0-217" name="__codelineno-0-217"></a>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">    Raises:</span>
@@ -26910,8 +26910,8 @@ is not published by the product.</p>
     <div class="doc doc-contents ">
 
         <p>Fetch the in-window ABI granules and return the written paths.</p>
-<p>Runs the cheap :meth:<code>_search</code> (key enumeration) then
-:meth:<code>_fetch</code> (whole-granule download). The granules are raw,
+<p>Runs the cheap <code>_search</code> (key enumeration) then
+<code>_fetch</code> (whole-granule download). The granules are raw,
 undecoded NetCDF — reading / cropping / band extraction is a
 downstream pyramids (or <code>satpy</code>) step.</p>
 
@@ -27000,8 +27000,8 @@ nothing in the window was available.</p>
 <a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the in-window ABI granules and return the written paths.</span>
 <a id="__codelineno-0-428" name="__codelineno-0-428"></a>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">    Runs the cheap :meth:`_search` (key enumeration) then</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">    :meth:`_fetch` (whole-granule download). The granules are raw,</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">    Runs the cheap `_search` (key enumeration) then</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">    `_fetch` (whole-granule download). The granules are raw,</span>
 <a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">    undecoded NetCDF — reading / cropping / band extraction is a</span>
 <a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">    downstream pyramids (or `satpy`) step.</span>
 <a id="__codelineno-0-433" name="__codelineno-0-433"></a>
@@ -27391,7 +27391,7 @@ only (enumeration is listing-driven, not cadence-computed).</p>
 
         <p>One curated ABI product family (the "dataset" analog).</p>
 <p>The product key (<code>"abi-l2-mcmip"</code>) is the parent key in
-:attr:<code>Catalog.datasets</code> and is repeated here as :attr:<code>product</code> so a
+<code>Catalog.datasets</code> and is repeated here as <code>product</code> so a
 row carries its own identity when passed around outside the catalog.</p>
 
 
@@ -27459,7 +27459,7 @@ in <code>dataset=</code> / <code>variables={product: [...]}</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>The domain keys this product publishes (a subset of
-:attr:<code>Catalog.domains</code>), e.g. <code>["C", "F", "M1", "M2"]</code>.</p>
+<code>Catalog.domains</code>), e.g. <code>["C", "F", "M1", "M2"]</code>.</p>
               </div>
             </td>
           </tr>
@@ -27585,7 +27585,7 @@ combined product, the in-file band-variable names
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One curated ABI product family (the &quot;dataset&quot; analog).</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a>
 <a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    The product key (`&quot;abi-l2-mcmip&quot;`) is the parent key in</span>
-<a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">    :attr:`Catalog.datasets` and is repeated here as :attr:`product` so a</span>
+<a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">    `Catalog.datasets` and is repeated here as `product` so a</span>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">    row carries its own identity when passed around outside the catalog.</span>
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a>
 <a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="sd">    Attributes:</span>
@@ -27596,7 +27596,7 @@ combined product, the in-file band-variable names
 <a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">        level: Processing level (`&quot;L1b&quot;` / `&quot;L2&quot;`).</span>
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">        description: Human-readable summary.</span>
 <a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">        domains: The domain keys this product publishes (a subset of</span>
-<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">            :attr:`Catalog.domains`), e.g. `[&quot;C&quot;, &quot;F&quot;, &quot;M1&quot;, &quot;M2&quot;]`.</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">            `Catalog.domains`), e.g. `[&quot;C&quot;, &quot;F&quot;, &quot;M1&quot;, &quot;M2&quot;]`.</span>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">        band_split: `True` when each ABI channel is a **separate** file</span>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">            (`ABI-L1b-Rad`, `ABI-L2-CMIP`) so `variables=` picks which</span>
 <a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">            granule files are fetched; `False` when one file carries all</span>
@@ -28158,7 +28158,7 @@ need the downstream reader.</p>
 <a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            domain: `&quot;C&quot;` / `&quot;F&quot;` / `&quot;M1&quot;` / `&quot;M2&quot;`. `None` uses the</span>
 <a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">                product&#39;s `default_domain`.</span>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            region: AWS region of the buckets.</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            catalog: Optional pre-built :class:`Catalog` (tests inject</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            catalog: Optional pre-built `Catalog` (tests inject</span>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">                one); defaults to the bundled catalog.</span>
 <a id="__codelineno-0-217" name="__codelineno-0-217"></a>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">        Raises:</span>
@@ -28204,7 +28204,7 @@ need the downstream reader.</p>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_input_dates</span><span class="p">(</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the scan-time window into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the scan-time window into a `TemporalExtent`.</span>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            start: Inclusive window start.</span>
@@ -28351,7 +28351,7 @@ need the downstream reader.</p>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download each granule whole to `self.root_dir` (unsigned boto3).</span>
 <a id="__codelineno-0-406" name="__codelineno-0-406"></a>
 <a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">            products: The granules from :meth:`_search`.</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">            products: The granules from `_search`.</span>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a>
 <a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">            list[Path]: The written NetCDF paths, in order.</span>
@@ -28372,8 +28372,8 @@ need the downstream reader.</p>
 <a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the in-window ABI granules and return the written paths.</span>
 <a id="__codelineno-0-428" name="__codelineno-0-428"></a>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        Runs the cheap :meth:`_search` (key enumeration) then</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">        :meth:`_fetch` (whole-granule download). The granules are raw,</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        Runs the cheap `_search` (key enumeration) then</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">        `_fetch` (whole-granule download). The granules are raw,</span>
 <a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">        undecoded NetCDF — reading / cropping / band extraction is a</span>
 <a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        downstream pyramids (or `satpy`) step.</span>
 <a id="__codelineno-0-433" name="__codelineno-0-433"></a>
@@ -28645,7 +28645,7 @@ product's <code>default_domain</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional pre-built :class:<code>Catalog</code> (tests inject
+                <p>Optional pre-built <code>Catalog</code> (tests inject
 one); defaults to the bundled catalog.</p>
               </div>
             </td>
@@ -28818,7 +28818,7 @@ is not published by the product.</p>
 <a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        domain: `&quot;C&quot;` / `&quot;F&quot;` / `&quot;M1&quot;` / `&quot;M2&quot;`. `None` uses the</span>
 <a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            product&#39;s `default_domain`.</span>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        region: AWS region of the buckets.</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        catalog: Optional pre-built :class:`Catalog` (tests inject</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        catalog: Optional pre-built `Catalog` (tests inject</span>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">            one); defaults to the bundled catalog.</span>
 <a id="__codelineno-0-217" name="__codelineno-0-217"></a>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">    Raises:</span>
@@ -28876,8 +28876,8 @@ is not published by the product.</p>
     <div class="doc doc-contents ">
 
         <p>Fetch the in-window ABI granules and return the written paths.</p>
-<p>Runs the cheap :meth:<code>_search</code> (key enumeration) then
-:meth:<code>_fetch</code> (whole-granule download). The granules are raw,
+<p>Runs the cheap <code>_search</code> (key enumeration) then
+<code>_fetch</code> (whole-granule download). The granules are raw,
 undecoded NetCDF — reading / cropping / band extraction is a
 downstream pyramids (or <code>satpy</code>) step.</p>
 
@@ -28966,8 +28966,8 @@ nothing in the window was available.</p>
 <a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the in-window ABI granules and return the written paths.</span>
 <a id="__codelineno-0-428" name="__codelineno-0-428"></a>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">    Runs the cheap :meth:`_search` (key enumeration) then</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">    :meth:`_fetch` (whole-granule download). The granules are raw,</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">    Runs the cheap `_search` (key enumeration) then</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">    `_fetch` (whole-granule download). The granules are raw,</span>
 <a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">    undecoded NetCDF — reading / cropping / band extraction is a</span>
 <a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">    downstream pyramids (or `satpy`) step.</span>
 <a id="__codelineno-0-433" name="__codelineno-0-433"></a>
@@ -29373,7 +29373,7 @@ nothing rather than every granule).</p>
     <div class="doc doc-contents first">
 
         <p>Product / domain / satellite catalog for the GOES ABI backend.</p>
-<p>Hosts :class:<code>Catalog</code>, the pydantic-backed reader for the bundled
+<p>Hosts <code>Catalog</code>, the pydantic-backed reader for the bundled
 <code>goes_data_catalog.yaml</code>. A GOES request is three-axis: a <strong>satellite</strong>
 (which bucket — <code>east</code>/<code>west</code> resolve to the current operational
 <code>noaa-goes19</code> / <code>noaa-goes18</code>), a <strong>product</strong> (which ABI product family,
@@ -29383,12 +29383,12 @@ e.g. <code>abi-l2-mcmip</code>), and a <strong>domain</strong> (<code>C</code> C
 prefix and are split by the filename token.</p>
 <p>The product is the "dataset" role (the key the user names in
 <code>dataset=</code> / <code>variables={product: [...]}</code>), so it lives under the
-inherited :attr:<code>~earthlens.base.AbstractCatalog.datasets</code> field — which
+inherited <code>datasets</code> field — which
 gives the catalog its <code>cat["abi-l2-mcmip"]</code> / <code>"abi-l2-mcmip" in cat</code> /
 <code>len(cat)</code> dict-like surface and the did-you-mean error for free.
 Domains, satellites, and the 16 ABI channels hang off parallel maps.</p>
-<p>:data:<code>CATALOG_PATH</code> is the path to the bundled YAML;
-:func:<code>clear_catalog_cache</code> empties the <code>(path, mtime)</code> parse cache.</p>
+<p><code>CATALOG_PATH</code> is the path to the bundled YAML;
+<code>clear_catalog_cache</code> empties the <code>(path, mtime)</code> parse cache.</p>
 
 
 
@@ -29428,16 +29428,16 @@ Domains, satellites, and the 16 ABI channels hang off parallel maps.</p>
 
         <p>Product / domain / satellite catalog for the GOES ABI backend.</p>
 <p>Reads the bundled <code>goes_data_catalog.yaml</code> (shipped as package data)
-and exposes its <code>products:</code> block as a map of :class:<code>GOESProduct</code>
-rows keyed by product key under the inherited :attr:<code>datasets</code> field,
-plus parallel :attr:<code>domains</code>, :attr:<code>satellites</code>, and
-:attr:<code>channels</code> maps. Instantiate with no arguments (<code>Catalog()</code>);
-:func:<code>model_post_init</code> loads and validates the YAML in one pass and
+and exposes its <code>products:</code> block as a map of <code>GOESProduct</code>
+rows keyed by product key under the inherited <code>datasets</code> field,
+plus parallel <code>domains</code>, <code>satellites</code>, and
+<code>channels</code> maps. Instantiate with no arguments (<code>Catalog()</code>);
+<code>model_post_init</code> loads and validates the YAML in one pass and
 caches it by <code>(path, mtime)</code>.</p>
-<p>Resolve a product with :meth:<code>get_product</code> (a thin alias over
-:meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>), a domain with
-:meth:<code>get_domain</code>, and a satellite/role to its bucket with
-:meth:<code>bucket_for</code>.</p>
+<p>Resolve a product with <code>get_product</code> (a thin alias over
+<code>get_dataset</code>), a domain with
+<code>get_domain</code>, and a satellite/role to its bucket with
+<code>bucket_for</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -29457,7 +29457,7 @@ caches it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from product key to its :class:<code>GOESProduct</code> row.</p>
+                <p>Map from product key to its <code>GOESProduct</code> row.</p>
               </div>
             </td>
           </tr>
@@ -29469,7 +29469,7 @@ caches it by <code>(path, mtime)</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>Map from domain key (<code>"C"</code>, <code>"F"</code>, <code>"M1"</code>, <code>"M2"</code>) to
-its :class:<code>GOESDomain</code> row.</p>
+its <code>GOESDomain</code> row.</p>
               </div>
             </td>
           </tr>
@@ -29493,7 +29493,7 @@ to its unsigned bucket name.</p>
             <td>
               <div class="doc-md-description">
                 <p>Map from ABI channel token (<code>"C01"</code>) to its
-:class:<code>GOESChannel</code> metadata.</p>
+<code>GOESChannel</code> metadata.</p>
               </div>
             </td>
           </tr>
@@ -29708,26 +29708,26 @@ to its unsigned bucket name.</p>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Product / domain / satellite catalog for the GOES ABI backend.</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">    Reads the bundled `goes_data_catalog.yaml` (shipped as package data)</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">    and exposes its `products:` block as a map of :class:`GOESProduct`</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">    rows keyed by product key under the inherited :attr:`datasets` field,</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    plus parallel :attr:`domains`, :attr:`satellites`, and</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">    :attr:`channels` maps. Instantiate with no arguments (`Catalog()`);</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">    :func:`model_post_init` loads and validates the YAML in one pass and</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">    and exposes its `products:` block as a map of `GOESProduct`</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">    rows keyed by product key under the inherited `datasets` field,</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    plus parallel `domains`, `satellites`, and</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">    `channels` maps. Instantiate with no arguments (`Catalog()`);</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">    `model_post_init` loads and validates the YAML in one pass and</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">    caches it by `(path, mtime)`.</span>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">    Resolve a product with :meth:`get_product` (a thin alias over</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`), a domain with</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    :meth:`get_domain`, and a satellite/role to its bucket with</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">    :meth:`bucket_for`.</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">    Resolve a product with `get_product` (a thin alias over</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    `get_dataset`), a domain with</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    `get_domain`, and a satellite/role to its bucket with</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">    `bucket_for`.</span>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        datasets: Map from product key to its :class:`GOESProduct` row.</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        datasets: Map from product key to its `GOESProduct` row.</span>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        domains: Map from domain key (`&quot;C&quot;`, `&quot;F&quot;`, `&quot;M1&quot;`, `&quot;M2&quot;`) to</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            its :class:`GOESDomain` row.</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            its `GOESDomain` row.</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        satellites: Map from role / satellite number (`&quot;east&quot;`, `&quot;19&quot;`)</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            to its unsigned bucket name.</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        channels: Map from ABI channel token (`&quot;C01&quot;`) to its</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">            :class:`GOESChannel` metadata.</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">            `GOESChannel` metadata.</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        available_datasets: Sorted product keys.</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    Examples:</span>
@@ -29762,13 +29762,13 @@ to its unsigned bucket name.</p>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no products were supplied.</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        `Catalog()` with no args reads `CATALOG_PATH` (cached by</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        `(path, mtime)`); passing `datasets=...` skips the disk read</span>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        (used in tests). Either way the `available_datasets` index is</span>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        derived from the loaded map.</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            ValueError: Propagated from :meth:`load` when the YAML is</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            ValueError: Propagated from `load` when the YAML is</span>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">                missing, empty, or has a malformed row.</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
@@ -29785,10 +29785,10 @@ to its unsigned bucket name.</p>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a>
 <a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file has no</span>
@@ -29800,10 +29800,10 @@ to its unsigned bucket name.</p>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">payload</span><span class="p">)</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESProduct</span><span class="p">:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESProduct` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `GOESProduct` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-340" name="__codelineno-0-340"></a>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">        Thin alias over</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        `get_dataset`.</span>
 <a id="__codelineno-0-343" name="__codelineno-0-343"></a>
 <a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">            key: A product key (`&quot;abi-l2-mcmip&quot;`, `&quot;abi-l1b-rad&quot;`).</span>
@@ -29817,7 +29817,7 @@ to its unsigned bucket name.</p>
 <a id="__codelineno-0-353" name="__codelineno-0-353"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;GOESProduct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a>
 <a id="__codelineno-0-355" name="__codelineno-0-355"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESDomain</span><span class="p">:</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESDomain` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `GOESDomain` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a>
 <a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">            key: A domain key (`&quot;C&quot;`, `&quot;F&quot;`, `&quot;M1&quot;`, `&quot;M2&quot;`).</span>
@@ -30041,7 +30041,7 @@ to its unsigned bucket name.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the :class:<code>GOESDomain</code> for <code>key</code>, with a did-you-mean hint.</p>
+        <p>Return the <code>GOESDomain</code> for <code>key</code>, with a did-you-mean hint.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -30144,7 +30144,7 @@ to its unsigned bucket name.</p>
 <span class="normal"><a href="#__codelineno-0-373">373</a></span>
 <span class="normal"><a href="#__codelineno-0-374">374</a></span>
 <span class="normal"><a href="#__codelineno-0-375">375</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESDomain</span><span class="p">:</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESDomain` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `GOESDomain` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a>
 <a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        key: A domain key (`&quot;C&quot;`, `&quot;F&quot;`, `&quot;M1&quot;`, `&quot;M2&quot;`).</span>
@@ -30181,9 +30181,9 @@ to its unsigned bucket name.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the :class:<code>GOESProduct</code> for <code>key</code>, with a did-you-mean hint.</p>
+        <p>Return the <code>GOESProduct</code> for <code>key</code>, with a did-you-mean hint.</p>
 <p>Thin alias over
-:meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>.</p>
+<code>get_dataset</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -30281,10 +30281,10 @@ to its unsigned bucket name.</p>
 <span class="normal"><a href="#__codelineno-0-351">351</a></span>
 <span class="normal"><a href="#__codelineno-0-352">352</a></span>
 <span class="normal"><a href="#__codelineno-0-353">353</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GOESProduct</span><span class="p">:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`GOESProduct` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `GOESProduct` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-340" name="__codelineno-0-340"></a>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">    Thin alias over</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">    `get_dataset`.</span>
 <a id="__codelineno-0-343" name="__codelineno-0-343"></a>
 <a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        key: A product key (`&quot;abi-l2-mcmip&quot;`, `&quot;abi-l1b-rad&quot;`).</span>
@@ -30341,7 +30341,7 @@ to its unsigned bucket name.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the
-module-level :data:<code>CATALOG_PATH</code>.</p>
+module-level <code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -30367,7 +30367,7 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code>.</p>
+                <p>A fully-populated <code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -30426,10 +30426,10 @@ channel row fails validation.</p>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a>
 <a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file has no</span>
@@ -30457,7 +30457,7 @@ channel row fails validation.</p>
     <div class="doc doc-contents ">
 
         <p>Auto-load the bundled catalog when no products were supplied.</p>
-<p><code>Catalog()</code> with no args reads :data:<code>CATALOG_PATH</code> (cached by
+<p><code>Catalog()</code> with no args reads <code>CATALOG_PATH</code> (cached by
 <code>(path, mtime)</code>); passing <code>datasets=...</code> skips the disk read
 (used in tests). Either way the <code>available_datasets</code> index is
 derived from the loaded map.</p>
@@ -30478,7 +30478,7 @@ derived from the loaded map.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Propagated from :meth:<code>load</code> when the YAML is
+                <p>Propagated from <code>load</code> when the YAML is
 missing, empty, or has a malformed row.</p>
               </div>
             </td>
@@ -30510,13 +30510,13 @@ missing, empty, or has a malformed row.</p>
 <span class="normal"><a href="#__codelineno-0-316">316</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no products were supplied.</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    `Catalog()` with no args reads `CATALOG_PATH` (cached by</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    `(path, mtime)`); passing `datasets=...` skips the disk read</span>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">    (used in tests). Either way the `available_datasets` index is</span>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    derived from the loaded map.</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        ValueError: Propagated from :meth:`load` when the YAML is</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        ValueError: Propagated from `load` when the YAML is</span>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            missing, empty, or has a malformed row.</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
@@ -30960,7 +30960,7 @@ only (enumeration is listing-driven, not cadence-computed).</p>
 
         <p>One curated ABI product family (the "dataset" analog).</p>
 <p>The product key (<code>"abi-l2-mcmip"</code>) is the parent key in
-:attr:<code>Catalog.datasets</code> and is repeated here as :attr:<code>product</code> so a
+<code>Catalog.datasets</code> and is repeated here as <code>product</code> so a
 row carries its own identity when passed around outside the catalog.</p>
 
 
@@ -31028,7 +31028,7 @@ in <code>dataset=</code> / <code>variables={product: [...]}</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>The domain keys this product publishes (a subset of
-:attr:<code>Catalog.domains</code>), e.g. <code>["C", "F", "M1", "M2"]</code>.</p>
+<code>Catalog.domains</code>), e.g. <code>["C", "F", "M1", "M2"]</code>.</p>
               </div>
             </td>
           </tr>
@@ -31154,7 +31154,7 @@ combined product, the in-file band-variable names
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One curated ABI product family (the &quot;dataset&quot; analog).</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a>
 <a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    The product key (`&quot;abi-l2-mcmip&quot;`) is the parent key in</span>
-<a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">    :attr:`Catalog.datasets` and is repeated here as :attr:`product` so a</span>
+<a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">    `Catalog.datasets` and is repeated here as `product` so a</span>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">    row carries its own identity when passed around outside the catalog.</span>
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a>
 <a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="sd">    Attributes:</span>
@@ -31165,7 +31165,7 @@ combined product, the in-file band-variable names
 <a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">        level: Processing level (`&quot;L1b&quot;` / `&quot;L2&quot;`).</span>
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">        description: Human-readable summary.</span>
 <a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">        domains: The domain keys this product publishes (a subset of</span>
-<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">            :attr:`Catalog.domains`), e.g. `[&quot;C&quot;, &quot;F&quot;, &quot;M1&quot;, &quot;M2&quot;]`.</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">            `Catalog.domains`), e.g. `[&quot;C&quot;, &quot;F&quot;, &quot;M1&quot;, &quot;M2&quot;]`.</span>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">        band_split: `True` when each ABI channel is a **separate** file</span>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">            (`ABI-L1b-Rad`, `ABI-L2-CMIP`) so `variables=` picks which</span>
 <a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">            granule files are fetched; `False` when one file carries all</span>

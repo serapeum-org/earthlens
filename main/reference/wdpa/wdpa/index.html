@@ -24287,9 +24287,9 @@ rendered API.</p>
 <p>Fetches protected-area polygons from the World Database on Protected and
 Conserved Areas through a thin direct Protected Planet v4 REST client
 (<code>pywdpa</code> is not used — it targets the retired v3 API). Authenticated with a
-personal token (<code>?token=</code> query param) via :class:<code>WdpaAuth</code>; every fetch
+personal token (<code>?token=</code> query param) via <code>WdpaAuth</code>; every fetch
 raises a <code>LicenseWarning</code> for the custom UNEP-WCMC terms. See
-:class:<code>earthlens.wdpa.backend.WDPA</code>.</p>
+<code>earthlens.wdpa.backend.WDPA</code>.</p>
 
 
 
@@ -24331,7 +24331,7 @@ raises a <code>LicenseWarning</code> for the custom UNEP-WCMC terms. See
 <p>Carries a message that names a fix: pass <code>token=</code> to <code>WDPA(...)</code>, set
 the <code>WDPA_TOKEN</code> environment variable, or request a token at
 <code>api.protectedplanet.net/request</code>. A subclass of the cross-backend
-:class:<code>earthlens.base.AuthenticationError</code> so callers can catch every
+<code>earthlens.base.AuthenticationError</code> so callers can catch every
 backend's auth failure with one <code>except</code> clause.</p>
 
 
@@ -24357,7 +24357,7 @@ backend's auth failure with one <code>except</code> clause.</p>
 <a id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="sd">    Carries a message that names a fix: pass `token=` to `WDPA(...)`, set</span>
 <a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="sd">    the `WDPA_TOKEN` environment variable, or request a token at</span>
 <a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="sd">    `api.protectedplanet.net/request`. A subclass of the cross-backend</span>
-<a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">    :class:`earthlens.base.AuthenticationError` so callers can catch every</span>
+<a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">    `earthlens.base.AuthenticationError` so callers can catch every</span>
 <a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">    backend&#39;s auth failure with one `except` clause.</span>
 <a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
@@ -24386,8 +24386,8 @@ backend's auth failure with one <code>except</code> clause.</p>
 
         <p>Country catalog for the WDPA / Protected Planet backend.</p>
 <p>Reads the bundled <code>wdpa_data_catalog.yaml</code> (shipped as package data) and
-exposes its <code>countries:</code> block as a map of :class:<code>Country</code> rows.
-Instantiate with no arguments (<code>Catalog()</code>); :func:<code>model_post_init</code>
+exposes its <code>countries:</code> block as a map of <code>Country</code> rows.
+Instantiate with no arguments (<code>Catalog()</code>); <code>model_post_init</code>
 loads and validates the YAML (cached) in one pass.</p>
 
 
@@ -24408,7 +24408,7 @@ loads and validates the YAML (cached) in one pass.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from the ISO3 code to its :class:<code>Country</code> row.</p>
+                <p>Map from the ISO3 code to its <code>Country</code> row.</p>
               </div>
             </td>
           </tr>
@@ -24552,12 +24552,12 @@ loads and validates the YAML (cached) in one pass.</p>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Country catalog for the WDPA / Protected Planet backend.</span>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    Reads the bundled `wdpa_data_catalog.yaml` (shipped as package data) and</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    exposes its `countries:` block as a map of :class:`Country` rows.</span>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    Instantiate with no arguments (`Catalog()`); :func:`model_post_init`</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    exposes its `countries:` block as a map of `Country` rows.</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    Instantiate with no arguments (`Catalog()`); `model_post_init`</span>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">    loads and validates the YAML (cached) in one pass.</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a>
 <a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">        datasets: Map from the ISO3 code to its :class:`Country` row.</span>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">        datasets: Map from the ISO3 code to its `Country` row.</span>
 <a id="__codelineno-0-134" name="__codelineno-0-134"></a>
 <a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">        - Resolve a code, a friendly name, and a `country:` selector:</span>
@@ -24606,14 +24606,14 @@ loads and validates the YAML (cached) in one pass.</p>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-183" name="__codelineno-0-183"></a>
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">            A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            ValueError: If the file has no `countries:` block, or a row</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">                fails :class:`Country` validation.</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">                fails `Country` validation.</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-192" name="__codelineno-0-192"></a>        <span class="n">rows</span><span class="p">,</span> <span class="n">available</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
@@ -24708,7 +24708,7 @@ loads and validates the YAML (cached) in one pass.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the
-module-level :data:<code>CATALOG_PATH</code>.</p>
+module-level <code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -24734,7 +24734,7 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated :class:<code>Catalog</code>.</p>
+                <p>A fully-populated <code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -24758,7 +24758,7 @@ module-level :data:<code>CATALOG_PATH</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>If the file has no <code>countries:</code> block, or a row
-fails :class:<code>Country</code> validation.</p>
+fails <code>Country</code> validation.</p>
               </div>
             </td>
           </tr>
@@ -24791,14 +24791,14 @@ fails :class:<code>Country</code> validation.</p>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
 <a id="__codelineno-0-183" name="__codelineno-0-183"></a>
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">        A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">        ValueError: If the file has no `countries:` block, or a row</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">            fails :class:`Country` validation.</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">            fails `Country` validation.</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-192" name="__codelineno-0-192"></a>    <span class="n">rows</span><span class="p">,</span> <span class="n">available</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
@@ -25006,7 +25006,7 @@ alpha-3 code, or a country name.</p>
 
 
         <p>One curated WDPA country's dispatch row.</p>
-<p>The ISO3 code is the parent key in :attr:<code>Catalog.datasets</code> and is not
+<p>The ISO3 code is the parent key in <code>Catalog.datasets</code> and is not
 stored on the row.</p>
 
 
@@ -25097,7 +25097,7 @@ stored on the row.</p>
 <span class="normal"><a href="#__codelineno-0-121">121</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="k">class</span><span class="w"> </span><span class="nc">Country</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One curated WDPA country&#39;s dispatch row.</span>
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a>
-<a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    The ISO3 code is the parent key in :attr:`Catalog.datasets` and is not</span>
+<a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    The ISO3 code is the parent key in `Catalog.datasets` and is not</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">    stored on the row.</span>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    Attributes:</span>
@@ -25171,7 +25171,7 @@ stored on the row.</p>
 shape every other earthlens backend uses. Each entry in <code>variables</code>
 is a country ISO3 code (<code>"KEN"</code> or <code>"country:KEN"</code>) or a WDPA id;
 results across entries are unioned into one polygon
-:class:<code>~pyramids.feature.collection.FeatureCollection</code>.</p>
+<code>pyramids.feature.collection.FeatureCollection</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -25497,7 +25497,7 @@ results across entries are unioned into one polygon
 <a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">    shape every other earthlens backend uses. Each entry in `variables`</span>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    is a country ISO3 code (`&quot;KEN&quot;` or `&quot;country:KEN&quot;`) or a WDPA id;</span>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">    results across entries are unioned into one polygon</span>
-<a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    :class:`~pyramids.feature.collection.FeatureCollection`.</span>
+<a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection`.</span>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a>
 <a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">        OUTPUT_KIND: `&quot;vector&quot;` — the facade rejects `aggregate=`.</span>
@@ -25625,7 +25625,7 @@ results across entries are unioned into one polygon
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse `[start, end]` into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse `[start, end]` into a `TemporalExtent`.</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">        WDPA is not time-filtered, so the window only frames the request</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">        and the resolution is the sentinel `&quot;all&quot;`.</span>
@@ -26357,12 +26357,12 @@ fetches everything.</p>
 
 
         <p>Resolve and hold the Protected Planet API token (mandatory).</p>
-<p>Implements the :class:<code>earthlens.base.SingleSecretAuth</code> contract for a
+<p>Implements the <code>earthlens.base.SingleSecretAuth</code> contract for a
 single-secret backend: it declares its env var and provider name and
 supplies <code>_explicit_credential</code> / <code>_connect</code>, while the inherited
-:meth:<code>configure</code> performs the resolution and is idempotent. After a
+<code>configure</code> performs the resolution and is idempotent. After a
 successful <code>configure()</code>, the token is available via the
-:attr:<code>token</code> property for <code>_rest</code> to attach as the <code>token=</code> query
+<code>token</code> property for <code>_rest</code> to attach as the <code>token=</code> query
 parameter.</p>
 
 
@@ -26382,7 +26382,7 @@ parameter.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The :class:<code>WdpaCredentials</code> passed at construction.</p>
+                <p>The <code>WdpaCredentials</code> passed at construction.</p>
               </div>
             </td>
           </tr>
@@ -26476,16 +26476,16 @@ parameter.</p>
 <span class="normal"><a href="#__codelineno-0-141">141</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="k">class</span><span class="w"> </span><span class="nc">WdpaAuth</span><span class="p">(</span><span class="n">SingleSecretAuth</span><span class="p">[</span><span class="n">WdpaCredentials</span><span class="p">]):</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve and hold the Protected Planet API token (mandatory).</span>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    Implements the :class:`earthlens.base.SingleSecretAuth` contract for a</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    Implements the `earthlens.base.SingleSecretAuth` contract for a</span>
 <a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">    single-secret backend: it declares its env var and provider name and</span>
 <a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">    supplies `_explicit_credential` / `_connect`, while the inherited</span>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">    :meth:`configure` performs the resolution and is idempotent. After a</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">    `configure` performs the resolution and is idempotent. After a</span>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    successful `configure()`, the token is available via the</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    :attr:`token` property for `_rest` to attach as the `token=` query</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    `token` property for `_rest` to attach as the `token=` query</span>
 <a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    parameter.</span>
 <a id="__codelineno-0-90" name="__codelineno-0-90"></a>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">        _creds: The :class:`WdpaCredentials` passed at construction.</span>
+<a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">        _creds: The `WdpaCredentials` passed at construction.</span>
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a>
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">        - Resolve an explicit token:</span>
@@ -26521,13 +26521,13 @@ parameter.</p>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a>    <span class="nd">@property</span>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">token</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved token; valid only after :meth:`configure`.</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved token; valid only after `configure`.</span>
 <a id="__codelineno-0-129" name="__codelineno-0-129"></a>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a><span class="sd">            str: The Protected Planet API token string.</span>
 <a id="__codelineno-0-132" name="__codelineno-0-132"></a>
 <a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">            AuthenticationError: When read before :meth:`configure` has</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">            AuthenticationError: When read before `configure` has</span>
 <a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">                resolved a token.</span>
 <a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -26564,7 +26564,7 @@ parameter.</p>
 
     <div class="doc doc-contents ">
 
-        <p>The resolved token; valid only after :meth:<code>configure</code>.</p>
+        <p>The resolved token; valid only after <code>configure</code>.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -26605,7 +26605,7 @@ parameter.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>When read before :meth:<code>configure</code> has
+                <p>When read before <code>configure</code> has
 resolved a token.</p>
               </div>
             </td>
@@ -26647,9 +26647,9 @@ resolved a token.</p>
 
         <p>Frozen value object holding the Protected Planet API token.</p>
 <p>The token is optional at construction time: <code>None</code> means "resolve from
-the <code>WDPA_TOKEN</code> environment variable at :meth:<code>WdpaAuth.configure</code>
+the <code>WDPA_TOKEN</code> environment variable at <code>WdpaAuth.configure</code>
 time". The real "is there a usable token?" gate is
-:meth:<code>WdpaAuth.configure</code>, not this model.</p>
+<code>WdpaAuth.configure</code>, not this model.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -26670,7 +26670,7 @@ time". The real "is there a usable token?" gate is
             <td>
               <div class="doc-md-description">
                 <p>The Protected Planet API token, stored as a
-:class:<code>pydantic.SecretStr</code> so it is never echoed by
+<code>pydantic.SecretStr</code> so it is never echoed by
 <code>repr(creds)</code> or in logs. <code>None</code> defers resolution to the
 environment variable.</p>
               </div>
@@ -26734,13 +26734,13 @@ environment variable.</p>
 <a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Frozen value object holding the Protected Planet API token.</span>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a>
 <a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="sd">    The token is optional at construction time: `None` means &quot;resolve from</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    the `WDPA_TOKEN` environment variable at :meth:`WdpaAuth.configure`</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    the `WDPA_TOKEN` environment variable at `WdpaAuth.configure`</span>
 <a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">    time&quot;. The real &quot;is there a usable token?&quot; gate is</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    :meth:`WdpaAuth.configure`, not this model.</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    `WdpaAuth.configure`, not this model.</span>
 <a id="__codelineno-0-55" name="__codelineno-0-55"></a>
 <a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">        token: The Protected Planet API token, stored as a</span>
-<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">            :class:`pydantic.SecretStr` so it is never echoed by</span>
+<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">            `pydantic.SecretStr` so it is never echoed by</span>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">            `repr(creds)` or in logs. `None` defers resolution to the</span>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">            environment variable.</span>
 <a id="__codelineno-0-61" name="__codelineno-0-61"></a>
@@ -26811,11 +26811,11 @@ World Database on Protected and Conserved Areas (Protected Planet) — 300 k+
 areas — through a thin direct v4 REST client (<code>earthlens.wdpa._rest</code>). The
 <code>pywdpa</code> package is not used: it targets the retired v3 API (taken down
 2026-05-01) and writes a shapefile to disk. v4 requires a personal token
-passed as a <code>?token=</code> query parameter (resolved by :class:<code>WdpaAuth</code>).</p>
+passed as a <code>?token=</code> query parameter (resolved by <code>WdpaAuth</code>).</p>
 <p>This is the cluster's only polygon-geometry backend (<code>OUTPUT_KIND =
 "vector"</code>). Each entry in <code>variables</code> selects a country (ISO3 code) or a
 single WDPA id; the per-area GeoJSON geometry is assembled into a polygon
-:class:<code>~pyramids.feature.collection.FeatureCollection</code>. <code>download()</code>
+<code>pyramids.feature.collection.FeatureCollection</code>. <code>download()</code>
 returns it and, when <code>path</code> is set, writes it (GeoParquet by default).</p>
 <p>WDPA data carries a custom UNEP-WCMC license (commercial use needs written
 permission, redistribution is restricted), so every fetch raises a
@@ -26863,7 +26863,7 @@ permission, redistribution is restricted), so every fetch raises a
 shape every other earthlens backend uses. Each entry in <code>variables</code>
 is a country ISO3 code (<code>"KEN"</code> or <code>"country:KEN"</code>) or a WDPA id;
 results across entries are unioned into one polygon
-:class:<code>~pyramids.feature.collection.FeatureCollection</code>.</p>
+<code>pyramids.feature.collection.FeatureCollection</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -27189,7 +27189,7 @@ results across entries are unioned into one polygon
 <a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">    shape every other earthlens backend uses. Each entry in `variables`</span>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    is a country ISO3 code (`&quot;KEN&quot;` or `&quot;country:KEN&quot;`) or a WDPA id;</span>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">    results across entries are unioned into one polygon</span>
-<a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    :class:`~pyramids.feature.collection.FeatureCollection`.</span>
+<a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection`.</span>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a>
 <a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">        OUTPUT_KIND: `&quot;vector&quot;` — the facade rejects `aggregate=`.</span>
@@ -27317,7 +27317,7 @@ results across entries are unioned into one polygon
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse `[start, end]` into a :class:`TemporalExtent`.</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse `[start, end]` into a `TemporalExtent`.</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">        WDPA is not time-filtered, so the window only frames the request</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">        and the resolution is the sentinel `&quot;all&quot;`.</span>
@@ -28053,7 +28053,7 @@ fetches everything.</p>
     <div class="doc doc-contents first">
 
         <p>Credentials and token resolution for the WDPA / Protected Planet backend.</p>
-<p>Hosts :class:<code>WdpaAuth</code>, an :class:<code>earthlens.base.SingleSecretAuth</code> subclass
+<p>Hosts <code>WdpaAuth</code>, an <code>earthlens.base.SingleSecretAuth</code> subclass
 that resolves the Protected Planet <strong>personal API token</strong> from, in priority
 order, an explicit <code>token=</code> argument or the <code>WDPA_TOKEN</code> environment
 variable. The Protected Planet v4 API requires a token on every request,
@@ -28063,15 +28063,15 @@ no username/password, so this is a single-secret auth shape mirroring
 none can be resolved.</p>
 <p>The shape:</p>
 <ul>
-<li>:class:<code>WdpaCredentials</code> is a frozen pydantic value object carrying the
-  optional token as a :class:<code>pydantic.SecretStr</code>.</li>
-<li>:class:<code>WdpaAuth</code> binds those credentials and lets the shared
-  :meth:<code>earthlens.base.SingleSecretAuth.configure</code> resolve the token —
+<li><code>WdpaCredentials</code> is a frozen pydantic value object carrying the
+  optional token as a <code>pydantic.SecretStr</code>.</li>
+<li><code>WdpaAuth</code> binds those credentials and lets the shared
+  <code>earthlens.base.SingleSecretAuth.configure</code> resolve the token —
   explicit token first, then the <code>WDPA_TOKEN</code> env var, then a clear
-  :class:<code>AuthenticationError</code> naming the token-request URL (never an
+  <code>AuthenticationError</code> naming the token-request URL (never an
   interactive prompt).</li>
 </ul>
-<p>The resolved token is read back via the :attr:<code>WdpaAuth.token</code> property and
+<p>The resolved token is read back via the <code>WdpaAuth.token</code> property and
 attached as the <code>token=</code> query parameter by <code>earthlens.wdpa._rest</code>.</p>
 
 
@@ -28114,7 +28114,7 @@ attached as the <code>token=</code> query parameter by <code>earthlens.wdpa._res
 <p>Carries a message that names a fix: pass <code>token=</code> to <code>WDPA(...)</code>, set
 the <code>WDPA_TOKEN</code> environment variable, or request a token at
 <code>api.protectedplanet.net/request</code>. A subclass of the cross-backend
-:class:<code>earthlens.base.AuthenticationError</code> so callers can catch every
+<code>earthlens.base.AuthenticationError</code> so callers can catch every
 backend's auth failure with one <code>except</code> clause.</p>
 
 
@@ -28140,7 +28140,7 @@ backend's auth failure with one <code>except</code> clause.</p>
 <a id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="sd">    Carries a message that names a fix: pass `token=` to `WDPA(...)`, set</span>
 <a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="sd">    the `WDPA_TOKEN` environment variable, or request a token at</span>
 <a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="sd">    `api.protectedplanet.net/request`. A subclass of the cross-backend</span>
-<a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">    :class:`earthlens.base.AuthenticationError` so callers can catch every</span>
+<a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">    `earthlens.base.AuthenticationError` so callers can catch every</span>
 <a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">    backend&#39;s auth failure with one `except` clause.</span>
 <a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
@@ -28168,12 +28168,12 @@ backend's auth failure with one <code>except</code> clause.</p>
 
 
         <p>Resolve and hold the Protected Planet API token (mandatory).</p>
-<p>Implements the :class:<code>earthlens.base.SingleSecretAuth</code> contract for a
+<p>Implements the <code>earthlens.base.SingleSecretAuth</code> contract for a
 single-secret backend: it declares its env var and provider name and
 supplies <code>_explicit_credential</code> / <code>_connect</code>, while the inherited
-:meth:<code>configure</code> performs the resolution and is idempotent. After a
+<code>configure</code> performs the resolution and is idempotent. After a
 successful <code>configure()</code>, the token is available via the
-:attr:<code>token</code> property for <code>_rest</code> to attach as the <code>token=</code> query
+<code>token</code> property for <code>_rest</code> to attach as the <code>token=</code> query
 parameter.</p>
 
 
@@ -28193,7 +28193,7 @@ parameter.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The :class:<code>WdpaCredentials</code> passed at construction.</p>
+                <p>The <code>WdpaCredentials</code> passed at construction.</p>
               </div>
             </td>
           </tr>
@@ -28287,16 +28287,16 @@ parameter.</p>
 <span class="normal"><a href="#__codelineno-0-141">141</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="k">class</span><span class="w"> </span><span class="nc">WdpaAuth</span><span class="p">(</span><span class="n">SingleSecretAuth</span><span class="p">[</span><span class="n">WdpaCredentials</span><span class="p">]):</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve and hold the Protected Planet API token (mandatory).</span>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    Implements the :class:`earthlens.base.SingleSecretAuth` contract for a</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    Implements the `earthlens.base.SingleSecretAuth` contract for a</span>
 <a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">    single-secret backend: it declares its env var and provider name and</span>
 <a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">    supplies `_explicit_credential` / `_connect`, while the inherited</span>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">    :meth:`configure` performs the resolution and is idempotent. After a</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">    `configure` performs the resolution and is idempotent. After a</span>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    successful `configure()`, the token is available via the</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    :attr:`token` property for `_rest` to attach as the `token=` query</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    `token` property for `_rest` to attach as the `token=` query</span>
 <a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    parameter.</span>
 <a id="__codelineno-0-90" name="__codelineno-0-90"></a>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">        _creds: The :class:`WdpaCredentials` passed at construction.</span>
+<a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">        _creds: The `WdpaCredentials` passed at construction.</span>
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a>
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">        - Resolve an explicit token:</span>
@@ -28332,13 +28332,13 @@ parameter.</p>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a>    <span class="nd">@property</span>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">token</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved token; valid only after :meth:`configure`.</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved token; valid only after `configure`.</span>
 <a id="__codelineno-0-129" name="__codelineno-0-129"></a>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a><span class="sd">            str: The Protected Planet API token string.</span>
 <a id="__codelineno-0-132" name="__codelineno-0-132"></a>
 <a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">            AuthenticationError: When read before :meth:`configure` has</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">            AuthenticationError: When read before `configure` has</span>
 <a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">                resolved a token.</span>
 <a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -28375,7 +28375,7 @@ parameter.</p>
 
     <div class="doc doc-contents ">
 
-        <p>The resolved token; valid only after :meth:<code>configure</code>.</p>
+        <p>The resolved token; valid only after <code>configure</code>.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -28416,7 +28416,7 @@ parameter.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>When read before :meth:<code>configure</code> has
+                <p>When read before <code>configure</code> has
 resolved a token.</p>
               </div>
             </td>
@@ -28458,9 +28458,9 @@ resolved a token.</p>
 
         <p>Frozen value object holding the Protected Planet API token.</p>
 <p>The token is optional at construction time: <code>None</code> means "resolve from
-the <code>WDPA_TOKEN</code> environment variable at :meth:<code>WdpaAuth.configure</code>
+the <code>WDPA_TOKEN</code> environment variable at <code>WdpaAuth.configure</code>
 time". The real "is there a usable token?" gate is
-:meth:<code>WdpaAuth.configure</code>, not this model.</p>
+<code>WdpaAuth.configure</code>, not this model.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -28481,7 +28481,7 @@ time". The real "is there a usable token?" gate is
             <td>
               <div class="doc-md-description">
                 <p>The Protected Planet API token, stored as a
-:class:<code>pydantic.SecretStr</code> so it is never echoed by
+<code>pydantic.SecretStr</code> so it is never echoed by
 <code>repr(creds)</code> or in logs. <code>None</code> defers resolution to the
 environment variable.</p>
               </div>
@@ -28545,13 +28545,13 @@ environment variable.</p>
 <a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Frozen value object holding the Protected Planet API token.</span>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a>
 <a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="sd">    The token is optional at construction time: `None` means &quot;resolve from</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    the `WDPA_TOKEN` environment variable at :meth:`WdpaAuth.configure`</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    the `WDPA_TOKEN` environment variable at `WdpaAuth.configure`</span>
 <a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">    time&quot;. The real &quot;is there a usable token?&quot; gate is</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    :meth:`WdpaAuth.configure`, not this model.</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    `WdpaAuth.configure`, not this model.</span>
 <a id="__codelineno-0-55" name="__codelineno-0-55"></a>
 <a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">        token: The Protected Planet API token, stored as a</span>
-<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">            :class:`pydantic.SecretStr` so it is never echoed by</span>
+<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">            `pydantic.SecretStr` so it is never echoed by</span>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">            `repr(creds)` or in logs. `None` defers resolution to the</span>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">            environment variable.</span>
 <a id="__codelineno-0-61" name="__codelineno-0-61"></a>

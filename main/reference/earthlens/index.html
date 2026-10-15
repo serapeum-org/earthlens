@@ -24088,13 +24088,13 @@
 
 
         <p>Facade that routes a download to the requested backend.</p>
-<p>The class-level :attr:<code>DataSources</code> mapping resolves a string key
+<p>The class-level <code>DataSources</code> mapping resolves a string key
 (<code>"chc"</code>, <code>"amazon-s3"</code>, <code>"ecmwf"</code>, or <code>"gee"</code> / its alias
 <code>"google-earth-engine"</code>) to the concrete
-:class:<code>AbstractDataSource</code> subclass that owns the request shape,
+<code>AbstractDataSource</code> subclass that owns the request shape,
 authentication, and post-processing for that provider. Each
-backend's SDK is an optional dependency, so :attr:<code>DataSources</code>
-is a :class:<code>_LazyRegistry</code>: indexing it imports the backend on
+backend's SDK is an optional dependency, so <code>DataSources</code>
+is a <code>_LazyRegistry</code>: indexing it imports the backend on
 demand and rewrites a missing SDK into a friendly
 <code>ImportError</code> naming the extra to install
 (e.g. <code>pip install earthlens[ecmwf]</code>).</p>
@@ -24120,7 +24120,7 @@ demand and rewrites a missing SDK into a friendly
 Keys are the user-facing names accepted by <code>data_source</code>;
 values resolve at access time to the corresponding
 subclasses of
-:class:<code>earthlens.base.AbstractDataSource</code>.</p>
+<code>earthlens.base.AbstractDataSource</code>.</p>
               </div>
             </td>
           </tr>
@@ -24130,8 +24130,8 @@ subclasses of
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Instance attribute set by :meth:<code>__init__</code> —
-holds the concrete backend that :meth:<code>download</code> routes to.</p>
+                <p>Instance attribute set by <code>__init__</code> —
+holds the concrete backend that <code>download</code> routes to.</p>
               </div>
             </td>
           </tr>
@@ -24189,102 +24189,102 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 
 <details class="see-also" open>
   <summary>See Also</summary>
-  <p>:class:<code>earthlens.chc.CHIRPS</code>: CHIRPS rainfall over FTP.
-:class:<code>earthlens.s3.S3</code>: AWS Open-Data datasets over public S3
+  <p><code>earthlens.chc.CHIRPS</code>: CHIRPS rainfall over FTP.
+<code>earthlens.s3.S3</code>: AWS Open-Data datasets over public S3
     (ERA5, Sentinel-2, GOES, Copernicus DEM, ESA WorldCover) +
     an arbitrary-bucket passthrough.
-:class:<code>earthlens.asf.ASF</code>: Alaska Satellite Facility SAR
+<code>earthlens.asf.ASF</code>: Alaska Satellite Facility SAR
     search and InSAR baseline <code>stack()</code> via <code>asf_search</code>;
     reuses NASA Earthdata Login auth from
-    :class:<code>earthlens.earthdata.EarthdataAuth</code>. Keys
+    <code>earthlens.earthdata.EarthdataAuth</code>. Keys
     <code>"asf"</code> / <code>"alaska-satellite-facility"</code>; topic key <code>"asf:insar"</code>.
-:class:<code>earthlens.cmems.CMEMS</code>: Copernicus Marine ocean
+<code>earthlens.cmems.CMEMS</code>: Copernicus Marine ocean
     datasets via <code>copernicusmarine</code>.
-:class:<code>earthlens.earthdata.Earthdata</code>: NASA EOSDIS granules
+<code>earthlens.earthdata.Earthdata</code>: NASA EOSDIS granules
     across 9 DAACs via <code>earthaccess</code> + CMR; the first backend
     whose <code>OUTPUT_KIND</code> is per-dataset (raster / vector /
     tabular), not fixed.
-:class:<code>earthlens.ecmwf.ECMWF</code>: ERA5 via the Copernicus
+<code>earthlens.ecmwf.ECMWF</code>: ERA5 via the Copernicus
     Climate Data Store (cdsapi).
-:class:<code>earthlens.eumetsat.EUMETSAT</code>: EUMETSAT Data Store
+<code>earthlens.eumetsat.EUMETSAT</code>: EUMETSAT Data Store
     products (MTG / MSG / Metop / Sentinel-3/-5P/-6 mirrors)
     via <code>eumdac</code>; per-collection <code>OUTPUT_KIND</code>; key <code>"eumetsat"</code>.
-:class:<code>earthlens.fdsn.FDSN</code>: seismic events from the FDSN
+<code>earthlens.fdsn.FDSN</code>: seismic events from the FDSN
     networks (USGS / EMSC / INGV / EarthScope / ISC / GeoNet)
     via <code>obspy</code>; the first <code>vector</code>-output backend.
-:class:<code>earthlens.gee.GEE</code>: imagery from Google Earth Engine
+<code>earthlens.gee.GEE</code>: imagery from Google Earth Engine
     (<code>earthengine-api</code>); keys <code>"gee"</code> / <code>"google-earth-engine"</code>.
-:class:<code>earthlens.gdacs.GDACS</code>: GDACS multi-hazard disaster
+<code>earthlens.gdacs.GDACS</code>: GDACS multi-hazard disaster
     alerts (public feed, no credentials); key <code>"gdacs"</code>.
-:class:<code>earthlens.emdat.EMDAT</code>: CRED EM-DAT disaster events and
+<code>earthlens.emdat.EMDAT</code>: CRED EM-DAT disaster events and
     their geocoded locations — the UCLouvain Dataverse archive
     (<code>emdat:events</code>, anonymous, <code>tabular</code>, 1900 onwards, natural
     and technological) and GDIS (<code>gdis:points</code> / <code>gdis:polygons</code>,
     Earthdata Login, <code>vector</code>, 1960-2018). Per-instance
     <code>OUTPUT_KIND</code>; the archive carries a restricted-use
     <code>LicenseWarning</code>; keys <code>"emdat"</code> / <code>"gdis"</code>.
-:class:<code>earthlens.openaq.OpenAQ</code>: ground-station air-quality
+<code>earthlens.openaq.OpenAQ</code>: ground-station air-quality
     measurements from OpenAQ v3 (tabular <code>DataFrame</code>).
-:class:<code>earthlens.openeo.OpenEO</code>: server-side openEO process graphs
+<code>earthlens.openeo.OpenEO</code>: server-side openEO process graphs
     (defaults to CDSE openEO); <code>raster</code> output, <code>aggregate=</code> is a
     native <code>aggregate_temporal_period</code> node; key <code>"openeo"</code>.
-:class:<code>earthlens.sentinel_hub.SentinelHub</code>: server-side Sentinel
+<code>earthlens.sentinel_hub.SentinelHub</code>: server-side Sentinel
     Hub render on CDSE (Process / Async / Batch raster, Statistical /
     Batch-Statistical tabular); <code>mixed</code> output, evalscript-driven;
     keys <code>"sentinel-hub"</code> / <code>"sentinelhub"</code>.
-:class:<code>earthlens.tropycal.TropicalCyclone</code>: tropical-cyclone
+<code>earthlens.tropycal.TropicalCyclone</code>: tropical-cyclone
     best tracks via <code>tropycal</code> (<code>vector</code> output); key
     <code>"tropycal"</code>.
-:class:<code>earthlens.firms.FIRMS</code>: NASA FIRMS active-fire
+<code>earthlens.firms.FIRMS</code>: NASA FIRMS active-fire
     detections (MODIS / VIIRS) as a <code>vector</code> FeatureCollection;
     free <code>MAP_KEY</code>, no extra; key <code>"firms"</code>.
-:class:<code>earthlens.nwm.NWM</code>: NOAA National Water Model hydrologic
+<code>earthlens.nwm.NWM</code>: NOAA National Water Model hydrologic
     output — per-reach streamflow (<code>chrtout</code>, <code>tabular</code>) and
     gridded land surface (<code>ldasout</code>, <code>raster</code>) — fetched whole
     from the anonymous <code>noaa-nwm-pds</code> bucket; tabular subsetting +
     the retrospective Zarr read via pyramids <code>LabeledDataset</code>. Keys
     <code>"nwm"</code> / <code>"national-water-model"</code>.
-:class:<code>earthlens.cmip6.CMIP6</code>: Raw CMIP6 climate projections — the
+<code>earthlens.cmip6.CMIP6</code>: Raw CMIP6 climate projections — the
     full <code>model x scenario x variable x member</code> archive as
     analysis-ready Zarr on the open Pangeo <code>gs://cmip6</code> bucket. A
     facet tuple (<code>source_id</code> / <code>experiment_id</code> / <code>variable_id</code> /
     <code>table_id</code>) resolves to the store(s) and pyramids writes a
     bbox/time NetCDF subset (<code>raster</code>); anonymous, no extra. Keys
     <code>"cmip6"</code> / <code>"pangeo-cmip6"</code>; topic key <code>"cmip6:climate-projections"</code>.
-:class:<code>earthlens.goes.GOES</code>: NOAA GOES-R ABI geostationary imagery
+<code>earthlens.goes.GOES</code>: NOAA GOES-R ABI geostationary imagery
     fetched whole (raw NetCDF granules, <code>raster</code>) from the anonymous
     <code>noaa-goes19</code> / <code>noaa-goes18</code> / <code>noaa-goes16</code> buckets by
     satellite / product / domain / scan-time window; rides the <code>[s3]</code>
     extra (unsigned boto3), no auth, decode is downstream
     (pyramids / satpy); key <code>"goes"</code>.
-:class:<code>earthlens.hdx.HDX</code>: Humanitarian Data Exchange resources
+<code>earthlens.hdx.HDX</code>: Humanitarian Data Exchange resources
     via CKAN (<code>hdx-python-api</code>); the first <code>mixed</code>-output
     backend (downloads CSV / GeoTIFF / GeoPackage / … files
     as-is); public, no credentials; key <code>"hdx"</code>.
-:class:<code>earthlens.overture.Overture</code>: Overture Maps Foundation
+<code>earthlens.overture.Overture</code>: Overture Maps Foundation
     GeoParquet (buildings / places / transportation / divisions)
     over public S3 via <code>overturemaps</code>; <code>vector</code> FeatureCollection
     output with a per-row <code>license_id</code> column (and an ODbL
     <code>LicenseWarning</code>); no credentials; key <code>"overture"</code>.
-:class:<code>earthlens.nwp.NWP</code>: open numerical-weather-prediction
+<code>earthlens.nwp.NWP</code>: open numerical-weather-prediction
     forecasts (NOAA NODD / ECMWF Open Data / DWD) on a forecast
     <code>(cycle, step)</code> axis, returned as bbox-cropped COGs; key
     <code>"nwp"</code>.
-:class:<code>earthlens.radar.Radar</code>: NEXRAD Level-II radar volumes
+<code>earthlens.radar.Radar</code>: NEXRAD Level-II radar volumes
     assembled from the real-time chunk feed (<code>vector</code> inventory);
     keys <code>"radar"</code> / <code>"nexrad"</code>.
-:class:<code>earthlens.usgs_water.USGSWater</code>: USGS NWIS / Water Data
+<code>earthlens.usgs_water.USGSWater</code>: USGS NWIS / Water Data
     per-site water observations (discharge, gage height,
     water quality, …) via <code>dataretrieval</code> as a <code>tabular</code>
     <code>DataFrame</code>; optional <code>API_USGS_PAT</code>, anonymous works; keys
     <code>"usgs-water"</code> / <code>"usgs-nwis"</code> / <code>"nwis"</code>.
-:class:<code>earthlens.ghsl.GHSL</code>: JRC Global Human Settlement Layer
+<code>earthlens.ghsl.GHSL</code>: JRC Global Human Settlement Layer
     (population / built-up / settlement-model grids + R2025A WUP
     projections) over open HTTPS, reprojected / mosaicked / cropped
     to the AOI via <code>pyramids</code> as <code>raster</code> GeoTIFFs (one per
     product × epoch; <code>aggregate=</code> reduces across epochs); no
     credentials; keys <code>"ghsl"</code> / <code>"ghs"</code>; topic key <code>"ghsl:human-settlement"</code>.
-:class:<code>earthlens.glaciers.Glaciers</code>: glacier outlines / fluctuations
+<code>earthlens.glaciers.Glaciers</code>: glacier outlines / fluctuations
     over three open sources — RGI 7.0 per-region outlines (UNESCO
     IHP-WINS) and GLIMS WFS time-series outlines as <code>vector</code>
     <code>FeatureCollection</code>s clipped to the AOI, and the WGMS Fluctuations
@@ -24292,19 +24292,19 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
     <code>tabular</code> <code>DataFrame</code>; per-instance <code>OUTPUT_KIND</code>, <code>aggregate=</code>
     rejected; no credentials; keys <code>"glaciers"</code> / <code>"rgi"</code> / <code>"glims"</code>
     / <code>"wgms"</code>.
-:class:<code>earthlens.worldpop.WorldPop</code>: WorldPop open population data
+<code>earthlens.worldpop.WorldPop</code>: WorldPop open population data
     hub (CC-BY-4.0, no credentials) — per-country / global gridded
     population, density, age/sex, births, projections; mosaic +
     crop to the AOI via <code>pyramids</code> with a tidy age/sex table for
     demographic products; <code>mixed</code> output; keys <code>"worldpop"</code> /
     <code>"world-pop"</code>.
-:class:<code>earthlens.gbif.GBIF</code>: GBIF species occurrences via
+<code>earthlens.gbif.GBIF</code>: GBIF species occurrences via
     <code>pygbif</code> (anonymous); <code>vector</code> occurrence-point
     FeatureCollection; key <code>"gbif"</code>.
-:class:<code>earthlens.obis.OBIS</code>: OBIS marine occurrences via
+<code>earthlens.obis.OBIS</code>: OBIS marine occurrences via
     <code>pyobis</code> (anonymous); <code>vector</code> occurrence-point
     FeatureCollection; key <code>"obis"</code>.
-:class:<code>earthlens.drought.Drought</code>: Drought-indicator backend over
+<code>earthlens.drought.Drought</code>: Drought-indicator backend over
     three live services — US Drought Monitor (vector polygons via
     GeoJSON), Copernicus EDO/GDO (raster via the Copernicus drought
     <code>GetCoverage</code> REST endpoint), and CSIC SPEIbase (raster via
@@ -24312,20 +24312,20 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
     discoverability keys (<code>"drought"</code> / <code>"usdm"</code> / <code>"edo"</code> /
     <code>"gdo"</code>) all resolve to the same backend; all require an
     explicit <code>dataset=</code> kwarg.
-:class:<code>earthlens.wdpa.WDPA</code>: Protected Planet (WDPA)
+<code>earthlens.wdpa.WDPA</code>: Protected Planet (WDPA)
     protected-area polygons via the direct v4 REST API
     (<code>?token=</code>); <code>vector</code> polygon FeatureCollection; keys
     <code>"wdpa"</code> / <code>"protected-planet"</code>.
-:class:<code>earthlens.iucn.IUCN</code>: IUCN Red List v4 assessments via
+<code>earthlens.iucn.IUCN</code>: IUCN Red List v4 assessments via
     the direct REST shim (Bearer token); <code>tabular</code> <code>DataFrame</code>
     (always a CC-BY-NC <code>LicenseWarning</code>); keys <code>"iucn"</code> /
     <code>"redlist"</code>.
-:class:<code>earthlens.argo.ARGO</code>: Argo autonomous-float ocean
+<code>earthlens.argo.ARGO</code>: Argo autonomous-float ocean
     profiles (temperature / salinity / pressure, plus BGC
     parameters) via <code>argopy</code> as a <code>tabular</code> long-format
     <code>DataFrame</code>; region / <code>float:</code> / <code>profile:</code> selectors, open
     data (no auth); keys <code>"argo"</code> / <code>"argo-floats"</code> / <code>"argopy"</code>.
-:class:<code>earthlens.osm.OSM</code>: OpenStreetMap features over three public,
+<code>earthlens.osm.OSM</code>: OpenStreetMap features over three public,
     keyless download types — <code>live</code> (current-state, via Overpass),
     <code>history</code> (OSM history / analytics, via ohsome), and <code>bulk</code>
     (regional <code>.osm.pbf</code> extracts) — as a <code>vector</code> FeatureCollection
@@ -25750,13 +25750,13 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <span class="normal"><a href="#__codelineno-0-1856">1856</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="k">class</span><span class="w"> </span><span class="nc">EarthLens</span><span class="p">:</span>
 <a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Facade that routes a download to the requested backend.</span>
 <a id="__codelineno-0-455" name="__codelineno-0-455"></a>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">    The class-level :attr:`DataSources` mapping resolves a string key</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">    The class-level `DataSources` mapping resolves a string key</span>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">    (`&quot;chc&quot;`, `&quot;amazon-s3&quot;`, `&quot;ecmwf&quot;`, or `&quot;gee&quot;` / its alias</span>
 <a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">    `&quot;google-earth-engine&quot;`) to the concrete</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">    :class:`AbstractDataSource` subclass that owns the request shape,</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">    `AbstractDataSource` subclass that owns the request shape,</span>
 <a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">    authentication, and post-processing for that provider. Each</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">    backend&#39;s SDK is an optional dependency, so :attr:`DataSources`</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">    is a :class:`_LazyRegistry`: indexing it imports the backend on</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">    backend&#39;s SDK is an optional dependency, so `DataSources`</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="sd">    is a `_LazyRegistry`: indexing it imports the backend on</span>
 <a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">    demand and rewrites a missing SDK into a friendly</span>
 <a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">    `ImportError` naming the extra to install</span>
 <a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">    (e.g. `pip install earthlens[ecmwf]`).</span>
@@ -25766,9 +25766,9 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">            Keys are the user-facing names accepted by `data_source`;</span>
 <a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">            values resolve at access time to the corresponding</span>
 <a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">            subclasses of</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">            :class:`earthlens.base.AbstractDataSource`.</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">        datasource: Instance attribute set by :meth:`__init__` —</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">            holds the concrete backend that :meth:`download` routes to.</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">            `earthlens.base.AbstractDataSource`.</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">        datasource: Instance attribute set by `__init__` —</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">            holds the concrete backend that `download` routes to.</span>
 <a id="__codelineno-0-475" name="__codelineno-0-475"></a>
 <a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">        - Inspect the registered backends:</span>
@@ -25820,102 +25820,102 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-524" name="__codelineno-0-524"></a>
 <a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">    See Also:</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">        :class:`earthlens.chc.CHIRPS`: CHIRPS rainfall over FTP.</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">        :class:`earthlens.s3.S3`: AWS Open-Data datasets over public S3</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">        `earthlens.chc.CHIRPS`: CHIRPS rainfall over FTP.</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">        `earthlens.s3.S3`: AWS Open-Data datasets over public S3</span>
 <a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">            (ERA5, Sentinel-2, GOES, Copernicus DEM, ESA WorldCover) +</span>
 <a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">            an arbitrary-bucket passthrough.</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">        :class:`earthlens.asf.ASF`: Alaska Satellite Facility SAR</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">        `earthlens.asf.ASF`: Alaska Satellite Facility SAR</span>
 <a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">            search and InSAR baseline `stack()` via `asf_search`;</span>
 <a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">            reuses NASA Earthdata Login auth from</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">            :class:`earthlens.earthdata.EarthdataAuth`. Keys</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">            `earthlens.earthdata.EarthdataAuth`. Keys</span>
 <a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">            `&quot;asf&quot;` / `&quot;alaska-satellite-facility&quot;`; topic key `&quot;asf:insar&quot;`.</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">        :class:`earthlens.cmems.CMEMS`: Copernicus Marine ocean</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">        `earthlens.cmems.CMEMS`: Copernicus Marine ocean</span>
 <a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">            datasets via `copernicusmarine`.</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">        :class:`earthlens.earthdata.Earthdata`: NASA EOSDIS granules</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">        `earthlens.earthdata.Earthdata`: NASA EOSDIS granules</span>
 <a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">            across 9 DAACs via `earthaccess` + CMR; the first backend</span>
 <a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            whose `OUTPUT_KIND` is per-dataset (raster / vector /</span>
 <a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">            tabular), not fixed.</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">        :class:`earthlens.ecmwf.ECMWF`: ERA5 via the Copernicus</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">        `earthlens.ecmwf.ECMWF`: ERA5 via the Copernicus</span>
 <a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">            Climate Data Store (cdsapi).</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">        :class:`earthlens.eumetsat.EUMETSAT`: EUMETSAT Data Store</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">        `earthlens.eumetsat.EUMETSAT`: EUMETSAT Data Store</span>
 <a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">            products (MTG / MSG / Metop / Sentinel-3/-5P/-6 mirrors)</span>
 <a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">            via `eumdac`; per-collection `OUTPUT_KIND`; key `&quot;eumetsat&quot;`.</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">        :class:`earthlens.fdsn.FDSN`: seismic events from the FDSN</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">        `earthlens.fdsn.FDSN`: seismic events from the FDSN</span>
 <a id="__codelineno-0-547" name="__codelineno-0-547"></a><span class="sd">            networks (USGS / EMSC / INGV / EarthScope / ISC / GeoNet)</span>
 <a id="__codelineno-0-548" name="__codelineno-0-548"></a><span class="sd">            via `obspy`; the first `vector`-output backend.</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a><span class="sd">        :class:`earthlens.gee.GEE`: imagery from Google Earth Engine</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a><span class="sd">        `earthlens.gee.GEE`: imagery from Google Earth Engine</span>
 <a id="__codelineno-0-550" name="__codelineno-0-550"></a><span class="sd">            (`earthengine-api`); keys `&quot;gee&quot;` / `&quot;google-earth-engine&quot;`.</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="sd">        :class:`earthlens.gdacs.GDACS`: GDACS multi-hazard disaster</span>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="sd">        `earthlens.gdacs.GDACS`: GDACS multi-hazard disaster</span>
 <a id="__codelineno-0-552" name="__codelineno-0-552"></a><span class="sd">            alerts (public feed, no credentials); key `&quot;gdacs&quot;`.</span>
-<a id="__codelineno-0-553" name="__codelineno-0-553"></a><span class="sd">        :class:`earthlens.emdat.EMDAT`: CRED EM-DAT disaster events and</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a><span class="sd">        `earthlens.emdat.EMDAT`: CRED EM-DAT disaster events and</span>
 <a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="sd">            their geocoded locations — the UCLouvain Dataverse archive</span>
 <a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">            (`emdat:events`, anonymous, `tabular`, 1900 onwards, natural</span>
 <a id="__codelineno-0-556" name="__codelineno-0-556"></a><span class="sd">            and technological) and GDIS (`gdis:points` / `gdis:polygons`,</span>
 <a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">            Earthdata Login, `vector`, 1960-2018). Per-instance</span>
 <a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">            `OUTPUT_KIND`; the archive carries a restricted-use</span>
 <a id="__codelineno-0-559" name="__codelineno-0-559"></a><span class="sd">            `LicenseWarning`; keys `&quot;emdat&quot;` / `&quot;gdis&quot;`.</span>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">        :class:`earthlens.openaq.OpenAQ`: ground-station air-quality</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">        `earthlens.openaq.OpenAQ`: ground-station air-quality</span>
 <a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">            measurements from OpenAQ v3 (tabular `DataFrame`).</span>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">        :class:`earthlens.openeo.OpenEO`: server-side openEO process graphs</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">        `earthlens.openeo.OpenEO`: server-side openEO process graphs</span>
 <a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">            (defaults to CDSE openEO); `raster` output, `aggregate=` is a</span>
 <a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">            native `aggregate_temporal_period` node; key `&quot;openeo&quot;`.</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">        :class:`earthlens.sentinel_hub.SentinelHub`: server-side Sentinel</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">        `earthlens.sentinel_hub.SentinelHub`: server-side Sentinel</span>
 <a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">            Hub render on CDSE (Process / Async / Batch raster, Statistical /</span>
 <a id="__codelineno-0-567" name="__codelineno-0-567"></a><span class="sd">            Batch-Statistical tabular); `mixed` output, evalscript-driven;</span>
 <a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">            keys `&quot;sentinel-hub&quot;` / `&quot;sentinelhub&quot;`.</span>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="sd">        :class:`earthlens.tropycal.TropicalCyclone`: tropical-cyclone</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="sd">        `earthlens.tropycal.TropicalCyclone`: tropical-cyclone</span>
 <a id="__codelineno-0-570" name="__codelineno-0-570"></a><span class="sd">            best tracks via `tropycal` (`vector` output); key</span>
 <a id="__codelineno-0-571" name="__codelineno-0-571"></a><span class="sd">            `&quot;tropycal&quot;`.</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="sd">        :class:`earthlens.firms.FIRMS`: NASA FIRMS active-fire</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="sd">        `earthlens.firms.FIRMS`: NASA FIRMS active-fire</span>
 <a id="__codelineno-0-573" name="__codelineno-0-573"></a><span class="sd">            detections (MODIS / VIIRS) as a `vector` FeatureCollection;</span>
 <a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="sd">            free `MAP_KEY`, no extra; key `&quot;firms&quot;`.</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">        :class:`earthlens.nwm.NWM`: NOAA National Water Model hydrologic</span>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">        `earthlens.nwm.NWM`: NOAA National Water Model hydrologic</span>
 <a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">            output — per-reach streamflow (`chrtout`, `tabular`) and</span>
 <a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">            gridded land surface (`ldasout`, `raster`) — fetched whole</span>
 <a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">            from the anonymous `noaa-nwm-pds` bucket; tabular subsetting +</span>
 <a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="sd">            the retrospective Zarr read via pyramids `LabeledDataset`. Keys</span>
 <a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">            `&quot;nwm&quot;` / `&quot;national-water-model&quot;`.</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">        :class:`earthlens.cmip6.CMIP6`: Raw CMIP6 climate projections — the</span>
+<a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">        `earthlens.cmip6.CMIP6`: Raw CMIP6 climate projections — the</span>
 <a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">            full `model x scenario x variable x member` archive as</span>
 <a id="__codelineno-0-583" name="__codelineno-0-583"></a><span class="sd">            analysis-ready Zarr on the open Pangeo `gs://cmip6` bucket. A</span>
 <a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">            facet tuple (`source_id` / `experiment_id` / `variable_id` /</span>
 <a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">            `table_id`) resolves to the store(s) and pyramids writes a</span>
 <a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">            bbox/time NetCDF subset (`raster`); anonymous, no extra. Keys</span>
 <a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">            `&quot;cmip6&quot;` / `&quot;pangeo-cmip6&quot;`; topic key `&quot;cmip6:climate-projections&quot;`.</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">        :class:`earthlens.goes.GOES`: NOAA GOES-R ABI geostationary imagery</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">        `earthlens.goes.GOES`: NOAA GOES-R ABI geostationary imagery</span>
 <a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">            fetched whole (raw NetCDF granules, `raster`) from the anonymous</span>
 <a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="sd">            `noaa-goes19` / `noaa-goes18` / `noaa-goes16` buckets by</span>
 <a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="sd">            satellite / product / domain / scan-time window; rides the `[s3]`</span>
 <a id="__codelineno-0-592" name="__codelineno-0-592"></a><span class="sd">            extra (unsigned boto3), no auth, decode is downstream</span>
 <a id="__codelineno-0-593" name="__codelineno-0-593"></a><span class="sd">            (pyramids / satpy); key `&quot;goes&quot;`.</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a><span class="sd">        :class:`earthlens.hdx.HDX`: Humanitarian Data Exchange resources</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a><span class="sd">        `earthlens.hdx.HDX`: Humanitarian Data Exchange resources</span>
 <a id="__codelineno-0-595" name="__codelineno-0-595"></a><span class="sd">            via CKAN (`hdx-python-api`); the first `mixed`-output</span>
 <a id="__codelineno-0-596" name="__codelineno-0-596"></a><span class="sd">            backend (downloads CSV / GeoTIFF / GeoPackage / … files</span>
 <a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="sd">            as-is); public, no credentials; key `&quot;hdx&quot;`.</span>
-<a id="__codelineno-0-598" name="__codelineno-0-598"></a><span class="sd">        :class:`earthlens.overture.Overture`: Overture Maps Foundation</span>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a><span class="sd">        `earthlens.overture.Overture`: Overture Maps Foundation</span>
 <a id="__codelineno-0-599" name="__codelineno-0-599"></a><span class="sd">            GeoParquet (buildings / places / transportation / divisions)</span>
 <a id="__codelineno-0-600" name="__codelineno-0-600"></a><span class="sd">            over public S3 via `overturemaps`; `vector` FeatureCollection</span>
 <a id="__codelineno-0-601" name="__codelineno-0-601"></a><span class="sd">            output with a per-row `license_id` column (and an ODbL</span>
 <a id="__codelineno-0-602" name="__codelineno-0-602"></a><span class="sd">            `LicenseWarning`); no credentials; key `&quot;overture&quot;`.</span>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a><span class="sd">        :class:`earthlens.nwp.NWP`: open numerical-weather-prediction</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a><span class="sd">        `earthlens.nwp.NWP`: open numerical-weather-prediction</span>
 <a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="sd">            forecasts (NOAA NODD / ECMWF Open Data / DWD) on a forecast</span>
 <a id="__codelineno-0-605" name="__codelineno-0-605"></a><span class="sd">            `(cycle, step)` axis, returned as bbox-cropped COGs; key</span>
 <a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="sd">            `&quot;nwp&quot;`.</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">        :class:`earthlens.radar.Radar`: NEXRAD Level-II radar volumes</span>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">        `earthlens.radar.Radar`: NEXRAD Level-II radar volumes</span>
 <a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">            assembled from the real-time chunk feed (`vector` inventory);</span>
 <a id="__codelineno-0-609" name="__codelineno-0-609"></a><span class="sd">            keys `&quot;radar&quot;` / `&quot;nexrad&quot;`.</span>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a><span class="sd">        :class:`earthlens.usgs_water.USGSWater`: USGS NWIS / Water Data</span>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a><span class="sd">        `earthlens.usgs_water.USGSWater`: USGS NWIS / Water Data</span>
 <a id="__codelineno-0-611" name="__codelineno-0-611"></a><span class="sd">            per-site water observations (discharge, gage height,</span>
 <a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">            water quality, …) via `dataretrieval` as a `tabular`</span>
 <a id="__codelineno-0-613" name="__codelineno-0-613"></a><span class="sd">            `DataFrame`; optional `API_USGS_PAT`, anonymous works; keys</span>
 <a id="__codelineno-0-614" name="__codelineno-0-614"></a><span class="sd">            `&quot;usgs-water&quot;` / `&quot;usgs-nwis&quot;` / `&quot;nwis&quot;`.</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">        :class:`earthlens.ghsl.GHSL`: JRC Global Human Settlement Layer</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">        `earthlens.ghsl.GHSL`: JRC Global Human Settlement Layer</span>
 <a id="__codelineno-0-616" name="__codelineno-0-616"></a><span class="sd">            (population / built-up / settlement-model grids + R2025A WUP</span>
 <a id="__codelineno-0-617" name="__codelineno-0-617"></a><span class="sd">            projections) over open HTTPS, reprojected / mosaicked / cropped</span>
 <a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">            to the AOI via `pyramids` as `raster` GeoTIFFs (one per</span>
 <a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="sd">            product × epoch; `aggregate=` reduces across epochs); no</span>
 <a id="__codelineno-0-620" name="__codelineno-0-620"></a><span class="sd">            credentials; keys `&quot;ghsl&quot;` / `&quot;ghs&quot;`; topic key `&quot;ghsl:human-settlement&quot;`.</span>
-<a id="__codelineno-0-621" name="__codelineno-0-621"></a><span class="sd">        :class:`earthlens.glaciers.Glaciers`: glacier outlines / fluctuations</span>
+<a id="__codelineno-0-621" name="__codelineno-0-621"></a><span class="sd">        `earthlens.glaciers.Glaciers`: glacier outlines / fluctuations</span>
 <a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">            over three open sources — RGI 7.0 per-region outlines (UNESCO</span>
 <a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="sd">            IHP-WINS) and GLIMS WFS time-series outlines as `vector`</span>
 <a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">            `FeatureCollection`s clipped to the AOI, and the WGMS Fluctuations</span>
@@ -25923,19 +25923,19 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="sd">            `tabular` `DataFrame`; per-instance `OUTPUT_KIND`, `aggregate=`</span>
 <a id="__codelineno-0-627" name="__codelineno-0-627"></a><span class="sd">            rejected; no credentials; keys `&quot;glaciers&quot;` / `&quot;rgi&quot;` / `&quot;glims&quot;`</span>
 <a id="__codelineno-0-628" name="__codelineno-0-628"></a><span class="sd">            / `&quot;wgms&quot;`.</span>
-<a id="__codelineno-0-629" name="__codelineno-0-629"></a><span class="sd">        :class:`earthlens.worldpop.WorldPop`: WorldPop open population data</span>
+<a id="__codelineno-0-629" name="__codelineno-0-629"></a><span class="sd">        `earthlens.worldpop.WorldPop`: WorldPop open population data</span>
 <a id="__codelineno-0-630" name="__codelineno-0-630"></a><span class="sd">            hub (CC-BY-4.0, no credentials) — per-country / global gridded</span>
 <a id="__codelineno-0-631" name="__codelineno-0-631"></a><span class="sd">            population, density, age/sex, births, projections; mosaic +</span>
 <a id="__codelineno-0-632" name="__codelineno-0-632"></a><span class="sd">            crop to the AOI via `pyramids` with a tidy age/sex table for</span>
 <a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">            demographic products; `mixed` output; keys `&quot;worldpop&quot;` /</span>
 <a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">            `&quot;world-pop&quot;`.</span>
-<a id="__codelineno-0-635" name="__codelineno-0-635"></a><span class="sd">        :class:`earthlens.gbif.GBIF`: GBIF species occurrences via</span>
+<a id="__codelineno-0-635" name="__codelineno-0-635"></a><span class="sd">        `earthlens.gbif.GBIF`: GBIF species occurrences via</span>
 <a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">            `pygbif` (anonymous); `vector` occurrence-point</span>
 <a id="__codelineno-0-637" name="__codelineno-0-637"></a><span class="sd">            FeatureCollection; key `&quot;gbif&quot;`.</span>
-<a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="sd">        :class:`earthlens.obis.OBIS`: OBIS marine occurrences via</span>
+<a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="sd">        `earthlens.obis.OBIS`: OBIS marine occurrences via</span>
 <a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="sd">            `pyobis` (anonymous); `vector` occurrence-point</span>
 <a id="__codelineno-0-640" name="__codelineno-0-640"></a><span class="sd">            FeatureCollection; key `&quot;obis&quot;`.</span>
-<a id="__codelineno-0-641" name="__codelineno-0-641"></a><span class="sd">        :class:`earthlens.drought.Drought`: Drought-indicator backend over</span>
+<a id="__codelineno-0-641" name="__codelineno-0-641"></a><span class="sd">        `earthlens.drought.Drought`: Drought-indicator backend over</span>
 <a id="__codelineno-0-642" name="__codelineno-0-642"></a><span class="sd">            three live services — US Drought Monitor (vector polygons via</span>
 <a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">            GeoJSON), Copernicus EDO/GDO (raster via the Copernicus drought</span>
 <a id="__codelineno-0-644" name="__codelineno-0-644"></a><span class="sd">            `GetCoverage` REST endpoint), and CSIC SPEIbase (raster via</span>
@@ -25943,20 +25943,20 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">            discoverability keys (`&quot;drought&quot;` / `&quot;usdm&quot;` / `&quot;edo&quot;` /</span>
 <a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">            `&quot;gdo&quot;`) all resolve to the same backend; all require an</span>
 <a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">            explicit `dataset=` kwarg.</span>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">        :class:`earthlens.wdpa.WDPA`: Protected Planet (WDPA)</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">        `earthlens.wdpa.WDPA`: Protected Planet (WDPA)</span>
 <a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">            protected-area polygons via the direct v4 REST API</span>
 <a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">            (`?token=`); `vector` polygon FeatureCollection; keys</span>
 <a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">            `&quot;wdpa&quot;` / `&quot;protected-planet&quot;`.</span>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">        :class:`earthlens.iucn.IUCN`: IUCN Red List v4 assessments via</span>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">        `earthlens.iucn.IUCN`: IUCN Red List v4 assessments via</span>
 <a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="sd">            the direct REST shim (Bearer token); `tabular` `DataFrame`</span>
 <a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">            (always a CC-BY-NC `LicenseWarning`); keys `&quot;iucn&quot;` /</span>
 <a id="__codelineno-0-656" name="__codelineno-0-656"></a><span class="sd">            `&quot;redlist&quot;`.</span>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="sd">        :class:`earthlens.argo.ARGO`: Argo autonomous-float ocean</span>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="sd">        `earthlens.argo.ARGO`: Argo autonomous-float ocean</span>
 <a id="__codelineno-0-658" name="__codelineno-0-658"></a><span class="sd">            profiles (temperature / salinity / pressure, plus BGC</span>
 <a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">            parameters) via `argopy` as a `tabular` long-format</span>
 <a id="__codelineno-0-660" name="__codelineno-0-660"></a><span class="sd">            `DataFrame`; region / `float:` / `profile:` selectors, open</span>
 <a id="__codelineno-0-661" name="__codelineno-0-661"></a><span class="sd">            data (no auth); keys `&quot;argo&quot;` / `&quot;argo-floats&quot;` / `&quot;argopy&quot;`.</span>
-<a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="sd">        :class:`earthlens.osm.OSM`: OpenStreetMap features over three public,</span>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="sd">        `earthlens.osm.OSM`: OpenStreetMap features over three public,</span>
 <a id="__codelineno-0-663" name="__codelineno-0-663"></a><span class="sd">            keyless download types — `live` (current-state, via Overpass),</span>
 <a id="__codelineno-0-664" name="__codelineno-0-664"></a><span class="sd">            `history` (OSM history / analytics, via ohsome), and `bulk`</span>
 <a id="__codelineno-0-665" name="__codelineno-0-665"></a><span class="sd">            (regional `.osm.pbf` extracts) — as a `vector` FeatureCollection</span>
@@ -25990,13 +25990,13 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-693" name="__codelineno-0-693"></a>    <span class="p">):</span>
 <a id="__codelineno-0-694" name="__codelineno-0-694"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve the backend and construct it with the user&#39;s parameters.</span>
 <a id="__codelineno-0-695" name="__codelineno-0-695"></a>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a><span class="sd">        Validates `data_source` against :attr:`DataSources`, fills in</span>
+<a id="__codelineno-0-696" name="__codelineno-0-696"></a><span class="sd">        Validates `data_source` against `DataSources`, fills in</span>
 <a id="__codelineno-0-697" name="__codelineno-0-697"></a><span class="sd">        whole-Earth defaults for missing `lat_lim` / `lon_lim`, and</span>
 <a id="__codelineno-0-698" name="__codelineno-0-698"></a><span class="sd">        instantiates the concrete backend bound to `self.datasource`.</span>
 <a id="__codelineno-0-699" name="__codelineno-0-699"></a>
 <a id="__codelineno-0-700" name="__codelineno-0-700"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-701" name="__codelineno-0-701"></a><span class="sd">            data_source: Backend key. One of the registered keys in</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a><span class="sd">                :attr:`DataSources` — `&quot;chc&quot;` (alias `&quot;chirps&quot;`),</span>
+<a id="__codelineno-0-702" name="__codelineno-0-702"></a><span class="sd">                `DataSources` — `&quot;chc&quot;` (alias `&quot;chirps&quot;`),</span>
 <a id="__codelineno-0-703" name="__codelineno-0-703"></a><span class="sd">                `&quot;climate-indices&quot;` (alias `&quot;climate_indices&quot;`; topic key</span>
 <a id="__codelineno-0-704" name="__codelineno-0-704"></a><span class="sd">                `&quot;climate-indices:teleconnections&quot;`),</span>
 <a id="__codelineno-0-705" name="__codelineno-0-705"></a><span class="sd">                `&quot;amazon-s3&quot;`, `&quot;asf&quot;` (alias</span>
@@ -26101,11 +26101,11 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">                Defaults to `None`.</span>
 <a id="__codelineno-0-805" name="__codelineno-0-805"></a><span class="sd">            lat_lim: Legacy latitude pair `[lat_min, lat_max]` — prefer the</span>
 <a id="__codelineno-0-806" name="__codelineno-0-806"></a><span class="sd">                single `aoi=` channel, which also accepts a bbox. Defaults to</span>
-<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">                :data:`DEFAULT_LATITUDE_LIMIT` (whole Earth). Mutually</span>
+<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">                `DEFAULT_LATITUDE_LIMIT` (whole Earth). Mutually</span>
 <a id="__codelineno-0-808" name="__codelineno-0-808"></a><span class="sd">                exclusive with `aoi`.</span>
 <a id="__codelineno-0-809" name="__codelineno-0-809"></a><span class="sd">            lon_lim: Legacy longitude pair `[lon_min, lon_max]` — prefer the</span>
 <a id="__codelineno-0-810" name="__codelineno-0-810"></a><span class="sd">                single `aoi=` channel. Defaults to</span>
-<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">                :data:`DEFAULT_LONGITUDE_LIMIT` (whole Earth). Mutually</span>
+<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">                `DEFAULT_LONGITUDE_LIMIT` (whole Earth). Mutually</span>
 <a id="__codelineno-0-812" name="__codelineno-0-812"></a><span class="sd">                exclusive with `aoi`.</span>
 <a id="__codelineno-0-813" name="__codelineno-0-813"></a><span class="sd">            fmt: `strptime` format tried first when `start` / `end` are</span>
 <a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="sd">                strings; a non-matching string falls back to an ISO-8601</span>
@@ -26119,7 +26119,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="sd">                `buffer`), a shapely geometry, any `__geo_interface__`</span>
 <a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">                object, a GeoJSON geometry / Feature, a WKT string, or a</span>
 <a id="__codelineno-0-824" name="__codelineno-0-824"></a><span class="sd">                `GeoDataFrame` / `GeoSeries`. Reduced to `lat_lim` /</span>
-<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">                `lon_lim` by :func:`earthlens.base.spatial.normalize_aoi`.</span>
+<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">                `lon_lim` by `earthlens.base.spatial.normalize_aoi`.</span>
 <a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">                Passing both `aoi` and `lat_lim` / `lon_lim` raises</span>
 <a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">                `ValueError`. Defaults to `None`.</span>
 <a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="sd">            buffer: Half-width in degrees applied to a `(lon, lat)` point</span>
@@ -26140,7 +26140,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-843" name="__codelineno-0-843"></a>
 <a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">            ValueError: If `data_source` is not a key of</span>
-<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">                :attr:`DataSources`, if both `aoi` and</span>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">                `DataSources`, if both `aoi` and</span>
 <a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">                `lat_lim` / `lon_lim` are given, if `buffer` is given</span>
 <a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">                without a point `aoi`, or if `aoi` is malformed.</span>
 <a id="__codelineno-0-849" name="__codelineno-0-849"></a><span class="sd">            AuthenticationError: For backends that defer auth</span>
@@ -26188,7 +26188,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-891" name="__codelineno-0-891"></a><span class="sd">                ```</span>
 <a id="__codelineno-0-892" name="__codelineno-0-892"></a><span class="sd">            - Construct an ECMWF-backed facade. Marked</span>
 <a id="__codelineno-0-893" name="__codelineno-0-893"></a><span class="sd">              `# doctest: +SKIP` because it builds a real</span>
-<a id="__codelineno-0-894" name="__codelineno-0-894"></a><span class="sd">              :class:`cdsapi.Client`, which requires</span>
+<a id="__codelineno-0-894" name="__codelineno-0-894"></a><span class="sd">              `cdsapi.Client`, which requires</span>
 <a id="__codelineno-0-895" name="__codelineno-0-895"></a><span class="sd">              `~/.cdsapirc`:</span>
 <a id="__codelineno-0-896" name="__codelineno-0-896"></a>
 <a id="__codelineno-0-897" name="__codelineno-0-897"></a><span class="sd">                ```python</span>
@@ -26209,7 +26209,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-912" name="__codelineno-0-912"></a><span class="sd">                ```</span>
 <a id="__codelineno-0-913" name="__codelineno-0-913"></a>
 <a id="__codelineno-0-914" name="__codelineno-0-914"></a><span class="sd">        See Also:</span>
-<a id="__codelineno-0-915" name="__codelineno-0-915"></a><span class="sd">            :meth:`download`: Triggers the actual retrieval.</span>
+<a id="__codelineno-0-915" name="__codelineno-0-915"></a><span class="sd">            `download`: Triggers the actual retrieval.</span>
 <a id="__codelineno-0-916" name="__codelineno-0-916"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-917" name="__codelineno-0-917"></a>        <span class="c1"># Back-compat for the legacy positional order</span>
 <a id="__codelineno-0-918" name="__codelineno-0-918"></a>        <span class="c1"># `EarthLens(variables, data_source, ...)`. `data_source` is now</span>
@@ -26404,7 +26404,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-1107" name="__codelineno-0-1107"></a>
 <a id="__codelineno-0-1108" name="__codelineno-0-1108"></a>    <span class="c1">#: Constructor parameter names the facade owns and supplies itself.</span>
 <a id="__codelineno-0-1109" name="__codelineno-0-1109"></a>    <span class="c1">#: Everything else a backend declares is a backend-specific option,</span>
-<a id="__codelineno-0-1110" name="__codelineno-0-1110"></a>    <span class="c1">#: surfaced by :meth:`options_for` and accepted as a kwarg.</span>
+<a id="__codelineno-0-1110" name="__codelineno-0-1110"></a>    <span class="c1">#: surfaced by `options_for` and accepted as a kwarg.</span>
 <a id="__codelineno-0-1111" name="__codelineno-0-1111"></a>    <span class="n">_FACADE_PARAMS</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span>
 <a id="__codelineno-0-1112" name="__codelineno-0-1112"></a>        <span class="p">{</span>
 <a id="__codelineno-0-1113" name="__codelineno-0-1113"></a>            <span class="s2">&quot;self&quot;</span><span class="p">,</span>
@@ -26575,7 +26575,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-1278" name="__codelineno-0-1278"></a>
 <a id="__codelineno-0-1279" name="__codelineno-0-1279"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-1280" name="__codelineno-0-1280"></a><span class="sd">            data_source: A registered backend key.</span>
-<a id="__codelineno-0-1281" name="__codelineno-0-1281"></a><span class="sd">            key: A curated dataset key (see :meth:`list_datasets`).</span>
+<a id="__codelineno-0-1281" name="__codelineno-0-1281"></a><span class="sd">            key: A curated dataset key (see `list_datasets`).</span>
 <a id="__codelineno-0-1282" name="__codelineno-0-1282"></a>
 <a id="__codelineno-0-1283" name="__codelineno-0-1283"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-1284" name="__codelineno-0-1284"></a><span class="sd">            The backend-specific dataset record (carries the dataset&#39;s</span>
@@ -26701,9 +26701,9 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-1404" name="__codelineno-0-1404"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Eagerly authenticate the bound backend; raise on failure.</span>
 <a id="__codelineno-0-1405" name="__codelineno-0-1405"></a>
 <a id="__codelineno-0-1406" name="__codelineno-0-1406"></a><span class="sd">        The explicit, fail-fast counterpart to the lazy authentication</span>
-<a id="__codelineno-0-1407" name="__codelineno-0-1407"></a><span class="sd">        that otherwise happens on the first :meth:`download` / `search`.</span>
+<a id="__codelineno-0-1407" name="__codelineno-0-1407"></a><span class="sd">        that otherwise happens on the first `download` / `search`.</span>
 <a id="__codelineno-0-1408" name="__codelineno-0-1408"></a><span class="sd">        Delegates to</span>
-<a id="__codelineno-0-1409" name="__codelineno-0-1409"></a><span class="sd">        :meth:`earthlens.base.AbstractDataSource.authenticate` — opening</span>
+<a id="__codelineno-0-1409" name="__codelineno-0-1409"></a><span class="sd">        `earthlens.base.AbstractDataSource.authenticate` — opening</span>
 <a id="__codelineno-0-1410" name="__codelineno-0-1410"></a><span class="sd">        the network client or running the credential step — and is a</span>
 <a id="__codelineno-0-1411" name="__codelineno-0-1411"></a><span class="sd">        no-op for credential-free backends. Lets callers separate &quot;do I</span>
 <a id="__codelineno-0-1412" name="__codelineno-0-1412"></a><span class="sd">        have valid credentials?&quot; from the download itself, e.g. wrap only</span>
@@ -26762,18 +26762,18 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-1465" name="__codelineno-0-1465"></a>
 <a id="__codelineno-0-1466" name="__codelineno-0-1466"></a><span class="sd">        The cheap, dry-run half of the search→fetch split: it queries the</span>
 <a id="__codelineno-0-1467" name="__codelineno-0-1467"></a><span class="sd">        backend&#39;s catalog and returns one</span>
-<a id="__codelineno-0-1468" name="__codelineno-0-1468"></a><span class="sd">        :class:`~earthlens.base.RemoteProduct` per item that</span>
-<a id="__codelineno-0-1469" name="__codelineno-0-1469"></a><span class="sd">        :meth:`download` would fetch, so you can inspect or filter the</span>
+<a id="__codelineno-0-1468" name="__codelineno-0-1468"></a><span class="sd">        `RemoteProduct` per item that</span>
+<a id="__codelineno-0-1469" name="__codelineno-0-1469"></a><span class="sd">        `download` would fetch, so you can inspect or filter the</span>
 <a id="__codelineno-0-1470" name="__codelineno-0-1470"></a><span class="sd">        result first.</span>
 <a id="__codelineno-0-1471" name="__codelineno-0-1471"></a>
 <a id="__codelineno-0-1472" name="__codelineno-0-1472"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-1473" name="__codelineno-0-1473"></a><span class="sd">            One :class:`~earthlens.base.RemoteProduct` per matching item;</span>
+<a id="__codelineno-0-1473" name="__codelineno-0-1473"></a><span class="sd">            One `RemoteProduct` per matching item;</span>
 <a id="__codelineno-0-1474" name="__codelineno-0-1474"></a><span class="sd">            the empty list when nothing matches.</span>
 <a id="__codelineno-0-1475" name="__codelineno-0-1475"></a>
 <a id="__codelineno-0-1476" name="__codelineno-0-1476"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-1477" name="__codelineno-0-1477"></a><span class="sd">            NotImplementedError: If the bound backend keeps the legacy</span>
 <a id="__codelineno-0-1478" name="__codelineno-0-1478"></a><span class="sd">                `_api`-only flow (CHIRPS, S3, ECMWF, GEE) and exposes no</span>
-<a id="__codelineno-0-1479" name="__codelineno-0-1479"></a><span class="sd">                searchable product list — call :meth:`download` directly.</span>
+<a id="__codelineno-0-1479" name="__codelineno-0-1479"></a><span class="sd">                searchable product list — call `download` directly.</span>
 <a id="__codelineno-0-1480" name="__codelineno-0-1480"></a>
 <a id="__codelineno-0-1481" name="__codelineno-0-1481"></a><span class="sd">        Examples:</span>
 <a id="__codelineno-0-1482" name="__codelineno-0-1482"></a><span class="sd">            - Preview a STAC search without fetching any bytes (live;</span>
@@ -26801,16 +26801,16 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-1504" name="__codelineno-0-1504"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <a id="__codelineno-0-1505" name="__codelineno-0-1505"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return how many products this request matches, without downloading.</span>
 <a id="__codelineno-0-1506" name="__codelineno-0-1506"></a>
-<a id="__codelineno-0-1507" name="__codelineno-0-1507"></a><span class="sd">        Uses the backend&#39;s :meth:`~earthlens.base.AbstractDataSource._count`</span>
+<a id="__codelineno-0-1507" name="__codelineno-0-1507"></a><span class="sd">        Uses the backend&#39;s `_count`</span>
 <a id="__codelineno-0-1508" name="__codelineno-0-1508"></a><span class="sd">        hook, which a backend with a cheap server-side total overrides;</span>
-<a id="__codelineno-0-1509" name="__codelineno-0-1509"></a><span class="sd">        otherwise it counts a :meth:`search`.</span>
+<a id="__codelineno-0-1509" name="__codelineno-0-1509"></a><span class="sd">        otherwise it counts a `search`.</span>
 <a id="__codelineno-0-1510" name="__codelineno-0-1510"></a>
 <a id="__codelineno-0-1511" name="__codelineno-0-1511"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-1512" name="__codelineno-0-1512"></a><span class="sd">            The number of matching products.</span>
 <a id="__codelineno-0-1513" name="__codelineno-0-1513"></a>
 <a id="__codelineno-0-1514" name="__codelineno-0-1514"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-1515" name="__codelineno-0-1515"></a><span class="sd">            NotImplementedError: If the bound backend exposes no</span>
-<a id="__codelineno-0-1516" name="__codelineno-0-1516"></a><span class="sd">                searchable product list (see :meth:`search`).</span>
+<a id="__codelineno-0-1516" name="__codelineno-0-1516"></a><span class="sd">                searchable product list (see `search`).</span>
 <a id="__codelineno-0-1517" name="__codelineno-0-1517"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1518" name="__codelineno-0-1518"></a>        <span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-0-1519" name="__codelineno-0-1519"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">_count</span><span class="p">()</span>
@@ -26823,7 +26823,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-1526" name="__codelineno-0-1526"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">preview</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <a id="__codelineno-0-1527" name="__codelineno-0-1527"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the first `n` matching products as plain dicts.</span>
 <a id="__codelineno-0-1528" name="__codelineno-0-1528"></a>
-<a id="__codelineno-0-1529" name="__codelineno-0-1529"></a><span class="sd">        A notebook-friendly view over :meth:`search`: each product is</span>
+<a id="__codelineno-0-1529" name="__codelineno-0-1529"></a><span class="sd">        A notebook-friendly view over `search`: each product is</span>
 <a id="__codelineno-0-1530" name="__codelineno-0-1530"></a><span class="sd">        flattened to `{&quot;id&quot;: ..., &quot;href&quot;: ..., **metadata}` for quick</span>
 <a id="__codelineno-0-1531" name="__codelineno-0-1531"></a><span class="sd">        tabular display before committing to a download.</span>
 <a id="__codelineno-0-1532" name="__codelineno-0-1532"></a>
@@ -26836,7 +26836,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-1539" name="__codelineno-0-1539"></a>
 <a id="__codelineno-0-1540" name="__codelineno-0-1540"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-1541" name="__codelineno-0-1541"></a><span class="sd">            NotImplementedError: If the bound backend exposes no</span>
-<a id="__codelineno-0-1542" name="__codelineno-0-1542"></a><span class="sd">                searchable product list (see :meth:`search`).</span>
+<a id="__codelineno-0-1542" name="__codelineno-0-1542"></a><span class="sd">                searchable product list (see `search`).</span>
 <a id="__codelineno-0-1543" name="__codelineno-0-1543"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1544" name="__codelineno-0-1544"></a>        <span class="k">return</span> <span class="p">[</span>
 <a id="__codelineno-0-1545" name="__codelineno-0-1545"></a>            <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;href&quot;</span><span class="p">:</span> <span class="n">product</span><span class="o">.</span><span class="n">href</span><span class="p">,</span> <span class="o">**</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">}</span>
@@ -26861,7 +26861,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-1564" name="__codelineno-0-1564"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-1565" name="__codelineno-0-1565"></a><span class="sd">            progress_bar: Whether the backend should print a per-date</span>
 <a id="__codelineno-0-1566" name="__codelineno-0-1566"></a><span class="sd">                progress bar during the loop. Defaults to `True`.</span>
-<a id="__codelineno-0-1567" name="__codelineno-0-1567"></a><span class="sd">            aggregate: Optional :class:`earthlens.aggregate.AggregationConfig`.</span>
+<a id="__codelineno-0-1567" name="__codelineno-0-1567"></a><span class="sd">            aggregate: Optional `earthlens.aggregate.AggregationConfig`.</span>
 <a id="__codelineno-0-1568" name="__codelineno-0-1568"></a><span class="sd">                Two conditions must both hold for it to be forwarded:</span>
 <a id="__codelineno-0-1569" name="__codelineno-0-1569"></a><span class="sd">                the backend&#39;s `OUTPUT_KIND` is `&quot;raster&quot;` or</span>
 <a id="__codelineno-0-1570" name="__codelineno-0-1570"></a><span class="sd">                `&quot;mixed&quot;` — the shapes for which a gridded reduction</span>
@@ -26898,7 +26898,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-1601" name="__codelineno-0-1601"></a><span class="sd">            AuthenticationError: When the ECMWF backend cannot</span>
 <a id="__codelineno-0-1602" name="__codelineno-0-1602"></a><span class="sd">                authenticate against CDS (typically a missing</span>
 <a id="__codelineno-0-1603" name="__codelineno-0-1603"></a><span class="sd">                `~/.cdsapirc`). See</span>
-<a id="__codelineno-0-1604" name="__codelineno-0-1604"></a><span class="sd">                :class:`earthlens.ecmwf.AuthenticationError`.</span>
+<a id="__codelineno-0-1604" name="__codelineno-0-1604"></a><span class="sd">                `earthlens.ecmwf.AuthenticationError`.</span>
 <a id="__codelineno-0-1605" name="__codelineno-0-1605"></a><span class="sd">            KeyError: When any backend receives an unknown variable</span>
 <a id="__codelineno-0-1606" name="__codelineno-0-1606"></a><span class="sd">                code that the catalog cannot resolve.</span>
 <a id="__codelineno-0-1607" name="__codelineno-0-1607"></a><span class="sd">            NotImplementedError: When `aggregate=` is not `None` and the</span>
@@ -26950,14 +26950,14 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-1653" name="__codelineno-0-1653"></a><span class="sd">                ```</span>
 <a id="__codelineno-0-1654" name="__codelineno-0-1654"></a>
 <a id="__codelineno-0-1655" name="__codelineno-0-1655"></a><span class="sd">        See Also:</span>
-<a id="__codelineno-0-1656" name="__codelineno-0-1656"></a><span class="sd">            :meth:`earthlens.chc.CHIRPS.download`: CHIRPS</span>
+<a id="__codelineno-0-1656" name="__codelineno-0-1656"></a><span class="sd">            `earthlens.chc.CHIRPS.download`: CHIRPS</span>
 <a id="__codelineno-0-1657" name="__codelineno-0-1657"></a><span class="sd">                backend implementation, including the `cores=`</span>
 <a id="__codelineno-0-1658" name="__codelineno-0-1658"></a><span class="sd">                keyword for parallel retrieval.</span>
-<a id="__codelineno-0-1659" name="__codelineno-0-1659"></a><span class="sd">            :meth:`earthlens.s3.S3.download`: S3/ERA5 backend</span>
+<a id="__codelineno-0-1659" name="__codelineno-0-1659"></a><span class="sd">            `earthlens.s3.S3.download`: S3/ERA5 backend</span>
 <a id="__codelineno-0-1660" name="__codelineno-0-1660"></a><span class="sd">                implementation.</span>
-<a id="__codelineno-0-1661" name="__codelineno-0-1661"></a><span class="sd">            :meth:`earthlens.ecmwf.ECMWF.download`: ECMWF/CDS</span>
+<a id="__codelineno-0-1661" name="__codelineno-0-1661"></a><span class="sd">            `earthlens.ecmwf.ECMWF.download`: ECMWF/CDS</span>
 <a id="__codelineno-0-1662" name="__codelineno-0-1662"></a><span class="sd">                backend implementation.</span>
-<a id="__codelineno-0-1663" name="__codelineno-0-1663"></a><span class="sd">            :meth:`earthlens.gee.GEE.download`: Google Earth Engine</span>
+<a id="__codelineno-0-1663" name="__codelineno-0-1663"></a><span class="sd">            `earthlens.gee.GEE.download`: Google Earth Engine</span>
 <a id="__codelineno-0-1664" name="__codelineno-0-1664"></a><span class="sd">                backend implementation (`export_via`, the 32768-px</span>
 <a id="__codelineno-0-1665" name="__codelineno-0-1665"></a><span class="sd">                synchronous cap).</span>
 <a id="__codelineno-0-1666" name="__codelineno-0-1666"></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -26968,7 +26968,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-1671" name="__codelineno-0-1671"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">iter_download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <a id="__codelineno-0-1672" name="__codelineno-0-1672"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Stream the backend&#39;s artifacts one item at a time.</span>
 <a id="__codelineno-0-1673" name="__codelineno-0-1673"></a>
-<a id="__codelineno-0-1674" name="__codelineno-0-1674"></a><span class="sd">        The streaming counterpart to :meth:`download`, for a vector / tabular</span>
+<a id="__codelineno-0-1674" name="__codelineno-0-1674"></a><span class="sd">        The streaming counterpart to `download`, for a vector / tabular</span>
 <a id="__codelineno-0-1675" name="__codelineno-0-1675"></a><span class="sd">        result too large to want resident all at once: each product&#39;s fragment</span>
 <a id="__codelineno-0-1676" name="__codelineno-0-1676"></a><span class="sd">        is yielded as it arrives, so a caller can write or reduce it and let it</span>
 <a id="__codelineno-0-1677" name="__codelineno-0-1677"></a><span class="sd">        go before the next one is fetched.</span>
@@ -26977,7 +26977,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-1680" name="__codelineno-0-1680"></a><span class="sd">        hook — most search/fetch backends do; a backend that answers the whole</span>
 <a id="__codelineno-0-1681" name="__codelineno-0-1681"></a><span class="sd">        request in one server-side call cannot, and says so rather than</span>
 <a id="__codelineno-0-1682" name="__codelineno-0-1682"></a><span class="sd">        pretending. `aggregate=` is not accepted: a reduction needs the whole</span>
-<a id="__codelineno-0-1683" name="__codelineno-0-1683"></a><span class="sd">        cube, so ask for it through :meth:`download`.</span>
+<a id="__codelineno-0-1683" name="__codelineno-0-1683"></a><span class="sd">        cube, so ask for it through `download`.</span>
 <a id="__codelineno-0-1684" name="__codelineno-0-1684"></a>
 <a id="__codelineno-0-1685" name="__codelineno-0-1685"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-1686" name="__codelineno-0-1686"></a><span class="sd">            limit: Total rows / features to yield across every product, or</span>
@@ -27018,7 +27018,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-1721" name="__codelineno-0-1721"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_redirect_output_to_tempdir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-1722" name="__codelineno-0-1722"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Point the backend output at a throwaway temp dir for an in-memory load.</span>
 <a id="__codelineno-0-1723" name="__codelineno-0-1723"></a>
-<a id="__codelineno-0-1724" name="__codelineno-0-1724"></a><span class="sd">        Called by :meth:`load` when `path` was omitted: `load` only needs the</span>
+<a id="__codelineno-0-1724" name="__codelineno-0-1724"></a><span class="sd">        Called by `load` when `path` was omitted: `load` only needs the</span>
 <a id="__codelineno-0-1725" name="__codelineno-0-1725"></a><span class="sd">        in-memory object, so the incidental files go to a fresh temp directory</span>
 <a id="__codelineno-0-1726" name="__codelineno-0-1726"></a><span class="sd">        instead of the persistent `&lt;output_dir()&gt;/&lt;source&gt;/` default, and a</span>
 <a id="__codelineno-0-1727" name="__codelineno-0-1727"></a><span class="sd">        load-and-plot run never leaves files in the working tree. Creating the</span>
@@ -27049,8 +27049,8 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-1752" name="__codelineno-0-1752"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <a id="__codelineno-0-1753" name="__codelineno-0-1753"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the `aggregate=` guard, then forward to the backend&#39;s `download`.</span>
 <a id="__codelineno-0-1754" name="__codelineno-0-1754"></a>
-<a id="__codelineno-0-1755" name="__codelineno-0-1755"></a><span class="sd">        The shared fetch path behind :meth:`download` (which first redirects an</span>
-<a id="__codelineno-0-1756" name="__codelineno-0-1756"></a><span class="sd">        omitted `path` to the persistent directory) and :meth:`load` (which</span>
+<a id="__codelineno-0-1755" name="__codelineno-0-1755"></a><span class="sd">        The shared fetch path behind `download` (which first redirects an</span>
+<a id="__codelineno-0-1756" name="__codelineno-0-1756"></a><span class="sd">        omitted `path` to the persistent directory) and `load` (which</span>
 <a id="__codelineno-0-1757" name="__codelineno-0-1757"></a><span class="sd">        keeps the throwaway temp directory). Rejects a non-`None` `aggregate`</span>
 <a id="__codelineno-0-1758" name="__codelineno-0-1758"></a><span class="sd">        before the backend is called — for a non-raster backend, and equally</span>
 <a id="__codelineno-0-1759" name="__codelineno-0-1759"></a><span class="sd">        for a raster one that does not declare `SUPPORTS_AGGREGATE`.</span>
@@ -27096,7 +27096,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-1799" name="__codelineno-0-1799"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <a id="__codelineno-0-1800" name="__codelineno-0-1800"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download and return the data in memory instead of only on disk.</span>
 <a id="__codelineno-0-1801" name="__codelineno-0-1801"></a>
-<a id="__codelineno-0-1802" name="__codelineno-0-1802"></a><span class="sd">        The lazy-stack convenience: runs :meth:`download` and hands back the</span>
+<a id="__codelineno-0-1802" name="__codelineno-0-1802"></a><span class="sd">        The lazy-stack convenience: runs `download` and hands back the</span>
 <a id="__codelineno-0-1803" name="__codelineno-0-1803"></a><span class="sd">        fetched data as the project&#39;s **native pyramids objects** rather than</span>
 <a id="__codelineno-0-1804" name="__codelineno-0-1804"></a><span class="sd">        leaving the caller to re-open files. Raster outputs are read into a</span>
 <a id="__codelineno-0-1805" name="__codelineno-0-1805"></a><span class="sd">        `pyramids.Dataset` / `NetCDF` (a `.nc` path becomes a `NetCDF`, every</span>
@@ -27122,8 +27122,8 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-1825" name="__codelineno-0-1825"></a><span class="sd">        xarray dependency.</span>
 <a id="__codelineno-0-1826" name="__codelineno-0-1826"></a>
 <a id="__codelineno-0-1827" name="__codelineno-0-1827"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-1828" name="__codelineno-0-1828"></a><span class="sd">            *args: Forwarded positionally to :meth:`download`.</span>
-<a id="__codelineno-0-1829" name="__codelineno-0-1829"></a><span class="sd">            **kwargs: Forwarded as keywords to :meth:`download`.</span>
+<a id="__codelineno-0-1828" name="__codelineno-0-1828"></a><span class="sd">            *args: Forwarded positionally to `download`.</span>
+<a id="__codelineno-0-1829" name="__codelineno-0-1829"></a><span class="sd">            **kwargs: Forwarded as keywords to `download`.</span>
 <a id="__codelineno-0-1830" name="__codelineno-0-1830"></a>
 <a id="__codelineno-0-1831" name="__codelineno-0-1831"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-1832" name="__codelineno-0-1832"></a><span class="sd">            For a raster / mixed backend, a list with each written raster read</span>
@@ -27424,7 +27424,7 @@ bound (mid-construction), or the backend lacks <code>name</code>.</p>
     <div class="doc doc-contents ">
 
         <p>Resolve the backend and construct it with the user's parameters.</p>
-<p>Validates <code>data_source</code> against :attr:<code>DataSources</code>, fills in
+<p>Validates <code>data_source</code> against <code>DataSources</code>, fills in
 whole-Earth defaults for missing <code>lat_lim</code> / <code>lon_lim</code>, and
 instantiates the concrete backend bound to <code>self.datasource</code>.</p>
 
@@ -27450,7 +27450,7 @@ instantiates the concrete backend bound to <code>self.datasource</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>Backend key. One of the registered keys in
-:attr:<code>DataSources</code> — <code>"chc"</code> (alias <code>"chirps"</code>),
+<code>DataSources</code> — <code>"chc"</code> (alias <code>"chirps"</code>),
 <code>"climate-indices"</code> (alias <code>"climate_indices"</code>; topic key
 <code>"climate-indices:teleconnections"</code>),
 <code>"amazon-s3"</code>, <code>"asf"</code> (alias
@@ -27690,7 +27690,7 @@ Shape depends on the backend:</p>
               <div class="doc-md-description">
                 <p>Legacy latitude pair <code>[lat_min, lat_max]</code> — prefer the
 single <code>aoi=</code> channel, which also accepts a bbox. Defaults to
-:data:<code>DEFAULT_LATITUDE_LIMIT</code> (whole Earth). Mutually
+<code>DEFAULT_LATITUDE_LIMIT</code> (whole Earth). Mutually
 exclusive with <code>aoi</code>.</p>
               </div>
             </td>
@@ -27709,7 +27709,7 @@ exclusive with <code>aoi</code>.</p>
               <div class="doc-md-description">
                 <p>Legacy longitude pair <code>[lon_min, lon_max]</code> — prefer the
 single <code>aoi=</code> channel. Defaults to
-:data:<code>DEFAULT_LONGITUDE_LIMIT</code> (whole Earth). Mutually
+<code>DEFAULT_LONGITUDE_LIMIT</code> (whole Earth). Mutually
 exclusive with <code>aoi</code>.</p>
               </div>
             </td>
@@ -27753,7 +27753,7 @@ N order), a bbox mapping, a <code>(lon, lat)</code> point (with
 <code>buffer</code>), a shapely geometry, any <code>__geo_interface__</code>
 object, a GeoJSON geometry / Feature, a WKT string, or a
 <code>GeoDataFrame</code> / <code>GeoSeries</code>. Reduced to <code>lat_lim</code> /
-<code>lon_lim</code> by :func:<code>earthlens.base.spatial.normalize_aoi</code>.
+<code>lon_lim</code> by <code>earthlens.base.spatial.normalize_aoi</code>.
 Passing both <code>aoi</code> and <code>lat_lim</code> / <code>lon_lim</code> raises
 <code>ValueError</code>. Defaults to <code>None</code>.</p>
               </div>
@@ -27827,7 +27827,7 @@ not accept is its <code>TypeError</code>, not the facade's.</p>
             <td>
               <div class="doc-md-description">
                 <p>If <code>data_source</code> is not a key of
-:attr:<code>DataSources</code>, if both <code>aoi</code> and
+<code>DataSources</code>, if both <code>aoi</code> and
 <code>lat_lim</code> / <code>lon_lim</code> are given, if <code>buffer</code> is given
 without a point <code>aoi</code>, or if <code>aoi</code> is malformed.</p>
               </div>
@@ -27895,7 +27895,7 @@ installed (e.g. <code>data_source="gee"</code> without
 </code></pre></div>
 - Construct an ECMWF-backed facade. Marked
   <code># doctest: +SKIP</code> because it builds a real
-  :class:<code>cdsapi.Client</code>, which requires
+  <code>cdsapi.Client</code>, which requires
   <code>~/.cdsapirc</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">earthlens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>  <span class="c1"># doctest: +SKIP</span>
@@ -27917,7 +27917,7 @@ installed (e.g. <code>data_source="gee"</code> without
 
 <details class="see-also" open>
   <summary>See Also</summary>
-  <p>:meth:<code>download</code>: Triggers the actual retrieval.</p>
+  <p><code>download</code>: Triggers the actual retrieval.</p>
 </details>
 
             <details class="mkdocstrings-source">
@@ -28337,13 +28337,13 @@ installed (e.g. <code>data_source="gee"</code> without
 <a id="__codelineno-0-693" name="__codelineno-0-693"></a><span class="p">):</span>
 <a id="__codelineno-0-694" name="__codelineno-0-694"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve the backend and construct it with the user&#39;s parameters.</span>
 <a id="__codelineno-0-695" name="__codelineno-0-695"></a>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a><span class="sd">    Validates `data_source` against :attr:`DataSources`, fills in</span>
+<a id="__codelineno-0-696" name="__codelineno-0-696"></a><span class="sd">    Validates `data_source` against `DataSources`, fills in</span>
 <a id="__codelineno-0-697" name="__codelineno-0-697"></a><span class="sd">    whole-Earth defaults for missing `lat_lim` / `lon_lim`, and</span>
 <a id="__codelineno-0-698" name="__codelineno-0-698"></a><span class="sd">    instantiates the concrete backend bound to `self.datasource`.</span>
 <a id="__codelineno-0-699" name="__codelineno-0-699"></a>
 <a id="__codelineno-0-700" name="__codelineno-0-700"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-701" name="__codelineno-0-701"></a><span class="sd">        data_source: Backend key. One of the registered keys in</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a><span class="sd">            :attr:`DataSources` — `&quot;chc&quot;` (alias `&quot;chirps&quot;`),</span>
+<a id="__codelineno-0-702" name="__codelineno-0-702"></a><span class="sd">            `DataSources` — `&quot;chc&quot;` (alias `&quot;chirps&quot;`),</span>
 <a id="__codelineno-0-703" name="__codelineno-0-703"></a><span class="sd">            `&quot;climate-indices&quot;` (alias `&quot;climate_indices&quot;`; topic key</span>
 <a id="__codelineno-0-704" name="__codelineno-0-704"></a><span class="sd">            `&quot;climate-indices:teleconnections&quot;`),</span>
 <a id="__codelineno-0-705" name="__codelineno-0-705"></a><span class="sd">            `&quot;amazon-s3&quot;`, `&quot;asf&quot;` (alias</span>
@@ -28448,11 +28448,11 @@ installed (e.g. <code>data_source="gee"</code> without
 <a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">            Defaults to `None`.</span>
 <a id="__codelineno-0-805" name="__codelineno-0-805"></a><span class="sd">        lat_lim: Legacy latitude pair `[lat_min, lat_max]` — prefer the</span>
 <a id="__codelineno-0-806" name="__codelineno-0-806"></a><span class="sd">            single `aoi=` channel, which also accepts a bbox. Defaults to</span>
-<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">            :data:`DEFAULT_LATITUDE_LIMIT` (whole Earth). Mutually</span>
+<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">            `DEFAULT_LATITUDE_LIMIT` (whole Earth). Mutually</span>
 <a id="__codelineno-0-808" name="__codelineno-0-808"></a><span class="sd">            exclusive with `aoi`.</span>
 <a id="__codelineno-0-809" name="__codelineno-0-809"></a><span class="sd">        lon_lim: Legacy longitude pair `[lon_min, lon_max]` — prefer the</span>
 <a id="__codelineno-0-810" name="__codelineno-0-810"></a><span class="sd">            single `aoi=` channel. Defaults to</span>
-<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">            :data:`DEFAULT_LONGITUDE_LIMIT` (whole Earth). Mutually</span>
+<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">            `DEFAULT_LONGITUDE_LIMIT` (whole Earth). Mutually</span>
 <a id="__codelineno-0-812" name="__codelineno-0-812"></a><span class="sd">            exclusive with `aoi`.</span>
 <a id="__codelineno-0-813" name="__codelineno-0-813"></a><span class="sd">        fmt: `strptime` format tried first when `start` / `end` are</span>
 <a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="sd">            strings; a non-matching string falls back to an ISO-8601</span>
@@ -28466,7 +28466,7 @@ installed (e.g. <code>data_source="gee"</code> without
 <a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="sd">            `buffer`), a shapely geometry, any `__geo_interface__`</span>
 <a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">            object, a GeoJSON geometry / Feature, a WKT string, or a</span>
 <a id="__codelineno-0-824" name="__codelineno-0-824"></a><span class="sd">            `GeoDataFrame` / `GeoSeries`. Reduced to `lat_lim` /</span>
-<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">            `lon_lim` by :func:`earthlens.base.spatial.normalize_aoi`.</span>
+<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">            `lon_lim` by `earthlens.base.spatial.normalize_aoi`.</span>
 <a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">            Passing both `aoi` and `lat_lim` / `lon_lim` raises</span>
 <a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">            `ValueError`. Defaults to `None`.</span>
 <a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="sd">        buffer: Half-width in degrees applied to a `(lon, lat)` point</span>
@@ -28487,7 +28487,7 @@ installed (e.g. <code>data_source="gee"</code> without
 <a id="__codelineno-0-843" name="__codelineno-0-843"></a>
 <a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">        ValueError: If `data_source` is not a key of</span>
-<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">            :attr:`DataSources`, if both `aoi` and</span>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">            `DataSources`, if both `aoi` and</span>
 <a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">            `lat_lim` / `lon_lim` are given, if `buffer` is given</span>
 <a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">            without a point `aoi`, or if `aoi` is malformed.</span>
 <a id="__codelineno-0-849" name="__codelineno-0-849"></a><span class="sd">        AuthenticationError: For backends that defer auth</span>
@@ -28535,7 +28535,7 @@ installed (e.g. <code>data_source="gee"</code> without
 <a id="__codelineno-0-891" name="__codelineno-0-891"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-892" name="__codelineno-0-892"></a><span class="sd">        - Construct an ECMWF-backed facade. Marked</span>
 <a id="__codelineno-0-893" name="__codelineno-0-893"></a><span class="sd">          `# doctest: +SKIP` because it builds a real</span>
-<a id="__codelineno-0-894" name="__codelineno-0-894"></a><span class="sd">          :class:`cdsapi.Client`, which requires</span>
+<a id="__codelineno-0-894" name="__codelineno-0-894"></a><span class="sd">          `cdsapi.Client`, which requires</span>
 <a id="__codelineno-0-895" name="__codelineno-0-895"></a><span class="sd">          `~/.cdsapirc`:</span>
 <a id="__codelineno-0-896" name="__codelineno-0-896"></a>
 <a id="__codelineno-0-897" name="__codelineno-0-897"></a><span class="sd">            ```python</span>
@@ -28556,7 +28556,7 @@ installed (e.g. <code>data_source="gee"</code> without
 <a id="__codelineno-0-912" name="__codelineno-0-912"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-913" name="__codelineno-0-913"></a>
 <a id="__codelineno-0-914" name="__codelineno-0-914"></a><span class="sd">    See Also:</span>
-<a id="__codelineno-0-915" name="__codelineno-0-915"></a><span class="sd">        :meth:`download`: Triggers the actual retrieval.</span>
+<a id="__codelineno-0-915" name="__codelineno-0-915"></a><span class="sd">        `download`: Triggers the actual retrieval.</span>
 <a id="__codelineno-0-916" name="__codelineno-0-916"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-917" name="__codelineno-0-917"></a>    <span class="c1"># Back-compat for the legacy positional order</span>
 <a id="__codelineno-0-918" name="__codelineno-0-918"></a>    <span class="c1"># `EarthLens(variables, data_source, ...)`. `data_source` is now</span>
@@ -28732,9 +28732,9 @@ installed (e.g. <code>data_source="gee"</code> without
 
         <p>Eagerly authenticate the bound backend; raise on failure.</p>
 <p>The explicit, fail-fast counterpart to the lazy authentication
-that otherwise happens on the first :meth:<code>download</code> / <code>search</code>.
+that otherwise happens on the first <code>download</code> / <code>search</code>.
 Delegates to
-:meth:<code>earthlens.base.AbstractDataSource.authenticate</code> — opening
+<code>earthlens.base.AbstractDataSource.authenticate</code> — opening
 the network client or running the credential step — and is a
 no-op for credential-free backends. Lets callers separate "do I
 have valid credentials?" from the download itself, e.g. wrap only
@@ -28925,9 +28925,9 @@ backends.</p>
 <a id="__codelineno-0-1404" name="__codelineno-0-1404"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Eagerly authenticate the bound backend; raise on failure.</span>
 <a id="__codelineno-0-1405" name="__codelineno-0-1405"></a>
 <a id="__codelineno-0-1406" name="__codelineno-0-1406"></a><span class="sd">    The explicit, fail-fast counterpart to the lazy authentication</span>
-<a id="__codelineno-0-1407" name="__codelineno-0-1407"></a><span class="sd">    that otherwise happens on the first :meth:`download` / `search`.</span>
+<a id="__codelineno-0-1407" name="__codelineno-0-1407"></a><span class="sd">    that otherwise happens on the first `download` / `search`.</span>
 <a id="__codelineno-0-1408" name="__codelineno-0-1408"></a><span class="sd">    Delegates to</span>
-<a id="__codelineno-0-1409" name="__codelineno-0-1409"></a><span class="sd">    :meth:`earthlens.base.AbstractDataSource.authenticate` — opening</span>
+<a id="__codelineno-0-1409" name="__codelineno-0-1409"></a><span class="sd">    `earthlens.base.AbstractDataSource.authenticate` — opening</span>
 <a id="__codelineno-0-1410" name="__codelineno-0-1410"></a><span class="sd">    the network client or running the credential step — and is a</span>
 <a id="__codelineno-0-1411" name="__codelineno-0-1411"></a><span class="sd">    no-op for credential-free backends. Lets callers separate &quot;do I</span>
 <a id="__codelineno-0-1412" name="__codelineno-0-1412"></a><span class="sd">    have valid credentials?&quot; from the download itself, e.g. wrap only</span>
@@ -29243,9 +29243,9 @@ import its module and is not installed.</p>
     <div class="doc doc-contents ">
 
         <p>Return how many products this request matches, without downloading.</p>
-<p>Uses the backend's :meth:<code>~earthlens.base.AbstractDataSource._count</code>
+<p>Uses the backend's <code>_count</code>
 hook, which a backend with a cheap server-side total overrides;
-otherwise it counts a :meth:<code>search</code>.</p>
+otherwise it counts a <code>search</code>.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -29287,7 +29287,7 @@ otherwise it counts a :meth:<code>search</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>If the bound backend exposes no
-searchable product list (see :meth:<code>search</code>).</p>
+searchable product list (see <code>search</code>).</p>
               </div>
             </td>
           </tr>
@@ -29320,16 +29320,16 @@ searchable product list (see :meth:<code>search</code>).</p>
 <span class="normal"><a href="#__codelineno-0-1524">1524</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1504" name="__codelineno-0-1504"></a><span class="k">def</span><span class="w"> </span><span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <a id="__codelineno-0-1505" name="__codelineno-0-1505"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return how many products this request matches, without downloading.</span>
 <a id="__codelineno-0-1506" name="__codelineno-0-1506"></a>
-<a id="__codelineno-0-1507" name="__codelineno-0-1507"></a><span class="sd">    Uses the backend&#39;s :meth:`~earthlens.base.AbstractDataSource._count`</span>
+<a id="__codelineno-0-1507" name="__codelineno-0-1507"></a><span class="sd">    Uses the backend&#39;s `_count`</span>
 <a id="__codelineno-0-1508" name="__codelineno-0-1508"></a><span class="sd">    hook, which a backend with a cheap server-side total overrides;</span>
-<a id="__codelineno-0-1509" name="__codelineno-0-1509"></a><span class="sd">    otherwise it counts a :meth:`search`.</span>
+<a id="__codelineno-0-1509" name="__codelineno-0-1509"></a><span class="sd">    otherwise it counts a `search`.</span>
 <a id="__codelineno-0-1510" name="__codelineno-0-1510"></a>
 <a id="__codelineno-0-1511" name="__codelineno-0-1511"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-1512" name="__codelineno-0-1512"></a><span class="sd">        The number of matching products.</span>
 <a id="__codelineno-0-1513" name="__codelineno-0-1513"></a>
 <a id="__codelineno-0-1514" name="__codelineno-0-1514"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-1515" name="__codelineno-0-1515"></a><span class="sd">        NotImplementedError: If the bound backend exposes no</span>
-<a id="__codelineno-0-1516" name="__codelineno-0-1516"></a><span class="sd">            searchable product list (see :meth:`search`).</span>
+<a id="__codelineno-0-1516" name="__codelineno-0-1516"></a><span class="sd">            searchable product list (see `search`).</span>
 <a id="__codelineno-0-1517" name="__codelineno-0-1517"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1518" name="__codelineno-0-1518"></a>    <span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-0-1519" name="__codelineno-0-1519"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">_count</span><span class="p">()</span>
@@ -29398,7 +29398,7 @@ searchable product list (see :meth:<code>search</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A curated dataset key (see :meth:<code>list_datasets</code>).</p>
+                <p>A curated dataset key (see <code>list_datasets</code>).</p>
               </div>
             </td>
             <td>
@@ -29531,7 +29531,7 @@ curated dataset (the message suggests the closest key).</p>
 <a id="__codelineno-0-1278" name="__codelineno-0-1278"></a>
 <a id="__codelineno-0-1279" name="__codelineno-0-1279"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-1280" name="__codelineno-0-1280"></a><span class="sd">        data_source: A registered backend key.</span>
-<a id="__codelineno-0-1281" name="__codelineno-0-1281"></a><span class="sd">        key: A curated dataset key (see :meth:`list_datasets`).</span>
+<a id="__codelineno-0-1281" name="__codelineno-0-1281"></a><span class="sd">        key: A curated dataset key (see `list_datasets`).</span>
 <a id="__codelineno-0-1282" name="__codelineno-0-1282"></a>
 <a id="__codelineno-0-1283" name="__codelineno-0-1283"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-1284" name="__codelineno-0-1284"></a><span class="sd">        The backend-specific dataset record (carries the dataset&#39;s</span>
@@ -29625,7 +29625,7 @@ progress bar during the loop. Defaults to <code>True</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional :class:<code>earthlens.aggregate.AggregationConfig</code>.
+                <p>Optional <code>earthlens.aggregate.AggregationConfig</code>.
 Two conditions must both hold for it to be forwarded:
 the backend's <code>OUTPUT_KIND</code> is <code>"raster"</code> or
 <code>"mixed"</code> — the shapes for which a gridded reduction
@@ -29793,7 +29793,7 @@ USGS Water).</li>
                 <p>When the ECMWF backend cannot
 authenticate against CDS (typically a missing
 <code>~/.cdsapirc</code>). See
-:class:<code>earthlens.ecmwf.AuthenticationError</code>.</p>
+<code>earthlens.ecmwf.AuthenticationError</code>.</p>
               </div>
             </td>
           </tr>
@@ -29869,14 +29869,14 @@ not wired the reducer and so does not declare
 
 <details class="see-also" open>
   <summary>See Also</summary>
-  <p>:meth:<code>earthlens.chc.CHIRPS.download</code>: CHIRPS
+  <p><code>earthlens.chc.CHIRPS.download</code>: CHIRPS
     backend implementation, including the <code>cores=</code>
     keyword for parallel retrieval.
-:meth:<code>earthlens.s3.S3.download</code>: S3/ERA5 backend
+<code>earthlens.s3.S3.download</code>: S3/ERA5 backend
     implementation.
-:meth:<code>earthlens.ecmwf.ECMWF.download</code>: ECMWF/CDS
+<code>earthlens.ecmwf.ECMWF.download</code>: ECMWF/CDS
     backend implementation.
-:meth:<code>earthlens.gee.GEE.download</code>: Google Earth Engine
+<code>earthlens.gee.GEE.download</code>: Google Earth Engine
     backend implementation (<code>export_via</code>, the 32768-px
     synchronous cap).</p>
 </details>
@@ -30021,7 +30021,7 @@ not wired the reducer and so does not declare
 <a id="__codelineno-0-1564" name="__codelineno-0-1564"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-1565" name="__codelineno-0-1565"></a><span class="sd">        progress_bar: Whether the backend should print a per-date</span>
 <a id="__codelineno-0-1566" name="__codelineno-0-1566"></a><span class="sd">            progress bar during the loop. Defaults to `True`.</span>
-<a id="__codelineno-0-1567" name="__codelineno-0-1567"></a><span class="sd">        aggregate: Optional :class:`earthlens.aggregate.AggregationConfig`.</span>
+<a id="__codelineno-0-1567" name="__codelineno-0-1567"></a><span class="sd">        aggregate: Optional `earthlens.aggregate.AggregationConfig`.</span>
 <a id="__codelineno-0-1568" name="__codelineno-0-1568"></a><span class="sd">            Two conditions must both hold for it to be forwarded:</span>
 <a id="__codelineno-0-1569" name="__codelineno-0-1569"></a><span class="sd">            the backend&#39;s `OUTPUT_KIND` is `&quot;raster&quot;` or</span>
 <a id="__codelineno-0-1570" name="__codelineno-0-1570"></a><span class="sd">            `&quot;mixed&quot;` — the shapes for which a gridded reduction</span>
@@ -30058,7 +30058,7 @@ not wired the reducer and so does not declare
 <a id="__codelineno-0-1601" name="__codelineno-0-1601"></a><span class="sd">        AuthenticationError: When the ECMWF backend cannot</span>
 <a id="__codelineno-0-1602" name="__codelineno-0-1602"></a><span class="sd">            authenticate against CDS (typically a missing</span>
 <a id="__codelineno-0-1603" name="__codelineno-0-1603"></a><span class="sd">            `~/.cdsapirc`). See</span>
-<a id="__codelineno-0-1604" name="__codelineno-0-1604"></a><span class="sd">            :class:`earthlens.ecmwf.AuthenticationError`.</span>
+<a id="__codelineno-0-1604" name="__codelineno-0-1604"></a><span class="sd">            `earthlens.ecmwf.AuthenticationError`.</span>
 <a id="__codelineno-0-1605" name="__codelineno-0-1605"></a><span class="sd">        KeyError: When any backend receives an unknown variable</span>
 <a id="__codelineno-0-1606" name="__codelineno-0-1606"></a><span class="sd">            code that the catalog cannot resolve.</span>
 <a id="__codelineno-0-1607" name="__codelineno-0-1607"></a><span class="sd">        NotImplementedError: When `aggregate=` is not `None` and the</span>
@@ -30110,14 +30110,14 @@ not wired the reducer and so does not declare
 <a id="__codelineno-0-1653" name="__codelineno-0-1653"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-1654" name="__codelineno-0-1654"></a>
 <a id="__codelineno-0-1655" name="__codelineno-0-1655"></a><span class="sd">    See Also:</span>
-<a id="__codelineno-0-1656" name="__codelineno-0-1656"></a><span class="sd">        :meth:`earthlens.chc.CHIRPS.download`: CHIRPS</span>
+<a id="__codelineno-0-1656" name="__codelineno-0-1656"></a><span class="sd">        `earthlens.chc.CHIRPS.download`: CHIRPS</span>
 <a id="__codelineno-0-1657" name="__codelineno-0-1657"></a><span class="sd">            backend implementation, including the `cores=`</span>
 <a id="__codelineno-0-1658" name="__codelineno-0-1658"></a><span class="sd">            keyword for parallel retrieval.</span>
-<a id="__codelineno-0-1659" name="__codelineno-0-1659"></a><span class="sd">        :meth:`earthlens.s3.S3.download`: S3/ERA5 backend</span>
+<a id="__codelineno-0-1659" name="__codelineno-0-1659"></a><span class="sd">        `earthlens.s3.S3.download`: S3/ERA5 backend</span>
 <a id="__codelineno-0-1660" name="__codelineno-0-1660"></a><span class="sd">            implementation.</span>
-<a id="__codelineno-0-1661" name="__codelineno-0-1661"></a><span class="sd">        :meth:`earthlens.ecmwf.ECMWF.download`: ECMWF/CDS</span>
+<a id="__codelineno-0-1661" name="__codelineno-0-1661"></a><span class="sd">        `earthlens.ecmwf.ECMWF.download`: ECMWF/CDS</span>
 <a id="__codelineno-0-1662" name="__codelineno-0-1662"></a><span class="sd">            backend implementation.</span>
-<a id="__codelineno-0-1663" name="__codelineno-0-1663"></a><span class="sd">        :meth:`earthlens.gee.GEE.download`: Google Earth Engine</span>
+<a id="__codelineno-0-1663" name="__codelineno-0-1663"></a><span class="sd">        `earthlens.gee.GEE.download`: Google Earth Engine</span>
 <a id="__codelineno-0-1664" name="__codelineno-0-1664"></a><span class="sd">            backend implementation (`export_via`, the 32768-px</span>
 <a id="__codelineno-0-1665" name="__codelineno-0-1665"></a><span class="sd">            synchronous cap).</span>
 <a id="__codelineno-0-1666" name="__codelineno-0-1666"></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -30344,7 +30344,7 @@ the full <code>available_datasets</code> universe plus the curated keys.</p>
     <div class="doc doc-contents ">
 
         <p>Stream the backend's artifacts one item at a time.</p>
-<p>The streaming counterpart to :meth:<code>download</code>, for a vector / tabular
+<p>The streaming counterpart to <code>download</code>, for a vector / tabular
 result too large to want resident all at once: each product's fragment
 is yielded as it arrives, so a caller can write or reduce it and let it
 go before the next one is fetched.</p>
@@ -30352,7 +30352,7 @@ go before the next one is fetched.</p>
 hook — most search/fetch backends do; a backend that answers the whole
 request in one server-side call cannot, and says so rather than
 pretending. <code>aggregate=</code> is not accepted: a reduction needs the whole
-cube, so ask for it through :meth:<code>download</code>.</p>
+cube, so ask for it through <code>download</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -30528,7 +30528,7 @@ fetch to stream from.</p>
 <span class="normal"><a href="#__codelineno-0-1719">1719</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1671" name="__codelineno-0-1671"></a><span class="k">def</span><span class="w"> </span><span class="nf">iter_download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <a id="__codelineno-0-1672" name="__codelineno-0-1672"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Stream the backend&#39;s artifacts one item at a time.</span>
 <a id="__codelineno-0-1673" name="__codelineno-0-1673"></a>
-<a id="__codelineno-0-1674" name="__codelineno-0-1674"></a><span class="sd">    The streaming counterpart to :meth:`download`, for a vector / tabular</span>
+<a id="__codelineno-0-1674" name="__codelineno-0-1674"></a><span class="sd">    The streaming counterpart to `download`, for a vector / tabular</span>
 <a id="__codelineno-0-1675" name="__codelineno-0-1675"></a><span class="sd">    result too large to want resident all at once: each product&#39;s fragment</span>
 <a id="__codelineno-0-1676" name="__codelineno-0-1676"></a><span class="sd">    is yielded as it arrives, so a caller can write or reduce it and let it</span>
 <a id="__codelineno-0-1677" name="__codelineno-0-1677"></a><span class="sd">    go before the next one is fetched.</span>
@@ -30537,7 +30537,7 @@ fetch to stream from.</p>
 <a id="__codelineno-0-1680" name="__codelineno-0-1680"></a><span class="sd">    hook — most search/fetch backends do; a backend that answers the whole</span>
 <a id="__codelineno-0-1681" name="__codelineno-0-1681"></a><span class="sd">    request in one server-side call cannot, and says so rather than</span>
 <a id="__codelineno-0-1682" name="__codelineno-0-1682"></a><span class="sd">    pretending. `aggregate=` is not accepted: a reduction needs the whole</span>
-<a id="__codelineno-0-1683" name="__codelineno-0-1683"></a><span class="sd">    cube, so ask for it through :meth:`download`.</span>
+<a id="__codelineno-0-1683" name="__codelineno-0-1683"></a><span class="sd">    cube, so ask for it through `download`.</span>
 <a id="__codelineno-0-1684" name="__codelineno-0-1684"></a>
 <a id="__codelineno-0-1685" name="__codelineno-0-1685"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-1686" name="__codelineno-0-1686"></a><span class="sd">        limit: Total rows / features to yield across every product, or</span>
@@ -30762,7 +30762,7 @@ fetch to stream from.</p>
     <div class="doc doc-contents ">
 
         <p>Download and return the data in memory instead of only on disk.</p>
-<p>The lazy-stack convenience: runs :meth:<code>download</code> and hands back the
+<p>The lazy-stack convenience: runs <code>download</code> and hands back the
 fetched data as the project's <strong>native pyramids objects</strong> rather than
 leaving the caller to re-open files. Raster outputs are read into a
 <code>pyramids.Dataset</code> / <code>NetCDF</code> (a <code>.nc</code> path becomes a <code>NetCDF</code>, every
@@ -30806,7 +30806,7 @@ xarray dependency.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Forwarded positionally to :meth:<code>download</code>.</p>
+                <p>Forwarded positionally to <code>download</code>.</p>
               </div>
             </td>
             <td>
@@ -30822,7 +30822,7 @@ xarray dependency.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Forwarded as keywords to :meth:<code>download</code>.</p>
+                <p>Forwarded as keywords to <code>download</code>.</p>
               </div>
             </td>
             <td>
@@ -30972,7 +30972,7 @@ xarray dependency.</p>
 <span class="normal"><a href="#__codelineno-0-1856">1856</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1799" name="__codelineno-0-1799"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <a id="__codelineno-0-1800" name="__codelineno-0-1800"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Download and return the data in memory instead of only on disk.</span>
 <a id="__codelineno-0-1801" name="__codelineno-0-1801"></a>
-<a id="__codelineno-0-1802" name="__codelineno-0-1802"></a><span class="sd">    The lazy-stack convenience: runs :meth:`download` and hands back the</span>
+<a id="__codelineno-0-1802" name="__codelineno-0-1802"></a><span class="sd">    The lazy-stack convenience: runs `download` and hands back the</span>
 <a id="__codelineno-0-1803" name="__codelineno-0-1803"></a><span class="sd">    fetched data as the project&#39;s **native pyramids objects** rather than</span>
 <a id="__codelineno-0-1804" name="__codelineno-0-1804"></a><span class="sd">    leaving the caller to re-open files. Raster outputs are read into a</span>
 <a id="__codelineno-0-1805" name="__codelineno-0-1805"></a><span class="sd">    `pyramids.Dataset` / `NetCDF` (a `.nc` path becomes a `NetCDF`, every</span>
@@ -30998,8 +30998,8 @@ xarray dependency.</p>
 <a id="__codelineno-0-1825" name="__codelineno-0-1825"></a><span class="sd">    xarray dependency.</span>
 <a id="__codelineno-0-1826" name="__codelineno-0-1826"></a>
 <a id="__codelineno-0-1827" name="__codelineno-0-1827"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-1828" name="__codelineno-0-1828"></a><span class="sd">        *args: Forwarded positionally to :meth:`download`.</span>
-<a id="__codelineno-0-1829" name="__codelineno-0-1829"></a><span class="sd">        **kwargs: Forwarded as keywords to :meth:`download`.</span>
+<a id="__codelineno-0-1828" name="__codelineno-0-1828"></a><span class="sd">        *args: Forwarded positionally to `download`.</span>
+<a id="__codelineno-0-1829" name="__codelineno-0-1829"></a><span class="sd">        **kwargs: Forwarded as keywords to `download`.</span>
 <a id="__codelineno-0-1830" name="__codelineno-0-1830"></a>
 <a id="__codelineno-0-1831" name="__codelineno-0-1831"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-1832" name="__codelineno-0-1832"></a><span class="sd">        For a raster / mixed backend, a list with each written raster read</span>
@@ -31234,7 +31234,7 @@ ECMWF's <code>skip_constraints</code>).</p>
     <div class="doc doc-contents ">
 
         <p>Return the first <code>n</code> matching products as plain dicts.</p>
-<p>A notebook-friendly view over :meth:<code>search</code>: each product is
+<p>A notebook-friendly view over <code>search</code>: each product is
 flattened to <code>{"id": ..., "href": ..., **metadata}</code> for quick
 tabular display before committing to a download.</p>
 
@@ -31319,7 +31319,7 @@ tabular display before committing to a download.</p>
             <td>
               <div class="doc-md-description">
                 <p>If the bound backend exposes no
-searchable product list (see :meth:<code>search</code>).</p>
+searchable product list (see <code>search</code>).</p>
               </div>
             </td>
           </tr>
@@ -31353,7 +31353,7 @@ searchable product list (see :meth:<code>search</code>).</p>
 <span class="normal"><a href="#__codelineno-0-1547">1547</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1526" name="__codelineno-0-1526"></a><span class="k">def</span><span class="w"> </span><span class="nf">preview</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <a id="__codelineno-0-1527" name="__codelineno-0-1527"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the first `n` matching products as plain dicts.</span>
 <a id="__codelineno-0-1528" name="__codelineno-0-1528"></a>
-<a id="__codelineno-0-1529" name="__codelineno-0-1529"></a><span class="sd">    A notebook-friendly view over :meth:`search`: each product is</span>
+<a id="__codelineno-0-1529" name="__codelineno-0-1529"></a><span class="sd">    A notebook-friendly view over `search`: each product is</span>
 <a id="__codelineno-0-1530" name="__codelineno-0-1530"></a><span class="sd">    flattened to `{&quot;id&quot;: ..., &quot;href&quot;: ..., **metadata}` for quick</span>
 <a id="__codelineno-0-1531" name="__codelineno-0-1531"></a><span class="sd">    tabular display before committing to a download.</span>
 <a id="__codelineno-0-1532" name="__codelineno-0-1532"></a>
@@ -31366,7 +31366,7 @@ searchable product list (see :meth:<code>search</code>).</p>
 <a id="__codelineno-0-1539" name="__codelineno-0-1539"></a>
 <a id="__codelineno-0-1540" name="__codelineno-0-1540"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-1541" name="__codelineno-0-1541"></a><span class="sd">        NotImplementedError: If the bound backend exposes no</span>
-<a id="__codelineno-0-1542" name="__codelineno-0-1542"></a><span class="sd">            searchable product list (see :meth:`search`).</span>
+<a id="__codelineno-0-1542" name="__codelineno-0-1542"></a><span class="sd">            searchable product list (see `search`).</span>
 <a id="__codelineno-0-1543" name="__codelineno-0-1543"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1544" name="__codelineno-0-1544"></a>    <span class="k">return</span> <span class="p">[</span>
 <a id="__codelineno-0-1545" name="__codelineno-0-1545"></a>        <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;href&quot;</span><span class="p">:</span> <span class="n">product</span><span class="o">.</span><span class="n">href</span><span class="p">,</span> <span class="o">**</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="p">}</span>
@@ -31392,8 +31392,8 @@ searchable product list (see :meth:<code>search</code>).</p>
         <p>List the products this request matches, without downloading them.</p>
 <p>The cheap, dry-run half of the search→fetch split: it queries the
 backend's catalog and returns one
-:class:<code>~earthlens.base.RemoteProduct</code> per item that
-:meth:<code>download</code> would fetch, so you can inspect or filter the
+<code>RemoteProduct</code> per item that
+<code>download</code> would fetch, so you can inspect or filter the
 result first.</p>
 
 
@@ -31401,23 +31401,23 @@ result first.</p>
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
+          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>One</code></td>            <td>
+            <td>
                   <code><span title="list">list</span>[<span title="earthlens.base.RemoteProduct">RemoteProduct</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>class:<code>~earthlens.base.RemoteProduct</code> per matching item;</p>
+                <p>One <code>RemoteProduct</code> per matching item;</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td></td>            <td>
+            <td>
                   <code><span title="list">list</span>[<span title="earthlens.base.RemoteProduct">RemoteProduct</span>]</code>
             </td>
             <td>
@@ -31447,7 +31447,7 @@ result first.</p>
               <div class="doc-md-description">
                 <p>If the bound backend keeps the legacy
 <code>_api</code>-only flow (CHIRPS, S3, ECMWF, GEE) and exposes no
-searchable product list — call :meth:<code>download</code> directly.</p>
+searchable product list — call <code>download</code> directly.</p>
               </div>
             </td>
           </tr>
@@ -31517,18 +31517,18 @@ searchable product list — call :meth:<code>download</code> directly.</p>
 <a id="__codelineno-0-1465" name="__codelineno-0-1465"></a>
 <a id="__codelineno-0-1466" name="__codelineno-0-1466"></a><span class="sd">    The cheap, dry-run half of the search→fetch split: it queries the</span>
 <a id="__codelineno-0-1467" name="__codelineno-0-1467"></a><span class="sd">    backend&#39;s catalog and returns one</span>
-<a id="__codelineno-0-1468" name="__codelineno-0-1468"></a><span class="sd">    :class:`~earthlens.base.RemoteProduct` per item that</span>
-<a id="__codelineno-0-1469" name="__codelineno-0-1469"></a><span class="sd">    :meth:`download` would fetch, so you can inspect or filter the</span>
+<a id="__codelineno-0-1468" name="__codelineno-0-1468"></a><span class="sd">    `RemoteProduct` per item that</span>
+<a id="__codelineno-0-1469" name="__codelineno-0-1469"></a><span class="sd">    `download` would fetch, so you can inspect or filter the</span>
 <a id="__codelineno-0-1470" name="__codelineno-0-1470"></a><span class="sd">    result first.</span>
 <a id="__codelineno-0-1471" name="__codelineno-0-1471"></a>
 <a id="__codelineno-0-1472" name="__codelineno-0-1472"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-1473" name="__codelineno-0-1473"></a><span class="sd">        One :class:`~earthlens.base.RemoteProduct` per matching item;</span>
+<a id="__codelineno-0-1473" name="__codelineno-0-1473"></a><span class="sd">        One `RemoteProduct` per matching item;</span>
 <a id="__codelineno-0-1474" name="__codelineno-0-1474"></a><span class="sd">        the empty list when nothing matches.</span>
 <a id="__codelineno-0-1475" name="__codelineno-0-1475"></a>
 <a id="__codelineno-0-1476" name="__codelineno-0-1476"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-1477" name="__codelineno-0-1477"></a><span class="sd">        NotImplementedError: If the bound backend keeps the legacy</span>
 <a id="__codelineno-0-1478" name="__codelineno-0-1478"></a><span class="sd">            `_api`-only flow (CHIRPS, S3, ECMWF, GEE) and exposes no</span>
-<a id="__codelineno-0-1479" name="__codelineno-0-1479"></a><span class="sd">            searchable product list — call :meth:`download` directly.</span>
+<a id="__codelineno-0-1479" name="__codelineno-0-1479"></a><span class="sd">            searchable product list — call `download` directly.</span>
 <a id="__codelineno-0-1480" name="__codelineno-0-1480"></a>
 <a id="__codelineno-0-1481" name="__codelineno-0-1481"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-1482" name="__codelineno-0-1482"></a><span class="sd">        - Preview a STAC search without fetching any bytes (live;</span>
