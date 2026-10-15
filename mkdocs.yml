@@ -536,6 +536,7 @@ nav:
       - Rhine Landsat, wet year vs 2026 drought: examples/showcases/rhine_landsat_wetyear_vs_2026.ipynb
       - 2026 Super El Niño, ONI + SST anomaly: examples/showcases/el_nino_2026.ipynb
       - Europe's summer of extreme heat, 2026: examples/showcases/european_heatwave_summer_2026.ipynb
+      - Amazon deforestation, Rondônia fishbone 2001-2025 (time-lapse): examples/showcases/amazon_deforestation.ipynb
       - Every satellite earthlens can reach (3D): examples/showcase/earthlens-satellites.ipynb
       - Total solar eclipse 2026, geometry (3D): examples/showcase/eclipse/eclipse_geometry_3d.ipynb
       - Total solar eclipse 2026 from Meteosat-12 (MTG FCI): examples/showcase/eclipse/solar_eclipse_2026_eumetsat_fci.ipynb
