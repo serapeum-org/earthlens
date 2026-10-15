@@ -24897,7 +24897,7 @@ this section; this page is the rendered API.</p>
 Management System) area CSV API that returns near-real-time and archival
 <strong>active-fire detections</strong> from MODIS (C6.1) and VIIRS (S-NPP / NOAA-20 /
 NOAA-21) as a pyramids
-<code>FeatureCollection</code> of fire-pixel
+<code>pyramids.feature.collection.FeatureCollection</code> of fire-pixel
 points (CRS <code>EPSG:4326</code>).</p>
 <p>This is a <code>vector</code> backend: the result is a table of geolocated fire
 detections, not a gridded array, so <code>FIRMS.OUTPUT_KIND</code> is
@@ -26097,7 +26097,7 @@ window of fire detections through the same <code>download()</code> shape every
 other earthlens backend uses. Windows longer than the FIRMS 5-day
 per-request cap are chunked, and each <code>(sensor, ≤5-day chunk)</code> is
 one CSV GET; the rows are mapped to a
-<code>FeatureCollection</code>.</p>
+<code>pyramids.feature.collection.FeatureCollection</code>.</p>
 <p>FIRMS needs a free <code>MAP_KEY</code>. Supply it to <code>authenticate</code> as
 <code>api_key=</code>, or set the <code>FIRMS_MAP_KEY</code> environment variable and let
 <code>authenticate()</code> / <code>download()</code> resolve it. Credentials are not a
@@ -26669,7 +26669,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    other earthlens backend uses. Windows longer than the FIRMS 5-day</span>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    per-request cap are chunked, and each `(sensor, ≤5-day chunk)` is</span>
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">    one CSV GET; the rows are mapped to a</span>
-<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    `FeatureCollection`.</span>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection`.</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    FIRMS needs a free `MAP_KEY`. Supply it to `authenticate` as</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">    `api_key=`, or set the `FIRMS_MAP_KEY` environment variable and let</span>
@@ -29681,7 +29681,7 @@ from the NASA FIRMS (Fire Information for Resource Management System)
 area CSV endpoint, across MODIS (C6.1) and VIIRS (S-NPP / NOAA-20 /
 NOAA-21) sensors. The rows for a <code>[start, end]</code> window over a bbox come
 back as CSV, which <code>earthlens.firms.events</code> maps to a pyramids
-<code>FeatureCollection</code> of fire-pixel
+<code>pyramids.feature.collection.FeatureCollection</code> of fire-pixel
 points.</p>
 <p>This is a <code>vector</code> backend: the on-the-wire result is a table of
 geolocated detections, not a gridded array, so <code>OUTPUT_KIND = "vector"</code>
@@ -29744,7 +29744,7 @@ window of fire detections through the same <code>download()</code> shape every
 other earthlens backend uses. Windows longer than the FIRMS 5-day
 per-request cap are chunked, and each <code>(sensor, ≤5-day chunk)</code> is
 one CSV GET; the rows are mapped to a
-<code>FeatureCollection</code>.</p>
+<code>pyramids.feature.collection.FeatureCollection</code>.</p>
 <p>FIRMS needs a free <code>MAP_KEY</code>. Supply it to <code>authenticate</code> as
 <code>api_key=</code>, or set the <code>FIRMS_MAP_KEY</code> environment variable and let
 <code>authenticate()</code> / <code>download()</code> resolve it. Credentials are not a
@@ -30316,7 +30316,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    other earthlens backend uses. Windows longer than the FIRMS 5-day</span>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    per-request cap are chunked, and each `(sensor, ≤5-day chunk)` is</span>
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">    one CSV GET; the rows are mapped to a</span>
-<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    `FeatureCollection`.</span>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection`.</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    FIRMS needs a free `MAP_KEY`. Supply it to `authenticate` as</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">    `api_key=`, or set the `FIRMS_MAP_KEY` environment variable and let</span>

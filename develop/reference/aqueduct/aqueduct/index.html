@@ -24368,7 +24368,7 @@ area</strong> to river flooding, aggregated by admin unit — <strong>country</s
 baseline, and seven 2030 climate × socio-economic scenarios (RCP4.5 / RCP8.5 ×
 SSP2 / SSP3). The admin polygons carry the risk attributes, so this is a
 <code>vector</code> backend: <code>download()</code> returns a pyramids
-<code>FeatureCollection</code> (or a geometry-dropped
+<code>pyramids.feature.collection.FeatureCollection</code> (or a geometry-dropped
 <code>pandas.DataFrame</code>), and the <code>earthlens.earthlens.EarthLens</code> facade
 rejects an <code>aggregate=</code> argument.</p>
 <p>This is the flood <strong>impact / exposure</strong> layer. It is distinct from the Aqueduct
@@ -25349,7 +25349,7 @@ shape.</p>
 <a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">                this is a no-op.</span>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">            A `FeatureCollection` (also</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">            A `pyramids.feature.collection.FeatureCollection` (also</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">            written to `root_dir`) or, when `geometry=False`, a</span>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">            `pandas.DataFrame` of the units and their `rp_&lt;n&gt;` columns.</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a>
@@ -26053,7 +26053,7 @@ this is a no-op.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A <code>FeatureCollection</code> (also</p>
+                <p>A <code>pyramids.feature.collection.FeatureCollection</code> (also</p>
               </div>
             </td>
           </tr>
@@ -26165,7 +26165,7 @@ this is a no-op.</p>
 <a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">            this is a no-op.</span>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        A `FeatureCollection` (also</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        A `pyramids.feature.collection.FeatureCollection` (also</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        written to `root_dir`) or, when `geometry=False`, a</span>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        `pandas.DataFrame` of the units and their `rp_&lt;n&gt;` columns.</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a>
@@ -27357,7 +27357,7 @@ scenario fails validation.</p>
 credentials), reads it with pyramids, selects one metric / year / scenario
 across the requested flood return periods, filters by unit name and/or bbox, and
 returns the admin polygons carrying the selected exposure columns as a
-<code>FeatureCollection</code> (or, with
+<code>pyramids.feature.collection.FeatureCollection</code> (or, with
 <code>geometry=False</code>, a geometry-dropped <code>pandas.DataFrame</code>).</p>
 <p>This is a static, country/state/basin-indexed product with no time axis, so a
 missing <code>start</code> / <code>end</code> is legal (<code>REQUIRES_TIME_WINDOW = False</code>). It is a
@@ -28096,7 +28096,7 @@ shape.</p>
 <a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">                this is a no-op.</span>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">            A `FeatureCollection` (also</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">            A `pyramids.feature.collection.FeatureCollection` (also</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">            written to `root_dir`) or, when `geometry=False`, a</span>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">            `pandas.DataFrame` of the units and their `rp_&lt;n&gt;` columns.</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a>
@@ -28800,7 +28800,7 @@ this is a no-op.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A <code>FeatureCollection</code> (also</p>
+                <p>A <code>pyramids.feature.collection.FeatureCollection</code> (also</p>
               </div>
             </td>
           </tr>
@@ -28912,7 +28912,7 @@ this is a no-op.</p>
 <a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">            this is a no-op.</span>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        A `FeatureCollection` (also</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        A `pyramids.feature.collection.FeatureCollection` (also</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        written to `root_dir`) or, when `geometry=False`, a</span>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        `pandas.DataFrame` of the units and their `rp_&lt;n&gt;` columns.</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a>

@@ -24495,7 +24495,7 @@ discriminator:</p>
 </ul>
 <p>Output is <strong>per instance</strong>: the resolved source's <code>output_kind</code> decides whether
 <code>download</code> returns a pyramids
-<code>FeatureCollection</code> (<code>structures</code>/<code>nfhl</code>) or
+<code>pyramids.feature.collection.FeatureCollection</code> (<code>structures</code>/<code>nfhl</code>) or
 a <code>pandas.DataFrame</code> (<code>nfip</code>). All three are public-domain and keyless —
 no auth. A spatial/attribute bound is <strong>required</strong> (no unbounded national pull),
 and <code>aggregate=</code> is rejected (these are records, not gridded rasters).</p>
@@ -25148,7 +25148,7 @@ validation.</p>
         <p>US flood exposure / loss backend (per-instance output).</p>
 <p>Resolves <code>source=</code> to its catalog row, issues the one bounded request that
 source needs, and returns a
-<code>FeatureCollection</code> (<code>structures</code>/<code>nfhl</code>)
+<code>pyramids.feature.collection.FeatureCollection</code> (<code>structures</code>/<code>nfhl</code>)
 or a <code>pandas.DataFrame</code> (<code>nfip</code>). US-only: a non-US box returns an
 empty result, not an error (<code>G4</code>).</p>
 
@@ -25593,7 +25593,7 @@ to know the return shape.</p>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    Resolves `source=` to its catalog row, issues the one bounded request that</span>
 <a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    source needs, and returns a</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    `FeatureCollection` (`structures`/`nfhl`)</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection` (`structures`/`nfhl`)</span>
 <a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    or a `pandas.DataFrame` (`nfip`). US-only: a non-US box returns an</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">    empty result, not an error (`G4`).</span>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a>
@@ -25930,7 +25930,7 @@ to know the return shape.</p>
 <a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">                issued (paged for `nfip`), so this is a no-op.</span>
 <a id="__codelineno-0-414" name="__codelineno-0-414"></a>
 <a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            A `FeatureCollection` for</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            A `pyramids.feature.collection.FeatureCollection` for</span>
 <a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            `structures`/`nfhl`, or a `pandas.DataFrame` (also written to</span>
 <a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">            `root_dir`) for `nfip`.</span>
 <a id="__codelineno-0-419" name="__codelineno-0-419"></a>
@@ -26524,7 +26524,7 @@ issued (paged for <code>nfip</code>), so this is a no-op.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A <code>FeatureCollection</code> for</p>
+                <p>A <code>pyramids.feature.collection.FeatureCollection</code> for</p>
               </div>
             </td>
           </tr>
@@ -26625,7 +26625,7 @@ issued (paged for <code>nfip</code>), so this is a no-op.</p>
 <a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            issued (paged for `nfip`), so this is a no-op.</span>
 <a id="__codelineno-0-414" name="__codelineno-0-414"></a>
 <a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        A `FeatureCollection` for</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        A `pyramids.feature.collection.FeatureCollection` for</span>
 <a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        `structures`/`nfhl`, or a `pandas.DataFrame` (also written to</span>
 <a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">        `root_dir`) for `nfip`.</span>
 <a id="__codelineno-0-419" name="__codelineno-0-419"></a>
@@ -27997,7 +27997,7 @@ v3) — and returns the shape that source declares.</p>
 <ul>
 <li><strong>Per-instance <code>OUTPUT_KIND</code> (<code>G1</code>).</strong> The resolved source's <code>output_kind</code> is
   copied onto <code>self.OUTPUT_KIND</code> in <code>__init__</code>: <code>structures</code>/<code>nfhl</code> return a
-  pyramids <code>FeatureCollection</code> (<code>vector</code>),
+  pyramids <code>pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>),
   <code>nfip</code> returns a <code>pandas.DataFrame</code> (<code>tabular</code>). The
   <code>earthlens.earthlens.EarthLens</code> facade reads the instance attribute to
   gate <code>aggregate=</code> and to know the return shape.</li>
@@ -28049,7 +28049,7 @@ dependency.</p>
         <p>US flood exposure / loss backend (per-instance output).</p>
 <p>Resolves <code>source=</code> to its catalog row, issues the one bounded request that
 source needs, and returns a
-<code>FeatureCollection</code> (<code>structures</code>/<code>nfhl</code>)
+<code>pyramids.feature.collection.FeatureCollection</code> (<code>structures</code>/<code>nfhl</code>)
 or a <code>pandas.DataFrame</code> (<code>nfip</code>). US-only: a non-US box returns an
 empty result, not an error (<code>G4</code>).</p>
 
@@ -28494,7 +28494,7 @@ to know the return shape.</p>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    Resolves `source=` to its catalog row, issues the one bounded request that</span>
 <a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    source needs, and returns a</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    `FeatureCollection` (`structures`/`nfhl`)</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection` (`structures`/`nfhl`)</span>
 <a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    or a `pandas.DataFrame` (`nfip`). US-only: a non-US box returns an</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">    empty result, not an error (`G4`).</span>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a>
@@ -28831,7 +28831,7 @@ to know the return shape.</p>
 <a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">                issued (paged for `nfip`), so this is a no-op.</span>
 <a id="__codelineno-0-414" name="__codelineno-0-414"></a>
 <a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            A `FeatureCollection` for</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            A `pyramids.feature.collection.FeatureCollection` for</span>
 <a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            `structures`/`nfhl`, or a `pandas.DataFrame` (also written to</span>
 <a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">            `root_dir`) for `nfip`.</span>
 <a id="__codelineno-0-419" name="__codelineno-0-419"></a>
@@ -29425,7 +29425,7 @@ issued (paged for <code>nfip</code>), so this is a no-op.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A <code>FeatureCollection</code> for</p>
+                <p>A <code>pyramids.feature.collection.FeatureCollection</code> for</p>
               </div>
             </td>
           </tr>
@@ -29526,7 +29526,7 @@ issued (paged for <code>nfip</code>), so this is a no-op.</p>
 <a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            issued (paged for `nfip`), so this is a no-op.</span>
 <a id="__codelineno-0-414" name="__codelineno-0-414"></a>
 <a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        A `FeatureCollection` for</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        A `pyramids.feature.collection.FeatureCollection` for</span>
 <a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        `structures`/`nfhl`, or a `pandas.DataFrame` (also written to</span>
 <a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">        `root_dir`) for `nfip`.</span>
 <a id="__codelineno-0-419" name="__codelineno-0-419"></a>
@@ -30729,7 +30729,7 @@ file's <code>st_mtime_ns</code>, so any real edit invalidates the entry on its o
 spatial request shapes the vector sources need — a GeoJSON polygon body for the
 NSI structures POST, and an ArcGIS envelope query for the FEMA NFHL layer — and
 that wrap a returned GeoJSON <code>FeatureCollection</code> into a pyramids
-<code>FeatureCollection</code>. No network, no state.</p>
+<code>pyramids.feature.collection.FeatureCollection</code>. No network, no state.</p>
 
 
 

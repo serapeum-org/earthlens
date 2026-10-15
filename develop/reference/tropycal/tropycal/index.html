@@ -24860,7 +24860,7 @@ rendered API. tropycal fetches public best-track files, so there is no
 <p>Thin wrapper over <code>tropycal.tracks.TrackDataset</code> that returns tropical-
 cyclone best tracks — from IBTrACS (global, 1848-present) or HURDAT2
 (NHC North Atlantic / East Pacific reanalysis) — as a pyramids
-<code>FeatureCollection</code> of track features
+<code>pyramids.feature.collection.FeatureCollection</code> of track features
 (CRS <code>EPSG:4326</code>).</p>
 <p>This is a <code>vector</code> backend: the result is a table of track features, not
 a gridded array, so <code>TropicalCyclone.OUTPUT_KIND</code> is <code>"vector"</code> and
@@ -27148,7 +27148,7 @@ space/time window of cyclone best tracks through the same
 <code>download()</code> shape every other earthlens backend uses. Each basin
 code in <code>variables</code> becomes one (slow, cached) <code>TrackDataset</code> load;
 the storms in the requested seasons are filtered to the window + bbox
-and mapped to a <code>FeatureCollection</code>,
+and mapped to a <code>pyramids.feature.collection.FeatureCollection</code>,
 and the basins' results are unioned into the single FeatureCollection
 <code>download()</code> returns.</p>
 <p>Four products, selected with <code>product=</code>: <code>besttrack</code> (the default),
@@ -27996,7 +27996,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">    `download()` shape every other earthlens backend uses. Each basin</span>
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">    code in `variables` becomes one (slow, cached) `TrackDataset` load;</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    the storms in the requested seasons are filtered to the window + bbox</span>
-<a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">    and mapped to a `FeatureCollection`,</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">    and mapped to a `pyramids.feature.collection.FeatureCollection`,</span>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    and the basins&#39; results are unioned into the single FeatureCollection</span>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    `download()` returns.</span>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a>
@@ -30930,7 +30930,7 @@ IBTrACS (global) or HURDAT2 (North Atlantic / East Pacific reanalysis) —
 through the same <code>download()</code> shape every other earthlens backend uses.
 Each basin code in <code>variables</code> becomes one <code>TrackDataset</code> load; the
 storms in the requested seasons are mapped to a pyramids
-<code>FeatureCollection</code> by
+<code>pyramids.feature.collection.FeatureCollection</code> by
 <code>earthlens.tropycal.events</code>.</p>
 <p>This is a <code>vector</code> backend: the result is a table of track features
 (per-fix <code>Point</code>s by default, or one <code>LineString</code> per storm with
@@ -30992,7 +30992,7 @@ space/time window of cyclone best tracks through the same
 <code>download()</code> shape every other earthlens backend uses. Each basin
 code in <code>variables</code> becomes one (slow, cached) <code>TrackDataset</code> load;
 the storms in the requested seasons are filtered to the window + bbox
-and mapped to a <code>FeatureCollection</code>,
+and mapped to a <code>pyramids.feature.collection.FeatureCollection</code>,
 and the basins' results are unioned into the single FeatureCollection
 <code>download()</code> returns.</p>
 <p>Four products, selected with <code>product=</code>: <code>besttrack</code> (the default),
@@ -31840,7 +31840,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">    `download()` shape every other earthlens backend uses. Each basin</span>
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">    code in `variables` becomes one (slow, cached) `TrackDataset` load;</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    the storms in the requested seasons are filtered to the window + bbox</span>
-<a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">    and mapped to a `FeatureCollection`,</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">    and mapped to a `pyramids.feature.collection.FeatureCollection`,</span>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    and the basins&#39; results are unioned into the single FeatureCollection</span>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    `download()` returns.</span>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a>

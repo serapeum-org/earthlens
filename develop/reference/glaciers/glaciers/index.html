@@ -24872,7 +24872,7 @@ through pyramids <code>FeatureCollection.read_file</code> and the WGMS path is p
 </ul>
 <p>Output is <strong>per instance</strong>: a dataset's <code>output_kind</code> decides whether
 <code>download</code> returns a pyramids
-<code>FeatureCollection</code> (<code>vector</code>, rgi/glims) or
+<code>pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>, rgi/glims) or
 a <code>pandas.DataFrame</code> (<code>tabular</code>, wgms). All three sources are open, so the
 backend ships <strong>no auth</strong>. Vector file I/O always goes through pyramids
 <code>FeatureCollection.read_file</code> — never a bare geopandas file read — and the WGMS
@@ -25964,7 +25964,7 @@ present.</p>
         <p>Glacier outlines / fluctuations backend (mixed output).</p>
 <p>Resolves one dataset id to its catalog row, routes the request to that row's
 source (RGI / GLIMS / WGMS), and returns a pyramids
-<code>FeatureCollection</code> (<code>vector</code>) or a
+<code>pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>) or a
 <code>pandas.DataFrame</code> (<code>tabular</code>) per the row's <code>output_kind</code>. The query
 is a search/fetch split: <code>_search</code> pins the products (one per
 overlapping RGI region, or a single GLIMS / WGMS product) and <code>_fetch</code>
@@ -26383,7 +26383,7 @@ it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">    Resolves one dataset id to its catalog row, routes the request to that row&#39;s</span>
 <a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    source (RGI / GLIMS / WGMS), and returns a pyramids</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    `FeatureCollection` (`vector`) or a</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection` (`vector`) or a</span>
 <a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">    `pandas.DataFrame` (`tabular`) per the row&#39;s `output_kind`. The query</span>
 <a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    is a search/fetch split: `_search` pins the products (one per</span>
 <a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">    overlapping RGI region, or a single GLIMS / WGMS product) and `_fetch`</span>
@@ -26622,7 +26622,7 @@ it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            products: The list from `_search`.</span>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            list: One `FeatureCollection`</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            list: One `pyramids.feature.collection.FeatureCollection`</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">                per RGI region / the GLIMS query (`vector`), or a single</span>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">                `pandas.DataFrame` (`tabular`, wgms).</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -26683,7 +26683,7 @@ it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">                fetch is a small loop, so this is a no-op.</span>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">            A pyramids `FeatureCollection`</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">            A pyramids `pyramids.feature.collection.FeatureCollection`</span>
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">            (`vector`, rgi/glims; clipped, EPSG:4326) or a</span>
 <a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">            `pandas.DataFrame` (`tabular`, wgms; also written to</span>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">            `root_dir`).</span>
@@ -27302,7 +27302,7 @@ fetch is a small loop, so this is a no-op.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A pyramids <code>FeatureCollection</code></p>
+                <p>A pyramids <code>pyramids.feature.collection.FeatureCollection</code></p>
               </div>
             </td>
           </tr>
@@ -27418,7 +27418,7 @@ fetch is a small loop, so this is a no-op.</p>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">            fetch is a small loop, so this is a no-op.</span>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        A pyramids `FeatureCollection`</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        A pyramids `pyramids.feature.collection.FeatureCollection`</span>
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        (`vector`, rgi/glims; clipped, EPSG:4326) or a</span>
 <a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        `pandas.DataFrame` (`tabular`, wgms; also written to</span>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        `root_dir`).</span>
@@ -29774,7 +29774,7 @@ glacier / region selector (wgms).</p>
 <ul>
 <li><strong>Per-instance <code>OUTPUT_KIND</code> (<code>G1</code>).</strong> The resolved dataset's <code>output_kind</code> is
   copied onto <code>self.OUTPUT_KIND</code> in <code>__init__</code>: <code>vector</code> returns a pyramids
-  <code>FeatureCollection</code> (rgi/glims outlines),
+  <code>pyramids.feature.collection.FeatureCollection</code> (rgi/glims outlines),
   <code>tabular</code> returns a <code>pandas.DataFrame</code> (wgms fluctuations). The
   <code>earthlens.earthlens.EarthLens</code> facade reads the instance attribute to
   gate <code>aggregate=</code> (rejected for both) and to know the return shape.</li>
@@ -29828,7 +29828,7 @@ pure pandas.</p>
         <p>Glacier outlines / fluctuations backend (mixed output).</p>
 <p>Resolves one dataset id to its catalog row, routes the request to that row's
 source (RGI / GLIMS / WGMS), and returns a pyramids
-<code>FeatureCollection</code> (<code>vector</code>) or a
+<code>pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>) or a
 <code>pandas.DataFrame</code> (<code>tabular</code>) per the row's <code>output_kind</code>. The query
 is a search/fetch split: <code>_search</code> pins the products (one per
 overlapping RGI region, or a single GLIMS / WGMS product) and <code>_fetch</code>
@@ -30247,7 +30247,7 @@ it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">    Resolves one dataset id to its catalog row, routes the request to that row&#39;s</span>
 <a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    source (RGI / GLIMS / WGMS), and returns a pyramids</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    `FeatureCollection` (`vector`) or a</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection` (`vector`) or a</span>
 <a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">    `pandas.DataFrame` (`tabular`) per the row&#39;s `output_kind`. The query</span>
 <a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    is a search/fetch split: `_search` pins the products (one per</span>
 <a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">    overlapping RGI region, or a single GLIMS / WGMS product) and `_fetch`</span>
@@ -30486,7 +30486,7 @@ it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            products: The list from `_search`.</span>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            list: One `FeatureCollection`</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            list: One `pyramids.feature.collection.FeatureCollection`</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">                per RGI region / the GLIMS query (`vector`), or a single</span>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">                `pandas.DataFrame` (`tabular`, wgms).</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -30547,7 +30547,7 @@ it to gate <code>aggregate=</code> and to know the return shape.</p>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">                fetch is a small loop, so this is a no-op.</span>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">            A pyramids `FeatureCollection`</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">            A pyramids `pyramids.feature.collection.FeatureCollection`</span>
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">            (`vector`, rgi/glims; clipped, EPSG:4326) or a</span>
 <a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">            `pandas.DataFrame` (`tabular`, wgms; also written to</span>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">            `root_dir`).</span>
@@ -31166,7 +31166,7 @@ fetch is a small loop, so this is a no-op.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A pyramids <code>FeatureCollection</code></p>
+                <p>A pyramids <code>pyramids.feature.collection.FeatureCollection</code></p>
               </div>
             </td>
           </tr>
@@ -31282,7 +31282,7 @@ fetch is a small loop, so this is a no-op.</p>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">            fetch is a small loop, so this is a no-op.</span>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        A pyramids `FeatureCollection`</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        A pyramids `pyramids.feature.collection.FeatureCollection`</span>
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        (`vector`, rgi/glims; clipped, EPSG:4326) or a</span>
 <a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        `pandas.DataFrame` (`tabular`, wgms; also written to</span>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        `root_dir`).</span>

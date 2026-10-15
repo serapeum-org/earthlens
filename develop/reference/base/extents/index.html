@@ -25207,7 +25207,7 @@ inside the download loop.</p>
             <td>
               <div class="doc-md-description">
                 <p>Inclusive start of the requested window. Typed
-<code>Any</code> because pandas / numpy timestamp types
+<code>typing.Any</code> because pandas / numpy timestamp types
 are not native pydantic primitives; the cross-field
 validator below enforces <code>start_date &lt;= end_date</code> for
 anything that supports comparison.</p>
@@ -25247,7 +25247,7 @@ shorthand pandas uses for <code>date_range(freq=...)</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>The <code>pandas.DatetimeIndex</code> the download loop
-iterates. Typed <code>Any</code> to avoid a hard
+iterates. Typed <code>typing.Any</code> to avoid a hard
 pandas import in the abstract module.</p>
               </div>
             </td>
@@ -25322,7 +25322,7 @@ pandas import in the abstract module.</p>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">        start_date: Inclusive start of the requested window. Typed</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            `Any` because pandas / numpy timestamp types</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            `typing.Any` because pandas / numpy timestamp types</span>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">            are not native pydantic primitives; the cross-field</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">            validator below enforces `start_date &lt;= end_date` for</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">            anything that supports comparison.</span>
@@ -25332,7 +25332,7 @@ pandas import in the abstract module.</p>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">            `&quot;D&quot;` for daily, `&quot;MS&quot;` for month-start. Same</span>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">            shorthand pandas uses for `date_range(freq=...)`.</span>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">        dates: The `pandas.DatetimeIndex` the download loop</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">            iterates. Typed `Any` to avoid a hard</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">            iterates. Typed `typing.Any` to avoid a hard</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">            pandas import in the abstract module.</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>

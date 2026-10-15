@@ -25018,7 +25018,7 @@ login and is deliberately not used.</p>
   the preferred route for research. Returns a <code>pandas.DataFrame</code>.</li>
 <li><strong><code>gdis:points</code></strong> / <strong><code>gdis:polygons</code></strong> — <strong>GDIS</strong> (Geocoded Disasters), the
   CC-BY-4.0 geocoded derivative of EM-DAT <em>natural</em> disasters, 1960-2018, as a
-  pyramids <code>FeatureCollection</code>.
+  pyramids <code>pyramids.feature.collection.FeatureCollection</code>.
   <code>gdis:points</code> is the centroid CSV (about 1 MB, and the only distribution
   carrying <code>year</code> / <code>latitude</code> / <code>longitude</code>); <code>gdis:polygons</code> is the
   admin-unit footprint GeoPackage, which is a <strong>2.2 GB</strong> download and is
@@ -27038,7 +27038,7 @@ free, which triggers a <code>LicenseWarning</code> on download.</p>
         <p>EM-DAT disaster event / location backend (per-instance output kind).</p>
 <p>Resolves one dataset id to its catalog row, fetches it from that row's
 provider, and returns a <code>pandas.DataFrame</code> (<code>tabular</code>) or a
-<code>FeatureCollection</code> (<code>vector</code>) per the
+<code>pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>) per the
 row's <code>output_kind</code>.</p>
 
 
@@ -27711,7 +27711,7 @@ shape.</p>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    Resolves one dataset id to its catalog row, fetches it from that row&#39;s</span>
 <a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    provider, and returns a `pandas.DataFrame` (`tabular`) or a</span>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    `FeatureCollection` (`vector`) per the</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection` (`vector`) per the</span>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">    row&#39;s `output_kind`.</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a>
 <a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    Attributes:</span>
@@ -27973,7 +27973,7 @@ shape.</p>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            list[Any]: One element per product — a `pandas.DataFrame` for a</span>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">                `tabular` dataset, a</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">                `FeatureCollection` for a</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">                `pyramids.feature.collection.FeatureCollection` for a</span>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">                `vector` one.</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_one</span><span class="p">(</span><span class="n">product</span><span class="p">)</span> <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">]</span>
@@ -28230,7 +28230,7 @@ shape.</p>
 <a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">            A `pandas.DataFrame` for `emdat:events` (also written to</span>
 <a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">            `root_dir`), or an in-memory</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">            `FeatureCollection` for a</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">            `pyramids.feature.collection.FeatureCollection` for a</span>
 <a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">            `gdis:*` dataset.</span>
 <a id="__codelineno-0-650" name="__codelineno-0-650"></a>
 <a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        Raises:</span>
@@ -29000,7 +29000,7 @@ through to the transport, so <code>False</code> really does silence it.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>FeatureCollection</code> for a</p>
+                <p><code>pyramids.feature.collection.FeatureCollection</code> for a</p>
               </div>
             </td>
           </tr>
@@ -29100,7 +29100,7 @@ Earthdata Login credentials.</p>
 <a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">        A `pandas.DataFrame` for `emdat:events` (also written to</span>
 <a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">        `root_dir`), or an in-memory</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">        `FeatureCollection` for a</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">        `pyramids.feature.collection.FeatureCollection` for a</span>
 <a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">        `gdis:*` dataset.</span>
 <a id="__codelineno-0-650" name="__codelineno-0-650"></a>
 <a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">    Raises:</span>
@@ -30387,7 +30387,7 @@ date-window and bbox filters.</p>
 <li><strong>Per-instance <code>OUTPUT_KIND</code>.</strong> The resolved dataset's <code>output_kind</code> is copied
   onto <code>self.OUTPUT_KIND</code> in <code>__init__</code>: <code>emdat:events</code> is <code>tabular</code> and returns
   a <code>pandas.DataFrame</code>, both <code>gdis:*</code> rows are <code>vector</code> and return a
-  pyramids <code>FeatureCollection</code>. The
+  pyramids <code>pyramids.feature.collection.FeatureCollection</code>. The
   <code>earthlens.earthlens.EarthLens</code> facade reads the instance attribute to
   know the return shape.</li>
 <li><strong>Conditional auth.</strong> <code>emdat:events</code> comes from the UCLouvain Dataverse and
@@ -30440,7 +30440,7 @@ date-window and bbox filters.</p>
         <p>EM-DAT disaster event / location backend (per-instance output kind).</p>
 <p>Resolves one dataset id to its catalog row, fetches it from that row's
 provider, and returns a <code>pandas.DataFrame</code> (<code>tabular</code>) or a
-<code>FeatureCollection</code> (<code>vector</code>) per the
+<code>pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>) per the
 row's <code>output_kind</code>.</p>
 
 
@@ -31113,7 +31113,7 @@ shape.</p>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    Resolves one dataset id to its catalog row, fetches it from that row&#39;s</span>
 <a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    provider, and returns a `pandas.DataFrame` (`tabular`) or a</span>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    `FeatureCollection` (`vector`) per the</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection` (`vector`) per the</span>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">    row&#39;s `output_kind`.</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a>
 <a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    Attributes:</span>
@@ -31375,7 +31375,7 @@ shape.</p>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            list[Any]: One element per product — a `pandas.DataFrame` for a</span>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">                `tabular` dataset, a</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">                `FeatureCollection` for a</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">                `pyramids.feature.collection.FeatureCollection` for a</span>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">                `vector` one.</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_one</span><span class="p">(</span><span class="n">product</span><span class="p">)</span> <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">]</span>
@@ -31632,7 +31632,7 @@ shape.</p>
 <a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">            A `pandas.DataFrame` for `emdat:events` (also written to</span>
 <a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">            `root_dir`), or an in-memory</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">            `FeatureCollection` for a</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">            `pyramids.feature.collection.FeatureCollection` for a</span>
 <a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">            `gdis:*` dataset.</span>
 <a id="__codelineno-0-650" name="__codelineno-0-650"></a>
 <a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        Raises:</span>
@@ -32402,7 +32402,7 @@ through to the transport, so <code>False</code> really does silence it.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>FeatureCollection</code> for a</p>
+                <p><code>pyramids.feature.collection.FeatureCollection</code> for a</p>
               </div>
             </td>
           </tr>
@@ -32502,7 +32502,7 @@ Earthdata Login credentials.</p>
 <a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">        A `pandas.DataFrame` for `emdat:events` (also written to</span>
 <a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">        `root_dir`), or an in-memory</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">        `FeatureCollection` for a</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">        `pyramids.feature.collection.FeatureCollection` for a</span>
 <a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">        `gdis:*` dataset.</span>
 <a id="__codelineno-0-650" name="__codelineno-0-650"></a>
 <a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">    Raises:</span>

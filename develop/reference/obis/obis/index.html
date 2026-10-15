@@ -24841,7 +24841,7 @@ species/space/time window of marine occurrences through the same
 <code>download()</code> shape every other earthlens backend uses. Each entry in
 <code>variables</code> resolves to an OBIS <code>scientificname</code>; the bbox becomes a
 WKT polygon; the <code>.execute()</code> DataFrame is mapped to a points
-<code>FeatureCollection</code>.</p>
+<code>pyramids.feature.collection.FeatureCollection</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -25173,7 +25173,7 @@ WKT polygon; the <code>.execute()</code> DataFrame is mapped to a points
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">    `download()` shape every other earthlens backend uses. Each entry in</span>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">    `variables` resolves to an OBIS `scientificname`; the bbox becomes a</span>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    WKT polygon; the `.execute()` DataFrame is mapped to a points</span>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    `FeatureCollection`.</span>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection`.</span>
 <a id="__codelineno-0-79" name="__codelineno-0-79"></a>
 <a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">        OUTPUT_KIND: `&quot;vector&quot;` — the facade rejects `aggregate=`.</span>
@@ -26251,7 +26251,7 @@ contract; only the SDK call and the request fields differ.</p>
 <p><code>pyobis</code> 1.x returns a lazy <code>OccResponse</code> query object whose <code>.execute()</code>
 yields a <code>pandas.DataFrame</code> (one row per occurrence) — not the 0.x
 <code>{"results": [...]}</code> dict. The DataFrame is mapped straight to a points
-<code>FeatureCollection</code> via the shared
+<code>pyramids.feature.collection.FeatureCollection</code> via the shared
 <code>earthlens.biodiversity</code> mapper (OBIS is Darwin Core, so the coordinate
 fields are <code>decimalLatitude</code> / <code>decimalLongitude</code>, same as GBIF).</p>
 <p><code>download()</code> returns the in-memory FeatureCollection and, when <code>path</code> is
@@ -26300,7 +26300,7 @@ species/space/time window of marine occurrences through the same
 <code>download()</code> shape every other earthlens backend uses. Each entry in
 <code>variables</code> resolves to an OBIS <code>scientificname</code>; the bbox becomes a
 WKT polygon; the <code>.execute()</code> DataFrame is mapped to a points
-<code>FeatureCollection</code>.</p>
+<code>pyramids.feature.collection.FeatureCollection</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -26632,7 +26632,7 @@ WKT polygon; the <code>.execute()</code> DataFrame is mapped to a points
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">    `download()` shape every other earthlens backend uses. Each entry in</span>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">    `variables` resolves to an OBIS `scientificname`; the bbox becomes a</span>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    WKT polygon; the `.execute()` DataFrame is mapped to a points</span>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    `FeatureCollection`.</span>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection`.</span>
 <a id="__codelineno-0-79" name="__codelineno-0-79"></a>
 <a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">        OUTPUT_KIND: `&quot;vector&quot;` — the facade rejects `aggregate=`.</span>
