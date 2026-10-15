@@ -6,7 +6,7 @@ HTTPS and reads its building footprints — no credentials. Gated behind the `e2
 (`osmium`), while the in-memory `pyrosm` engine needs the opt-in `pyrosm` SDK
 (CI injects it with `uv run --with pyrosm`). A default `pytest` run skips it, a
 missing engine SDK skips these tests (via `skipif`, not a collection-time
-`importorskip`, so the `osm` lane deselects them without a spurious skip line),
+`importorskip`, so a skip is reported per test rather than during collection),
 and a transport failure skips rather than fails. The extract is cached under the
 test's `tmp_path` so the run is self-contained.
 
@@ -27,11 +27,16 @@ from earthlens.osm._pbf import download_extract, read_pbf
 from earthlens.testing import skip_on_upstream
 
 # Gate the SDK requirement as a per-test skipif, not a module-level
-# `importorskip`. A module-level importorskip reports a skip during *collection*,
-# so it surfaces even in the `osm` lane — where these `osm_pbf`-marked tests are
-# deselected and never run — printing a misleading "needs pip install pyrosm"
-# line. As a skipif it only reports for selected tests: the tests skip when an
-# engine SDK is absent (the base install), and deselect silently otherwise.
+# `importorskip`, which reports its skip during *collection* — before any
+# marker expression is applied — and so prints a misleading "needs pip install
+# pyrosm" line for every lane that merely collects this file.
+#
+# These tests are not deselected by the `osm` lane. The directory auto-tagger
+# marks everything under `tests/osm/` with `osm`, so they carry both markers
+# and `-m "e2e and osm"` collects all four tests in this directory, not two
+# (verified: `4/197 tests collected`). In that lane the base install has no
+# engine SDK, so they skip here; `-m "e2e and osm_pbf"` collects the two
+# below, and the dedicated lane injects `pyrosm` so they run.
 _MISSING_SDKS = [
     name for name in ("pyrosm", "osmium") if importlib.util.find_spec(name) is None
 ]
