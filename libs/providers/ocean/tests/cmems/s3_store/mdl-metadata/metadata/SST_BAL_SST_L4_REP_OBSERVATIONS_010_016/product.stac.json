@@ -1,0 +1,257 @@
+{
+  "id": "SST_BAL_SST_L4_REP_OBSERVATIONS_010_016",
+  "type": "Collection",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/scientific/v1.0.0/schema.json"
+  ],
+  "title": "Baltic Sea- Sea Surface Temperature Reprocessed",
+  "description": "For the Baltic Sea- The DMI Sea Surface Temperature reprocessed analysis provides daily gap-free sea surface temperature fields, referred as L4 product, at 0.02deg. x 0.02deg. horizontal resolution. It is produced by the DMI Optimal Interpolation (DMIOI) system (Høyer and She, 2007) to provide a high resolution (1/50deg. - approx. 2km grid resolution) daily analysis of the daily average sea surface temperature (SST) at 20 cm depth. It uses satellite data from infra-red radiometers, from the ESA SST_cci v3.0 (Embury et al., 2024) and Copernicus C3S projects, namely L2P data from (A)ATSRs, SLSTR and AVHRR for the period 1982-2021, L3U data from SLSTR and AVHRR for 2022-July 19 2024 and L2P data from SLSTR and AVHRR from July 20 2024 onward. For the Sea Ice Concentration it uses the Baltic high resolution sea ice concentration data from the Copernicus Marine Service SI TAC.\n\n**References:**\n\n* Høyer, J. L., & Karagali, I. (2016). Sea surface temperature climate data record for the North Sea and Baltic Sea. Journal of Climate, 29(7), 2529-2541.\n* Høyer, J. L. and She, J., Optimal interpolation of sea surface temperature for the North Sea and Baltic Sea, J. Mar. Sys., Vol 65, 1-4, pp., 2007.Høyer, J. L. and She, J., Optimal interpolation of sea surface temperature for the North Sea and Baltic Sea, J. Mar. Sys., Vol 65, 1-4, pp., 2007.\n* Embury, O., Merchant, C.J., Good, S.A., Rayner, N.A., Høyer, J.L., Atkinson, C., Block, T., Alerskans, E., Pearson, K.J., Worsfold, M., McCarroll, N., Donlon, C. Satellite-based time-series of sea-surface temperature since 1980 for climate applications. Scientific Data 11, 326 (2024). https://doi.org/10.1038/s41597-024-03147-w\"\n",
+  "license": "proprietary",
+  "providers": [
+    {
+      "name": "DMI (Denmark)",
+      "roles": [
+        "producer"
+      ]
+    },
+    {
+      "name": "Copernicus Marine Service",
+      "roles": [
+        "host",
+        "processor"
+      ],
+      "url": "https://marine.copernicus.eu"
+    }
+  ],
+  "keywords": [
+    "target-application#seaiceclimate",
+    "oceanographic-geographical-features",
+    "satellite-observation",
+    "sea-surface-temperature",
+    "sea-ice-area-fraction",
+    "multi-year",
+    "weather-climate-and-seasonal-forecasting",
+    "coastal-marine-environment",
+    "marine-safety",
+    "marine-resources",
+    "baltic-sea",
+    "level-4"
+  ],
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.stac.json",
+      "title": "Copernicus Marine Data Store",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.stac.json",
+      "title": "Copernicus Marine Data Store",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "cmems_obs-sst_bal_phy-temp_my_l4_P1D-m_202506/dataset.stac.json",
+      "title": "All data",
+      "type": "application/json"
+    },
+    {
+      "rel": "license",
+      "href": "https://marine.copernicus.eu/user-corner/service-commitments-and-licence",
+      "title": "Copernicus Marine Service Commitments and Licence",
+      "type": "text/html"
+    },
+    {
+      "rel": "cite-as",
+      "href": "https://doi.org/10.48670/moi-00156",
+      "title": "10.48670/moi-00156",
+      "type": "text/html"
+    },
+    {
+      "rel": "alternative",
+      "href": "https://data.marine.copernicus.eu/product/SST_BAL_SST_L4_REP_OBSERVATIONS_010_016",
+      "title": "Product page",
+      "type": "text/html"
+    },
+    {
+      "rel": "describedby",
+      "href": "https://documentation.marine.copernicus.eu/QUID/CMEMS-SST-QUID-010-016-040.pdf",
+      "title": "Quality Information Document",
+      "type": "application/pdf",
+      "ref": "CMEMS-SST-QUID-010-016-040",
+      "createdAt": "2015-05-01",
+      "updatedAt": "2024-07-26T13:33:16.383Z"
+    },
+    {
+      "rel": "describedby",
+      "href": "https://documentation.marine.copernicus.eu/SQO/CMEMS-SST-SQO-010-016-040.pdf",
+      "title": "Synthesis Quality Overview",
+      "type": "application/pdf",
+      "ref": "CMEMS-SST-SQO-010-016-040",
+      "createdAt": "2023-11-30",
+      "updatedAt": "2024-07-26T14:40:51.485Z"
+    },
+    {
+      "rel": "describedby",
+      "href": "http://documentation.marine.copernicus.eu/PUM/CMEMS-SST-PUM-010-016.pdf",
+      "title": "Product User Manual",
+      "type": "application/pdf",
+      "ref": "CMEMS-SST-PUM-010-016",
+      "createdAt": "2026-06-25",
+      "updatedAt": "2025-06-19T14:30:43.373796Z"
+    }
+  ],
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [
+          -10,
+          48,
+          30,
+          66
+        ]
+      ]
+    },
+    "temporal": {
+      "interval": [
+        [
+          "1982-01-01T00:00:00Z",
+          "2024-12-31T00:00:00Z"
+        ]
+      ]
+    }
+  },
+  "assets": {
+    "thumbnail": {
+      "href": "https://mdl-metadata.s3.waw3-1.cloudferro.com/metadata/thumbnails/SST_BAL_SST_L4_REP_OBSERVATIONS_010_016.jpg",
+      "type": "image/jpeg",
+      "roles": [
+        "thumbnail"
+      ],
+      "title": "Baltic Sea- Sea Surface Temperature Reprocessed thumbnail"
+    }
+  },
+  "properties": {
+    "altId": "580de7ba-ee7c-4c07-8ff4-f53680abf157",
+    "providerMetadata": {
+      "source": "cmems",
+      "type": "csw",
+      "url": "https://csw.marine.copernicus.eu/geonetwork/csw-MYOCEAN-CORE-PRODUCTS/eng/csw?service=CSW&version=2.0.2&request=GetRecordById&id=580de7ba-ee7c-4c07-8ff4-f53680abf157&elementsetname=full&outputSchema=http://www.isotc211.org/2005/gmd"
+    },
+    "thumbnailMeta": {
+      "creationDate": "2023-06-18T06:31:44.626Z",
+      "layerId": "SST_BAL_SST_L4_REP_OBSERVATIONS_010_016/DMI_BAL_SST_L4_REP_OBSERVATIONS_010_016_202012/analysed_sst",
+      "time": 1480291200000,
+      "elevation": null,
+      "basemapId": "light",
+      "overlays": {
+        "tags": [
+          {
+            "name": "SST"
+          }
+        ]
+      },
+      "crs": "epsg:4326",
+      "valueMin": 277.32000732421875,
+      "valueMax": 286.79998779296875,
+      "valueClamp": true,
+      "logScale": false,
+      "style": "default",
+      "colormapId": "thermal",
+      "colormapInvert": false
+    },
+    "creationDate": "2012-08-26",
+    "modifiedDate": "2025-06-24",
+    "contacts": [
+      {
+        "name": "",
+        "organisationName": "SST-DMI-COPENHAGEN-DK",
+        "responsiblePartyRole": "resourceProvider",
+        "email": ""
+      }
+    ],
+    "projection": "WGS 84 (EPSG:4326)",
+    "assimilatedData": [],
+    "formats": [
+      "NetCDF-4"
+    ],
+    "updateFrequencies": {
+      "biannually": null
+    },
+    "featureTypes": [
+      "Grid"
+    ],
+    "indicatorFamilies": [],
+    "geoExtent": {
+      "type": "envelope",
+      "coordinates": [
+        [
+          -12,
+          67.99
+        ],
+        [
+          32.01,
+          46
+        ]
+      ]
+    },
+    "geoResolution": {
+      "row": {
+        "magnitude": 0.02,
+        "units": "degree"
+      },
+      "column": {
+        "magnitude": 0.02,
+        "units": "degree"
+      }
+    },
+    "tempExtentBegin": "1982-01-01",
+    "tempResolutions": [
+      "Daily"
+    ],
+    "vertExtentMin": 0,
+    "vertExtentMax": 0,
+    "rank": 12450,
+    "useCases": [],
+    "areas": [
+      "Baltic Sea"
+    ],
+    "times": [
+      "Past"
+    ],
+    "sources": [
+      "Satellite observations"
+    ],
+    "colors": [
+      "White Ocean",
+      "Blue Ocean"
+    ],
+    "communities": [
+      "Polar environment monitoring",
+      "Climate & adaptation",
+      "Policy & governance",
+      "Science & innovation",
+      "Extremes, hazards & safety",
+      "Coastal services"
+    ],
+    "processingLevel": "Level 4",
+    "mainVariables": [
+      "Temperature",
+      "Sea ice"
+    ],
+    "allVariables": [
+      "Sea ice area fraction",
+      "Sea surface temperature"
+    ],
+    "directives": [
+      "Marine Strategy Framework Directive (MSFD)",
+      "Water Framework Directive (WFD)"
+    ],
+    "crs": "EPSG:4326",
+    "isStaging": false,
+    "admp_updated": "2026-10-14T07:38:40.058777Z"
+  },
+  "sci:doi": "10.48670/moi-00156"
+}

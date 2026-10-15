@@ -1,0 +1,4 @@
+# Recorded S3 objects: byte-for-byte what the service returned, so no
+# end-of-line translation. The zarr chunks are blosc-compressed binary, and
+# the JSON/.z* documents are hashed and length-checked by the toolbox.
+s3_store/** -text

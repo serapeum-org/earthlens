@@ -1,0 +1,184 @@
+interactions:
+- request:
+    body: client_id=toolbox&grant_type=password&username=REDACTED&password=REDACTED&scope=openid+profile+email
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br, zstd
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '126'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - python-requests/2.34.2
+    method: POST
+    uri: https://auth.marine.copernicus.eu/realms/MIS/protocol/openid-connect/token
+  response:
+    body:
+      string: '{"access_token": "REDACTED", "expires_in": 300, "refresh_expires_in":
+        600, "refresh_token": "REDACTED", "token_type": "Bearer", "id_token": "REDACTED",
+        "not-before-policy": 0, "session_state": "REDACTED", "scope": "openid email
+        profile"}'
+    headers:
+      cache-control:
+      - no-store
+      content-length:
+      - '3448'
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Oct 2026 17:28:55 GMT
+      pragma:
+      - no-cache
+      referrer-policy:
+      - no-referrer
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      x-robots-tag:
+      - none
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br, zstd
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.34.2
+      authorization:
+      - REDACTED
+    method: GET
+    uri: https://auth.marine.copernicus.eu/realms/MIS/protocol/openid-connect/userinfo
+  response:
+    body:
+      string: '{"sub": "REDACTED", "name": "REDACTED", "groups": ["default-roles-mis",
+        "offline_access", "uma_authorization"], "preferred_username": "REDACTED",
+        "given_name": "REDACTED", "family_name": "REDACTED", "email": "REDACTED"}'
+    headers:
+      cache-control:
+      - no-store,no-cache
+      content-length:
+      - '246'
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Oct 2026 17:28:55 GMT
+      pragma:
+      - no-cache
+      referrer-policy:
+      - no-referrer
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      x-robots-tag:
+      - none
+    status:
+      code: 200
+      message: OK
+- request:
+    body: client_id=toolbox&grant_type=password&username=REDACTED&password=REDACTED&scope=openid+profile+email
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br, zstd
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '126'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - python-requests/2.34.2
+    method: POST
+    uri: https://auth.marine.copernicus.eu/realms/MIS/protocol/openid-connect/token
+  response:
+    body:
+      string: '{"access_token": "REDACTED", "expires_in": 300, "refresh_expires_in":
+        600, "refresh_token": "REDACTED", "token_type": "Bearer", "id_token": "REDACTED",
+        "not-before-policy": 0, "session_state": "REDACTED", "scope": "openid email
+        profile"}'
+    headers:
+      cache-control:
+      - no-store
+      content-length:
+      - '3448'
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Oct 2026 17:28:55 GMT
+      pragma:
+      - no-cache
+      referrer-policy:
+      - no-referrer
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      x-robots-tag:
+      - none
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br, zstd
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.34.2
+      authorization:
+      - REDACTED
+    method: GET
+    uri: https://auth.marine.copernicus.eu/realms/MIS/protocol/openid-connect/userinfo
+  response:
+    body:
+      string: '{"sub": "REDACTED", "name": "REDACTED", "groups": ["default-roles-mis",
+        "offline_access", "uma_authorization"], "preferred_username": "REDACTED",
+        "given_name": "REDACTED", "family_name": "REDACTED", "email": "REDACTED"}'
+    headers:
+      cache-control:
+      - no-store,no-cache
+      content-length:
+      - '246'
+      content-type:
+      - application/json
+      date:
+      - Thu, 15 Oct 2026 17:28:55 GMT
+      pragma:
+      - no-cache
+      referrer-policy:
+      - no-referrer
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      x-robots-tag:
+      - none
+    status:
+      code: 200
+      message: OK
+version: 1

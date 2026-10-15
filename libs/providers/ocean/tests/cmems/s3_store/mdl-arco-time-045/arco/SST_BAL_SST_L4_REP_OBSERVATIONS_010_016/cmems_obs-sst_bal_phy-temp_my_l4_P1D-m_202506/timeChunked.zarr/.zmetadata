@@ -1,0 +1,311 @@
+{
+  "metadata": {
+    ".zattrs": {
+      "Conventions": "CF-1.4, Unidata Observation Dataset v1.0",
+      "Metadata_Conventions": "Unidata Dataset Discovery v1.0",
+      "acknowledgment": "Please acknowledge the use of these data with the following statement: These data were provided by DMI and Copernicus CMEMS",
+      "cdm_data_type": "grid",
+      "comment": "IN NO EVENT SHALL DMI OR ITS REPRESENTATIVES BE LIABLE FOR ANY DAMAGES WHATSOEVER INCLUDING, WITHOUT LIMITATION, SPECIAL, INDIRECT, INCIDENTAL OR CONSEQUENTIAL DAMAGES OR DAMAGES FOR LOSS OF BUSINESS PROFITS OR SAVINGS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR OTHER PECUNIARY LOSS ARISING OUT OF THE USE OF OR THE BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR OTHER PECUNIARY LOSS ARISING OUT OF THE USE OF OR THE INABILITY TO USE THIS DMI PRODUCT, EVEN IF DMI HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. THIS LIMITATION SHALL APPLY TO CLAIMS OF PERSONAL INJURY TO THE EXTENT PERMITTED BY LAW. SOME COUNTRIES OR STATES DO NOT ALLOW THE EXCLUSION OR LIMITATION OF LIABILITY FOR CONSEQUENTIAL, SPECIAL, INDIRECT, INCIDENTAL DAMAGES AND, ACCORDINGLY, SOME PORTIONS OF THESE LIMITATIONS MAY NOT APPLY TO YOU. BY USING THIS PRODUCT, YOU HAVE ACCEPTED THAT THE ABOVE LIMITATIONS OR THE MAXIMUM LEGALLY APPLICABLE SUBSET OF THESE LIMITATIONS APPLY TO YOUR USE OF THIS PRODUCT. WARNING Some applications are unable to properly handle signed bytevalues. If values are encountered > 127, please subtract 256 from this reported value",
+      "creator_email": "myocean_po@dmi.dk",
+      "creator_name": "Danish Meteorological Institute - DMI Copenhagen",
+      "creator_url": "http://ocean.dmi.dk/satellite/",
+      "date_created": "20250117T143312Z",
+      "easternmost_longitude": 30.0,
+      "file_quality_level": 3,
+      "gds_version_id": "2.0",
+      "geospatial_lat_resolution": 0.019999999552965164,
+      "geospatial_lat_units": "degrees north",
+      "geospatial_lon_resolution": 0.019999999552965164,
+      "geospatial_lon_units": "degrees east",
+      "history": "Version 2.0",
+      "id": "DMI-L4UHfnd-NSEABALTIC-DMI_OI",
+      "institution": "Danish Meteorological Institute, DMI",
+      "keywords": "Oceans > Ocean Temperature > Sea Surface Temperature",
+      "keywords_vocabulary": "NASA Global Change Master Directory (GCMD) Science Keywords",
+      "license": "these data are available free of charge under the Copernicus CMEMS data policy",
+      "metadata_link": "http://data.nodc.noaa.gov/NESDIS_DataCenters/metadata/index.html",
+      "naming_authority": "org.ghrsst",
+      "netcdf_version_id": "netcdf-4.4.1.1.6",
+      "northernmost_latitude": 66.0,
+      "platform": "NOAA, ERS, ENVISAT, SENTINEL 3, MetOp",
+      "processing_level": "L4",
+      "product_version": "Version 2.0",
+      "project": "Copernicus CMEMS SST TAC project",
+      "publisher_email": "servicedesk.cmems@mercator-ocean.eu",
+      "publisher_name": "CMEMS SST TAC and DMI",
+      "publisher_url": "https://marine.copernicus.eu/",
+      "references": "H\u00f8yer, J. L. and She, J. (2007), Optimal interpolation of sea surface temperature for the North Sea and Baltic Sea,  J. Mar. Sys., Vol 65, 1-4, pp. 176-189. H\u00f8yer, J. L., Le Borgne, P., and Eastwood, S. (2014). A bias correction method for Arctic satellite sea surface temperature observations. Remote Sensing of Environment, 146,201-213. H\u00f8yer, J. L. and Karagali, I. (2016), Sea Surface Temperature Climate Data Record for the North Sea and Baltic Sea, J. Climate, 29(7), 2529-2541.",
+      "sensor": "AVHRR, ATSR1, ATSR2, AATSR, SLSTR",
+      "source": "ESA SST CCI v3.0, C3S and  CMEMS FMI and SMHI Sea ice concentration",
+      "southernmost_latitude": 48.0,
+      "spatial_resolution": "  0.02 degrees",
+      "standard_name_vocabulary": "NetCDF Climate and forecast (CF) Metadata Convention",
+      "start_time": "20241231T000000Z",
+      "stop_time": "20250101T000000Z",
+      "summary": "DMI Sea Surface Temperature analysis created using multisensor satellite SST observations",
+      "time_coverage_end": "20250101T000000Z",
+      "time_coverage_start": "20241231T000000Z",
+      "title": "Baltic Sea/North Sea SST analysis, daily reprocessed level 4 analysis (SST_BAL_SST_L4_REP_OBSERVATIONS_010_016)",
+      "uuid": "b51a00d1-bdab-4ac2-ae25-ffffc5939a0b",
+      "westernmost_longitude": -10.0
+    },
+    ".zgroup": {
+      "zarr_format": 2
+    },
+    "analysed_sst/.zarray": {
+      "chunks": [
+        1,
+        901,
+        512
+      ],
+      "compressor": {
+        "blocksize": 0,
+        "clevel": 5,
+        "cname": "lz4",
+        "id": "blosc",
+        "shuffle": 1
+      },
+      "dtype": "<i2",
+      "fill_value": -32768,
+      "filters": null,
+      "order": "C",
+      "shape": [
+        15706,
+        901,
+        2001
+      ],
+      "zarr_format": 2
+    },
+    "analysed_sst/.zattrs": {
+      "_ARRAY_DIMENSIONS": [
+        "time",
+        "latitude",
+        "longitude"
+      ],
+      "add_offset": 273.1499938964844,
+      "comment": "",
+      "long_name": "analysed sea surface temperature",
+      "scale_factor": 0.009999999776482582,
+      "source": "ESA CCI and C3S L2P satellite SST products",
+      "standard_name": "sea_surface_foundation_temperature",
+      "units": "kelvin",
+      "valid_max": 4500,
+      "valid_min": -300
+    },
+    "analysis_error/.zarray": {
+      "chunks": [
+        1,
+        901,
+        512
+      ],
+      "compressor": {
+        "blocksize": 0,
+        "clevel": 5,
+        "cname": "lz4",
+        "id": "blosc",
+        "shuffle": 1
+      },
+      "dtype": "<i2",
+      "fill_value": -32768,
+      "filters": null,
+      "order": "C",
+      "shape": [
+        15706,
+        901,
+        2001
+      ],
+      "zarr_format": 2
+    },
+    "analysis_error/.zattrs": {
+      "_ARRAY_DIMENSIONS": [
+        "time",
+        "latitude",
+        "longitude"
+      ],
+      "add_offset": 0.0,
+      "comment": "",
+      "long_name": "estimated error standard deviation of analysed_sst",
+      "scale_factor": 0.009999999776482582,
+      "standard_name": "sea_surface_temperature_error",
+      "units": "kelvin",
+      "valid_max": 32767,
+      "valid_min": 0
+    },
+    "latitude/.zarray": {
+      "chunks": [
+        901
+      ],
+      "compressor": {
+        "blocksize": 0,
+        "clevel": 5,
+        "cname": "lz4",
+        "id": "blosc",
+        "shuffle": 1
+      },
+      "dtype": "<f4",
+      "fill_value": "NaN",
+      "filters": null,
+      "order": "C",
+      "shape": [
+        901
+      ],
+      "zarr_format": 2
+    },
+    "latitude/.zattrs": {
+      "_ARRAY_DIMENSIONS": [
+        "latitude"
+      ],
+      "axis": "Y",
+      "comment": "geographical coordinates, WGS84 projection",
+      "long_name": "latitude",
+      "standard_name": "latitude",
+      "units": "degrees_north",
+      "valid_max": 90.0,
+      "valid_min": -90.0
+    },
+    "longitude/.zarray": {
+      "chunks": [
+        2001
+      ],
+      "compressor": {
+        "blocksize": 0,
+        "clevel": 5,
+        "cname": "lz4",
+        "id": "blosc",
+        "shuffle": 1
+      },
+      "dtype": "<f4",
+      "fill_value": "NaN",
+      "filters": null,
+      "order": "C",
+      "shape": [
+        2001
+      ],
+      "zarr_format": 2
+    },
+    "longitude/.zattrs": {
+      "_ARRAY_DIMENSIONS": [
+        "longitude"
+      ],
+      "axis": "X",
+      "comment": "geographical coordinates, WGS84 projection",
+      "long_name": "longitude",
+      "standard_name": "longitude",
+      "units": "degrees_east",
+      "valid_max": 180.0,
+      "valid_min": -180.0
+    },
+    "mask/.zarray": {
+      "chunks": [
+        1,
+        901,
+        512
+      ],
+      "compressor": {
+        "blocksize": 0,
+        "clevel": 5,
+        "cname": "lz4",
+        "id": "blosc",
+        "shuffle": 1
+      },
+      "dtype": "|i1",
+      "fill_value": -128,
+      "filters": null,
+      "order": "C",
+      "shape": [
+        15706,
+        901,
+        2001
+      ],
+      "zarr_format": 2
+    },
+    "mask/.zattrs": {
+      "_ARRAY_DIMENSIONS": [
+        "time",
+        "latitude",
+        "longitude"
+      ],
+      "comment": "Mask can be used to further filter the data",
+      "flag_masks": [
+        1,
+        2,
+        4,
+        8,
+        16
+      ],
+      "flag_meanings": "water land optional_lake_surface sea_ice optional_river_surface",
+      "long_name": "land sea ice lake bit mask",
+      "source": "NAVOCEANO_landmask_v1.0, CMEMS SI TAC ice and SMHI ice",
+      "valid_max": 31,
+      "valid_min": 1
+    },
+    "sea_ice_fraction/.zarray": {
+      "chunks": [
+        1,
+        901,
+        512
+      ],
+      "compressor": {
+        "blocksize": 0,
+        "clevel": 5,
+        "cname": "lz4",
+        "id": "blosc",
+        "shuffle": 1
+      },
+      "dtype": "|i1",
+      "fill_value": -128,
+      "filters": null,
+      "order": "C",
+      "shape": [
+        15706,
+        901,
+        2001
+      ],
+      "zarr_format": 2
+    },
+    "sea_ice_fraction/.zattrs": {
+      "_ARRAY_DIMENSIONS": [
+        "time",
+        "latitude",
+        "longitude"
+      ],
+      "add_offset": 0.0,
+      "comment": "",
+      "long_name": "sea ice area fraction",
+      "scale_factor": 0.009999999776482582,
+      "source": "CMEMS SI TAC and SMHI icemask",
+      "standard_name": "sea_ice_area_fraction",
+      "units": "1",
+      "valid_max": 100,
+      "valid_min": 0
+    },
+    "time/.zarray": {
+      "chunks": [
+        15706
+      ],
+      "compressor": {
+        "blocksize": 0,
+        "clevel": 5,
+        "cname": "lz4",
+        "id": "blosc",
+        "shuffle": 1
+      },
+      "dtype": "<i4",
+      "fill_value": null,
+      "filters": null,
+      "order": "C",
+      "shape": [
+        15706
+      ],
+      "zarr_format": 2
+    },
+    "time/.zattrs": {
+      "_ARRAY_DIMENSIONS": [
+        "time"
+      ],
+      "calendar": "proleptic_gregorian",
+      "units": "seconds since 1981-01-01"
+    }
+  },
+  "zarr_consolidated_format": 1
+}
