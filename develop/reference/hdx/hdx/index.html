@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -804,6 +804,34 @@
     
   
     Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
   
 
     
@@ -24357,21 +24385,21 @@ public, so there is no <code>auth</code> module.</p>
 id), filters its resources, and downloads the matching files to disk.
 HDX is a public catalogue, so there is no authentication.</p>
 <p>Unlike every gridded earthlens backend, the output shape is the fixed
-value <code>"mixed"</code> — <code>HDX</code> is the first mixed backend: one dataset
+value <code>"mixed"</code> — :class:<code>HDX</code> is the first mixed backend: one dataset
 can carry raster, vector and tabular resources at once. The MVP
 downloads each resource file in its native format and records its CKAN
 format label; reading / converting it into a pyramids type is the
 deferred <code>PY-D</code> work item.</p>
 <p>Public surface (re-exported from this package):</p>
 <ul>
-<li><code>HDX</code> — the backend itself; instantiate with a
+<li>:class:<code>HDX</code> — the backend itself; instantiate with a
   <code>{dataset_key: [resource_filter, ...]}</code> mapping (or the <code>hdx_id=</code>
-  escape hatch), then call <code>HDX.download</code>.</li>
-<li><code>Catalog</code> — pydantic-backed loader for the bundled per-theme
+  escape hatch), then call :meth:<code>HDX.download</code>.</li>
+<li>:class:<code>Catalog</code> — pydantic-backed loader for the bundled per-theme
   <code>catalog/</code> directory.</li>
-<li><code>HdxDataset</code> — one curated dataset row (<code>hdx_id</code>, <code>org</code>,
+<li>:class:<code>HdxDataset</code> — one curated dataset row (<code>hdx_id</code>, <code>org</code>,
   <code>title</code>, <code>themes</code>, <code>formats</code>, <code>resource_filter</code>, <code>output_kinds</code>).</li>
-<li><code>CATALOG_PATH</code> — absolute path to the bundled <code>catalog/</code>
+<li>:data:<code>CATALOG_PATH</code> — absolute path to the bundled <code>catalog/</code>
   directory; monkey-patchable to redirect the loader.</li>
 </ul>
 <p>The <code>[hdx]</code> extra pulls <code>hdx-python-api&gt;=6,&lt;7</code>. The import is lazy, so
@@ -24418,7 +24446,7 @@ surfaces as a friendly <code>ImportError</code> naming <code>earthlens[hdx]</cod
 <p>Reads the bundled <code>catalog/</code> directory (shipped as package data)
 and exposes its consumed top-level sections as typed pydantic
 fields. Instantiate with no arguments (<code>Catalog()</code>) —
-<code>model_post_init</code> parses the YAML and populates every field
+:func:<code>model_post_init</code> parses the YAML and populates every field
 in one pass.</p>
 
 
@@ -24442,7 +24470,7 @@ in one pass.</p>
                 <p>The full index of every HDX dataset id (the
 whole <code>data.humdata.org</code> catalogue, ~41k), produced by the
 <code>refresh --all</code> tool. Any id here resolves to a thin
-<code>HdxDataset</code> via <code>get_dataset</code> (the long-tail
+:class:<code>HdxDataset</code> via :meth:<code>get_dataset</code> (the long-tail
 fallback, mirroring <code>earthlens.earthdata</code>'s <code>_auto.json</code>);
 the curated <code>datasets</code> carry vetted metadata.</p>
               </div>
@@ -24456,7 +24484,7 @@ the curated <code>datasets</code> carry vetted metadata.</p>
             <td>
               <div class="doc-md-description">
                 <p>Structural map keyed by the curated dataset key. Each
-value is an <code>HdxDataset</code>.</p>
+value is an :class:<code>HdxDataset</code>.</p>
               </div>
             </td>
           </tr>
@@ -24650,18 +24678,18 @@ value is an <code>HdxDataset</code>.</p>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    Reads the bundled `catalog/` directory (shipped as package data)</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    and exposes its consumed top-level sections as typed pydantic</span>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">    fields. Instantiate with no arguments (`Catalog()`) —</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    `model_post_init` parses the YAML and populates every field</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    :func:`model_post_init` parses the YAML and populates every field</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    in one pass.</span>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        available_datasets: The full index of every HDX dataset id (the</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            whole `data.humdata.org` catalogue, ~41k), produced by the</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            `refresh --all` tool. Any id here resolves to a thin</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            `HdxDataset` via `get_dataset` (the long-tail</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            :class:`HdxDataset` via :meth:`get_dataset` (the long-tail</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            fallback, mirroring `earthlens.earthdata`&#39;s `_auto.json`);</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            the curated `datasets` carry vetted metadata.</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        datasets: Structural map keyed by the curated dataset key. Each</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            value is an `HdxDataset`.</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            value is an :class:`HdxDataset`.</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        - A curated key is a member; the long tail resolves but is not:</span>
@@ -24678,8 +24706,8 @@ value is an <code>HdxDataset</code>.</p>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="n">available_datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">HdxDataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="c1">#: The full long-tail index `{hdx_id: {org, title}}`, used by</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>    <span class="c1">#: `get_dataset` to synthesise enriched rows. Set by</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="c1">#: `load`; defaults to an empty map.</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>    <span class="c1">#: :meth:`get_dataset` to synthesise enriched rows. Set by</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="c1">#: :meth:`load`; defaults to an empty map.</span>
 <a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="n">_available_rows</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">PrivateAttr</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -24692,7 +24720,7 @@ value is an <code>HdxDataset</code>.</p>
 <a id="__codelineno-0-343" name="__codelineno-0-343"></a>
 <a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">            ValueError: When auto-loading, propagates the same errors as</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">                `load`.</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">                :meth:`load`.</span>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a>            <span class="k">return</span>
@@ -24708,13 +24736,13 @@ value is an <code>HdxDataset</code>.</p>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            catalog_path: Path to the `catalog/` directory or a single</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">                `*.yaml` file. Defaults to module-level</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">                `CATALOG_PATH`.</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-363" name="__codelineno-0-363"></a>
 <a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-366" name="__codelineno-0-366"></a>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">            ValueError: Propagated from `_load_catalog_data`.</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">            ValueError: Propagated from :func:`_load_catalog_data`.</span>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="n">yaml_available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
@@ -24738,7 +24766,7 @@ value is an <code>HdxDataset</code>.</p>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">        Curated `datasets` (hand-vetted, with full metadata) win.</span>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        Otherwise, any id in the full long-tail index (the whole</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        `data.humdata.org` catalogue) resolves to a synthesised</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        `HdxDataset` carrying its `hdx_id` plus the `org` / `title`</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        :class:`HdxDataset` carrying its `hdx_id` plus the `org` / `title`</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        recorded in `_available.json` (empty for the few ids the CKAN</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        `package_search` walk does not expose). The `hdx_id` is the only</span>
 <a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        load-bearing field — the backend fetches the dataset live via</span>
@@ -24781,14 +24809,14 @@ value is an <code>HdxDataset</code>.</p>
 <a id="__codelineno-0-432" name="__codelineno-0-432"></a>        <span class="p">)</span>
 <a id="__codelineno-0-433" name="__codelineno-0-433"></a>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a curated dataset key to its `HdxDataset` row.</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a curated dataset key to its :class:`HdxDataset` row.</span>
 <a id="__codelineno-0-436" name="__codelineno-0-436"></a>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        Thin wrapper over the base `get_dataset` (which raises a</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        Thin wrapper over the base :meth:`get_dataset` (which raises a</span>
 <a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown key), named</span>
 <a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">        `resolve` to match the Earthdata backend&#39;s catalog surface.</span>
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a>
 <a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">            key: Curated dataset key (a member of `datasets`).</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">            key: Curated dataset key (a member of :attr:`datasets`).</span>
 <a id="__codelineno-0-443" name="__codelineno-0-443"></a>
 <a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">            HdxDataset: The resolved row.</span>
@@ -24838,7 +24866,7 @@ value is an <code>HdxDataset</code>.</p>
 <p>Curated <code>datasets</code> (hand-vetted, with full metadata) win.
 Otherwise, any id in the full long-tail index (the whole
 <code>data.humdata.org</code> catalogue) resolves to a synthesised
-<code>HdxDataset</code> carrying its <code>hdx_id</code> plus the <code>org</code> / <code>title</code>
+:class:<code>HdxDataset</code> carrying its <code>hdx_id</code> plus the <code>org</code> / <code>title</code>
 recorded in <code>_available.json</code> (empty for the few ids the CKAN
 <code>package_search</code> walk does not expose). The <code>hdx_id</code> is the only
 load-bearing field — the backend fetches the dataset live via
@@ -24981,7 +25009,7 @@ available index.</p>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">    Curated `datasets` (hand-vetted, with full metadata) win.</span>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">    Otherwise, any id in the full long-tail index (the whole</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">    `data.humdata.org` catalogue) resolves to a synthesised</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">    `HdxDataset` carrying its `hdx_id` plus the `org` / `title`</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">    :class:`HdxDataset` carrying its `hdx_id` plus the `org` / `title`</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">    recorded in `_available.json` (empty for the few ids the CKAN</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">    `package_search` walk does not expose). The `hdx_id` is the only</span>
 <a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">    load-bearing field — the backend fetches the dataset live via</span>
@@ -25068,7 +25096,7 @@ available index.</p>
               <div class="doc-md-description">
                 <p>Path to the <code>catalog/</code> directory or a single
 <code>*.yaml</code> file. Defaults to module-level
-<code>CATALOG_PATH</code>.</p>
+:data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -25094,7 +25122,7 @@ available index.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -25117,7 +25145,7 @@ available index.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Propagated from <code>_load_catalog_data</code>.</p>
+                <p>Propagated from :func:<code>_load_catalog_data</code>.</p>
               </div>
             </td>
           </tr>
@@ -25163,13 +25191,13 @@ available index.</p>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        catalog_path: Path to the `catalog/` directory or a single</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            `*.yaml` file. Defaults to module-level</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">            `CATALOG_PATH`.</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-363" name="__codelineno-0-363"></a>
 <a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-366" name="__codelineno-0-366"></a>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        ValueError: Propagated from `_load_catalog_data`.</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        ValueError: Propagated from :func:`_load_catalog_data`.</span>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-370" name="__codelineno-0-370"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a>    <span class="n">yaml_available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
@@ -25226,7 +25254,7 @@ the caller passed <code>datasets=...</code>, the disk read is skipped.</p>
             <td>
               <div class="doc-md-description">
                 <p>When auto-loading, propagates the same errors as
-<code>load</code>.</p>
+:meth:<code>load</code>.</p>
               </div>
             </td>
           </tr>
@@ -25263,7 +25291,7 @@ the caller passed <code>datasets=...</code>, the disk read is skipped.</p>
 <a id="__codelineno-0-343" name="__codelineno-0-343"></a>
 <a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        ValueError: When auto-loading, propagates the same errors as</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">            `load`.</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">            :meth:`load`.</span>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="k">return</span>
@@ -25288,8 +25316,8 @@ the caller passed <code>datasets=...</code>, the disk read is skipped.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Resolve a curated dataset key to its <code>HdxDataset</code> row.</p>
-<p>Thin wrapper over the base <code>get_dataset</code> (which raises a
+        <p>Resolve a curated dataset key to its :class:<code>HdxDataset</code> row.</p>
+<p>Thin wrapper over the base :meth:<code>get_dataset</code> (which raises a
 <code>ValueError</code> with a did-you-mean hint on an unknown key), named
 <code>resolve</code> to match the Earthdata backend's catalog surface.</p>
 
@@ -25314,7 +25342,7 @@ the caller passed <code>datasets=...</code>, the disk read is skipped.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Curated dataset key (a member of <code>datasets</code>).</p>
+                <p>Curated dataset key (a member of :attr:<code>datasets</code>).</p>
               </div>
             </td>
             <td>
@@ -25411,14 +25439,14 @@ hint).</p>
 <span class="normal"><a href="#__codelineno-0-458">458</a></span>
 <span class="normal"><a href="#__codelineno-0-459">459</a></span>
 <span class="normal"><a href="#__codelineno-0-460">460</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a curated dataset key to its `HdxDataset` row.</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a curated dataset key to its :class:`HdxDataset` row.</span>
 <a id="__codelineno-0-436" name="__codelineno-0-436"></a>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">    Thin wrapper over the base `get_dataset` (which raises a</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">    Thin wrapper over the base :meth:`get_dataset` (which raises a</span>
 <a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown key), named</span>
 <a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">    `resolve` to match the Earthdata backend&#39;s catalog surface.</span>
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a>
 <a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        key: Curated dataset key (a member of `datasets`).</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        key: Curated dataset key (a member of :attr:`datasets`).</span>
 <a id="__codelineno-0-443" name="__codelineno-0-443"></a>
 <a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">        HdxDataset: The resolved row.</span>
@@ -26011,12 +26039,12 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">                escape hatch — a single glob / format label or a list of</span>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">                them.</span>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">            cores: Number of worker threads for downloading resources in</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">                `_fetch`. `1` (default) downloads sequentially;</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">                :meth:`_fetch`. `1` (default) downloads sequentially;</span>
 <a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">                `&gt; 1` downloads concurrently (I/O-bound HTTP, so threads),</span>
 <a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">                preserving result order. Mirrors the CHC backend&#39;s</span>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">                `cores=`.</span>
 <a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">            max_retries: Total attempts for each CKAN read in</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">                `_search` (`Dataset.read_from_hdx`) before giving</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">                :meth:`_search` (`Dataset.read_from_hdx`) before giving</span>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">                up, with exponential backoff between tries. `1` disables</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">                retrying. Defaults to `4` (≈1s, 2s, 4s backoff).</span>
 <a id="__codelineno-0-182" name="__codelineno-0-182"></a>
@@ -26140,7 +26168,7 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a `TemporalExtent` (ignored).</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a :class:`TemporalExtent` (ignored).</span>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        HDX has no temporal query (`G2`); the window is parsed only for</span>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        facade parity and never narrows the resource selection. The</span>
@@ -26168,11 +26196,11 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        One `Dataset.read_from_hdx` call per target (a curated dataset&#39;s</span>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        `hdx_id` or the `hdx_id=` escape hatch, `G6`); each dataset&#39;s</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        resources are filtered with `match_resource` against the</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        resources are filtered with :func:`match_resource` against the</span>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        target&#39;s filter list (`G2`). bbox / time are **not** used — CKAN</span>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        has no spatial/temporal query. Each surviving resource becomes</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        one `RemoteProduct` whose `metadata` carries the raw SDK</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        resource handle, so `_fetch` can download without</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        one :class:`RemoteProduct` whose `metadata` carries the raw SDK</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        resource handle, so :meth:`_fetch` can download without</span>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        re-querying.</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        Returns:</span>
@@ -26244,7 +26272,7 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        input order in the result.</span>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a>
 <a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">            products: The products from `_search`.</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">            products: The products from :meth:`_search`.</span>
 <a id="__codelineno-0-408" name="__codelineno-0-408"></a>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">            list[Path]: Local paths of every downloaded resource, in</span>
@@ -26268,7 +26296,7 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download one product&#39;s resource into its per-dataset subdir.</span>
 <a id="__codelineno-0-429" name="__codelineno-0-429"></a>
 <a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">            product: A product from `_search`.</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">            product: A product from :meth:`_search`.</span>
 <a id="__codelineno-0-432" name="__codelineno-0-432"></a>
 <a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">            Path: The local path of the downloaded resource file.</span>
@@ -26290,8 +26318,8 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-450" name="__codelineno-0-450"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">:</span>
 <a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve the requested datasets and download their resources.</span>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">        Composes `_search` (resolve each dataset → filter its</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">        resources) and `_fetch` (download the matching files to</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">        Composes :meth:`_search` (resolve each dataset → filter its</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">        resources) and :meth:`_fetch` (download the matching files to</span>
 <a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">        `self.root_dir`). By default returns the local file paths; with</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">        `read=True` each downloaded resource is additionally read into</span>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">        its pyramids type via `pyramids.read_resource` (`M1`).</span>
@@ -26623,7 +26651,7 @@ them.</p>
             <td>
               <div class="doc-md-description">
                 <p>Number of worker threads for downloading resources in
-<code>_fetch</code>. <code>1</code> (default) downloads sequentially;
+:meth:<code>_fetch</code>. <code>1</code> (default) downloads sequentially;
 <code>&gt; 1</code> downloads concurrently (I/O-bound HTTP, so threads),
 preserving result order. Mirrors the CHC backend's
 <code>cores=</code>.</p>
@@ -26643,7 +26671,7 @@ preserving result order. Mirrors the CHC backend's
             <td>
               <div class="doc-md-description">
                 <p>Total attempts for each CKAN read in
-<code>_search</code> (<code>Dataset.read_from_hdx</code>) before giving
+:meth:<code>_search</code> (<code>Dataset.read_from_hdx</code>) before giving
 up, with exponential backoff between tries. <code>1</code> disables
 retrying. Defaults to <code>4</code> (≈1s, 2s, 4s backoff).</p>
               </div>
@@ -26835,12 +26863,12 @@ hint is surfaced).</p>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">            escape hatch — a single glob / format label or a list of</span>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">            them.</span>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        cores: Number of worker threads for downloading resources in</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">            `_fetch`. `1` (default) downloads sequentially;</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">            :meth:`_fetch`. `1` (default) downloads sequentially;</span>
 <a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            `&gt; 1` downloads concurrently (I/O-bound HTTP, so threads),</span>
 <a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">            preserving result order. Mirrors the CHC backend&#39;s</span>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">            `cores=`.</span>
 <a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">        max_retries: Total attempts for each CKAN read in</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">            `_search` (`Dataset.read_from_hdx`) before giving</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">            :meth:`_search` (`Dataset.read_from_hdx`) before giving</span>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">            up, with exponential backoff between tries. `1` disables</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">            retrying. Defaults to `4` (≈1s, 2s, 4s backoff).</span>
 <a id="__codelineno-0-182" name="__codelineno-0-182"></a>
@@ -26892,8 +26920,8 @@ hint is surfaced).</p>
     <div class="doc doc-contents ">
 
         <p>Resolve the requested datasets and download their resources.</p>
-<p>Composes <code>_search</code> (resolve each dataset → filter its
-resources) and <code>_fetch</code> (download the matching files to
+<p>Composes :meth:<code>_search</code> (resolve each dataset → filter its
+resources) and :meth:<code>_fetch</code> (download the matching files to
 <code>self.root_dir</code>). By default returns the local file paths; with
 <code>read=True</code> each downloaded resource is additionally read into
 its pyramids type via <code>pyramids.read_resource</code> (<code>M1</code>).</p>
@@ -27044,8 +27072,8 @@ same order — when <code>read=True</code>.</p>
 <a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">:</span>
 <a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve the requested datasets and download their resources.</span>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">    Composes `_search` (resolve each dataset → filter its</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">    resources) and `_fetch` (download the matching files to</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">    Composes :meth:`_search` (resolve each dataset → filter its</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">    resources) and :meth:`_fetch` (download the matching files to</span>
 <a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">    `self.root_dir`). By default returns the local file paths; with</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">    `read=True` each downloaded resource is additionally read into</span>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">    its pyramids type via `pyramids.read_resource` (`M1`).</span>
@@ -27116,8 +27144,8 @@ same order — when <code>read=True</code>.</p>
         <p>One curated HDX dataset row.</p>
 <p>Mirrors a single <code>datasets.&lt;key&gt;:</code> block in one of the per-theme
 <code>catalog/*.yaml</code> files. The friendly dataset key itself is the
-parent key in <code>Catalog.datasets</code> and is not stored on the
-row; <code>hdx_id</code> is the CKAN-side identifier the backend reads.</p>
+parent key in :attr:<code>Catalog.datasets</code> and is not stored on the
+row; :attr:<code>hdx_id</code> is the CKAN-side identifier the backend reads.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -27307,8 +27335,8 @@ this field documents the per-dataset reality.</p>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a>
 <a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">    Mirrors a single `datasets.&lt;key&gt;:` block in one of the per-theme</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">    `catalog/*.yaml` files. The friendly dataset key itself is the</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">    parent key in `Catalog.datasets` and is not stored on the</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">    row; `hdx_id` is the CKAN-side identifier the backend reads.</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">    parent key in :attr:`Catalog.datasets` and is not stored on the</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">    row; :attr:`hdx_id` is the CKAN-side identifier the backend reads.</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">        hdx_id: The HDX/CKAN dataset `name` (the identifier</span>
@@ -28022,12 +28050,12 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">                escape hatch — a single glob / format label or a list of</span>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">                them.</span>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">            cores: Number of worker threads for downloading resources in</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">                `_fetch`. `1` (default) downloads sequentially;</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">                :meth:`_fetch`. `1` (default) downloads sequentially;</span>
 <a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">                `&gt; 1` downloads concurrently (I/O-bound HTTP, so threads),</span>
 <a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">                preserving result order. Mirrors the CHC backend&#39;s</span>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">                `cores=`.</span>
 <a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">            max_retries: Total attempts for each CKAN read in</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">                `_search` (`Dataset.read_from_hdx`) before giving</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">                :meth:`_search` (`Dataset.read_from_hdx`) before giving</span>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">                up, with exponential backoff between tries. `1` disables</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">                retrying. Defaults to `4` (≈1s, 2s, 4s backoff).</span>
 <a id="__codelineno-0-182" name="__codelineno-0-182"></a>
@@ -28151,7 +28179,7 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a `TemporalExtent` (ignored).</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a :class:`TemporalExtent` (ignored).</span>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        HDX has no temporal query (`G2`); the window is parsed only for</span>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        facade parity and never narrows the resource selection. The</span>
@@ -28179,11 +28207,11 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        One `Dataset.read_from_hdx` call per target (a curated dataset&#39;s</span>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        `hdx_id` or the `hdx_id=` escape hatch, `G6`); each dataset&#39;s</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        resources are filtered with `match_resource` against the</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        resources are filtered with :func:`match_resource` against the</span>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        target&#39;s filter list (`G2`). bbox / time are **not** used — CKAN</span>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        has no spatial/temporal query. Each surviving resource becomes</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        one `RemoteProduct` whose `metadata` carries the raw SDK</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        resource handle, so `_fetch` can download without</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        one :class:`RemoteProduct` whose `metadata` carries the raw SDK</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        resource handle, so :meth:`_fetch` can download without</span>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        re-querying.</span>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        Returns:</span>
@@ -28255,7 +28283,7 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        input order in the result.</span>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a>
 <a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">            products: The products from `_search`.</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">            products: The products from :meth:`_search`.</span>
 <a id="__codelineno-0-408" name="__codelineno-0-408"></a>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">            list[Path]: Local paths of every downloaded resource, in</span>
@@ -28279,7 +28307,7 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download one product&#39;s resource into its per-dataset subdir.</span>
 <a id="__codelineno-0-429" name="__codelineno-0-429"></a>
 <a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">            product: A product from `_search`.</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">            product: A product from :meth:`_search`.</span>
 <a id="__codelineno-0-432" name="__codelineno-0-432"></a>
 <a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">            Path: The local path of the downloaded resource file.</span>
@@ -28301,8 +28329,8 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-450" name="__codelineno-0-450"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">:</span>
 <a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve the requested datasets and download their resources.</span>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">        Composes `_search` (resolve each dataset → filter its</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">        resources) and `_fetch` (download the matching files to</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">        Composes :meth:`_search` (resolve each dataset → filter its</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">        resources) and :meth:`_fetch` (download the matching files to</span>
 <a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">        `self.root_dir`). By default returns the local file paths; with</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">        `read=True` each downloaded resource is additionally read into</span>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">        its pyramids type via `pyramids.read_resource` (`M1`).</span>
@@ -28634,7 +28662,7 @@ them.</p>
             <td>
               <div class="doc-md-description">
                 <p>Number of worker threads for downloading resources in
-<code>_fetch</code>. <code>1</code> (default) downloads sequentially;
+:meth:<code>_fetch</code>. <code>1</code> (default) downloads sequentially;
 <code>&gt; 1</code> downloads concurrently (I/O-bound HTTP, so threads),
 preserving result order. Mirrors the CHC backend's
 <code>cores=</code>.</p>
@@ -28654,7 +28682,7 @@ preserving result order. Mirrors the CHC backend's
             <td>
               <div class="doc-md-description">
                 <p>Total attempts for each CKAN read in
-<code>_search</code> (<code>Dataset.read_from_hdx</code>) before giving
+:meth:<code>_search</code> (<code>Dataset.read_from_hdx</code>) before giving
 up, with exponential backoff between tries. <code>1</code> disables
 retrying. Defaults to <code>4</code> (≈1s, 2s, 4s backoff).</p>
               </div>
@@ -28846,12 +28874,12 @@ hint is surfaced).</p>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">            escape hatch — a single glob / format label or a list of</span>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">            them.</span>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        cores: Number of worker threads for downloading resources in</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">            `_fetch`. `1` (default) downloads sequentially;</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">            :meth:`_fetch`. `1` (default) downloads sequentially;</span>
 <a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            `&gt; 1` downloads concurrently (I/O-bound HTTP, so threads),</span>
 <a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">            preserving result order. Mirrors the CHC backend&#39;s</span>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">            `cores=`.</span>
 <a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">        max_retries: Total attempts for each CKAN read in</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">            `_search` (`Dataset.read_from_hdx`) before giving</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">            :meth:`_search` (`Dataset.read_from_hdx`) before giving</span>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">            up, with exponential backoff between tries. `1` disables</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">            retrying. Defaults to `4` (≈1s, 2s, 4s backoff).</span>
 <a id="__codelineno-0-182" name="__codelineno-0-182"></a>
@@ -28903,8 +28931,8 @@ hint is surfaced).</p>
     <div class="doc doc-contents ">
 
         <p>Resolve the requested datasets and download their resources.</p>
-<p>Composes <code>_search</code> (resolve each dataset → filter its
-resources) and <code>_fetch</code> (download the matching files to
+<p>Composes :meth:<code>_search</code> (resolve each dataset → filter its
+resources) and :meth:<code>_fetch</code> (download the matching files to
 <code>self.root_dir</code>). By default returns the local file paths; with
 <code>read=True</code> each downloaded resource is additionally read into
 its pyramids type via <code>pyramids.read_resource</code> (<code>M1</code>).</p>
@@ -29055,8 +29083,8 @@ same order — when <code>read=True</code>.</p>
 <a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">:</span>
 <a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve the requested datasets and download their resources.</span>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">    Composes `_search` (resolve each dataset → filter its</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">    resources) and `_fetch` (download the matching files to</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">    Composes :meth:`_search` (resolve each dataset → filter its</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">    resources) and :meth:`_fetch` (download the matching files to</span>
 <a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">    `self.root_dir`). By default returns the local file paths; with</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">    `read=True` each downloaded resource is additionally read into</span>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">    its pyramids type via `pyramids.read_resource` (`M1`).</span>
@@ -29129,18 +29157,18 @@ same order — when <code>read=True</code>.</p>
     <div class="doc doc-contents first">
 
         <p>Dataset-catalog loader for the Humanitarian Data Exchange backend.</p>
-<p>Hosts <code>Catalog</code>, the pydantic-backed reader for the bundled HDX
-catalog. Mirrors the shape of <code>earthlens.earthdata.catalog</code> and
-<code>earthlens.cmems.catalog</code>: the catalog ships as a directory of
+<p>Hosts :class:<code>Catalog</code>, the pydantic-backed reader for the bundled HDX
+catalog. Mirrors the shape of :mod:<code>earthlens.earthdata.catalog</code> and
+:mod:<code>earthlens.cmems.catalog</code>: the catalog ships as a directory of
 per-theme YAML files at <code>src/earthlens/hdx/catalog/</code>
 (<code>population.yaml</code>, <code>buildings.yaml</code>, <code>boundaries.yaml</code>, …) plus a
 single gzipped <code>_available.json.gz</code> carrying the long-tail index
 (the <code>C7</code> auto-generated index). Each per-theme file contributes its
-<code>datasets:</code> block; the loader unions them into one <code>Catalog</code> at
+<code>datasets:</code> block; the loader unions them into one :class:<code>Catalog</code> at
 construction time.</p>
 <p>A friendly dataset key (e.g. <code>"kontur-population"</code>) resolves to an
-<code>HdxDataset</code> via <code>Catalog.get_dataset</code> / <code>Catalog()["..."]</code>
-/ <code>Catalog.resolve</code>. The row carries the fields the backend needs
+:class:<code>HdxDataset</code> via :meth:<code>Catalog.get_dataset</code> / <code>Catalog()["..."]</code>
+/ :meth:<code>Catalog.resolve</code>. The row carries the fields the backend needs
 to address one HDX dataset and filter its resources: the CKAN
 <code>hdx_id</code> (the dataset's <code>name</code> on <code>data.humdata.org</code>), the owning
 <code>org</code>, a human <code>title</code>, the <code>themes</code> it belongs to, the CKAN format
@@ -29151,7 +29179,7 @@ optional default <code>resource_filter</code>, and the informational
 the <code>C7</code> refresh tool found for the curated orgs/themes; the curated
 <code>datasets:</code> map is the small vetted subset the maintainer hand-checks.
 The path to the bundled catalog directory lives at
-<code>CATALOG_PATH</code>; tests can monkey-patch that module attribute to
+:data:<code>CATALOG_PATH</code>; tests can monkey-patch that module attribute to
 redirect the loader at a temporary directory or single YAML file.</p>
 
 
@@ -29194,7 +29222,7 @@ redirect the loader at a temporary directory or single YAML file.</p>
 <p>Reads the bundled <code>catalog/</code> directory (shipped as package data)
 and exposes its consumed top-level sections as typed pydantic
 fields. Instantiate with no arguments (<code>Catalog()</code>) —
-<code>model_post_init</code> parses the YAML and populates every field
+:func:<code>model_post_init</code> parses the YAML and populates every field
 in one pass.</p>
 
 
@@ -29218,7 +29246,7 @@ in one pass.</p>
                 <p>The full index of every HDX dataset id (the
 whole <code>data.humdata.org</code> catalogue, ~41k), produced by the
 <code>refresh --all</code> tool. Any id here resolves to a thin
-<code>HdxDataset</code> via <code>get_dataset</code> (the long-tail
+:class:<code>HdxDataset</code> via :meth:<code>get_dataset</code> (the long-tail
 fallback, mirroring <code>earthlens.earthdata</code>'s <code>_auto.json</code>);
 the curated <code>datasets</code> carry vetted metadata.</p>
               </div>
@@ -29232,7 +29260,7 @@ the curated <code>datasets</code> carry vetted metadata.</p>
             <td>
               <div class="doc-md-description">
                 <p>Structural map keyed by the curated dataset key. Each
-value is an <code>HdxDataset</code>.</p>
+value is an :class:<code>HdxDataset</code>.</p>
               </div>
             </td>
           </tr>
@@ -29426,18 +29454,18 @@ value is an <code>HdxDataset</code>.</p>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    Reads the bundled `catalog/` directory (shipped as package data)</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    and exposes its consumed top-level sections as typed pydantic</span>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">    fields. Instantiate with no arguments (`Catalog()`) —</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    `model_post_init` parses the YAML and populates every field</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    :func:`model_post_init` parses the YAML and populates every field</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    in one pass.</span>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        available_datasets: The full index of every HDX dataset id (the</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            whole `data.humdata.org` catalogue, ~41k), produced by the</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            `refresh --all` tool. Any id here resolves to a thin</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            `HdxDataset` via `get_dataset` (the long-tail</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            :class:`HdxDataset` via :meth:`get_dataset` (the long-tail</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            fallback, mirroring `earthlens.earthdata`&#39;s `_auto.json`);</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            the curated `datasets` carry vetted metadata.</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        datasets: Structural map keyed by the curated dataset key. Each</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            value is an `HdxDataset`.</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            value is an :class:`HdxDataset`.</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        - A curated key is a member; the long tail resolves but is not:</span>
@@ -29454,8 +29482,8 @@ value is an <code>HdxDataset</code>.</p>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="n">available_datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">HdxDataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="c1">#: The full long-tail index `{hdx_id: {org, title}}`, used by</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>    <span class="c1">#: `get_dataset` to synthesise enriched rows. Set by</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="c1">#: `load`; defaults to an empty map.</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>    <span class="c1">#: :meth:`get_dataset` to synthesise enriched rows. Set by</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="c1">#: :meth:`load`; defaults to an empty map.</span>
 <a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="n">_available_rows</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">PrivateAttr</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -29468,7 +29496,7 @@ value is an <code>HdxDataset</code>.</p>
 <a id="__codelineno-0-343" name="__codelineno-0-343"></a>
 <a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">            ValueError: When auto-loading, propagates the same errors as</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">                `load`.</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">                :meth:`load`.</span>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a>            <span class="k">return</span>
@@ -29484,13 +29512,13 @@ value is an <code>HdxDataset</code>.</p>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            catalog_path: Path to the `catalog/` directory or a single</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">                `*.yaml` file. Defaults to module-level</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">                `CATALOG_PATH`.</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-363" name="__codelineno-0-363"></a>
 <a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-366" name="__codelineno-0-366"></a>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">            ValueError: Propagated from `_load_catalog_data`.</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">            ValueError: Propagated from :func:`_load_catalog_data`.</span>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="n">yaml_available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
@@ -29514,7 +29542,7 @@ value is an <code>HdxDataset</code>.</p>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">        Curated `datasets` (hand-vetted, with full metadata) win.</span>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        Otherwise, any id in the full long-tail index (the whole</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        `data.humdata.org` catalogue) resolves to a synthesised</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        `HdxDataset` carrying its `hdx_id` plus the `org` / `title`</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        :class:`HdxDataset` carrying its `hdx_id` plus the `org` / `title`</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        recorded in `_available.json` (empty for the few ids the CKAN</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        `package_search` walk does not expose). The `hdx_id` is the only</span>
 <a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        load-bearing field — the backend fetches the dataset live via</span>
@@ -29557,14 +29585,14 @@ value is an <code>HdxDataset</code>.</p>
 <a id="__codelineno-0-432" name="__codelineno-0-432"></a>        <span class="p">)</span>
 <a id="__codelineno-0-433" name="__codelineno-0-433"></a>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a curated dataset key to its `HdxDataset` row.</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a curated dataset key to its :class:`HdxDataset` row.</span>
 <a id="__codelineno-0-436" name="__codelineno-0-436"></a>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        Thin wrapper over the base `get_dataset` (which raises a</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        Thin wrapper over the base :meth:`get_dataset` (which raises a</span>
 <a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown key), named</span>
 <a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">        `resolve` to match the Earthdata backend&#39;s catalog surface.</span>
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a>
 <a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">            key: Curated dataset key (a member of `datasets`).</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">            key: Curated dataset key (a member of :attr:`datasets`).</span>
 <a id="__codelineno-0-443" name="__codelineno-0-443"></a>
 <a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">            HdxDataset: The resolved row.</span>
@@ -29614,7 +29642,7 @@ value is an <code>HdxDataset</code>.</p>
 <p>Curated <code>datasets</code> (hand-vetted, with full metadata) win.
 Otherwise, any id in the full long-tail index (the whole
 <code>data.humdata.org</code> catalogue) resolves to a synthesised
-<code>HdxDataset</code> carrying its <code>hdx_id</code> plus the <code>org</code> / <code>title</code>
+:class:<code>HdxDataset</code> carrying its <code>hdx_id</code> plus the <code>org</code> / <code>title</code>
 recorded in <code>_available.json</code> (empty for the few ids the CKAN
 <code>package_search</code> walk does not expose). The <code>hdx_id</code> is the only
 load-bearing field — the backend fetches the dataset live via
@@ -29757,7 +29785,7 @@ available index.</p>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">    Curated `datasets` (hand-vetted, with full metadata) win.</span>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">    Otherwise, any id in the full long-tail index (the whole</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">    `data.humdata.org` catalogue) resolves to a synthesised</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">    `HdxDataset` carrying its `hdx_id` plus the `org` / `title`</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">    :class:`HdxDataset` carrying its `hdx_id` plus the `org` / `title`</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">    recorded in `_available.json` (empty for the few ids the CKAN</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">    `package_search` walk does not expose). The `hdx_id` is the only</span>
 <a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">    load-bearing field — the backend fetches the dataset live via</span>
@@ -29844,7 +29872,7 @@ available index.</p>
               <div class="doc-md-description">
                 <p>Path to the <code>catalog/</code> directory or a single
 <code>*.yaml</code> file. Defaults to module-level
-<code>CATALOG_PATH</code>.</p>
+:data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -29870,7 +29898,7 @@ available index.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -29893,7 +29921,7 @@ available index.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Propagated from <code>_load_catalog_data</code>.</p>
+                <p>Propagated from :func:<code>_load_catalog_data</code>.</p>
               </div>
             </td>
           </tr>
@@ -29939,13 +29967,13 @@ available index.</p>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        catalog_path: Path to the `catalog/` directory or a single</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            `*.yaml` file. Defaults to module-level</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">            `CATALOG_PATH`.</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-363" name="__codelineno-0-363"></a>
 <a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-366" name="__codelineno-0-366"></a>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        ValueError: Propagated from `_load_catalog_data`.</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        ValueError: Propagated from :func:`_load_catalog_data`.</span>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-370" name="__codelineno-0-370"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a>    <span class="n">yaml_available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
@@ -30002,7 +30030,7 @@ the caller passed <code>datasets=...</code>, the disk read is skipped.</p>
             <td>
               <div class="doc-md-description">
                 <p>When auto-loading, propagates the same errors as
-<code>load</code>.</p>
+:meth:<code>load</code>.</p>
               </div>
             </td>
           </tr>
@@ -30039,7 +30067,7 @@ the caller passed <code>datasets=...</code>, the disk read is skipped.</p>
 <a id="__codelineno-0-343" name="__codelineno-0-343"></a>
 <a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        ValueError: When auto-loading, propagates the same errors as</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">            `load`.</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">            :meth:`load`.</span>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="k">return</span>
@@ -30064,8 +30092,8 @@ the caller passed <code>datasets=...</code>, the disk read is skipped.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Resolve a curated dataset key to its <code>HdxDataset</code> row.</p>
-<p>Thin wrapper over the base <code>get_dataset</code> (which raises a
+        <p>Resolve a curated dataset key to its :class:<code>HdxDataset</code> row.</p>
+<p>Thin wrapper over the base :meth:<code>get_dataset</code> (which raises a
 <code>ValueError</code> with a did-you-mean hint on an unknown key), named
 <code>resolve</code> to match the Earthdata backend's catalog surface.</p>
 
@@ -30090,7 +30118,7 @@ the caller passed <code>datasets=...</code>, the disk read is skipped.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Curated dataset key (a member of <code>datasets</code>).</p>
+                <p>Curated dataset key (a member of :attr:<code>datasets</code>).</p>
               </div>
             </td>
             <td>
@@ -30187,14 +30215,14 @@ hint).</p>
 <span class="normal"><a href="#__codelineno-0-458">458</a></span>
 <span class="normal"><a href="#__codelineno-0-459">459</a></span>
 <span class="normal"><a href="#__codelineno-0-460">460</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HdxDataset</span><span class="p">:</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a curated dataset key to its `HdxDataset` row.</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a curated dataset key to its :class:`HdxDataset` row.</span>
 <a id="__codelineno-0-436" name="__codelineno-0-436"></a>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">    Thin wrapper over the base `get_dataset` (which raises a</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">    Thin wrapper over the base :meth:`get_dataset` (which raises a</span>
 <a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown key), named</span>
 <a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">    `resolve` to match the Earthdata backend&#39;s catalog surface.</span>
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a>
 <a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        key: Curated dataset key (a member of `datasets`).</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        key: Curated dataset key (a member of :attr:`datasets`).</span>
 <a id="__codelineno-0-443" name="__codelineno-0-443"></a>
 <a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">        HdxDataset: The resolved row.</span>
@@ -30247,8 +30275,8 @@ hint).</p>
         <p>One curated HDX dataset row.</p>
 <p>Mirrors a single <code>datasets.&lt;key&gt;:</code> block in one of the per-theme
 <code>catalog/*.yaml</code> files. The friendly dataset key itself is the
-parent key in <code>Catalog.datasets</code> and is not stored on the
-row; <code>hdx_id</code> is the CKAN-side identifier the backend reads.</p>
+parent key in :attr:<code>Catalog.datasets</code> and is not stored on the
+row; :attr:<code>hdx_id</code> is the CKAN-side identifier the backend reads.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -30438,8 +30466,8 @@ this field documents the per-dataset reality.</p>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a>
 <a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">    Mirrors a single `datasets.&lt;key&gt;:` block in one of the per-theme</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">    `catalog/*.yaml` files. The friendly dataset key itself is the</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">    parent key in `Catalog.datasets` and is not stored on the</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">    row; `hdx_id` is the CKAN-side identifier the backend reads.</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">    parent key in :attr:`Catalog.datasets` and is not stored on the</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">    row; :attr:`hdx_id` is the CKAN-side identifier the backend reads.</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">        hdx_id: The HDX/CKAN dataset `name` (the identifier</span>
@@ -30582,8 +30610,8 @@ mutation invalidates the entry on its own.</p>
     <div class="doc doc-contents first">
 
         <p>Internal helpers for the HDX backend.</p>
-<p>Currently just <code>match_resource</code>, the resource-filter matcher
-shared by <code>earthlens.hdx.backend.HDX._search</code> and the catalog's
+<p>Currently just :func:<code>match_resource</code>, the resource-filter matcher
+shared by :meth:<code>earthlens.hdx.backend.HDX._search</code> and the catalog's
 default <code>resource_filter</code>. Kept out of <code>backend.py</code> so the matching
 rule can be unit-tested in isolation.</p>
 

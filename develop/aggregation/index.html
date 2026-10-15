@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -1099,6 +1099,34 @@
     
   
     Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
   
 
     
@@ -24285,11 +24313,11 @@ iterator for anything large.</p>
 <p>Arguments:</p>
 <ul>
 <li><code>nc_path</code> — path to the NetCDF on disk.</li>
-<li><code>var_info</code> — <code>earthlens.ecmwf.Variable</code> row (resolves
+<li><code>var_info</code> — :class:<code>earthlens.ecmwf.Variable</code> row (resolves
   <code>op="auto"</code> via <code>is_pre_aggregated</code> / <code>is_flux</code>, drives the output filename via
   <code>cds_variable</code>, picks the variable from the NetCDF via
   <code>nc_variable</code>).</li>
-<li><code>config</code> — <code>AggregationConfig</code> describing the window,
+<li><code>config</code> — :class:<code>AggregationConfig</code> describing the window,
   reduction, and output location.</li>
 </ul>
 <h3 id="iter_aggregate_netcdfnc_path-var_info-config-iteratoraggregatedwindow"><a class="toclink" href="#iter_aggregate_netcdfnc_path-var_info-config-iteratoraggregatedwindow"><code>iter_aggregate_netcdf(nc_path, var_info, config) -&gt; Iterator[AggregatedWindow]</code></a><a class="headerlink" href="#iter_aggregate_netcdfnc_path-var_info-config-iteratoraggregatedwindow" title="Permanent link">#</a></h3>
@@ -24657,13 +24685,13 @@ a plain caller passing a bare stand-in to <code>aggregate_netcdf</code>.</p>
 </ul>
 <h2 id="related"><a class="toclink" href="#related">Related</a><a class="headerlink" href="#related" title="Permanent link">#</a></h2>
 <ul>
-<li><code>earthlens.aggregate.AggregationConfig</code> — frozen request
+<li>:class:<code>earthlens.aggregate.AggregationConfig</code> — frozen request
   payload.</li>
-<li><code>earthlens.aggregate.aggregate_netcdf</code> — the core function.</li>
-<li><code>earthlens.ecmwf.Catalog</code> — resolves <code>(dataset, code)</code> pairs
+<li>:func:<code>earthlens.aggregate.aggregate_netcdf</code> — the core function.</li>
+<li>:class:<code>earthlens.ecmwf.Catalog</code> — resolves <code>(dataset, code)</code> pairs
   to the <code>Variable</code> rows that drive <code>op="auto"</code> and the output
   filename.</li>
-<li><code>earthlens.ecmwf.ECMWF.download</code> — accepts the <code>aggregate</code>
+<li>:meth:<code>earthlens.ecmwf.ECMWF.download</code> — accepts the <code>aggregate</code>
   parameter for one-call download-and-aggregate.</li>
 </ul>
 
