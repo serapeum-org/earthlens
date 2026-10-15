@@ -22,6 +22,7 @@ from earthlens.earthlens import EarthLens
 from earthlens.nwp import Catalog
 from earthlens.nwp.centres.dwd import DWDCentre
 from earthlens.nwp.centres.noaa import NOAACentre
+from earthlens.testing import skip_on_upstream
 
 pytestmark = [pytest.mark.nwp, pytest.mark.e2e]
 
@@ -65,8 +66,8 @@ class TestGFSLive:
                 steps=[0],
             )
             paths = lens.download(progress_bar=False)
-        except Exception as exc:  # network / data-availability flake
-            pytest.skip(f"GFS live fetch unavailable: {exc}")
+        except Exception as exc:  # noqa: BLE001 - upstream -> skip, else re-raise
+            skip_on_upstream(exc)
         assert paths, "expected at least one COG"
         assert all(p.exists() and p.stat().st_size > 0 for p in paths)
 
@@ -96,8 +97,8 @@ class TestIFSLive:
                 mirror="aws",
             )
             paths = lens.download(progress_bar=False)
-        except Exception as exc:  # network / data-availability flake
-            pytest.skip(f"IFS live fetch unavailable: {exc}")
+        except Exception as exc:  # noqa: BLE001 - upstream -> skip, else re-raise
+            skip_on_upstream(exc)
         assert paths, "expected at least one COG"
         assert all(p.exists() and p.stat().st_size > 0 for p in paths)
 
@@ -114,8 +115,8 @@ class TestICONLive:
             out = DWDCentre(tmp_path).fetch_one(
                 model, cycle, 0, ["temperature_2m"], "auto"
             )
-        except Exception as exc:
-            pytest.skip(f"ICON live fetch unavailable: {exc}")
+        except Exception as exc:  # noqa: BLE001 - upstream -> skip, else re-raise
+            skip_on_upstream(exc)
         assert out.exists() and out.stat().st_size > 0
 
 
@@ -138,8 +139,8 @@ class TestModeLive:
             whole = NOAACentre(whole_dir).fetch_one(
                 model, cycle, 0, ["temperature_2m"], "auto", whole=True
             )
-        except Exception as exc:  # network / data-availability flake
-            pytest.skip(f"GFS live fetch unavailable: {exc}")
+        except Exception as exc:  # noqa: BLE001 - upstream -> skip, else re-raise
+            skip_on_upstream(exc)
         assert subset.exists() and subset.stat().st_size > 0
         assert whole.exists() and whole.stat().st_size > 0
         # The whole GFS field carries every variable/level; the subset is one

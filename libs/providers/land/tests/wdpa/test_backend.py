@@ -61,7 +61,7 @@ class TestFetchAndDownload:
     def test_country_request_returns_polygons(self, tmp_path, fake_wdpa):
         """A country request authenticates, fetches, and returns polygons."""
         fake_wdpa.state.set_responses(
-            [fake_wdpa.response({"protected_areas": [fake_wdpa.area()]})]
+            [fake_wdpa.response(json={"protected_areas": [fake_wdpa.area()]})]
         )
         fc = _backend(tmp_path).download()
         assert isinstance(fc, GeoDataFrame)
@@ -72,7 +72,7 @@ class TestFetchAndDownload:
     def test_request_uses_query_token_and_geometry(self, tmp_path, fake_wdpa):
         """The request carries the token as a query param and with_geometry."""
         fake_wdpa.state.set_responses(
-            [fake_wdpa.response({"protected_areas": [fake_wdpa.area()]})]
+            [fake_wdpa.response(json={"protected_areas": [fake_wdpa.area()]})]
         )
         _backend(tmp_path).download()
         call = fake_wdpa.state.calls[0]
@@ -88,8 +88,10 @@ class TestFetchAndDownload:
         full_page = [fake_wdpa.area(wdpa_id=str(i)) for i in range(50)]
         fake_wdpa.state.set_responses(
             [
-                fake_wdpa.response({"protected_areas": full_page}),
-                fake_wdpa.response({"protected_areas": [fake_wdpa.area(wdpa_id="x")]}),
+                fake_wdpa.response(json={"protected_areas": full_page}),
+                fake_wdpa.response(
+                    json={"protected_areas": [fake_wdpa.area(wdpa_id="x")]}
+                ),
             ]
         )
         fc = _backend(tmp_path).download()
@@ -100,14 +102,18 @@ class TestFetchAndDownload:
         """A point-only protected area is dropped from the polygon result."""
         point = {"type": "Point", "coordinates": [0, 0]}
         fake_wdpa.state.set_responses(
-            [fake_wdpa.response({"protected_areas": [fake_wdpa.area(geometry=point)]})]
+            [
+                fake_wdpa.response(
+                    json={"protected_areas": [fake_wdpa.area(geometry=point)]}
+                )
+            ]
         )
         assert len(_backend(tmp_path).download()) == 0
 
     def test_by_id_request(self, tmp_path, fake_wdpa):
         """A numeric selector fetches a single protected area by id."""
         fake_wdpa.state.set_responses(
-            [fake_wdpa.response({"protected_area": fake_wdpa.area(wdpa_id="555")})]
+            [fake_wdpa.response(json={"protected_area": fake_wdpa.area(wdpa_id="555")})]
         )
         fc = _backend(tmp_path, variables=["555"]).download()
         assert fake_wdpa.state.calls[0]["url"].endswith("/protected_areas/555")
@@ -116,14 +122,14 @@ class TestFetchAndDownload:
     def test_license_warning_fires(self, tmp_path, fake_wdpa):
         """Every fetch raises the UNEP-WCMC LicenseWarning."""
         fake_wdpa.state.set_responses(
-            [fake_wdpa.response({"protected_areas": [fake_wdpa.area()]})]
+            [fake_wdpa.response(json={"protected_areas": [fake_wdpa.area()]})]
         )
         with pytest.warns(LicenseWarning):
             _backend(tmp_path).download()
 
     def test_http_401_raises_auth_error(self, tmp_path, fake_wdpa):
         """An HTTP 401 surfaces as an AuthenticationError."""
-        fake_wdpa.state.set_responses([fake_wdpa.response({}, status_code=401)])
+        fake_wdpa.state.set_responses([fake_wdpa.response(json={}, status_code=401)])
         with pytest.raises(AuthenticationError, match="401"):
             _backend(tmp_path).download()
 
@@ -133,7 +139,7 @@ class TestFetchAndDownload:
         # shim raises (the URL the fake echoes carries SECRET-TOKEN-HERE).
         leaky = "SECRET-TOKEN-HERE"
         fake_wdpa.state.set_responses(
-            [fake_wdpa.response({}, status_code=400)]  # 400 is non-retried
+            [fake_wdpa.response(json={}, status_code=400)]  # 400 is non-retried
         )
         with pytest.raises(RuntimeError) as exc:
             _backend(tmp_path).download()
@@ -146,9 +152,9 @@ class TestFetchAndDownload:
         """A 502 is retried; once a 200 arrives the download completes."""
         fake_wdpa.state.set_responses(
             [
-                fake_wdpa.response({}, status_code=502),
-                fake_wdpa.response({}, status_code=502),
-                fake_wdpa.response({"protected_areas": [fake_wdpa.area()]}),
+                fake_wdpa.response(json={}, status_code=502),
+                fake_wdpa.response(json={}, status_code=502),
+                fake_wdpa.response(json={"protected_areas": [fake_wdpa.area()]}),
             ]
         )
         fc = _backend(tmp_path).download()
@@ -160,8 +166,10 @@ class TestFetchAndDownload:
         """A 429 with `Retry-After` sleeps for that many seconds, then retries."""
         fake_wdpa.state.set_responses(
             [
-                fake_wdpa.response({}, status_code=429, headers={"Retry-After": "7"}),
-                fake_wdpa.response({"protected_areas": []}),
+                fake_wdpa.response(
+                    json={}, status_code=429, headers={"Retry-After": "7"}
+                ),
+                fake_wdpa.response(json={"protected_areas": []}),
             ]
         )
         _backend(tmp_path).download()
@@ -172,7 +180,7 @@ class TestFetchAndDownload:
         fake_wdpa.state.set_responses(
             [
                 fake_wdpa.ConnectionError("network glitch"),
-                fake_wdpa.response({"protected_areas": [fake_wdpa.area()]}),
+                fake_wdpa.response(json={"protected_areas": [fake_wdpa.area()]}),
             ]
         )
         fc = _backend(tmp_path).download()
@@ -193,7 +201,7 @@ class TestFetchAndDownload:
     def test_empty_path_opts_out_of_writing(self, tmp_path, fake_wdpa):
         """`path=""` returns the in-memory FC but writes no file."""
         fake_wdpa.state.set_responses(
-            [fake_wdpa.response({"protected_areas": [fake_wdpa.area()]})]
+            [fake_wdpa.response(json={"protected_areas": [fake_wdpa.area()]})]
         )
         backend = WDPA(
             start="2024-01-01",
@@ -210,13 +218,17 @@ class TestFetchAndDownload:
 
     def test_warn_license_suppressed_on_empty(self, tmp_path, fake_wdpa, recwarn):
         """An empty country result does not emit the LicenseWarning."""
-        fake_wdpa.state.set_responses([fake_wdpa.response({"protected_areas": []})])
+        fake_wdpa.state.set_responses(
+            [fake_wdpa.response(json={"protected_areas": []})]
+        )
         _backend(tmp_path).download()
         assert not [w for w in recwarn.list if issubclass(w.category, LicenseWarning)]
 
     def test_persistent_5xx_exhausts_retries_then_raises(self, tmp_path, fake_wdpa):
         """When every retry returns 5xx, _get raises a token-free RuntimeError."""
-        fake_wdpa.state.set_responses([fake_wdpa.response({}, status_code=503)] * 10)
+        fake_wdpa.state.set_responses(
+            [fake_wdpa.response(json={}, status_code=503)] * 10
+        )
         with pytest.raises(RuntimeError, match="503") as exc:
             _backend(tmp_path).download()
         assert "SECRET-TOKEN-HERE" not in str(exc.value)
@@ -234,9 +246,9 @@ class TestFetchAndDownload:
         fake_wdpa.state.set_responses(
             [
                 fake_wdpa.response(
-                    {}, status_code=429, headers={"Retry-After": "soon"}
+                    json={}, status_code=429, headers={"Retry-After": "soon"}
                 ),
-                fake_wdpa.response({"protected_areas": []}),
+                fake_wdpa.response(json={"protected_areas": []}),
             ]
         )
         _backend(tmp_path).download()
@@ -271,11 +283,11 @@ class TestFetchAndDownload:
         fake_wdpa.state.set_responses(
             [
                 fake_wdpa.response(
-                    {},
+                    json={},
                     status_code=429,
                     headers={"Retry-After": "Fri, 31 Dec 2099 23:59:59 GMT"},
                 ),
-                fake_wdpa.response({"protected_areas": []}),
+                fake_wdpa.response(json={"protected_areas": []}),
             ]
         )
         _backend(tmp_path).download()
@@ -286,7 +298,7 @@ class TestFetchAndDownload:
     def test_download_writes_geoparquet(self, tmp_path, fake_wdpa):
         """A non-empty result is written to a GeoParquet file under path."""
         fake_wdpa.state.set_responses(
-            [fake_wdpa.response({"protected_areas": [fake_wdpa.area()]})]
+            [fake_wdpa.response(json={"protected_areas": [fake_wdpa.area()]})]
         )
         _backend(tmp_path).download()
         assert (tmp_path / "wdpa_protected_areas.parquet").exists()
@@ -294,7 +306,7 @@ class TestFetchAndDownload:
     def test_country_prefix_selector(self, tmp_path, fake_wdpa):
         """A `country:` prefixed selector fetches the country's areas."""
         fake_wdpa.state.set_responses(
-            [fake_wdpa.response({"protected_areas": [fake_wdpa.area()]})]
+            [fake_wdpa.response(json={"protected_areas": [fake_wdpa.area()]})]
         )
         _backend(tmp_path, variables=["country:KEN"]).download()
         assert fake_wdpa.state.calls[0]["params"]["country"] == "KEN"
@@ -308,7 +320,7 @@ class TestFetchAndDownload:
     def test_geojson_write(self, tmp_path, fake_wdpa):
         """A non-parquet file_format writes via the OGR driver."""
         fake_wdpa.state.set_responses(
-            [fake_wdpa.response({"protected_areas": [fake_wdpa.area()]})]
+            [fake_wdpa.response(json={"protected_areas": [fake_wdpa.area()]})]
         )
         _backend(tmp_path, file_format="geojson").download()
         assert (tmp_path / "wdpa_protected_areas.geojson").exists()
@@ -318,7 +330,7 @@ class TestFetchAndDownload:
         from geopandas import GeoDataFrame
 
         fake_wdpa.state.set_responses(
-            [fake_wdpa.response({"protected_areas": [fake_wdpa.area()]})]
+            [fake_wdpa.response(json={"protected_areas": [fake_wdpa.area()]})]
         )
         assert isinstance(_backend(tmp_path)._api(), GeoDataFrame)
 

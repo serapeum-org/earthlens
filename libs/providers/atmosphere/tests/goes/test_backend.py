@@ -170,68 +170,63 @@ class TestConstruction:
 class TestSearch:
     """Tests for GOES._search enumeration + filtering."""
 
-    def test_plans_in_window_granules(self, make_goes, patch_client):
+    def test_plans_in_window_granules(self, make_goes, seed_goes):
         """Only granules whose scan-start lands in the window are planned."""
         goes = make_goes()
-        patch_client(
-            goes,
-            FakeS3(
-                pages={HOUR_C: [_mcmipc("20261841201180"), _mcmipc("20261841240000")]}
-            ),
-        )
+        seed_goes(goes, [_mcmipc("20261841201180"), _mcmipc("20261841240000")])
         products = goes._search()
         assert [p.id for p in products] == [
             "OR_ABI-L2-MCMIPC-M6_G19_s20261841201180_e1_c1.nc"
         ], "the 12:40 granule is outside the 12:00-12:30 window"
 
-    def test_metadata_carries_bucket_and_scan_start(self, make_goes, patch_client):
+    def test_metadata_carries_bucket_and_scan_start(self, make_goes, seed_goes):
         """Each planned product carries its bucket, product key and scan-start."""
         goes = make_goes()
-        patch_client(goes, FakeS3(pages={HOUR_C: [_mcmipc("20261841201180")]}))
+        seed_goes(goes, [_mcmipc("20261841201180")])
         meta = goes._search()[0].metadata
         assert meta["bucket"] == "noaa-goes19", "bucket recorded"
         assert meta["scan_start"] == dt.datetime(2026, 7, 3, 12, 1, 18), "parsed time"
 
-    def test_mesoscale_subsector_filter(self, make_goes, patch_client):
+    def test_mesoscale_subsector_filter(self, make_goes, seed_goes):
         """Domain M1 keeps only the M1 subsector granules (M2 is filtered out)."""
         goes = make_goes(dataset="abi-l2-mcmip", domain="M1")
         keys = [
             f"{HOUR_M}OR_ABI-L2-MCMIPM1-M6_G19_s20261841205000_e1_c1.nc",
             f"{HOUR_M}OR_ABI-L2-MCMIPM2-M6_G19_s20261841205300_e1_c1.nc",
         ]
-        patch_client(goes, FakeS3(pages={HOUR_M: keys}))
+        seed_goes(goes, keys)
         planned = [p.id for p in goes._search()]
         assert planned == ["OR_ABI-L2-MCMIPM1-M6_G19_s20261841205000_e1_c1.nc"], (
             "only the M1 subsector is kept"
         )
 
-    def test_channel_filter_for_band_split(self, make_goes, patch_client):
+    def test_channel_filter_for_band_split(self, make_goes, seed_goes):
         """A band-split product with variables keeps only the requested channels."""
         goes = make_goes(dataset="abi-l1b-rad", domain="C", variables=["C02"])
         keys = [
             f"{HOUR_RAD}OR_ABI-L1b-RadC-M6C01_G19_s20261841201180_e1_c1.nc",
             f"{HOUR_RAD}OR_ABI-L1b-RadC-M6C02_G19_s20261841201180_e1_c1.nc",
         ]
-        patch_client(goes, FakeS3(pages={HOUR_RAD: keys}))
+        seed_goes(goes, keys)
         planned = [p.id for p in goes._search()]
         assert planned == ["OR_ABI-L1b-RadC-M6C02_G19_s20261841201180_e1_c1.nc"], (
             "C01 is filtered out; only the requested C02 remains"
         )
 
-    def test_channel_filter_disambiguates_c02_from_c12(self, make_goes, patch_client):
+    def test_channel_filter_disambiguates_c02_from_c12(self, make_goes, seed_goes):
         """The channel filter matches C02 exactly, never C12 / C20 (L1)."""
         goes = make_goes(dataset="abi-l1b-rad", domain="C", variables=["C02"])
         keys = [
             f"{HOUR_RAD}OR_ABI-L1b-RadC-M6C02_G19_s20261841201180_e1_c1.nc",
             f"{HOUR_RAD}OR_ABI-L1b-RadC-M6C12_G19_s20261841201180_e1_c1.nc",
         ]
-        patch_client(goes, FakeS3(pages={HOUR_RAD: keys}))
+        seed_goes(goes, keys)
         planned = [p.id for p in goes._search()]
         assert planned == ["OR_ABI-L1b-RadC-M6C02_G19_s20261841201180_e1_c1.nc"], (
             "C12 must not be matched when C02 is requested"
         )
 
-    def test_mesoscale_and_channel_filters_together(self, make_goes, patch_client):
+    def test_mesoscale_and_channel_filters_together(self, make_goes, seed_goes):
         """A band-split M1 request keeps only the M1-subsector + requested-channel key."""
         goes = make_goes(dataset="abi-l1b-rad", domain="M1", variables=["C13"])
         hour = "ABI-L1b-RadM/2026/184/12/"
@@ -240,30 +235,30 @@ class TestSearch:
             f"{hour}OR_ABI-L1b-RadM2-M6C13_G19_s20261841205300_e1_c1.nc",  # wrong subsector
             f"{hour}OR_ABI-L1b-RadM1-M6C07_G19_s20261841206000_e1_c1.nc",  # wrong channel
         ]
-        patch_client(goes, FakeS3(pages={hour: keys}))
+        seed_goes(goes, keys)
         planned = [p.id for p in goes._search()]
         assert planned == ["OR_ABI-L1b-RadM1-M6C13_G19_s20261841205000_e1_c1.nc"], (
             "both the subsector and the channel filter must apply on one key"
         )
 
-    def test_combined_product_variables_not_filtered(self, make_goes, patch_client):
+    def test_combined_product_variables_not_filtered(self, make_goes, seed_goes):
         """A combined product ignores variables and keeps the whole granule."""
         goes = make_goes(dataset="abi-l2-mcmip", variables=["CMI_C13"])
-        patch_client(goes, FakeS3(pages={HOUR_C: [_mcmipc("20261841201180")]}))
+        seed_goes(goes, [_mcmipc("20261841201180")])
         assert len(goes._search()) == 1, "the single multi-band granule is kept"
 
-    def test_unparseable_key_skipped(self, make_goes, patch_client):
+    def test_unparseable_key_skipped(self, make_goes, seed_goes):
         """A listed key with no scan-start token is skipped, not planned."""
         goes = make_goes()
-        patch_client(goes, FakeS3(pages={HOUR_C: [f"{HOUR_C}junk.nc"]}))
+        seed_goes(goes, [f"{HOUR_C}junk.nc"])
         assert goes._search() == [], "no parseable scan-start -> dropped"
 
-    def test_missing_hour_logged(self, make_goes, patch_client):
+    def test_missing_hour_logged(self, make_goes, seed_goes):
         """Empty hour prefixes are surfaced in a single summary warning (G6)."""
         from loguru import logger
 
         goes = make_goes()
-        patch_client(goes, FakeS3(pages={}))
+        seed_goes(goes, [])
         messages: list[str] = []
         sink_id = logger.add(messages.append, level="WARNING", format="{message}")
         try:
@@ -274,12 +269,12 @@ class TestSearch:
             "the missing hour must be logged, not silently skipped"
         )
 
-    def test_missing_hours_do_not_flood_warnings(self, make_goes, patch_client):
+    def test_missing_hours_do_not_flood_warnings(self, make_goes, seed_goes):
         """A wide all-empty window emits ONE summary warning, not one per hour (R2-L1)."""
         from loguru import logger
 
         goes = make_goes(start="2026-01-01", end="2026-02-01", fmt="%Y-%m-%d")
-        patch_client(goes, FakeS3(pages={}))
+        seed_goes(goes, [])
         empties = []
         sink_id = logger.add(
             lambda m: empties.append(m), level="WARNING", format="{message}"
@@ -291,10 +286,10 @@ class TestSearch:
         summary = [m for m in empties if "had no granules" in m]
         assert len(summary) == 1, "one summary warning regardless of window width"
 
-    def test_bare_date_window_spans_whole_day(self, make_goes, patch_client):
+    def test_bare_date_window_spans_whole_day(self, make_goes, seed_goes):
         """A bare-date request (default fmt) returns the day's granules (H1)."""
         goes = make_goes(start="2026-07-03", end="2026-07-03", fmt="%Y-%m-%d")
-        patch_client(goes, FakeS3(pages={HOUR_C: [_mcmipc("20261841201180")]}))
+        seed_goes(goes, [_mcmipc("20261841201180")])
         planned = goes._search()
         assert len(planned) == 1, "a noon granule is inside the whole-day window"
         assert len(goes.time.dates) == 24, "the bare date enumerates all 24 hours"
@@ -307,12 +302,12 @@ class TestSearch:
         assert goes.time.end_date == dt.datetime(2026, 7, 4, 0, 0), "midnight respected"
         assert len(goes.time.dates) == 3, "22:00, 23:00, 00:00 — not the whole next day"
 
-    def test_wide_window_warns(self, make_goes, patch_client):
+    def test_wide_window_warns(self, make_goes, seed_goes):
         """A window wider than the threshold logs a many-round-trip warning (M2)."""
         from loguru import logger
 
         goes = make_goes(start="2026-01-01", end="2026-03-01", fmt="%Y-%m-%d")
-        patch_client(goes, FakeS3(pages={}))
+        seed_goes(goes, [])
         messages: list[str] = []
         sink_id = logger.add(messages.append, level="WARNING", format="{message}")
         try:
@@ -321,7 +316,7 @@ class TestSearch:
             logger.remove(sink_id)
         assert any("S3 LIST per hour" in m for m in messages), "wide-window warning"
 
-    def test_two_hour_window_lists_both_prefixes(self, make_goes, patch_client):
+    def test_two_hour_window_lists_both_prefixes(self, make_goes, seed_goes):
         """A window spanning two hours lists both hour prefixes."""
         goes = make_goes(start="2026-07-03 12:00", end="2026-07-03 13:30")
         pages = {
@@ -330,28 +325,33 @@ class TestSearch:
                 "ABI-L2-MCMIPC/2026/184/13/OR_ABI-L2-MCMIPC-M6_G19_s20261841305000_e1_c1.nc"
             ],
         }
-        fake = patch_client(goes, FakeS3(pages=pages))
-        assert len(goes._search()) == 2, "one granule from each hour"
-        assert len(fake.listed) == 2, "both hour prefixes were listed"
+        seed_goes(goes, [key for keys in pages.values() for key in keys])
+        found = goes._search()
+        assert len(found) == 2, "one granule from each hour"
+        # Asserting the outcome rather than a call log: the emulator keeps no
+        # record of calls, and "both hour prefixes were listed" only mattered
+        # because it meant a granule from each hour came back. That is now
+        # checked directly.
+        assert {p.metadata["scan_start"].hour for p in found} == {12, 13}
 
 
 class TestFetchAndDownload:
     """Tests for GOES._fetch and GOES.download."""
 
-    def test_download_writes_granules(self, make_goes, patch_client):
+    def test_download_writes_granules(self, make_goes, seed_goes):
         """download returns the written NetCDF paths under the output dir."""
         goes = make_goes()
-        patch_client(goes, FakeS3(pages={HOUR_C: [_mcmipc("20261841201180")]}))
+        seed_goes(goes, [_mcmipc("20261841201180")])
         paths = goes.download(progress_bar=False)
         assert [Path(p).name for p in paths] == [
             "OR_ABI-L2-MCMIPC-M6_G19_s20261841201180_e1_c1.nc"
         ], "one granule written"
         assert paths[0].read_bytes().startswith(b"netcdf:"), "streamed the fake body"
 
-    def test_download_empty_window_returns_empty_list(self, make_goes, patch_client):
+    def test_download_empty_window_returns_empty_list(self, make_goes, seed_goes):
         """A window matching nothing returns an empty list without fetching."""
         goes = make_goes()
-        patch_client(goes, FakeS3(pages={}))
+        seed_goes(goes, [])
         assert goes.download(progress_bar=False) == [], "no granules -> []"
 
     def test_download_rejects_aggregate(self, make_goes):
@@ -360,10 +360,10 @@ class TestFetchAndDownload:
         with pytest.raises(NotImplementedError, match="raw, undecoded"):
             goes.download(aggregate=object())
 
-    def test_api_composes_search_fetch(self, make_goes, patch_client):
+    def test_api_composes_search_fetch(self, make_goes, seed_goes):
         """_api returns the fetched paths via the search/fetch composition."""
         goes = make_goes()
-        patch_client(goes, FakeS3(pages={HOUR_C: [_mcmipc("20261841201180")]}))
+        seed_goes(goes, [_mcmipc("20261841201180")])
         assert len(goes._api()) == 1, "one granule fetched through _api"
 
 

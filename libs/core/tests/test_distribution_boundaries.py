@@ -2483,3 +2483,583 @@ class TestNoRstRoles:
         assert self._offenders() == ["docs/page.md"], (
             "a file the scan cannot decode must be passed over, not raise"
         )
+
+
+# ---------------------------------------------------------------------------
+# Test-suite hygiene: the three rules the live-gating seam replaced an idiom
+# for. Same shape as the GDAL rule above -- walk the source, assert something no
+# single review would catch -- but pointed at `tests/` rather than `src/`,
+# because that is where each of these regressions actually happened.
+# ---------------------------------------------------------------------------
+
+#: Dotted network entry points that must never be reached at *import* time. A
+#: `-m "not e2e"` run still imports every module it then deselects, so a probe
+#: at module scope (or in a decorator expression, which is evaluated just as
+#: eagerly) puts real sockets in the unit lane and makes its skip reason
+#: unreadable to both masked-lane guards.
+_NETWORK_CALLS: frozenset[str] = frozenset(
+    {
+        "socket.create_connection",
+        "socket.gethostbyname",
+        "urllib.request.urlopen",
+        "requests.get",
+        "requests.head",
+        "requests.post",
+        "requests.put",
+        "requests.delete",
+        "requests.request",
+        "boto3.client",
+        "boto3.resource",
+        "HttpClient",
+    }
+)
+
+#: Words that mark a skip reason as an *availability* skip. One of these in a
+#: bare `pytest.skip` is the bug this rule exists for: the two masked-lane
+#: guards read an unprefixed skip as "this backend was never configured", so an
+#: outage is reported as a missing credential and, beside passing neighbours,
+#: reddens the whole lane (issue in `planning/testing`, finding `C1`).
+_AVAILABILITY_WORDS = re.compile(
+    r"\b(unavailable|unreachable|offline|is down|not responding)\b", re.IGNORECASE
+)
+
+
+def _test_modules() -> list[Path]:
+    """Return every test module and conftest across the six members."""
+    return sorted(
+        path
+        for pattern in ("libs/core/tests/**/*.py", "libs/providers/*/tests/**/*.py")
+        for path in _ROOT.glob(pattern)
+        if not _EXCLUDED_DIRS.intersection(path.parts)
+    )
+
+
+_TEST_MODULES = _test_modules()
+_TEST_IDS = [str(p.relative_to(_ROOT)).replace("\\", "/") for p in _TEST_MODULES]
+
+
+def _dotted(node: ast.AST) -> str:
+    """Return the dotted source spelling of a call target (`a.b.c`), or `""`."""
+    parts: list[str] = []
+    while isinstance(node, ast.Attribute):
+        parts.append(node.attr)
+        node = node.value
+    if isinstance(node, ast.Name):
+        parts.append(node.id)
+    return ".".join(reversed(parts))
+
+
+def _is_network_call(node: ast.Call) -> bool:
+    """Return whether `node` calls one of the known network entry points."""
+    dotted = _dotted(node.func)
+    if dotted in _NETWORK_CALLS:
+        return True
+    # `from socket import create_connection` / `from requests import get` leave
+    # only the bare name, so match the tail too -- but only for the distinctive
+    # ones, or every `get()` in the suite would trip.
+    return dotted in {"create_connection", "urlopen"}
+
+
+def _import_time_nodes(tree: ast.Module):
+    """Yield the nodes evaluated when the module is imported.
+
+    A function body is deferred, but its *decorators* and argument defaults are
+    not: `@pytest.mark.skipif(not _probe(), ...)` runs the probe at import, which
+    is exactly the idiom this rule retired.
+    """
+    stack: list[ast.AST] = list(tree.body)
+    while stack:
+        node = stack.pop()
+        yield node
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            stack.extend(node.decorator_list)
+            stack.extend(node.args.defaults)
+            stack.extend(d for d in node.args.kw_defaults if d is not None)
+            continue
+        stack.extend(ast.iter_child_nodes(node))
+
+
+def _networking_helpers(tree: ast.Module) -> set[str]:
+    """Return module-level function names whose body reaches the network."""
+    return {
+        node.name
+        for node in tree.body
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and any(
+            isinstance(child, ast.Call) and _is_network_call(child)
+            for child in ast.walk(node)
+        )
+    }
+
+
+@functools.cache
+def _import_time_probes(path: Path) -> tuple[tuple[int, str], ...]:
+    """Return `(line, target)` for every network call made at import time."""
+    tree = ast.parse(_source_text(path))
+    helpers = _networking_helpers(tree)
+    found: list[tuple[int, str]] = []
+    for node in _import_time_nodes(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        target = _dotted(node.func)
+        if _is_network_call(node) or target in helpers:
+            found.append((node.lineno, target or "<call>"))
+    return tuple(sorted(set(found)))
+
+
+@functools.cache
+def _unprefixed_availability_skips(path: Path) -> tuple[tuple[int, str], ...]:
+    """Return `(line, reason)` for every bare `pytest.skip` naming an outage."""
+    found: list[tuple[int, str]] = []
+    for node in ast.walk(ast.parse(_source_text(path))):
+        if not isinstance(node, ast.Call) or _dotted(node.func) != "pytest.skip":
+            continue
+        if not node.args:
+            continue
+        text = " ".join(
+            part.value
+            for part in ast.walk(node.args[0])
+            if isinstance(part, ast.Constant) and isinstance(part.value, str)
+        )
+        if _AVAILABILITY_WORDS.search(text):
+            found.append((node.lineno, text.strip()))
+    return tuple(sorted(set(found)))
+
+
+class TestNoImportTimeNetworkProbes:
+    """No test module opens a socket while pytest is still collecting."""
+
+    @pytest.mark.parametrize("path", _TEST_MODULES, ids=_TEST_IDS)
+    def test_no_probe_at_module_scope(self, path):
+        """Reachability is decided by `requires_host` at run time, not at import."""
+        offenders = _import_time_probes(path)
+        assert not offenders, (
+            f"{path.name} reaches the network at import time "
+            f"{[f'line {line}: {target}' for line, target in offenders]}. "
+            "`-m` deselects after collection, so this runs in the unit lane too: "
+            "move the probe behind `@pytest.mark.requires_host(...)` or an autouse "
+            "fixture that calls `earthlens.testing.require_reachable`"
+        )
+
+    def test_the_walk_sees_a_decorator_expression(self):
+        """A probe inside a `skipif` decorator is import-time, and is caught."""
+        tree = ast.parse(
+            "import socket\n"
+            "@pytest.mark.skipif(not socket.create_connection(('h', 443)), reason='x')\n"
+            "def test_x():\n"
+            "    pass\n"
+        )
+        calls = [n for n in _import_time_nodes(tree) if isinstance(n, ast.Call)]
+        assert any(_is_network_call(call) for call in calls)
+
+    def test_the_walk_leaves_a_function_body_alone(self):
+        """The same call inside the test body is exactly what the rule wants."""
+        tree = ast.parse(
+            "import socket\ndef test_x():\n    socket.create_connection(('h', 443))\n"
+        )
+        calls = [n for n in _import_time_nodes(tree) if isinstance(n, ast.Call)]
+        assert not any(_is_network_call(call) for call in calls)
+
+    def test_a_local_probe_helper_is_followed_one_level(self):
+        """`_host_ok()` called at module scope counts as the probe it wraps."""
+        tree = ast.parse(
+            "import socket\n"
+            "def _host_ok(h):\n"
+            "    return socket.create_connection((h, 443))\n"
+            "_ONLINE = _host_ok('example.org')\n"
+        )
+        assert "_host_ok" in _networking_helpers(tree)
+
+
+class TestAvailabilitySkipsCarryTheGuardPrefix:
+    """An outage skips through the shared helpers, never a bare `pytest.skip`."""
+
+    @pytest.mark.parametrize("path", _TEST_MODULES, ids=_TEST_IDS)
+    def test_no_unprefixed_availability_skip(self, path):
+        """A skip that says "unavailable" must be one the guards can count."""
+        offenders = _unprefixed_availability_skips(path)
+        assert not offenders, (
+            f"{path.name} skips for upstream availability without the guard prefix "
+            f"{[f'line {line}: {reason!r}' for line, reason in offenders]}. "
+            "Use `earthlens.testing.skip_on_upstream(exc)` (classify and re-raise) "
+            "or `skip_live_unavailable(reason)`, so a masked lane is diagnosed as an "
+            "outage instead of a missing credential"
+        )
+
+    def test_the_rule_matches_the_idiom_it_retired(self):
+        """The detector fires on the exact spelling the migration removed."""
+        tree = ast.parse('pytest.skip(f"EMODnet WCS unavailable: {exc}")')
+        node = tree.body[0].value
+        text = " ".join(
+            part.value
+            for part in ast.walk(node.args[0])
+            if isinstance(part, ast.Constant) and isinstance(part.value, str)
+        )
+        assert _AVAILABILITY_WORDS.search(text)
+
+    def test_the_rule_leaves_a_configuration_skip_alone(self):
+        """A missing credential is not an outage and must stay a plain skip."""
+        assert not _AVAILABILITY_WORDS.search("set AIRNOW_API_KEY to run live e2e")
+
+
+#: Import roots that only exist when an optional extra is installed. Derived
+#: from the `[project.optional-dependencies]` tables of the seven distributions
+#: (distribution name -> import name, which differ often enough to be worth
+#: spelling out: `earthengine-api` -> `ee`, `hdx-python-api` -> `hdx`,
+#: `herbie-data` -> `herbie`, `isimip-client` -> `isimip_client`).
+_OPTIONAL_SDKS: frozenset[str] = frozenset(
+    {
+        "airbase",
+        "argopy",
+        "asf_search",
+        "boto3",
+        "botocore",
+        "cartopy",
+        "cdsapi",
+        "copernicusmarine",
+        "dataretrieval",
+        "duckdb",
+        "earthaccess",
+        "ee",
+        "erddapy",
+        "eumdac",
+        "googleapiclient",
+        "gportal",
+        "hdx",
+        "herbie",
+        "isimip_client",
+        "obspy",
+        "ohsome",
+        "openeo",
+        "osmium",
+        "overpy",
+        "overturemaps",
+        "py7zr",
+        "pygbif",
+        "pyobis",
+        "pyramids_eo",
+        "pyrosm",
+        "rtree",
+        "sentinelhub",
+        "tropycal",
+        "worldpoppy",
+    }
+)
+
+#: Test modules permitted a hard module-scope SDK import, each with the reason.
+#: Empty: every remaining case became `pytest.importorskip`, which skips the
+#: module instead of erroring the whole directory's collection. Kept as the
+#: same explicit escape hatch `_GDAL_ALLOWED` is, and policed the same way --
+#: an entry that stops being needed fails the test below.
+_SDK_IMPORT_ALLOWED: frozenset[str] = frozenset()
+
+
+def _module_scope_sdk_imports(path: Path) -> list[tuple[int, str]]:
+    """Return `(line, root)` for each unguarded module-scope optional-SDK import.
+
+    An import inside a function, under `if TYPE_CHECKING:`, or in a
+    `try: ... except ImportError:` is already soft and does not count.
+    """
+    tree = ast.parse(_source_text(path))
+    soft: set[int] = set()
+    for node in ast.walk(tree):
+        deferred = (
+            isinstance(node, ast.Try)
+            and any(_handles_import_error(h) for h in node.handlers)
+        ) or (isinstance(node, ast.If) and _is_type_checking(node.test))
+        if deferred or isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            soft.update(
+                line
+                for child in ast.walk(node)
+                if (line := getattr(child, "lineno", None)) is not None
+            )
+    found: list[tuple[int, str]] = []
+    for node in ast.walk(tree):
+        if getattr(node, "lineno", None) in soft:
+            continue
+        if isinstance(node, ast.Import):
+            roots = [alias.name.split(".")[0] for alias in node.names]
+        elif isinstance(node, ast.ImportFrom):
+            roots = [(node.module or "").split(".")[0]] if node.level == 0 else []
+        else:
+            continue
+        found.extend((node.lineno, root) for root in roots if root in _OPTIONAL_SDKS)
+    return sorted(set(found))
+
+
+def _handles_import_error(handler: ast.ExceptHandler) -> bool:
+    """Return whether an `except` clause catches `ImportError`/`ModuleNotFoundError`."""
+    names = {"ImportError", "ModuleNotFoundError", "Exception"}
+    node = handler.type
+    if node is None:
+        return True
+    if isinstance(node, ast.Name):
+        return node.id in names
+    if isinstance(node, ast.Tuple):
+        return any(isinstance(e, ast.Name) and e.id in names for e in node.elts)
+    return False
+
+
+def _is_type_checking(node: ast.AST) -> bool:
+    """Return whether an `if` test is the `TYPE_CHECKING` guard."""
+    return (isinstance(node, ast.Name) and node.id == "TYPE_CHECKING") or (
+        isinstance(node, ast.Attribute) and node.attr == "TYPE_CHECKING"
+    )
+
+
+class TestOptionalSdkAbsenceIsASkip:
+    """A missing extra skips the module; it never errors the whole directory."""
+
+    @pytest.mark.parametrize("path", _TEST_MODULES, ids=_TEST_IDS)
+    def test_no_hard_sdk_import_at_module_scope(self, path):
+        """`pytest.importorskip`, a `sys.modules` fake, or a function-local import."""
+        rel = str(path.relative_to(_ROOT)).replace("\\", "/")
+        if rel in _SDK_IMPORT_ALLOWED:
+            pytest.skip(f"{rel} is an explicit allowance")
+        offenders = _module_scope_sdk_imports(path)
+        assert not offenders, (
+            f"{path.name} imports optional SDK(s) at module scope "
+            f"{[f'line {line}: {root}' for line, root in offenders]}. A missing extra "
+            "then interrupts collection for the whole directory instead of skipping "
+            "one module -- which is what any environment narrower than `extras: all` "
+            "gets, including the only resolution the `argo` backend installs in. Use "
+            "`pytest.importorskip(\"<sdk>\")`"
+        )
+
+    def test_the_allowances_are_still_used(self):
+        """An allowance that no longer applies is a false claim; drop it."""
+        stale = [
+            rel
+            for rel in _SDK_IMPORT_ALLOWED
+            if not _module_scope_sdk_imports(_ROOT / rel)
+        ]
+        assert not stale, f"_SDK_IMPORT_ALLOWED entries no longer needed: {stale}"
+
+    def test_a_guarded_import_is_not_an_offender(self):
+        """The soft forms the policy allows do not trip the rule."""
+        tree = ast.parse(
+            "try:\n    import boto3\nexcept ImportError:\n    boto3 = None\n"
+        )
+        node = next(n for n in ast.walk(tree) if isinstance(n, ast.Try))
+        assert _handles_import_error(node.handlers[0])
+
+
+#: The provider subpackages. Core is released independently of all five, so a
+#: core test that imports one has an undeclared dependency on it.
+_PROVIDER_PACKAGES: frozenset[str] = frozenset(
+    path.name
+    for pattern in ("libs/providers/*/src/earthlens/*",)
+    for path in _ROOT.glob(pattern)
+    if path.is_dir() and not path.name.startswith(("_", "."))
+)
+
+#: Core tests allowed to reach a provider's *private* module, each with the
+#: reason. Same shape and the same self-policing as `_GDAL_ALLOWED`: an entry
+#: that stops being needed fails the test below.
+_CORE_PRIVATE_PROVIDER_ALLOWED: dict[str, str] = {
+    # These two drive a *core CLI* branch (`datasets refresh --tiles`, the
+    # `--live` validator's error path) and the only way in is to monkeypatch
+    # the helper the CLI calls. Moving them to the land tests would make a
+    # provider's suite responsible for core's CLI, which is worse. They are
+    # soft imports, so a core-only environment skips them.
+    "libs/core/tests/cli/test_datasets.py": "monkeypatches ghsl/gee helpers to drive core CLI branches",
+    "libs/core/tests/cli/test_validate.py": "monkeypatches ghsl_url to drive the core --live validator",
+}
+
+
+def _core_test_modules() -> list[Path]:
+    """Return every test module under `libs/core/tests`."""
+    return sorted(
+        path
+        for path in _ROOT.glob("libs/core/tests/**/*.py")
+        if not _EXCLUDED_DIRS.intersection(path.parts)
+    )
+
+
+_CORE_TESTS = _core_test_modules()
+_CORE_IDS = [str(p.relative_to(_ROOT)).replace("\\", "/") for p in _CORE_TESTS]
+
+
+def _provider_imports(path: Path) -> list[tuple[int, str, bool, bool]]:
+    """Return `(line, module, is_private, is_soft)` per provider import.
+
+    Three spellings count, at any depth — a function-local import is still a
+    dependency, it just fails later:
+
+    * `import earthlens.<provider>...`
+    * `from earthlens.<provider> import ...`
+    * `pytest.importorskip("earthlens.<provider>...")`, which is *soft* (the
+      point of this rule) but still names the module, so the private-module
+      rule below can see it.
+    """
+    found: list[tuple[int, str, bool, bool]] = []
+    for node in ast.walk(ast.parse(_source_text(path))):
+        soft = False
+        if isinstance(node, ast.Import):
+            modules = [alias.name for alias in node.names]
+        elif isinstance(node, ast.ImportFrom) and node.level == 0:
+            modules = [node.module or ""]
+        elif (
+            isinstance(node, ast.Call)
+            and _dotted(node.func).endswith("importorskip")
+            and node.args
+            and isinstance(node.args[0], ast.Constant)
+            and isinstance(node.args[0].value, str)
+        ):
+            modules = [node.args[0].value]
+            soft = True
+        else:
+            continue
+        for module in modules:
+            parts = module.split(".")
+            if len(parts) < 2 or parts[0] != "earthlens":
+                continue
+            if parts[1] not in _PROVIDER_PACKAGES:
+                continue
+            private = any(part.startswith("_") for part in parts[2:])
+            found.append((node.lineno, module, private, soft))
+    return found
+
+
+def _is_soft_import(path: Path, lineno: int) -> bool:
+    """Return whether the import at `lineno` is guarded (importorskip / try)."""
+    text = _source_text(path)
+    tree = ast.parse(text)
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Try) and any(
+            _handles_import_error(handler) for handler in node.handlers
+        ):
+            if any(
+                getattr(child, "lineno", None) == lineno for child in ast.walk(node)
+            ):
+                return True
+    return False
+
+
+class TestCoreTestsDoNotDependOnProviders:
+    """Core is released on its own, so its tests must run without the providers."""
+
+    @pytest.mark.parametrize("path", _CORE_TESTS, ids=_CORE_IDS)
+    def test_provider_imports_are_soft(self, path):
+        """A provider import in a core test is `importorskip`, not a hard import."""
+        offenders = [
+            f"line {line}: {module}"
+            for line, module, _private, soft in _provider_imports(path)
+            if not soft and not _is_soft_import(path, line)
+        ]
+        assert not offenders, (
+            f"{path.name} hard-imports provider package(s) {offenders}. core is "
+            "released independently of all five providers, so `cd libs/core && "
+            'pytest` must skip these rather than error: use '
+            '`pytest.importorskip("earthlens.<provider>")`'
+        )
+
+    @pytest.mark.parametrize("path", _CORE_TESTS, ids=_CORE_IDS)
+    def test_no_private_provider_modules(self, path):
+        """Core never reaches into a provider's underscore-private modules."""
+        rel = str(path.relative_to(_ROOT)).replace("\\", "/")
+        offenders = [
+            f"line {line}: {module}"
+            for line, module, private, _soft in _provider_imports(path)
+            if private
+        ]
+        if rel in _CORE_PRIVATE_PROVIDER_ALLOWED:
+            assert offenders, (
+                f"{rel} is in _CORE_PRIVATE_PROVIDER_ALLOWED "
+                f"({_CORE_PRIVATE_PROVIDER_ALLOWED[rel]!r}) but no longer imports a "
+                "private provider module -- drop the allowance"
+            )
+            return
+        assert not offenders, (
+            f"{path.name} imports private provider module(s) {offenders}. This is "
+            "the reverse of TestNoPrivateCoreImports: the provider owns that name "
+            "and may rename it in any release. Assert the promise from the "
+            "provider's own tests, or add an entry to "
+            "_CORE_PRIVATE_PROVIDER_ALLOWED with the reason"
+        )
+
+    def test_the_provider_list_was_discovered(self):
+        """The rule is only meaningful if the provider packages were found."""
+        assert len(_PROVIDER_PACKAGES) > 40, (
+            f"expected the 60-odd provider subpackages, found {len(_PROVIDER_PACKAGES)}"
+        )
+
+
+#: The part of the S3 surface that is unmistakably S3 and unmistakably drifts:
+#: the listing contract, with its `Delimiter` / `CommonPrefixes` branch and its
+#: pagination envelope. A class re-implementing it is standing in for botocore,
+#: which `earthlens.testing.s3_emulator` does with a real S3 instead.
+#:
+#: Deliberately excludes `get_object` / `download_file` / `head_object`: other
+#: SDK doubles define those names, and a stub that overrides only one of them
+#: to raise is injecting a transport failure, which is not a bucket state the
+#: emulator can hold.
+_S3_CLIENT_METHODS = frozenset({"list_objects_v2", "get_paginator"})
+
+#: Test modules still allowed to define an S3 client double, each with the
+#: reason the emulator cannot serve that case. Anything else is a regression.
+_S3_DOUBLE_ALLOWED: dict[str, str] = {
+    # Unit-tests the pagination helper itself by driving continuation tokens
+    # directly; the emulator only paginates past a thousand keys.
+    "libs/providers/atmosphere/tests/goes/conftest.py": "drives continuation tokens",
+    # Three tests assert what the SDK was *called with* (`downloaded`,
+    # `extra_args`) and one injects a mid-transfer failure. A call log is the
+    # double's job, and a transport error is not a bucket state.
+    "libs/providers/atmosphere/tests/s3/conftest.py": "asserts call shape",
+    # Asserts the helper requests the *second* page — the emulator paginates
+    # faithfully, but only past a thousand keys, so forcing the branch there
+    # would mean seeding a thousand objects to test one `if`.
+    "libs/providers/atmosphere/tests/goes/test_helpers.py": "drives a second page",
+    # Same: proves the station walk follows `IsTruncated` across two pages.
+    "libs/providers/atmosphere/tests/radar/test_cli.py": "drives a second page",
+}
+
+
+def _s3_doubles(path: Path) -> list[str]:
+    """Return the names of classes in `path` that stand in for an S3 client."""
+    try:
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+    except (OSError, SyntaxError):  # pragma: no cover - unreadable test module
+        return []
+    found = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.ClassDef):
+            continue
+        methods = {
+            child.name
+            for child in node.body
+            if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef))
+        }
+        if methods & _S3_CLIENT_METHODS:
+            found.append(node.name)
+    return found
+
+
+class TestBucketTestsUseTheEmulator:
+    """A bucket backend is tested against S3's semantics, not a re-implementation."""
+
+    @pytest.mark.parametrize("path", _TEST_MODULES, ids=_TEST_IDS)
+    def test_no_new_s3_client_double(self, path):
+        """A hand-written S3 client belongs in the allow-list or nowhere."""
+        relative = path.relative_to(_ROOT).as_posix()
+        doubles = _s3_doubles(path)
+        if relative in _S3_DOUBLE_ALLOWED:
+            return
+        assert not doubles, (
+            f"{relative} defines {doubles}, standing in for an S3 client. "
+            "Use the `s3_emulator` fixture from `earthlens.testing`, which runs "
+            "a real S3 in-process, so the error shapes, the pagination envelope "
+            "and the streaming body are S3's rather than the double's. If the "
+            "case genuinely cannot be expressed against a real bucket, add the "
+            "file to `_S3_DOUBLE_ALLOWED` with the reason"
+        )
+
+    @pytest.mark.parametrize("relative", sorted(_S3_DOUBLE_ALLOWED))
+    def test_the_allowance_is_still_used(self, relative):
+        """An allowance that stopped being used is a false claim; delete it."""
+        path = _ROOT / relative
+        assert path.exists(), f"{relative} is gone; drop its _S3_DOUBLE_ALLOWED entry"
+        assert _s3_doubles(path), (
+            f"{relative} no longer defines an S3 client double "
+            f"({_S3_DOUBLE_ALLOWED[relative]}); drop its _S3_DOUBLE_ALLOWED entry"
+        )

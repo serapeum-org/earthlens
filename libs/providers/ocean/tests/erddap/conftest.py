@@ -8,6 +8,8 @@ import types
 import pandas as pd
 import pytest
 
+from earthlens.testing import FakeResponse
+
 
 class FakeErddapClient:
     """Records ctor kwargs + set attributes; realises tabledap via `to_pandas`.
@@ -58,34 +60,6 @@ def fake_erddapy(monkeypatch):
 FAKE_NETCDF_BYTES = b"CDF\x01earthlens-fake-netcdf-body"
 
 
-class FakeResponse:
-    """Minimal `requests` response carrying canned NetCDF bytes."""
-
-    def __init__(
-        self,
-        content: bytes = FAKE_NETCDF_BYTES,
-        error: Exception | None = None,
-        status_code: int = 200,
-    ):
-        self.content = content
-        self._error = error
-        self.status_code = status_code
-        self.headers: dict[str, str] = {}
-
-    def raise_for_status(self) -> None:
-        """Raise the configured error, if any."""
-        if self._error is not None:
-            raise self._error
-
-    def close(self) -> None:
-        """No-op close; the HttpClient may release the response."""
-        return None
-
-    def iter_content(self, chunk_size=None):
-        """Yield the canned body in one chunk, as a streamed response would."""
-        yield self.content
-
-
 @pytest.fixture
 def fake_nc_get(monkeypatch):
     """Stub `backend.requests.get`; returns the recorded URL list."""
@@ -93,7 +67,7 @@ def fake_nc_get(monkeypatch):
 
     def _get(url: str, **kwargs) -> FakeResponse:
         calls.append(url)
-        return FakeResponse()
+        return FakeResponse(content=FAKE_NETCDF_BYTES)
 
     monkeypatch.setattr("earthlens.erddap.backend.requests.get", _get)
     return calls

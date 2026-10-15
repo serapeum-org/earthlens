@@ -6,8 +6,9 @@ import pytest
 import requests
 
 from earthlens.airnow.client import AirnowClient
+from earthlens.testing import FakeResponse
 
-from .conftest import _FakeAirnow, _FakeResponse, _FakeSession
+from .conftest import _FakeAirnow, _FakeSession
 
 
 @pytest.mark.airnow
@@ -41,7 +42,7 @@ class TestGetData:
 
         class _S:
             def get(self, *a, **k):
-                return _FakeResponse({"error": "x"})
+                return FakeResponse(json={"error": "x"})
 
         client = AirnowClient("k", session=_S())
         assert client.get_data({}) == []
@@ -63,7 +64,9 @@ class TestGetData:
 
         class _S:
             def get(self, *a, **k):
-                return _FakeResponse({}, status_code=429, headers={"Retry-After": "0"})
+                return FakeResponse(
+                    json={}, status_code=429, headers={"Retry-After": "0"}
+                )
 
         client = AirnowClient("k", session=_S(), max_retries=1, sleep=lambda s: None)
         with pytest.raises(requests.HTTPError):
@@ -78,7 +81,7 @@ class TestGetData:
 
             def get(self, *a, **k):
                 self.n += 1
-                return _FakeResponse({}, status_code=500)
+                return FakeResponse(json={}, status_code=500)
 
         session = _S()
         client = AirnowClient("k", session=session, sleep=lambda s: None)

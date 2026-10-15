@@ -19,6 +19,7 @@ import pytest
 from earthlens.earthlens import EarthLens
 from earthlens.fdsn import FDSN
 from earthlens.fdsn.events import ATTRIBUTE_COLUMNS
+from earthlens.testing import skip_on_upstream
 
 # A historically very active window + box: the 2011 Tohoku sequence off
 # the Pacific coast of Japan, which has many M5+ events on record.
@@ -91,7 +92,7 @@ class TestEarthscopeLiveQuery:
                 min_magnitude=5.0,
             ).download()
         except RuntimeError as exc:
-            pytest.skip(f"EarthScope service unavailable: {exc}")
+            skip_on_upstream(exc)
 
         assert len(fc) > 0, "expected at least one M5+ event from EarthScope"
         assert fc.crs.to_epsg() == 4326

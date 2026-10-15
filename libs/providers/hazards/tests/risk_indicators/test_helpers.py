@@ -10,6 +10,7 @@ import pytest
 from pyramids.feature.collection import FeatureCollection
 
 from earthlens.risk_indicators import _helpers
+from earthlens.testing import FakeResponse
 
 pytestmark = pytest.mark.risk_indicators
 
@@ -27,26 +28,7 @@ class _Recorder:
 
     def __call__(self, url, params=None, headers=None, timeout=None):
         self.url, self.params, self.headers = url, params, headers
-        return _Resp(self.payload)
-
-
-class _Resp:
-    """A minimal requests.Response stand-in."""
-
-    def __init__(self, payload):
-        self._payload = payload
-        self.status_code = 200
-        self.headers = {}
-
-    def raise_for_status(self):
-        """No-op for the 200 fixtures."""
-
-    def json(self):
-        """Return the canned payload."""
-        return self._payload
-
-    def close(self):
-        """No-op close hook (HttpClient calls it on retry/errored responses)."""
+        return FakeResponse(json=self.payload)
 
 
 def _load(name):
@@ -66,7 +48,7 @@ class _FlakyGet:
         self.attempts += 1
         if self.errors:
             raise self.errors.pop(0)
-        return _Resp(self.payload)
+        return FakeResponse(json=self.payload)
 
 
 class _ReturnsResponse:
@@ -81,12 +63,13 @@ class _ReturnsResponse:
         return self.response
 
 
-class _HttpError(_Resp):
+class _HttpError(FakeResponse):
     """A response whose raise_for_status raises an HTTPError with a status."""
 
     def __init__(self, status_code):
-        super().__init__({})
-        self.status_code = status_code
+        # The shared double is keyword-only, and derives the error from the
+        # status itself -- the subclass only exists to name the intent.
+        super().__init__(json={}, status_code=status_code)
 
     def raise_for_status(self):
         """Raise an HTTPError carrying this response (for status checks)."""
@@ -138,7 +121,9 @@ class TestRequestJsonRetry:
     def test_thinkhazard_404_is_retried(self, monkeypatch):
         """A flapping ThinkHazard 404 is retried and the next attempt's body returned."""
         monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
-        seq = _SequenceGet([_HttpError(404), _Resp({"hazard_category": "HIG"})])
+        seq = _SequenceGet(
+            [_HttpError(404), FakeResponse(json={"hazard_category": "HIG"})]
+        )
         monkeypatch.setattr(_helpers.requests, "get", seq)
         assert _helpers.thinkhazard_query("133", "FL") == {"hazard_category": "HIG"}
         assert seq.calls == 2
@@ -155,7 +140,7 @@ class TestRequestJsonRetry:
     def test_thinkhazard_all_hazards_404_is_retried(self, monkeypatch):
         """The all-hazards branch (no hazard mnemonic) also retries a 404."""
         monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
-        seq = _SequenceGet([_HttpError(404), _Resp([{"hazardtype": "FL"}])])
+        seq = _SequenceGet([_HttpError(404), FakeResponse(json=[{"hazardtype": "FL"}])])
         monkeypatch.setattr(_helpers.requests, "get", seq)
         assert _helpers.thinkhazard_query("133") == [{"hazardtype": "FL"}]
         assert seq.calls == 2
@@ -163,7 +148,9 @@ class TestRequestJsonRetry:
     def test_thinkhazard_404_succeeds_on_last_allowed_attempt(self, monkeypatch):
         """Two 404s inside the retry budget still resolve on the third attempt."""
         monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
-        seq = _SequenceGet([_HttpError(404), _HttpError(404), _Resp({"ok": True})])
+        seq = _SequenceGet(
+            [_HttpError(404), _HttpError(404), FakeResponse(json={"ok": True})]
+        )
         monkeypatch.setattr(_helpers.requests, "get", seq)
         assert _helpers.thinkhazard_query("133", "FL") == {"ok": True}
         assert seq.calls == _helpers._HTTP_RETRIES + 1
@@ -211,7 +198,7 @@ class TestRequestJsonRetry:
         """A 5xx status is retried via the 500-599 forcelist."""
         monkeypatch.setattr(_helpers.time, "sleep", lambda _s: None)
         first_503 = _HttpError(503)
-        second_ok = _Resp({"data": [1]})
+        second_ok = FakeResponse(json={"data": [1]})
         responses = iter([first_503, second_ok])
         calls = {"n": 0}
 

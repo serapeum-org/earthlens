@@ -11,8 +11,11 @@ Pins two cross-cutting invariants of the test infrastructure:
 
 from __future__ import annotations
 
-import cdsapi
 import pytest
+
+#: The `ecmwf` extra is optional, so a missing `cdsapi` skips this module
+#: rather than erroring the whole directory's collection.
+cdsapi = pytest.importorskip("cdsapi")
 
 pytestmark = [pytest.mark.unit]
 

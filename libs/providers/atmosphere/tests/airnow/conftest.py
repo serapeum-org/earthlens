@@ -12,6 +12,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from earthlens.testing import FakeResponse
+
 
 def _observation(
     *,
@@ -44,32 +46,6 @@ def _observation(
     }
 
 
-class _FakeResponse:
-    """Canned `requests`-like response with json/raise_for_status."""
-
-    def __init__(
-        self,
-        payload: Any,
-        status_code: int = 200,
-        headers: dict[str, str] | None = None,
-    ) -> None:
-        self._payload = payload
-        self.status_code = status_code
-        self.headers = headers or {}
-
-    def json(self) -> Any:
-        return self._payload
-
-    def raise_for_status(self) -> None:
-        if self.status_code >= 400:
-            import requests
-
-            raise requests.HTTPError(f"HTTP {self.status_code}")
-
-    def close(self) -> None:
-        """No-op close so `HttpClient` can release the response on retry."""
-
-
 class _FakeAirnow:
     """Recording transport: returns `rows` after emitting `n_429` retries."""
 
@@ -78,12 +54,12 @@ class _FakeAirnow:
         self.rows: list[dict[str, Any]] = rows if rows is not None else [_observation()]
         self.n_429: int = 0
 
-    def respond(self, params: dict[str, Any]) -> _FakeResponse:
+    def respond(self, params: dict[str, Any]) -> FakeResponse:
         self.calls.append(params)
         if self.n_429 > 0:
             self.n_429 -= 1
-            return _FakeResponse([], status_code=429, headers={"Retry-After": "0"})
-        return _FakeResponse(self.rows)
+            return FakeResponse(json=[], status_code=429, headers={"Retry-After": "0"})
+        return FakeResponse(json=self.rows)
 
 
 class _FakeSession:
@@ -98,5 +74,5 @@ class _FakeSession:
         params: dict[str, Any] | None = None,
         headers: dict[str, str] | None = None,
         timeout: float | None = None,
-    ) -> _FakeResponse:
+    ) -> FakeResponse:
         return self._state.respond(dict(params or {}))

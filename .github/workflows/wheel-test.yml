@@ -4,6 +4,16 @@ permissions:
   contents: read
 
 on:
+  # Also on pull requests: a packaging or namespace regression (a missing
+  # package-data glob, a namespace `__init__.py` creeping back in) used to be
+  # caught only after merge, because this workflow ran on push-to-main and at
+  # release. The PR leg is reduced to one Python version; the full 3.11-3.14
+  # sweep still runs on merge and at release.
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'mkdocs.yml'
   push:
     branches: [main]
   workflow_dispatch:
@@ -42,6 +52,15 @@ jobs:
         # them at job time, so every version is hash-verified (S8544) and an
         # upstream release cannot redden an unrelated PR.
         #
+        # `moto` and `pytest-recording` are test-only, but the suite does not
+        # merely run slower without them: `pytest-recording` registers the
+        # `vcr` marker, and `--strict-markers` turns an unregistered marker
+        # into a collection error, so every `test_wire.py` aborts the whole
+        # run instead of skipping. `moto` degrades more quietly — the bucket
+        # fixtures `importorskip` it — but silently skipping the six boto3
+        # backends in the one lane that exercises the built wheels is not
+        # worth saving a pin.
+        #
         # `uv pip compile`, not `uv export`: the workspace lock is deliberately
         # forked (argopy needs xarray>=2025.7, openeo needs <2025.1.2, declared
         # in `[tool.uv] conflicts`) and `export` emits the union of both forks
@@ -54,7 +73,7 @@ jobs:
         run: |
           set -euo pipefail
           version=$(ls dist/earthlens-[0-9]*.whl | sed -E 's|.*/earthlens-([^-]+)-py3.*|\1|')
-          printf 'earthlens[all]==%s\npytest\npytest-cov\nhypothesis\npsutil\n' "${version}" \
+          printf 'earthlens[all]==%s\npytest\npytest-cov\npytest-socket\nhypothesis\npsutil\nmoto\npytest-recording\n' "${version}" \
             > dist/requirements.in
           uv pip compile --generate-hashes --universal --python-version 3.11 \
             --find-links dist \
@@ -97,7 +116,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: ["3.11", "3.12", "3.13", "3.14"]
+        # One version on a pull request, the full floor-to-ceiling sweep on a
+        # merge or a release. A packaging regression shows on any of them, so
+        # the PR leg only needs to be fast enough to be worth gating on.
+        python-version: >-
+          ${{ github.event_name == 'pull_request'
+          && fromJSON('["3.12"]')
+          || fromJSON('["3.11", "3.12", "3.13", "3.14"]') }}
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -214,4 +239,9 @@ jobs:
         # marker set) drive collection. Skip e2e tests — they hit live CDS /
         # FTP / S3 services and require credentials that aren't provisioned
         # here. The dedicated tests-e2e.yml workflow runs them with secrets.
-        run: pytest -vvv -sv -m "not e2e"
+        # --disable-socket for the same reason as tests.yml: this lane is the
+        # one that collects all six members at once, so it was paying every
+        # module-scope probe in the repo. Loopback stays open for emulators.
+        run: >
+          pytest -vvv -sv -m "not e2e"
+          --disable-socket --allow-unix-socket --allow-hosts=127.0.0.1,::1

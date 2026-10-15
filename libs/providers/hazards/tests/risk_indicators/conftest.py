@@ -17,6 +17,7 @@ import pytest
 from loguru import logger
 
 from earthlens.risk_indicators import _helpers
+from earthlens.testing import FakeResponse
 
 DATA = Path(__file__).parent / "data"
 
@@ -134,30 +135,6 @@ def load_json(name: str) -> Any:
     return json.loads((DATA / name).read_text(encoding="utf-8"))
 
 
-class _FakeResponse:
-    """A minimal stand-in for `requests.Response` over a JSON payload."""
-
-    def __init__(self, payload: Any, status_code: int = 200) -> None:
-        self._payload = payload
-        self.status_code = status_code
-
-    def raise_for_status(self) -> None:
-        """No-op: the captured responses are always 200."""
-
-    def json(self) -> Any:
-        """Return the captured payload."""
-        return self._payload
-
-    @property
-    def text(self) -> str:
-        """Return the payload as text, for the HTML the results page serves."""
-        return (
-            self._payload
-            if isinstance(self._payload, str)
-            else json.dumps(self._payload)
-        )
-
-
 class FakeHttp:
     """Records `requests.get` calls and routes each to a captured fixture."""
 
@@ -170,7 +147,7 @@ class FakeHttp:
         params: dict | None = None,
         headers: dict | None = None,
         timeout: float | None = None,
-    ) -> _FakeResponse:
+    ) -> FakeResponse:
         """Route a GET to the captured payload for its URL.
 
         Args:
@@ -180,7 +157,7 @@ class FakeHttp:
             timeout: Ignored.
 
         Returns:
-            _FakeResponse: The captured payload wrapped as a response.
+            FakeResponse: The captured payload wrapped as a response.
 
         Raises:
             AssertionError: If no fixture matches the URL.
@@ -206,7 +183,7 @@ class FakeHttp:
             payload = load_json("thinkhazard_report_133.json")
         else:  # pragma: no cover - guards an unrouted URL in a new test
             raise AssertionError(f"no fixture routed for URL {url!r}")
-        return _FakeResponse(payload)
+        return FakeResponse(json=payload)
 
 
 @pytest.fixture

@@ -4,6 +4,12 @@ name: Tests - E2E (reusable per-theme on change)
 # (tests-e2e-<theme>.yml) triggers on its theme's paths and calls this with
 # `theme:`; the logic below lives here once.
 #
+# Two callers share it: the per-PR tests-e2e-<theme>.yml files, and
+# tests-e2e.yml's full sweep on merge, which passes `run_all: true` so the
+# detect step selects every lane instead of diffing. That input is the only
+# difference between a PR run and a merge run — the lanes, their extras, their
+# timeouts and their guards are defined once, here.
+#
 #   * detect - diff the PR against its base and map changed paths onto the
 #              theme's e2e lanes, emitting a matrix of only the affected ones.
 #              A dedicated (heavy-SDK) provider gets its own narrow-extra lane;
@@ -20,9 +26,14 @@ on:
   workflow_call:
     inputs:
       theme:
-        description: "Thematic distribution: atmosphere|ocean|imagery|land|hazards."
+        description: "Thematic distribution: core|atmosphere|ocean|imagery|land|hazards."
         required: true
         type: string
+      run_all:
+        description: "Skip the change detection and run every lane (the merge sweep)."
+        required: false
+        type: boolean
+        default: false
       timeout_minutes:
         description: "Wall-clock cap (minutes) for each e2e matrix lane."
         required: false
@@ -51,6 +62,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           THEME: ${{ inputs.theme }}
+          RUN_ALL: ${{ inputs.run_all }}
         run: |
           set -euo pipefail
 
@@ -60,6 +72,17 @@ jobs:
           # tests live under `(src/earthlens|tests)/<backend>/` - a flat
           # `tests/test_<backend>.py` would miss the dedicated lane's path_re.
           case "$THEME" in
+          core)
+            # core is not a provider theme and has no per-backend lanes: its
+            # four e2e tests (the facade + the NWM live download) are one
+            # catch-all. It is in this table so that it gets the same lane
+            # contract as everything else — the junit report, the
+            # assert_tests_ran guard, the timeout and -rs.
+            providers=()
+            catchall_marker="e2e"
+            catchall_deselect=""
+            dedicated_backends="__none__"
+            ;;
           atmosphere)
             providers=(
             '{"name":"nwp","path":"libs/providers/atmosphere/(src/earthlens|tests)/nwp/","marker":"e2e and nwp","groups":"groups: dev, extras: nwp","pkg":"libs/providers/atmosphere/tests/nwp"}'
@@ -112,8 +135,15 @@ jobs:
             '{"name":"emdat","path":"libs/providers/hazards/(src/earthlens|tests)/emdat/","marker":"e2e and emdat and not gdis","groups":"groups: dev, extras: emdat","pkg":"libs/providers/hazards/tests/emdat"}'
             '{"name":"osm","path":"libs/providers/hazards/(src/earthlens|tests)/osm/","marker":"e2e and osm","groups":"groups: dev, extras: osm","pkg":"libs/providers/hazards/tests/osm"}'
             '{"name":"osm-pbf","path":"libs/providers/hazards/(src/earthlens|tests)/osm/","marker":"e2e and osm_pbf","groups":"groups: dev, extras: osm","pkg":"libs/providers/hazards/tests/osm","with_pkg":"pyrosm>=0.11.0"}'
+            # GDIS rides NASA Earthdata Cloud, so it needs an Earthdata Login
+            # whose account has also accepted the SEDAC data-use agreement.
+            # `allow_all_skipped` because a repo without that credential skips
+            # the whole lane legitimately — the same declared exemption the
+            # wdpa lane carries, replacing the `if: env.EARTHDATA_TOKEN != ''`
+            # step guard the merge sweep used to express it with.
+            '{"name":"gdis","path":"libs/providers/hazards/(src/earthlens|tests)/emdat/","marker":"e2e and emdat and gdis","groups":"groups: dev, extras: emdat","pkg":"libs/providers/hazards/tests/emdat","allow_all_skipped":true}'
             )
-            catchall_marker="e2e and not emdat and not osm and not osm_pbf"
+            catchall_marker="e2e and not emdat and not osm and not osm_pbf and not gdis"
             catchall_deselect=""
             dedicated_backends="emdat|osm"
             ;;
@@ -125,15 +155,31 @@ jobs:
 
           # Only code paths gate the catch-all: a non-code change under the
           # theme (e.g. README.md) must not launch its whole live-e2e suite.
-          theme_code_re="^libs/providers/$THEME/(src/earthlens|tests)/"
-          dedicated_re="libs/providers/$THEME/(src/earthlens|tests)/($dedicated_backends)/"
+          # core lives at libs/core, not libs/providers/<theme>, and has no
+          # dedicated lanes, so its regexes differ.
+          if [ "$THEME" = "core" ]; then
+            theme_code_re='^libs/core/(src|tests)/'
+            dedicated_re='^$'
+            theme_shared_re='^libs/core/(tests/conftest\.py|pyproject\.toml)'
+            catchall_pkg="libs/core"
+            catchall_name="core"
+          else
+            theme_code_re="^libs/providers/$THEME/(src/earthlens|tests)/"
+            dedicated_re="libs/providers/$THEME/(src/earthlens|tests)/($dedicated_backends)/"
+            theme_shared_re="^libs/providers/$THEME/(src/earthlens/_$THEME/|tests/conftest\.py|pyproject\.toml)"
+            catchall_pkg="libs/providers/$THEME"
+            catchall_name="rest-of-$THEME"
+          fi
           # Any change to core, the lockfile, a manifest, or an e2e workflow
           # file forces every lane in the theme to run.
           global_shared_re='^(libs/core/|uv\.lock|pyproject\.toml|\.github/workflows/tests-e2e-)'
-          theme_shared_re="^libs/providers/$THEME/(src/earthlens/_$THEME/|tests/conftest\.py|pyproject\.toml)"
 
           run_all=0
-          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+          if [ "$RUN_ALL" = "true" ]; then
+            echo "run_all requested by the caller -> running every $THEME lane"
+            run_all=1
+            changed=""
+          elif [ "$EVENT_NAME" = "workflow_dispatch" ]; then
             echo "manual dispatch -> running every $THEME lane"
             run_all=1
             changed=""
@@ -176,9 +222,9 @@ jobs:
           fi
           if [ "$include_catchall" -eq 1 ]; then
             includes+=("$(jq -cn \
-              --arg name "rest-of-$THEME" --arg marker "$catchall_marker" \
+              --arg name "$catchall_name" --arg marker "$catchall_marker" \
               --arg groups "groups: dev, extras: all" --arg deselect "$catchall_deselect" \
-              --arg pkg "libs/providers/$THEME" --argjson allow_empty true \
+              --arg pkg "$catchall_pkg" --argjson allow_empty true \
               '{name:$name, marker:$marker, groups:$groups, pkg:$pkg, deselect:$deselect, allow_empty:$allow_empty, allow_all_skipped:false, with_pkg:""}')")
           fi
 
@@ -196,7 +242,7 @@ jobs:
       needs.detect.outputs.matrix != '[]' &&
       github.repository == 'serapeum-org/earthlens'
     runs-on: ubuntu-latest
-    # A live provider host can hang (see the scheduled workflow's Dataverse
+    # A live provider host can hang (see the merge sweep's Dataverse
     # probe); cap the job rather than hold a runner for the 6-hour default.
     # The cap is a caller-tunable input (default 45) so a theme with slower
     # live hosts can raise it without touching the other themes.
@@ -219,6 +265,19 @@ jobs:
           install-groups: ${{ matrix.groups }}
           verify-lock: true
           version: "0.11.29"
+
+      # dataverse.uclouvain.be is a single university host with no CDN. When it
+      # is unreachable from the runner the suite spends four 60-second connect
+      # timeouts saying nothing useful, so resolve and dial it first and print
+      # the outcome. Never fails the job: the tests below are the gate, and this
+      # only exists to tell an unreachable host apart from a real regression.
+      - name: Probe the Dataverse host
+        if: startsWith(matrix.name, 'emdat') || startsWith(matrix.name, 'gdis')
+        continue-on-error: true
+        run: |
+          getent hosts dataverse.uclouvain.be || echo "DNS: no answer"
+          curl -sS -m 30 -o /dev/null -w 'HTTP %{http_code} in %{time_total}s\n' \
+            https://dataverse.uclouvain.be/ || echo "curl: unreachable"
 
       - name: Run live e2e tests for ${{ matrix.name }}
         # All service credentials are passed as env; a lane whose secret is

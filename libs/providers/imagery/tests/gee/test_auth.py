@@ -12,7 +12,6 @@ import json
 import traceback
 from unittest.mock import MagicMock
 
-import ee
 import pytest
 
 from earthlens.gee import auth as auth_module
@@ -26,6 +25,10 @@ from earthlens.gee.auth import (
     _load_key_dict,
     _redact,
 )
+
+#: The `gee` extra is optional, so a missing `earthengine-api` skips this
+#: module rather than erroring the whole directory's collection.
+ee = pytest.importorskip("ee")
 
 
 def _key_text(**extra) -> str:

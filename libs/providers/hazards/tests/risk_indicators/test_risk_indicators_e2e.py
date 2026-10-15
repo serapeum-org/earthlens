@@ -26,7 +26,6 @@ Run with:
 from __future__ import annotations
 
 import os
-import socket
 from pathlib import Path
 
 import pandas as pd
@@ -38,24 +37,13 @@ from earthlens.earthlens import EarthLens
 pytestmark = [pytest.mark.e2e, pytest.mark.risk_indicators]
 
 
-def _host_ok(host: str) -> bool:
-    """Return True when `host` is reachable on port 443."""
-    try:
-        socket.create_connection((host, 443), timeout=5).close()
-        return True
-    except OSError:
-        return False
-
-
-_thinkhazard_skip = pytest.mark.skipif(
-    not _host_ok("thinkhazard.org"), reason="ThinkHazard host unreachable"
-)
-_inform_skip = pytest.mark.skipif(
-    not _host_ok("drmkc.jrc.ec.europa.eu"), reason="INFORM host unreachable"
-)
+_thinkhazard_skip = pytest.mark.requires_host("thinkhazard.org")
+_inform_skip = pytest.mark.requires_host("drmkc.jrc.ec.europa.eu")
+#: The GFW gate is two separate things: a missing key is a configuration
+#: skip, an unreachable host an availability one, and only the second may
+#: carry the masked-lane prefix.
 _gfw_skip = pytest.mark.skipif(
-    not (os.environ.get("GFW_API_KEY") and _host_ok("data-api.globalforestwatch.org")),
-    reason="GFW_API_KEY unset or GFW host unreachable",
+    not os.environ.get("GFW_API_KEY"), reason="GFW_API_KEY unset"
 )
 
 
@@ -139,6 +127,7 @@ def test_inform_climate_risk_live(tmp_path: Path) -> None:
 
 
 @_gfw_skip
+@pytest.mark.requires_host("data-api.globalforestwatch.org")
 def test_gfw_tree_cover_loss_live(tmp_path: Path) -> None:
     """A live GFW tree-cover-loss query for Kenya returns per-year loss rows."""
     df = EarthLens(
@@ -152,6 +141,7 @@ def test_gfw_tree_cover_loss_live(tmp_path: Path) -> None:
 
 
 @_gfw_skip
+@pytest.mark.requires_host("data-api.globalforestwatch.org")
 def test_gfw_admin_boundary_live(tmp_path: Path) -> None:
     """A live GFW geostore pull for Kenya returns an admin-boundary FeatureCollection."""
     result = EarthLens(

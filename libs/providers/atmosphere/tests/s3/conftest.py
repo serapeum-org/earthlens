@@ -14,6 +14,30 @@ import numpy as np
 import pytest
 
 from earthlens.base.s3 import S3Auth
+from earthlens.testing import seed_s3
+
+
+@pytest.fixture(autouse=True)
+def _offline_aws_credentials(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Stop botocore's credential chain before it reaches the metadata service.
+
+    A *signed* client resolves credentials eagerly, walking env -> shared
+    config -> the EC2 instance metadata service at 169.254.169.254. With no
+    credentials configured, three tests here reached that address: silently on
+    a developer machine, and visibly once the lane blocked sockets. The result
+    was also non-deterministic — the same tests behaved differently depending
+    on whether the machine running them happened to have an AWS profile.
+
+    Dummy values stop the chain at the first step. This configures the SDK
+    under test; it does not gate anything (`-m` still decides what runs).
+    """
+    monkeypatch.setenv("AWS_ACCESS_KEY_ID", "testing")
+    monkeypatch.setenv("AWS_SECRET_ACCESS_KEY", "testing")
+    monkeypatch.setenv("AWS_SESSION_TOKEN", "testing")
+    monkeypatch.setenv("AWS_DEFAULT_REGION", "us-east-1")
+    # Belt and braces: even with credentials present, botocore probes IMDS for
+    # the region/role in some code paths.
+    monkeypatch.setenv("AWS_EC2_METADATA_DISABLED", "true")
 
 
 class FakeS3Client:
@@ -188,3 +212,55 @@ def patch_auth(monkeypatch):
         monkeypatch.setattr(S3Auth, "client", lambda self: client)
 
     return _apply
+
+
+#: The bucket and key the DEM tests read; the backend resolves both from the
+#: catalog, so they are stated once here and imported by the test module.
+DEM_BUCKET = "copernicus-dem-30m"
+DEM_KEY = (
+    "Copernicus_DSM_COG_10_N00_00_E006_00_DEM/"
+    "Copernicus_DSM_COG_10_N00_00_E006_00_DEM.tif"
+)
+
+
+@pytest.fixture
+def seed_buckets(s3_emulator, tiny_cog):
+    """Publish objects on an in-process S3 instead of faking the client.
+
+    Takes the same keywords `fake_client_factory` did, so a call site moves
+    across unchanged in shape. What differs is who answers: `missing`,
+    `denied` and `no_bucket` are no longer hand-built `ClientError`s but
+    whatever S3 itself returns for an absent key, an unsigned read of a
+    private object, and an absent bucket. Those three shapes are the ones a
+    double is least likely to get right, and the backend branches on them.
+
+    `FakeS3Client` stays for the handful of tests that assert what the SDK
+    was *called with* (`downloaded`, `extra_args`) rather than what S3 did —
+    a call log is the double's job, and the emulator keeps none.
+    """
+    cog = tiny_cog.read_bytes()
+
+    def _seed(listing=None, *, missing=(), denied=(), broken=(), no_bucket=()):
+        gone, private, corrupt, absent = (
+            set(missing),
+            set(denied),
+            set(broken),
+            set(no_bucket),
+        )
+        plan = listing if listing is not None else {DEM_BUCKET: [DEM_KEY]}
+        for bucket, keys in plan.items():
+            if any(key in absent for key in keys):
+                continue  # the bucket itself is never created
+            bodies = {
+                key: (b"not a cog" if key in corrupt else cog)
+                for key in keys
+                if key not in gone
+            }
+            public = {k: v for k, v in bodies.items() if k not in private}
+            hidden = {k: v for k, v in bodies.items() if k in private}
+            seed_s3(s3_emulator, bucket, public)
+            if hidden:
+                seed_s3(s3_emulator, bucket, hidden, public=False)
+        return s3_emulator
+
+    return _seed

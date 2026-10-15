@@ -9,36 +9,13 @@ import requests
 
 from earthlens.base.http import _parse_retry_after
 from earthlens.openaq.client import BASE_URL, OpenaqClient
-
-
-class _Resp:
-    """Canned response with json/raise_for_status/status/headers."""
-
-    def __init__(
-        self,
-        payload: dict[str, Any],
-        status_code: int = 200,
-        headers: dict[str, str] | None = None,
-    ) -> None:
-        self._payload = payload
-        self.status_code = status_code
-        self.headers = headers or {}
-
-    def json(self) -> dict[str, Any]:
-        return self._payload
-
-    def raise_for_status(self) -> None:
-        if self.status_code >= 400:
-            raise requests.HTTPError(f"HTTP {self.status_code}")
-
-    def close(self) -> None:
-        return None
+from earthlens.testing import FakeResponse
 
 
 class _SeqSession:
     """Returns queued responses in order, recording each GET's args."""
 
-    def __init__(self, responses: list[_Resp]) -> None:
+    def __init__(self, responses: list[FakeResponse]) -> None:
         self._responses = list(responses)
         self.calls: list[dict[str, Any]] = []
 
@@ -48,14 +25,16 @@ class _SeqSession:
         params: dict[str, Any] | None = None,
         headers: dict[str, str] | None = None,
         timeout: float | None = None,
-    ) -> _Resp:
+    ) -> FakeResponse:
         self.calls.append(
             {"url": url, "params": dict(params or {}), "headers": dict(headers or {})}
         )
         return self._responses.pop(0)
 
 
-def _client(responses: list[_Resp], **kwargs: Any) -> tuple[OpenaqClient, _SeqSession]:
+def _client(
+    responses: list[FakeResponse], **kwargs: Any
+) -> tuple[OpenaqClient, _SeqSession]:
     """Build a client over a sequenced fake session with no real sleeps."""
     session = _SeqSession(responses)
     waits: list[float] = []
@@ -83,14 +62,14 @@ class TestRequest:
 
     def test_attaches_api_key_header(self):
         """Every request carries the X-API-Key header."""
-        client, session = _client([_Resp({"results": []})])
+        client, session = _client([FakeResponse(json={"results": []})])
         client._request("locations", {"limit": 10})
         assert session.calls[0]["headers"]["X-API-Key"] == "key"
         assert session.calls[0]["url"] == f"{BASE_URL}/locations"
 
     def test_sends_earthlens_user_agent(self):
         """The HttpClient migration sends the non-Mozilla earthlens UA (G4)."""
-        client, session = _client([_Resp({"results": []})])
+        client, session = _client([FakeResponse(json={"results": []})])
         client._request("locations", {"limit": 10})
         user_agent = session.calls[0]["headers"]["User-Agent"]
         assert user_agent.startswith("earthlens/")
@@ -107,8 +86,8 @@ class TestRequest:
         """A 429 with Retry-After is retried, then succeeds."""
         client, session = _client(
             [
-                _Resp({}, 429, {"Retry-After": "0"}),
-                _Resp({"results": [{"a": 1}]}),
+                FakeResponse(json={}, status_code=429, headers={"Retry-After": "0"}),
+                FakeResponse(json={"results": [{"a": 1}]}),
             ]
         )
         payload = client._request("locations", {"limit": 10})
@@ -118,7 +97,11 @@ class TestRequest:
     def test_429_without_retry_after_uses_backoff(self):
         """A 429 with no Retry-After falls back to exponential back-off."""
         client, session = _client(
-            [_Resp({}, 429), _Resp({"results": []})], backoff_factor=2.0
+            [
+                FakeResponse(json={}, status_code=429),
+                FakeResponse(json={"results": []}),
+            ],
+            backoff_factor=2.0,
         )
         client._request("locations", {})
         assert client._waits == [2.0]  # type: ignore[attr-defined]
@@ -126,20 +109,26 @@ class TestRequest:
     def test_large_retry_after_is_uncapped(self):
         """A Retry-After above the default cap is honoured (openaq is uncapped)."""
         client, session = _client(
-            [_Resp({}, 429, {"Retry-After": "600"}), _Resp({"results": []})]
+            [
+                FakeResponse(json={}, status_code=429, headers={"Retry-After": "600"}),
+                FakeResponse(json={"results": []}),
+            ]
         )
         client._request("locations", {})
         assert client._waits == [600.0]  # type: ignore[attr-defined]
 
     def test_raises_after_max_retries(self):
         """Exhausted 429s raise the final HTTPError."""
-        client, _ = _client([_Resp({}, 429, {"Retry-After": "0"})] * 3, max_retries=2)
+        client, _ = _client(
+            [FakeResponse(json={}, status_code=429, headers={"Retry-After": "0"})] * 3,
+            max_retries=2,
+        )
         with pytest.raises(requests.HTTPError):
             client._request("locations", {})
 
     def test_non_429_error_raises_immediately(self):
         """A non-429 error status raises without retrying."""
-        client, session = _client([_Resp({}, 500)])
+        client, session = _client([FakeResponse(json={}, status_code=500)])
         with pytest.raises(requests.HTTPError):
             client._request("locations", {})
         assert len(session.calls) == 1
@@ -153,8 +142,8 @@ class TestPaginate:
         """Pagination stops when a page returns fewer than `limit` rows."""
         client, _ = _client(
             [
-                _Resp({"results": [{"i": 1}, {"i": 2}]}),
-                _Resp({"results": [{"i": 3}]}),
+                FakeResponse(json={"results": [{"i": 1}, {"i": 2}]}),
+                FakeResponse(json={"results": [{"i": 3}]}),
             ]
         )
         items = list(client.paginate("locations", {"limit": 2}))
@@ -162,18 +151,20 @@ class TestPaginate:
 
     def test_max_items_caps(self):
         """max_items stops iteration early mid-page."""
-        client, _ = _client([_Resp({"results": [{"i": 1}, {"i": 2}, {"i": 3}]})])
+        client, _ = _client(
+            [FakeResponse(json={"results": [{"i": 1}, {"i": 2}, {"i": 3}]})]
+        )
         items = list(client.paginate("locations", {"limit": 10}, max_items=2))
         assert len(items) == 2
 
     def test_empty_results_terminate(self):
         """An empty first page yields nothing and stops."""
-        client, _ = _client([_Resp({"results": []})])
+        client, _ = _client([FakeResponse(json={"results": []})])
         assert list(client.paginate("locations", {"limit": 10})) == []
 
     def test_limit_clamped_to_max_page_size(self):
         """A limit above the v3 maximum is clamped to 1000 in the request."""
-        client, session = _client([_Resp({"results": []})])
+        client, session = _client([FakeResponse(json={"results": []})])
         list(client.paginate("locations", {"limit": 5000}))
         assert session.calls[0]["params"]["limit"] == 1000
 
@@ -184,7 +175,7 @@ class TestListEndpoints:
 
     def test_list_locations_forwards_bbox_and_ids(self):
         """list_locations forwards bbox + parameters_id to the query."""
-        client, session = _client([_Resp({"results": [{"id": 1}]})])
+        client, session = _client([FakeResponse(json={"results": [{"id": 1}]})])
         client.list_locations(bbox="1,2,3,4", parameters_id=[2, 5], limit=100)
         params = session.calls[0]["params"]
         assert params["bbox"] == "1,2,3,4"
@@ -192,13 +183,13 @@ class TestListEndpoints:
 
     def test_list_locations_omits_empty_ids(self):
         """No parameters_id key is sent when the id list is empty."""
-        client, session = _client([_Resp({"results": []})])
+        client, session = _client([FakeResponse(json={"results": []})])
         client.list_locations(bbox="1,2,3,4", parameters_id=[], limit=100)
         assert "parameters_id" not in session.calls[0]["params"]
 
     def test_list_measurements_raw_path_uses_datetime_filter(self):
         """A None rollup hits /measurements and filters on datetime_from/to."""
-        client, session = _client([_Resp({"results": []})])
+        client, session = _client([FakeResponse(json={"results": []})])
         client.list_measurements(
             sensor_id="10",
             datetime_from="2024-01-01T00:00:00",
@@ -212,7 +203,7 @@ class TestListEndpoints:
 
     def test_list_measurements_hours_uses_datetime_filter(self):
         """The sub-daily /hours rollup also filters on datetime_from/to."""
-        client, session = _client([_Resp({"results": []})])
+        client, session = _client([FakeResponse(json={"results": []})])
         client.list_measurements(
             sensor_id="10",
             datetime_from="2024-01-01T00:00:00",
@@ -226,7 +217,7 @@ class TestListEndpoints:
     @pytest.mark.parametrize("rollup", ["days", "months", "years"])
     def test_list_measurements_date_rollups_use_date_filter(self, rollup: str):
         """The /days, /months, /years rollups filter on a calendar date_from/to."""
-        client, session = _client([_Resp({"results": []})])
+        client, session = _client([FakeResponse(json={"results": []})])
         client.list_measurements(
             sensor_id="10",
             datetime_from="2024-01-01T00:00:00",

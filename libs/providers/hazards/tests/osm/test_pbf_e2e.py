@@ -21,11 +21,10 @@ import importlib.util
 from pathlib import Path
 
 import pytest
-import requests
 
 from earthlens.earthlens import EarthLens
 from earthlens.osm._pbf import download_extract, read_pbf
-from earthlens.testing import skip_live_unavailable
+from earthlens.testing import skip_on_upstream
 
 # Gate the SDK requirement as a per-test skipif, not a module-level
 # `importorskip`. A module-level importorskip reports a skip during *collection*,
@@ -55,13 +54,6 @@ _LAT_LIM = [35.88, 35.94]
 _LON_LIM = [14.48, 14.54]
 
 
-def _skip_on_network(exc: Exception) -> None:
-    """Skip (not fail) when the failure is a transport problem, else re-raise."""
-    if isinstance(exc, (requests.ConnectionError, requests.Timeout)):
-        skip_live_unavailable(f"Geofabrik unreachable: {exc}")
-    raise exc
-
-
 class TestPbfLive:
     """A live Geofabrik download + pyrosm read of the Malta extract."""
 
@@ -82,7 +74,7 @@ class TestPbfLive:
                 engine="pyrosm",
             ).download(progress_bar=False)
         except Exception as exc:  # noqa: BLE001 - transport -> skip, else re-raise
-            _skip_on_network(exc)
+            skip_on_upstream(exc)
         assert len(fc) >= 1, "expected at least one building footprint"
         assert fc.crs.to_epsg() == 4326
         # the identity column is normalised to `osm_id` (from pyrosm's `id`).
@@ -102,7 +94,7 @@ class TestPbfPyosmiumLive:
                 "europe/malta", tmp_path / "geofabrik", progress=False
             )
         except Exception as exc:  # noqa: BLE001 - transport -> skip, else re-raise
-            _skip_on_network(exc)
+            skip_on_upstream(exc)
         bbox = (_LON_LIM[0], _LAT_LIM[0], _LON_LIM[1], _LAT_LIM[1])
         buildings = read_pbf(
             path, pyrosm_method="get_buildings", bbox=bbox, engine="pyosmium"

@@ -1,0 +1,85 @@
+{
+  "id": "cmems_obs-sst_bal_phy-temp_my_l4_P1D-m_202611",
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/datacube/v2.1.0/schema.json"
+  ],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "properties": {
+    "title": "All data",
+    "cube:dimensions": {},
+    "cube:variables": {},
+    "datetime": "1970-01-01T00:00:00.000000Z",
+    "admp_in_preparation": true,
+    "admp_released_date": "2026-11-24T13:00:00.000Z",
+    "admp_retired_date": null,
+    "admp_title": "All data",
+    "admp_updated": "2026-10-14T07:38:39.214750Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../../catalog.stac.json",
+      "title": "Copernicus Marine Data Store",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../product.stac.json",
+      "title": "SST_BAL_PHY_L4_MY_010_016",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../product.stac.json",
+      "title": "SST_BAL_PHY_L4_MY_010_016",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "native": {
+      "id": "native",
+      "href": "https://s3.waw3-1.cloudferro.com/mdl-native-06/native/SST_BAL_PHY_L4_MY_010_016/cmems_obs-sst_bal_phy-temp_my_l4_P1D-m_202611",
+      "type": "application/x-netcdf",
+      "roles": [
+        "data"
+      ],
+      "title": "Native dataset",
+      "description": "The original, non-ARCO version of this dataset, as published by the data provider."
+    }
+  },
+  "collection": "SST_BAL_PHY_L4_MY_010_016"
+}

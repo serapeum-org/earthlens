@@ -1,25 +1,22 @@
-"""Shared pytest fixtures for testing earthlens and its backends.
+"""Live-test gating: the availability classifier, the skip helpers and the guards.
 
-Imported by each member distribution's `tests/conftest.py`. It lives in the
-installed package rather than in a test directory because pytest's rootdir
-becomes the *member* directory when a member is run on its own — which is how CI
-runs them — so a repo-root `conftest.py` silently would not load and a module
-under `libs/core/tests/` would not be importable. An installed module is
-reachable from any rootdir.
+One idiom for "do not run this live test right now", so both masked-lane guards
+can tell an upstream outage from an unconfigured backend:
 
-The `numpy.testing` / `pandas.testing` precedent: shipping test support beside
-the code it tests, so downstream code testing its own backend gets the same
-seams rather than reinventing them.
+- `require_reachable` (and the `requires_host` marker that calls it) —
+  probe a host once per session and skip, prefixed, when it is unreachable.
+- `skip_on_upstream` — classify an exception a test caught itself and
+  either skip, prefixed, or re-raise it unchanged.
+- `skip_live_unavailable` — the raw prefixed skip the two above build on.
 
-Requires pytest, which is why it is behind the `test` extra
-(`pip install earthlens-core[test]`) — importing this module without it raises
-`ImportError`. Nothing in the runtime package imports it.
+Split out of the former single-module `earthlens.testing`; import from
+`earthlens.testing`, not from here.
 """
 
 from __future__ import annotations
 
-import hashlib
 import re
+import socket
 import urllib.error
 from collections.abc import Generator
 from typing import NoReturn
@@ -32,53 +29,7 @@ from earthlens.base import (
     response_status,
     status_in_message,
 )
-from earthlens.config import set_cache_dir, set_output_dir
-
-
-@pytest.fixture(autouse=True)
-def unpooled_http_transport(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Point `HttpClient`'s default transport at the `requests`-module adapter.
-
-    Production pools: `HttpClient()` builds a `requests.Session`, so a backend
-    pulling many small files from one host pays one TCP+TLS handshake instead of
-    one per file. The suite, though, drives HTTP by patching `requests.get` /
-    `requests.head` on the module object, and `session.get` never consults
-    `requests.get` — 161 tests would fall through to the real network.
-
-    So for the duration of a test the default becomes
-    `RequestsGet`, which re-resolves `requests` per
-    call. Every module-level fake keeps driving the transport while production
-    keeps its pooled session. A test that needs the shipped default asks for
-    `real_pooled_session`, which switches it back.
-
-    Args:
-        monkeypatch: pytest's patcher, so the seam is undone per test.
-    """
-    from earthlens.base import http
-
-    monkeypatch.setattr(http, "new_session", http.RequestsGet)
-    # The per-thread cache outlives a test, so a session built against the
-    # previous test's transport would otherwise be handed to this one.
-    http.reset_thread_local_sessions()
-
-
-@pytest.fixture
-def real_pooled_session(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Restore the production default so a test can observe real pooling.
-
-    Args:
-        monkeypatch: pytest's patcher, so the seam is undone per test.
-    """
-    import requests
-
-    from earthlens.base import http
-
-    monkeypatch.setattr(http, "new_session", requests.Session)
-    # Same reason as the unpooled fixture: the per-thread cache outlives a
-    # test, so without this the pooled session under test would be whichever
-    # one the previous test's transport built.
-    http.reset_thread_local_sessions()
-
+from earthlens.testing._tagging import tag_items_by_directory
 
 # HTTP statuses that mean "the service, not the request, is the problem":
 # 408 request timeout, 425 too early, 429 rate limited, and every 5xx. 403 is
@@ -216,6 +167,183 @@ def skip_live_unavailable(reason: str) -> NoReturn:
     pytest.skip(f"{_LIVE_SKIP_PREFIX}{reason}")
 
 
+def skip_on_upstream(exc: BaseException) -> NoReturn:
+    """Re-raise `exc` unless it is an availability failure, which skips, prefixed.
+
+    The counterpart to `require_reachable` for the case a test catches its
+    own exception: the host answered, but the call failed. Replaces the
+    `pytest.skip(f"… unavailable: {exc}")` idiom, which emits an *unprefixed*
+    skip that both masked-lane guards read as "this backend was never
+    configured" — so a transient outage is reported as a missing credential and,
+    beside passing neighbours, reddens the whole lane.
+
+    Args:
+        exc: The exception the test caught.
+
+    Raises:
+        Skipped: When `is_upstream_unavailable` recognises `exc`.
+        BaseException: `exc` itself, unchanged, when it does not.
+
+    Examples:
+        ```python
+        >>> import requests
+        >>> from earthlens.testing import skip_on_upstream
+        >>> try:
+        ...     skip_on_upstream(ValueError("bad bbox"))
+        ... except ValueError as caught:
+        ...     print(caught)
+        bad bbox
+
+        ```
+    """
+    reason = is_upstream_unavailable(exc)
+    if reason is None:
+        raise exc
+    skip_live_unavailable(reason)
+
+
+#: Reachability verdicts keyed on the probed target: `None` when the host
+#: answered, otherwise the reason it did not. Cached for the life of the
+#: process so N tests against one host cost one probe, which is the whole
+#: reason the per-module `skipif` idiom was tolerable in the first place.
+_PROBE_CACHE: dict[str, str | None] = {}
+
+#: Default probe timeout. Deliberately longer than the 5s several of the
+#: hand-rolled helpers used: a 5s budget turns a merely slow public host into a
+#: skipped test, which is the false-negative direction that hides regressions.
+_PROBE_TIMEOUT = 10.0
+
+
+#: pytest-socket raises `SocketBlockedError` for a blocked `socket()` and
+#: `SocketConnectBlockedError` for a blocked `connect()` under `--allow-hosts`.
+#: The two share no base beyond `RuntimeError`, and importing them would make
+#: the plugin a hard dependency of this module, so they are matched by name.
+_SOCKET_BLOCK_ERRORS = frozenset({"SocketBlockedError", "SocketConnectBlockedError"})
+
+
+def _is_socket_blocked(exc: BaseException) -> bool:
+    """Return whether `exc` is pytest-socket refusing the connection.
+
+    Args:
+        exc: The exception to classify.
+
+    Returns:
+        `True` when the lane's socket block raised it.
+    """
+    return type(exc).__name__ in _SOCKET_BLOCK_ERRORS
+
+
+def _probe(target: str, timeout: float) -> str | None:
+    """Return `None` when `target` answers, else the reason it did not.
+
+    A URL is probed with a `HEAD` and *any* HTTP answer counts as reachable —
+    even a 500. Whether the service works is the test's business, and the
+    `pytest_runtest_call` hook already classifies that; this only answers
+    "is the host there at all". A bare host (optionally `host:port`) is probed
+    with a TCP connect.
+    """
+    try:
+        if "://" in target:
+            import requests
+
+            requests.head(target, timeout=timeout, allow_redirects=True)
+        else:
+            host, _, port = target.partition(":")
+            socket.create_connection((host, int(port or 443)), timeout=timeout).close()
+    except Exception as exc:  # noqa: BLE001 - any probe failure is a verdict
+        # pytest-socket blocking the probe means the test is in the wrong lane,
+        # not that the host is down. Let that surface as the error it is.
+        if _is_socket_blocked(exc):
+            raise
+        return f"{target} unreachable ({type(exc).__name__})"
+    return None
+
+
+def require_reachable(target: str, *, timeout: float = _PROBE_TIMEOUT) -> None:
+    """Skip the current live test, prefixed, when `target` cannot be reached.
+
+    The single replacement for the ~30 hand-rolled `_network_ok` / `_host_ok` /
+    `_online` probes that used four transports, three timeouts and — because
+    they fed a module-level `pytest.mark.skipif` — ran at *import* time, so the
+    `-m "not e2e"` lane opened real sockets during collection and the resulting
+    skip carried no prefix.
+
+    Called from inside a test (or, preferably, via the `requires_host` marker)
+    it runs only for selected tests, probes each target once per session, and
+    stamps the guard prefix so a lane masked by an outage is diagnosed as an
+    outage.
+
+    Args:
+        target: A URL (`https://host/path`, probed with `HEAD`), a bare host
+            (probed with a TCP connect to 443), or `host:port`.
+        timeout: Seconds to wait for the probe.
+
+    Raises:
+        Skipped: When the target does not answer.
+
+    Examples:
+        ```python
+        >>> import pytest
+        >>> from earthlens.testing import require_reachable, reset_reachability_cache
+        >>> reset_reachability_cache({"down.invalid": "down.invalid unreachable"})
+        >>> with pytest.raises(BaseException, match="live e2e skipped"):
+        ...     require_reachable("down.invalid")
+        >>> reset_reachability_cache()
+
+        ```
+    """
+    if target not in _PROBE_CACHE:
+        _PROBE_CACHE[target] = _probe(target, timeout)
+    reason = _PROBE_CACHE[target]
+    if reason is not None:
+        skip_live_unavailable(reason)
+
+
+def reset_reachability_cache(seed: dict[str, str | None] | None = None) -> None:
+    """Clear (or seed) the per-session reachability verdicts.
+
+    Args:
+        seed: Verdicts to install instead — `None` for a reachable host, a
+            reason string for an unreachable one. Omit to simply clear.
+    """
+    _PROBE_CACHE.clear()
+    if seed:
+        _PROBE_CACHE.update(seed)
+
+
+@pytest.fixture(autouse=True)
+def require_marked_hosts(request: pytest.FixtureRequest) -> None:
+    """Apply every `requires_host` marker on the test before it runs.
+
+    Lets a live test keep the one-line decorator ergonomics of the `skipif`
+    idiom it replaces — `@pytest.mark.requires_host("wgms.ch")` — while the
+    probe happens at run time, for selected tests only, and skips with the
+    guard prefix.
+
+    Args:
+        request: pytest's request object, for the item's markers.
+    """
+    for marker in request.node.iter_markers("requires_host"):
+        timeout = marker.kwargs.get("timeout", _PROBE_TIMEOUT)
+        for target in marker.args:
+            require_reachable(target, timeout=timeout)
+
+
+#: What to tell someone whose non-e2e test just tried to open a socket. A bare
+#: `SocketBlockedError` names the symptom; this names the decision they have to
+#: make. Borrowed from Airflow, whose DB-access block fails with a sentence
+#: saying which marker to add rather than with a connection error.
+_SOCKET_BLOCKED_HELP = (
+    "{nodeid} opened a network socket, and this lane runs with "
+    "`--disable-socket` because it must not touch the network.\n"
+    "Either fake the transport (`earthlens.testing.fake_http` / `FakeResponse`, "
+    "or an emulator on 127.0.0.1), or mark the test `@pytest.mark.e2e` so it "
+    "runs in a live lane instead.\n"
+    "If it is a *reachability probe*, it belongs in "
+    "`@pytest.mark.requires_host(...)`, which runs only for selected tests."
+)
+
+
 @pytest.hookimpl(wrapper=True)
 def pytest_runtest_call(item: pytest.Item) -> Generator[None, object, object]:
     """Turn an upstream-availability failure in a live `e2e` test into a skip.
@@ -225,6 +353,10 @@ def pytest_runtest_call(item: pytest.Item) -> Generator[None, object, object]:
     `skipped`, not `failed`. This wrapper inspects the exception a `e2e`-marked
     test raises and, when `is_upstream_unavailable` recognises it, re-raises it as
     a skip. Every other failure — and every non-`e2e` test — propagates unchanged.
+
+    It also rewrites pytest-socket's `SocketBlockedError` into a message that
+    says what to do about it, since that error arrives in the lane where the
+    author is least likely to know the lane blocks sockets at all.
 
     Args:
         item: The test item pytest is about to run.
@@ -239,7 +371,45 @@ def pytest_runtest_call(item: pytest.Item) -> Generator[None, object, object]:
             reason = is_upstream_unavailable(exc)
             if reason is not None:
                 pytest.skip(f"{_LIVE_SKIP_PREFIX}{reason}")
+        elif _is_socket_blocked(exc):
+            raise RuntimeError(_SOCKET_BLOCKED_HELP.format(nodeid=item.nodeid)) from exc
         raise
+
+
+#: Reason stamped on a quarantined test's skip, so a reader of the log knows the
+#: test was held back deliberately rather than failing to select.
+_QUARANTINE_REASON = (
+    "quarantined — chronically unreliable upstream; run it with `-m quarantined`"
+)
+
+
+def pytest_collection_modifyitems(
+    config: pytest.Config, items: list[pytest.Item]
+) -> None:
+    """Tag each item by its directory, then hold back the quarantined ones.
+
+    Two jobs in one hook because pytest allows a conftest only one
+    `pytest_collection_modifyitems`, and both belong to every member:
+
+    1. `tag_items_by_directory` gives each test its
+       backend marker, so `-m <backend>` selects that backend's whole subtree —
+       including the `test_cli.py` that used to carry only `cli`.
+    2. A `quarantined` test is skipped unless the `-m` expression names the
+       marker. The third option the suite lacked: a live backend whose host is
+       down for weeks could previously only be deleted (losing the coverage) or
+       left in a shared lane (reddening its neighbours).
+
+    Args:
+        config: The session config, read for the `-m` expression.
+        items: The collected items, mutated in place.
+    """
+    tag_items_by_directory(items)
+    if re.search(r"\bquarantined\b", config.getoption("-m", default="") or ""):
+        return
+    skip = pytest.mark.skip(reason=_QUARANTINE_REASON)
+    for item in items:
+        if item.get_closest_marker("quarantined") is not None:
+            item.add_marker(skip)
 
 
 def _skip_reason(report: pytest.TestReport) -> str:
@@ -304,53 +474,3 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
             "masked run does not report green.",
             red=True,
         )
-
-
-@pytest.fixture(scope="session", autouse=True)
-def _earthlens_dirs_scratch(tmp_path_factory):
-    """Point the output and cache directories at a scratch root for the session.
-
-    Session-scoped and autouse so the redirect is in place before *any* other
-    fixture runs. A function-scoped fixture would be too late: pytest builds
-    session-, package-, module- and class-scoped fixtures first, so a
-    module-scoped fixture that constructs a backend without `path=` would
-    resolve the developer's real `~/.earthlens/data` instead.
-    """
-    root = tmp_path_factory.mktemp("earthlens-dirs")
-    set_output_dir(root / "data")
-    set_cache_dir(root / "cache")
-    yield root
-    set_output_dir(None)
-    set_cache_dir(None)
-
-
-@pytest.fixture(autouse=True)
-def isolate_earthlens_dirs(_earthlens_dirs_scratch, request):
-    """Give each test its own slot beneath the session scratch root.
-
-    A backend built without `path=` resolves to the configured output directory,
-    and each backend hangs its intermediates cache off the configured cache
-    directory. Left alone those are the developer's own `~/.earthlens/data` and
-    per-platform user cache, so any test that downloads would write there.
-
-    Per test, so a cache one test populates is not visible to the next — several
-    tests assert on an empty or a pre-seeded cache. The slot is keyed on a hash
-    of the whole node id: truncating the id would drop the discriminating path
-    prefix, and long ids that end alike would share a directory. A readable
-    prefix is kept so a leftover directory can still be traced back to its test.
-    Resolving a directory never creates it, so an unused slot costs nothing.
-
-    Autouse, so a member's tests get the isolation by importing this module's
-    fixtures the same way they already import the HTTP transport seam.
-    """
-    nodeid = request.node.nodeid
-    label = re.sub(r"[^A-Za-z0-9_.-]", "_", nodeid)[-60:]
-    digest = hashlib.blake2b(nodeid.encode("utf-8"), digest_size=8).hexdigest()
-    root = _earthlens_dirs_scratch / f"{label}-{digest}"
-    set_output_dir(root / "data")
-    set_cache_dir(root / "cache")
-    yield
-    # Back to the session root rather than None, so anything still resolving
-    # after this test — a wider-scoped teardown — stays isolated too.
-    set_output_dir(_earthlens_dirs_scratch / "data")
-    set_cache_dir(_earthlens_dirs_scratch / "cache")

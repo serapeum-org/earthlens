@@ -9,7 +9,6 @@ from collections.abc import Mapping
 from typing import List
 from unittest.mock import MagicMock
 
-import cdsapi
 import numpy as np
 import pandas as pd
 import pytest
@@ -21,10 +20,19 @@ from earthlens._backends import (
 )
 from earthlens.aggregate import AggregationConfig
 from earthlens.base.abstractdatasource import native_parameters
-from earthlens.chc import CHIRPS
 from earthlens.earthlens import EarthLens, _LazyRegistry, _source_dirname
-from earthlens.ecmwf import ECMWF
-from earthlens.s3 import S3
+
+#: Core's tests sweep the backend registry, so a handful of them need a
+#: real provider. The providers are separate distributions, so the import
+#: is soft: `cd libs/core && pytest` with only earthlens-core installed
+#: skips these rather than erroring the whole module.
+CHIRPS = pytest.importorskip("earthlens.chc").CHIRPS
+ECMWF = pytest.importorskip("earthlens.ecmwf").ECMWF
+S3 = pytest.importorskip("earthlens.s3").S3
+
+#: The `ecmwf` extra is optional, so a missing `cdsapi` skips this module
+#: rather than erroring the whole directory's collection.
+cdsapi = pytest.importorskip("cdsapi")
 
 
 class _SentinelClient:
@@ -345,6 +353,11 @@ class TestECMWFBackend:
             lat_lim=[4.0, 5.0],
             lon_lim=[-75.0, -74.0],
             path=str(tmp_path),
+            # The constraints lookup is a live HTTP call the faked client
+            # never sees, so without this the "offline" test reached the real
+            # CDS on every unit run. The provider's own suite sets the same
+            # flag; the facade forwards it through **backend_kwargs.
+            skip_constraints=True,
         )
         earthlens.download(progress_bar=False)
 
@@ -1213,7 +1226,7 @@ class TestFacadeDiscovery:
 
     def test_catalog_missing_raises_not_implemented(self, monkeypatch):
         """A backend whose module ships no Catalog raises NotImplementedError."""
-        import earthlens.chc as chc_module
+        chc_module = pytest.importorskip("earthlens.chc")
 
         monkeypatch.delattr(chc_module, "Catalog", raising=False)
         with pytest.raises(NotImplementedError, match="no catalog"):

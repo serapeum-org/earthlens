@@ -136,7 +136,7 @@ class TestLiveValidatorBranches:
 
     def test_live_ghsl_reports_url_error(self, monkeypatch):
         """A ghsl_url failure is reported as an issue rather than raised."""
-        import earthlens.ghsl._helpers as helpers
+        helpers = pytest.importorskip("earthlens.ghsl._helpers")
 
         def boom(*a, **kw):
             raise RuntimeError("bad url")

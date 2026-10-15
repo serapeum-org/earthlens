@@ -16,6 +16,8 @@ import pytest
 import requests
 from pyramids.dataset import Dataset, GeoReference
 
+from earthlens.testing import FakeResponse
+
 #: The WGS84 extent the tiny test GeoTIFF covers (a Kenya-sized box).
 TIF_WEST, TIF_SOUTH, TIF_EAST, TIF_NORTH = 33.9, -4.7, 41.9, 5.0
 
@@ -86,33 +88,6 @@ def age_records(iso3: str = "ken", years=(2020,)) -> list[dict]:
     return out
 
 
-class _FakeResponse:
-    """Minimal stand-in for `requests.Response` returning canned data."""
-
-    status_code = 200
-    headers: dict[str, str] = {}
-
-    def __init__(self, *, json_data: object | None = None, content: bytes = b""):
-        self._json = json_data
-        self.content = content
-
-    def json(self) -> object:
-        """Return the canned decoded JSON body."""
-        return self._json
-
-    def raise_for_status(self) -> None:
-        """Raise `HTTPError` when neither JSON nor content was supplied (a 404)."""
-        if self._json is None and not self.content:
-            raise requests.HTTPError("404 Not Found")
-
-    def close(self) -> None:
-        """No-op — the fake holds no socket."""
-
-    def iter_content(self, chunk_size=None):
-        """Yield the canned body in one chunk, as a streamed response would."""
-        yield self.content
-
-
 @pytest.fixture
 def patch_http(monkeypatch, tiny_tif_bytes):
     """Return an installer that routes `requests.get` to canned REST + tiny tifs.
@@ -124,9 +99,9 @@ def patch_http(monkeypatch, tiny_tif_bytes):
     def _install(records: list[dict]) -> None:
         def fake_get(url, params=None, timeout=None, **kwargs):
             if "/rest/data/" in url:
-                return _FakeResponse(json_data={"data": records})
+                return FakeResponse(json={"data": records})
             if url.endswith(".tif"):
-                return _FakeResponse(content=tiny_tif_bytes)
+                return FakeResponse(content=tiny_tif_bytes)
             raise AssertionError(f"unexpected URL in test: {url}")
 
         monkeypatch.setattr(requests, "get", fake_get)

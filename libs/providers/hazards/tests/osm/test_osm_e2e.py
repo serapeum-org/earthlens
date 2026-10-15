@@ -13,13 +13,13 @@ Run with:
 from __future__ import annotations
 
 from pathlib import Path
+from typing import NoReturn
 
 import pytest
-import requests
 
 from earthlens.earthlens import EarthLens
 from earthlens.osm import OhsomeUnavailableError
-from earthlens.testing import skip_live_unavailable
+from earthlens.testing import skip_live_unavailable, skip_on_upstream
 
 pytestmark = [pytest.mark.e2e, pytest.mark.osm]
 
@@ -30,31 +30,29 @@ _LAT_LIM = [49.40, 49.42]
 _LON_LIM = [8.67, 8.71]
 
 
-def _skip_on_network(exc: Exception) -> None:
-    """Skip (not fail) when the failure is a transport problem, else re-raise.
+def _skip_on_network(exc: Exception) -> NoReturn:
+    """Skip an ohsome throttle/outage; let the shared classifier judge the rest.
 
-    Transport dropouts (offline / a throttled mirror) skip, and so does a
-    public-endpoint unavailability: a `403` / `429` throttle (issue #1025) or a
-    `5xx` outage (issue #790) from `api.ohsome.org` (a keyless service) is a
-    transient upstream condition, not a regression, so the backend's typed
-    `OhsomeUnavailableError` skips the lane rather than reddening it. Anything
-    else re-raises and fails.
+    One arm is genuinely backend-specific and stays here: `api.ohsome.org` is
+    keyless, so a `403` from its front proxy is a throttle (#1025) and a `5xx`
+    on this tiny smoke bbox is an outage (#790) — neither is a regression. The
+    generic status rule deliberately refuses to forgive a `403`, and widening
+    it for everyone would mask real auth failures, so the exception is declared
+    here rather than in the shared classifier. Equally deliberately, a `404` or
+    a `600` on the same type re-raises: ohsome answers 4xx for a bad
+    filter/bbox/time, and #1088 exists to keep that failing.
+
+    Everything else goes to `skip_on_upstream`, which skips a transport dropout
+    with the guard prefix and re-raises anything that is not an outage.
     """
-    if isinstance(exc, (requests.ConnectionError, requests.Timeout)):
-        skip_live_unavailable(f"OSM service unreachable: {exc}")
     status = getattr(exc, "status_code", None)
-    # A 5xx on this tiny smoke bbox is only ever an upstream outage, never
-    # something the request shape provoked (ohsome answers 4xx for a bad
-    # filter/bbox/time), so skipping it here does not mask an earthlens defect —
-    # the offline TestOhsomeRoute suite is the real guardrail for the 5xx
-    # classification logic.
     if (
         isinstance(exc, OhsomeUnavailableError)
         and status is not None
         and (status in (403, 429) or 500 <= status < 600)
     ):
-        pytest.skip(f"ohsome public endpoint unavailable (HTTP {status}): {exc}")
-    raise exc
+        skip_live_unavailable(f"ohsome public endpoint unavailable (HTTP {status})")
+    skip_on_upstream(exc)
 
 
 class TestOverpassLive:
