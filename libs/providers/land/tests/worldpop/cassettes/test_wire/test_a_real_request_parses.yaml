@@ -1,0 +1,457 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - earthlens/0.27.1
+    method: GET
+    uri: https://hub.worldpop.org/rest/data/pop/wpgp?iso3=MCO
+  response:
+    body:
+      string: '{"data":[{"id":"1495","title":"The spatial distribution of population
+        in 2000, Monaco","desc":"Estimated total number of people per grid-cell. The
+        dataset is available to download in Geotiff format at a resolution of 3 arc
+        (approximately 100m at the equator). The projection is Geographic Coordinate
+        System, WGS84. The units are number of people per pixel. The mapping approach
+        is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2000","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2000/MCO/mco_ppp_2000.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2000/MCO/mco_ppp_2000.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/1495/mco_ppp_wpgp_2000_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=1495"},{"id":"1744","title":"The
+        spatial distribution of population in 2001, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2001","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2001/MCO/mco_ppp_2001.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2001/MCO/mco_ppp_2001.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/1744/mco_ppp_wpgp_2001_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=1744"},{"id":"1993","title":"The
+        spatial distribution of population in 2002, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2002","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2002/MCO/mco_ppp_2002.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2002/MCO/mco_ppp_2002.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/1993/mco_ppp_wpgp_2002_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=1993"},{"id":"2242","title":"The
+        spatial distribution of population in 2003, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2003","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2003/MCO/mco_ppp_2003.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2003/MCO/mco_ppp_2003.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/2242/mco_ppp_wpgp_2003_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=2242"},{"id":"2491","title":"The
+        spatial distribution of population in 2004, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2004","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2004/MCO/mco_ppp_2004.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2004/MCO/mco_ppp_2004.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/2491/mco_ppp_wpgp_2004_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=2491"},{"id":"2740","title":"The
+        spatial distribution of population in 2005, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2005","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2005/MCO/mco_ppp_2005.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2005/MCO/mco_ppp_2005.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/2740/mco_ppp_wpgp_2005_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=2740"},{"id":"2989","title":"The
+        spatial distribution of population in 2006, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2006","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2006/MCO/mco_ppp_2006.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2006/MCO/mco_ppp_2006.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/2989/mco_ppp_wpgp_2006_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=2989"},{"id":"3238","title":"The
+        spatial distribution of population in 2007, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2007","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2007/MCO/mco_ppp_2007.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2007/MCO/mco_ppp_2007.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/3238/mco_ppp_wpgp_2007_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=3238"},{"id":"3487","title":"The
+        spatial distribution of population in 2008, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2008","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2008/MCO/mco_ppp_2008.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2008/MCO/mco_ppp_2008.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/3487/mco_ppp_wpgp_2008_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=3487"},{"id":"3728","title":"The
+        spatial distribution of population in 2009, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2009","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2009/MCO/mco_ppp_2009.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2009/MCO/mco_ppp_2009.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/3728/mco_ppp_wpgp_2009_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=3728"},{"id":"3977","title":"The
+        spatial distribution of population in 2010, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2010","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2010/MCO/mco_ppp_2010.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2010/MCO/mco_ppp_2010.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/3977/mco_ppp_wpgp_2010_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=3977"},{"id":"4226","title":"The
+        spatial distribution of population in 2011, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2011","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2011/MCO/mco_ppp_2011.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2011/MCO/mco_ppp_2011.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/4226/mco_ppp_wpgp_2011_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=4226"},{"id":"4475","title":"The
+        spatial distribution of population in 2012, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2012","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2012/MCO/mco_ppp_2012.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2012/MCO/mco_ppp_2012.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/4475/mco_ppp_wpgp_2012_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=4475"},{"id":"4724","title":"The
+        spatial distribution of population in 2013, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2013","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2013/MCO/mco_ppp_2013.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2013/MCO/mco_ppp_2013.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/4724/mco_ppp_wpgp_2013_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=4724"},{"id":"4973","title":"The
+        spatial distribution of population in 2014, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2014","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2014/MCO/mco_ppp_2014.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2014/MCO/mco_ppp_2014.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/4973/mco_ppp_wpgp_2014_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=4973"},{"id":"5222","title":"The
+        spatial distribution of population in 2015, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2015","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2015/MCO/mco_ppp_2015.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2015/MCO/mco_ppp_2015.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/5222/mco_ppp_wpgp_2015_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=5222"},{"id":"5471","title":"The
+        spatial distribution of population in 2016, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2016","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2016/MCO/mco_ppp_2016.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2016/MCO/mco_ppp_2016.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/5471/mco_ppp_wpgp_2016_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=5471"},{"id":"5720","title":"The
+        spatial distribution of population in 2017, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2017","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2017/MCO/mco_ppp_2017.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2017/MCO/mco_ppp_2017.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/5720/mco_ppp_wpgp_2017_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=5720"},{"id":"5969","title":"The
+        spatial distribution of population in 2018, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2018","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2018/MCO/mco_ppp_2018.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2018/MCO/mco_ppp_2018.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/5969/mco_ppp_wpgp_2018_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=5969"},{"id":"6218","title":"The
+        spatial distribution of population in 2019, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2019","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2019/MCO/mco_ppp_2019.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2019/MCO/mco_ppp_2019.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/6218/mco_ppp_wpgp_2019_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=6218"},{"id":"6467","title":"The
+        spatial distribution of population in 2020, Monaco","desc":"Estimated total
+        number of people per grid-cell. The dataset is available to download in Geotiff
+        format at a resolution of 3 arc (approximately 100m at the equator). The projection
+        is Geographic Coordinate System, WGS84. The units are number of people per
+        pixel. The mapping approach is Random Forest-based dasymetric redistribution.","doi":"10.5258/SOTON/WP00645","date":"2018-11-01","popyear":"2020","citation":"WorldPop
+        (www.worldpop.org - School of Geography and Environmental Science, University
+        of Southampton; Department of Geography and Geosciences, University of Louisville;
+        Departement de Geographie, Universite de Namur) and Center for International
+        Earth Science Information Network (CIESIN), Columbia University (2018). Global
+        High Resolution Population Denominators Project - Funded by The Bill and Melinda
+        Gates Foundation (OPP1134076). https://dx.doi.org/10.5258/SOTON/WP00645","data_file":"GIS/Population/Global_2000_2020/2020/MCO/mco_ppp_2020.tif","archive":"N","public":"Y","source":"WorldPop,
+        University of Southampton, UK","data_format":"Geotiff","author_email":"wp@worldpop.uk","author_name":"WorldPop","maintainer_name":"WorldPop","maintainer_email":"wp@worldpop.uk","project":"Population
+        Counts","category":"Unconstrained individual countries 2000-2020 ( 100m resolution
+        )","gtype":"Population","continent":"Europe","country":"Monaco","iso3":"MCO","files":["https://data.worldpop.org/GIS/Population/Global_2000_2020/2020/MCO/mco_ppp_2020.tif"],"url_img":"https://hub.worldpop.org/tabs/gdata/img/6467/mco_ppp_wpgp_2020_Image.png","organisation":"WorldPop,
+        University of Southampton, UK, hub.worldpop.org","license":"https://hub.worldpop.org/data/licence.txt","url_summary":"https://hub.worldpop.org/geodata/summary?id=6467"}]}'
+    headers:
+      '#01':
+      - '[23:04:47 08659400 SQL QUERY      ] SELECT `id`,`rest` FROM `project` WHERE
+        `alias` = "pop" LIMIT 1'
+      '#02':
+      - '[23:04:47 08788100 SQL QUERY      ] SELECT id FROM `category` WHERE `alias`
+        = "wpgp" LIMIT 1'
+      '#03':
+      - '[23:04:47 08861300 SQL QUERY      ] SELECT g.id, g.title, g.desc, g.doi,
+        g.date, g.popyear, g.citation, g.data_file, g.file_img, g.archive, g.public,
+        g.source, g.data_format, g.author_email, g.author_name, g.license_path, g.maintainer_name,
+        g.maintainer_email, p.name project, cat.name category, t.name gtype, cn.name
+        continent, c.name country, c.iso3 FROM gdata g LEFT JOIN project p ON p.id
+        = g.project_id LEFT JOIN category cat ON cat.id = g.category_id LEFT JOIN
+        gtype t ON t.id = g.gtype_id LEFT JOIN continent cn ON cn.id = g.continent_id
+        LEFT JOIN country c ON c.id = g.country_id WHERE c.iso3 = ''MCO'' AND g.category_id
+        = 29'
+      Connection:
+      - close
+      Content-Encoding:
+      - none
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 14 Oct 2026 22:04:47 GMT
+      Server:
+      - Apache/2.4.62 (Red Hat Enterprise Linux) OpenSSL/3.5.5
+      Transfer-Encoding:
+      - chunked
+      X-Powered-By:
+      - PHP/8.0.30
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - identity
+      Connection:
+      - keep-alive
+      User-Agent:
+      - earthlens/0.27.1
+    method: GET
+    uri: https://data.worldpop.org/GIS/Population/Global_2000_2020/2020/MCO/mco_ppp_2020.tif
+  response:
+    body:
+      string: !!binary |
+        SUkqAAgAAAATAAABAwABAAAAJQAAAAEBAwABAAAAIgAAAAIBAwABAAAAIAAAAAMBAwABAAAABQAA
+        AAYBAwABAAAAAQAAABEBBAABAAAAxgIAABUBAwABAAAAAQAAABYBAwABAAAAIgAAABcBBAABAAAA
+        LQgAABwBAwABAAAAAQAAAD0BAwABAAAAAQAAAFMBAwABAAAAAwAAAA6DDAADAAAAJgIAAIKEDAAG
+        AAAAPgIAAK+HAwAgAAAAbgIAALCHDAACAAAArgIAALGHAgAIAAAAvgIAAICkAgArAQAA8gAAAIGk
+        AgAHAAAAHgIAAAAAAAA8R0RBTE1ldGFkYXRhPgogIDxJdGVtIG5hbWU9IlNUQVRJU1RJQ1NfTUFY
+        SU1VTSIgc2FtcGxlPSIwIj40NTguMjg0NjYyNjE5OTU8L0l0ZW0+CiAgPEl0ZW0gbmFtZT0iU1RB
+        VElTVElDU19NRUFOIiBzYW1wbGU9IjAiPjEwMC4zNDM3NTE5OTYyNDwvSXRlbT4KICA8SXRlbSBu
+        YW1lPSJTVEFUSVNUSUNTX01JTklNVU0iIHNhbXBsZT0iMCI+MTcuNDczOTA0OTc5MDU5PC9JdGVt
+        PgogIDxJdGVtIG5hbWU9IlNUQVRJU1RJQ1NfU1REREVWIiBzYW1wbGU9IjAiPjg0LjgyNTA3Mjg5
+        MDgzPC9JdGVtPgo8L0dEQUxNZXRhZGF0YT4KAAAtOTk5OTkAAAcz9K+BTks/01KEr4FOSz8AAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFleQM9pox1AW2d5pw3gRUAAAAAAAAAAAAEAAQAA
+        AAcAAAQAAAEAAgABBAAAAQABAAAIAAABAOYQAQixhwcAAAAGCAAAAQCOIwkIsIcBAAEACwiwhwEA
+        AACIbXSWHaRyQAAAAECmVFhBV0dTIDg0fACAIAnsNjwKCQaCwOEweFQiHQ2IQyJQuKQ+JxaKxGMx
+        eNRiEG1orghpFUn0hg56rQhR6Oy2OS+NzGWTCZzKXTaJqkONchoFGMEhsISr8hkBIochqBaKkhLU
+        NKaVzea1OpVWaVacVmMEFgsMhhAFoohuZxhYhtQIhEhmpoBMhsEBKwhDpf0x0Im5EdQq+o1e/Vqs
+        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
+        BoD4fvzjphGiAg==
+    headers:
+      Accept-Ranges:
+      - bytes
+      Connection:
+      - Keep-Alive
+      Content-Disposition:
+      - attachment
+      Content-Length:
+      - '2803'
+      Content-Type:
+      - image/tiff
+      Date:
+      - Wed, 14 Oct 2026 22:04:53 GMT
+      ETag:
+      - '"af3-57b44bc50e532"'
+      Keep-Alive:
+      - timeout=5, max=100
+      Last-Modified:
+      - Thu, 22 Nov 2018 18:07:10 GMT
+      Server:
+      - Apache
+    status:
+      code: 200
+      message: OK
+version: 1
