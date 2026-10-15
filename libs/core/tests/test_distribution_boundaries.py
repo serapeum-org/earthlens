@@ -2353,6 +2353,26 @@ class TestGdalGuardDetection:
         assert not _imports_pyramids(ast.parse(source).body[0])
 
 
+def _seed_a_role_tree(root: Path, self_relative: str) -> None:
+    """Write one file per decision the role scan makes, each carrying a role.
+
+    The scan reports a path relative to the root it walks, so the cases have to
+    be laid out as a real tree rather than assembled in memory.
+    """
+    for relative in (
+        "docs/page.md",
+        "libs/core/src/earthlens/module.py",
+        "examples/notebook.ipynb",
+        "docs/notes.txt",
+        "planning/unsearched.md",
+        self_relative,
+    ):
+        target = root / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text("see :meth:`GEE.download` for the call\n", encoding="utf-8")
+    (root / "docs/plain.md").write_text("`Reducer` is the strategy\n", encoding="utf-8")
+
+
 class TestNoRstRoles:
     """Docs are rendered as Markdown, so an rST cross-reference role is literal text."""
 
@@ -2425,5 +2445,41 @@ class TestNoRstRoles:
         """A negative control, so an empty result cannot come from a dead regex."""
         assert self.ROLE.search(":class:`Reducer`")
         assert self.ROLE.search("see :meth:`GEE.download` for the call")
+        assert self.ROLE.search(":py:class:`Reducer`")
         assert not self.ROLE.search("`Reducer` is the strategy")
         assert not self.ROLE.search("a dict like {'a': 'b'} and `x`")
+
+    def test_the_scan_reports_the_files_that_carry_a_role(self, monkeypatch, tmp_path):
+        """The empty result is evidence only if the scan can report a hit at all.
+
+        The other tests here each check one part in isolation - that the roots
+        hold files, that the regex still matches. None of them runs the
+        reporting path, so a suffix set that excluded everything, a typo in a
+        root name, or an exemption that swallowed the repository would all pass
+        green.
+        """
+        monkeypatch.setattr(sys.modules[__name__], "_ROOT", tmp_path)
+        _seed_a_role_tree(tmp_path, self.SELF)
+        assert self._offenders() == [
+            "docs/page.md",
+            "examples/notebook.ipynb",
+            "libs/core/src/earthlens/module.py",
+        ], (
+            "the scan must report a role in each searched suffix, and skip the "
+            "unsearched suffix, the unsearched root, the exempted file and the "
+            "file that only uses plain inline code"
+        )
+
+    def test_an_undecodable_file_is_skipped_rather_than_failing_the_sweep(
+        self, monkeypatch, tmp_path
+    ):
+        """One unreadable byte must not take the whole sweep down with it."""
+        monkeypatch.setattr(sys.modules[__name__], "_ROOT", tmp_path)
+        (tmp_path / "docs").mkdir(parents=True)
+        (tmp_path / "docs/page.md").write_text(
+            "see :meth:`GEE.download` for the call\n", encoding="utf-8"
+        )
+        (tmp_path / "docs/latin1.md").write_bytes(b"\xff\xfe :class:`Reducer`\n")
+        assert self._offenders() == ["docs/page.md"], (
+            "a file the scan cannot decode must be passed over, not raise"
+        )
