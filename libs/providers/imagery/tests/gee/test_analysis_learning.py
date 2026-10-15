@@ -212,11 +212,23 @@ class TestClassify:
 class TestTheGuardedImport:
     """scikit-learn is reached through one seam, like the pyramids-eo reader."""
 
-    def test_the_availability_check_agrees_with_the_environment(self):
-        """`sklearn_available` is a probe, not a guess."""
-        import importlib.util
+    def test_the_availability_check_finds_the_installed_package(self):
+        """scikit-learn is on the `[gee]` extra, so it is importable here.
 
-        assert sklearn_available() == (importlib.util.find_spec("sklearn") is not None)
+        The previous version of this test imported `importlib.util` in its own
+        body, which guaranteed the attribute the implementation reached for
+        existed by the time the assertion ran - so it could not fail even
+        though the implementation raised `AttributeError` on a clean
+        interpreter.
+        """
+        assert sklearn_available() is True
+
+    def test_the_availability_check_reports_a_missing_package(self, monkeypatch):
+        """The false branch was never exercised, so it is pinned here."""
+        import earthlens.gee.analysis._sklearn as guard
+
+        monkeypatch.setattr(guard, "find_spec", lambda name: None)
+        assert guard.sklearn_available() is False
 
     def test_a_missing_install_names_the_extra(self, monkeypatch):
         """The error should say what to install, not fail on an attribute."""

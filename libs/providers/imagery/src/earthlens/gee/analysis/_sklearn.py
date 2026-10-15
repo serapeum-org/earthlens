@@ -14,6 +14,7 @@ failing on an attribute.
 from __future__ import annotations
 
 import importlib
+from importlib.util import find_spec
 from types import ModuleType
 
 __all__ = ["import_cluster", "import_ensemble", "sklearn_available"]
@@ -76,4 +77,9 @@ def sklearn_available() -> bool:
         a caller can take the learning path at all, without catching an
         exception to find out.
     """
-    return importlib.util.find_spec("sklearn") is not None
+    # `find_spec` is imported by name rather than reached as
+    # `importlib.util.find_spec`: `importlib.util` is a submodule, so that
+    # attribute exists only once something has imported it. It happens to be
+    # preloaded in a dev environment, which is why the original spelling worked
+    # here and would have raised `AttributeError` on a clean interpreter.
+    return find_spec("sklearn") is not None
