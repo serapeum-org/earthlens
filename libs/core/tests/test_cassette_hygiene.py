@@ -50,15 +50,17 @@ def _cassette(tmp_path: Path, body: object) -> Path:
 def test_an_identity_response_body_is_caught(tmp_path):
     """An unscrubbed identity field in a JSON response fails the check."""
     leaky = '{"sub":"abc-123","preferred_username":"someone","scope":"openid"}'
+    cassette = _cassette(tmp_path, leaky)
     with pytest.raises(AssertionError, match="response body"):
-        assert_cassette_is_scrubbed(_cassette(tmp_path, leaky))
+        assert_cassette_is_scrubbed(cassette)
 
 
 def test_a_token_response_body_is_caught(tmp_path):
     """A bearer credential in a response body fails the check anywhere."""
     leaky = '{"access_token":"ey.live.token","token_type":"Bearer"}'
+    cassette = _cassette(tmp_path, leaky)
     with pytest.raises(AssertionError, match="access_token"):
-        assert_cassette_is_scrubbed(_cassette(tmp_path, leaky))
+        assert_cassette_is_scrubbed(cassette)
 
 
 def test_a_data_payload_reusing_identity_words_is_not_flagged(tmp_path):
