@@ -28,6 +28,11 @@ class _FakeReaderError(Exception):
     """Stands in for `pyramids_eo.errors.ReaderError`, which may not be installed."""
 
 
+def _raise_missing_extra():
+    """Fail the guarded import the way an uninstalled `[eedai]` extra does."""
+    raise ImportError("the pyramids-eo EEDAI reader is required for this path")
+
+
 class _UnwiredEngine(Engine):
     """An engine that registers to prove the seam but cannot fetch yet."""
 
@@ -174,6 +179,24 @@ class TestReaderRefusalTypes:
             engines_module, "import_earthengine_reader", lambda: SimpleNamespace()
         )
         assert AuthenticationError not in reader_refusal_types()
+
+    def test_resolves_when_the_extra_is_absent(self, monkeypatch):
+        """A missing `[eedai]` install yields the transport error, not an `ImportError`.
+
+        The call site is the expression of an `except` clause, reached only
+        after a reader call has already raised. Raising there replaces the
+        reader's own failure with an import failure and leaves the handler
+        unable to match anything, so the resolution has to survive the extra
+        being uninstalled.
+        """
+        from earthlens.gee import engines as engines_module
+
+        monkeypatch.setattr(
+            engines_module, "import_earthengine_reader", _raise_missing_extra
+        )
+        types = reader_refusal_types()
+        assert OSError in types, "the transport error stands without a reader to ask"
+        assert all(issubclass(entry, BaseException) for entry in types)
 
 
 class TestEeEngine:

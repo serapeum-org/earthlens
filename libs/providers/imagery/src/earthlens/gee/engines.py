@@ -425,14 +425,25 @@ def reader_refusal_types() -> tuple[type[BaseException], ...]:
     optional, and so the types come from `pyramids_eo.errors` rather than the
     reader module, which does not re-export `ReaderError`.
 
-    Returns:
-        The exception types to catch around a reader export.
+    Total by construction, because the one call site is the expression of an
+    `except` clause (`GEE._export_via_eedai`). An exception raised while
+    evaluating that expression replaces the reader's own failure and leaves the
+    handler matching nothing, so a missing `[eedai]` extra must not raise here
+    even though the path is only reached after a reader call. It is reachable
+    without the extra: `eedai_available()` gates `AutoEngine.plan` alone, while
+    `engine="eedai"` goes through `EedaiEngine.plan`, which never consults it.
+    With no reader to ask, the transport error still stands on its own.
 
-    Raises:
-        ImportError: If `pyramids-eo` (the `[eedai]` extra) is not installed.
-            Only reached on a path that has already committed to the reader,
-            which cannot have been routed to without it.
+    Returns:
+        The exception types to catch around a reader export; `(OSError,)` when
+        the extra is absent.
     """
     from earthlens.gee.backend import _reader_errors
 
-    return _reader_errors(import_earthengine_reader())
+    try:
+        reader = import_earthengine_reader()
+    except ImportError:
+        # No reader to consult for its own error class. `_reader_errors` still
+        # resolves `OSError` and, independently, `pyramids_eo.errors`.
+        reader = None
+    return _reader_errors(reader)
