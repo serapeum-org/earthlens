@@ -16,8 +16,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import numpy as np
-from pydantic import field_validator
+from pydantic import field_validator, model_validator
 
+from earthlens.gee.analysis._arrays import read_masked, result_like, validate_no_data
 from earthlens.gee.analysis.base import RasterOperation
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -64,6 +65,7 @@ class Reclassify(RasterOperation):
     bins: tuple[tuple[float, float, float], ...]
     band: int = 0
     dtype: str = "float32"
+    no_data: float | int | None = None
 
     @field_validator("bins")
     @classmethod
@@ -93,6 +95,21 @@ class Reclassify(RasterOperation):
                 )
         return value
 
+    @model_validator(mode="after")
+    def _sentinel_fits_the_dtype(self) -> Reclassify:
+        """Refuse a sentinel the output dtype cannot store, at construction.
+
+        Returns:
+            The operation, once its sentinel is representable.
+
+        Raises:
+            ValueError: If `no_data` cannot be stored in `dtype` - NaN in an
+                integer band is cast to 0, which collides with a real class, so
+                it has to fail here rather than silently at apply time.
+        """
+        validate_no_data(self.no_data, self.dtype)
+        return self
+
     def apply(self, ds: Dataset) -> Dataset:
         """Return a one-band raster of class values.
 
@@ -103,14 +120,14 @@ class Reclassify(RasterOperation):
             A new single-band raster holding one class value per cell, with
             unmatched cells as no-data.
         """
-        from pyramids.dataset import Dataset as PyramidsDataset
-
-        values = np.asarray(ds.read_array(band=self.band), dtype="float64")
+        # Masked, so an open lower bin cannot sweep the sentinel into the
+        # lowest class - `(-inf, 10]` otherwise matches -9999.
+        values = read_masked(ds, self.band)
         classified = np.full(values.shape, np.nan, dtype="float64")
         for lower, upper, class_value in self.bins:
             inside = (values >= lower) & (values < upper)
             classified = np.where(inside, class_value, classified)
-        return PyramidsDataset.dataset_like(ds, classified.astype(self.dtype))
+        return result_like(ds, classified, dtype=self.dtype, no_data=self.no_data)
 
 
 class ConvertUnits(RasterOperation):

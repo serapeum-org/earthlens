@@ -21,6 +21,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 from pydantic import field_validator
 
+from earthlens.gee.analysis._arrays import read_masked, result_like
 from earthlens.gee.analysis._sklearn import import_cluster
 from earthlens.gee.analysis.base import RasterOperation
 
@@ -102,16 +103,11 @@ class Cluster(RasterOperation):
             ValueError: If no cell has a value in every feature band, so there
                 is nothing to fit.
         """
-        from pyramids.dataset import Dataset as PyramidsDataset
-
         indices = self.bands if self.bands is not None else tuple(range(ds.band_count))
         # A masked read, not `isfinite`: the sentinel is a number like -9999,
         # so a finiteness test treats it as data and k-means hands it a cluster
         # of its own. The mask comes from the band's declared no-data value.
-        masked = [ds.read_array(band=index, masked=True) for index in indices]
-        features = np.stack(
-            [np.ma.filled(band, np.nan).astype("float64") for band in masked]
-        )
+        features = np.stack([read_masked(ds, index) for index in indices])
         rows, columns = features.shape[1], features.shape[2]
         flat = features.reshape(len(indices), rows * columns).T
         usable = np.isfinite(flat).all(axis=1)
@@ -125,6 +121,11 @@ class Cluster(RasterOperation):
         )
         labels = np.full(rows * columns, self.no_data_label, dtype="int64")
         labels[usable] = kmeans.fit_predict(flat[usable])
-        return PyramidsDataset.dataset_like(
-            ds, labels.reshape(rows, columns).astype(self.dtype)
+        # The result declares `no_data_label`, not the source's sentinel: a
+        # label raster's voids are the cells that were not clustered.
+        return result_like(
+            ds,
+            labels.reshape(rows, columns),
+            dtype=self.dtype,
+            no_data=self.no_data_label,
         )

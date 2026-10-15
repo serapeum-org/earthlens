@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING, Literal
 import numpy as np
 from pydantic import field_validator
 
+from earthlens.gee.analysis._arrays import read_masked, result_like
 from earthlens.gee.analysis.base import RasterOperation
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -177,9 +178,10 @@ class Texture(RasterOperation):
         Returns:
             A new single-band raster of texture values.
         """
-        from pyramids.dataset import Dataset as PyramidsDataset
-
-        values = np.asarray(ds.read_array(band=self.band), dtype="float64")
+        # Masked: quantising over the raw array lets one -9999 set the low
+        # end of the range, which pushes every real value into the top bin and
+        # flattens the texture of the whole raster.
+        values = read_masked(ds, self.band)
         finite = values[np.isfinite(values)]
         if finite.size:
             low, high = float(finite.min()), float(finite.max())
@@ -205,7 +207,12 @@ class Texture(RasterOperation):
                 return float("nan")
             return _measure(_cooccurrence(window.reshape(side, side), levels), measure)
 
-        quantised_ds = PyramidsDataset.dataset_like(ds, quantised.astype("float32"))
-        return PyramidsDataset.dataset_like(
-            ds, quantised_ds.focal_apply(_window_texture, radius=self.radius, band=0)
+        # The intermediate carries NaN at the voids, declared as such, so
+        # `focal_apply` hands the window NaN rather than a sentinel value.
+        quantised_ds = result_like(ds, quantised, dtype="float32", no_data=float("nan"))
+        return result_like(
+            ds,
+            quantised_ds.focal_apply(_window_texture, radius=self.radius, band=0),
+            dtype="float32",
+            no_data=float("nan"),
         )

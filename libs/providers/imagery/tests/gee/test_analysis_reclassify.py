@@ -74,8 +74,15 @@ class TestReclassify:
 
     def test_the_dtype_is_configurable(self):
         """Class values are integers; storing them as such is the point."""
-        result = Reclassify(bins=SLOPE_CLASSES, dtype="uint8").apply(_raster(SLOPES))
+        result = Reclassify(bins=SLOPE_CLASSES, dtype="uint8", no_data=255).apply(
+            _raster(SLOPES)
+        )
         assert np.asarray(result.read_array()).dtype == np.uint8
+
+    def test_an_integer_dtype_needs_an_explicit_sentinel(self):
+        """An unmatched cell cannot be NaN in an integer band, so it must be named."""
+        with pytest.raises(ValidationError, match="no_data must be given"):
+            Reclassify(bins=SLOPE_CLASSES, dtype="uint8")
 
     def test_the_output_keeps_the_source_grid(self):
         """A classified raster sits on the same footprint."""

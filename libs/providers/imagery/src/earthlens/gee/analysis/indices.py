@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+from earthlens.gee.analysis._arrays import read_masked, result_like
 from earthlens.gee.analysis.base import RasterOperation
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -76,23 +77,23 @@ class NormalizedDifference(RasterOperation):
         Raises:
             IndexError: If either band index is outside the raster.
         """
-        from pyramids.dataset import Dataset as PyramidsDataset
-
         for index in (self.a, self.b):
             if not 0 <= index < ds.band_count:
                 raise IndexError(
                     f"{self.name} asked for band {index} of a raster with "
                     f"{ds.band_count} band(s)"
                 )
-        first = np.asarray(ds.read_array(band=self.a), dtype="float64")
-        second = np.asarray(ds.read_array(band=self.b), dtype="float64")
+        # Masked reads, so a void does not become `(-9999 - -9999) / (-9999 +
+        # -9999)` = -0.0, which is a perfectly plausible index value.
+        first = read_masked(ds, self.a)
+        second = read_masked(ds, self.b)
         total = first + second
         # `np.where` alone would still evaluate the division everywhere and
         # warn; masking the denominator first keeps the computation quiet and
-        # leaves the undefined cells as NaN for the no-data stamp below.
+        # leaves the undefined cells as NaN for the sentinel below.
         with np.errstate(invalid="ignore", divide="ignore"):
             index = np.where(total == 0, np.nan, (first - second) / total)
-        return PyramidsDataset.dataset_like(ds, index.astype("float32"))
+        return result_like(ds, index, dtype="float32", no_data=float("nan"))
 
 
 class Ndvi(RasterOperation):

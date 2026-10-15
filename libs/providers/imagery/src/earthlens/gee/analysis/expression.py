@@ -26,8 +26,9 @@ import ast
 from typing import TYPE_CHECKING, Any, ClassVar
 
 import numpy as np
-from pydantic import field_validator
+from pydantic import field_validator, model_validator
 
+from earthlens.gee.analysis._arrays import read_masked, result_like, validate_no_data
 from earthlens.gee.analysis.base import RasterOperation
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -225,6 +226,7 @@ class BandExpression(RasterOperation):
 
     formula: str
     dtype: str = "float32"
+    no_data: float | int | None = None
 
     #: Parsed formulas, keyed by text. Parsing is cheap but the validator runs
     #: on every construction, and an operation is often rebuilt in a loop.
@@ -254,6 +256,21 @@ class BandExpression(RasterOperation):
         _check(tree)
         cls._CACHE[value] = tree
         return value
+
+    @model_validator(mode="after")
+    def _sentinel_fits_the_dtype(self) -> BandExpression:
+        """Refuse a sentinel the output dtype cannot store, at construction.
+
+        Returns:
+            The operation, once its sentinel is representable.
+
+        Raises:
+            ValueError: If `no_data` cannot be stored in `dtype` - NaN in an
+                integer band is cast to 0, which collides with a real class, so
+                it has to fail here rather than silently at apply time.
+        """
+        validate_no_data(self.no_data, self.dtype)
+        return self
 
     def _tree(self) -> ast.Expression:
         """Return the parsed formula, parsing again if the cache was cleared."""
@@ -285,12 +302,12 @@ class BandExpression(RasterOperation):
         Raises:
             KeyError: If the formula names a band the raster does not carry.
         """
-        from pyramids.dataset import Dataset as PyramidsDataset
-
         bands: dict[str, Any] = {}
         names = list(ds.band_names or [])
         for index in range(ds.band_count):
-            array = np.asarray(ds.read_array(band=index), dtype="float64")
+            # Masked, so a formula never sees the sentinel as a value: without
+            # this `b0 > 0` is false for a void only by accident of its sign.
+            array = read_masked(ds, index)
             bands[f"b{index}"] = array
             if index < len(names):
                 bands[names[index]] = array
@@ -299,4 +316,4 @@ class BandExpression(RasterOperation):
         # it so the output is still a raster rather than failing on write.
         if np.isscalar(result) or np.asarray(result).ndim == 0:
             result = np.full((ds.rows, ds.columns), result)
-        return PyramidsDataset.dataset_like(ds, np.asarray(result).astype(self.dtype))
+        return result_like(ds, result, dtype=self.dtype, no_data=self.no_data)

@@ -98,8 +98,15 @@ class TestWhatCompiles:
 
     def test_the_output_dtype_is_configurable(self):
         """A mask is better stored as an integer than a float."""
-        result = BandExpression(formula="b0 > 0.5", dtype="uint8").apply(_two_band())
+        result = BandExpression(formula="b0 > 0.5", dtype="uint8", no_data=255).apply(
+            _two_band()
+        )
         assert np.asarray(result.read_array()).dtype == np.uint8
+
+    def test_an_integer_dtype_needs_an_explicit_sentinel(self):
+        """NaN cast to an integer band is 0, which collides with a real value."""
+        with pytest.raises(ValidationError, match="no_data must be given"):
+            BandExpression(formula="b0 > 0.5", dtype="uint8")
 
     def test_the_output_keeps_the_source_grid(self):
         """An expression result is georeferenced like its input."""

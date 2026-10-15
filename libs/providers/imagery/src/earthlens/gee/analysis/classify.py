@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from pydantic import BaseModel, ConfigDict, model_validator
 
+from earthlens.gee.analysis._arrays import read_masked, result_like
 from earthlens.gee.analysis._sklearn import import_ensemble
 from earthlens.gee.analysis.base import RasterOperation
 
@@ -108,17 +109,9 @@ class TrainingExtractor(BaseModel):
                 f"raster is {labels.rows}x{labels.columns}; they must share a grid"
             )
         indices = self.bands if self.bands is not None else tuple(range(ds.band_count))
-        features = np.stack(
-            [
-                np.ma.filled(ds.read_array(band=index, masked=True), np.nan).astype(
-                    "float64"
-                )
-                for index in indices
-            ]
-        )
-        label_values = labels.read_array(band=self.label_band, masked=True)
+        features = np.stack([read_masked(ds, index) for index in indices])
         flat_features = features.reshape(len(indices), -1).T
-        flat_labels = np.ma.filled(label_values, np.nan).astype("float64").ravel()
+        flat_labels = read_masked(labels, self.label_band).ravel()
         labelled = np.isfinite(flat_labels) & np.isfinite(flat_features).all(axis=1)
         if not labelled.any():
             raise ValueError(
@@ -188,8 +181,6 @@ class Classify(RasterOperation):
             ValueError: If the raster's feature count differs from the training
                 pair's, which would silently misalign the bands.
         """
-        from pyramids.dataset import Dataset as PyramidsDataset
-
         indices = self.bands if self.bands is not None else tuple(range(ds.band_count))
         expected = np.asarray(self.training.features).shape[1]
         if len(indices) != expected:
@@ -197,14 +188,7 @@ class Classify(RasterOperation):
                 f"{self.name} was trained on {expected} band(s) but is being "
                 f"applied to {len(indices)}; the features would not line up"
             )
-        features = np.stack(
-            [
-                np.ma.filled(ds.read_array(band=index, masked=True), np.nan).astype(
-                    "float64"
-                )
-                for index in indices
-            ]
-        )
+        features = np.stack([read_masked(ds, index) for index in indices])
         rows, columns = features.shape[1], features.shape[2]
         flat = features.reshape(len(indices), rows * columns).T
         usable = np.isfinite(flat).all(axis=1)
@@ -217,6 +201,11 @@ class Classify(RasterOperation):
         predicted = np.full(rows * columns, self.no_data_label, dtype="int64")
         if usable.any():
             predicted[usable] = forest.predict(flat[usable])
-        return PyramidsDataset.dataset_like(
-            ds, predicted.reshape(rows, columns).astype(self.dtype)
+        # The result declares `no_data_label`, since a class raster's voids
+        # are the cells the classifier could not predict.
+        return result_like(
+            ds,
+            predicted.reshape(rows, columns),
+            dtype=self.dtype,
+            no_data=self.no_data_label,
         )
