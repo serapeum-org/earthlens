@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -804,6 +804,34 @@
     
   
     Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
   
 
     
@@ -24402,8 +24430,8 @@ as GeoTIFF. Every shipped DEM is reached through one uniform NOAA ERDDAP
 <code>griddap</code> transport (pinned live in the A1 gate): a bbox-subset NetCDF the
 backend reads with <code>pyramids.netcdf.NetCDF</code> and writes to GeoTIFF — earthlens
 never imports a competing array stack to touch the NetCDF.</p>
-<p>The public surface is the <code>Bathymetry</code>
-backend and the <code>Catalog</code> of DEM rows.</p>
+<p>The public surface is the :class:<code>~earthlens.bathymetry.backend.Bathymetry</code>
+backend and the :class:<code>~earthlens.bathymetry.catalog.Catalog</code> of DEM rows.</p>
 
 
 
@@ -24444,8 +24472,8 @@ backend and the <code>Catalog</code> of DEM rows.</p>
         <p>Global topography / bathymetry DEM backend (raster GeoTIFF output).</p>
 <p>Fetches a curated static DEM (GEBCO 2020, ETOPO1 ice / bedrock via ERDDAP
 <code>griddap</code>; EMODnet Bathymetry via OGC WCS) subset to the request bbox and
-written as GeoTIFF. The request is a search/fetch split: <code>_search</code>
-names the single resolved product and <code>_fetch</code> realises it (download
+written as GeoTIFF. The request is a search/fetch split: :meth:<code>_search</code>
+names the single resolved product and :meth:<code>_fetch</code> realises it (download
 → pyramids → GeoTIFF), dispatching on the row's <code>transport</code>.</p>
 
 
@@ -25010,8 +25038,8 @@ are static).</p>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    Fetches a curated static DEM (GEBCO 2020, ETOPO1 ice / bedrock via ERDDAP</span>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">    `griddap`; EMODnet Bathymetry via OGC WCS) subset to the request bbox and</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    written as GeoTIFF. The request is a search/fetch split: `_search`</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    names the single resolved product and `_fetch` realises it (download</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    written as GeoTIFF. The request is a search/fetch split: :meth:`_search`</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    names the single resolved product and :meth:`_fetch` realises it (download</span>
 <a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">    → pyramids → GeoTIFF), dispatching on the row&#39;s `transport`.</span>
 <a id="__codelineno-0-72" name="__codelineno-0-72"></a>
 <a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">    Attributes:</span>
@@ -25172,7 +25200,7 @@ are static).</p>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">            list[RemoteProduct]: One product carrying the resolved</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">                `Dataset` row in its `metadata`.</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">                :class:`Dataset` row in its `metadata`.</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a>        <span class="k">return</span> <span class="p">[</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a>            <span class="n">RemoteProduct</span><span class="p">(</span>
@@ -25185,7 +25213,7 @@ are static).</p>
 <a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download each DEM subset and write it as a GeoTIFF.</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">            products: The single-element list from `_search`.</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">            products: The single-element list from :meth:`_search`.</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            list[Path]: The written GeoTIFF path(s).</span>
@@ -25196,8 +25224,8 @@ are static).</p>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Subset one DEM to a GeoTIFF via the row&#39;s transport.</span>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        Dispatches on the resolved row&#39;s `transport`: `&quot;wcs&quot;` rows are read</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        over OGC WCS through pyramids `Dataset.from_wcs` (`_fetch_wcs`),</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        every other row over ERDDAP `griddap` (`_fetch_griddap`).</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        over OGC WCS through pyramids `Dataset.from_wcs` (:meth:`_fetch_wcs`),</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        every other row over ERDDAP `griddap` (:meth:`_fetch_griddap`).</span>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">            product: The `RemoteProduct` whose `metadata[&quot;dataset&quot;]` is the</span>
@@ -25506,7 +25534,7 @@ are static).</p>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>
 <a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">            ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">                (from `_download`).</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">                (from :meth:`_download`).</span>
 <a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-567" name="__codelineno-0-567"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
@@ -26029,7 +26057,7 @@ bounding box is missing.</p>
             <td>
               <div class="doc-md-description">
                 <p>If a request is outside the DEM's coverage / oversize
-(from <code>_download</code>).</p>
+(from :meth:<code>_download</code>).</p>
               </div>
             </td>
           </tr>
@@ -26069,7 +26097,7 @@ bounding box is missing.</p>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>
 <a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">        ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">            (from `_download`).</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">            (from :meth:`_download`).</span>
 <a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-567" name="__codelineno-0-567"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
@@ -27208,7 +27236,7 @@ failing, the way the OSM backend's <code>OhsomeUnavailableError</code> does.</p>
 
         <p>Global topography / bathymetry DEM backend — <code>Bathymetry(AbstractDataSource)</code>.</p>
 <p><code>Bathymetry</code> is a download-and-localise raster backend (<code>OUTPUT_KIND="raster"</code>).
-A <code>dataset=&lt;id&gt;</code> selects a curated <code>Dataset</code>
+A <code>dataset=&lt;id&gt;</code> selects a curated :class:<code>~earthlens.bathymetry.catalog.Dataset</code>
 row and <code>download()</code> subsets that DEM to the request bbox, returning the list of
 written GeoTIFF paths. Two transports ship, chosen per row: an ERDDAP <code>griddap</code>
 endpoint (GEBCO / ETOPO — subset to a NetCDF read back with
@@ -27221,7 +27249,7 @@ stack to touch it. On the griddap path an out-of-coverage / oversize request
 surfaces as a clear <code>ValueError</code> (ERDDAP rejects it or returns an HTML error
 body, never data), so the user never sees a bare HTTP error or a corrupt file.
 The WCS path instead guards the request bbox against the coverage's
-<code>native_bbox</code> (<code>Bathymetry._guard_wcs_domain</code>) — a fully out-of-coverage
+<code>native_bbox</code> (:meth:<code>Bathymetry._guard_wcs_domain</code>) — a fully out-of-coverage
 AOI raises, a partial overlap is allowed through with a warning (its
 out-of-coverage cells come back as <code>0.0</code> fill) — because the WCS server returns
 a zero-filled grid, not an error, outside coverage.</p>
@@ -27266,8 +27294,8 @@ a zero-filled grid, not an error, outside coverage.</p>
         <p>Global topography / bathymetry DEM backend (raster GeoTIFF output).</p>
 <p>Fetches a curated static DEM (GEBCO 2020, ETOPO1 ice / bedrock via ERDDAP
 <code>griddap</code>; EMODnet Bathymetry via OGC WCS) subset to the request bbox and
-written as GeoTIFF. The request is a search/fetch split: <code>_search</code>
-names the single resolved product and <code>_fetch</code> realises it (download
+written as GeoTIFF. The request is a search/fetch split: :meth:<code>_search</code>
+names the single resolved product and :meth:<code>_fetch</code> realises it (download
 → pyramids → GeoTIFF), dispatching on the row's <code>transport</code>.</p>
 
 
@@ -27832,8 +27860,8 @@ are static).</p>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    Fetches a curated static DEM (GEBCO 2020, ETOPO1 ice / bedrock via ERDDAP</span>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">    `griddap`; EMODnet Bathymetry via OGC WCS) subset to the request bbox and</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    written as GeoTIFF. The request is a search/fetch split: `_search`</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    names the single resolved product and `_fetch` realises it (download</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    written as GeoTIFF. The request is a search/fetch split: :meth:`_search`</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    names the single resolved product and :meth:`_fetch` realises it (download</span>
 <a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">    → pyramids → GeoTIFF), dispatching on the row&#39;s `transport`.</span>
 <a id="__codelineno-0-72" name="__codelineno-0-72"></a>
 <a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">    Attributes:</span>
@@ -27994,7 +28022,7 @@ are static).</p>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">            list[RemoteProduct]: One product carrying the resolved</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">                `Dataset` row in its `metadata`.</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">                :class:`Dataset` row in its `metadata`.</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a>        <span class="k">return</span> <span class="p">[</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a>            <span class="n">RemoteProduct</span><span class="p">(</span>
@@ -28007,7 +28035,7 @@ are static).</p>
 <a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download each DEM subset and write it as a GeoTIFF.</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">            products: The single-element list from `_search`.</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">            products: The single-element list from :meth:`_search`.</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            list[Path]: The written GeoTIFF path(s).</span>
@@ -28018,8 +28046,8 @@ are static).</p>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Subset one DEM to a GeoTIFF via the row&#39;s transport.</span>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        Dispatches on the resolved row&#39;s `transport`: `&quot;wcs&quot;` rows are read</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        over OGC WCS through pyramids `Dataset.from_wcs` (`_fetch_wcs`),</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        every other row over ERDDAP `griddap` (`_fetch_griddap`).</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        over OGC WCS through pyramids `Dataset.from_wcs` (:meth:`_fetch_wcs`),</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        every other row over ERDDAP `griddap` (:meth:`_fetch_griddap`).</span>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">            product: The `RemoteProduct` whose `metadata[&quot;dataset&quot;]` is the</span>
@@ -28328,7 +28356,7 @@ are static).</p>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>
 <a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">            ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">                (from `_download`).</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">                (from :meth:`_download`).</span>
 <a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-567" name="__codelineno-0-567"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
@@ -28851,7 +28879,7 @@ bounding box is missing.</p>
             <td>
               <div class="doc-md-description">
                 <p>If a request is outside the DEM's coverage / oversize
-(from <code>_download</code>).</p>
+(from :meth:<code>_download</code>).</p>
               </div>
             </td>
           </tr>
@@ -28891,7 +28919,7 @@ bounding box is missing.</p>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>
 <a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">        ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">            (from `_download`).</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">            (from :meth:`_download`).</span>
 <a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-567" name="__codelineno-0-567"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
@@ -30194,7 +30222,7 @@ failing, the way the OSM backend's <code>OhsomeUnavailableError</code> does.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A <code>SpatialExtent</code> (the backend's
+                <p>A :class:<code>~earthlens.base.SpatialExtent</code> (the backend's
 <code>self.space</code>).</p>
               </div>
             </td>
@@ -30247,7 +30275,7 @@ degrees.</p>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `(west, south, east, north)` bbox of a spatial extent.</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        space: A `SpatialExtent` (the backend&#39;s</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        space: A :class:`~earthlens.base.SpatialExtent` (the backend&#39;s</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">            `self.space`).</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">    Returns:</span>

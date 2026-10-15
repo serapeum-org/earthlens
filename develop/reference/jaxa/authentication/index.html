@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -804,6 +804,34 @@
     
   
     Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
   
 
     
@@ -23943,7 +23971,7 @@ for the <code>gportal</code> protocol:</p>
 <code>gportal.download(username=, password=)</code> as call-site kwargs so the SDK's
 module-level credential globals stay untouched between requests.</p>
 <p>If neither resolves on a <code>gportal</code> request, <code>JaxaAuth.configure()</code>
-raises <code>earthlens.jaxa.AuthenticationError</code> naming both
+raises :class:<code>earthlens.jaxa.AuthenticationError</code> naming both
 environment variables and the registration URL — it never blocks on an
 interactive prompt.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
@@ -23977,11 +24005,11 @@ calls) act on the right side:</p>
 <li><code>JaxaAuth(creds, protocol="jaxa-earth").configure()</code> is a no-op.</li>
 <li><code>JaxaAuth(creds, protocol="gportal").configure()</code> resolves and caches
   the G-Portal credentials, raising
-  <code>earthlens.jaxa.AuthenticationError</code> on miss.</li>
+  :class:<code>earthlens.jaxa.AuthenticationError</code> on miss.</li>
 <li><code>JaxaAuth(creds, protocol="ptree").configure()</code> resolves and caches
   the P-Tree credentials (from <code>ptree_username</code> / <code>ptree_password</code> or
   <code>$JAXA_PTREE_USERNAME</code> / <code>$JAXA_PTREE_PASSWORD</code>), raising
-  <code>earthlens.jaxa.AuthenticationError</code> on miss.</li>
+  :class:<code>earthlens.jaxa.AuthenticationError</code> on miss.</li>
 </ul>
 <p><code>EarthLens(...).authenticate()</code> therefore fails-fast on a <code>gportal</code>
 or <code>ptree</code> request without credentials — the SFTP download or FTP
@@ -24014,7 +24042,7 @@ protocol:</p>
    <code>JAXA_PTREE_PASSWORD</code>.</li>
 </ol>
 <p>Missing credentials raise
-<code>earthlens.jaxa.AuthenticationError</code> naming both env vars and
+:class:<code>earthlens.jaxa.AuthenticationError</code> naming both env vars and
 the registration URL. Live probe (2026-07-04) confirmed the archive
 still serves plain FTP on <code>ftp.ptree.jaxa.jp:21</code>, so <code>paramiko</code> is
 not required.</p>
@@ -24033,7 +24061,7 @@ not required.</p>
 <h2 id="4c-p-tree-scope-licence"><a class="toclink" href="#4c-p-tree-scope-licence">4c. P-Tree scope &amp; licence</a><a class="headerlink" href="#4c-p-tree-scope-licence" title="Permanent link">#</a></h2>
 <ul>
 <li><strong>Retention.</strong> P-Tree ships the <strong>last 30 days</strong> of HSD granules only.
-  Requests further back raise <code>earthlens.jaxa.RetentionError</code>
+  Requests further back raise :class:<code>earthlens.jaxa.RetentionError</code>
   before the FTP call — no cryptic <code>450 No such file or directory</code>.</li>
 <li><strong>Licence.</strong> Since <strong>2026-02-01</strong> P-Tree data (including HSD) is
   available for <strong>commercial use</strong>; attribution per the

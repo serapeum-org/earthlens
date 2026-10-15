@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -804,6 +804,34 @@
     
   
     Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
   
 
     
@@ -24595,15 +24623,15 @@ submits an async cutout job (submit bbox -&gt; poll -&gt; download), returning t
 imports <code>xarray</code> / <code>netCDF4</code> — reading the NetCDF is pyramids'.</p>
 <p>Public surface (re-exported from this package):</p>
 <ul>
-<li><code>ISIMIP</code> — the backend; instantiate with a date window, a bbox, and a
+<li>:class:<code>ISIMIP</code> — the backend; instantiate with a date window, a bbox, and a
   facet set (<code>dataset</code> / <code>gcm</code> / <code>scenario</code> / <code>variables</code>), then call
-  <code>ISIMIP.download</code>.</li>
-<li><code>Catalog</code> — loader for the bundled <code>isimip_data_catalog.yaml</code> (config +
+  :meth:<code>ISIMIP.download</code>.</li>
+<li>:class:<code>Catalog</code> — loader for the bundled <code>isimip_data_catalog.yaml</code> (config +
   curated facet vocabulary).</li>
-<li><code>Variable</code> / <code>Forcing</code> / <code>Scenario</code> / <code>Round</code> — one
+<li>:class:<code>Variable</code> / :class:<code>Forcing</code> / :class:<code>Scenario</code> / :class:<code>Round</code> — one
   curated variable / forcing / scenario / round row.</li>
-<li><code>CATALOG_PATH</code> — path to the bundled YAML; monkey-patchable in tests.</li>
-<li><code>clear_catalog_cache</code> — empty the catalog parse cache.</li>
+<li>:data:<code>CATALOG_PATH</code> — path to the bundled YAML; monkey-patchable in tests.</li>
+<li>:func:<code>clear_catalog_cache</code> — empty the catalog parse cache.</li>
 </ul>
 
 
@@ -24654,12 +24682,12 @@ imports <code>xarray</code> / <code>netCDF4</code> — reading the NetCDF is pyr
 
         <p>Config + curated-vocabulary catalog for the ISIMIP backend.</p>
 <p>Reads the bundled <code>isimip_data_catalog.yaml</code> (shipped as package data) and
-exposes its <code>variables:</code> block as a map of <code>Variable</code> rows keyed by
-<code>climate_variable</code> under the inherited <code>datasets</code> field, plus parallel
-<code>forcings</code>, <code>scenarios</code>, and <code>rounds</code> maps and the API
-config (<code>data_url</code>, <code>files_api_url</code>, <code>products</code>,
-<code>time_steps</code>). Instantiate with no arguments (<code>Catalog()</code>);
-<code>model_post_init</code> loads and validates the YAML in one pass and caches
+exposes its <code>variables:</code> block as a map of :class:<code>Variable</code> rows keyed by
+<code>climate_variable</code> under the inherited :attr:<code>datasets</code> field, plus parallel
+:attr:<code>forcings</code>, :attr:<code>scenarios</code>, and :attr:<code>rounds</code> maps and the API
+config (:attr:<code>data_url</code>, :attr:<code>files_api_url</code>, :attr:<code>products</code>,
+:attr:<code>time_steps</code>). Instantiate with no arguments (<code>Catalog()</code>);
+:func:<code>model_post_init</code> loads and validates the YAML in one pass and caches
 it by <code>(path, mtime)</code>.</p>
 
 
@@ -24724,7 +24752,7 @@ it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from <code>climate_variable</code> to its <code>Variable</code> row.</p>
+                <p>Map from <code>climate_variable</code> to its :class:<code>Variable</code> row.</p>
               </div>
             </td>
           </tr>
@@ -24735,7 +24763,7 @@ it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from <code>climate_forcing</code> to its <code>Forcing</code> row.</p>
+                <p>Map from <code>climate_forcing</code> to its :class:<code>Forcing</code> row.</p>
               </div>
             </td>
           </tr>
@@ -24746,7 +24774,7 @@ it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from <code>climate_scenario</code> to its <code>Scenario</code> row.</p>
+                <p>Map from <code>climate_scenario</code> to its :class:<code>Scenario</code> row.</p>
               </div>
             </td>
           </tr>
@@ -24757,7 +24785,7 @@ it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from <code>simulation_round</code> to its <code>Round</code> row.</p>
+                <p>Map from <code>simulation_round</code> to its :class:<code>Round</code> row.</p>
               </div>
             </td>
           </tr>
@@ -25018,12 +25046,12 @@ it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Config + curated-vocabulary catalog for the ISIMIP backend.</span>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">    Reads the bundled `isimip_data_catalog.yaml` (shipped as package data) and</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    exposes its `variables:` block as a map of `Variable` rows keyed by</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">    `climate_variable` under the inherited `datasets` field, plus parallel</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">    `forcings`, `scenarios`, and `rounds` maps and the API</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">    config (`data_url`, `files_api_url`, `products`,</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">    `time_steps`). Instantiate with no arguments (`Catalog()`);</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">    `model_post_init` loads and validates the YAML in one pass and caches</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    exposes its `variables:` block as a map of :class:`Variable` rows keyed by</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">    `climate_variable` under the inherited :attr:`datasets` field, plus parallel</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">    :attr:`forcings`, :attr:`scenarios`, and :attr:`rounds` maps and the API</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">    config (:attr:`data_url`, :attr:`files_api_url`, :attr:`products`,</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">    :attr:`time_steps`). Instantiate with no arguments (`Catalog()`);</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">    :func:`model_post_init` loads and validates the YAML in one pass and caches</span>
 <a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">    it by `(path, mtime)`.</span>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">    Attributes:</span>
@@ -25031,10 +25059,10 @@ it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        files_api_url: The ISIMIP files API v2 (the async cutout job endpoint).</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        products: The request products (`InputData` / `OutputData`).</span>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        time_steps: The temporal resolutions (`daily` / `monthly`).</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        datasets: Map from `climate_variable` to its `Variable` row.</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        forcings: Map from `climate_forcing` to its `Forcing` row.</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        scenarios: Map from `climate_scenario` to its `Scenario` row.</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        rounds: Map from `simulation_round` to its `Round` row.</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        datasets: Map from `climate_variable` to its :class:`Variable` row.</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        forcings: Map from `climate_forcing` to its :class:`Forcing` row.</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        scenarios: Map from `climate_scenario` to its :class:`Scenario` row.</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        rounds: Map from `simulation_round` to its :class:`Round` row.</span>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        - List curated variables and resolve one:</span>
@@ -25076,13 +25104,13 @@ it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no variables were supplied.</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        `Catalog()` with no args reads `CATALOG_PATH` (cached by</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">        `(path, mtime)`); passing `datasets=...` skips the disk read (used in</span>
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        tests). Either way the `available_datasets` index is derived from the</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        loaded variable map.</span>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            ValueError: Propagated from `load` when the YAML is missing,</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            ValueError: Propagated from :meth:`load` when the YAML is missing,</span>
 <a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">                empty, or has a malformed row.</span>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_url</span><span class="p">:</span>
@@ -25103,10 +25131,10 @@ it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">                `CATALOG_PATH`.</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file is</span>
@@ -25142,7 +25170,7 @@ it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="k">return</span> <span class="n">out</span>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a>
 <a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_forcing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Forcing</span><span class="p">:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Forcing` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Forcing` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">            key: A `climate_forcing` (`&quot;gfdl-esm4&quot;`, `&quot;ukesm1-0-ll&quot;`).</span>
@@ -25156,7 +25184,7 @@ it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-346" name="__codelineno-0-346"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Forcing&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">forcings</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="s2">&quot;forcing&quot;</span><span class="p">))</span>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_scenario</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Scenario</span><span class="p">:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Scenario` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Scenario` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">            key: A `climate_scenario` (`&quot;ssp585&quot;`, `&quot;historical&quot;`).</span>
@@ -25170,7 +25198,7 @@ it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Scenario&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scenarios</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="s2">&quot;scenario&quot;</span><span class="p">))</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a>
 <a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_round</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Round</span><span class="p">:</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Round` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Round` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-364" name="__codelineno-0-364"></a>
 <a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            key: A `simulation_round` (`&quot;ISIMIP3b&quot;`, `&quot;ISIMIP3a&quot;`).</span>
@@ -25261,7 +25289,7 @@ it by <code>(path, mtime)</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>Forcing</code> for <code>key</code>, with a did-you-mean hint.</p>
+        <p>Return the :class:<code>Forcing</code> for <code>key</code>, with a did-you-mean hint.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -25356,7 +25384,7 @@ it by <code>(path, mtime)</code>.</p>
 <span class="normal"><a href="#__codelineno-0-344">344</a></span>
 <span class="normal"><a href="#__codelineno-0-345">345</a></span>
 <span class="normal"><a href="#__codelineno-0-346">346</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_forcing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Forcing</span><span class="p">:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Forcing` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Forcing` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        key: A `climate_forcing` (`&quot;gfdl-esm4&quot;`, `&quot;ukesm1-0-ll&quot;`).</span>
@@ -25385,7 +25413,7 @@ it by <code>(path, mtime)</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>Round</code> for <code>key</code>, with a did-you-mean hint.</p>
+        <p>Return the :class:<code>Round</code> for <code>key</code>, with a did-you-mean hint.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -25480,7 +25508,7 @@ it by <code>(path, mtime)</code>.</p>
 <span class="normal"><a href="#__codelineno-0-372">372</a></span>
 <span class="normal"><a href="#__codelineno-0-373">373</a></span>
 <span class="normal"><a href="#__codelineno-0-374">374</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_round</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Round</span><span class="p">:</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Round` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Round` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-364" name="__codelineno-0-364"></a>
 <a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        key: A `simulation_round` (`&quot;ISIMIP3b&quot;`, `&quot;ISIMIP3a&quot;`).</span>
@@ -25509,7 +25537,7 @@ it by <code>(path, mtime)</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>Scenario</code> for <code>key</code>, with a did-you-mean hint.</p>
+        <p>Return the :class:<code>Scenario</code> for <code>key</code>, with a did-you-mean hint.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -25604,7 +25632,7 @@ it by <code>(path, mtime)</code>.</p>
 <span class="normal"><a href="#__codelineno-0-358">358</a></span>
 <span class="normal"><a href="#__codelineno-0-359">359</a></span>
 <span class="normal"><a href="#__codelineno-0-360">360</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_scenario</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Scenario</span><span class="p">:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Scenario` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Scenario` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        key: A `climate_scenario` (`&quot;ssp585&quot;`, `&quot;historical&quot;`).</span>
@@ -25661,7 +25689,7 @@ it by <code>(path, mtime)</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the module-level
-<code>CATALOG_PATH</code>.</p>
+:data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -25687,7 +25715,7 @@ it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -25744,10 +25772,10 @@ missing its config keys, or any curated row fails validation.</p>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            `CATALOG_PATH`.</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file is</span>
@@ -25774,7 +25802,7 @@ missing its config keys, or any curated row fails validation.</p>
     <div class="doc doc-contents ">
 
         <p>Auto-load the bundled catalog when no variables were supplied.</p>
-<p><code>Catalog()</code> with no args reads <code>CATALOG_PATH</code> (cached by
+<p><code>Catalog()</code> with no args reads :data:<code>CATALOG_PATH</code> (cached by
 <code>(path, mtime)</code>); passing <code>datasets=...</code> skips the disk read (used in
 tests). Either way the <code>available_datasets</code> index is derived from the
 loaded variable map.</p>
@@ -25795,7 +25823,7 @@ loaded variable map.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Propagated from <code>load</code> when the YAML is missing,
+                <p>Propagated from :meth:<code>load</code> when the YAML is missing,
 empty, or has a malformed row.</p>
               </div>
             </td>
@@ -25831,13 +25859,13 @@ empty, or has a malformed row.</p>
 <span class="normal"><a href="#__codelineno-0-288">288</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no variables were supplied.</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    `Catalog()` with no args reads `CATALOG_PATH` (cached by</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">    `(path, mtime)`); passing `datasets=...` skips the disk read (used in</span>
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">    tests). Either way the `available_datasets` index is derived from the</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">    loaded variable map.</span>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        ValueError: Propagated from `load` when the YAML is missing,</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        ValueError: Propagated from :meth:`load` when the YAML is missing,</span>
 <a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">            empty, or has a malformed row.</span>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_url</span><span class="p">:</span>
@@ -26776,9 +26804,9 @@ other earthlens backend uses. The output is one NetCDF granule per resolved
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">            poll: Seconds between cutout-job status polls. Defaults to `4.0`.</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">            path: Output directory for the written NetCDFs.</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">            fmt: `strptime` format for `start` / `end`.</span>
-<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">            catalog: Optional pre-built `Catalog`; defaults to the bundled</span>
+<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">            catalog: Optional pre-built :class:`Catalog`; defaults to the bundled</span>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">                catalog.</span>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">            client: Optional pre-built `IsimipClient`; defaults to a</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">            client: Optional pre-built :class:`IsimipClient`; defaults to a</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">                lazily-built `isimip-client` client (needs the `[isimip]` extra).</span>
 <a id="__codelineno-0-113" name="__codelineno-0-113"></a>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">        Raises:</span>
@@ -26866,7 +26894,7 @@ other earthlens backend uses. The output is one NetCDF granule per resolved
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_input_dates</span><span class="p">(</span>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-0-198" name="__codelineno-0-198"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a `TemporalExtent`.</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">            start: Inclusive window start.</span>
@@ -27017,7 +27045,7 @@ other earthlens backend uses. The output is one NetCDF granule per resolved
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        `whole_globe` request: download the raw granules directly.</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">            products: The products from `_search`.</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">            products: The products from :meth:`_search`.</span>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">            list[Path]: The written NetCDF paths, in product order.</span>
@@ -27059,7 +27087,7 @@ other earthlens backend uses. The output is one NetCDF granule per resolved
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        Each resolved dataset writes into its own subdirectory keyed by the</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        dataset id, the requested `[start, end]` window, and the bbox region</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        (`global` for a whole-globe request). `_download_extract` returns</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        (`global` for a whole-globe request). :meth:`_download_extract` returns</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        every `*.nc` it finds in that directory, so keying on all three means</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        concurrent products never collide, re-running the same request just</span>
 <a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        overwrites in place, and re-running the same dataset/window with a</span>
@@ -27150,7 +27178,7 @@ other earthlens backend uses. The output is one NetCDF granule per resolved
 <a id="__codelineno-0-480" name="__codelineno-0-480"></a>        <span class="k">return</span> <span class="n">found</span>
 <a id="__codelineno-0-481" name="__codelineno-0-481"></a>
 <a id="__codelineno-0-482" name="__codelineno-0-482"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_warn_license</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Emit a `LicenseWarning` for a restricted, non-open, or unknown-licence dataset.</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Emit a :class:`LicenseWarning` for a restricted, non-open, or unknown-licence dataset.</span>
 <a id="__codelineno-0-484" name="__codelineno-0-484"></a>
 <a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">        A dataset whose `rights` are empty is treated as unknown (warned), so a</span>
 <a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">        licence the API does not report is surfaced rather than assumed open.</span>
@@ -27174,15 +27202,15 @@ other earthlens backend uses. The output is one NetCDF granule per resolved
 <a id="__codelineno-0-504" name="__codelineno-0-504"></a>
 <a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">            str: The round&#39;s `default_license` (the authoritative per-dataset</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">                licence is surfaced live via `_warn_license`).</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">                licence is surfaced live via :meth:`_warn_license`).</span>
 <a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-509" name="__codelineno-0-509"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">get_round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_round</span><span class="p">)</span><span class="o">.</span><span class="n">default_license</span>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a>
 <a id="__codelineno-0-511" name="__codelineno-0-511"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested bias-adjusted granules and return the written paths.</span>
 <a id="__codelineno-0-513" name="__codelineno-0-513"></a>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">        Runs the cheap `_search` (facet -&gt; dataset resolution) then</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">        `_fetch`, which submits the cutout job(s) and writes one cut NetCDF</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">        Runs the cheap :meth:`_search` (facet -&gt; dataset resolution) then</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">        :meth:`_fetch`, which submits the cutout job(s) and writes one cut NetCDF</span>
 <a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">        per resolved granule.</span>
 <a id="__codelineno-0-517" name="__codelineno-0-517"></a>
 <a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">        Args:</span>
@@ -27478,7 +27506,7 @@ precedence over any <code>lat_lim</code> / <code>lon_lim</code> (a warning is lo
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional pre-built <code>Catalog</code>; defaults to the bundled
+                <p>Optional pre-built :class:<code>Catalog</code>; defaults to the bundled
 catalog.</p>
               </div>
             </td>
@@ -27495,7 +27523,7 @@ catalog.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional pre-built <code>IsimipClient</code>; defaults to a
+                <p>Optional pre-built :class:<code>IsimipClient</code>; defaults to a
 lazily-built <code>isimip-client</code> client (needs the <code>[isimip]</code> extra).</p>
               </div>
             </td>
@@ -27682,9 +27710,9 @@ empty, or no bbox is given without <code>whole_globe</code>.</p>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">        poll: Seconds between cutout-job status polls. Defaults to `4.0`.</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">        path: Output directory for the written NetCDFs.</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">        fmt: `strptime` format for `start` / `end`.</span>
-<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">        catalog: Optional pre-built `Catalog`; defaults to the bundled</span>
+<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">        catalog: Optional pre-built :class:`Catalog`; defaults to the bundled</span>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">            catalog.</span>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">        client: Optional pre-built `IsimipClient`; defaults to a</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">        client: Optional pre-built :class:`IsimipClient`; defaults to a</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">            lazily-built `isimip-client` client (needs the `[isimip]` extra).</span>
 <a id="__codelineno-0-113" name="__codelineno-0-113"></a>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">    Raises:</span>
@@ -27763,8 +27791,8 @@ empty, or no bbox is given without <code>whole_globe</code>.</p>
     <div class="doc doc-contents ">
 
         <p>Fetch the requested bias-adjusted granules and return the written paths.</p>
-<p>Runs the cheap <code>_search</code> (facet -&gt; dataset resolution) then
-<code>_fetch</code>, which submits the cutout job(s) and writes one cut NetCDF
+<p>Runs the cheap :meth:<code>_search</code> (facet -&gt; dataset resolution) then
+:meth:<code>_fetch</code>, which submits the cutout job(s) and writes one cut NetCDF
 per resolved granule.</p>
 
 
@@ -27880,8 +27908,8 @@ matches nothing raises rather than returning an empty list).</p>
 <span class="normal"><a href="#__codelineno-0-530">530</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested bias-adjusted granules and return the written paths.</span>
 <a id="__codelineno-0-513" name="__codelineno-0-513"></a>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">    Runs the cheap `_search` (facet -&gt; dataset resolution) then</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">    `_fetch`, which submits the cutout job(s) and writes one cut NetCDF</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">    Runs the cheap :meth:`_search` (facet -&gt; dataset resolution) then</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">    :meth:`_fetch`, which submits the cutout job(s) and writes one cut NetCDF</span>
 <a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">    per resolved granule.</span>
 <a id="__codelineno-0-517" name="__codelineno-0-517"></a>
 <a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">    Args:</span>
@@ -27933,7 +27961,7 @@ matches nothing raises rather than returning an empty list).</p>
             <td>
               <div class="doc-md-description">
                 <p>The round's <code>default_license</code> (the authoritative per-dataset
-licence is surfaced live via <code>_warn_license</code>).</p>
+licence is surfaced live via :meth:<code>_warn_license</code>).</p>
               </div>
             </td>
           </tr>
@@ -27955,7 +27983,7 @@ licence is surfaced live via <code>_warn_license</code>).</p>
 <a id="__codelineno-0-504" name="__codelineno-0-504"></a>
 <a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">        str: The round&#39;s `default_license` (the authoritative per-dataset</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            licence is surfaced live via `_warn_license`).</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            licence is surfaced live via :meth:`_warn_license`).</span>
 <a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-509" name="__codelineno-0-509"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">get_round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_round</span><span class="p">)</span><span class="o">.</span><span class="n">default_license</span>
 </code></pre></div></td></tr></table></div>
@@ -28498,11 +28526,11 @@ non-stationary-futures input for flood / hydrology impact models. Unlike the
 bias-corrected against W5E5 and formatted for impact models.</p>
 <p>A request is a <em>facet set</em> — <code>dataset</code> (the <code>simulation_round</code>, e.g.
 <code>"ISIMIP3b"</code>), <code>gcm</code> (the <code>climate_forcing</code>), <code>scenario</code> (<code>climate_scenario</code>),
-<code>variables</code> (<code>climate_variable</code>s), <code>time_step</code> (+ <code>product</code>). <code>_search</code>
+<code>variables</code> (<code>climate_variable</code>s), <code>time_step</code> (+ <code>product</code>). :meth:<code>_search</code>
 queries the ISIMIP REST API for the matching datasets and resolves each to its
 per-decade NetCDF granule <code>path</code>s (filtered to the requested date window).
 Because a single granule is ~1-2 GB (a whole global-daily dataset is ~18 GB),
-<code>_fetch</code> never pulls them whole: it submits a <strong>server-side cutout job</strong>
+:meth:<code>_fetch</code> never pulls them whole: it submits a <strong>server-side cutout job</strong>
 (<code>isimip-client.cutout_bbox</code>: submit bbox -&gt; poll -&gt; download the cut zip),
 extracts the cut NetCDF granules, and returns their <code>list[Path]</code>. earthlens never
 imports <code>xarray</code> / <code>netCDF4</code> — reading the NetCDF is pyramids'.</p>
@@ -29132,9 +29160,9 @@ other earthlens backend uses. The output is one NetCDF granule per resolved
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">            poll: Seconds between cutout-job status polls. Defaults to `4.0`.</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">            path: Output directory for the written NetCDFs.</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">            fmt: `strptime` format for `start` / `end`.</span>
-<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">            catalog: Optional pre-built `Catalog`; defaults to the bundled</span>
+<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">            catalog: Optional pre-built :class:`Catalog`; defaults to the bundled</span>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">                catalog.</span>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">            client: Optional pre-built `IsimipClient`; defaults to a</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">            client: Optional pre-built :class:`IsimipClient`; defaults to a</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">                lazily-built `isimip-client` client (needs the `[isimip]` extra).</span>
 <a id="__codelineno-0-113" name="__codelineno-0-113"></a>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">        Raises:</span>
@@ -29222,7 +29250,7 @@ other earthlens backend uses. The output is one NetCDF granule per resolved
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_input_dates</span><span class="p">(</span>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-0-198" name="__codelineno-0-198"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a `TemporalExtent`.</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">            start: Inclusive window start.</span>
@@ -29373,7 +29401,7 @@ other earthlens backend uses. The output is one NetCDF granule per resolved
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        `whole_globe` request: download the raw granules directly.</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">            products: The products from `_search`.</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">            products: The products from :meth:`_search`.</span>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">            list[Path]: The written NetCDF paths, in product order.</span>
@@ -29415,7 +29443,7 @@ other earthlens backend uses. The output is one NetCDF granule per resolved
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        Each resolved dataset writes into its own subdirectory keyed by the</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        dataset id, the requested `[start, end]` window, and the bbox region</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        (`global` for a whole-globe request). `_download_extract` returns</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        (`global` for a whole-globe request). :meth:`_download_extract` returns</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        every `*.nc` it finds in that directory, so keying on all three means</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        concurrent products never collide, re-running the same request just</span>
 <a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        overwrites in place, and re-running the same dataset/window with a</span>
@@ -29506,7 +29534,7 @@ other earthlens backend uses. The output is one NetCDF granule per resolved
 <a id="__codelineno-0-480" name="__codelineno-0-480"></a>        <span class="k">return</span> <span class="n">found</span>
 <a id="__codelineno-0-481" name="__codelineno-0-481"></a>
 <a id="__codelineno-0-482" name="__codelineno-0-482"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_warn_license</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Emit a `LicenseWarning` for a restricted, non-open, or unknown-licence dataset.</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Emit a :class:`LicenseWarning` for a restricted, non-open, or unknown-licence dataset.</span>
 <a id="__codelineno-0-484" name="__codelineno-0-484"></a>
 <a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">        A dataset whose `rights` are empty is treated as unknown (warned), so a</span>
 <a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">        licence the API does not report is surfaced rather than assumed open.</span>
@@ -29530,15 +29558,15 @@ other earthlens backend uses. The output is one NetCDF granule per resolved
 <a id="__codelineno-0-504" name="__codelineno-0-504"></a>
 <a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">            str: The round&#39;s `default_license` (the authoritative per-dataset</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">                licence is surfaced live via `_warn_license`).</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">                licence is surfaced live via :meth:`_warn_license`).</span>
 <a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-509" name="__codelineno-0-509"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">get_round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_round</span><span class="p">)</span><span class="o">.</span><span class="n">default_license</span>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a>
 <a id="__codelineno-0-511" name="__codelineno-0-511"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested bias-adjusted granules and return the written paths.</span>
 <a id="__codelineno-0-513" name="__codelineno-0-513"></a>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">        Runs the cheap `_search` (facet -&gt; dataset resolution) then</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">        `_fetch`, which submits the cutout job(s) and writes one cut NetCDF</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">        Runs the cheap :meth:`_search` (facet -&gt; dataset resolution) then</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">        :meth:`_fetch`, which submits the cutout job(s) and writes one cut NetCDF</span>
 <a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">        per resolved granule.</span>
 <a id="__codelineno-0-517" name="__codelineno-0-517"></a>
 <a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">        Args:</span>
@@ -29834,7 +29862,7 @@ precedence over any <code>lat_lim</code> / <code>lon_lim</code> (a warning is lo
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional pre-built <code>Catalog</code>; defaults to the bundled
+                <p>Optional pre-built :class:<code>Catalog</code>; defaults to the bundled
 catalog.</p>
               </div>
             </td>
@@ -29851,7 +29879,7 @@ catalog.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional pre-built <code>IsimipClient</code>; defaults to a
+                <p>Optional pre-built :class:<code>IsimipClient</code>; defaults to a
 lazily-built <code>isimip-client</code> client (needs the <code>[isimip]</code> extra).</p>
               </div>
             </td>
@@ -30038,9 +30066,9 @@ empty, or no bbox is given without <code>whole_globe</code>.</p>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">        poll: Seconds between cutout-job status polls. Defaults to `4.0`.</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">        path: Output directory for the written NetCDFs.</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">        fmt: `strptime` format for `start` / `end`.</span>
-<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">        catalog: Optional pre-built `Catalog`; defaults to the bundled</span>
+<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">        catalog: Optional pre-built :class:`Catalog`; defaults to the bundled</span>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">            catalog.</span>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">        client: Optional pre-built `IsimipClient`; defaults to a</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">        client: Optional pre-built :class:`IsimipClient`; defaults to a</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">            lazily-built `isimip-client` client (needs the `[isimip]` extra).</span>
 <a id="__codelineno-0-113" name="__codelineno-0-113"></a>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">    Raises:</span>
@@ -30119,8 +30147,8 @@ empty, or no bbox is given without <code>whole_globe</code>.</p>
     <div class="doc doc-contents ">
 
         <p>Fetch the requested bias-adjusted granules and return the written paths.</p>
-<p>Runs the cheap <code>_search</code> (facet -&gt; dataset resolution) then
-<code>_fetch</code>, which submits the cutout job(s) and writes one cut NetCDF
+<p>Runs the cheap :meth:<code>_search</code> (facet -&gt; dataset resolution) then
+:meth:<code>_fetch</code>, which submits the cutout job(s) and writes one cut NetCDF
 per resolved granule.</p>
 
 
@@ -30236,8 +30264,8 @@ matches nothing raises rather than returning an empty list).</p>
 <span class="normal"><a href="#__codelineno-0-530">530</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested bias-adjusted granules and return the written paths.</span>
 <a id="__codelineno-0-513" name="__codelineno-0-513"></a>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">    Runs the cheap `_search` (facet -&gt; dataset resolution) then</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">    `_fetch`, which submits the cutout job(s) and writes one cut NetCDF</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">    Runs the cheap :meth:`_search` (facet -&gt; dataset resolution) then</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">    :meth:`_fetch`, which submits the cutout job(s) and writes one cut NetCDF</span>
 <a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">    per resolved granule.</span>
 <a id="__codelineno-0-517" name="__codelineno-0-517"></a>
 <a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">    Args:</span>
@@ -30289,7 +30317,7 @@ matches nothing raises rather than returning an empty list).</p>
             <td>
               <div class="doc-md-description">
                 <p>The round's <code>default_license</code> (the authoritative per-dataset
-licence is surfaced live via <code>_warn_license</code>).</p>
+licence is surfaced live via :meth:<code>_warn_license</code>).</p>
               </div>
             </td>
           </tr>
@@ -30311,7 +30339,7 @@ licence is surfaced live via <code>_warn_license</code>).</p>
 <a id="__codelineno-0-504" name="__codelineno-0-504"></a>
 <a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">        str: The round&#39;s `default_license` (the authoritative per-dataset</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            licence is surfaced live via `_warn_license`).</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            licence is surfaced live via :meth:`_warn_license`).</span>
 <a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-509" name="__codelineno-0-509"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">get_round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_round</span><span class="p">)</span><span class="o">.</span><span class="n">default_license</span>
 </code></pre></div></td></tr></table></div>
@@ -30350,7 +30378,7 @@ licence is surfaced live via <code>_warn_license</code>).</p>
     <div class="doc doc-contents first">
 
         <p>Config + curated-vocabulary catalog for the ISIMIP backend.</p>
-<p>Hosts <code>Catalog</code>, the pydantic-backed reader for the bundled
+<p>Hosts :class:<code>Catalog</code>, the pydantic-backed reader for the bundled
 <code>isimip_data_catalog.yaml</code>. ISIMIP is addressed by a <em>facet set</em>
 (<code>simulation_round</code>, <code>climate_forcing</code>, <code>climate_scenario</code>, <code>climate_variable</code>,
 <code>time_step</code>, <code>product</code>), which the ISIMIP repository REST API resolves to the
@@ -30363,8 +30391,8 @@ time-step enumerations) plus the <em>request vocabulary</em> — the rounds / fo
 raising a did-you-mean error on an unknown facet. The blocks cover the
 ISIMIP3b / ISIMIP3a InputData facets; dataset resolution and the authoritative
 per-dataset licence still run against the live API.</p>
-<p><code>CATALOG_PATH</code> is the path to the bundled YAML;
-<code>clear_catalog_cache</code> empties the <code>(path, mtime)</code> parse cache.</p>
+<p>:data:<code>CATALOG_PATH</code> is the path to the bundled YAML;
+:func:<code>clear_catalog_cache</code> empties the <code>(path, mtime)</code> parse cache.</p>
 
 
 
@@ -30404,12 +30432,12 @@ per-dataset licence still run against the live API.</p>
 
         <p>Config + curated-vocabulary catalog for the ISIMIP backend.</p>
 <p>Reads the bundled <code>isimip_data_catalog.yaml</code> (shipped as package data) and
-exposes its <code>variables:</code> block as a map of <code>Variable</code> rows keyed by
-<code>climate_variable</code> under the inherited <code>datasets</code> field, plus parallel
-<code>forcings</code>, <code>scenarios</code>, and <code>rounds</code> maps and the API
-config (<code>data_url</code>, <code>files_api_url</code>, <code>products</code>,
-<code>time_steps</code>). Instantiate with no arguments (<code>Catalog()</code>);
-<code>model_post_init</code> loads and validates the YAML in one pass and caches
+exposes its <code>variables:</code> block as a map of :class:<code>Variable</code> rows keyed by
+<code>climate_variable</code> under the inherited :attr:<code>datasets</code> field, plus parallel
+:attr:<code>forcings</code>, :attr:<code>scenarios</code>, and :attr:<code>rounds</code> maps and the API
+config (:attr:<code>data_url</code>, :attr:<code>files_api_url</code>, :attr:<code>products</code>,
+:attr:<code>time_steps</code>). Instantiate with no arguments (<code>Catalog()</code>);
+:func:<code>model_post_init</code> loads and validates the YAML in one pass and caches
 it by <code>(path, mtime)</code>.</p>
 
 
@@ -30474,7 +30502,7 @@ it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from <code>climate_variable</code> to its <code>Variable</code> row.</p>
+                <p>Map from <code>climate_variable</code> to its :class:<code>Variable</code> row.</p>
               </div>
             </td>
           </tr>
@@ -30485,7 +30513,7 @@ it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from <code>climate_forcing</code> to its <code>Forcing</code> row.</p>
+                <p>Map from <code>climate_forcing</code> to its :class:<code>Forcing</code> row.</p>
               </div>
             </td>
           </tr>
@@ -30496,7 +30524,7 @@ it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from <code>climate_scenario</code> to its <code>Scenario</code> row.</p>
+                <p>Map from <code>climate_scenario</code> to its :class:<code>Scenario</code> row.</p>
               </div>
             </td>
           </tr>
@@ -30507,7 +30535,7 @@ it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from <code>simulation_round</code> to its <code>Round</code> row.</p>
+                <p>Map from <code>simulation_round</code> to its :class:<code>Round</code> row.</p>
               </div>
             </td>
           </tr>
@@ -30768,12 +30796,12 @@ it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Config + curated-vocabulary catalog for the ISIMIP backend.</span>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">    Reads the bundled `isimip_data_catalog.yaml` (shipped as package data) and</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    exposes its `variables:` block as a map of `Variable` rows keyed by</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">    `climate_variable` under the inherited `datasets` field, plus parallel</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">    `forcings`, `scenarios`, and `rounds` maps and the API</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">    config (`data_url`, `files_api_url`, `products`,</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">    `time_steps`). Instantiate with no arguments (`Catalog()`);</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">    `model_post_init` loads and validates the YAML in one pass and caches</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    exposes its `variables:` block as a map of :class:`Variable` rows keyed by</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">    `climate_variable` under the inherited :attr:`datasets` field, plus parallel</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">    :attr:`forcings`, :attr:`scenarios`, and :attr:`rounds` maps and the API</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">    config (:attr:`data_url`, :attr:`files_api_url`, :attr:`products`,</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">    :attr:`time_steps`). Instantiate with no arguments (`Catalog()`);</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">    :func:`model_post_init` loads and validates the YAML in one pass and caches</span>
 <a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">    it by `(path, mtime)`.</span>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">    Attributes:</span>
@@ -30781,10 +30809,10 @@ it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        files_api_url: The ISIMIP files API v2 (the async cutout job endpoint).</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        products: The request products (`InputData` / `OutputData`).</span>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        time_steps: The temporal resolutions (`daily` / `monthly`).</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        datasets: Map from `climate_variable` to its `Variable` row.</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        forcings: Map from `climate_forcing` to its `Forcing` row.</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        scenarios: Map from `climate_scenario` to its `Scenario` row.</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        rounds: Map from `simulation_round` to its `Round` row.</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        datasets: Map from `climate_variable` to its :class:`Variable` row.</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        forcings: Map from `climate_forcing` to its :class:`Forcing` row.</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        scenarios: Map from `climate_scenario` to its :class:`Scenario` row.</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        rounds: Map from `simulation_round` to its :class:`Round` row.</span>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        - List curated variables and resolve one:</span>
@@ -30826,13 +30854,13 @@ it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no variables were supplied.</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        `Catalog()` with no args reads `CATALOG_PATH` (cached by</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">        `(path, mtime)`); passing `datasets=...` skips the disk read (used in</span>
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        tests). Either way the `available_datasets` index is derived from the</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        loaded variable map.</span>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            ValueError: Propagated from `load` when the YAML is missing,</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            ValueError: Propagated from :meth:`load` when the YAML is missing,</span>
 <a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">                empty, or has a malformed row.</span>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_url</span><span class="p">:</span>
@@ -30853,10 +30881,10 @@ it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">                `CATALOG_PATH`.</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file is</span>
@@ -30892,7 +30920,7 @@ it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="k">return</span> <span class="n">out</span>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a>
 <a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_forcing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Forcing</span><span class="p">:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Forcing` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Forcing` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">            key: A `climate_forcing` (`&quot;gfdl-esm4&quot;`, `&quot;ukesm1-0-ll&quot;`).</span>
@@ -30906,7 +30934,7 @@ it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-346" name="__codelineno-0-346"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Forcing&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">forcings</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="s2">&quot;forcing&quot;</span><span class="p">))</span>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_scenario</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Scenario</span><span class="p">:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Scenario` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Scenario` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">            key: A `climate_scenario` (`&quot;ssp585&quot;`, `&quot;historical&quot;`).</span>
@@ -30920,7 +30948,7 @@ it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Scenario&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scenarios</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="s2">&quot;scenario&quot;</span><span class="p">))</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a>
 <a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_round</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Round</span><span class="p">:</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Round` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Round` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-364" name="__codelineno-0-364"></a>
 <a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            key: A `simulation_round` (`&quot;ISIMIP3b&quot;`, `&quot;ISIMIP3a&quot;`).</span>
@@ -31011,7 +31039,7 @@ it by <code>(path, mtime)</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>Forcing</code> for <code>key</code>, with a did-you-mean hint.</p>
+        <p>Return the :class:<code>Forcing</code> for <code>key</code>, with a did-you-mean hint.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -31106,7 +31134,7 @@ it by <code>(path, mtime)</code>.</p>
 <span class="normal"><a href="#__codelineno-0-344">344</a></span>
 <span class="normal"><a href="#__codelineno-0-345">345</a></span>
 <span class="normal"><a href="#__codelineno-0-346">346</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_forcing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Forcing</span><span class="p">:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Forcing` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Forcing` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        key: A `climate_forcing` (`&quot;gfdl-esm4&quot;`, `&quot;ukesm1-0-ll&quot;`).</span>
@@ -31135,7 +31163,7 @@ it by <code>(path, mtime)</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>Round</code> for <code>key</code>, with a did-you-mean hint.</p>
+        <p>Return the :class:<code>Round</code> for <code>key</code>, with a did-you-mean hint.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -31230,7 +31258,7 @@ it by <code>(path, mtime)</code>.</p>
 <span class="normal"><a href="#__codelineno-0-372">372</a></span>
 <span class="normal"><a href="#__codelineno-0-373">373</a></span>
 <span class="normal"><a href="#__codelineno-0-374">374</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_round</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Round</span><span class="p">:</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Round` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Round` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-364" name="__codelineno-0-364"></a>
 <a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        key: A `simulation_round` (`&quot;ISIMIP3b&quot;`, `&quot;ISIMIP3a&quot;`).</span>
@@ -31259,7 +31287,7 @@ it by <code>(path, mtime)</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>Scenario</code> for <code>key</code>, with a did-you-mean hint.</p>
+        <p>Return the :class:<code>Scenario</code> for <code>key</code>, with a did-you-mean hint.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -31354,7 +31382,7 @@ it by <code>(path, mtime)</code>.</p>
 <span class="normal"><a href="#__codelineno-0-358">358</a></span>
 <span class="normal"><a href="#__codelineno-0-359">359</a></span>
 <span class="normal"><a href="#__codelineno-0-360">360</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_scenario</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Scenario</span><span class="p">:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Scenario` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Scenario` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        key: A `climate_scenario` (`&quot;ssp585&quot;`, `&quot;historical&quot;`).</span>
@@ -31411,7 +31439,7 @@ it by <code>(path, mtime)</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the module-level
-<code>CATALOG_PATH</code>.</p>
+:data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -31437,7 +31465,7 @@ it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -31494,10 +31522,10 @@ missing its config keys, or any curated row fails validation.</p>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            `CATALOG_PATH`.</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file is</span>
@@ -31524,7 +31552,7 @@ missing its config keys, or any curated row fails validation.</p>
     <div class="doc doc-contents ">
 
         <p>Auto-load the bundled catalog when no variables were supplied.</p>
-<p><code>Catalog()</code> with no args reads <code>CATALOG_PATH</code> (cached by
+<p><code>Catalog()</code> with no args reads :data:<code>CATALOG_PATH</code> (cached by
 <code>(path, mtime)</code>); passing <code>datasets=...</code> skips the disk read (used in
 tests). Either way the <code>available_datasets</code> index is derived from the
 loaded variable map.</p>
@@ -31545,7 +31573,7 @@ loaded variable map.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Propagated from <code>load</code> when the YAML is missing,
+                <p>Propagated from :meth:<code>load</code> when the YAML is missing,
 empty, or has a malformed row.</p>
               </div>
             </td>
@@ -31581,13 +31609,13 @@ empty, or has a malformed row.</p>
 <span class="normal"><a href="#__codelineno-0-288">288</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no variables were supplied.</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    `Catalog()` with no args reads `CATALOG_PATH` (cached by</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">    `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">    `(path, mtime)`); passing `datasets=...` skips the disk read (used in</span>
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">    tests). Either way the `available_datasets` index is derived from the</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">    loaded variable map.</span>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        ValueError: Propagated from `load` when the YAML is missing,</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        ValueError: Propagated from :meth:`load` when the YAML is missing,</span>
 <a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">            empty, or has a malformed row.</span>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_url</span><span class="p">:</span>

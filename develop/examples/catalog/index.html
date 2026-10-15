@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -804,6 +804,34 @@
     
   
     Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
   
 
     
@@ -24076,7 +24104,7 @@
 — CHIRPS / CHIRP precipitation, CHIRTS temperature &amp; humidity, CHIRPS-GEFS
 forecasts, CHPclim climatology, WBGT, SPI / SPEI, and CHC_CMIP6 scenario
 deltas. The catalog is pydantic-backed; <code>datasets</code> is a map of dataset key
-→ <code>Dataset</code> carrying FTP path, spatial / temporal extent, available
+→ :class:<code>Dataset</code> carrying FTP path, spatial / temporal extent, available
 formats, and a per-variable map.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.chc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
@@ -24212,7 +24240,7 @@ variable, append an entry to the matching per-family file under
 <code>src/earthlens/ecmwf/catalog/</code> following the schema in
 <code>_index.yaml</code>'s header comment.</p>
 <p><code>get_variable(dataset_name, variable_name)</code> is the canonical lookup;
-<code>get_dataset(name)</code> returns the structural <code>Dataset</code> record,
+<code>get_dataset(name)</code> returns the structural :class:<code>Dataset</code> record,
 and <code>describe(name)</code> is a thin serializer over it.</p>
 <h3 id="regional-reanalysis-families-carra-cerra-pan-carra"><a class="toclink" href="#regional-reanalysis-families-carra-cerra-pan-carra">Regional reanalysis families: CARRA / CERRA / PAN-CARRA</a><a class="headerlink" href="#regional-reanalysis-families-carra-cerra-pan-carra" title="Permanent link">#</a></h3>
 <p>The three high-resolution regional reanalysis families now ship
@@ -24605,7 +24633,7 @@ validator runs on the final request.</p>
 <h3 id="pre-flight-constraints-validation"><a class="toclink" href="#pre-flight-constraints-validation">Pre-flight constraints validation</a><a class="headerlink" href="#pre-flight-constraints-validation" title="Permanent link">#</a></h3>
 <p>Every CDS request passes through
 <code>earthlens.ecmwf.constraints.validate_request()</code> before
-<code>cdsapi.Client.retrieve</code> is called. The validator runs five
+:meth:<code>cdsapi.Client.retrieve</code> is called. The validator runs five
 phases (cheap → expensive); the first failure is reported, so the
 user gets the most specific error possible:</p>
 <ol>

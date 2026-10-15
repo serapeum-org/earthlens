@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -804,6 +804,34 @@
     
   
     Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
   
 
     
@@ -24319,10 +24347,10 @@ rendered API. Argo is open data, so there is no <code>auth</code> module.</p>
 <p>Thin wrapper over the official <code>argopy</code> SDK that pulls autonomous-float
 ocean profiles — temperature, salinity, pressure, and (for BGC floats)
 biogeochemical parameters — from the global Argo array, and returns them
-as a long-format <code>pandas.DataFrame</code>.</p>
+as a long-format :class:<code>pandas.DataFrame</code>.</p>
 <p>This is a <code>tabular</code> backend: Argo profiles are irregular point data (one
-per float per ~10-day cycle), not a grid, so <code>ARGO.OUTPUT_KIND</code> is
-<code>"tabular"</code> and the <code>earthlens.earthlens.EarthLens</code> facade rejects
+per float per ~10-day cycle), not a grid, so :data:<code>ARGO.OUTPUT_KIND</code> is
+<code>"tabular"</code> and the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects
 an <code>aggregate=</code> argument for it (gridded ocean fields are the CMEMS
 path).</p>
 <p>Request shape: <code>variables</code> is either a list of Argo parameter names
@@ -24334,13 +24362,13 @@ backend / QC mode / depth range with <code>source=</code> / <code>mode=</code> /
 is open data — there is no authentication and no <code>auth</code> module.</p>
 <p>Public surface (re-exported from this package):</p>
 <ul>
-<li><code>ARGO</code> — the backend; instantiate with a date range, a bbox
+<li>:class:<code>ARGO</code> — the backend; instantiate with a date range, a bbox
   (or a <code>float:</code> / <code>profile:</code> selector in <code>variables</code>), then call
-  <code>ARGO.download</code>.</li>
-<li><code>Catalog</code> — pydantic-backed loader for the bundled
+  :meth:<code>ARGO.download</code>.</li>
+<li>:class:<code>Catalog</code> — pydantic-backed loader for the bundled
   <code>argo_data_catalog.yaml</code> parameter-family vocabulary.</li>
-<li><code>Family</code> — one dataset family's parameter row.</li>
-<li><code>CATALOG_PATH</code> — path to the bundled catalog YAML.</li>
+<li>:class:<code>Family</code> — one dataset family's parameter row.</li>
+<li>:data:<code>CATALOG_PATH</code> — path to the bundled catalog YAML.</li>
 </ul>
 
 
@@ -24382,9 +24410,9 @@ is open data — there is no authentication and no <code>auth</code> module.</p>
         <p>Argo float-profile backend (long-format tabular output).</p>
 <p>Fetches autonomous-float ocean profiles for a bbox / float / profile
 selection through the same <code>download()</code> shape every other earthlens
-backend uses, and returns a long-format <code>pandas.DataFrame</code>
+backend uses, and returns a long-format :class:<code>pandas.DataFrame</code>
 (one row per measured level). The query is a search/fetch split:
-<code>_search</code> resolves the single <code>argopy</code> request and <code>_fetch</code>
+:meth:<code>_search</code> resolves the single <code>argopy</code> request and :meth:<code>_fetch</code>
 realises it to a frame.</p>
 
 
@@ -24740,9 +24768,9 @@ data, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a>
 <a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">    Fetches autonomous-float ocean profiles for a bbox / float / profile</span>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">    selection through the same `download()` shape every other earthlens</span>
-<a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">    backend uses, and returns a long-format `pandas.DataFrame`</span>
+<a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">    backend uses, and returns a long-format :class:`pandas.DataFrame`</span>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    (one row per measured level). The query is a search/fetch split:</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    `_search` resolves the single `argopy` request and `_fetch`</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    :meth:`_search` resolves the single `argopy` request and :meth:`_fetch`</span>
 <a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    realises it to a frame.</span>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a><span class="sd">    Attributes:</span>
@@ -24866,7 +24894,7 @@ data, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a `TemporalExtent`.</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        Argo `.region()` takes the whole window as ISO date bounds in one</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        call, so there is no per-date loop; `dates` collapses to the two</span>
@@ -24958,10 +24986,10 @@ data, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a>
 <a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        Widens the inherited `-&gt; list[Path]` contract: a tabular backend</span>
 <a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        returns in-memory frames, not file paths (the write happens in</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        `download` via `_write_table`).</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        :meth:`download` via :meth:`_write_table`).</span>
 <a id="__codelineno-0-345" name="__codelineno-0-345"></a>
 <a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">            products: The list returned by `_search`.</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">            products: The list returned by :meth:`_search`.</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">            list[pd.DataFrame]: One frame per product, same order.</span>
@@ -24980,7 +25008,7 @@ data, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        both are normalised here.</span>
 <a id="__codelineno-0-364" name="__codelineno-0-364"></a>
 <a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            product: One `RemoteProduct` from `_search`.</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">            pd.DataFrame: The realised profile frame, or the canonical</span>
@@ -25015,7 +25043,7 @@ data, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-398" name="__codelineno-0-398"></a>
 <a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">            fetcher: An `argopy.DataFetcher`.</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">            selection: The parsed `Selection`.</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">            selection: The parsed :class:`Selection`.</span>
 <a id="__codelineno-0-402" name="__codelineno-0-402"></a>
 <a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">            The `argopy` access point (a fetcher) ready to realise.</span>
@@ -25776,9 +25804,9 @@ transferred. <code>None</code> (the default) returns everything.</p>
 
         <p>Parameter-family catalog for the Argo backend.</p>
 <p>Reads the bundled <code>argo_data_catalog.yaml</code> (shipped as package data)
-and exposes its <code>families:</code> block as a map of <code>Family</code> rows
-keyed by family name under the inherited <code>datasets</code> field.
-Instantiate with no arguments (<code>Catalog()</code>); <code>model_post_init</code>
+and exposes its <code>families:</code> block as a map of :class:<code>Family</code> rows
+keyed by family name under the inherited :attr:<code>datasets</code> field.
+Instantiate with no arguments (<code>Catalog()</code>); :func:<code>model_post_init</code>
 loads and validates the YAML in one pass.</p>
 
 
@@ -25800,7 +25828,7 @@ loads and validates the YAML in one pass.</p>
             <td>
               <div class="doc-md-description">
                 <p>Map from the family name (<code>"phy"</code> / <code>"bgc"</code>) to its
-<code>Family</code> row.</p>
+:class:<code>Family</code> row.</p>
               </div>
             </td>
           </tr>
@@ -25962,14 +25990,14 @@ loads and validates the YAML in one pass.</p>
 <a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter-family catalog for the Argo backend.</span>
 <a id="__codelineno-0-121" name="__codelineno-0-121"></a>
 <a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">    Reads the bundled `argo_data_catalog.yaml` (shipped as package data)</span>
-<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">    and exposes its `families:` block as a map of `Family` rows</span>
-<a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">    keyed by family name under the inherited `datasets` field.</span>
-<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">    Instantiate with no arguments (`Catalog()`); `model_post_init`</span>
+<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">    and exposes its `families:` block as a map of :class:`Family` rows</span>
+<a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">    keyed by family name under the inherited :attr:`datasets` field.</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">    Instantiate with no arguments (`Catalog()`); :func:`model_post_init`</span>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">    loads and validates the YAML in one pass.</span>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a>
 <a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">        datasets: Map from the family name (`&quot;phy&quot;` / `&quot;bgc&quot;`) to its</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">            `Family` row.</span>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">            :class:`Family` row.</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a>
 <a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">        - List families and a family&#39;s parameters:</span>
@@ -26014,14 +26042,14 @@ loads and validates the YAML in one pass.</p>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-176" name="__codelineno-0-176"></a>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file has no</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">                `families:` block, or a row fails `Family` validation.</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">                `families:` block, or a row fails :class:`Family` validation.</span>
 <a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a>        <span class="n">cached</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
@@ -26030,10 +26058,10 @@ loads and validates the YAML in one pass.</p>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">cached</span><span class="p">))</span>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_family</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Family</span><span class="p">:</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Family` for `name`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Family` for `name`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-192" name="__codelineno-0-192"></a>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        Thin alias over</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">        `get_dataset`.</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">            name: A family name (`&quot;phy&quot;` / `&quot;bgc&quot;`).</span>
@@ -26108,9 +26136,9 @@ loads and validates the YAML in one pass.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>Family</code> for <code>name</code>, with a did-you-mean hint.</p>
+        <p>Return the :class:<code>Family</code> for <code>name</code>, with a did-you-mean hint.</p>
 <p>Thin alias over
-<code>get_dataset</code>.</p>
+:meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -26208,10 +26236,10 @@ loads and validates the YAML in one pass.</p>
 <span class="normal"><a href="#__codelineno-0-203">203</a></span>
 <span class="normal"><a href="#__codelineno-0-204">204</a></span>
 <span class="normal"><a href="#__codelineno-0-205">205</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_family</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Family</span><span class="p">:</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Family` for `name`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Family` for `name`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-192" name="__codelineno-0-192"></a>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">    Thin alias over</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">    `get_dataset`.</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">        name: A family name (`&quot;phy&quot;` / `&quot;bgc&quot;`).</span>
@@ -26268,7 +26296,7 @@ loads and validates the YAML in one pass.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the
-module-level <code>CATALOG_PATH</code>.</p>
+module-level :data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -26294,7 +26322,7 @@ module-level <code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -26318,7 +26346,7 @@ module-level <code>CATALOG_PATH</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>If <code>catalog_path</code> does not exist, or if the file has no
-<code>families:</code> block, or a row fails <code>Family</code> validation.</p>
+<code>families:</code> block, or a row fails :class:<code>Family</code> validation.</p>
               </div>
             </td>
           </tr>
@@ -26353,14 +26381,14 @@ module-level <code>CATALOG_PATH</code>.</p>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-176" name="__codelineno-0-176"></a>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file has no</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            `families:` block, or a row fails `Family` validation.</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            `families:` block, or a row fails :class:`Family` validation.</span>
 <a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a>    <span class="n">cached</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
@@ -26659,8 +26687,8 @@ parameters and the closest match).</p>
 
         <p>One Argo dataset family's parameter vocabulary.</p>
 <p>The family key (<code>"phy"</code> / <code>"bgc"</code>) is the parent key in
-<code>Catalog.datasets</code>; the loader copies it onto the row as
-<code>name</code> so a resolved family is self-describing.</p>
+:attr:<code>Catalog.datasets</code>; the loader copies it onto the row as
+:attr:<code>name</code> so a resolved family is self-describing.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -26775,8 +26803,8 @@ rejected at load time, and the field is excluded from
 <a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One Argo dataset family&#39;s parameter vocabulary.</span>
 <a id="__codelineno-0-44" name="__codelineno-0-44"></a>
 <a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">    The family key (`&quot;phy&quot;` / `&quot;bgc&quot;`) is the parent key in</span>
-<a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">    `Catalog.datasets`; the loader copies it onto the row as</span>
-<a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">    `name` so a resolved family is self-describing.</span>
+<a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">    :attr:`Catalog.datasets`; the loader copies it onto the row as</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">    :attr:`name` so a resolved family is self-describing.</span>
 <a id="__codelineno-0-48" name="__codelineno-0-48"></a>
 <a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">        name: The family&#39;s catalog key, injected by the loader; the row</span>
@@ -26888,12 +26916,12 @@ autonomous-float ocean profiles — temperature, salinity, pressure, and
 (for BGC floats) biogeochemical parameters — from the global Argo array
 of ~4000 active floats. A request is either a bbox + time window over a
 set of parameter names (a <strong>region</strong> selection) or a <code>float:</code> / <code>profile:</code>
-selector; the backend returns a long-format <code>pandas.DataFrame</code>, so
-<code>OUTPUT_KIND = "tabular"</code> and the <code>earthlens.earthlens.EarthLens</code>
+selector; the backend returns a long-format :class:<code>pandas.DataFrame</code>, so
+<code>OUTPUT_KIND = "tabular"</code> and the :class:<code>earthlens.earthlens.EarthLens</code>
 facade rejects an <code>aggregate=</code> argument (gridded ocean fields are the
 CMEMS path).</p>
 <p>The selection mode is routed from <code>variables</code> (see
-<code>earthlens.argo._helpers.parse_selection</code>):</p>
+:func:<code>earthlens.argo._helpers.parse_selection</code>):</p>
 <ul>
 <li>a parameter list (<code>["TEMP", "PSAL"]</code>, or an empty list) → <code>.region(...)</code>
   over the request bbox + time + depth range;</li>
@@ -26907,7 +26935,7 @@ QC mode with <code>mode=</code> (<code>"standard"</code> default / <code>"expert
 and the depth envelope with <code>depth=(min, max)</code> dbar (default <code>0–2000</code>).</p>
 <p>Argo is open data — there is no authentication. On a successful fetch the
 backend logs the standard Argo data-acknowledgement statement
-(<code>earthlens.argo._helpers.ARGO_ACKNOWLEDGEMENT</code>).</p>
+(:data:<code>earthlens.argo._helpers.ARGO_ACKNOWLEDGEMENT</code>).</p>
 
 
 
@@ -26948,9 +26976,9 @@ backend logs the standard Argo data-acknowledgement statement
         <p>Argo float-profile backend (long-format tabular output).</p>
 <p>Fetches autonomous-float ocean profiles for a bbox / float / profile
 selection through the same <code>download()</code> shape every other earthlens
-backend uses, and returns a long-format <code>pandas.DataFrame</code>
+backend uses, and returns a long-format :class:<code>pandas.DataFrame</code>
 (one row per measured level). The query is a search/fetch split:
-<code>_search</code> resolves the single <code>argopy</code> request and <code>_fetch</code>
+:meth:<code>_search</code> resolves the single <code>argopy</code> request and :meth:<code>_fetch</code>
 realises it to a frame.</p>
 
 
@@ -27306,9 +27334,9 @@ data, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a>
 <a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">    Fetches autonomous-float ocean profiles for a bbox / float / profile</span>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">    selection through the same `download()` shape every other earthlens</span>
-<a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">    backend uses, and returns a long-format `pandas.DataFrame`</span>
+<a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">    backend uses, and returns a long-format :class:`pandas.DataFrame`</span>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    (one row per measured level). The query is a search/fetch split:</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    `_search` resolves the single `argopy` request and `_fetch`</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    :meth:`_search` resolves the single `argopy` request and :meth:`_fetch`</span>
 <a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    realises it to a frame.</span>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a><span class="sd">    Attributes:</span>
@@ -27432,7 +27460,7 @@ data, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a `TemporalExtent`.</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        Argo `.region()` takes the whole window as ISO date bounds in one</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        call, so there is no per-date loop; `dates` collapses to the two</span>
@@ -27524,10 +27552,10 @@ data, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a>
 <a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        Widens the inherited `-&gt; list[Path]` contract: a tabular backend</span>
 <a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        returns in-memory frames, not file paths (the write happens in</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        `download` via `_write_table`).</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        :meth:`download` via :meth:`_write_table`).</span>
 <a id="__codelineno-0-345" name="__codelineno-0-345"></a>
 <a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">            products: The list returned by `_search`.</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">            products: The list returned by :meth:`_search`.</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">            list[pd.DataFrame]: One frame per product, same order.</span>
@@ -27546,7 +27574,7 @@ data, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        both are normalised here.</span>
 <a id="__codelineno-0-364" name="__codelineno-0-364"></a>
 <a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            product: One `RemoteProduct` from `_search`.</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">            pd.DataFrame: The realised profile frame, or the canonical</span>
@@ -27581,7 +27609,7 @@ data, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-398" name="__codelineno-0-398"></a>
 <a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">            fetcher: An `argopy.DataFetcher`.</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">            selection: The parsed `Selection`.</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">            selection: The parsed :class:`Selection`.</span>
 <a id="__codelineno-0-402" name="__codelineno-0-402"></a>
 <a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">            The `argopy` access point (a fetcher) ready to realise.</span>
@@ -28350,11 +28378,11 @@ physical temperature / salinity / pressure) and <code>"bgc"</code> (biogeochemic
 parameters). This module is the curated vocabulary of the canonical Argo
 parameter names per family, used to validate a request's <code>variables=</code>
 against the chosen <code>dataset=</code> family with a did-you-mean hint.</p>
-<p><code>Catalog</code> is a thin <code>earthlens.base.AbstractCatalog</code>
+<p>:class:<code>Catalog</code> is a thin :class:<code>earthlens.base.AbstractCatalog</code>
 subclass that loads the bundled <code>argo_data_catalog.yaml</code> and exposes each
-family as a <code>Family</code> row (keyed by family name under the inherited
+family as a :class:<code>Family</code> row (keyed by family name under the inherited
 <code>datasets</code> field, which gives it the <code>cat["phy"]</code> / <code>"phy" in cat</code> /
-<code>len(cat)</code> dict-like surface). <code>CATALOG_PATH</code> is the path to the
+<code>len(cat)</code> dict-like surface). :data:<code>CATALOG_PATH</code> is the path to the
 bundled YAML and is monkey-patchable in tests.</p>
 
 
@@ -28395,9 +28423,9 @@ bundled YAML and is monkey-patchable in tests.</p>
 
         <p>Parameter-family catalog for the Argo backend.</p>
 <p>Reads the bundled <code>argo_data_catalog.yaml</code> (shipped as package data)
-and exposes its <code>families:</code> block as a map of <code>Family</code> rows
-keyed by family name under the inherited <code>datasets</code> field.
-Instantiate with no arguments (<code>Catalog()</code>); <code>model_post_init</code>
+and exposes its <code>families:</code> block as a map of :class:<code>Family</code> rows
+keyed by family name under the inherited :attr:<code>datasets</code> field.
+Instantiate with no arguments (<code>Catalog()</code>); :func:<code>model_post_init</code>
 loads and validates the YAML in one pass.</p>
 
 
@@ -28419,7 +28447,7 @@ loads and validates the YAML in one pass.</p>
             <td>
               <div class="doc-md-description">
                 <p>Map from the family name (<code>"phy"</code> / <code>"bgc"</code>) to its
-<code>Family</code> row.</p>
+:class:<code>Family</code> row.</p>
               </div>
             </td>
           </tr>
@@ -28581,14 +28609,14 @@ loads and validates the YAML in one pass.</p>
 <a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameter-family catalog for the Argo backend.</span>
 <a id="__codelineno-0-121" name="__codelineno-0-121"></a>
 <a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">    Reads the bundled `argo_data_catalog.yaml` (shipped as package data)</span>
-<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">    and exposes its `families:` block as a map of `Family` rows</span>
-<a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">    keyed by family name under the inherited `datasets` field.</span>
-<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">    Instantiate with no arguments (`Catalog()`); `model_post_init`</span>
+<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">    and exposes its `families:` block as a map of :class:`Family` rows</span>
+<a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">    keyed by family name under the inherited :attr:`datasets` field.</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">    Instantiate with no arguments (`Catalog()`); :func:`model_post_init`</span>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">    loads and validates the YAML in one pass.</span>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a>
 <a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">        datasets: Map from the family name (`&quot;phy&quot;` / `&quot;bgc&quot;`) to its</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">            `Family` row.</span>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">            :class:`Family` row.</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a>
 <a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">        - List families and a family&#39;s parameters:</span>
@@ -28633,14 +28661,14 @@ loads and validates the YAML in one pass.</p>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-176" name="__codelineno-0-176"></a>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file has no</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">                `families:` block, or a row fails `Family` validation.</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">                `families:` block, or a row fails :class:`Family` validation.</span>
 <a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a>        <span class="n">cached</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
@@ -28649,10 +28677,10 @@ loads and validates the YAML in one pass.</p>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">cached</span><span class="p">))</span>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_family</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Family</span><span class="p">:</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Family` for `name`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Family` for `name`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-192" name="__codelineno-0-192"></a>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        Thin alias over</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">        `get_dataset`.</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">            name: A family name (`&quot;phy&quot;` / `&quot;bgc&quot;`).</span>
@@ -28727,9 +28755,9 @@ loads and validates the YAML in one pass.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>Family</code> for <code>name</code>, with a did-you-mean hint.</p>
+        <p>Return the :class:<code>Family</code> for <code>name</code>, with a did-you-mean hint.</p>
 <p>Thin alias over
-<code>get_dataset</code>.</p>
+:meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -28827,10 +28855,10 @@ loads and validates the YAML in one pass.</p>
 <span class="normal"><a href="#__codelineno-0-203">203</a></span>
 <span class="normal"><a href="#__codelineno-0-204">204</a></span>
 <span class="normal"><a href="#__codelineno-0-205">205</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_family</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Family</span><span class="p">:</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Family` for `name`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Family` for `name`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-192" name="__codelineno-0-192"></a>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">    Thin alias over</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">    `get_dataset`.</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">        name: A family name (`&quot;phy&quot;` / `&quot;bgc&quot;`).</span>
@@ -28887,7 +28915,7 @@ loads and validates the YAML in one pass.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the
-module-level <code>CATALOG_PATH</code>.</p>
+module-level :data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -28913,7 +28941,7 @@ module-level <code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -28937,7 +28965,7 @@ module-level <code>CATALOG_PATH</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>If <code>catalog_path</code> does not exist, or if the file has no
-<code>families:</code> block, or a row fails <code>Family</code> validation.</p>
+<code>families:</code> block, or a row fails :class:<code>Family</code> validation.</p>
               </div>
             </td>
           </tr>
@@ -28972,14 +29000,14 @@ module-level <code>CATALOG_PATH</code>.</p>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-176" name="__codelineno-0-176"></a>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file has no</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            `families:` block, or a row fails `Family` validation.</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            `families:` block, or a row fails :class:`Family` validation.</span>
 <a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a>    <span class="n">cached</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
@@ -29278,8 +29306,8 @@ parameters and the closest match).</p>
 
         <p>One Argo dataset family's parameter vocabulary.</p>
 <p>The family key (<code>"phy"</code> / <code>"bgc"</code>) is the parent key in
-<code>Catalog.datasets</code>; the loader copies it onto the row as
-<code>name</code> so a resolved family is self-describing.</p>
+:attr:<code>Catalog.datasets</code>; the loader copies it onto the row as
+:attr:<code>name</code> so a resolved family is self-describing.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -29394,8 +29422,8 @@ rejected at load time, and the field is excluded from
 <a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One Argo dataset family&#39;s parameter vocabulary.</span>
 <a id="__codelineno-0-44" name="__codelineno-0-44"></a>
 <a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">    The family key (`&quot;phy&quot;` / `&quot;bgc&quot;`) is the parent key in</span>
-<a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">    `Catalog.datasets`; the loader copies it onto the row as</span>
-<a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">    `name` so a resolved family is self-describing.</span>
+<a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">    :attr:`Catalog.datasets`; the loader copies it onto the row as</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">    :attr:`name` so a resolved family is self-describing.</span>
 <a id="__codelineno-0-48" name="__codelineno-0-48"></a>
 <a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">        name: The family&#39;s catalog key, injected by the loader; the row</span>

@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -804,6 +804,34 @@
     
   
     Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
   
 
     
@@ -24273,12 +24301,12 @@ the <code>API</code> shape.</p>
 
 
         <p>Reusable HTTP transport: session, headers, timeout, retry, download.</p>
-<p>Wraps a <code>requests.Session</code>, attaching default headers (a
+<p>Wraps a :class:<code>requests.Session</code>, attaching default headers (a
 non-Mozilla <code>User-Agent</code> and <code>Accept-Encoding: gzip, deflate</code>) to
 every request and applying a shared timeout. The verbs
-(<code>get</code>, <code>post</code>, <code>request</code>) route through a
-<code>Retry-After</code>-aware back-off loop; <code>get_json</code> decodes the JSON
-body and <code>download</code> streams a response to disk. Both the
+(:meth:<code>get</code>, :meth:<code>post</code>, :meth:<code>request</code>) route through a
+<code>Retry-After</code>-aware back-off loop; :meth:<code>get_json</code> decodes the JSON
+body and :meth:<code>download</code> streams a response to disk. Both the
 session and the sleep function are injectable so the client is fully
 unit-testable without a live network.</p>
 <p>Default headers set at construction are merged with (and overridden
@@ -25709,12 +25737,12 @@ non-idempotent verb such as <code>POST</code>.</p>
 <span class="normal"><a href="#__codelineno-0-2548">2548</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1274" name="__codelineno-0-1274"></a><span class="k">class</span><span class="w"> </span><span class="nc">HttpClient</span><span class="p">:</span>
 <a id="__codelineno-0-1275" name="__codelineno-0-1275"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Reusable HTTP transport: session, headers, timeout, retry, download.</span>
 <a id="__codelineno-0-1276" name="__codelineno-0-1276"></a>
-<a id="__codelineno-0-1277" name="__codelineno-0-1277"></a><span class="sd">    Wraps a `requests.Session`, attaching default headers (a</span>
+<a id="__codelineno-0-1277" name="__codelineno-0-1277"></a><span class="sd">    Wraps a :class:`requests.Session`, attaching default headers (a</span>
 <a id="__codelineno-0-1278" name="__codelineno-0-1278"></a><span class="sd">    non-Mozilla `User-Agent` and `Accept-Encoding: gzip, deflate`) to</span>
 <a id="__codelineno-0-1279" name="__codelineno-0-1279"></a><span class="sd">    every request and applying a shared timeout. The verbs</span>
-<a id="__codelineno-0-1280" name="__codelineno-0-1280"></a><span class="sd">    (`get`, `post`, `request`) route through a</span>
-<a id="__codelineno-0-1281" name="__codelineno-0-1281"></a><span class="sd">    `Retry-After`-aware back-off loop; `get_json` decodes the JSON</span>
-<a id="__codelineno-0-1282" name="__codelineno-0-1282"></a><span class="sd">    body and `download` streams a response to disk. Both the</span>
+<a id="__codelineno-0-1280" name="__codelineno-0-1280"></a><span class="sd">    (:meth:`get`, :meth:`post`, :meth:`request`) route through a</span>
+<a id="__codelineno-0-1281" name="__codelineno-0-1281"></a><span class="sd">    `Retry-After`-aware back-off loop; :meth:`get_json` decodes the JSON</span>
+<a id="__codelineno-0-1282" name="__codelineno-0-1282"></a><span class="sd">    body and :meth:`download` streams a response to disk. Both the</span>
 <a id="__codelineno-0-1283" name="__codelineno-0-1283"></a><span class="sd">    session and the sleep function are injectable so the client is fully</span>
 <a id="__codelineno-0-1284" name="__codelineno-0-1284"></a><span class="sd">    unit-testable without a live network.</span>
 <a id="__codelineno-0-1285" name="__codelineno-0-1285"></a>
@@ -25773,12 +25801,12 @@ non-idempotent verb such as <code>POST</code>.</p>
 <a id="__codelineno-0-1338" name="__codelineno-0-1338"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a client with default headers, timeout, and retry policy.</span>
 <a id="__codelineno-0-1339" name="__codelineno-0-1339"></a>
 <a id="__codelineno-0-1340" name="__codelineno-0-1340"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-1341" name="__codelineno-0-1341"></a><span class="sd">            session: An existing `requests.Session` to reuse.</span>
+<a id="__codelineno-0-1341" name="__codelineno-0-1341"></a><span class="sd">            session: An existing :class:`requests.Session` to reuse.</span>
 <a id="__codelineno-0-1342" name="__codelineno-0-1342"></a><span class="sd">                Defaults to a fresh session. Injectable so tests can</span>
 <a id="__codelineno-0-1343" name="__codelineno-0-1343"></a><span class="sd">                supply a fake transport.</span>
 <a id="__codelineno-0-1344" name="__codelineno-0-1344"></a><span class="sd">            user_agent: The default `User-Agent` header value. Defaults</span>
 <a id="__codelineno-0-1345" name="__codelineno-0-1345"></a><span class="sd">                to `earthlens/{version}` (non-Mozilla by design; see</span>
-<a id="__codelineno-0-1346" name="__codelineno-0-1346"></a><span class="sd">                `_default_user_agent`).</span>
+<a id="__codelineno-0-1346" name="__codelineno-0-1346"></a><span class="sd">                :func:`_default_user_agent`).</span>
 <a id="__codelineno-0-1347" name="__codelineno-0-1347"></a><span class="sd">            headers: Extra default headers merged onto every request</span>
 <a id="__codelineno-0-1348" name="__codelineno-0-1348"></a><span class="sd">                (e.g. `{&quot;X-API-Key&quot;: ...}`). Override per call with a</span>
 <a id="__codelineno-0-1349" name="__codelineno-0-1349"></a><span class="sd">                request-level `headers=`.</span>
@@ -25796,7 +25824,7 @@ non-idempotent verb such as <code>POST</code>.</p>
 <a id="__codelineno-0-1361" name="__codelineno-0-1361"></a><span class="sd">                `None` disables the cap.</span>
 <a id="__codelineno-0-1362" name="__codelineno-0-1362"></a><span class="sd">            retry_on_exceptions: Exception types that also trigger a retry</span>
 <a id="__codelineno-0-1363" name="__codelineno-0-1363"></a><span class="sd">                when raised by the transport. `None` (the default) uses</span>
-<a id="__codelineno-0-1364" name="__codelineno-0-1364"></a><span class="sd">                `DEFAULT_RETRY_EXCEPTIONS` — a refused or reset</span>
+<a id="__codelineno-0-1364" name="__codelineno-0-1364"></a><span class="sd">                :data:`DEFAULT_RETRY_EXCEPTIONS` — a refused or reset</span>
 <a id="__codelineno-0-1365" name="__codelineno-0-1365"></a><span class="sd">                connection, a timeout, a body truncated mid-stream — and is</span>
 <a id="__codelineno-0-1366" name="__codelineno-0-1366"></a><span class="sd">                what selects the strict policy: the never-retry list applies</span>
 <a id="__codelineno-0-1367" name="__codelineno-0-1367"></a><span class="sd">                and `connect_retries` takes its small default. Passing any</span>
@@ -25805,7 +25833,7 @@ non-idempotent verb such as <code>POST</code>.</p>
 <a id="__codelineno-0-1370" name="__codelineno-0-1370"></a><span class="sd">                `max_retries`. Pass `()` to retry on status only.</span>
 <a id="__codelineno-0-1371" name="__codelineno-0-1371"></a><span class="sd">            connect_retries: Retries allowed for a failure in the connect</span>
 <a id="__codelineno-0-1372" name="__codelineno-0-1372"></a><span class="sd">                phase, counted separately from `read_retries`. `None` (the</span>
-<a id="__codelineno-0-1373" name="__codelineno-0-1373"></a><span class="sd">                default) resolves to `DEFAULT_CONNECT_RETRIES` while</span>
+<a id="__codelineno-0-1373" name="__codelineno-0-1373"></a><span class="sd">                default) resolves to :data:`DEFAULT_CONNECT_RETRIES` while</span>
 <a id="__codelineno-0-1374" name="__codelineno-0-1374"></a><span class="sd">                the client uses the default exception set — a host that will</span>
 <a id="__codelineno-0-1375" name="__codelineno-0-1375"></a><span class="sd">                not accept a connection rarely starts doing so within a</span>
 <a id="__codelineno-0-1376" name="__codelineno-0-1376"></a><span class="sd">                back-off window — and to `max_retries` when the caller</span>
@@ -25817,7 +25845,7 @@ non-idempotent verb such as <code>POST</code>.</p>
 <a id="__codelineno-0-1382" name="__codelineno-0-1382"></a><span class="sd">                This is the transient case a retry actually helps.</span>
 <a id="__codelineno-0-1383" name="__codelineno-0-1383"></a><span class="sd">            retry_unsafe_methods: Whether a *read*-phase failure may replay a</span>
 <a id="__codelineno-0-1384" name="__codelineno-0-1384"></a><span class="sd">                non-idempotent verb. `False` (the default) replays only the</span>
-<a id="__codelineno-0-1385" name="__codelineno-0-1385"></a><span class="sd">                methods in `IDEMPOTENT_METHODS`, because a response</span>
+<a id="__codelineno-0-1385" name="__codelineno-0-1385"></a><span class="sd">                methods in :data:`IDEMPOTENT_METHODS`, because a response</span>
 <a id="__codelineno-0-1386" name="__codelineno-0-1386"></a><span class="sd">                that broke after the request was delivered may already have</span>
 <a id="__codelineno-0-1387" name="__codelineno-0-1387"></a><span class="sd">                been acted on, so replaying a `POST` risks a double</span>
 <a id="__codelineno-0-1388" name="__codelineno-0-1388"></a><span class="sd">                submission. Connect-phase failures are replayed for any</span>
@@ -25837,7 +25865,7 @@ non-idempotent verb such as <code>POST</code>.</p>
 <a id="__codelineno-0-1402" name="__codelineno-0-1402"></a><span class="sd">            clock: Monotonic clock used for the `min_interval` throttle.</span>
 <a id="__codelineno-0-1403" name="__codelineno-0-1403"></a><span class="sd">                Injectable so tests drive it deterministically.</span>
 <a id="__codelineno-0-1404" name="__codelineno-0-1404"></a><span class="sd">            sleep: The sleep function used between retries and for the</span>
-<a id="__codelineno-0-1405" name="__codelineno-0-1405"></a><span class="sd">                throttle. Defaults to `time.sleep`; injectable so</span>
+<a id="__codelineno-0-1405" name="__codelineno-0-1405"></a><span class="sd">                throttle. Defaults to :func:`time.sleep`; injectable so</span>
 <a id="__codelineno-0-1406" name="__codelineno-0-1406"></a><span class="sd">                tests run without real delays.</span>
 <a id="__codelineno-0-1407" name="__codelineno-0-1407"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1408" name="__codelineno-0-1408"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">session</span> <span class="k">if</span> <span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">new_session</span><span class="p">()</span>
@@ -25899,7 +25927,7 @@ non-idempotent verb such as <code>POST</code>.</p>
 <a id="__codelineno-0-1464" name="__codelineno-0-1464"></a>
 <a id="__codelineno-0-1465" name="__codelineno-0-1465"></a>    <span class="nd">@property</span>
 <a id="__codelineno-0-1466" name="__codelineno-0-1466"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">session</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span><span class="p">:</span>
-<a id="__codelineno-0-1467" name="__codelineno-0-1467"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the underlying `requests.Session`.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-1467" name="__codelineno-0-1467"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the underlying :class:`requests.Session`.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-1468" name="__codelineno-0-1468"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span>
 <a id="__codelineno-0-1469" name="__codelineno-0-1469"></a>
 <a id="__codelineno-0-1470" name="__codelineno-0-1470"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_merge_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
@@ -25965,22 +25993,22 @@ non-idempotent verb such as <code>POST</code>.</p>
 <a id="__codelineno-0-1530" name="__codelineno-0-1530"></a>        <span class="p">)</span>
 <a id="__codelineno-0-1531" name="__codelineno-0-1531"></a>
 <a id="__codelineno-0-1532" name="__codelineno-0-1532"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
-<a id="__codelineno-0-1533" name="__codelineno-0-1533"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Send a `GET` request. See `request` for arguments.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-1533" name="__codelineno-0-1533"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Send a `GET` request. See :meth:`request` for arguments.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-1534" name="__codelineno-0-1534"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 <a id="__codelineno-0-1535" name="__codelineno-0-1535"></a>
 <a id="__codelineno-0-1536" name="__codelineno-0-1536"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
-<a id="__codelineno-0-1537" name="__codelineno-0-1537"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Send a `POST` request. See `request` for arguments.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-1537" name="__codelineno-0-1537"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Send a `POST` request. See :meth:`request` for arguments.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-1538" name="__codelineno-0-1538"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 <a id="__codelineno-0-1539" name="__codelineno-0-1539"></a>
 <a id="__codelineno-0-1540" name="__codelineno-0-1540"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <a id="__codelineno-0-1541" name="__codelineno-0-1541"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Send a `GET` request and decode the JSON response body.</span>
 <a id="__codelineno-0-1542" name="__codelineno-0-1542"></a>
-<a id="__codelineno-0-1543" name="__codelineno-0-1543"></a><span class="sd">        Convenience over `get` for the REST endpoints that return</span>
+<a id="__codelineno-0-1543" name="__codelineno-0-1543"></a><span class="sd">        Convenience over :meth:`get` for the REST endpoints that return</span>
 <a id="__codelineno-0-1544" name="__codelineno-0-1544"></a><span class="sd">        JSON envelopes.</span>
 <a id="__codelineno-0-1545" name="__codelineno-0-1545"></a>
 <a id="__codelineno-0-1546" name="__codelineno-0-1546"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-1547" name="__codelineno-0-1547"></a><span class="sd">            url: Absolute request URL.</span>
-<a id="__codelineno-0-1548" name="__codelineno-0-1548"></a><span class="sd">            **kwargs: Keyword arguments forwarded to `get`</span>
+<a id="__codelineno-0-1548" name="__codelineno-0-1548"></a><span class="sd">            **kwargs: Keyword arguments forwarded to :meth:`get`</span>
 <a id="__codelineno-0-1549" name="__codelineno-0-1549"></a><span class="sd">                (`params`, `headers`, `timeout`, ...).</span>
 <a id="__codelineno-0-1550" name="__codelineno-0-1550"></a>
 <a id="__codelineno-0-1551" name="__codelineno-0-1551"></a><span class="sd">        Returns:</span>
@@ -26005,13 +26033,13 @@ non-idempotent verb such as <code>POST</code>.</p>
 <a id="__codelineno-0-1570" name="__codelineno-0-1570"></a><span class="sd">        so a `ChunkedEncodingError` raised mid-stream escapes it. The</span>
 <a id="__codelineno-0-1571" name="__codelineno-0-1571"></a><span class="sd">        default transport retry covers the non-streaming verbs, whose</span>
 <a id="__codelineno-0-1572" name="__codelineno-0-1572"></a><span class="sd">        bodies `requests` materialises inside the loop, and</span>
-<a id="__codelineno-0-1573" name="__codelineno-0-1573"></a><span class="sd">        `download`, which owns its own. A caller streaming a large</span>
-<a id="__codelineno-0-1574" name="__codelineno-0-1574"></a><span class="sd">        body that needs the same protection should use `download`</span>
+<a id="__codelineno-0-1573" name="__codelineno-0-1573"></a><span class="sd">        :meth:`download`, which owns its own. A caller streaming a large</span>
+<a id="__codelineno-0-1574" name="__codelineno-0-1574"></a><span class="sd">        body that needs the same protection should use :meth:`download`</span>
 <a id="__codelineno-0-1575" name="__codelineno-0-1575"></a><span class="sd">        or re-request on failure itself.</span>
 <a id="__codelineno-0-1576" name="__codelineno-0-1576"></a>
 <a id="__codelineno-0-1577" name="__codelineno-0-1577"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-1578" name="__codelineno-0-1578"></a><span class="sd">            url: Absolute request URL.</span>
-<a id="__codelineno-0-1579" name="__codelineno-0-1579"></a><span class="sd">            **kwargs: Keyword arguments forwarded to `get`.</span>
+<a id="__codelineno-0-1579" name="__codelineno-0-1579"></a><span class="sd">            **kwargs: Keyword arguments forwarded to :meth:`get`.</span>
 <a id="__codelineno-0-1580" name="__codelineno-0-1580"></a>
 <a id="__codelineno-0-1581" name="__codelineno-0-1581"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-1582" name="__codelineno-0-1582"></a><span class="sd">            requests.Response: The open streaming response.</span>
@@ -27032,7 +27060,7 @@ non-idempotent verb such as <code>POST</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the underlying <code>requests.Session</code>.</p>
+        <p>Return the underlying :class:<code>requests.Session</code>.</p>
 
     </div>
 
@@ -27075,7 +27103,7 @@ non-idempotent verb such as <code>POST</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An existing <code>requests.Session</code> to reuse.
+                <p>An existing :class:<code>requests.Session</code> to reuse.
 Defaults to a fresh session. Injectable so tests can
 supply a fake transport.</p>
               </div>
@@ -27095,7 +27123,7 @@ supply a fake transport.</p>
               <div class="doc-md-description">
                 <p>The default <code>User-Agent</code> header value. Defaults
 to <code>earthlens/{version}</code> (non-Mozilla by design; see
-<code>_default_user_agent</code>).</p>
+:func:<code>_default_user_agent</code>).</p>
               </div>
             </td>
             <td>
@@ -27218,7 +27246,7 @@ large <code>Retry-After</code> cannot pin the thread indefinitely.
               <div class="doc-md-description">
                 <p>Exception types that also trigger a retry
 when raised by the transport. <code>None</code> (the default) uses
-<code>DEFAULT_RETRY_EXCEPTIONS</code> — a refused or reset
+:data:<code>DEFAULT_RETRY_EXCEPTIONS</code> — a refused or reset
 connection, a timeout, a body truncated mid-stream — and is
 what selects the strict policy: the never-retry list applies
 and <code>connect_retries</code> takes its small default. Passing any
@@ -27242,7 +27270,7 @@ the policy: nothing is vetoed and <code>connect_retries</code> follows
               <div class="doc-md-description">
                 <p>Retries allowed for a failure in the connect
 phase, counted separately from <code>read_retries</code>. <code>None</code> (the
-default) resolves to <code>DEFAULT_CONNECT_RETRIES</code> while
+default) resolves to :data:<code>DEFAULT_CONNECT_RETRIES</code> while
 the client uses the default exception set — a host that will
 not accept a connection rarely starts doing so within a
 back-off window — and to <code>max_retries</code> when the caller
@@ -27284,7 +27312,7 @@ This is the transient case a retry actually helps.</p>
               <div class="doc-md-description">
                 <p>Whether a <em>read</em>-phase failure may replay a
 non-idempotent verb. <code>False</code> (the default) replays only the
-methods in <code>IDEMPOTENT_METHODS</code>, because a response
+methods in :data:<code>IDEMPOTENT_METHODS</code>, because a response
 that broke after the request was delivered may already have
 been acted on, so replaying a <code>POST</code> risks a double
 submission. Connect-phase failures are replayed for any
@@ -27379,7 +27407,7 @@ Injectable so tests drive it deterministically.</p>
             <td>
               <div class="doc-md-description">
                 <p>The sleep function used between retries and for the
-throttle. Defaults to <code>time.sleep</code>; injectable so
+throttle. Defaults to :func:<code>time.sleep</code>; injectable so
 tests run without real delays.</p>
               </div>
             </td>
@@ -27558,12 +27586,12 @@ tests run without real delays.</p>
 <a id="__codelineno-0-1338" name="__codelineno-0-1338"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a client with default headers, timeout, and retry policy.</span>
 <a id="__codelineno-0-1339" name="__codelineno-0-1339"></a>
 <a id="__codelineno-0-1340" name="__codelineno-0-1340"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-1341" name="__codelineno-0-1341"></a><span class="sd">        session: An existing `requests.Session` to reuse.</span>
+<a id="__codelineno-0-1341" name="__codelineno-0-1341"></a><span class="sd">        session: An existing :class:`requests.Session` to reuse.</span>
 <a id="__codelineno-0-1342" name="__codelineno-0-1342"></a><span class="sd">            Defaults to a fresh session. Injectable so tests can</span>
 <a id="__codelineno-0-1343" name="__codelineno-0-1343"></a><span class="sd">            supply a fake transport.</span>
 <a id="__codelineno-0-1344" name="__codelineno-0-1344"></a><span class="sd">        user_agent: The default `User-Agent` header value. Defaults</span>
 <a id="__codelineno-0-1345" name="__codelineno-0-1345"></a><span class="sd">            to `earthlens/{version}` (non-Mozilla by design; see</span>
-<a id="__codelineno-0-1346" name="__codelineno-0-1346"></a><span class="sd">            `_default_user_agent`).</span>
+<a id="__codelineno-0-1346" name="__codelineno-0-1346"></a><span class="sd">            :func:`_default_user_agent`).</span>
 <a id="__codelineno-0-1347" name="__codelineno-0-1347"></a><span class="sd">        headers: Extra default headers merged onto every request</span>
 <a id="__codelineno-0-1348" name="__codelineno-0-1348"></a><span class="sd">            (e.g. `{&quot;X-API-Key&quot;: ...}`). Override per call with a</span>
 <a id="__codelineno-0-1349" name="__codelineno-0-1349"></a><span class="sd">            request-level `headers=`.</span>
@@ -27581,7 +27609,7 @@ tests run without real delays.</p>
 <a id="__codelineno-0-1361" name="__codelineno-0-1361"></a><span class="sd">            `None` disables the cap.</span>
 <a id="__codelineno-0-1362" name="__codelineno-0-1362"></a><span class="sd">        retry_on_exceptions: Exception types that also trigger a retry</span>
 <a id="__codelineno-0-1363" name="__codelineno-0-1363"></a><span class="sd">            when raised by the transport. `None` (the default) uses</span>
-<a id="__codelineno-0-1364" name="__codelineno-0-1364"></a><span class="sd">            `DEFAULT_RETRY_EXCEPTIONS` — a refused or reset</span>
+<a id="__codelineno-0-1364" name="__codelineno-0-1364"></a><span class="sd">            :data:`DEFAULT_RETRY_EXCEPTIONS` — a refused or reset</span>
 <a id="__codelineno-0-1365" name="__codelineno-0-1365"></a><span class="sd">            connection, a timeout, a body truncated mid-stream — and is</span>
 <a id="__codelineno-0-1366" name="__codelineno-0-1366"></a><span class="sd">            what selects the strict policy: the never-retry list applies</span>
 <a id="__codelineno-0-1367" name="__codelineno-0-1367"></a><span class="sd">            and `connect_retries` takes its small default. Passing any</span>
@@ -27590,7 +27618,7 @@ tests run without real delays.</p>
 <a id="__codelineno-0-1370" name="__codelineno-0-1370"></a><span class="sd">            `max_retries`. Pass `()` to retry on status only.</span>
 <a id="__codelineno-0-1371" name="__codelineno-0-1371"></a><span class="sd">        connect_retries: Retries allowed for a failure in the connect</span>
 <a id="__codelineno-0-1372" name="__codelineno-0-1372"></a><span class="sd">            phase, counted separately from `read_retries`. `None` (the</span>
-<a id="__codelineno-0-1373" name="__codelineno-0-1373"></a><span class="sd">            default) resolves to `DEFAULT_CONNECT_RETRIES` while</span>
+<a id="__codelineno-0-1373" name="__codelineno-0-1373"></a><span class="sd">            default) resolves to :data:`DEFAULT_CONNECT_RETRIES` while</span>
 <a id="__codelineno-0-1374" name="__codelineno-0-1374"></a><span class="sd">            the client uses the default exception set — a host that will</span>
 <a id="__codelineno-0-1375" name="__codelineno-0-1375"></a><span class="sd">            not accept a connection rarely starts doing so within a</span>
 <a id="__codelineno-0-1376" name="__codelineno-0-1376"></a><span class="sd">            back-off window — and to `max_retries` when the caller</span>
@@ -27602,7 +27630,7 @@ tests run without real delays.</p>
 <a id="__codelineno-0-1382" name="__codelineno-0-1382"></a><span class="sd">            This is the transient case a retry actually helps.</span>
 <a id="__codelineno-0-1383" name="__codelineno-0-1383"></a><span class="sd">        retry_unsafe_methods: Whether a *read*-phase failure may replay a</span>
 <a id="__codelineno-0-1384" name="__codelineno-0-1384"></a><span class="sd">            non-idempotent verb. `False` (the default) replays only the</span>
-<a id="__codelineno-0-1385" name="__codelineno-0-1385"></a><span class="sd">            methods in `IDEMPOTENT_METHODS`, because a response</span>
+<a id="__codelineno-0-1385" name="__codelineno-0-1385"></a><span class="sd">            methods in :data:`IDEMPOTENT_METHODS`, because a response</span>
 <a id="__codelineno-0-1386" name="__codelineno-0-1386"></a><span class="sd">            that broke after the request was delivered may already have</span>
 <a id="__codelineno-0-1387" name="__codelineno-0-1387"></a><span class="sd">            been acted on, so replaying a `POST` risks a double</span>
 <a id="__codelineno-0-1388" name="__codelineno-0-1388"></a><span class="sd">            submission. Connect-phase failures are replayed for any</span>
@@ -27622,7 +27650,7 @@ tests run without real delays.</p>
 <a id="__codelineno-0-1402" name="__codelineno-0-1402"></a><span class="sd">        clock: Monotonic clock used for the `min_interval` throttle.</span>
 <a id="__codelineno-0-1403" name="__codelineno-0-1403"></a><span class="sd">            Injectable so tests drive it deterministically.</span>
 <a id="__codelineno-0-1404" name="__codelineno-0-1404"></a><span class="sd">        sleep: The sleep function used between retries and for the</span>
-<a id="__codelineno-0-1405" name="__codelineno-0-1405"></a><span class="sd">            throttle. Defaults to `time.sleep`; injectable so</span>
+<a id="__codelineno-0-1405" name="__codelineno-0-1405"></a><span class="sd">            throttle. Defaults to :func:`time.sleep`; injectable so</span>
 <a id="__codelineno-0-1406" name="__codelineno-0-1406"></a><span class="sd">            tests run without real delays.</span>
 <a id="__codelineno-0-1407" name="__codelineno-0-1407"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1408" name="__codelineno-0-1408"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">session</span> <span class="k">if</span> <span class="n">session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">new_session</span><span class="p">()</span>
@@ -29376,7 +29404,7 @@ unchanged. <code>RangeReadError</code> is never raised here.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Send a <code>GET</code> request. See <code>request</code> for arguments.</p>
+        <p>Send a <code>GET</code> request. See :meth:<code>request</code> for arguments.</p>
 
 
             <details class="mkdocstrings-source">
@@ -29384,7 +29412,7 @@ unchanged. <code>RangeReadError</code> is never raised here.</p>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1532">1532</a></span>
 <span class="normal"><a href="#__codelineno-0-1533">1533</a></span>
 <span class="normal"><a href="#__codelineno-0-1534">1534</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1532" name="__codelineno-0-1532"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
-<a id="__codelineno-0-1533" name="__codelineno-0-1533"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Send a `GET` request. See `request` for arguments.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-1533" name="__codelineno-0-1533"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Send a `GET` request. See :meth:`request` for arguments.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-1534" name="__codelineno-0-1534"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -29404,7 +29432,7 @@ unchanged. <code>RangeReadError</code> is never raised here.</p>
     <div class="doc doc-contents ">
 
         <p>Send a <code>GET</code> request and decode the JSON response body.</p>
-<p>Convenience over <code>get</code> for the REST endpoints that return
+<p>Convenience over :meth:<code>get</code> for the REST endpoints that return
 JSON envelopes.</p>
 
 
@@ -29444,7 +29472,7 @@ JSON envelopes.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Keyword arguments forwarded to <code>get</code>
+                <p>Keyword arguments forwarded to :meth:<code>get</code>
 (<code>params</code>, <code>headers</code>, <code>timeout</code>, ...).</p>
               </div>
             </td>
@@ -29526,12 +29554,12 @@ the retryable status is exhausted.</p>
 <span class="normal"><a href="#__codelineno-0-1558">1558</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1540" name="__codelineno-0-1540"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <a id="__codelineno-0-1541" name="__codelineno-0-1541"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Send a `GET` request and decode the JSON response body.</span>
 <a id="__codelineno-0-1542" name="__codelineno-0-1542"></a>
-<a id="__codelineno-0-1543" name="__codelineno-0-1543"></a><span class="sd">    Convenience over `get` for the REST endpoints that return</span>
+<a id="__codelineno-0-1543" name="__codelineno-0-1543"></a><span class="sd">    Convenience over :meth:`get` for the REST endpoints that return</span>
 <a id="__codelineno-0-1544" name="__codelineno-0-1544"></a><span class="sd">    JSON envelopes.</span>
 <a id="__codelineno-0-1545" name="__codelineno-0-1545"></a>
 <a id="__codelineno-0-1546" name="__codelineno-0-1546"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-1547" name="__codelineno-0-1547"></a><span class="sd">        url: Absolute request URL.</span>
-<a id="__codelineno-0-1548" name="__codelineno-0-1548"></a><span class="sd">        **kwargs: Keyword arguments forwarded to `get`</span>
+<a id="__codelineno-0-1548" name="__codelineno-0-1548"></a><span class="sd">        **kwargs: Keyword arguments forwarded to :meth:`get`</span>
 <a id="__codelineno-0-1549" name="__codelineno-0-1549"></a><span class="sd">            (`params`, `headers`, `timeout`, ...).</span>
 <a id="__codelineno-0-1550" name="__codelineno-0-1550"></a>
 <a id="__codelineno-0-1551" name="__codelineno-0-1551"></a><span class="sd">    Returns:</span>
@@ -29559,7 +29587,7 @@ the retryable status is exhausted.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Send a <code>POST</code> request. See <code>request</code> for arguments.</p>
+        <p>Send a <code>POST</code> request. See :meth:<code>request</code> for arguments.</p>
 
 
             <details class="mkdocstrings-source">
@@ -29567,7 +29595,7 @@ the retryable status is exhausted.</p>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1536">1536</a></span>
 <span class="normal"><a href="#__codelineno-0-1537">1537</a></span>
 <span class="normal"><a href="#__codelineno-0-1538">1538</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1536" name="__codelineno-0-1536"></a><span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
-<a id="__codelineno-0-1537" name="__codelineno-0-1537"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Send a `POST` request. See `request` for arguments.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-1537" name="__codelineno-0-1537"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Send a `POST` request. See :meth:`request` for arguments.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-1538" name="__codelineno-0-1538"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -29899,8 +29927,8 @@ caller's to handle: the iteration happens outside the retry loop,
 so a <code>ChunkedEncodingError</code> raised mid-stream escapes it. The
 default transport retry covers the non-streaming verbs, whose
 bodies <code>requests</code> materialises inside the loop, and
-<code>download</code>, which owns its own. A caller streaming a large
-body that needs the same protection should use <code>download</code>
+:meth:<code>download</code>, which owns its own. A caller streaming a large
+body that needs the same protection should use :meth:<code>download</code>
 or re-request on failure itself.</p>
 
 
@@ -29940,7 +29968,7 @@ or re-request on failure itself.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Keyword arguments forwarded to <code>get</code>.</p>
+                <p>Keyword arguments forwarded to :meth:<code>get</code>.</p>
               </div>
             </td>
             <td>
@@ -30013,13 +30041,13 @@ or re-request on failure itself.</p>
 <a id="__codelineno-0-1570" name="__codelineno-0-1570"></a><span class="sd">    so a `ChunkedEncodingError` raised mid-stream escapes it. The</span>
 <a id="__codelineno-0-1571" name="__codelineno-0-1571"></a><span class="sd">    default transport retry covers the non-streaming verbs, whose</span>
 <a id="__codelineno-0-1572" name="__codelineno-0-1572"></a><span class="sd">    bodies `requests` materialises inside the loop, and</span>
-<a id="__codelineno-0-1573" name="__codelineno-0-1573"></a><span class="sd">    `download`, which owns its own. A caller streaming a large</span>
-<a id="__codelineno-0-1574" name="__codelineno-0-1574"></a><span class="sd">    body that needs the same protection should use `download`</span>
+<a id="__codelineno-0-1573" name="__codelineno-0-1573"></a><span class="sd">    :meth:`download`, which owns its own. A caller streaming a large</span>
+<a id="__codelineno-0-1574" name="__codelineno-0-1574"></a><span class="sd">    body that needs the same protection should use :meth:`download`</span>
 <a id="__codelineno-0-1575" name="__codelineno-0-1575"></a><span class="sd">    or re-request on failure itself.</span>
 <a id="__codelineno-0-1576" name="__codelineno-0-1576"></a>
 <a id="__codelineno-0-1577" name="__codelineno-0-1577"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-1578" name="__codelineno-0-1578"></a><span class="sd">        url: Absolute request URL.</span>
-<a id="__codelineno-0-1579" name="__codelineno-0-1579"></a><span class="sd">        **kwargs: Keyword arguments forwarded to `get`.</span>
+<a id="__codelineno-0-1579" name="__codelineno-0-1579"></a><span class="sd">        **kwargs: Keyword arguments forwarded to :meth:`get`.</span>
 <a id="__codelineno-0-1580" name="__codelineno-0-1580"></a>
 <a id="__codelineno-0-1581" name="__codelineno-0-1581"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-1582" name="__codelineno-0-1582"></a><span class="sd">        requests.Response: The open streaming response.</span>

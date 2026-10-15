@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -804,6 +804,34 @@
     
   
     Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
   
 
     
@@ -24420,11 +24448,11 @@ rendered API. GDACS is public, so there is no <code>auth</code> module.</p>
 Alert and Coordination System (JRC / UN OCHA) — that returns
 multi-hazard alerts (earthquakes, tropical cyclones, floods, volcanoes,
 wildfires, droughts), each with a green/orange/red impact score, as a
-pyramids <code>pyramids.feature.collection.FeatureCollection</code> of
+pyramids :class:<code>~pyramids.feature.collection.FeatureCollection</code> of
 geolocated alert features (CRS <code>EPSG:4326</code>).</p>
 <p>This is a <code>vector</code> backend: the result is a table of alerts, not a
-gridded array, so <code>GDACS.OUTPUT_KIND</code> is <code>"vector"</code> and the
-<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code>
+gridded array, so :data:<code>GDACS.OUTPUT_KIND</code> is <code>"vector"</code> and the
+:class:<code>earthlens.earthlens.EarthLens</code> facade rejects an <code>aggregate=</code>
 argument for it.</p>
 <p>GDACS needs <strong>no credentials</strong> — the feed is public, so (like CHC)
 there is no auth class and no <code>[gdacs]</code> extra to install; the only
@@ -24437,19 +24465,19 @@ alert-level filter (<code>Green</code>/<code>Orange</code>/<code>Red</code>) arr
 <code>alert_level=</code> keyword argument.</p>
 <p>Public surface (re-exported from this package):</p>
 <ul>
-<li><code>GDACS</code> — the backend; instantiate with a date range, a bbox,
-  and <code>variables=[hazard_code, ...]</code>, then call <code>GDACS.download</code>.</li>
-<li><code>GdacsUnavailableError</code> — raised when the SEARCH feed is
+<li>:class:<code>GDACS</code> — the backend; instantiate with a date range, a bbox,
+  and <code>variables=[hazard_code, ...]</code>, then call :meth:<code>GDACS.download</code>.</li>
+<li>:class:<code>GdacsUnavailableError</code> — raised when the SEARCH feed is
   unavailable after the backend's retries (a transport error or a
   retry-worthy status that persisted); carries the originating
   <code>status_code</code>. A live e2e test catches it and skips.</li>
-<li><code>Catalog</code> — pydantic-backed loader for the bundled
+<li>:class:<code>Catalog</code> — pydantic-backed loader for the bundled
   <code>gdacs_data_catalog.yaml</code> hazard-type dispatch table.</li>
-<li><code>HazardType</code> — one hazard type's dispatch row (<code>name</code>,
+<li>:class:<code>HazardType</code> — one hazard type's dispatch row (<code>name</code>,
   <code>description</code>).</li>
-<li><code>geojson_to_fc</code> / <code>empty_fc</code> — the GDACS GeoJSON →
+<li>:func:<code>geojson_to_fc</code> / :func:<code>empty_fc</code> — the GDACS GeoJSON →
   FeatureCollection mapper and its empty-result counterpart.</li>
-<li><code>CATALOG_PATH</code> — path to the bundled hazard YAML;
+<li>:data:<code>CATALOG_PATH</code> — path to the bundled hazard YAML;
   monkey-patchable in tests.</li>
 </ul>
 
@@ -24504,11 +24532,11 @@ alert-level filter (<code>Green</code>/<code>Orange</code>/<code>Red</code>) arr
         <p>Hazard-type catalog for the GDACS backend.</p>
 <p>Reads the bundled <code>gdacs_data_catalog.yaml</code> (shipped as package
 data) and exposes its <code>hazard_types:</code> block as a map of
-<code>HazardType</code> rows, keyed by GDACS event-type code under the
-inherited <code>datasets</code> field. Instantiate with no arguments
-(<code>Catalog()</code>); <code>model_post_init</code> loads and validates the YAML
-in one pass. Resolve a hazard with <code>get_hazard</code> (a thin alias
-over <code>get_dataset</code>).</p>
+:class:<code>HazardType</code> rows, keyed by GDACS event-type code under the
+inherited :attr:<code>datasets</code> field. Instantiate with no arguments
+(<code>Catalog()</code>); :func:<code>model_post_init</code> loads and validates the YAML
+in one pass. Resolve a hazard with :meth:<code>get_hazard</code> (a thin alias
+over :meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>).</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -24529,7 +24557,7 @@ over <code>get_dataset</code>).</p>
             <td>
               <div class="doc-md-description">
                 <p>Map from the GDACS event-type code to its
-<code>HazardType</code> row.</p>
+:class:<code>HazardType</code> row.</p>
               </div>
             </td>
           </tr>
@@ -24672,15 +24700,15 @@ over <code>get_dataset</code>).</p>
 <a id="__codelineno-0-121" name="__codelineno-0-121"></a>
 <a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">    Reads the bundled `gdacs_data_catalog.yaml` (shipped as package</span>
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">    data) and exposes its `hazard_types:` block as a map of</span>
-<a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">    `HazardType` rows, keyed by GDACS event-type code under the</span>
-<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">    inherited `datasets` field. Instantiate with no arguments</span>
-<a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">    (`Catalog()`); `model_post_init` loads and validates the YAML</span>
-<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    in one pass. Resolve a hazard with `get_hazard` (a thin alias</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    over `get_dataset`).</span>
+<a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">    :class:`HazardType` rows, keyed by GDACS event-type code under the</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">    inherited :attr:`datasets` field. Instantiate with no arguments</span>
+<a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">    (`Catalog()`); :func:`model_post_init` loads and validates the YAML</span>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    in one pass. Resolve a hazard with :meth:`get_hazard` (a thin alias</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    over :meth:`~earthlens.base.AbstractCatalog.get_dataset`).</span>
 <a id="__codelineno-0-129" name="__codelineno-0-129"></a>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a><span class="sd">        datasets: Map from the GDACS event-type code to its</span>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">            `HazardType` row.</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">            :class:`HazardType` row.</span>
 <a id="__codelineno-0-133" name="__codelineno-0-133"></a>
 <a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">        - List hazard codes and resolve one:</span>
@@ -24728,14 +24756,14 @@ over <code>get_dataset</code>).</p>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a>
 <a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a>
 <a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file has no</span>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">                `hazard_types:` block, or a row fails `HazardType`</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">                `hazard_types:` block, or a row fails :class:`HazardType`</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">                validation.</span>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
@@ -24745,10 +24773,10 @@ over <code>get_dataset</code>).</p>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">hazards</span><span class="p">))</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_hazard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HazardType</span><span class="p">:</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `HazardType` for `code`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`HazardType` for `code`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-198" name="__codelineno-0-198"></a>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">        Thin alias over</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">        `get_dataset`.</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">            code: A GDACS event-type code (`&quot;EQ&quot;`, `&quot;TC&quot;`, …).</span>
@@ -24853,9 +24881,9 @@ over <code>get_dataset</code>).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>HazardType</code> for <code>code</code>, with a did-you-mean hint.</p>
+        <p>Return the :class:<code>HazardType</code> for <code>code</code>, with a did-you-mean hint.</p>
 <p>Thin alias over
-<code>get_dataset</code>.</p>
+:meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -24953,10 +24981,10 @@ over <code>get_dataset</code>).</p>
 <span class="normal"><a href="#__codelineno-0-209">209</a></span>
 <span class="normal"><a href="#__codelineno-0-210">210</a></span>
 <span class="normal"><a href="#__codelineno-0-211">211</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_hazard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HazardType</span><span class="p">:</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `HazardType` for `code`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`HazardType` for `code`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-198" name="__codelineno-0-198"></a>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">    Thin alias over</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">    `get_dataset`.</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">        code: A GDACS event-type code (`&quot;EQ&quot;`, `&quot;TC&quot;`, …).</span>
@@ -25013,7 +25041,7 @@ over <code>get_dataset</code>).</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the
-module-level <code>CATALOG_PATH</code>.</p>
+module-level :data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -25039,7 +25067,7 @@ module-level <code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -25063,7 +25091,7 @@ module-level <code>CATALOG_PATH</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>If <code>catalog_path</code> does not exist, or if the file has no
-<code>hazard_types:</code> block, or a row fails <code>HazardType</code>
+<code>hazard_types:</code> block, or a row fails :class:<code>HazardType</code>
 validation.</p>
               </div>
             </td>
@@ -25100,14 +25128,14 @@ validation.</p>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a>
 <a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a>
 <a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file has no</span>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">            `hazard_types:` block, or a row fails `HazardType`</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">            `hazard_types:` block, or a row fails :class:`HazardType`</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            validation.</span>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
@@ -25151,7 +25179,7 @@ validation.</p>
 space/time/hazard window of disaster alerts through the same
 <code>download()</code> shape every other earthlens backend uses. All requested
 hazard types come back in one combined GET; the GeoJSON is mapped to
-a <code>pyramids.feature.collection.FeatureCollection</code> and, if the
+a :class:<code>~pyramids.feature.collection.FeatureCollection</code> and, if the
 feed did not honour a bbox, clipped to the requested box
 client-side.</p>
 <p>The feed needs no credentials.</p>
@@ -25533,7 +25561,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">    space/time/hazard window of disaster alerts through the same</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    `download()` shape every other earthlens backend uses. All requested</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">    hazard types come back in one combined GET; the GeoJSON is mapped to</span>
-<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    a `pyramids.feature.collection.FeatureCollection` and, if the</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    a :class:`~pyramids.feature.collection.FeatureCollection` and, if the</span>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    feed did not honour a bbox, clipped to the requested box</span>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    client-side.</span>
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a>
@@ -25629,7 +25657,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-192" name="__codelineno-0-192"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a `TemporalExtent`.</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">        GDACS issues a single SEARCH call spanning the whole window, so</span>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">        there is no per-date loop. The resolution is kept as the</span>
@@ -25655,7 +25683,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_whole_window_extent</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-217" name="__codelineno-0-217"></a>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;One `RemoteProduct` carrying the whole combined query.</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;One :class:`RemoteProduct` carrying the whole combined query.</span>
 <a id="__codelineno-0-220" name="__codelineno-0-220"></a>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        Resolves every hazard code in `self.vars` against the bundled</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        catalog (raising with a did-you-mean hint on an unknown code)</span>
@@ -25690,7 +25718,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Issue the one combined GET and map the GeoJSON to a FeatureCollection.</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        Widens the inherited `-&gt; list[Path]` contract: a vector backend</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        returns in-memory `FeatureCollection`s, not file paths. A</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        returns in-memory :class:`FeatureCollection`s, not file paths. A</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        service-availability failure (a connection/timeout error or a</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        retry-worthy status) that outlives the retries is re-raised as</span>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        `GdacsUnavailableError`; a genuine request error (`403` / `404`)</span>
@@ -25700,14 +25728,14 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        alerts are clipped to `self.space` client-side.</span>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        When the response hits the endpoint&#39;s</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        `MAX_EVENTS_PER_RESPONSE` cap (100), the result is almost</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        :data:`MAX_EVENTS_PER_RESPONSE` cap (100), the result is almost</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        certainly truncated to the most-recent matches; a warning is</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        logged so the truncation is never silent (the endpoint offers no</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        pagination — narrow the window to retrieve more).</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">            products: The single-element list returned by</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">                `_search`.</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">                :meth:`_search`.</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">            list[FeatureCollection]: A single-element list with the</span>
@@ -25810,7 +25838,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a>
 <a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        Issues the single combined SEARCH GET, maps and clips the</span>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        result, writes it to one vector file under `path`, and returns</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        the in-memory `FeatureCollection`. An empty result</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        the in-memory :class:`FeatureCollection`. An empty result</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        returns a schema-correct empty FeatureCollection and writes</span>
 <a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        nothing.</span>
 <a id="__codelineno-0-377" name="__codelineno-0-377"></a>
@@ -26294,7 +26322,7 @@ hazard codes.</p>
         <p>Query GDACS once and return the matched alerts.</p>
 <p>Issues the single combined SEARCH GET, maps and clips the
 result, writes it to one vector file under <code>path</code>, and returns
-the in-memory <code>FeatureCollection</code>. An empty result
+the in-memory :class:<code>FeatureCollection</code>. An empty result
 returns a schema-correct empty FeatureCollection and writes
 nothing.</p>
 
@@ -26398,7 +26426,7 @@ Empty (schema-only) when nothing matched.</p>
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a>
 <a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">    Issues the single combined SEARCH GET, maps and clips the</span>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">    result, writes it to one vector file under `path`, and returns</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">    the in-memory `FeatureCollection`. An empty result</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">    the in-memory :class:`FeatureCollection`. An empty result</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">    returns a schema-correct empty FeatureCollection and writes</span>
 <a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">    nothing.</span>
 <a id="__codelineno-0-377" name="__codelineno-0-377"></a>
@@ -26484,7 +26512,7 @@ not a malformed request.</p>
 </code></pre></div></li>
 </ul>
         <p>The <code>(message, status_code)</code> constructor is inherited from
-<code>UpstreamUnavailableError</code>.</p>
+:class:<code>~earthlens.base.UpstreamUnavailableError</code>.</p>
 
 
 
@@ -26562,7 +26590,7 @@ not a malformed request.</p>
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">    The `(message, status_code)` constructor is inherited from</span>
-<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    `UpstreamUnavailableError`.</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    :class:`~earthlens.base.UpstreamUnavailableError`.</span>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
@@ -26607,7 +26635,7 @@ not a malformed request.</p>
 
         <p>One GDACS hazard type's dispatch row.</p>
 <p>The GDACS event-type code is the parent key in
-<code>Catalog.datasets</code> and is not stored on the row.</p>
+:attr:<code>Catalog.datasets</code> and is not stored on the row.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -26702,7 +26730,7 @@ severity value means.</p>
 <a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One GDACS hazard type&#39;s dispatch row.</span>
 <a id="__codelineno-0-55" name="__codelineno-0-55"></a>
 <a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">    The GDACS event-type code is the parent key in</span>
-<a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    `Catalog.datasets` and is not stored on the row.</span>
+<a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    :attr:`Catalog.datasets` and is not stored on the row.</span>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">        name: Human-readable hazard name (`&quot;Earthquake&quot;`,</span>
@@ -26787,7 +26815,7 @@ count — an empty result is a legitimate answer, not an error.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Zero rows, the <code>ATTRIBUTE_COLUMNS</code>
+                <p>Zero rows, the :data:<code>ATTRIBUTE_COLUMNS</code>
 columns with their declared dtypes, an empty <code>geometry</code>
 column, CRS <code>EPSG:4326</code>.</p>
               </div>
@@ -26861,7 +26889,7 @@ column, CRS <code>EPSG:4326</code>.</p>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    count — an empty result is a legitimate answer, not an error.</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">        FeatureCollection: Zero rows, the `ATTRIBUTE_COLUMNS`</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">        FeatureCollection: Zero rows, the :data:`ATTRIBUTE_COLUMNS`</span>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">            columns with their declared dtypes, an empty `geometry`</span>
 <a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">            column, CRS `EPSG:4326`.</span>
 <a id="__codelineno-0-175" name="__codelineno-0-175"></a>
@@ -26909,7 +26937,7 @@ column, CRS <code>EPSG:4326</code>.</p>
     <div class="doc doc-contents ">
 
         <p>Convert a GDACS GeoJSON FeatureCollection into a <code>FeatureCollection</code>.</p>
-<p>One row per feature, columns per <code>ATTRIBUTE_COLUMNS</code> plus a
+<p>One row per feature, columns per :data:<code>ATTRIBUTE_COLUMNS</code> plus a
 <code>geometry</code> column built from each feature's GeoJSON <code>geometry</code>
 (<code>Point</code> for most alerts; floods / cyclone tracks may carry
 polygons or lines, which are preserved as-is). A feature with no
@@ -26917,7 +26945,7 @@ usable geometry still contributes a row, but its <code>geometry</code> is
 <code>None</code> rather than an invalid value that would corrupt a written
 GeoPackage/GeoJSON. An empty (or geometry-less) payload returns an
 empty FeatureCollection with the same columns/dtypes (see
-<code>empty_fc</code>). The numeric columns (<code>alert_score</code>, <code>severity</code>)
+:func:<code>empty_fc</code>). The numeric columns (<code>alert_score</code>, <code>severity</code>)
 are coerced with <code>pandas.to_numeric(errors="coerce")</code>, so a
 non-numeric value degrades to <code>NaN</code> rather than raising.</p>
 
@@ -27116,7 +27144,7 @@ geometry.</p>
 <span class="normal"><a href="#__codelineno-0-161">161</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="k">def</span><span class="w"> </span><span class="nf">geojson_to_fc</span><span class="p">(</span><span class="n">payload</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a GDACS GeoJSON FeatureCollection into a `FeatureCollection`.</span>
 <a id="__codelineno-0-71" name="__codelineno-0-71"></a>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    One row per feature, columns per `ATTRIBUTE_COLUMNS` plus a</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    One row per feature, columns per :data:`ATTRIBUTE_COLUMNS` plus a</span>
 <a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">    `geometry` column built from each feature&#39;s GeoJSON `geometry`</span>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">    (`Point` for most alerts; floods / cyclone tracks may carry</span>
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">    polygons or lines, which are preserved as-is). A feature with no</span>
@@ -27124,7 +27152,7 @@ geometry.</p>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    `None` rather than an invalid value that would corrupt a written</span>
 <a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    GeoPackage/GeoJSON. An empty (or geometry-less) payload returns an</span>
 <a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    empty FeatureCollection with the same columns/dtypes (see</span>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    `empty_fc`). The numeric columns (`alert_score`, `severity`)</span>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    :func:`empty_fc`). The numeric columns (`alert_score`, `severity`)</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">    are coerced with `pandas.to_numeric(errors=&quot;coerce&quot;)`, so a</span>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">    non-numeric value degrades to `NaN` rather than raising.</span>
 <a id="__codelineno-0-83" name="__codelineno-0-83"></a>
@@ -27238,12 +27266,12 @@ earthquakes, tropical cyclones, floods, volcanoes, wildfires, and
 droughts, each with a green/orange/red impact score — from the Global
 Disaster Alert and Coordination System (JRC / UN OCHA) SEARCH feed. The
 whole event list for a <code>[start, end]</code> window comes back in a single
-HTTPS GET, which <code>earthlens.gdacs.events</code> maps to a pyramids
-<code>pyramids.feature.collection.FeatureCollection</code> of alert
+HTTPS GET, which :mod:<code>earthlens.gdacs.events</code> maps to a pyramids
+:class:<code>~pyramids.feature.collection.FeatureCollection</code> of alert
 features.</p>
 <p>This is a <code>vector</code> backend: the on-the-wire result is a table of
 geolocated alerts, not a gridded array, so <code>OUTPUT_KIND = "vector"</code> and
-the <code>earthlens.earthlens.EarthLens</code> facade rejects an
+the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects an
 <code>aggregate=</code> argument (there is no meaningful gridded reduction of an
 alert table). <code>download()</code> returns the in-memory FeatureCollection and,
 as a side effect, writes it to one vector file under <code>path</code>.</p>
@@ -27298,7 +27326,7 @@ sentinel <code>"all"</code>.</p>
 space/time/hazard window of disaster alerts through the same
 <code>download()</code> shape every other earthlens backend uses. All requested
 hazard types come back in one combined GET; the GeoJSON is mapped to
-a <code>pyramids.feature.collection.FeatureCollection</code> and, if the
+a :class:<code>~pyramids.feature.collection.FeatureCollection</code> and, if the
 feed did not honour a bbox, clipped to the requested box
 client-side.</p>
 <p>The feed needs no credentials.</p>
@@ -27680,7 +27708,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">    space/time/hazard window of disaster alerts through the same</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    `download()` shape every other earthlens backend uses. All requested</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">    hazard types come back in one combined GET; the GeoJSON is mapped to</span>
-<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    a `pyramids.feature.collection.FeatureCollection` and, if the</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    a :class:`~pyramids.feature.collection.FeatureCollection` and, if the</span>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    feed did not honour a bbox, clipped to the requested box</span>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    client-side.</span>
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a>
@@ -27776,7 +27804,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-192" name="__codelineno-0-192"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a `TemporalExtent`.</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">        GDACS issues a single SEARCH call spanning the whole window, so</span>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">        there is no per-date loop. The resolution is kept as the</span>
@@ -27802,7 +27830,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_whole_window_extent</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-217" name="__codelineno-0-217"></a>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;One `RemoteProduct` carrying the whole combined query.</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;One :class:`RemoteProduct` carrying the whole combined query.</span>
 <a id="__codelineno-0-220" name="__codelineno-0-220"></a>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        Resolves every hazard code in `self.vars` against the bundled</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        catalog (raising with a did-you-mean hint on an unknown code)</span>
@@ -27837,7 +27865,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Issue the one combined GET and map the GeoJSON to a FeatureCollection.</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        Widens the inherited `-&gt; list[Path]` contract: a vector backend</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        returns in-memory `FeatureCollection`s, not file paths. A</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        returns in-memory :class:`FeatureCollection`s, not file paths. A</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        service-availability failure (a connection/timeout error or a</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        retry-worthy status) that outlives the retries is re-raised as</span>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        `GdacsUnavailableError`; a genuine request error (`403` / `404`)</span>
@@ -27847,14 +27875,14 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        alerts are clipped to `self.space` client-side.</span>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        When the response hits the endpoint&#39;s</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        `MAX_EVENTS_PER_RESPONSE` cap (100), the result is almost</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        :data:`MAX_EVENTS_PER_RESPONSE` cap (100), the result is almost</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        certainly truncated to the most-recent matches; a warning is</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        logged so the truncation is never silent (the endpoint offers no</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        pagination — narrow the window to retrieve more).</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">            products: The single-element list returned by</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">                `_search`.</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">                :meth:`_search`.</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">            list[FeatureCollection]: A single-element list with the</span>
@@ -27957,7 +27985,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a>
 <a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        Issues the single combined SEARCH GET, maps and clips the</span>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        result, writes it to one vector file under `path`, and returns</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        the in-memory `FeatureCollection`. An empty result</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        the in-memory :class:`FeatureCollection`. An empty result</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        returns a schema-correct empty FeatureCollection and writes</span>
 <a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        nothing.</span>
 <a id="__codelineno-0-377" name="__codelineno-0-377"></a>
@@ -28441,7 +28469,7 @@ hazard codes.</p>
         <p>Query GDACS once and return the matched alerts.</p>
 <p>Issues the single combined SEARCH GET, maps and clips the
 result, writes it to one vector file under <code>path</code>, and returns
-the in-memory <code>FeatureCollection</code>. An empty result
+the in-memory :class:<code>FeatureCollection</code>. An empty result
 returns a schema-correct empty FeatureCollection and writes
 nothing.</p>
 
@@ -28545,7 +28573,7 @@ Empty (schema-only) when nothing matched.</p>
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a>
 <a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">    Issues the single combined SEARCH GET, maps and clips the</span>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">    result, writes it to one vector file under `path`, and returns</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">    the in-memory `FeatureCollection`. An empty result</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">    the in-memory :class:`FeatureCollection`. An empty result</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">    returns a schema-correct empty FeatureCollection and writes</span>
 <a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">    nothing.</span>
 <a id="__codelineno-0-377" name="__codelineno-0-377"></a>
@@ -28611,7 +28639,7 @@ Empty (schema-only) when nothing matched.</p>
 this "catalog" is deliberately tiny: a six-row map from a GDACS
 event-type code (<code>"EQ"</code>, <code>"TC"</code>, <code>"FL"</code>, <code>"VO"</code>, <code>"WF"</code>, <code>"DR"</code>) to a
 little metadata. It mirrors <code>fdsn_data_catalog.yaml</code> / the FDSN
-<code>Catalog</code>: there is no <code>available_*</code>
+:class:<code>~earthlens.fdsn.catalog.Catalog</code>: there is no <code>available_*</code>
 index (the six codes <em>are</em> the whole GDACS universe, so an "available
 vs curated" split would just duplicate the map) and no
 <code>refresh</code> / <code>probe</code> / <code>audit</code> tooling.</p>
@@ -28621,13 +28649,13 @@ types — every event carries the same flat
 already names the hazard-specific unit (<code>"M"</code> for an earthquake, wind
 speed for a cyclone, …). There is therefore no per-hazard property
 schema to model: a single <code>severity</code> / <code>severity_unit</code> / <code>severity_text</code>
-column trio in <code>earthlens.gdacs.events</code> covers every hazard.</p>
-<p><code>Catalog</code> is a thin <code>earthlens.base.AbstractCatalog</code>
+column trio in :mod:<code>earthlens.gdacs.events</code> covers every hazard.</p>
+<p>:class:<code>Catalog</code> is a thin :class:<code>earthlens.base.AbstractCatalog</code>
 subclass that loads the bundled <code>gdacs_data_catalog.yaml</code> and exposes
-each row as a <code>HazardType</code>, keyed by code under the inherited
+each row as a :class:<code>HazardType</code>, keyed by code under the inherited
 <code>datasets</code> field — which is what gives it the <code>cat["EQ"]</code> /
 <code>"EQ" in cat</code> / <code>len(cat)</code> dict-like surface and the did-you-mean error
-for free. <code>CATALOG_PATH</code> is the path to the bundled YAML and is
+for free. :data:<code>CATALOG_PATH</code> is the path to the bundled YAML and is
 monkey-patchable in tests.</p>
 
 
@@ -28669,11 +28697,11 @@ monkey-patchable in tests.</p>
         <p>Hazard-type catalog for the GDACS backend.</p>
 <p>Reads the bundled <code>gdacs_data_catalog.yaml</code> (shipped as package
 data) and exposes its <code>hazard_types:</code> block as a map of
-<code>HazardType</code> rows, keyed by GDACS event-type code under the
-inherited <code>datasets</code> field. Instantiate with no arguments
-(<code>Catalog()</code>); <code>model_post_init</code> loads and validates the YAML
-in one pass. Resolve a hazard with <code>get_hazard</code> (a thin alias
-over <code>get_dataset</code>).</p>
+:class:<code>HazardType</code> rows, keyed by GDACS event-type code under the
+inherited :attr:<code>datasets</code> field. Instantiate with no arguments
+(<code>Catalog()</code>); :func:<code>model_post_init</code> loads and validates the YAML
+in one pass. Resolve a hazard with :meth:<code>get_hazard</code> (a thin alias
+over :meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>).</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -28694,7 +28722,7 @@ over <code>get_dataset</code>).</p>
             <td>
               <div class="doc-md-description">
                 <p>Map from the GDACS event-type code to its
-<code>HazardType</code> row.</p>
+:class:<code>HazardType</code> row.</p>
               </div>
             </td>
           </tr>
@@ -28837,15 +28865,15 @@ over <code>get_dataset</code>).</p>
 <a id="__codelineno-0-121" name="__codelineno-0-121"></a>
 <a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">    Reads the bundled `gdacs_data_catalog.yaml` (shipped as package</span>
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">    data) and exposes its `hazard_types:` block as a map of</span>
-<a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">    `HazardType` rows, keyed by GDACS event-type code under the</span>
-<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">    inherited `datasets` field. Instantiate with no arguments</span>
-<a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">    (`Catalog()`); `model_post_init` loads and validates the YAML</span>
-<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    in one pass. Resolve a hazard with `get_hazard` (a thin alias</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    over `get_dataset`).</span>
+<a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">    :class:`HazardType` rows, keyed by GDACS event-type code under the</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">    inherited :attr:`datasets` field. Instantiate with no arguments</span>
+<a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">    (`Catalog()`); :func:`model_post_init` loads and validates the YAML</span>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    in one pass. Resolve a hazard with :meth:`get_hazard` (a thin alias</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    over :meth:`~earthlens.base.AbstractCatalog.get_dataset`).</span>
 <a id="__codelineno-0-129" name="__codelineno-0-129"></a>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a><span class="sd">        datasets: Map from the GDACS event-type code to its</span>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">            `HazardType` row.</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">            :class:`HazardType` row.</span>
 <a id="__codelineno-0-133" name="__codelineno-0-133"></a>
 <a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">        - List hazard codes and resolve one:</span>
@@ -28893,14 +28921,14 @@ over <code>get_dataset</code>).</p>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a>
 <a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a>
 <a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file has no</span>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">                `hazard_types:` block, or a row fails `HazardType`</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">                `hazard_types:` block, or a row fails :class:`HazardType`</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">                validation.</span>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
@@ -28910,10 +28938,10 @@ over <code>get_dataset</code>).</p>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">hazards</span><span class="p">))</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_hazard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HazardType</span><span class="p">:</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `HazardType` for `code`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`HazardType` for `code`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-198" name="__codelineno-0-198"></a>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">        Thin alias over</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">        `get_dataset`.</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">            code: A GDACS event-type code (`&quot;EQ&quot;`, `&quot;TC&quot;`, …).</span>
@@ -29018,9 +29046,9 @@ over <code>get_dataset</code>).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>HazardType</code> for <code>code</code>, with a did-you-mean hint.</p>
+        <p>Return the :class:<code>HazardType</code> for <code>code</code>, with a did-you-mean hint.</p>
 <p>Thin alias over
-<code>get_dataset</code>.</p>
+:meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -29118,10 +29146,10 @@ over <code>get_dataset</code>).</p>
 <span class="normal"><a href="#__codelineno-0-209">209</a></span>
 <span class="normal"><a href="#__codelineno-0-210">210</a></span>
 <span class="normal"><a href="#__codelineno-0-211">211</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_hazard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HazardType</span><span class="p">:</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `HazardType` for `code`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`HazardType` for `code`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-198" name="__codelineno-0-198"></a>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">    Thin alias over</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">    `get_dataset`.</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">        code: A GDACS event-type code (`&quot;EQ&quot;`, `&quot;TC&quot;`, …).</span>
@@ -29178,7 +29206,7 @@ over <code>get_dataset</code>).</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the
-module-level <code>CATALOG_PATH</code>.</p>
+module-level :data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -29204,7 +29232,7 @@ module-level <code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -29228,7 +29256,7 @@ module-level <code>CATALOG_PATH</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>If <code>catalog_path</code> does not exist, or if the file has no
-<code>hazard_types:</code> block, or a row fails <code>HazardType</code>
+<code>hazard_types:</code> block, or a row fails :class:<code>HazardType</code>
 validation.</p>
               </div>
             </td>
@@ -29265,14 +29293,14 @@ validation.</p>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a>
 <a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a>
 <a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-184" name="__codelineno-0-184"></a>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file has no</span>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">            `hazard_types:` block, or a row fails `HazardType`</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">            `hazard_types:` block, or a row fails :class:`HazardType`</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            validation.</span>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
@@ -29313,7 +29341,7 @@ validation.</p>
 
         <p>One GDACS hazard type's dispatch row.</p>
 <p>The GDACS event-type code is the parent key in
-<code>Catalog.datasets</code> and is not stored on the row.</p>
+:attr:<code>Catalog.datasets</code> and is not stored on the row.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -29408,7 +29436,7 @@ severity value means.</p>
 <a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One GDACS hazard type&#39;s dispatch row.</span>
 <a id="__codelineno-0-55" name="__codelineno-0-55"></a>
 <a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">    The GDACS event-type code is the parent key in</span>
-<a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    `Catalog.datasets` and is not stored on the row.</span>
+<a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    :attr:`Catalog.datasets` and is not stored on the row.</span>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">        name: Human-readable hazard name (`&quot;Earthquake&quot;`,</span>
@@ -29515,12 +29543,12 @@ geometry/CRS handling inside pyramids primitives: earthlens assembles
 the plain attribute rows, builds the geometry column from each
 feature's GeoJSON <code>geometry</code> via <code>shapely.geometry.shape</code>, and hands
 the whole thing to
-<code>pyramids.feature.collection.FeatureCollection</code> (a
+:class:<code>pyramids.feature.collection.FeatureCollection</code> (a
 <code>geopandas.GeoDataFrame</code> subclass) tagged <code>EPSG:4326</code>.</p>
-<p>The canonical alert schema lives here as <code>ATTRIBUTE_COLUMNS</code>
+<p>The canonical alert schema lives here as :data:<code>ATTRIBUTE_COLUMNS</code>
 (attribute columns + dtypes) plus the <code>geometry</code> column. Both the
-populated path (<code>geojson_to_fc</code>) and the empty path
-(<code>empty_fc</code>) produce a FeatureCollection with exactly these
+populated path (:func:<code>geojson_to_fc</code>) and the empty path
+(:func:<code>empty_fc</code>) produce a FeatureCollection with exactly these
 columns and dtypes, so a downstream <code>to_file</code> never chokes on a schema
 mismatch between a hit and a miss.</p>
 <p>Field mapping follows the live GDACS SEARCH feed. Every feature's
@@ -29773,7 +29801,7 @@ count — an empty result is a legitimate answer, not an error.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Zero rows, the <code>ATTRIBUTE_COLUMNS</code>
+                <p>Zero rows, the :data:<code>ATTRIBUTE_COLUMNS</code>
 columns with their declared dtypes, an empty <code>geometry</code>
 column, CRS <code>EPSG:4326</code>.</p>
               </div>
@@ -29847,7 +29875,7 @@ column, CRS <code>EPSG:4326</code>.</p>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    count — an empty result is a legitimate answer, not an error.</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">        FeatureCollection: Zero rows, the `ATTRIBUTE_COLUMNS`</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">        FeatureCollection: Zero rows, the :data:`ATTRIBUTE_COLUMNS`</span>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">            columns with their declared dtypes, an empty `geometry`</span>
 <a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">            column, CRS `EPSG:4326`.</span>
 <a id="__codelineno-0-175" name="__codelineno-0-175"></a>
@@ -29895,7 +29923,7 @@ column, CRS <code>EPSG:4326</code>.</p>
     <div class="doc doc-contents ">
 
         <p>Convert a GDACS GeoJSON FeatureCollection into a <code>FeatureCollection</code>.</p>
-<p>One row per feature, columns per <code>ATTRIBUTE_COLUMNS</code> plus a
+<p>One row per feature, columns per :data:<code>ATTRIBUTE_COLUMNS</code> plus a
 <code>geometry</code> column built from each feature's GeoJSON <code>geometry</code>
 (<code>Point</code> for most alerts; floods / cyclone tracks may carry
 polygons or lines, which are preserved as-is). A feature with no
@@ -29903,7 +29931,7 @@ usable geometry still contributes a row, but its <code>geometry</code> is
 <code>None</code> rather than an invalid value that would corrupt a written
 GeoPackage/GeoJSON. An empty (or geometry-less) payload returns an
 empty FeatureCollection with the same columns/dtypes (see
-<code>empty_fc</code>). The numeric columns (<code>alert_score</code>, <code>severity</code>)
+:func:<code>empty_fc</code>). The numeric columns (<code>alert_score</code>, <code>severity</code>)
 are coerced with <code>pandas.to_numeric(errors="coerce")</code>, so a
 non-numeric value degrades to <code>NaN</code> rather than raising.</p>
 
@@ -30102,7 +30130,7 @@ geometry.</p>
 <span class="normal"><a href="#__codelineno-0-161">161</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="k">def</span><span class="w"> </span><span class="nf">geojson_to_fc</span><span class="p">(</span><span class="n">payload</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a GDACS GeoJSON FeatureCollection into a `FeatureCollection`.</span>
 <a id="__codelineno-0-71" name="__codelineno-0-71"></a>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    One row per feature, columns per `ATTRIBUTE_COLUMNS` plus a</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    One row per feature, columns per :data:`ATTRIBUTE_COLUMNS` plus a</span>
 <a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">    `geometry` column built from each feature&#39;s GeoJSON `geometry`</span>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">    (`Point` for most alerts; floods / cyclone tracks may carry</span>
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">    polygons or lines, which are preserved as-is). A feature with no</span>
@@ -30110,7 +30138,7 @@ geometry.</p>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    `None` rather than an invalid value that would corrupt a written</span>
 <a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    GeoPackage/GeoJSON. An empty (or geometry-less) payload returns an</span>
 <a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    empty FeatureCollection with the same columns/dtypes (see</span>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    `empty_fc`). The numeric columns (`alert_score`, `severity`)</span>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    :func:`empty_fc`). The numeric columns (`alert_score`, `severity`)</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">    are coerced with `pandas.to_numeric(errors=&quot;coerce&quot;)`, so a</span>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">    non-numeric value degrades to `NaN` rather than raising.</span>
 <a id="__codelineno-0-83" name="__codelineno-0-83"></a>

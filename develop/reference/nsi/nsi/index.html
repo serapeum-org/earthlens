@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -804,6 +804,34 @@
     
   
     Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
   
 
     
@@ -24494,13 +24522,13 @@ discriminator:</p>
   with paid amounts, via the OpenFEMA OData endpoint; <code>tabular</code>.</li>
 </ul>
 <p>Output is <strong>per instance</strong>: the resolved source's <code>output_kind</code> decides whether
-<code>download</code> returns a pyramids
-<code>pyramids.feature.collection.FeatureCollection</code> (<code>structures</code>/<code>nfhl</code>) or
-a <code>pandas.DataFrame</code> (<code>nfip</code>). All three are public-domain and keyless —
+:meth:<code>~earthlens.nsi.backend.NSI.download</code> returns a pyramids
+:class:<code>~pyramids.feature.collection.FeatureCollection</code> (<code>structures</code>/<code>nfhl</code>) or
+a :class:<code>pandas.DataFrame</code> (<code>nfip</code>). All three are public-domain and keyless —
 no auth. A spatial/attribute bound is <strong>required</strong> (no unbounded national pull),
 and <code>aggregate=</code> is rejected (these are records, not gridded rasters).</p>
-<p>The public surface is the <code>Catalog</code> (source name -&gt; endpoint + output kind
-+ field map) and its <code>Source</code> rows, the <code>NSI</code> backend, and the pure
+<p>The public surface is the :class:<code>Catalog</code> (source name -&gt; endpoint + output kind
++ field map) and its :class:<code>Source</code> rows, the :class:<code>NSI</code> backend, and the pure
 query/geometry helpers.</p>
 
 
@@ -24541,9 +24569,9 @@ query/geometry helpers.</p>
 
         <p>Source catalog for the NSI backend.</p>
 <p>Reads the bundled <code>nsi_data_catalog.yaml</code> (shipped as package data) and
-exposes its <code>sources:</code> block as a map of <code>Source</code> rows keyed by
+exposes its <code>sources:</code> block as a map of :class:<code>Source</code> rows keyed by
 name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row with
-<code>get</code> and list the shipped keys with <code>available</code>.</p>
+:meth:<code>get</code> and list the shipped keys with :meth:<code>available</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -24563,7 +24591,7 @@ name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row wi
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from source name to its <code>Source</code> row.</p>
+                <p>Map from source name to its :class:<code>Source</code> row.</p>
               </div>
             </td>
           </tr>
@@ -24684,12 +24712,12 @@ name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row wi
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Source catalog for the NSI backend.</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">    Reads the bundled `nsi_data_catalog.yaml` (shipped as package data) and</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    exposes its `sources:` block as a map of `Source` rows keyed by</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    exposes its `sources:` block as a map of :class:`Source` rows keyed by</span>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">    name. Instantiate with no arguments (`Catalog()`). Resolve one row with</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">    `get` and list the shipped keys with `available`.</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">    :meth:`get` and list the shipped keys with :meth:`available`.</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        datasets: Map from source name to its `Source` row.</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        datasets: Map from source name to its :class:`Source` row.</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">        - Resolve a source and read its output kind:</span>
@@ -24709,8 +24737,8 @@ name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row wi
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;NSI catalog&quot;</span>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sources&quot;</span>
 <a id="__codelineno-0-220" name="__codelineno-0-220"></a>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="c1">#: The source rows live in the base `datasets` field so the inherited</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>    <span class="c1">#: dict surface and `get_dataset`&#39;s did-you-mean hint work unchanged.</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="c1">#: The source rows live in the base :attr:`datasets` field so the inherited</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>    <span class="c1">#: dict surface and :meth:`get_dataset`&#39;s did-you-mean hint work unchanged.</span>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Source</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="nd">@classmethod</span>
@@ -24728,10 +24756,10 @@ name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row wi
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">                `CATALOG_PATH`.</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-241" name="__codelineno-0-241"></a>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            ValueError: If the file has no `sources:` block, or a row fails</span>
@@ -24741,9 +24769,9 @@ name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row wi
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Source</span><span class="p">:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a source name to its `Source` row.</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a source name to its :class:`Source` row.</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown key.</span>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        Args:</span>
@@ -24852,8 +24880,8 @@ name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row wi
 
     <div class="doc doc-contents ">
 
-        <p>Resolve a source name to its <code>Source</code> row.</p>
-<p>Thin wrapper over the inherited <code>get_dataset</code>, which raises a
+        <p>Resolve a source name to its :class:<code>Source</code> row.</p>
+<p>Thin wrapper over the inherited :meth:<code>get_dataset</code>, which raises a
 <code>ValueError</code> with a did-you-mean hint on an unknown key.</p>
 
 
@@ -24958,9 +24986,9 @@ did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-268">268</a></span>
 <span class="normal"><a href="#__codelineno-0-269">269</a></span>
 <span class="normal"><a href="#__codelineno-0-270">270</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Source</span><span class="p">:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a source name to its `Source` row.</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a source name to its :class:`Source` row.</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown key.</span>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">    Args:</span>
@@ -25021,7 +25049,7 @@ did-you-mean hint.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the module-level
-<code>CATALOG_PATH</code>.</p>
+:data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -25047,7 +25075,7 @@ did-you-mean hint.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -25103,10 +25131,10 @@ validation.</p>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">            `CATALOG_PATH`.</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-241" name="__codelineno-0-241"></a>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        ValueError: If the file has no `sources:` block, or a row fails</span>
@@ -25148,8 +25176,8 @@ validation.</p>
         <p>US flood exposure / loss backend (per-instance output).</p>
 <p>Resolves <code>source=</code> to its catalog row, issues the one bounded request that
 source needs, and returns a
-<code>pyramids.feature.collection.FeatureCollection</code> (<code>structures</code>/<code>nfhl</code>)
-or a <code>pandas.DataFrame</code> (<code>nfip</code>). US-only: a non-US box returns an
+:class:<code>~pyramids.feature.collection.FeatureCollection</code> (<code>structures</code>/<code>nfhl</code>)
+or a :class:<code>pandas.DataFrame</code> (<code>nfip</code>). US-only: a non-US box returns an
 empty result, not an error (<code>G4</code>).</p>
 
 
@@ -25170,7 +25198,7 @@ empty result, not an error (<code>G4</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Set <strong>per instance</strong> in <code>__init__</code> from the resolved
+                <p>Set <strong>per instance</strong> in :meth:<code>__init__</code> from the resolved
 source's <code>output_kind</code>. The facade reads it to gate <code>aggregate=</code> and
 to know the return shape.</p>
               </div>
@@ -25593,12 +25621,12 @@ to know the return shape.</p>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    Resolves `source=` to its catalog row, issues the one bounded request that</span>
 <a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    source needs, and returns a</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection` (`structures`/`nfhl`)</span>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    or a `pandas.DataFrame` (`nfip`). US-only: a non-US box returns an</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    :class:`~pyramids.feature.collection.FeatureCollection` (`structures`/`nfhl`)</span>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    or a :class:`pandas.DataFrame` (`nfip`). US-only: a non-US box returns an</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">    empty result, not an error (`G4`).</span>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a>
 <a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in `__init__` from the resolved</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in :meth:`__init__` from the resolved</span>
 <a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">            source&#39;s `output_kind`. The facade reads it to gate `aggregate=` and</span>
 <a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">            to know the return shape.</span>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -25781,7 +25809,7 @@ to know the return shape.</p>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a>            <span class="p">)</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the request&#39;s `SpatialExtent`.</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the request&#39;s :class:`SpatialExtent`.</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">            lat_lim: `[min_lat, max_lat]` (global sentinel when unbounded).</span>
@@ -25799,7 +25827,7 @@ to know the return shape.</p>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a `TemporalExtent`.</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        Dates are not part of the request (these sources are snapshots), so</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        `None` bounds are allowed and yield a `None`-dated extent.</span>
@@ -25839,7 +25867,7 @@ to know the return shape.</p>
 <a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Route the product to its source and parse the response.</span>
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            products: The list from `_search` (one product).</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            products: The list from :meth:`_search` (one product).</span>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a>
 <a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">            list: One element — a `FeatureCollection` (`structures`/`nfhl`) or a</span>
@@ -25930,8 +25958,8 @@ to know the return shape.</p>
 <a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">                issued (paged for `nfip`), so this is a no-op.</span>
 <a id="__codelineno-0-414" name="__codelineno-0-414"></a>
 <a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            A `pyramids.feature.collection.FeatureCollection` for</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            `structures`/`nfhl`, or a `pandas.DataFrame` (also written to</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            A :class:`~pyramids.feature.collection.FeatureCollection` for</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            `structures`/`nfhl`, or a :class:`pandas.DataFrame` (also written to</span>
 <a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">            `root_dir`) for `nfip`.</span>
 <a id="__codelineno-0-419" name="__codelineno-0-419"></a>
 <a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">        Raises:</span>
@@ -26513,33 +26541,33 @@ issued (paged for <code>nfip</code>), so this is a no-op.</p>
     <table>
       <thead>
         <tr>
-          <th>Type</th>
+<th>Name</th>          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td>
+<td><code>A</code></td>            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A <code>pyramids.feature.collection.FeatureCollection</code> for</p>
+                <p>class:<code>~pyramids.feature.collection.FeatureCollection</code> for</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td>
+<td></td>            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>structures</code>/<code>nfhl</code>, or a <code>pandas.DataFrame</code> (also written to</p>
+                <p><code>structures</code>/<code>nfhl</code>, or a :class:<code>pandas.DataFrame</code> (also written to</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td>
+<td></td>            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
@@ -26625,8 +26653,8 @@ issued (paged for <code>nfip</code>), so this is a no-op.</p>
 <a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            issued (paged for `nfip`), so this is a no-op.</span>
 <a id="__codelineno-0-414" name="__codelineno-0-414"></a>
 <a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        A `pyramids.feature.collection.FeatureCollection` for</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        `structures`/`nfhl`, or a `pandas.DataFrame` (also written to</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        A :class:`~pyramids.feature.collection.FeatureCollection` for</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        `structures`/`nfhl`, or a :class:`pandas.DataFrame` (also written to</span>
 <a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">        `root_dir`) for `nfip`.</span>
 <a id="__codelineno-0-419" name="__codelineno-0-419"></a>
 <a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">    Raises:</span>
@@ -26684,9 +26712,9 @@ issued (paged for <code>nfip</code>), so this is a no-op.</p>
 
 
         <p>One NSI catalog row (one of the three flood sources).</p>
-<p>The source name is the parent key in <code>Catalog.datasets</code> and is stored
-on the row as <code>id</code> so a resolved <code>Source</code> is self-describing.
-Which fields matter depends on <code>provider</code>; a cross-field validator
+<p>The source name is the parent key in :attr:<code>Catalog.datasets</code> and is stored
+on the row as :attr:<code>id</code> so a resolved :class:<code>Source</code> is self-describing.
+Which fields matter depends on :attr:<code>provider</code>; a cross-field validator
 enforces the source-specific ones (<code>nfhl</code> needs a layer, <code>nfip</code> a records
 key).</p>
 
@@ -26977,9 +27005,9 @@ fields), and this map documents the notable ones.</p>
 <span class="normal"><a href="#__codelineno-0-189">189</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="k">class</span><span class="w"> </span><span class="nc">Source</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One NSI catalog row (one of the three flood sources).</span>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    The source name is the parent key in `Catalog.datasets` and is stored</span>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    on the row as `id` so a resolved `Source` is self-describing.</span>
-<a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">    Which fields matter depends on `provider`; a cross-field validator</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    The source name is the parent key in :attr:`Catalog.datasets` and is stored</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    on the row as :attr:`id` so a resolved :class:`Source` is self-describing.</span>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">    Which fields matter depends on :attr:`provider`; a cross-field validator</span>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    enforces the source-specific ones (`nfhl` needs a layer, `nfip` a records</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">    key).</span>
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a>
@@ -27997,9 +28025,9 @@ v3) — and returns the shape that source declares.</p>
 <ul>
 <li><strong>Per-instance <code>OUTPUT_KIND</code> (<code>G1</code>).</strong> The resolved source's <code>output_kind</code> is
   copied onto <code>self.OUTPUT_KIND</code> in <code>__init__</code>: <code>structures</code>/<code>nfhl</code> return a
-  pyramids <code>pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>),
-  <code>nfip</code> returns a <code>pandas.DataFrame</code> (<code>tabular</code>). The
-  <code>earthlens.earthlens.EarthLens</code> facade reads the instance attribute to
+  pyramids :class:<code>~pyramids.feature.collection.FeatureCollection</code> (<code>vector</code>),
+  <code>nfip</code> returns a :class:<code>pandas.DataFrame</code> (<code>tabular</code>). The
+  :class:<code>earthlens.earthlens.EarthLens</code> facade reads the instance attribute to
   gate <code>aggregate=</code> and to know the return shape.</li>
 <li><strong>Bounded requests, required (<code>G3</code>).</strong> No unbounded national pull: <code>structures</code>
   needs a <code>fips=</code> or a <code>[lat_lim, lon_lim]</code> box, <code>nfhl</code> needs the box, and <code>nfip</code>
@@ -28049,8 +28077,8 @@ dependency.</p>
         <p>US flood exposure / loss backend (per-instance output).</p>
 <p>Resolves <code>source=</code> to its catalog row, issues the one bounded request that
 source needs, and returns a
-<code>pyramids.feature.collection.FeatureCollection</code> (<code>structures</code>/<code>nfhl</code>)
-or a <code>pandas.DataFrame</code> (<code>nfip</code>). US-only: a non-US box returns an
+:class:<code>~pyramids.feature.collection.FeatureCollection</code> (<code>structures</code>/<code>nfhl</code>)
+or a :class:<code>pandas.DataFrame</code> (<code>nfip</code>). US-only: a non-US box returns an
 empty result, not an error (<code>G4</code>).</p>
 
 
@@ -28071,7 +28099,7 @@ empty result, not an error (<code>G4</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Set <strong>per instance</strong> in <code>__init__</code> from the resolved
+                <p>Set <strong>per instance</strong> in :meth:<code>__init__</code> from the resolved
 source's <code>output_kind</code>. The facade reads it to gate <code>aggregate=</code> and
 to know the return shape.</p>
               </div>
@@ -28494,12 +28522,12 @@ to know the return shape.</p>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    Resolves `source=` to its catalog row, issues the one bounded request that</span>
 <a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    source needs, and returns a</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection` (`structures`/`nfhl`)</span>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    or a `pandas.DataFrame` (`nfip`). US-only: a non-US box returns an</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    :class:`~pyramids.feature.collection.FeatureCollection` (`structures`/`nfhl`)</span>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    or a :class:`pandas.DataFrame` (`nfip`). US-only: a non-US box returns an</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">    empty result, not an error (`G4`).</span>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a>
 <a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in `__init__` from the resolved</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in :meth:`__init__` from the resolved</span>
 <a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">            source&#39;s `output_kind`. The facade reads it to gate `aggregate=` and</span>
 <a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">            to know the return shape.</span>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -28682,7 +28710,7 @@ to know the return shape.</p>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a>            <span class="p">)</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the request&#39;s `SpatialExtent`.</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the request&#39;s :class:`SpatialExtent`.</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">            lat_lim: `[min_lat, max_lat]` (global sentinel when unbounded).</span>
@@ -28700,7 +28728,7 @@ to know the return shape.</p>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a `TemporalExtent`.</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        Dates are not part of the request (these sources are snapshots), so</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        `None` bounds are allowed and yield a `None`-dated extent.</span>
@@ -28740,7 +28768,7 @@ to know the return shape.</p>
 <a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Route the product to its source and parse the response.</span>
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            products: The list from `_search` (one product).</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            products: The list from :meth:`_search` (one product).</span>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a>
 <a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">            list: One element — a `FeatureCollection` (`structures`/`nfhl`) or a</span>
@@ -28831,8 +28859,8 @@ to know the return shape.</p>
 <a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">                issued (paged for `nfip`), so this is a no-op.</span>
 <a id="__codelineno-0-414" name="__codelineno-0-414"></a>
 <a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            A `pyramids.feature.collection.FeatureCollection` for</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            `structures`/`nfhl`, or a `pandas.DataFrame` (also written to</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            A :class:`~pyramids.feature.collection.FeatureCollection` for</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            `structures`/`nfhl`, or a :class:`pandas.DataFrame` (also written to</span>
 <a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">            `root_dir`) for `nfip`.</span>
 <a id="__codelineno-0-419" name="__codelineno-0-419"></a>
 <a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">        Raises:</span>
@@ -29414,33 +29442,33 @@ issued (paged for <code>nfip</code>), so this is a no-op.</p>
     <table>
       <thead>
         <tr>
-          <th>Type</th>
+<th>Name</th>          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td>
+<td><code>A</code></td>            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A <code>pyramids.feature.collection.FeatureCollection</code> for</p>
+                <p>class:<code>~pyramids.feature.collection.FeatureCollection</code> for</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td>
+<td></td>            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>structures</code>/<code>nfhl</code>, or a <code>pandas.DataFrame</code> (also written to</p>
+                <p><code>structures</code>/<code>nfhl</code>, or a :class:<code>pandas.DataFrame</code> (also written to</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td>
+<td></td>            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
@@ -29526,8 +29554,8 @@ issued (paged for <code>nfip</code>), so this is a no-op.</p>
 <a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            issued (paged for `nfip`), so this is a no-op.</span>
 <a id="__codelineno-0-414" name="__codelineno-0-414"></a>
 <a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        A `pyramids.feature.collection.FeatureCollection` for</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        `structures`/`nfhl`, or a `pandas.DataFrame` (also written to</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        A :class:`~pyramids.feature.collection.FeatureCollection` for</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        `structures`/`nfhl`, or a :class:`pandas.DataFrame` (also written to</span>
 <a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">        `root_dir`) for `nfip`.</span>
 <a id="__codelineno-0-419" name="__codelineno-0-419"></a>
 <a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">    Raises:</span>
@@ -29595,11 +29623,11 @@ issued (paged for <code>nfip</code>), so this is a no-op.</p>
 claims v3). This module is the bridge from a <code>source</code> key to its endpoint, the
 per-instance output kind, and the friendly -&gt; provider field map used to shape
 the response.</p>
-<p><code>Catalog</code> is a thin <code>earthlens.base.AbstractCatalog</code> subclass that
+<p>:class:<code>Catalog</code> is a thin :class:<code>earthlens.base.AbstractCatalog</code> subclass that
 loads the bundled <code>nsi_data_catalog.yaml</code> and exposes each row as a
-<code>Source</code>. Resolve one source with <code>Catalog.get</code> (a did-you-mean
-hint on an unknown key); list the shipped keys with <code>Catalog.available</code>.</p>
-<p><code>CATALOG_PATH</code> is the path to the bundled YAML.</p>
+:class:<code>Source</code>. Resolve one source with :meth:<code>Catalog.get</code> (a did-you-mean
+hint on an unknown key); list the shipped keys with :meth:<code>Catalog.available</code>.</p>
+<p>:data:<code>CATALOG_PATH</code> is the path to the bundled YAML.</p>
 
 
 
@@ -29639,9 +29667,9 @@ hint on an unknown key); list the shipped keys with <code>Catalog.available</cod
 
         <p>Source catalog for the NSI backend.</p>
 <p>Reads the bundled <code>nsi_data_catalog.yaml</code> (shipped as package data) and
-exposes its <code>sources:</code> block as a map of <code>Source</code> rows keyed by
+exposes its <code>sources:</code> block as a map of :class:<code>Source</code> rows keyed by
 name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row with
-<code>get</code> and list the shipped keys with <code>available</code>.</p>
+:meth:<code>get</code> and list the shipped keys with :meth:<code>available</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -29661,7 +29689,7 @@ name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row wi
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from source name to its <code>Source</code> row.</p>
+                <p>Map from source name to its :class:<code>Source</code> row.</p>
               </div>
             </td>
           </tr>
@@ -29782,12 +29810,12 @@ name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row wi
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Source catalog for the NSI backend.</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">    Reads the bundled `nsi_data_catalog.yaml` (shipped as package data) and</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    exposes its `sources:` block as a map of `Source` rows keyed by</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    exposes its `sources:` block as a map of :class:`Source` rows keyed by</span>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">    name. Instantiate with no arguments (`Catalog()`). Resolve one row with</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">    `get` and list the shipped keys with `available`.</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">    :meth:`get` and list the shipped keys with :meth:`available`.</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        datasets: Map from source name to its `Source` row.</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        datasets: Map from source name to its :class:`Source` row.</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">        - Resolve a source and read its output kind:</span>
@@ -29807,8 +29835,8 @@ name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row wi
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;NSI catalog&quot;</span>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sources&quot;</span>
 <a id="__codelineno-0-220" name="__codelineno-0-220"></a>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="c1">#: The source rows live in the base `datasets` field so the inherited</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>    <span class="c1">#: dict surface and `get_dataset`&#39;s did-you-mean hint work unchanged.</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="c1">#: The source rows live in the base :attr:`datasets` field so the inherited</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>    <span class="c1">#: dict surface and :meth:`get_dataset`&#39;s did-you-mean hint work unchanged.</span>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Source</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="nd">@classmethod</span>
@@ -29826,10 +29854,10 @@ name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row wi
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">                `CATALOG_PATH`.</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-241" name="__codelineno-0-241"></a>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            ValueError: If the file has no `sources:` block, or a row fails</span>
@@ -29839,9 +29867,9 @@ name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row wi
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Source</span><span class="p">:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a source name to its `Source` row.</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a source name to its :class:`Source` row.</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown key.</span>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        Args:</span>
@@ -29950,8 +29978,8 @@ name. Instantiate with no arguments (<code>Catalog()</code>). Resolve one row wi
 
     <div class="doc doc-contents ">
 
-        <p>Resolve a source name to its <code>Source</code> row.</p>
-<p>Thin wrapper over the inherited <code>get_dataset</code>, which raises a
+        <p>Resolve a source name to its :class:<code>Source</code> row.</p>
+<p>Thin wrapper over the inherited :meth:<code>get_dataset</code>, which raises a
 <code>ValueError</code> with a did-you-mean hint on an unknown key.</p>
 
 
@@ -30056,9 +30084,9 @@ did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-268">268</a></span>
 <span class="normal"><a href="#__codelineno-0-269">269</a></span>
 <span class="normal"><a href="#__codelineno-0-270">270</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Source</span><span class="p">:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a source name to its `Source` row.</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a source name to its :class:`Source` row.</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises a</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown key.</span>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">    Args:</span>
@@ -30119,7 +30147,7 @@ did-you-mean hint.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the module-level
-<code>CATALOG_PATH</code>.</p>
+:data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -30145,7 +30173,7 @@ did-you-mean hint.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -30201,10 +30229,10 @@ validation.</p>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">            `CATALOG_PATH`.</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-241" name="__codelineno-0-241"></a>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        ValueError: If the file has no `sources:` block, or a row fails</span>
@@ -30244,9 +30272,9 @@ validation.</p>
 
 
         <p>One NSI catalog row (one of the three flood sources).</p>
-<p>The source name is the parent key in <code>Catalog.datasets</code> and is stored
-on the row as <code>id</code> so a resolved <code>Source</code> is self-describing.
-Which fields matter depends on <code>provider</code>; a cross-field validator
+<p>The source name is the parent key in :attr:<code>Catalog.datasets</code> and is stored
+on the row as :attr:<code>id</code> so a resolved :class:<code>Source</code> is self-describing.
+Which fields matter depends on :attr:<code>provider</code>; a cross-field validator
 enforces the source-specific ones (<code>nfhl</code> needs a layer, <code>nfip</code> a records
 key).</p>
 
@@ -30537,9 +30565,9 @@ fields), and this map documents the notable ones.</p>
 <span class="normal"><a href="#__codelineno-0-189">189</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="k">class</span><span class="w"> </span><span class="nc">Source</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One NSI catalog row (one of the three flood sources).</span>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    The source name is the parent key in `Catalog.datasets` and is stored</span>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    on the row as `id` so a resolved `Source` is self-describing.</span>
-<a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">    Which fields matter depends on `provider`; a cross-field validator</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    The source name is the parent key in :attr:`Catalog.datasets` and is stored</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    on the row as :attr:`id` so a resolved :class:`Source` is self-describing.</span>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">    Which fields matter depends on :attr:`provider`; a cross-field validator</span>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    enforces the source-specific ones (`nfhl` needs a layer, `nfip` a records</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">    key).</span>
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a>
@@ -30729,7 +30757,7 @@ file's <code>st_mtime_ns</code>, so any real edit invalidates the entry on its o
 spatial request shapes the vector sources need — a GeoJSON polygon body for the
 NSI structures POST, and an ArcGIS envelope query for the FEMA NFHL layer — and
 that wrap a returned GeoJSON <code>FeatureCollection</code> into a pyramids
-<code>pyramids.feature.collection.FeatureCollection</code>. No network, no state.</p>
+:class:<code>~pyramids.feature.collection.FeatureCollection</code>. No network, no state.</p>
 
 
 

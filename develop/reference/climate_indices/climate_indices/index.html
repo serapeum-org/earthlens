@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -804,6 +804,34 @@
     
   
     Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
   
 
     
@@ -24420,13 +24448,13 @@ rendered API. Both sources are public, so there is no <code>auth</code> module.<
 <p>Fetches monthly teleconnection-index series (ENSO/ONI, NAO, AO, PDO,
 AMO, SOI, PNA, …) from two open ASCII sources — NOAA PSL and the KNMI
 Climate Explorer — and returns them as a long-format
-<code>pandas.DataFrame</code> (<code>date</code>, <code>index</code>, <code>value</code>, <code>source</code>). These are
+:class:<code>pandas.DataFrame</code> (<code>date</code>, <code>index</code>, <code>value</code>, <code>source</code>). These are
 <strong>global scalar monthly series</strong> with no geometry, so the backend is
 <code>OUTPUT_KIND = "tabular"</code>: spatial arguments are accepted for signature
 parity but ignored, and <code>aggregate=</code> is rejected.</p>
-<p>The public surface is the <code>Catalog</code> (index id → URL + dialect +
-metadata) and its <code>Index</code> rows, plus the two pure ASCII parsers
-<code>parse_psl</code> / <code>parse_climexp</code>. The <code>ClimateIndices</code>
+<p>The public surface is the :class:<code>Catalog</code> (index id → URL + dialect +
+metadata) and its :class:<code>Index</code> rows, plus the two pure ASCII parsers
+:func:<code>parse_psl</code> / :func:<code>parse_climexp</code>. The :class:<code>ClimateIndices</code>
 backend orchestrates download → parse → long frame.</p>
 
 
@@ -24468,9 +24496,9 @@ backend orchestrates download → parse → long frame.</p>
         <p>Index catalogue for the climate-indices backend.</p>
 <p>Reads the bundled <code>climate_indices_data_catalog.yaml</code> (shipped as
 package data) and exposes its <code>datasets:</code> block as a map of
-<code>Index</code> rows keyed by index id. Instantiate with no arguments
-(<code>Catalog()</code>). Resolve one row with <code>get</code>, or list the shipped
-ids with <code>available</code>.</p>
+:class:<code>Index</code> rows keyed by index id. Instantiate with no arguments
+(<code>Catalog()</code>). Resolve one row with :meth:<code>get</code>, or list the shipped
+ids with :meth:<code>available</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -24490,7 +24518,7 @@ ids with <code>available</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from index id to its <code>Index</code> row.</p>
+                <p>Map from index id to its :class:<code>Index</code> row.</p>
               </div>
             </td>
           </tr>
@@ -24626,12 +24654,12 @@ ids with <code>available</code>.</p>
 <a id="__codelineno-0-165" name="__codelineno-0-165"></a>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">    Reads the bundled `climate_indices_data_catalog.yaml` (shipped as</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">    package data) and exposes its `datasets:` block as a map of</span>
-<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">    `Index` rows keyed by index id. Instantiate with no arguments</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    (`Catalog()`). Resolve one row with `get`, or list the shipped</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">    ids with `available`.</span>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">    :class:`Index` rows keyed by index id. Instantiate with no arguments</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    (`Catalog()`). Resolve one row with :meth:`get`, or list the shipped</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">    ids with :meth:`available`.</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        datasets: Map from index id to its `Index` row.</span>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        datasets: Map from index id to its :class:`Index` row.</span>
 <a id="__codelineno-0-174" name="__codelineno-0-174"></a>
 <a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">        - Resolve a row and read its dialect:</span>
@@ -24658,9 +24686,9 @@ ids with <code>available</code>.</p>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;climate-indices catalog&quot;</span>
 <a id="__codelineno-0-198" name="__codelineno-0-198"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;indices&quot;</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="c1">#: The index rows live in the base `datasets` field so the</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="c1">#: The index rows live in the base :attr:`datasets` field so the</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>    <span class="c1">#: inherited dict surface (`len`, `in`, `[]`, iteration) and</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a>    <span class="c1">#: `get_dataset`&#39;s did-you-mean hint work unchanged.</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a>    <span class="c1">#: :meth:`get_dataset`&#39;s did-you-mean hint work unchanged.</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Index</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a>    <span class="nd">@classmethod</span>
@@ -24679,10 +24707,10 @@ ids with <code>available</code>.</p>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">            ValueError: If the file has no `datasets:` block, or a row</span>
@@ -24692,9 +24720,9 @@ ids with <code>available</code>.</p>
 <a id="__codelineno-0-231" name="__codelineno-0-231"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Index</span><span class="p">:</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve an index id to its `Index` row.</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve an index id to its :class:`Index` row.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        a `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        Args:</span>
@@ -24802,8 +24830,8 @@ ids with <code>available</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Resolve an index id to its <code>Index</code> row.</p>
-<p>Thin wrapper over the inherited <code>get_dataset</code>, which raises
+        <p>Resolve an index id to its :class:<code>Index</code> row.</p>
+<p>Thin wrapper over the inherited :meth:<code>get_dataset</code>, which raises
 a <code>ValueError</code> with a did-you-mean hint on an unknown id.</p>
 
 
@@ -24906,9 +24934,9 @@ adds a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-248">248</a></span>
 <span class="normal"><a href="#__codelineno-0-249">249</a></span>
 <span class="normal"><a href="#__codelineno-0-250">250</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Index</span><span class="p">:</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve an index id to its `Index` row.</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve an index id to its :class:`Index` row.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    a `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">    Args:</span>
@@ -24968,7 +24996,7 @@ adds a did-you-mean hint.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the
-module-level <code>CATALOG_PATH</code>.</p>
+module-level :data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -24994,7 +25022,7 @@ module-level <code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -25050,10 +25078,10 @@ fails validation.</p>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        ValueError: If the file has no `datasets:` block, or a row</span>
@@ -25097,9 +25125,9 @@ fails validation.</p>
 catalogue source (NOAA PSL or KNMI Climate Explorer), parses the
 source's ASCII dialect, filters to the <code>[start, end]</code> window, and
 returns the concatenation as a long-format
-<code>pandas.DataFrame</code> (<code>date</code>, <code>index</code>, <code>value</code>, <code>source</code>). The
-query is a search/fetch split: <code>_search</code> resolves each id to a
-catalogue row, and <code>_fetch</code> downloads and parses each one.</p>
+:class:<code>pandas.DataFrame</code> (<code>date</code>, <code>index</code>, <code>value</code>, <code>source</code>). The
+query is a search/fetch split: :meth:<code>_search</code> resolves each id to a
+catalogue row, and :meth:<code>_fetch</code> downloads and parses each one.</p>
 <p>Climate indices are global scalar monthly series, so spatial
 arguments are ignored (<code>G4</code>) and <code>aggregate=</code> is rejected (<code>G1</code>).</p>
 
@@ -25502,9 +25530,9 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    catalogue source (NOAA PSL or KNMI Climate Explorer), parses the</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">    source&#39;s ASCII dialect, filters to the `[start, end]` window, and</span>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">    returns the concatenation as a long-format</span>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    `pandas.DataFrame` (`date`, `index`, `value`, `source`). The</span>
-<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">    query is a search/fetch split: `_search` resolves each id to a</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">    catalogue row, and `_fetch` downloads and parses each one.</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    :class:`pandas.DataFrame` (`date`, `index`, `value`, `source`). The</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">    query is a search/fetch split: :meth:`_search` resolves each id to a</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">    catalogue row, and :meth:`_fetch` downloads and parses each one.</span>
 <a id="__codelineno-0-86" name="__codelineno-0-86"></a>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    Climate indices are global scalar monthly series, so spatial</span>
 <a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    arguments are ignored (`G4`) and `aggregate=` is rejected (`G1`).</span>
@@ -25589,7 +25617,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a>        <span class="p">)</span>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a global `SpatialExtent` (spatial args ignored).</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a global :class:`SpatialExtent` (spatial args ignored).</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">        Climate indices have no geometry (`G4`), so the bbox arguments are</span>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        discarded and a whole-globe extent is returned to keep</span>
@@ -25611,7 +25639,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a monthly `TemporalExtent`.</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a monthly :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">            start: Inclusive start date string.</span>
@@ -25671,10 +25699,10 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        Widens the inherited `-&gt; list[Path]` contract: a tabular backend</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        returns in-memory long-format frames, not file paths (the write</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        happens in `download` via `_write_table`).</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        happens in :meth:`download` via :meth:`_write_table`).</span>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">            products: The list returned by `_search`.</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">            products: The list returned by :meth:`_search`.</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">            list[pd.DataFrame]: One canonical long-schema frame per</span>
@@ -25686,7 +25714,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one index, parse it, stamp it, and filter to the window.</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">            product: One `RemoteProduct` from `_search`.</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">            pd.DataFrame: The canonical long-schema frame for this index</span>
@@ -25727,10 +25755,10 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;GET an index file&#39;s body, retrying transient failures.</span>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        A transient failure (connection error, timeout, or a 5xx status)</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        is retried up to `_HTTP_RETRIES` times with an exponential</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        is retried up to :data:`_HTTP_RETRIES` times with an exponential</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        back-off (`1s`, `2s`); a 4xx (e.g. 404) fails fast since retrying</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        a real miss is pointless. The retry engine is</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        `HttpClient`, configured to match the</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        :class:`~earthlens.base.http.HttpClient`, configured to match the</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        old hand-rolled loop byte-for-byte on wait sequence and attempt</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        count.</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a>
@@ -25813,7 +25841,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the long-format table to `root_dir` and return the path.</span>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        The filename spells out the requested ids</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        (`climate_indices_oni_nao.csv`) up to `_MAX_STEM_IDS`; beyond</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        (`climate_indices_oni_nao.csv`) up to :data:`_MAX_STEM_IDS`; beyond</span>
 <a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        that it is summarised as `climate_indices_&lt;n&gt;_indices.csv` to keep</span>
 <a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">        the name short.</span>
 <a id="__codelineno-0-397" name="__codelineno-0-397"></a>
@@ -26467,7 +26495,7 @@ window; an empty (schema-only) frame when nothing matched.</p>
 
 
         <p>One climate-index catalogue row.</p>
-<p>The index id is the parent key in <code>Catalog.datasets</code>; the row
+<p>The index id is the parent key in :attr:<code>Catalog.datasets</code>; the row
 carries everything the backend needs to fetch and parse the series.</p>
 
 
@@ -26629,7 +26657,7 @@ joined with the per-row <code>file</code>).</p>
 <span class="normal"><a href="#__codelineno-0-160">160</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="k">class</span><span class="w"> </span><span class="nc">Index</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One climate-index catalogue row.</span>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a>
-<a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">    The index id is the parent key in `Catalog.datasets`; the row</span>
+<a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">    The index id is the parent key in :attr:`Catalog.datasets`; the row</span>
 <a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="sd">    carries everything the backend needs to fetch and parse the series.</span>
 <a id="__codelineno-0-118" name="__codelineno-0-118"></a>
 <a id="__codelineno-0-119" name="__codelineno-0-119"></a><span class="sd">    Attributes:</span>
@@ -26728,7 +26756,7 @@ joined with the per-row <code>file</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>pd.DataFrame: An empty frame with exactly the <code>COLUMNS</code>
+                <p>pd.DataFrame: An empty frame with exactly the :data:<code>COLUMNS</code>
 schema (<code>date</code>, <code>index</code>, <code>value</code>, <code>source</code>) and no rows —
 the all-empty fallback the backend returns when no requested
 index yields any data.</p>
@@ -26754,7 +26782,7 @@ index yields any data.</p>
 <a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the zero-row canonical long frame.</span>
 <a id="__codelineno-0-39" name="__codelineno-0-39"></a>
 <a id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="sd">        pd.DataFrame: An empty frame with exactly the `COLUMNS`</span>
+<a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="sd">        pd.DataFrame: An empty frame with exactly the :data:`COLUMNS`</span>
 <a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="sd">            schema (`date`, `index`, `value`, `source`) and no rows —</span>
 <a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">            the all-empty fallback the backend returns when no requested</span>
 <a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">            index yields any data.</span>
@@ -26780,7 +26808,7 @@ index yields any data.</p>
         <p>Parse a KNMI climexp <code>&lt;id&gt;.dat</code> grid series to a long frame.</p>
 <p>Skips <code>#</code>-prefixed comment lines and reads <code>year jan..dec</code> rows (13
 tokens) or <code>year jan..dec annual</code> rows (14 tokens — the trailing
-annual-mean column is dropped). The fixed <code>CLIMEXP_SENTINEL</code>
+annual-mean column is dropped). The fixed :data:<code>CLIMEXP_SENTINEL</code>
 (<code>-999.9</code>) is mapped to <code>NaN</code>. A non-grid body (an HTML error page,
 or the <code>YYYYMMDD value</code> long form) yields no rows.</p>
 
@@ -26875,7 +26903,7 @@ or the <code>YYYYMMDD value</code> long form) yields no rows.</p>
 <a id="__codelineno-0-136" name="__codelineno-0-136"></a>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a><span class="sd">    Skips `#`-prefixed comment lines and reads `year jan..dec` rows (13</span>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">    tokens) or `year jan..dec annual` rows (14 tokens — the trailing</span>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">    annual-mean column is dropped). The fixed `CLIMEXP_SENTINEL`</span>
+<a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">    annual-mean column is dropped). The fixed :data:`CLIMEXP_SENTINEL`</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">    (`-999.9`) is mapped to `NaN`. A non-grid body (an HTML error page,</span>
 <a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">    or the `YYYYMMDD value` long form) yields no rows.</span>
 <a id="__codelineno-0-142" name="__codelineno-0-142"></a>
@@ -27095,13 +27123,13 @@ in-data missing markers are kept as raw values.</p>
 teleconnection-index ASCII files from two open sources — NOAA PSL and the
 KNMI Climate Explorer — parses each into a tidy long frame, filters to the
 requested window, and returns the concatenation as a long-format
-<code>pandas.DataFrame</code> (<code>date</code>, <code>index</code>, <code>value</code>, <code>source</code>).</p>
+:class:<code>pandas.DataFrame</code> (<code>date</code>, <code>index</code>, <code>value</code>, <code>source</code>).</p>
 <p>A request is <code>variables=[index id, …]</code> (e.g. <code>["oni", "nao"]</code>) + a
 <code>[start, end]</code> window; the index id selects the catalogue row, which pins
 the URL and the ASCII dialect. Climate indices are <strong>global scalar
 monthly series</strong> with no geometry, so this is <code>OUTPUT_KIND = "tabular"</code>:
 spatial arguments (<code>lat_lim</code> / <code>lon_lim</code> / <code>aoi</code>) are accepted for
-signature parity but ignored, and the <code>earthlens.earthlens.EarthLens</code>
+signature parity but ignored, and the :class:<code>earthlens.earthlens.EarthLens</code>
 facade rejects a non-<code>None</code> <code>aggregate=</code> (these are already monthly
 scalars — there is nothing to grid-reduce).</p>
 <p>The two sources are open (no auth, no SDK), so there is no <code>auth.py</code>; the
@@ -27149,9 +27177,9 @@ scalar series use no gridded-array dependency.</p>
 catalogue source (NOAA PSL or KNMI Climate Explorer), parses the
 source's ASCII dialect, filters to the <code>[start, end]</code> window, and
 returns the concatenation as a long-format
-<code>pandas.DataFrame</code> (<code>date</code>, <code>index</code>, <code>value</code>, <code>source</code>). The
-query is a search/fetch split: <code>_search</code> resolves each id to a
-catalogue row, and <code>_fetch</code> downloads and parses each one.</p>
+:class:<code>pandas.DataFrame</code> (<code>date</code>, <code>index</code>, <code>value</code>, <code>source</code>). The
+query is a search/fetch split: :meth:<code>_search</code> resolves each id to a
+catalogue row, and :meth:<code>_fetch</code> downloads and parses each one.</p>
 <p>Climate indices are global scalar monthly series, so spatial
 arguments are ignored (<code>G4</code>) and <code>aggregate=</code> is rejected (<code>G1</code>).</p>
 
@@ -27554,9 +27582,9 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    catalogue source (NOAA PSL or KNMI Climate Explorer), parses the</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">    source&#39;s ASCII dialect, filters to the `[start, end]` window, and</span>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">    returns the concatenation as a long-format</span>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    `pandas.DataFrame` (`date`, `index`, `value`, `source`). The</span>
-<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">    query is a search/fetch split: `_search` resolves each id to a</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">    catalogue row, and `_fetch` downloads and parses each one.</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    :class:`pandas.DataFrame` (`date`, `index`, `value`, `source`). The</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">    query is a search/fetch split: :meth:`_search` resolves each id to a</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">    catalogue row, and :meth:`_fetch` downloads and parses each one.</span>
 <a id="__codelineno-0-86" name="__codelineno-0-86"></a>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    Climate indices are global scalar monthly series, so spatial</span>
 <a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    arguments are ignored (`G4`) and `aggregate=` is rejected (`G1`).</span>
@@ -27641,7 +27669,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a>        <span class="p">)</span>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a global `SpatialExtent` (spatial args ignored).</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a global :class:`SpatialExtent` (spatial args ignored).</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">        Climate indices have no geometry (`G4`), so the bbox arguments are</span>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        discarded and a whole-globe extent is returned to keep</span>
@@ -27663,7 +27691,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a monthly `TemporalExtent`.</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a monthly :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">            start: Inclusive start date string.</span>
@@ -27723,10 +27751,10 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        Widens the inherited `-&gt; list[Path]` contract: a tabular backend</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        returns in-memory long-format frames, not file paths (the write</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        happens in `download` via `_write_table`).</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        happens in :meth:`download` via :meth:`_write_table`).</span>
 <a id="__codelineno-0-253" name="__codelineno-0-253"></a>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">            products: The list returned by `_search`.</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">            products: The list returned by :meth:`_search`.</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">            list[pd.DataFrame]: One canonical long-schema frame per</span>
@@ -27738,7 +27766,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one index, parse it, stamp it, and filter to the window.</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">            product: One `RemoteProduct` from `_search`.</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">            pd.DataFrame: The canonical long-schema frame for this index</span>
@@ -27779,10 +27807,10 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;GET an index file&#39;s body, retrying transient failures.</span>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        A transient failure (connection error, timeout, or a 5xx status)</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        is retried up to `_HTTP_RETRIES` times with an exponential</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        is retried up to :data:`_HTTP_RETRIES` times with an exponential</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        back-off (`1s`, `2s`); a 4xx (e.g. 404) fails fast since retrying</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        a real miss is pointless. The retry engine is</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        `HttpClient`, configured to match the</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        :class:`~earthlens.base.http.HttpClient`, configured to match the</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        old hand-rolled loop byte-for-byte on wait sequence and attempt</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        count.</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a>
@@ -27865,7 +27893,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the long-format table to `root_dir` and return the path.</span>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        The filename spells out the requested ids</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        (`climate_indices_oni_nao.csv`) up to `_MAX_STEM_IDS`; beyond</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        (`climate_indices_oni_nao.csv`) up to :data:`_MAX_STEM_IDS`; beyond</span>
 <a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        that it is summarised as `climate_indices_&lt;n&gt;_indices.csv` to keep</span>
 <a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">        the name short.</span>
 <a id="__codelineno-0-397" name="__codelineno-0-397"></a>
@@ -28527,16 +28555,16 @@ window; an empty (schema-only) frame when nothing matched.</p>
 ASCII files from two open sources (NOAA PSL, KNMI Climate Explorer). This
 module is the bridge from a short index id (<code>"oni"</code>, <code>"nao"</code>, …) to the
 URL + ASCII dialect + light metadata needed to fetch and parse it.</p>
-<p><code>Catalog</code> is a thin <code>earthlens.base.AbstractCatalog</code>
+<p>:class:<code>Catalog</code> is a thin :class:<code>earthlens.base.AbstractCatalog</code>
 subclass that loads the bundled <code>climate_indices_data_catalog.yaml</code> and
-exposes each row as an <code>Index</code>. The YAML keeps a DRY <code>sources:</code>
+exposes each row as an :class:<code>Index</code>. The YAML keeps a DRY <code>sources:</code>
 block (base URL + citation per source) and a <code>datasets:</code> block (one row
 per index); the loader joins <code>base_url + file</code> into each row's
-<code>Index.url</code> and attaches the source citation, so a resolved
-<code>Index</code> is self-describing. Resolve one with <code>Catalog.get</code>
+:attr:<code>Index.url</code> and attaches the source citation, so a resolved
+:class:<code>Index</code> is self-describing. Resolve one with :meth:<code>Catalog.get</code>
 (a did-you-mean hint on an unknown id); list the shipped ids with
-<code>Catalog.available</code>.</p>
-<p><code>CATALOG_PATH</code> is the path to the bundled YAML.</p>
+:meth:<code>Catalog.available</code>.</p>
+<p>:data:<code>CATALOG_PATH</code> is the path to the bundled YAML.</p>
 
 
 
@@ -28577,9 +28605,9 @@ per index); the loader joins <code>base_url + file</code> into each row's
         <p>Index catalogue for the climate-indices backend.</p>
 <p>Reads the bundled <code>climate_indices_data_catalog.yaml</code> (shipped as
 package data) and exposes its <code>datasets:</code> block as a map of
-<code>Index</code> rows keyed by index id. Instantiate with no arguments
-(<code>Catalog()</code>). Resolve one row with <code>get</code>, or list the shipped
-ids with <code>available</code>.</p>
+:class:<code>Index</code> rows keyed by index id. Instantiate with no arguments
+(<code>Catalog()</code>). Resolve one row with :meth:<code>get</code>, or list the shipped
+ids with :meth:<code>available</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -28599,7 +28627,7 @@ ids with <code>available</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from index id to its <code>Index</code> row.</p>
+                <p>Map from index id to its :class:<code>Index</code> row.</p>
               </div>
             </td>
           </tr>
@@ -28735,12 +28763,12 @@ ids with <code>available</code>.</p>
 <a id="__codelineno-0-165" name="__codelineno-0-165"></a>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">    Reads the bundled `climate_indices_data_catalog.yaml` (shipped as</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">    package data) and exposes its `datasets:` block as a map of</span>
-<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">    `Index` rows keyed by index id. Instantiate with no arguments</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    (`Catalog()`). Resolve one row with `get`, or list the shipped</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">    ids with `available`.</span>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">    :class:`Index` rows keyed by index id. Instantiate with no arguments</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    (`Catalog()`). Resolve one row with :meth:`get`, or list the shipped</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">    ids with :meth:`available`.</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        datasets: Map from index id to its `Index` row.</span>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">        datasets: Map from index id to its :class:`Index` row.</span>
 <a id="__codelineno-0-174" name="__codelineno-0-174"></a>
 <a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">        - Resolve a row and read its dialect:</span>
@@ -28767,9 +28795,9 @@ ids with <code>available</code>.</p>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;climate-indices catalog&quot;</span>
 <a id="__codelineno-0-198" name="__codelineno-0-198"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;indices&quot;</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="c1">#: The index rows live in the base `datasets` field so the</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="c1">#: The index rows live in the base :attr:`datasets` field so the</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>    <span class="c1">#: inherited dict surface (`len`, `in`, `[]`, iteration) and</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a>    <span class="c1">#: `get_dataset`&#39;s did-you-mean hint work unchanged.</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a>    <span class="c1">#: :meth:`get_dataset`&#39;s did-you-mean hint work unchanged.</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Index</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a>    <span class="nd">@classmethod</span>
@@ -28788,10 +28816,10 @@ ids with <code>available</code>.</p>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">            ValueError: If the file has no `datasets:` block, or a row</span>
@@ -28801,9 +28829,9 @@ ids with <code>available</code>.</p>
 <a id="__codelineno-0-231" name="__codelineno-0-231"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Index</span><span class="p">:</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve an index id to its `Index` row.</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve an index id to its :class:`Index` row.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        a `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        Args:</span>
@@ -28911,8 +28939,8 @@ ids with <code>available</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Resolve an index id to its <code>Index</code> row.</p>
-<p>Thin wrapper over the inherited <code>get_dataset</code>, which raises
+        <p>Resolve an index id to its :class:<code>Index</code> row.</p>
+<p>Thin wrapper over the inherited :meth:<code>get_dataset</code>, which raises
 a <code>ValueError</code> with a did-you-mean hint on an unknown id.</p>
 
 
@@ -29015,9 +29043,9 @@ adds a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-248">248</a></span>
 <span class="normal"><a href="#__codelineno-0-249">249</a></span>
 <span class="normal"><a href="#__codelineno-0-250">250</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Index</span><span class="p">:</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve an index id to its `Index` row.</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve an index id to its :class:`Index` row.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    a `ValueError` with a did-you-mean hint on an unknown id.</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">    Args:</span>
@@ -29077,7 +29105,7 @@ adds a did-you-mean hint.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the
-module-level <code>CATALOG_PATH</code>.</p>
+module-level :data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -29103,7 +29131,7 @@ module-level <code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -29159,10 +29187,10 @@ fails validation.</p>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        ValueError: If the file has no `datasets:` block, or a row</span>
@@ -29202,7 +29230,7 @@ fails validation.</p>
 
 
         <p>One climate-index catalogue row.</p>
-<p>The index id is the parent key in <code>Catalog.datasets</code>; the row
+<p>The index id is the parent key in :attr:<code>Catalog.datasets</code>; the row
 carries everything the backend needs to fetch and parse the series.</p>
 
 
@@ -29364,7 +29392,7 @@ joined with the per-row <code>file</code>).</p>
 <span class="normal"><a href="#__codelineno-0-160">160</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="k">class</span><span class="w"> </span><span class="nc">Index</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One climate-index catalogue row.</span>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a>
-<a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">    The index id is the parent key in `Catalog.datasets`; the row</span>
+<a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">    The index id is the parent key in :attr:`Catalog.datasets`; the row</span>
 <a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="sd">    carries everything the backend needs to fetch and parse the series.</span>
 <a id="__codelineno-0-118" name="__codelineno-0-118"></a>
 <a id="__codelineno-0-119" name="__codelineno-0-119"></a><span class="sd">    Attributes:</span>
@@ -29566,7 +29594,7 @@ data, so no gridded-array dependency is used in this subpackage by design.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>pd.DataFrame: An empty frame with exactly the <code>COLUMNS</code>
+                <p>pd.DataFrame: An empty frame with exactly the :data:<code>COLUMNS</code>
 schema (<code>date</code>, <code>index</code>, <code>value</code>, <code>source</code>) and no rows —
 the all-empty fallback the backend returns when no requested
 index yields any data.</p>
@@ -29592,7 +29620,7 @@ index yields any data.</p>
 <a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the zero-row canonical long frame.</span>
 <a id="__codelineno-0-39" name="__codelineno-0-39"></a>
 <a id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="sd">        pd.DataFrame: An empty frame with exactly the `COLUMNS`</span>
+<a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="sd">        pd.DataFrame: An empty frame with exactly the :data:`COLUMNS`</span>
 <a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="sd">            schema (`date`, `index`, `value`, `source`) and no rows —</span>
 <a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">            the all-empty fallback the backend returns when no requested</span>
 <a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">            index yields any data.</span>
@@ -29618,7 +29646,7 @@ index yields any data.</p>
         <p>Parse a KNMI climexp <code>&lt;id&gt;.dat</code> grid series to a long frame.</p>
 <p>Skips <code>#</code>-prefixed comment lines and reads <code>year jan..dec</code> rows (13
 tokens) or <code>year jan..dec annual</code> rows (14 tokens — the trailing
-annual-mean column is dropped). The fixed <code>CLIMEXP_SENTINEL</code>
+annual-mean column is dropped). The fixed :data:<code>CLIMEXP_SENTINEL</code>
 (<code>-999.9</code>) is mapped to <code>NaN</code>. A non-grid body (an HTML error page,
 or the <code>YYYYMMDD value</code> long form) yields no rows.</p>
 
@@ -29713,7 +29741,7 @@ or the <code>YYYYMMDD value</code> long form) yields no rows.</p>
 <a id="__codelineno-0-136" name="__codelineno-0-136"></a>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a><span class="sd">    Skips `#`-prefixed comment lines and reads `year jan..dec` rows (13</span>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">    tokens) or `year jan..dec annual` rows (14 tokens — the trailing</span>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">    annual-mean column is dropped). The fixed `CLIMEXP_SENTINEL`</span>
+<a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">    annual-mean column is dropped). The fixed :data:`CLIMEXP_SENTINEL`</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">    (`-999.9`) is mapped to `NaN`. A non-grid body (an HTML error page,</span>
 <a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">    or the `YYYYMMDD value` long form) yields no rows.</span>
 <a id="__codelineno-0-142" name="__codelineno-0-142"></a>

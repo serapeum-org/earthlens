@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -804,6 +804,34 @@
     
   
     Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
   
 
     
@@ -24641,10 +24669,10 @@ pages in this section; this page is the rendered API.</p>
 water observations from the U.S. Geological Survey's National Water
 Information System — stream gauges, groundwater wells, and
 water-quality sites across the United States — and returns them as a
-long-format <code>pandas.DataFrame</code>.</p>
+long-format :class:<code>pandas.DataFrame</code>.</p>
 <p>This is a <code>tabular</code> backend: the result is a table of per-site
-observations, not a gridded array, so <code>USGSWater.OUTPUT_KIND</code> is
-<code>"tabular"</code> and the <code>earthlens.earthlens.EarthLens</code> facade
+observations, not a gridded array, so :data:<code>USGSWater.OUTPUT_KIND</code> is
+<code>"tabular"</code> and the :class:<code>earthlens.earthlens.EarthLens</code> facade
 rejects an <code>aggregate=</code> argument for it (use <code>service="statistics"</code> for
 a server-side temporal rollup instead).</p>
 <p>Request shape: <code>variables</code> is a <code>list[str]</code> of NWIS <strong>parameter codes</strong>
@@ -24655,18 +24683,18 @@ The NWIS / Water Data service plane is selected by <code>service=</code> (defaul
 Authentication is an optional Personal Access Token.</p>
 <p>Public surface (re-exported from this package):</p>
 <ul>
-<li><code>USGSWater</code> — the backend; instantiate with a date range, a
+<li>:class:<code>USGSWater</code> — the backend; instantiate with a date range, a
   bbox (or <code>sites=</code>), and <code>variables=[code_or_name, ...]</code>, then call
-  <code>USGSWater.download</code>.</li>
-<li><code>Catalog</code> — pydantic-backed loader for the bundled
+  :meth:<code>USGSWater.download</code>.</li>
+<li>:class:<code>Catalog</code> — pydantic-backed loader for the bundled
   <code>usgs_water_data_catalog.yaml</code> parameter-code table.</li>
-<li><code>Parameter</code> — one parameter code's catalog row (<code>code</code>,
+<li>:class:<code>Parameter</code> — one parameter code's catalog row (<code>code</code>,
   <code>name</code>, <code>units</code>, <code>group</code>, <code>services</code>).</li>
-<li><code>UsgsWaterAuth</code> — <code>AbstractAuth</code> implementation resolving the
+<li>:class:<code>UsgsWaterAuth</code> — <code>AbstractAuth</code> implementation resolving the
   optional <code>API_USGS_PAT</code>.</li>
-<li><code>UsgsWaterCredentials</code> — frozen pydantic value object the auth
+<li>:class:<code>UsgsWaterCredentials</code> — frozen pydantic value object the auth
   class binds to (the optional token).</li>
-<li><code>CATALOG_PATH</code> — path to the bundled parameter YAML.</li>
+<li>:data:<code>CATALOG_PATH</code> — path to the bundled parameter YAML.</li>
 </ul>
 
 
@@ -24708,9 +24736,9 @@ Authentication is an optional Personal Access Token.</p>
         <p>Parameter-code catalog for the USGS Water backend.</p>
 <p>Reads the bundled <code>usgs_water_data_catalog.yaml</code> (shipped as
 package data) and exposes its <code>parameters:</code> block as a map of
-<code>Parameter</code> rows keyed by friendly name. Instantiate with no
+:class:<code>Parameter</code> rows keyed by friendly name. Instantiate with no
 arguments (<code>Catalog()</code>). Resolve a name or raw code with
-<code>resolve</code>, or a single row with <code>get_parameter</code>.</p>
+:meth:<code>resolve</code>, or a single row with :meth:<code>get_parameter</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -24735,7 +24763,7 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
             <td>
               <div class="doc-md-description">
                 <p>Map from the friendly parameter name to its
-<code>Parameter</code> row.</p>
+:class:<code>Parameter</code> row.</p>
               </div>
             </td>
           </tr>
@@ -24966,13 +24994,13 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a>
 <a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    Reads the bundled `usgs_water_data_catalog.yaml` (shipped as</span>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">    package data) and exposes its `parameters:` block as a map of</span>
-<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    `Parameter` rows keyed by friendly name. Instantiate with no</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    :class:`Parameter` rows keyed by friendly name. Instantiate with no</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">    arguments (`Catalog()`). Resolve a name or raw code with</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">    `resolve`, or a single row with `get_parameter`.</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">    :meth:`resolve`, or a single row with :meth:`get_parameter`.</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">        parameters: Map from the friendly parameter name to its</span>
-<a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">            `Parameter` row.</span>
+<a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">            :class:`Parameter` row.</span>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a>
 <a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">        - Resolve a friendly name and a raw code:</span>
@@ -24999,10 +25027,10 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;USGS Water parameter catalog&quot;</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;parameters&quot;</span>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a>    <span class="c1">#: The parameter rows live in the base `datasets` field so the</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a>    <span class="c1">#: The parameter rows live in the base :attr:`datasets` field so the</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="c1">#: inherited dict surface (`len`, `in`, `[]`, iteration) and</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a>    <span class="c1">#: `get_dataset`&#39;s did-you-mean hint work unchanged. The field</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a>    <span class="c1">#: is narrowed here to `Parameter` values; `parameters`</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a>    <span class="c1">#: :meth:`get_dataset`&#39;s did-you-mean hint work unchanged. The field</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a>    <span class="c1">#: is narrowed here to :class:`Parameter` values; :attr:`parameters`</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a>    <span class="c1">#: is the domain-named read alias.</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a>
@@ -25030,11 +25058,11 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="nd">@property</span>
 <a id="__codelineno-0-220" name="__codelineno-0-220"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">]:</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The parameter map — alias for the base `datasets` field.</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The parameter map — alias for the base :attr:`datasets` field.</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">            dict[str, Parameter]: The same mapping stored in</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">                `datasets`.</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">                :attr:`datasets`.</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        Examples:</span>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            - The alias and the base field are the same object:</span>
@@ -25066,14 +25094,14 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">            ValueError: If the file has no `parameters:` block, or a row</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">                fails `Parameter` validation.</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">                fails :class:`Parameter` validation.</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
@@ -25100,9 +25128,9 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name to its `Parameter` row.</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name to its :class:`Parameter` row.</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        a `ValueError` with a did-you-mean hint on an unknown name.</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        Args:</span>
@@ -25136,7 +25164,7 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        A raw 5-digit code (`&quot;00060&quot;`) passes through unmapped — the</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        full USGS code table is far larger than the curated catalog, so</span>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        any valid code is accepted directly. A non-code string is</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        looked up as a friendly name via `get_parameter`.</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        looked up as a friendly name via :meth:`get_parameter`.</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">            code_or_name: A friendly name (`&quot;discharge&quot;`) or a raw</span>
@@ -25239,7 +25267,7 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 
     <div class="doc doc-contents ">
 
-        <p>The parameter map — alias for the base <code>datasets</code> field.</p>
+        <p>The parameter map — alias for the base :attr:<code>datasets</code> field.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -25258,7 +25286,7 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
             <td>
               <div class="doc-md-description">
                 <p>dict[str, Parameter]: The same mapping stored in
-<code>datasets</code>.</p>
+:attr:<code>datasets</code>.</p>
               </div>
             </td>
           </tr>
@@ -25296,8 +25324,8 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 
     <div class="doc doc-contents ">
 
-        <p>Resolve a friendly name to its <code>Parameter</code> row.</p>
-<p>Thin wrapper over the inherited <code>get_dataset</code>, which raises
+        <p>Resolve a friendly name to its :class:<code>Parameter</code> row.</p>
+<p>Thin wrapper over the inherited :meth:<code>get_dataset</code>, which raises
 a <code>ValueError</code> with a did-you-mean hint on an unknown name.</p>
 
 
@@ -25425,9 +25453,9 @@ adds a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-317">317</a></span>
 <span class="normal"><a href="#__codelineno-0-318">318</a></span>
 <span class="normal"><a href="#__codelineno-0-319">319</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name to its `Parameter` row.</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name to its :class:`Parameter` row.</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    a `ValueError` with a did-you-mean hint on an unknown name.</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    Args:</span>
@@ -25499,7 +25527,7 @@ adds a did-you-mean hint.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the
-module-level <code>CATALOG_PATH</code>.</p>
+module-level :data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -25525,7 +25553,7 @@ module-level <code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -25549,7 +25577,7 @@ module-level <code>CATALOG_PATH</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>If the file has no <code>parameters:</code> block, or a row
-fails <code>Parameter</code> validation.</p>
+fails :class:<code>Parameter</code> validation.</p>
               </div>
             </td>
           </tr>
@@ -25581,14 +25609,14 @@ fails <code>Parameter</code> validation.</p>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        ValueError: If the file has no `parameters:` block, or a row</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            fails `Parameter` validation.</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            fails :class:`Parameter` validation.</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
@@ -25613,7 +25641,7 @@ fails <code>Parameter</code> validation.</p>
 <p>A raw 5-digit code (<code>"00060"</code>) passes through unmapped — the
 full USGS code table is far larger than the curated catalog, so
 any valid code is accepted directly. A non-code string is
-looked up as a friendly name via <code>get_parameter</code>.</p>
+looked up as a friendly name via :meth:<code>get_parameter</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -25724,7 +25752,7 @@ a known friendly name (with a did-you-mean hint).</p>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    A raw 5-digit code (`&quot;00060&quot;`) passes through unmapped — the</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">    full USGS code table is far larger than the curated catalog, so</span>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    any valid code is accepted directly. A non-code string is</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">    looked up as a friendly name via `get_parameter`.</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">    looked up as a friendly name via :meth:`get_parameter`.</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        code_or_name: A friendly name (`&quot;discharge&quot;`) or a raw</span>
@@ -25773,8 +25801,8 @@ a known friendly name (with a did-you-mean hint).</p>
 
         <p>One NWIS parameter code's catalog row.</p>
 <p>The user-facing name is the parent key in
-<code>Catalog.parameters</code> and is also stored on the row as
-<code>name</code> so a resolved <code>Parameter</code> is self-describing.</p>
+:attr:<code>Catalog.parameters</code> and is also stored on the row as
+:attr:<code>name</code> so a resolved :class:<code>Parameter</code> is self-describing.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -25839,7 +25867,7 @@ a known friendly name (with a did-you-mean hint).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>earthlens.usgs_water.backend.SERVICES</code>
+                <p>The :data:<code>earthlens.usgs_water.backend.SERVICES</code>
 this code is typically available on (<code>["daily",
 "instantaneous"]</code>).</p>
               </div>
@@ -25916,8 +25944,8 @@ this code is typically available on (<code>["daily",
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One NWIS parameter code&#39;s catalog row.</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">    The user-facing name is the parent key in</span>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">    `Catalog.parameters` and is also stored on the row as</span>
-<a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">    `name` so a resolved `Parameter` is self-describing.</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">    :attr:`Catalog.parameters` and is also stored on the row as</span>
+<a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">    :attr:`name` so a resolved :class:`Parameter` is self-describing.</span>
 <a id="__codelineno-0-113" name="__codelineno-0-113"></a>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">        code: The 5-digit NWIS parameter code (`&quot;00060&quot;`).</span>
@@ -25925,7 +25953,7 @@ this code is typically available on (<code>["daily",
 <a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="sd">        units: The reporting units (`&quot;ft3/s&quot;`, `&quot;degC&quot;`).</span>
 <a id="__codelineno-0-118" name="__codelineno-0-118"></a><span class="sd">        group: Coarse USGS classification (`&quot;Physical&quot;`, `&quot;Nutrients&quot;`,</span>
 <a id="__codelineno-0-119" name="__codelineno-0-119"></a><span class="sd">            …).</span>
-<a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="sd">        services: The `earthlens.usgs_water.backend.SERVICES`</span>
+<a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="sd">        services: The :data:`earthlens.usgs_water.backend.SERVICES`</span>
 <a id="__codelineno-0-121" name="__codelineno-0-121"></a><span class="sd">            this code is typically available on (`[&quot;daily&quot;,</span>
 <a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">            &quot;instantaneous&quot;]`).</span>
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a>
@@ -26000,12 +26028,12 @@ this code is typically available on (<code>["daily",
 <p>Fetches per-site water observations for a bbox / explicit sites /
 date window / parameter-code list through the same <code>download()</code>
 shape every other earthlens backend uses, and returns a
-long-format <code>pandas.DataFrame</code> (one row per observation).
-The query is a search/fetch split: <code>_search</code> enumerates the
-monitoring locations to pull, and <code>_fetch</code> pulls each
+long-format :class:<code>pandas.DataFrame</code> (one row per observation).
+The query is a search/fetch split: :meth:<code>_search</code> enumerates the
+monitoring locations to pull, and :meth:<code>_fetch</code> pulls each
 service's observations and normalises them to one tidy long schema.</p>
 <p>The <code>service=</code> argument selects the NWIS / Water Data plane (see
-<code>SERVICES</code>); <code>api=</code> selects the modern / legacy endpoint with
+:data:<code>SERVICES</code>); <code>api=</code> selects the modern / legacy endpoint with
 a 429 auto-fallback (see the module docstring). Authentication is
 an optional Personal Access Token.</p>
 
@@ -26547,13 +26575,13 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">    Fetches per-site water observations for a bbox / explicit sites /</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a><span class="sd">    date window / parameter-code list through the same `download()`</span>
 <a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    shape every other earthlens backend uses, and returns a</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">    long-format `pandas.DataFrame` (one row per observation).</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">    The query is a search/fetch split: `_search` enumerates the</span>
-<a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">    monitoring locations to pull, and `_fetch` pulls each</span>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">    long-format :class:`pandas.DataFrame` (one row per observation).</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">    The query is a search/fetch split: :meth:`_search` enumerates the</span>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">    monitoring locations to pull, and :meth:`_fetch` pulls each</span>
 <a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">    service&#39;s observations and normalises them to one tidy long schema.</span>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">    The `service=` argument selects the NWIS / Water Data plane (see</span>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">    `SERVICES`); `api=` selects the modern / legacy endpoint with</span>
+<a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">    :data:`SERVICES`); `api=` selects the modern / legacy endpoint with</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">    a 429 auto-fallback (see the module docstring). Authentication is</span>
 <a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">    an optional Personal Access Token.</span>
 <a id="__codelineno-0-142" name="__codelineno-0-142"></a>
@@ -26606,7 +26634,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">            api_token: Optional USGS Personal Access Token; falls back</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">                to the `API_USGS_PAT` env var, then anonymous access.</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">            service: The NWIS / Water Data plane to query — one of</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">                `SERVICES`. Defaults to `&quot;daily&quot;`.</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">                :data:`SERVICES`. Defaults to `&quot;daily&quot;`.</span>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">            sites: Explicit USGS site number(s) to query, bypassing the</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">                bbox site discovery. **Required** for the services that</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">                have no spatial (bbox) filter — `peaks`, `ratings`, and</span>
@@ -26685,7 +26713,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>        <span class="p">)</span>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build `UsgsWaterAuth` and resolve the optional token.</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build :class:`UsgsWaterAuth` and resolve the optional token.</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">        Returns `None` (the SDK has no global client object; the token,</span>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        when present, is exported to `API_USGS_PAT` by the auth).</span>
@@ -26707,7 +26735,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a `TemporalExtent`.</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        The whole window is fetched per site in one call (NWIS takes a</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        start/end range), so there is no per-date loop; `dates`</span>
@@ -26752,7 +26780,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the request bbox as modern `[west, south, east, north]`.</span>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        The legacy `&quot;west,south,east,north&quot;` string form is built inline by</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        `earthlens.usgs_water._helpers.query_kwargs` from this list.</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        :func:`earthlens.usgs_water._helpers.query_kwargs` from this list.</span>
 <a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-340" name="__codelineno-0-340"></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="p">]</span>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a>
@@ -26842,10 +26870,10 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-425" name="__codelineno-0-425"></a>
 <a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">        Widens the inherited `-&gt; list[Path]` contract: a tabular</span>
 <a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        backend returns in-memory long-format frames, not file paths</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">        (the write happens in `download` via `_write_table`).</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">        (the write happens in :meth:`download` via :meth:`_write_table`).</span>
 <a id="__codelineno-0-429" name="__codelineno-0-429"></a>
 <a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">            products: The list returned by `_search`.</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">            products: The list returned by :meth:`_search`.</span>
 <a id="__codelineno-0-432" name="__codelineno-0-432"></a>
 <a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">            list[pd.DataFrame]: One canonical long-schema frame per</span>
@@ -26857,7 +26885,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one product&#39;s service frame and normalise it.</span>
 <a id="__codelineno-0-441" name="__codelineno-0-441"></a>
 <a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">            product: One `RemoteProduct` from `_search`.</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
 <a id="__codelineno-0-444" name="__codelineno-0-444"></a>
 <a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">            pd.DataFrame: The canonical long-schema frame for this</span>
@@ -27241,7 +27269,7 @@ to the <code>API_USGS_PAT</code> env var, then anonymous access.</p>
             <td>
               <div class="doc-md-description">
                 <p>The NWIS / Water Data plane to query — one of
-<code>SERVICES</code>. Defaults to <code>"daily"</code>.</p>
+:data:<code>SERVICES</code>. Defaults to <code>"daily"</code>.</p>
               </div>
             </td>
             <td>
@@ -27538,7 +27566,7 @@ a flat list of parameter codes / names).</p>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">        api_token: Optional USGS Personal Access Token; falls back</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">            to the `API_USGS_PAT` env var, then anonymous access.</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">        service: The NWIS / Water Data plane to query — one of</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">            `SERVICES`. Defaults to `&quot;daily&quot;`.</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">            :data:`SERVICES`. Defaults to `&quot;daily&quot;`.</span>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        sites: Explicit USGS site number(s) to query, bypassing the</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">            bbox site discovery. **Required** for the services that</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">            have no spatial (bbox) filter — `peaks`, `ratings`, and</span>
@@ -27876,15 +27904,15 @@ was supplied.</p>
 
 
         <p>Resolve and hold the optional USGS Personal Access Token.</p>
-<p>Implements the <code>earthlens.base.AbstractAuth</code> contract for an
+<p>Implements the :class:<code>earthlens.base.AbstractAuth</code> contract for an
 <strong>optional</strong>-secret backend. Construction does not touch the
-environment; <code>configure</code> performs the resolution and is
+environment; :meth:<code>configure</code> performs the resolution and is
 idempotent. After <code>configure()</code>, the token (or <code>None</code> for
-anonymous) is available via the <code>token</code> property, and — when
+anonymous) is available via the :attr:<code>token</code> property, and — when
 a token was resolved — it is exported to the <code>API_USGS_PAT</code>
 environment variable so the <code>dataretrieval</code> SDK picks it up.</p>
 <p>The class is a context manager (inherited from
-<code>AbstractAuth</code>): <code>with UsgsWaterAuth(creds) as auth: ...</code>
+:class:<code>AbstractAuth</code>): <code>with UsgsWaterAuth(creds) as auth: ...</code>
 calls <code>configure()</code> on enter and the default no-op <code>close()</code> on
 exit.</p>
 
@@ -27905,7 +27933,7 @@ exit.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>UsgsWaterCredentials</code> passed at
+                <p>The :class:<code>UsgsWaterCredentials</code> passed at
 construction.</p>
               </div>
             </td>
@@ -28051,21 +28079,21 @@ construction.</p>
 <span class="normal"><a href="#__codelineno-0-182">182</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="k">class</span><span class="w"> </span><span class="nc">UsgsWaterAuth</span><span class="p">(</span><span class="n">AbstractAuth</span><span class="p">[</span><span class="n">UsgsWaterCredentials</span><span class="p">]):</span>
 <a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve and hold the optional USGS Personal Access Token.</span>
 <a id="__codelineno-0-85" name="__codelineno-0-85"></a>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">    Implements the `earthlens.base.AbstractAuth` contract for an</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">    Implements the :class:`earthlens.base.AbstractAuth` contract for an</span>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    **optional**-secret backend. Construction does not touch the</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    environment; `configure` performs the resolution and is</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    environment; :meth:`configure` performs the resolution and is</span>
 <a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    idempotent. After `configure()`, the token (or `None` for</span>
-<a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">    anonymous) is available via the `token` property, and — when</span>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">    anonymous) is available via the :attr:`token` property, and — when</span>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    a token was resolved — it is exported to the `API_USGS_PAT`</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">    environment variable so the `dataretrieval` SDK picks it up.</span>
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a>
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">    The class is a context manager (inherited from</span>
-<a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    `AbstractAuth`): `with UsgsWaterAuth(creds) as auth: ...`</span>
+<a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    :class:`AbstractAuth`): `with UsgsWaterAuth(creds) as auth: ...`</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">    calls `configure()` on enter and the default no-op `close()` on</span>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    exit.</span>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">        _creds: The `UsgsWaterCredentials` passed at</span>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">        _creds: The :class:`UsgsWaterCredentials` passed at</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">            construction.</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    Examples:</span>
@@ -28101,7 +28129,7 @@ construction.</p>
 <a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store credentials; does not resolve the token yet.</span>
 <a id="__codelineno-0-134" name="__codelineno-0-134"></a>
 <a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">            credentials: The `UsgsWaterCredentials` value object</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">            credentials: The :class:`UsgsWaterCredentials` value object</span>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a><span class="sd">                carrying the optional token.</span>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-139" name="__codelineno-0-139"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
@@ -28116,12 +28144,12 @@ construction.</p>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve the optional token and export it to the environment.</span>
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">        Idempotent — short-circuits when `is_authenticated`</span>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">        Idempotent — short-circuits when :meth:`is_authenticated`</span>
 <a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">        already returns `True`. Resolves the token in this order: the</span>
 <a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">        explicit `api_token` on the credentials, then the</span>
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">        `API_USGS_PAT` environment variable. When a token is found it</span>
 <a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">        is written back to `API_USGS_PAT` (the channel `dataretrieval`</span>
-<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">        reads) and `is_authenticated` flips to `True`. When none</span>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">        reads) and :meth:`is_authenticated` flips to `True`. When none</span>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">        is found this is a **no-op** — the request runs anonymously</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">        (rate-limited) and no error is raised.</span>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -28141,7 +28169,7 @@ construction.</p>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">token</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved PAT, or `None` for anonymous access.</span>
 <a id="__codelineno-0-175" name="__codelineno-0-175"></a>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">        Valid after `configure`; returns `None` both before</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">        Valid after :meth:`configure`; returns `None` both before</span>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">        configuration and when no token was available (anonymous).</span>
 <a id="__codelineno-0-178" name="__codelineno-0-178"></a>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">        Returns:</span>
@@ -28178,7 +28206,7 @@ construction.</p>
     <div class="doc doc-contents ">
 
         <p>The resolved PAT, or <code>None</code> for anonymous access.</p>
-<p>Valid after <code>configure</code>; returns <code>None</code> both before
+<p>Valid after :meth:<code>configure</code>; returns <code>None</code> both before
 configuration and when no token was available (anonymous).</p>
 
 
@@ -28245,7 +28273,7 @@ configuration and when no token was available (anonymous).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>UsgsWaterCredentials</code> value object
+                <p>The :class:<code>UsgsWaterCredentials</code> value object
 carrying the optional token.</p>
               </div>
             </td>
@@ -28272,7 +28300,7 @@ carrying the optional token.</p>
 <a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Store credentials; does not resolve the token yet.</span>
 <a id="__codelineno-0-134" name="__codelineno-0-134"></a>
 <a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">        credentials: The `UsgsWaterCredentials` value object</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">        credentials: The :class:`UsgsWaterCredentials` value object</span>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a><span class="sd">            carrying the optional token.</span>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-139" name="__codelineno-0-139"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
@@ -28296,12 +28324,12 @@ carrying the optional token.</p>
     <div class="doc doc-contents ">
 
         <p>Resolve the optional token and export it to the environment.</p>
-<p>Idempotent — short-circuits when <code>is_authenticated</code>
+<p>Idempotent — short-circuits when :meth:<code>is_authenticated</code>
 already returns <code>True</code>. Resolves the token in this order: the
 explicit <code>api_token</code> on the credentials, then the
 <code>API_USGS_PAT</code> environment variable. When a token is found it
 is written back to <code>API_USGS_PAT</code> (the channel <code>dataretrieval</code>
-reads) and <code>is_authenticated</code> flips to <code>True</code>. When none
+reads) and :meth:<code>is_authenticated</code> flips to <code>True</code>. When none
 is found this is a <strong>no-op</strong> — the request runs anonymously
 (rate-limited) and no error is raised.</p>
 
@@ -28333,12 +28361,12 @@ is found this is a <strong>no-op</strong> — the request runs anonymously
 <span class="normal"><a href="#__codelineno-0-170">170</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve the optional token and export it to the environment.</span>
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">    Idempotent — short-circuits when `is_authenticated`</span>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">    Idempotent — short-circuits when :meth:`is_authenticated`</span>
 <a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">    already returns `True`. Resolves the token in this order: the</span>
 <a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">    explicit `api_token` on the credentials, then the</span>
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">    `API_USGS_PAT` environment variable. When a token is found it</span>
 <a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    is written back to `API_USGS_PAT` (the channel `dataretrieval`</span>
-<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">    reads) and `is_authenticated` flips to `True`. When none</span>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">    reads) and :meth:`is_authenticated` flips to `True`. When none</span>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    is found this is a **no-op** — the request runs anonymously</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">    (rate-limited) and no error is raised.</span>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -28387,7 +28415,7 @@ is found this is a <strong>no-op</strong> — the request runs anonymously
         <p>Frozen value object holding the optional USGS PAT.</p>
 <p>The token is optional at construction time: <code>None</code> means "resolve
 from the <code>API_USGS_PAT</code> environment variable at
-<code>UsgsWaterAuth.configure</code> time, and if that is also unset,
+:meth:<code>UsgsWaterAuth.configure</code> time, and if that is also unset,
 run anonymously".</p>
 
 
@@ -28409,7 +28437,7 @@ run anonymously".</p>
             <td>
               <div class="doc-md-description">
                 <p>The USGS Personal Access Token, stored as a
-<code>pydantic.SecretStr</code> so it is never echoed by
+:class:<code>pydantic.SecretStr</code> so it is never echoed by
 <code>repr(creds)</code> or in logs. <code>None</code> defers resolution to the
 environment variable (and then to anonymous access).</p>
               </div>
@@ -28486,12 +28514,12 @@ environment variable (and then to anonymous access).</p>
 <a id="__codelineno-0-46" name="__codelineno-0-46"></a>
 <a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">    The token is optional at construction time: `None` means &quot;resolve</span>
 <a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="sd">    from the `API_USGS_PAT` environment variable at</span>
-<a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    `UsgsWaterAuth.configure` time, and if that is also unset,</span>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    :meth:`UsgsWaterAuth.configure` time, and if that is also unset,</span>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    run anonymously&quot;.</span>
 <a id="__codelineno-0-51" name="__codelineno-0-51"></a>
 <a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">        api_token: The USGS Personal Access Token, stored as a</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">            `pydantic.SecretStr` so it is never echoed by</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">            :class:`pydantic.SecretStr` so it is never echoed by</span>
 <a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">            `repr(creds)` or in logs. `None` defers resolution to the</span>
 <a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">            environment variable (and then to anonymous access).</span>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a>
@@ -28614,8 +28642,8 @@ stream gauges and many more groundwater / water-quality sites across the
 United States. A request is a bbox (or explicit <code>sites=</code>) + a time
 window + a list of <strong>NWIS parameter codes</strong> (<code>["00060"]</code> discharge,
 <code>["00065"]</code> gage height, …); the backend returns a per-site time-series
-as a long-format <code>pandas.DataFrame</code>, so <code>OUTPUT_KIND = "tabular"</code>
-and the <code>earthlens.earthlens.EarthLens</code> facade rejects an
+as a long-format :class:<code>pandas.DataFrame</code>, so <code>OUTPUT_KIND = "tabular"</code>
+and the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects an
 <code>aggregate=</code> argument (use the server-side <code>service="statistics"</code>
 rollup instead).</p>
 <p>The full NWIS / Water Data service surface is selectable via a
@@ -28636,7 +28664,7 @@ selects which:</p>
 </ul>
 <p>Authentication is an <strong>optional</strong> Personal Access Token (the
 <code>API_USGS_PAT</code> env var or the <code>api_token=</code> argument); anonymous access
-works at lower rate limits. See <code>earthlens.usgs_water.auth</code>.</p>
+works at lower rate limits. See :class:<code>earthlens.usgs_water.auth</code>.</p>
 
 
 
@@ -28678,12 +28706,12 @@ works at lower rate limits. See <code>earthlens.usgs_water.auth</code>.</p>
 <p>Fetches per-site water observations for a bbox / explicit sites /
 date window / parameter-code list through the same <code>download()</code>
 shape every other earthlens backend uses, and returns a
-long-format <code>pandas.DataFrame</code> (one row per observation).
-The query is a search/fetch split: <code>_search</code> enumerates the
-monitoring locations to pull, and <code>_fetch</code> pulls each
+long-format :class:<code>pandas.DataFrame</code> (one row per observation).
+The query is a search/fetch split: :meth:<code>_search</code> enumerates the
+monitoring locations to pull, and :meth:<code>_fetch</code> pulls each
 service's observations and normalises them to one tidy long schema.</p>
 <p>The <code>service=</code> argument selects the NWIS / Water Data plane (see
-<code>SERVICES</code>); <code>api=</code> selects the modern / legacy endpoint with
+:data:<code>SERVICES</code>); <code>api=</code> selects the modern / legacy endpoint with
 a 429 auto-fallback (see the module docstring). Authentication is
 an optional Personal Access Token.</p>
 
@@ -29225,13 +29253,13 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">    Fetches per-site water observations for a bbox / explicit sites /</span>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a><span class="sd">    date window / parameter-code list through the same `download()`</span>
 <a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    shape every other earthlens backend uses, and returns a</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">    long-format `pandas.DataFrame` (one row per observation).</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">    The query is a search/fetch split: `_search` enumerates the</span>
-<a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">    monitoring locations to pull, and `_fetch` pulls each</span>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">    long-format :class:`pandas.DataFrame` (one row per observation).</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">    The query is a search/fetch split: :meth:`_search` enumerates the</span>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">    monitoring locations to pull, and :meth:`_fetch` pulls each</span>
 <a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">    service&#39;s observations and normalises them to one tidy long schema.</span>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">    The `service=` argument selects the NWIS / Water Data plane (see</span>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">    `SERVICES`); `api=` selects the modern / legacy endpoint with</span>
+<a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">    :data:`SERVICES`); `api=` selects the modern / legacy endpoint with</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">    a 429 auto-fallback (see the module docstring). Authentication is</span>
 <a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">    an optional Personal Access Token.</span>
 <a id="__codelineno-0-142" name="__codelineno-0-142"></a>
@@ -29284,7 +29312,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">            api_token: Optional USGS Personal Access Token; falls back</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">                to the `API_USGS_PAT` env var, then anonymous access.</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">            service: The NWIS / Water Data plane to query — one of</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">                `SERVICES`. Defaults to `&quot;daily&quot;`.</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">                :data:`SERVICES`. Defaults to `&quot;daily&quot;`.</span>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">            sites: Explicit USGS site number(s) to query, bypassing the</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">                bbox site discovery. **Required** for the services that</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">                have no spatial (bbox) filter — `peaks`, `ratings`, and</span>
@@ -29363,7 +29391,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>        <span class="p">)</span>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build `UsgsWaterAuth` and resolve the optional token.</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build :class:`UsgsWaterAuth` and resolve the optional token.</span>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">        Returns `None` (the SDK has no global client object; the token,</span>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        when present, is exported to `API_USGS_PAT` by the auth).</span>
@@ -29385,7 +29413,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a `TemporalExtent`.</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        The whole window is fetched per site in one call (NWIS takes a</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        start/end range), so there is no per-date loop; `dates`</span>
@@ -29430,7 +29458,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the request bbox as modern `[west, south, east, north]`.</span>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        The legacy `&quot;west,south,east,north&quot;` string form is built inline by</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        `earthlens.usgs_water._helpers.query_kwargs` from this list.</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        :func:`earthlens.usgs_water._helpers.query_kwargs` from this list.</span>
 <a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-340" name="__codelineno-0-340"></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="p">]</span>
 <a id="__codelineno-0-341" name="__codelineno-0-341"></a>
@@ -29520,10 +29548,10 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-425" name="__codelineno-0-425"></a>
 <a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">        Widens the inherited `-&gt; list[Path]` contract: a tabular</span>
 <a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        backend returns in-memory long-format frames, not file paths</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">        (the write happens in `download` via `_write_table`).</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">        (the write happens in :meth:`download` via :meth:`_write_table`).</span>
 <a id="__codelineno-0-429" name="__codelineno-0-429"></a>
 <a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">            products: The list returned by `_search`.</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">            products: The list returned by :meth:`_search`.</span>
 <a id="__codelineno-0-432" name="__codelineno-0-432"></a>
 <a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">            list[pd.DataFrame]: One canonical long-schema frame per</span>
@@ -29535,7 +29563,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one product&#39;s service frame and normalise it.</span>
 <a id="__codelineno-0-441" name="__codelineno-0-441"></a>
 <a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">            product: One `RemoteProduct` from `_search`.</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
 <a id="__codelineno-0-444" name="__codelineno-0-444"></a>
 <a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">            pd.DataFrame: The canonical long-schema frame for this</span>
@@ -29919,7 +29947,7 @@ to the <code>API_USGS_PAT</code> env var, then anonymous access.</p>
             <td>
               <div class="doc-md-description">
                 <p>The NWIS / Water Data plane to query — one of
-<code>SERVICES</code>. Defaults to <code>"daily"</code>.</p>
+:data:<code>SERVICES</code>. Defaults to <code>"daily"</code>.</p>
               </div>
             </td>
             <td>
@@ -30216,7 +30244,7 @@ a flat list of parameter codes / names).</p>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">        api_token: Optional USGS Personal Access Token; falls back</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">            to the `API_USGS_PAT` env var, then anonymous access.</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">        service: The NWIS / Water Data plane to query — one of</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">            `SERVICES`. Defaults to `&quot;daily&quot;`.</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">            :data:`SERVICES`. Defaults to `&quot;daily&quot;`.</span>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        sites: Explicit USGS site number(s) to query, bypassing the</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">            bbox site discovery. **Required** for the services that</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">            have no spatial (bbox) filter — `peaks`, `ratings`, and</span>
@@ -30563,16 +30591,16 @@ discharge, <code>00065</code> gage height, <code>00010</code> water temperature,
 users think in names. This module is the name-to-code bridge plus light
 metadata (units, display name, parameter group, and which services the
 code is valid on).</p>
-<p><code>Catalog</code> is a thin <code>earthlens.base.AbstractCatalog</code>
+<p>:class:<code>Catalog</code> is a thin :class:<code>earthlens.base.AbstractCatalog</code>
 subclass that loads the bundled <code>usgs_water_data_catalog.yaml</code> and
-exposes each row as a <code>Parameter</code>. Resolve a single key with
-<code>Catalog.resolve</code> — which accepts either a friendly name
+exposes each row as a :class:<code>Parameter</code>. Resolve a single key with
+:meth:<code>Catalog.resolve</code> — which accepts either a friendly name
 (<code>"discharge"</code>) <strong>or</strong> a raw 5-digit code (<code>"00060"</code>, passed through
 unmapped), with a did-you-mean hint on an unknown name. The full ~25k
 USGS parameter-code table is <em>not</em> hand-curated here; the curated rows
 cover the common codes, and the refresh tool builds an informational
 <code>available_parameters</code> index from the live USGS reference table.</p>
-<p><code>CATALOG_PATH</code> is the path to the bundled YAML.</p>
+<p>:data:<code>CATALOG_PATH</code> is the path to the bundled YAML.</p>
 
 
 
@@ -30613,9 +30641,9 @@ cover the common codes, and the refresh tool builds an informational
         <p>Parameter-code catalog for the USGS Water backend.</p>
 <p>Reads the bundled <code>usgs_water_data_catalog.yaml</code> (shipped as
 package data) and exposes its <code>parameters:</code> block as a map of
-<code>Parameter</code> rows keyed by friendly name. Instantiate with no
+:class:<code>Parameter</code> rows keyed by friendly name. Instantiate with no
 arguments (<code>Catalog()</code>). Resolve a name or raw code with
-<code>resolve</code>, or a single row with <code>get_parameter</code>.</p>
+:meth:<code>resolve</code>, or a single row with :meth:<code>get_parameter</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -30640,7 +30668,7 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
             <td>
               <div class="doc-md-description">
                 <p>Map from the friendly parameter name to its
-<code>Parameter</code> row.</p>
+:class:<code>Parameter</code> row.</p>
               </div>
             </td>
           </tr>
@@ -30871,13 +30899,13 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a>
 <a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    Reads the bundled `usgs_water_data_catalog.yaml` (shipped as</span>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">    package data) and exposes its `parameters:` block as a map of</span>
-<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    `Parameter` rows keyed by friendly name. Instantiate with no</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    :class:`Parameter` rows keyed by friendly name. Instantiate with no</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">    arguments (`Catalog()`). Resolve a name or raw code with</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">    `resolve`, or a single row with `get_parameter`.</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">    :meth:`resolve`, or a single row with :meth:`get_parameter`.</span>
 <a id="__codelineno-0-160" name="__codelineno-0-160"></a>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">        parameters: Map from the friendly parameter name to its</span>
-<a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">            `Parameter` row.</span>
+<a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">            :class:`Parameter` row.</span>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a>
 <a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">        - Resolve a friendly name and a raw code:</span>
@@ -30904,10 +30932,10 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;USGS Water parameter catalog&quot;</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;parameters&quot;</span>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a>    <span class="c1">#: The parameter rows live in the base `datasets` field so the</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a>    <span class="c1">#: The parameter rows live in the base :attr:`datasets` field so the</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="c1">#: inherited dict surface (`len`, `in`, `[]`, iteration) and</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a>    <span class="c1">#: `get_dataset`&#39;s did-you-mean hint work unchanged. The field</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a>    <span class="c1">#: is narrowed here to `Parameter` values; `parameters`</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a>    <span class="c1">#: :meth:`get_dataset`&#39;s did-you-mean hint work unchanged. The field</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a>    <span class="c1">#: is narrowed here to :class:`Parameter` values; :attr:`parameters`</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a>    <span class="c1">#: is the domain-named read alias.</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a>
@@ -30935,11 +30963,11 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="nd">@property</span>
 <a id="__codelineno-0-220" name="__codelineno-0-220"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">]:</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The parameter map — alias for the base `datasets` field.</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The parameter map — alias for the base :attr:`datasets` field.</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">            dict[str, Parameter]: The same mapping stored in</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">                `datasets`.</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">                :attr:`datasets`.</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        Examples:</span>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            - The alias and the base field are the same object:</span>
@@ -30971,14 +30999,14 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">            ValueError: If the file has no `parameters:` block, or a row</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">                fails `Parameter` validation.</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">                fails :class:`Parameter` validation.</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
@@ -31005,9 +31033,9 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name to its `Parameter` row.</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name to its :class:`Parameter` row.</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        a `ValueError` with a did-you-mean hint on an unknown name.</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        Args:</span>
@@ -31041,7 +31069,7 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        A raw 5-digit code (`&quot;00060&quot;`) passes through unmapped — the</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        full USGS code table is far larger than the curated catalog, so</span>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        any valid code is accepted directly. A non-code string is</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        looked up as a friendly name via `get_parameter`.</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        looked up as a friendly name via :meth:`get_parameter`.</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">            code_or_name: A friendly name (`&quot;discharge&quot;`) or a raw</span>
@@ -31144,7 +31172,7 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 
     <div class="doc doc-contents ">
 
-        <p>The parameter map — alias for the base <code>datasets</code> field.</p>
+        <p>The parameter map — alias for the base :attr:<code>datasets</code> field.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -31163,7 +31191,7 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
             <td>
               <div class="doc-md-description">
                 <p>dict[str, Parameter]: The same mapping stored in
-<code>datasets</code>.</p>
+:attr:<code>datasets</code>.</p>
               </div>
             </td>
           </tr>
@@ -31201,8 +31229,8 @@ arguments (<code>Catalog()</code>). Resolve a name or raw code with
 
     <div class="doc doc-contents ">
 
-        <p>Resolve a friendly name to its <code>Parameter</code> row.</p>
-<p>Thin wrapper over the inherited <code>get_dataset</code>, which raises
+        <p>Resolve a friendly name to its :class:<code>Parameter</code> row.</p>
+<p>Thin wrapper over the inherited :meth:<code>get_dataset</code>, which raises
 a <code>ValueError</code> with a did-you-mean hint on an unknown name.</p>
 
 
@@ -31330,9 +31358,9 @@ adds a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-317">317</a></span>
 <span class="normal"><a href="#__codelineno-0-318">318</a></span>
 <span class="normal"><a href="#__codelineno-0-319">319</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name to its `Parameter` row.</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a friendly name to its :class:`Parameter` row.</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Thin wrapper over the inherited :meth:`get_dataset`, which raises</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    a `ValueError` with a did-you-mean hint on an unknown name.</span>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    Args:</span>
@@ -31404,7 +31432,7 @@ adds a did-you-mean hint.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the
-module-level <code>CATALOG_PATH</code>.</p>
+module-level :data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -31430,7 +31458,7 @@ module-level <code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -31454,7 +31482,7 @@ module-level <code>CATALOG_PATH</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>If the file has no <code>parameters:</code> block, or a row
-fails <code>Parameter</code> validation.</p>
+fails :class:<code>Parameter</code> validation.</p>
               </div>
             </td>
           </tr>
@@ -31486,14 +31514,14 @@ fails <code>Parameter</code> validation.</p>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        ValueError: If the file has no `parameters:` block, or a row</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            fails `Parameter` validation.</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            fails :class:`Parameter` validation.</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)))</span>
@@ -31518,7 +31546,7 @@ fails <code>Parameter</code> validation.</p>
 <p>A raw 5-digit code (<code>"00060"</code>) passes through unmapped — the
 full USGS code table is far larger than the curated catalog, so
 any valid code is accepted directly. A non-code string is
-looked up as a friendly name via <code>get_parameter</code>.</p>
+looked up as a friendly name via :meth:<code>get_parameter</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -31629,7 +31657,7 @@ a known friendly name (with a did-you-mean hint).</p>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    A raw 5-digit code (`&quot;00060&quot;`) passes through unmapped — the</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">    full USGS code table is far larger than the curated catalog, so</span>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    any valid code is accepted directly. A non-code string is</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">    looked up as a friendly name via `get_parameter`.</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">    looked up as a friendly name via :meth:`get_parameter`.</span>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        code_or_name: A friendly name (`&quot;discharge&quot;`) or a raw</span>
@@ -31678,8 +31706,8 @@ a known friendly name (with a did-you-mean hint).</p>
 
         <p>One NWIS parameter code's catalog row.</p>
 <p>The user-facing name is the parent key in
-<code>Catalog.parameters</code> and is also stored on the row as
-<code>name</code> so a resolved <code>Parameter</code> is self-describing.</p>
+:attr:<code>Catalog.parameters</code> and is also stored on the row as
+:attr:<code>name</code> so a resolved :class:<code>Parameter</code> is self-describing.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -31744,7 +31772,7 @@ a known friendly name (with a did-you-mean hint).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>earthlens.usgs_water.backend.SERVICES</code>
+                <p>The :data:<code>earthlens.usgs_water.backend.SERVICES</code>
 this code is typically available on (<code>["daily",
 "instantaneous"]</code>).</p>
               </div>
@@ -31821,8 +31849,8 @@ this code is typically available on (<code>["daily",
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One NWIS parameter code&#39;s catalog row.</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">    The user-facing name is the parent key in</span>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">    `Catalog.parameters` and is also stored on the row as</span>
-<a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">    `name` so a resolved `Parameter` is self-describing.</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">    :attr:`Catalog.parameters` and is also stored on the row as</span>
+<a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">    :attr:`name` so a resolved :class:`Parameter` is self-describing.</span>
 <a id="__codelineno-0-113" name="__codelineno-0-113"></a>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">        code: The 5-digit NWIS parameter code (`&quot;00060&quot;`).</span>
@@ -31830,7 +31858,7 @@ this code is typically available on (<code>["daily",
 <a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="sd">        units: The reporting units (`&quot;ft3/s&quot;`, `&quot;degC&quot;`).</span>
 <a id="__codelineno-0-118" name="__codelineno-0-118"></a><span class="sd">        group: Coarse USGS classification (`&quot;Physical&quot;`, `&quot;Nutrients&quot;`,</span>
 <a id="__codelineno-0-119" name="__codelineno-0-119"></a><span class="sd">            …).</span>
-<a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="sd">        services: The `earthlens.usgs_water.backend.SERVICES`</span>
+<a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="sd">        services: The :data:`earthlens.usgs_water.backend.SERVICES`</span>
 <a id="__codelineno-0-121" name="__codelineno-0-121"></a><span class="sd">            this code is typically available on (`[&quot;daily&quot;,</span>
 <a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">            &quot;instantaneous&quot;]`).</span>
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a>
@@ -31949,7 +31977,7 @@ entry on its own.</p>
     <div class="doc doc-contents first">
 
         <p>Optional Personal Access Token resolution for the USGS Water backend.</p>
-<p>Hosts <code>UsgsWaterAuth</code>, an <code>earthlens.base.AbstractAuth</code>
+<p>Hosts :class:<code>UsgsWaterAuth</code>, an :class:<code>earthlens.base.AbstractAuth</code>
 subclass that resolves an <strong>optional</strong> USGS Personal Access Token (PAT)
 from, in priority order, an explicit <code>api_token=</code> argument or the
 <code>API_USGS_PAT</code> environment variable. Unlike the OpenAQ backend (whose
@@ -31960,18 +31988,18 @@ token: when none is found, the backend runs anonymously (the modern
 the backend handles by falling back to the legacy endpoint).</p>
 <p>The shape:</p>
 <ul>
-<li><code>UsgsWaterCredentials</code> is a frozen pydantic value object
-  carrying the optional token as a <code>pydantic.SecretStr</code>.</li>
-<li><code>UsgsWaterAuth</code> binds those credentials and, in
-  <code>UsgsWaterAuth.configure</code>, resolves the token (explicit then
+<li>:class:<code>UsgsWaterCredentials</code> is a frozen pydantic value object
+  carrying the optional token as a :class:<code>pydantic.SecretStr</code>.</li>
+<li>:class:<code>UsgsWaterAuth</code> binds those credentials and, in
+  :meth:<code>UsgsWaterAuth.configure</code>, resolves the token (explicit then
   env var) and — when one is present — exports it back to the
   <code>API_USGS_PAT</code> environment variable, which is the channel the
   <code>dataretrieval</code> SDK reads. <code>configure()</code> is a no-op when anonymous.</li>
-<li><code>UsgsWaterAuth.is_authenticated</code> reports whether a token was
+<li>:meth:<code>UsgsWaterAuth.is_authenticated</code> reports whether a token was
   resolved (i.e. whether the request is token-backed or anonymous);
   both are valid operating modes.</li>
 </ul>
-<p>The resolved token is read back via the <code>UsgsWaterAuth.token</code>
+<p>The resolved token is read back via the :attr:<code>UsgsWaterAuth.token</code>
 property (which returns <code>None</code> when anonymous).</p>
 
 
@@ -32011,15 +32039,15 @@ property (which returns <code>None</code> when anonymous).</p>
 
 
         <p>Resolve and hold the optional USGS Personal Access Token.</p>
-<p>Implements the <code>earthlens.base.AbstractAuth</code> contract for an
+<p>Implements the :class:<code>earthlens.base.AbstractAuth</code> contract for an
 <strong>optional</strong>-secret backend. Construction does not touch the
-environment; <code>configure</code> performs the resolution and is
+environment; :meth:<code>configure</code> performs the resolution and is
 idempotent. After <code>configure()</code>, the token (or <code>None</code> for
-anonymous) is available via the <code>token</code> property, and — when
+anonymous) is available via the :attr:<code>token</code> property, and — when
 a token was resolved — it is exported to the <code>API_USGS_PAT</code>
 environment variable so the <code>dataretrieval</code> SDK picks it up.</p>
 <p>The class is a context manager (inherited from
-<code>AbstractAuth</code>): <code>with UsgsWaterAuth(creds) as auth: ...</code>
+:class:<code>AbstractAuth</code>): <code>with UsgsWaterAuth(creds) as auth: ...</code>
 calls <code>configure()</code> on enter and the default no-op <code>close()</code> on
 exit.</p>
 
@@ -32040,7 +32068,7 @@ exit.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>UsgsWaterCredentials</code> passed at
+                <p>The :class:<code>UsgsWaterCredentials</code> passed at
 construction.</p>
               </div>
             </td>
@@ -32186,21 +32214,21 @@ construction.</p>
 <span class="normal"><a href="#__codelineno-0-182">182</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="k">class</span><span class="w"> </span><span class="nc">UsgsWaterAuth</span><span class="p">(</span><span class="n">AbstractAuth</span><span class="p">[</span><span class="n">UsgsWaterCredentials</span><span class="p">]):</span>
 <a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve and hold the optional USGS Personal Access Token.</span>
 <a id="__codelineno-0-85" name="__codelineno-0-85"></a>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">    Implements the `earthlens.base.AbstractAuth` contract for an</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">    Implements the :class:`earthlens.base.AbstractAuth` contract for an</span>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    **optional**-secret backend. Construction does not touch the</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    environment; `configure` performs the resolution and is</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    environment; :meth:`configure` performs the resolution and is</span>
 <a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    idempotent. After `configure()`, the token (or `None` for</span>
-<a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">    anonymous) is available via the `token` property, and — when</span>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">    anonymous) is available via the :attr:`token` property, and — when</span>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    a token was resolved — it is exported to the `API_USGS_PAT`</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">    environment variable so the `dataretrieval` SDK picks it up.</span>
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a>
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">    The class is a context manager (inherited from</span>
-<a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    `AbstractAuth`): `with UsgsWaterAuth(creds) as auth: ...`</span>
+<a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    :class:`AbstractAuth`): `with UsgsWaterAuth(creds) as auth: ...`</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">    calls `configure()` on enter and the default no-op `close()` on</span>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    exit.</span>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">        _creds: The `UsgsWaterCredentials` passed at</span>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">        _creds: The :class:`UsgsWaterCredentials` passed at</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">            construction.</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    Examples:</span>
@@ -32236,7 +32264,7 @@ construction.</p>
 <a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store credentials; does not resolve the token yet.</span>
 <a id="__codelineno-0-134" name="__codelineno-0-134"></a>
 <a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">            credentials: The `UsgsWaterCredentials` value object</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">            credentials: The :class:`UsgsWaterCredentials` value object</span>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a><span class="sd">                carrying the optional token.</span>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-139" name="__codelineno-0-139"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
@@ -32251,12 +32279,12 @@ construction.</p>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve the optional token and export it to the environment.</span>
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">        Idempotent — short-circuits when `is_authenticated`</span>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">        Idempotent — short-circuits when :meth:`is_authenticated`</span>
 <a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">        already returns `True`. Resolves the token in this order: the</span>
 <a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">        explicit `api_token` on the credentials, then the</span>
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">        `API_USGS_PAT` environment variable. When a token is found it</span>
 <a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">        is written back to `API_USGS_PAT` (the channel `dataretrieval`</span>
-<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">        reads) and `is_authenticated` flips to `True`. When none</span>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">        reads) and :meth:`is_authenticated` flips to `True`. When none</span>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">        is found this is a **no-op** — the request runs anonymously</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">        (rate-limited) and no error is raised.</span>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -32276,7 +32304,7 @@ construction.</p>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">token</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved PAT, or `None` for anonymous access.</span>
 <a id="__codelineno-0-175" name="__codelineno-0-175"></a>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">        Valid after `configure`; returns `None` both before</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">        Valid after :meth:`configure`; returns `None` both before</span>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">        configuration and when no token was available (anonymous).</span>
 <a id="__codelineno-0-178" name="__codelineno-0-178"></a>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">        Returns:</span>
@@ -32313,7 +32341,7 @@ construction.</p>
     <div class="doc doc-contents ">
 
         <p>The resolved PAT, or <code>None</code> for anonymous access.</p>
-<p>Valid after <code>configure</code>; returns <code>None</code> both before
+<p>Valid after :meth:<code>configure</code>; returns <code>None</code> both before
 configuration and when no token was available (anonymous).</p>
 
 
@@ -32380,7 +32408,7 @@ configuration and when no token was available (anonymous).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>UsgsWaterCredentials</code> value object
+                <p>The :class:<code>UsgsWaterCredentials</code> value object
 carrying the optional token.</p>
               </div>
             </td>
@@ -32407,7 +32435,7 @@ carrying the optional token.</p>
 <a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Store credentials; does not resolve the token yet.</span>
 <a id="__codelineno-0-134" name="__codelineno-0-134"></a>
 <a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">        credentials: The `UsgsWaterCredentials` value object</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">        credentials: The :class:`UsgsWaterCredentials` value object</span>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a><span class="sd">            carrying the optional token.</span>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-139" name="__codelineno-0-139"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
@@ -32431,12 +32459,12 @@ carrying the optional token.</p>
     <div class="doc doc-contents ">
 
         <p>Resolve the optional token and export it to the environment.</p>
-<p>Idempotent — short-circuits when <code>is_authenticated</code>
+<p>Idempotent — short-circuits when :meth:<code>is_authenticated</code>
 already returns <code>True</code>. Resolves the token in this order: the
 explicit <code>api_token</code> on the credentials, then the
 <code>API_USGS_PAT</code> environment variable. When a token is found it
 is written back to <code>API_USGS_PAT</code> (the channel <code>dataretrieval</code>
-reads) and <code>is_authenticated</code> flips to <code>True</code>. When none
+reads) and :meth:<code>is_authenticated</code> flips to <code>True</code>. When none
 is found this is a <strong>no-op</strong> — the request runs anonymously
 (rate-limited) and no error is raised.</p>
 
@@ -32468,12 +32496,12 @@ is found this is a <strong>no-op</strong> — the request runs anonymously
 <span class="normal"><a href="#__codelineno-0-170">170</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve the optional token and export it to the environment.</span>
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">    Idempotent — short-circuits when `is_authenticated`</span>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">    Idempotent — short-circuits when :meth:`is_authenticated`</span>
 <a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">    already returns `True`. Resolves the token in this order: the</span>
 <a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">    explicit `api_token` on the credentials, then the</span>
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">    `API_USGS_PAT` environment variable. When a token is found it</span>
 <a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    is written back to `API_USGS_PAT` (the channel `dataretrieval`</span>
-<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">    reads) and `is_authenticated` flips to `True`. When none</span>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">    reads) and :meth:`is_authenticated` flips to `True`. When none</span>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    is found this is a **no-op** — the request runs anonymously</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">    (rate-limited) and no error is raised.</span>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -32522,7 +32550,7 @@ is found this is a <strong>no-op</strong> — the request runs anonymously
         <p>Frozen value object holding the optional USGS PAT.</p>
 <p>The token is optional at construction time: <code>None</code> means "resolve
 from the <code>API_USGS_PAT</code> environment variable at
-<code>UsgsWaterAuth.configure</code> time, and if that is also unset,
+:meth:<code>UsgsWaterAuth.configure</code> time, and if that is also unset,
 run anonymously".</p>
 
 
@@ -32544,7 +32572,7 @@ run anonymously".</p>
             <td>
               <div class="doc-md-description">
                 <p>The USGS Personal Access Token, stored as a
-<code>pydantic.SecretStr</code> so it is never echoed by
+:class:<code>pydantic.SecretStr</code> so it is never echoed by
 <code>repr(creds)</code> or in logs. <code>None</code> defers resolution to the
 environment variable (and then to anonymous access).</p>
               </div>
@@ -32621,12 +32649,12 @@ environment variable (and then to anonymous access).</p>
 <a id="__codelineno-0-46" name="__codelineno-0-46"></a>
 <a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">    The token is optional at construction time: `None` means &quot;resolve</span>
 <a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="sd">    from the `API_USGS_PAT` environment variable at</span>
-<a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    `UsgsWaterAuth.configure` time, and if that is also unset,</span>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    :meth:`UsgsWaterAuth.configure` time, and if that is also unset,</span>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    run anonymously&quot;.</span>
 <a id="__codelineno-0-51" name="__codelineno-0-51"></a>
 <a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">        api_token: The USGS Personal Access Token, stored as a</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">            `pydantic.SecretStr` so it is never echoed by</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">            :class:`pydantic.SecretStr` so it is never echoed by</span>
 <a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">            `repr(creds)` or in logs. `None` defers resolution to the</span>
 <a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">            environment variable (and then to anonymous access).</span>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a>

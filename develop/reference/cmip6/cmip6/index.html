@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -804,6 +804,34 @@
     
   
     Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
   
 
     
@@ -25063,16 +25091,16 @@ imports <code>xarray</code> / <code>zarr</code> / <code>gcsfs</code> — pyramid
 multidim driver, read anonymously; no gcsfs needed).</p>
 <p>Public surface (re-exported from this package):</p>
 <ul>
-<li><code>CMIP6</code> — the backend; instantiate with a date window, a bbox, and a
+<li>:class:<code>CMIP6</code> — the backend; instantiate with a date window, a bbox, and a
   facet tuple (<code>source_id</code> / <code>experiment_id</code> / <code>variable_id</code> / <code>table_id</code>), then
-  call <code>CMIP6.download</code>.</li>
-<li><code>Catalog</code> — loader for the bundled <code>cmip6_data_catalog.yaml</code> (config +
+  call :meth:<code>CMIP6.download</code>.</li>
+<li>:class:<code>Catalog</code> — loader for the bundled <code>cmip6_data_catalog.yaml</code> (config +
   curated vocabulary).</li>
-<li><code>Cmip6Variable</code> / <code>Experiment</code> / <code>Table</code> / <code>Source</code>
+<li>:class:<code>Cmip6Variable</code> / :class:<code>Experiment</code> / :class:<code>Table</code> / :class:<code>Source</code>
   — one curated variable / experiment / table / source row.</li>
-<li><code>CATALOG_PATH</code> — path to the bundled YAML; monkey-patchable in tests.</li>
-<li><code>clear_catalog_cache</code> — empty the catalog parse cache.</li>
-<li><code>StoreResolver</code> / <code>ResolvedStore</code> — facet -&gt; <code>zstore</code> resolution
+<li>:data:<code>CATALOG_PATH</code> — path to the bundled YAML; monkey-patchable in tests.</li>
+<li>:func:<code>clear_catalog_cache</code> — empty the catalog parse cache.</li>
+<li>:class:<code>StoreResolver</code> / :class:<code>ResolvedStore</code> — facet -&gt; <code>zstore</code> resolution
   over the consolidated-stores CSV.</li>
 </ul>
 
@@ -25513,10 +25541,10 @@ one gridded NetCDF per resolved store.</p>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">            temporal_resolution: Advisory cadence label (fixed by `table_id`).</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">            path: Output directory for the written NetCDFs.</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">            fmt: `strptime` format for `start` / `end`.</span>
-<a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">            catalog: Optional pre-built `Catalog`; defaults to the</span>
+<a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">            catalog: Optional pre-built :class:`Catalog`; defaults to the</span>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">                bundled catalog.</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">            resolver: Optional pre-built</span>
-<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">                `StoreResolver`; defaults to one</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">                :class:`~earthlens.cmip6.resolver.StoreResolver`; defaults to one</span>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">                built from the catalog&#39;s CSV URL and facet columns.</span>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a>
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">        Raises:</span>
@@ -25575,7 +25603,7 @@ one gridded NetCDF per resolved store.</p>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_input_dates</span><span class="p">(</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a `TemporalExtent`.</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a>
 <a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            start: Inclusive window start.</span>
@@ -25651,7 +25679,7 @@ one gridded NetCDF per resolved store.</p>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        bbox)` window through pyramids and write it to NetCDF.</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            products: The products from `_search`.</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            products: The products from :meth:`_search`.</span>
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            list[Path]: One written NetCDF path per store, in order.</span>
@@ -25693,7 +25721,7 @@ one gridded NetCDF per resolved store.</p>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            store: The resolved store to read.</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            The integer time selector for `accessor.write_subset` — a</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            The integer time selector for :func:`accessor.write_subset` — a</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            `(i0, i1)` index range for the date window, or `slice(None)` for a</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            `whole_time` request.</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -25720,8 +25748,8 @@ one gridded NetCDF per resolved store.</p>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested CMIP6 subset(s) and return the written paths.</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        Runs the cheap `_search` (facet -&gt; `zstore` resolution) then</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        `_fetch`, which writes one bbox/time NetCDF subset per resolved</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        Runs the cheap :meth:`_search` (facet -&gt; `zstore` resolution) then</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        :meth:`_fetch`, which writes one bbox/time NetCDF subset per resolved</span>
 <a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        store.</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        Args:</span>
@@ -26050,7 +26078,7 @@ series (warned). Defaults to <code>False</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional pre-built <code>Catalog</code>; defaults to the
+                <p>Optional pre-built :class:<code>Catalog</code>; defaults to the
 bundled catalog.</p>
               </div>
             </td>
@@ -26068,7 +26096,7 @@ bundled catalog.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional pre-built
-<code>StoreResolver</code>; defaults to one
+:class:<code>~earthlens.cmip6.resolver.StoreResolver</code>; defaults to one
 built from the catalog's CSV URL and facet columns.</p>
               </div>
             </td>
@@ -26259,10 +26287,10 @@ built from the catalog's CSV URL and facet columns.</p>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">        temporal_resolution: Advisory cadence label (fixed by `table_id`).</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">        path: Output directory for the written NetCDFs.</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">        fmt: `strptime` format for `start` / `end`.</span>
-<a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">        catalog: Optional pre-built `Catalog`; defaults to the</span>
+<a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">        catalog: Optional pre-built :class:`Catalog`; defaults to the</span>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">            bundled catalog.</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">        resolver: Optional pre-built</span>
-<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">            `StoreResolver`; defaults to one</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">            :class:`~earthlens.cmip6.resolver.StoreResolver`; defaults to one</span>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">            built from the catalog&#39;s CSV URL and facet columns.</span>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a>
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">    Raises:</span>
@@ -26335,8 +26363,8 @@ built from the catalog's CSV URL and facet columns.</p>
     <div class="doc doc-contents ">
 
         <p>Fetch the requested CMIP6 subset(s) and return the written paths.</p>
-<p>Runs the cheap <code>_search</code> (facet -&gt; <code>zstore</code> resolution) then
-<code>_fetch</code>, which writes one bbox/time NetCDF subset per resolved
+<p>Runs the cheap :meth:<code>_search</code> (facet -&gt; <code>zstore</code> resolution) then
+:meth:<code>_fetch</code>, which writes one bbox/time NetCDF subset per resolved
 store.</p>
 
 
@@ -26449,8 +26477,8 @@ returning an empty list).</p>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested CMIP6 subset(s) and return the written paths.</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Runs the cheap `_search` (facet -&gt; `zstore` resolution) then</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    `_fetch`, which writes one bbox/time NetCDF subset per resolved</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Runs the cheap :meth:`_search` (facet -&gt; `zstore` resolution) then</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    :meth:`_fetch`, which writes one bbox/time NetCDF subset per resolved</span>
 <a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    store.</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    Args:</span>
@@ -26557,12 +26585,12 @@ returning an empty list).</p>
 
         <p>Config + curated-vocabulary catalog for the CMIP6 backend.</p>
 <p>Reads the bundled <code>cmip6_data_catalog.yaml</code> (shipped as package data) and
-exposes its <code>variables:</code> block as a map of <code>Cmip6Variable</code> rows keyed
-by <code>variable_id</code> under the inherited <code>datasets</code> field, plus parallel
-<code>experiments</code>, <code>tables</code>, and <code>sources</code> maps and the
-resolution config (<code>csv_url</code>, <code>bucket</code>, <code>facet_columns</code>,
-<code>default_member_id</code>, <code>default_version</code>). Instantiate with no
-arguments (<code>Catalog()</code>); <code>model_post_init</code> loads and validates the YAML
+exposes its <code>variables:</code> block as a map of :class:<code>Cmip6Variable</code> rows keyed
+by <code>variable_id</code> under the inherited :attr:<code>datasets</code> field, plus parallel
+:attr:<code>experiments</code>, :attr:<code>tables</code>, and :attr:<code>sources</code> maps and the
+resolution config (:attr:<code>csv_url</code>, :attr:<code>bucket</code>, :attr:<code>facet_columns</code>,
+:attr:<code>default_member_id</code>, :attr:<code>default_version</code>). Instantiate with no
+arguments (<code>Catalog()</code>); :func:<code>model_post_init</code> loads and validates the YAML
 in one pass and caches it by <code>(path, mtime)</code>.</p>
 
 
@@ -26649,7 +26677,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from <code>variable_id</code> to its <code>Cmip6Variable</code> row.</p>
+                <p>Map from <code>variable_id</code> to its :class:<code>Cmip6Variable</code> row.</p>
               </div>
             </td>
           </tr>
@@ -26660,7 +26688,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from <code>experiment_id</code> to its <code>Experiment</code> row.</p>
+                <p>Map from <code>experiment_id</code> to its :class:<code>Experiment</code> row.</p>
               </div>
             </td>
           </tr>
@@ -26671,7 +26699,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from <code>table_id</code> to its <code>Table</code> row.</p>
+                <p>Map from <code>table_id</code> to its :class:<code>Table</code> row.</p>
               </div>
             </td>
           </tr>
@@ -26682,7 +26710,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from <code>source_id</code> to its <code>Source</code> row.</p>
+                <p>Map from <code>source_id</code> to its :class:<code>Source</code> row.</p>
               </div>
             </td>
           </tr>
@@ -26941,12 +26969,12 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Config + curated-vocabulary catalog for the CMIP6 backend.</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">    Reads the bundled `cmip6_data_catalog.yaml` (shipped as package data) and</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    exposes its `variables:` block as a map of `Cmip6Variable` rows keyed</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    by `variable_id` under the inherited `datasets` field, plus parallel</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    `experiments`, `tables`, and `sources` maps and the</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    resolution config (`csv_url`, `bucket`, `facet_columns`,</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    `default_member_id`, `default_version`). Instantiate with no</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    arguments (`Catalog()`); `model_post_init` loads and validates the YAML</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    exposes its `variables:` block as a map of :class:`Cmip6Variable` rows keyed</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    by `variable_id` under the inherited :attr:`datasets` field, plus parallel</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    :attr:`experiments`, :attr:`tables`, and :attr:`sources` maps and the</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    resolution config (:attr:`csv_url`, :attr:`bucket`, :attr:`facet_columns`,</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    :attr:`default_member_id`, :attr:`default_version`). Instantiate with no</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    arguments (`Catalog()`); :func:`model_post_init` loads and validates the YAML</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    in one pass and caches it by `(path, mtime)`.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Attributes:</span>
@@ -26956,10 +26984,10 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        default_member_id: Member label applied when a request omits it.</span>
 <a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        default_version: Version-selection policy (`&quot;latest&quot;`).</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        default_terms_note: Attribution fallback for an uncurated source.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        datasets: Map from `variable_id` to its `Cmip6Variable` row.</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        experiments: Map from `experiment_id` to its `Experiment` row.</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        tables: Map from `table_id` to its `Table` row.</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        sources: Map from `source_id` to its `Source` row.</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        datasets: Map from `variable_id` to its :class:`Cmip6Variable` row.</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        experiments: Map from `experiment_id` to its :class:`Experiment` row.</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        tables: Map from `table_id` to its :class:`Table` row.</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        sources: Map from `source_id` to its :class:`Source` row.</span>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        - List curated variables and resolve one:</span>
@@ -27003,13 +27031,13 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no variables were supplied.</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        `Catalog()` with no args reads `CATALOG_PATH` (cached by</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        `(path, mtime)`); passing `datasets=...` skips the disk read (used in</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">        tests). Either way the `available_datasets` index is derived from the</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        loaded variable map.</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            ValueError: Propagated from `load` when the YAML is missing,</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            ValueError: Propagated from :meth:`load` when the YAML is missing,</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">                empty, or has a malformed row.</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">csv_url</span><span class="p">:</span>
@@ -27032,10 +27060,10 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">                `CATALOG_PATH`.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file is missing</span>
@@ -27071,7 +27099,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-355" name="__codelineno-0-355"></a>        <span class="k">return</span> <span class="n">out</span>
 <a id="__codelineno-0-356" name="__codelineno-0-356"></a>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Experiment</span><span class="p">:</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Experiment` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Experiment` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            key: An `experiment_id` (`&quot;ssp585&quot;`, `&quot;historical&quot;`).</span>
@@ -27085,7 +27113,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Experiment&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="s2">&quot;experiment&quot;</span><span class="p">))</span>
 <a id="__codelineno-0-370" name="__codelineno-0-370"></a>
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Table</span><span class="p">:</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Table` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Table` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">            key: A `table_id` (`&quot;Amon&quot;`, `&quot;day&quot;`, `&quot;Omon&quot;`).</span>
@@ -27099,7 +27127,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-383" name="__codelineno-0-383"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Table&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="s2">&quot;table&quot;</span><span class="p">))</span>
 <a id="__codelineno-0-384" name="__codelineno-0-384"></a>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Source</span><span class="p">:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Source` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Source` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            key: A `source_id` (`&quot;CanESM5&quot;`, `&quot;GFDL-ESM4&quot;`).</span>
@@ -27115,7 +27143,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">terms_note</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the attribution note for `source_id`.</span>
 <a id="__codelineno-0-401" name="__codelineno-0-401"></a>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        Falls back to `default_terms_note` for an uncurated source (or a</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        Falls back to :attr:`default_terms_note` for an uncurated source (or a</span>
 <a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">        curated one with no per-model note).</span>
 <a id="__codelineno-0-404" name="__codelineno-0-404"></a>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        Args:</span>
@@ -27182,7 +27210,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>Experiment</code> for <code>key</code>, with a did-you-mean hint.</p>
+        <p>Return the :class:<code>Experiment</code> for <code>key</code>, with a did-you-mean hint.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -27277,7 +27305,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <span class="normal"><a href="#__codelineno-0-367">367</a></span>
 <span class="normal"><a href="#__codelineno-0-368">368</a></span>
 <span class="normal"><a href="#__codelineno-0-369">369</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Experiment</span><span class="p">:</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Experiment` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Experiment` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        key: An `experiment_id` (`&quot;ssp585&quot;`, `&quot;historical&quot;`).</span>
@@ -27306,7 +27334,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>Source</code> for <code>key</code>, with a did-you-mean hint.</p>
+        <p>Return the :class:<code>Source</code> for <code>key</code>, with a did-you-mean hint.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -27401,7 +27429,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <span class="normal"><a href="#__codelineno-0-395">395</a></span>
 <span class="normal"><a href="#__codelineno-0-396">396</a></span>
 <span class="normal"><a href="#__codelineno-0-397">397</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Source</span><span class="p">:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Source` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Source` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">        key: A `source_id` (`&quot;CanESM5&quot;`, `&quot;GFDL-ESM4&quot;`).</span>
@@ -27430,7 +27458,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>Table</code> for <code>key</code>, with a did-you-mean hint.</p>
+        <p>Return the :class:<code>Table</code> for <code>key</code>, with a did-you-mean hint.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -27525,7 +27553,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <span class="normal"><a href="#__codelineno-0-381">381</a></span>
 <span class="normal"><a href="#__codelineno-0-382">382</a></span>
 <span class="normal"><a href="#__codelineno-0-383">383</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Table</span><span class="p">:</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Table` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Table` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        key: A `table_id` (`&quot;Amon&quot;`, `&quot;day&quot;`, `&quot;Omon&quot;`).</span>
@@ -27582,7 +27610,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the module-level
-<code>CATALOG_PATH</code>.</p>
+:data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -27608,7 +27636,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -27665,10 +27693,10 @@ its <code>csv_url</code>, or any curated row fails validation.</p>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            `CATALOG_PATH`.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file is missing</span>
@@ -27695,7 +27723,7 @@ its <code>csv_url</code>, or any curated row fails validation.</p>
     <div class="doc doc-contents ">
 
         <p>Auto-load the bundled catalog when no variables were supplied.</p>
-<p><code>Catalog()</code> with no args reads <code>CATALOG_PATH</code> (cached by
+<p><code>Catalog()</code> with no args reads :data:<code>CATALOG_PATH</code> (cached by
 <code>(path, mtime)</code>); passing <code>datasets=...</code> skips the disk read (used in
 tests). Either way the <code>available_datasets</code> index is derived from the
 loaded variable map.</p>
@@ -27716,7 +27744,7 @@ loaded variable map.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Propagated from <code>load</code> when the YAML is missing,
+                <p>Propagated from :meth:<code>load</code> when the YAML is missing,
 empty, or has a malformed row.</p>
               </div>
             </td>
@@ -27754,13 +27782,13 @@ empty, or has a malformed row.</p>
 <span class="normal"><a href="#__codelineno-0-311">311</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no variables were supplied.</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    `Catalog()` with no args reads `CATALOG_PATH` (cached by</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">    `(path, mtime)`); passing `datasets=...` skips the disk read (used in</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">    tests). Either way the `available_datasets` index is derived from the</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    loaded variable map.</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        ValueError: Propagated from `load` when the YAML is missing,</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        ValueError: Propagated from :meth:`load` when the YAML is missing,</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            empty, or has a malformed row.</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">csv_url</span><span class="p">:</span>
@@ -27794,7 +27822,7 @@ empty, or has a malformed row.</p>
     <div class="doc doc-contents ">
 
         <p>Return the attribution note for <code>source_id</code>.</p>
-<p>Falls back to <code>default_terms_note</code> for an uncurated source (or a
+<p>Falls back to :attr:<code>default_terms_note</code> for an uncurated source (or a
 curated one with no per-model note).</p>
 
 
@@ -27872,7 +27900,7 @@ curated one with no per-model note).</p>
 <span class="normal"><a href="#__codelineno-0-414">414</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="k">def</span><span class="w"> </span><span class="nf">terms_note</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the attribution note for `source_id`.</span>
 <a id="__codelineno-0-401" name="__codelineno-0-401"></a>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">    Falls back to `default_terms_note` for an uncurated source (or a</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">    Falls back to :attr:`default_terms_note` for an uncurated source (or a</span>
 <a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">    curated one with no per-model note).</span>
 <a id="__codelineno-0-404" name="__codelineno-0-404"></a>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">    Args:</span>
@@ -28820,7 +28848,7 @@ to run offline.</p>
             <td>
               <div class="doc-md-description">
                 <p>The CSV facet column names (from the catalog), kept as
-schema documentation; <code>resolve()</code> filters on <code>_FILTER_FACETS</code>,
+schema documentation; <code>resolve()</code> filters on :data:<code>_FILTER_FACETS</code>,
 not on this list.</p>
               </div>
             </td>
@@ -28838,7 +28866,7 @@ not on this list.</p>
             <td>
               <div class="doc-md-description">
                 <p>Where to cache the downloaded CSV. Defaults to
-<code>default_cache_path</code>.</p>
+:func:<code>default_cache_path</code>.</p>
               </div>
             </td>
             <td>
@@ -29163,10 +29191,10 @@ not on this list.</p>
 <a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">        csv_url: URL of the consolidated-stores CSV.</span>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="sd">        facet_columns: The CSV facet column names (from the catalog), kept as</span>
-<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">            schema documentation; `resolve()` filters on `_FILTER_FACETS`,</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">            schema documentation; `resolve()` filters on :data:`_FILTER_FACETS`,</span>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">            not on this list.</span>
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="sd">        cache_path: Where to cache the downloaded CSV. Defaults to</span>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">            `default_cache_path`.</span>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">            :func:`default_cache_path`.</span>
 <a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">        frame: A pre-loaded `DataFrame` to use verbatim, skipping all I/O.</span>
 <a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">        timeout: Per-request network timeout, in seconds.</span>
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -29213,7 +29241,7 @@ not on this list.</p>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_ensure_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the cached CSV path, downloading it once if absent.</span>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        Streams through `HttpClient`&#39;s atomic</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        Streams through :class:`~earthlens.base.http.HttpClient`&#39;s atomic</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">        `download` (temp `.part` file + rename, cleanup on failure), then</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">        enforces the non-empty invariant: a zero-byte transfer unlinks the</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        cache and raises rather than caching a useless file.</span>
@@ -29268,7 +29296,7 @@ not on this list.</p>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        Filters the CSV by every pinned facet (unset facets fan out), then</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        reduces `version=&quot;latest&quot;` to the newest publication per store. Returns</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        one `ResolvedStore` per surviving row.</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        one :class:`ResolvedStore` per surviving row.</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">            source_id: Model (required).</span>
@@ -29350,7 +29378,7 @@ not on this list.</p>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="nd">@staticmethod</span>
 <a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_row_to_store</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResolvedStore</span><span class="p">:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a `ResolvedStore` from one CSV row.</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a :class:`ResolvedStore` from one CSV row.</span>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">            row: A `pandas.Series` for one store.</span>
@@ -29493,7 +29521,7 @@ not on this list.</p>
         <p>Resolve a facet tuple to the matching <code>zstore</code> store(s).</p>
 <p>Filters the CSV by every pinned facet (unset facets fan out), then
 reduces <code>version="latest"</code> to the newest publication per store. Returns
-one <code>ResolvedStore</code> per surviving row.</p>
+one :class:<code>ResolvedStore</code> per surviving row.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -29774,7 +29802,7 @@ eliminated every row and lists the values that were available.</p>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">    Filters the CSV by every pinned facet (unset facets fan out), then</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">    reduces `version=&quot;latest&quot;` to the newest publication per store. Returns</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">    one `ResolvedStore` per surviving row.</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">    one :class:`ResolvedStore` per surviving row.</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        source_id: Model (required).</span>
@@ -30062,11 +30090,11 @@ product the <code>gee</code> backend exposes or the CHC-CMIP6 precipitation delt
 backend exposes.</p>
 <p>A request is a CMIP6 <strong>facet tuple</strong> — <code>source_id</code> (model), <code>experiment_id</code>
 (scenario), <code>variable_id</code>, <code>table_id</code> (+ optional <code>member_id</code> / <code>grid_label</code> /
-<code>version</code>). <code>_search</code> resolves it against the CSV
-(<code>StoreResolver</code>) to the matching <code>zstore</code>
+<code>version</code>). :meth:<code>_search</code> resolves it against the CSV
+(:class:<code>~earthlens.cmip6.resolver.StoreResolver</code>) to the matching <code>zstore</code>
 URI(s) — a tuple that pins fewer facets <strong>fans out</strong>, one output per store.
-<code>_fetch</code> then has pyramids open each store and write a <strong>bbox/time NetCDF
-subset</strong> (<code>earthlens.cmip6.accessor</code>): the <code>[start, end]</code> window maps to an
+:meth:<code>_fetch</code> then has pyramids open each store and write a <strong>bbox/time NetCDF
+subset</strong> (:mod:<code>earthlens.cmip6.accessor</code>): the <code>[start, end]</code> window maps to an
 integer time-index range, the <code>lat_lim</code>/<code>lon_lim</code> box crops the grid, and only
 the requested cells are fetched. earthlens never imports <code>xarray</code> / <code>zarr</code> /
 <code>gcsfs</code> — pyramids owns the read (GDAL <code>/vsigs/</code>, anonymous).</p>
@@ -30502,10 +30530,10 @@ one gridded NetCDF per resolved store.</p>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">            temporal_resolution: Advisory cadence label (fixed by `table_id`).</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">            path: Output directory for the written NetCDFs.</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">            fmt: `strptime` format for `start` / `end`.</span>
-<a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">            catalog: Optional pre-built `Catalog`; defaults to the</span>
+<a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">            catalog: Optional pre-built :class:`Catalog`; defaults to the</span>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">                bundled catalog.</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">            resolver: Optional pre-built</span>
-<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">                `StoreResolver`; defaults to one</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">                :class:`~earthlens.cmip6.resolver.StoreResolver`; defaults to one</span>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">                built from the catalog&#39;s CSV URL and facet columns.</span>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a>
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">        Raises:</span>
@@ -30564,7 +30592,7 @@ one gridded NetCDF per resolved store.</p>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_input_dates</span><span class="p">(</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a `TemporalExtent`.</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a>
 <a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            start: Inclusive window start.</span>
@@ -30640,7 +30668,7 @@ one gridded NetCDF per resolved store.</p>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        bbox)` window through pyramids and write it to NetCDF.</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            products: The products from `_search`.</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            products: The products from :meth:`_search`.</span>
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            list[Path]: One written NetCDF path per store, in order.</span>
@@ -30682,7 +30710,7 @@ one gridded NetCDF per resolved store.</p>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            store: The resolved store to read.</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            The integer time selector for `accessor.write_subset` — a</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">            The integer time selector for :func:`accessor.write_subset` — a</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            `(i0, i1)` index range for the date window, or `slice(None)` for a</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            `whole_time` request.</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -30709,8 +30737,8 @@ one gridded NetCDF per resolved store.</p>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the requested CMIP6 subset(s) and return the written paths.</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        Runs the cheap `_search` (facet -&gt; `zstore` resolution) then</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        `_fetch`, which writes one bbox/time NetCDF subset per resolved</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        Runs the cheap :meth:`_search` (facet -&gt; `zstore` resolution) then</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        :meth:`_fetch`, which writes one bbox/time NetCDF subset per resolved</span>
 <a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        store.</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        Args:</span>
@@ -31039,7 +31067,7 @@ series (warned). Defaults to <code>False</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional pre-built <code>Catalog</code>; defaults to the
+                <p>Optional pre-built :class:<code>Catalog</code>; defaults to the
 bundled catalog.</p>
               </div>
             </td>
@@ -31057,7 +31085,7 @@ bundled catalog.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional pre-built
-<code>StoreResolver</code>; defaults to one
+:class:<code>~earthlens.cmip6.resolver.StoreResolver</code>; defaults to one
 built from the catalog's CSV URL and facet columns.</p>
               </div>
             </td>
@@ -31248,10 +31276,10 @@ built from the catalog's CSV URL and facet columns.</p>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">        temporal_resolution: Advisory cadence label (fixed by `table_id`).</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">        path: Output directory for the written NetCDFs.</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">        fmt: `strptime` format for `start` / `end`.</span>
-<a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">        catalog: Optional pre-built `Catalog`; defaults to the</span>
+<a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">        catalog: Optional pre-built :class:`Catalog`; defaults to the</span>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">            bundled catalog.</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">        resolver: Optional pre-built</span>
-<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">            `StoreResolver`; defaults to one</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">            :class:`~earthlens.cmip6.resolver.StoreResolver`; defaults to one</span>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">            built from the catalog&#39;s CSV URL and facet columns.</span>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a>
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">    Raises:</span>
@@ -31324,8 +31352,8 @@ built from the catalog's CSV URL and facet columns.</p>
     <div class="doc doc-contents ">
 
         <p>Fetch the requested CMIP6 subset(s) and return the written paths.</p>
-<p>Runs the cheap <code>_search</code> (facet -&gt; <code>zstore</code> resolution) then
-<code>_fetch</code>, which writes one bbox/time NetCDF subset per resolved
+<p>Runs the cheap :meth:<code>_search</code> (facet -&gt; <code>zstore</code> resolution) then
+:meth:<code>_fetch</code>, which writes one bbox/time NetCDF subset per resolved
 store.</p>
 
 
@@ -31438,8 +31466,8 @@ returning an empty list).</p>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the requested CMIP6 subset(s) and return the written paths.</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Runs the cheap `_search` (facet -&gt; `zstore` resolution) then</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    `_fetch`, which writes one bbox/time NetCDF subset per resolved</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Runs the cheap :meth:`_search` (facet -&gt; `zstore` resolution) then</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    :meth:`_fetch`, which writes one bbox/time NetCDF subset per resolved</span>
 <a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    store.</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    Args:</span>
@@ -31549,24 +31577,24 @@ returning an empty list).</p>
     <div class="doc doc-contents first">
 
         <p>Config + curated-vocabulary catalog for the CMIP6 backend.</p>
-<p>Hosts <code>Catalog</code>, the pydantic-backed reader for the bundled
+<p>Hosts :class:<code>Catalog</code>, the pydantic-backed reader for the bundled
 <code>cmip6_data_catalog.yaml</code>. CMIP6 is addressed by a <em>facet tuple</em>
 (<code>source_id</code>, <code>experiment_id</code>, <code>variable_id</code>, <code>table_id</code>, plus optional
 <code>member_id</code> / <code>grid_label</code> / <code>version</code>), and the per-store index — one Zarr
 store per facet combination — is far too large to inline (~515k rows). That
-index is the consolidated-stores CSV at <code>Catalog.csv_url</code>, fetched and
-cached by <code>earthlens.cmip6.resolver</code>; this catalog holds only the <em>config</em>
+index is the consolidated-stores CSV at :attr:<code>Catalog.csv_url</code>, fetched and
+cached by :mod:<code>earthlens.cmip6.resolver</code>; this catalog holds only the <em>config</em>
 (CSV URL, bucket, facet columns, defaults) plus a <em>curated vocabulary</em> of the
 common variables / experiments / tables / sources used for output metadata,
 docs, and did-you-mean hints.</p>
 <p>The curated <code>variables:</code> block is exposed under the inherited
-<code>datasets</code> field, so a variable resolves
+:attr:<code>~earthlens.base.AbstractCatalog.datasets</code> field, so a variable resolves
 with <code>cat["tas"]</code> / <code>"tas" in cat</code> / the did-you-mean error for free;
 <code>experiments:</code> / <code>tables:</code> / <code>sources:</code> hang off parallel maps. Resolution
 itself runs against the full CSV, so an <em>uncurated</em> facet still downloads — the
 curated rows only enrich metadata and error messages.</p>
-<p><code>CATALOG_PATH</code> is the path to the bundled YAML;
-<code>clear_catalog_cache</code> empties the <code>(path, mtime)</code> parse cache.</p>
+<p>:data:<code>CATALOG_PATH</code> is the path to the bundled YAML;
+:func:<code>clear_catalog_cache</code> empties the <code>(path, mtime)</code> parse cache.</p>
 
 
 
@@ -31606,12 +31634,12 @@ curated rows only enrich metadata and error messages.</p>
 
         <p>Config + curated-vocabulary catalog for the CMIP6 backend.</p>
 <p>Reads the bundled <code>cmip6_data_catalog.yaml</code> (shipped as package data) and
-exposes its <code>variables:</code> block as a map of <code>Cmip6Variable</code> rows keyed
-by <code>variable_id</code> under the inherited <code>datasets</code> field, plus parallel
-<code>experiments</code>, <code>tables</code>, and <code>sources</code> maps and the
-resolution config (<code>csv_url</code>, <code>bucket</code>, <code>facet_columns</code>,
-<code>default_member_id</code>, <code>default_version</code>). Instantiate with no
-arguments (<code>Catalog()</code>); <code>model_post_init</code> loads and validates the YAML
+exposes its <code>variables:</code> block as a map of :class:<code>Cmip6Variable</code> rows keyed
+by <code>variable_id</code> under the inherited :attr:<code>datasets</code> field, plus parallel
+:attr:<code>experiments</code>, :attr:<code>tables</code>, and :attr:<code>sources</code> maps and the
+resolution config (:attr:<code>csv_url</code>, :attr:<code>bucket</code>, :attr:<code>facet_columns</code>,
+:attr:<code>default_member_id</code>, :attr:<code>default_version</code>). Instantiate with no
+arguments (<code>Catalog()</code>); :func:<code>model_post_init</code> loads and validates the YAML
 in one pass and caches it by <code>(path, mtime)</code>.</p>
 
 
@@ -31698,7 +31726,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from <code>variable_id</code> to its <code>Cmip6Variable</code> row.</p>
+                <p>Map from <code>variable_id</code> to its :class:<code>Cmip6Variable</code> row.</p>
               </div>
             </td>
           </tr>
@@ -31709,7 +31737,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from <code>experiment_id</code> to its <code>Experiment</code> row.</p>
+                <p>Map from <code>experiment_id</code> to its :class:<code>Experiment</code> row.</p>
               </div>
             </td>
           </tr>
@@ -31720,7 +31748,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from <code>table_id</code> to its <code>Table</code> row.</p>
+                <p>Map from <code>table_id</code> to its :class:<code>Table</code> row.</p>
               </div>
             </td>
           </tr>
@@ -31731,7 +31759,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from <code>source_id</code> to its <code>Source</code> row.</p>
+                <p>Map from <code>source_id</code> to its :class:<code>Source</code> row.</p>
               </div>
             </td>
           </tr>
@@ -31990,12 +32018,12 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Config + curated-vocabulary catalog for the CMIP6 backend.</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">    Reads the bundled `cmip6_data_catalog.yaml` (shipped as package data) and</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    exposes its `variables:` block as a map of `Cmip6Variable` rows keyed</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    by `variable_id` under the inherited `datasets` field, plus parallel</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    `experiments`, `tables`, and `sources` maps and the</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    resolution config (`csv_url`, `bucket`, `facet_columns`,</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    `default_member_id`, `default_version`). Instantiate with no</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    arguments (`Catalog()`); `model_post_init` loads and validates the YAML</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    exposes its `variables:` block as a map of :class:`Cmip6Variable` rows keyed</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    by `variable_id` under the inherited :attr:`datasets` field, plus parallel</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    :attr:`experiments`, :attr:`tables`, and :attr:`sources` maps and the</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    resolution config (:attr:`csv_url`, :attr:`bucket`, :attr:`facet_columns`,</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    :attr:`default_member_id`, :attr:`default_version`). Instantiate with no</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    arguments (`Catalog()`); :func:`model_post_init` loads and validates the YAML</span>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    in one pass and caches it by `(path, mtime)`.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Attributes:</span>
@@ -32005,10 +32033,10 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        default_member_id: Member label applied when a request omits it.</span>
 <a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        default_version: Version-selection policy (`&quot;latest&quot;`).</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        default_terms_note: Attribution fallback for an uncurated source.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        datasets: Map from `variable_id` to its `Cmip6Variable` row.</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        experiments: Map from `experiment_id` to its `Experiment` row.</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        tables: Map from `table_id` to its `Table` row.</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        sources: Map from `source_id` to its `Source` row.</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        datasets: Map from `variable_id` to its :class:`Cmip6Variable` row.</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        experiments: Map from `experiment_id` to its :class:`Experiment` row.</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        tables: Map from `table_id` to its :class:`Table` row.</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        sources: Map from `source_id` to its :class:`Source` row.</span>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        - List curated variables and resolve one:</span>
@@ -32052,13 +32080,13 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no variables were supplied.</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        `Catalog()` with no args reads `CATALOG_PATH` (cached by</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        `(path, mtime)`); passing `datasets=...` skips the disk read (used in</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">        tests). Either way the `available_datasets` index is derived from the</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        loaded variable map.</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            ValueError: Propagated from `load` when the YAML is missing,</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            ValueError: Propagated from :meth:`load` when the YAML is missing,</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">                empty, or has a malformed row.</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">csv_url</span><span class="p">:</span>
@@ -32081,10 +32109,10 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">                `CATALOG_PATH`.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file is missing</span>
@@ -32120,7 +32148,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-355" name="__codelineno-0-355"></a>        <span class="k">return</span> <span class="n">out</span>
 <a id="__codelineno-0-356" name="__codelineno-0-356"></a>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Experiment</span><span class="p">:</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Experiment` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Experiment` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            key: An `experiment_id` (`&quot;ssp585&quot;`, `&quot;historical&quot;`).</span>
@@ -32134,7 +32162,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Experiment&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experiments</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="s2">&quot;experiment&quot;</span><span class="p">))</span>
 <a id="__codelineno-0-370" name="__codelineno-0-370"></a>
 <a id="__codelineno-0-371" name="__codelineno-0-371"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Table</span><span class="p">:</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Table` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Table` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">            key: A `table_id` (`&quot;Amon&quot;`, `&quot;day&quot;`, `&quot;Omon&quot;`).</span>
@@ -32148,7 +32176,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-383" name="__codelineno-0-383"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Table&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="s2">&quot;table&quot;</span><span class="p">))</span>
 <a id="__codelineno-0-384" name="__codelineno-0-384"></a>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Source</span><span class="p">:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Source` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Source` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            key: A `source_id` (`&quot;CanESM5&quot;`, `&quot;GFDL-ESM4&quot;`).</span>
@@ -32164,7 +32192,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">terms_note</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the attribution note for `source_id`.</span>
 <a id="__codelineno-0-401" name="__codelineno-0-401"></a>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        Falls back to `default_terms_note` for an uncurated source (or a</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        Falls back to :attr:`default_terms_note` for an uncurated source (or a</span>
 <a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">        curated one with no per-model note).</span>
 <a id="__codelineno-0-404" name="__codelineno-0-404"></a>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        Args:</span>
@@ -32231,7 +32259,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>Experiment</code> for <code>key</code>, with a did-you-mean hint.</p>
+        <p>Return the :class:<code>Experiment</code> for <code>key</code>, with a did-you-mean hint.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -32326,7 +32354,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <span class="normal"><a href="#__codelineno-0-367">367</a></span>
 <span class="normal"><a href="#__codelineno-0-368">368</a></span>
 <span class="normal"><a href="#__codelineno-0-369">369</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Experiment</span><span class="p">:</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Experiment` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Experiment` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        key: An `experiment_id` (`&quot;ssp585&quot;`, `&quot;historical&quot;`).</span>
@@ -32355,7 +32383,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>Source</code> for <code>key</code>, with a did-you-mean hint.</p>
+        <p>Return the :class:<code>Source</code> for <code>key</code>, with a did-you-mean hint.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -32450,7 +32478,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <span class="normal"><a href="#__codelineno-0-395">395</a></span>
 <span class="normal"><a href="#__codelineno-0-396">396</a></span>
 <span class="normal"><a href="#__codelineno-0-397">397</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Source</span><span class="p">:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Source` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Source` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">        key: A `source_id` (`&quot;CanESM5&quot;`, `&quot;GFDL-ESM4&quot;`).</span>
@@ -32479,7 +32507,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>Table</code> for <code>key</code>, with a did-you-mean hint.</p>
+        <p>Return the :class:<code>Table</code> for <code>key</code>, with a did-you-mean hint.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -32574,7 +32602,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
 <span class="normal"><a href="#__codelineno-0-381">381</a></span>
 <span class="normal"><a href="#__codelineno-0-382">382</a></span>
 <span class="normal"><a href="#__codelineno-0-383">383</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Table</span><span class="p">:</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Table` for `key`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Table` for `key`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        key: A `table_id` (`&quot;Amon&quot;`, `&quot;day&quot;`, `&quot;Omon&quot;`).</span>
@@ -32631,7 +32659,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the module-level
-<code>CATALOG_PATH</code>.</p>
+:data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -32657,7 +32685,7 @@ in one pass and caches it by <code>(path, mtime)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -32714,10 +32742,10 @@ its <code>csv_url</code>, or any curated row fails validation.</p>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            `CATALOG_PATH`.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file is missing</span>
@@ -32744,7 +32772,7 @@ its <code>csv_url</code>, or any curated row fails validation.</p>
     <div class="doc doc-contents ">
 
         <p>Auto-load the bundled catalog when no variables were supplied.</p>
-<p><code>Catalog()</code> with no args reads <code>CATALOG_PATH</code> (cached by
+<p><code>Catalog()</code> with no args reads :data:<code>CATALOG_PATH</code> (cached by
 <code>(path, mtime)</code>); passing <code>datasets=...</code> skips the disk read (used in
 tests). Either way the <code>available_datasets</code> index is derived from the
 loaded variable map.</p>
@@ -32765,7 +32793,7 @@ loaded variable map.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Propagated from <code>load</code> when the YAML is missing,
+                <p>Propagated from :meth:<code>load</code> when the YAML is missing,
 empty, or has a malformed row.</p>
               </div>
             </td>
@@ -32803,13 +32831,13 @@ empty, or has a malformed row.</p>
 <span class="normal"><a href="#__codelineno-0-311">311</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no variables were supplied.</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    `Catalog()` with no args reads `CATALOG_PATH` (cached by</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">    `(path, mtime)`); passing `datasets=...` skips the disk read (used in</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">    tests). Either way the `available_datasets` index is derived from the</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    loaded variable map.</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a>
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        ValueError: Propagated from `load` when the YAML is missing,</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        ValueError: Propagated from :meth:`load` when the YAML is missing,</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            empty, or has a malformed row.</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">csv_url</span><span class="p">:</span>
@@ -32843,7 +32871,7 @@ empty, or has a malformed row.</p>
     <div class="doc doc-contents ">
 
         <p>Return the attribution note for <code>source_id</code>.</p>
-<p>Falls back to <code>default_terms_note</code> for an uncurated source (or a
+<p>Falls back to :attr:<code>default_terms_note</code> for an uncurated source (or a
 curated one with no per-model note).</p>
 
 
@@ -32921,7 +32949,7 @@ curated one with no per-model note).</p>
 <span class="normal"><a href="#__codelineno-0-414">414</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="k">def</span><span class="w"> </span><span class="nf">terms_note</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the attribution note for `source_id`.</span>
 <a id="__codelineno-0-401" name="__codelineno-0-401"></a>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">    Falls back to `default_terms_note` for an uncurated source (or a</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">    Falls back to :attr:`default_terms_note` for an uncurated source (or a</span>
 <a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">    curated one with no per-model note).</span>
 <a id="__codelineno-0-404" name="__codelineno-0-404"></a>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">    Args:</span>
@@ -33677,7 +33705,7 @@ models are CC BY 4.0, cited via the source GCM).</p>
 <p>The Pangeo CMIP6 ARCO index is a single flat CSV — one row per Zarr store,
 keyed by the CMIP6 facets (<code>source_id</code>, <code>experiment_id</code>, <code>variable_id</code>,
 <code>table_id</code>, <code>member_id</code>, <code>grid_label</code>, <code>version</code>, ...) with the store URI in the
-<code>zstore</code> column. <code>StoreResolver</code> fetches and caches that CSV (with
+<code>zstore</code> column. :class:<code>StoreResolver</code> fetches and caches that CSV (with
 <code>requests</code>, read with <code>pandas</code> — both core), then filters it by a requested
 facet tuple to the matching <code>zstore</code> URI(s).</p>
 <p>The resolver is deliberately stateless and injectable: pass a pre-loaded
@@ -33687,7 +33715,7 @@ values that <em>were</em> available — so a typo in a model or scenario name is
 fix.</p>
 <p>No <code>intake-esm</code> (it would drag in <code>xarray</code>); no <code>xarray</code> / <code>zarr</code> / <code>gcsfs</code>
 here — this module only resolves URIs. Opening the store is
-<code>earthlens.cmip6.accessor</code>'s job (pyramids).</p>
+:mod:<code>earthlens.cmip6.accessor</code>'s job (pyramids).</p>
 
 
 
@@ -34121,7 +34149,7 @@ to run offline.</p>
             <td>
               <div class="doc-md-description">
                 <p>The CSV facet column names (from the catalog), kept as
-schema documentation; <code>resolve()</code> filters on <code>_FILTER_FACETS</code>,
+schema documentation; <code>resolve()</code> filters on :data:<code>_FILTER_FACETS</code>,
 not on this list.</p>
               </div>
             </td>
@@ -34139,7 +34167,7 @@ not on this list.</p>
             <td>
               <div class="doc-md-description">
                 <p>Where to cache the downloaded CSV. Defaults to
-<code>default_cache_path</code>.</p>
+:func:<code>default_cache_path</code>.</p>
               </div>
             </td>
             <td>
@@ -34464,10 +34492,10 @@ not on this list.</p>
 <a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">        csv_url: URL of the consolidated-stores CSV.</span>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="sd">        facet_columns: The CSV facet column names (from the catalog), kept as</span>
-<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">            schema documentation; `resolve()` filters on `_FILTER_FACETS`,</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">            schema documentation; `resolve()` filters on :data:`_FILTER_FACETS`,</span>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">            not on this list.</span>
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="sd">        cache_path: Where to cache the downloaded CSV. Defaults to</span>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">            `default_cache_path`.</span>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">            :func:`default_cache_path`.</span>
 <a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">        frame: A pre-loaded `DataFrame` to use verbatim, skipping all I/O.</span>
 <a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">        timeout: Per-request network timeout, in seconds.</span>
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -34514,7 +34542,7 @@ not on this list.</p>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_ensure_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the cached CSV path, downloading it once if absent.</span>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        Streams through `HttpClient`&#39;s atomic</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        Streams through :class:`~earthlens.base.http.HttpClient`&#39;s atomic</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">        `download` (temp `.part` file + rename, cleanup on failure), then</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">        enforces the non-empty invariant: a zero-byte transfer unlinks the</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        cache and raises rather than caching a useless file.</span>
@@ -34569,7 +34597,7 @@ not on this list.</p>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">        Filters the CSV by every pinned facet (unset facets fan out), then</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        reduces `version=&quot;latest&quot;` to the newest publication per store. Returns</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        one `ResolvedStore` per surviving row.</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        one :class:`ResolvedStore` per surviving row.</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">            source_id: Model (required).</span>
@@ -34651,7 +34679,7 @@ not on this list.</p>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a>
 <a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="nd">@staticmethod</span>
 <a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_row_to_store</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResolvedStore</span><span class="p">:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a `ResolvedStore` from one CSV row.</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a :class:`ResolvedStore` from one CSV row.</span>
 <a id="__codelineno-0-336" name="__codelineno-0-336"></a>
 <a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">            row: A `pandas.Series` for one store.</span>
@@ -34794,7 +34822,7 @@ not on this list.</p>
         <p>Resolve a facet tuple to the matching <code>zstore</code> store(s).</p>
 <p>Filters the CSV by every pinned facet (unset facets fan out), then
 reduces <code>version="latest"</code> to the newest publication per store. Returns
-one <code>ResolvedStore</code> per surviving row.</p>
+one :class:<code>ResolvedStore</code> per surviving row.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -35075,7 +35103,7 @@ eliminated every row and lists the values that were available.</p>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">    Filters the CSV by every pinned facet (unset facets fan out), then</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">    reduces `version=&quot;latest&quot;` to the newest publication per store. Returns</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">    one `ResolvedStore` per surviving row.</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">    one :class:`ResolvedStore` per surviving row.</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        source_id: Model (required).</span>
@@ -35230,16 +35258,16 @@ itself never imports <code>xarray</code> / <code>zarr</code> / <code>gcsfs</code
 GDAL's <code>/vsigs/</code> multidimensional driver (no gcsfs needed), and this module only:</p>
 <ul>
 <li>rewrites a <code>gs://cmip6/&lt;path&gt;/</code> <code>zstore</code> URI to the GDAL <code>ZARR:"/vsigs/..."</code>
-  form (<code>zstore_to_vsi</code>);</li>
+  form (:func:<code>zstore_to_vsi</code>);</li>
 <li>forces <strong>anonymous</strong> GCS access with <code>GS_NO_SIGN_REQUEST</code> around every read
-  (<code>anonymous_gcs</code>) — pyramids' <code>anon=True</code> only sets the AWS flag, and
+  (:func:<code>anonymous_gcs</code>) — pyramids' <code>anon=True</code> only sets the AWS flag, and
   this machine may carry ambient GCS credentials, so the flag is set explicitly;</li>
 <li>maps a CF <code>[start, end]</code> <strong>date window to an integer time-index range</strong>
-  (<code>resolve_time_window</code>) — the gridded reader selects time by integer
+  (:func:<code>resolve_time_window</code>) — the gridded reader selects time by integer
   index, and <code>LabeledDataset.select_time</code> is the public path that decodes CF
   time / non-standard calendars;</li>
 <li>reads the gridded <code>(time, bbox)</code> slice and writes it to NetCDF
-  (<code>write_subset</code>), a windowed read that fetches only the requested cells.</li>
+  (:func:<code>write_subset</code>), a windowed read that fetches only the requested cells.</li>
 </ul>
 <p>The pyramids reader classes are imported lazily behind an install-hint so the
 package imports (and the backend constructs) without a read ever happening.</p>
@@ -35369,7 +35397,7 @@ the open, so wrap the whole read + write.</p>
     <div class="doc doc-contents ">
 
         <p>Map a CF <code>[start, end]</code> date window to an integer time-index range.</p>
-<p>The gridded reader (<code>write_subset</code>) selects time by <strong>integer index</strong>;
+<p>The gridded reader (:func:<code>write_subset</code>) selects time by <strong>integer index</strong>;
 CMIP6 ARCO stores do not surface CF time units through GDAL's multidim path,
 but <code>LabeledDataset.select_time</code> decodes the store's own time <code>units</code> +
 <code>calendar</code> (so <code>noleap</code> / <code>360_day</code> work). The half-open window is recovered
@@ -35609,7 +35637,7 @@ when neither bound is given (the caller should read the whole series).</p>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Map a CF `[start, end]` date window to an integer time-index range.</span>
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">    The gridded reader (`write_subset`) selects time by **integer index**;</span>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">    The gridded reader (:func:`write_subset`) selects time by **integer index**;</span>
 <a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">    CMIP6 ARCO stores do not surface CF time units through GDAL&#39;s multidim path,</span>
 <a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">    but `LabeledDataset.select_time` decodes the store&#39;s own time `units` +</span>
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">    `calendar` (so `noleap` / `360_day` work). The half-open window is recovered</span>
@@ -35857,7 +35885,7 @@ when unavailable).</p>
         <p>Read a <code>(variable, time, bbox)</code> window of a store and write it to NetCDF.</p>
 <p>Opens the resolved Zarr store through pyramids' <code>NetCDF</code> reader (GDAL
 <code>/vsigs/</code>, anonymous) and writes the windowed slice — only the requested
-cells are fetched. The read + write both run inside <code>anonymous_gcs</code>.</p>
+cells are fetched. The read + write both run inside :func:<code>anonymous_gcs</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -36049,7 +36077,7 @@ grid.</p>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    Opens the resolved Zarr store through pyramids&#39; `NetCDF` reader (GDAL</span>
 <a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    `/vsigs/`, anonymous) and writes the windowed slice — only the requested</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    cells are fetched. The read + write both run inside `anonymous_gcs`.</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    cells are fetched. The read + write both run inside :func:`anonymous_gcs`.</span>
 <a id="__codelineno-0-233" name="__codelineno-0-233"></a>
 <a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">        zstore: The `gs://cmip6/...` store URI.</span>

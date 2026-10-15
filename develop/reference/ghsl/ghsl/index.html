@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -804,6 +804,34 @@
     
   
     Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
   
 
     
@@ -30151,7 +30179,7 @@ a fresh <code>GhslCredentials()</code> since GHSL needs no secrets.</p>
 
         <p>Empty credentials value object for the open GHSL backend.</p>
 <p>GHSL needs no secrets; this exists only to satisfy the
-<code>AbstractAuth</code> generic contract that
+:class:<code>~earthlens.base.auth.AbstractAuth</code> generic contract that
 every backend's auth class binds a <code>pydantic.BaseModel</code>
 credentials type. It carries no fields.</p>
 
@@ -30194,7 +30222,7 @@ credentials type. It carries no fields.</p>
 <a id="__codelineno-0-34" name="__codelineno-0-34"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Empty credentials value object for the open GHSL backend.</span>
 <a id="__codelineno-0-35" name="__codelineno-0-35"></a>
 <a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="sd">    GHSL needs no secrets; this exists only to satisfy the</span>
-<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="sd">    `AbstractAuth` generic contract that</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="sd">    :class:`~earthlens.base.auth.AbstractAuth` generic contract that</span>
 <a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="sd">    every backend&#39;s auth class binds a `pydantic.BaseModel`</span>
 <a id="__codelineno-0-39" name="__codelineno-0-39"></a><span class="sd">    credentials type. It carries no fields.</span>
 <a id="__codelineno-0-40" name="__codelineno-0-40"></a>
@@ -36939,7 +36967,7 @@ invalidates the entry on its own.</p>
 only</strong> — "reuse is authorised provided the source is acknowledged"
 (CC-BY-style). Every artefact is served over plain anonymous HTTPS
 from the JRC JEODPP file tree, so <code>GHSL</code> performs no login:
-<code>earthlens.ghsl.backend.GHSL._initialize</code> reads no credentials
+:meth:<code>earthlens.ghsl.backend.GHSL._initialize</code> reads no credentials
 and the backend works with no key, env var, or config file.</p>
 <p><code>GhslAuth</code> exists so the package mirrors the layout of the
 authenticated backends (each has an <code>auth.py</code> with an
@@ -37262,7 +37290,7 @@ a fresh <code>GhslCredentials()</code> since GHSL needs no secrets.</p>
 
         <p>Empty credentials value object for the open GHSL backend.</p>
 <p>GHSL needs no secrets; this exists only to satisfy the
-<code>AbstractAuth</code> generic contract that
+:class:<code>~earthlens.base.auth.AbstractAuth</code> generic contract that
 every backend's auth class binds a <code>pydantic.BaseModel</code>
 credentials type. It carries no fields.</p>
 
@@ -37305,7 +37333,7 @@ credentials type. It carries no fields.</p>
 <a id="__codelineno-0-34" name="__codelineno-0-34"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Empty credentials value object for the open GHSL backend.</span>
 <a id="__codelineno-0-35" name="__codelineno-0-35"></a>
 <a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="sd">    GHSL needs no secrets; this exists only to satisfy the</span>
-<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="sd">    `AbstractAuth` generic contract that</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="sd">    :class:`~earthlens.base.auth.AbstractAuth` generic contract that</span>
 <a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="sd">    every backend&#39;s auth class binds a `pydantic.BaseModel`</span>
 <a id="__codelineno-0-39" name="__codelineno-0-39"></a><span class="sd">    credentials type. It carries no fields.</span>
 <a id="__codelineno-0-40" name="__codelineno-0-40"></a>
