@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import math
+
 import numpy as np
 import pytest
 from pyramids.base.georeference import GeoReference
@@ -20,6 +22,13 @@ def _elevation(values: np.ndarray) -> Dataset:
 def _flat(fill: float = 100.0) -> Dataset:
     """A surface with no relief at all."""
     return _elevation(np.full((6, 6), fill))
+
+
+def _forty_five_degree_ramp() -> Dataset:
+    """A ramp rising one metre per metre, in a metric CRS: exactly 45 degrees."""
+    metric = GeoReference(top_left_corner=(0.0, 0.0), cell_size=1.0, epsg=3857)
+    values = np.tile(np.arange(5, dtype="float32"), (5, 1))
+    return Dataset.from_array(arr=values, geo_ref=metric)
 
 
 def _east_facing_ramp() -> Dataset:
@@ -44,17 +53,25 @@ class TestSlope:
         interior = _values(Slope().apply(_east_facing_ramp()))[1:-1, 1:-1]
         assert interior.min() > 0.0
 
-    def test_percent_units_differ_from_degrees(self):
-        """The `units` field reaches pyramids rather than being ignored."""
-        ramp = _east_facing_ramp()
-        degrees = _values(Slope(units="degrees").apply(ramp))[1:-1, 1:-1]
-        percent = _values(Slope(units="percent").apply(ramp))[1:-1, 1:-1]
-        assert not np.allclose(degrees, percent)
+    @pytest.mark.parametrize(
+        ("units", "expected"),
+        [("degrees", 45.0), ("radians", math.pi / 4), ("percent", 100.0)],
+        ids=["degrees", "radians", "percent"],
+    )
+    def test_each_unit_reports_the_value_that_unit_means(self, units, expected):
+        """A 45-degree slope is 45 degrees, pi/4 radians and 100 percent.
+
+        Asserting the number rather than "differs from degrees" is the point:
+        pyramids falls through to radians for any unit string it does not know,
+        so a looser assertion certifies whatever comes back.
+        """
+        result = _values(Slope(units=units).apply(_forty_five_degree_ramp()))
+        assert result[2, 2] == pytest.approx(expected, rel=1e-6)
 
     def test_an_unknown_unit_is_rejected_at_construction(self):
         """The literal is checked when the operation is built, not when it runs."""
         with pytest.raises(Exception, match="units"):
-            Slope(units="radians")
+            Slope(units="grads")
 
     def test_the_output_keeps_the_source_grid(self):
         """A derivative stays georeferenced like the elevation it came from."""

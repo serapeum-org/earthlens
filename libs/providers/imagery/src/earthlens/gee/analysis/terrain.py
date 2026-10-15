@@ -14,6 +14,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal
 
+import numpy as np
+
 from earthlens.gee.analysis.base import RasterOperation
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -34,14 +36,38 @@ def _like(ds: Dataset, array) -> Dataset:  # noqa: ANN001 - array is numpy or da
 
 
 class Slope(RasterOperation):
-    """Steepness of an elevation band, in degrees or percent.
+    """Steepness of an elevation band, in degrees, radians or percent.
+
+    `degrees` and `radians` are pyramids' own; `percent` - rise over run times
+    one hundred, the form a highway or drainage threshold is usually written in
+    - is computed here as `tan(radians) * 100`, because pyramids does not offer
+    it. That matters: pyramids falls through to **radians** for any unit string
+    it does not recognise, so passing `"percent"` straight through returned
+    0.785 where the answer is 100.
 
     Examples:
-        - Slope of a flat surface is zero everywhere:
+        - One metre of rise per metre of run, read in all three units:
             ```python
+            >>> import math
             >>> import numpy as np
             >>> from pyramids.base.georeference import GeoReference
             >>> from pyramids.dataset import Dataset
+            >>> metric = GeoReference(top_left_corner=(0.0, 0.0), cell_size=1.0, epsg=3857)
+            >>> ramp = Dataset.from_array(
+            ...     arr=np.tile(np.arange(5, dtype="float32"), (5, 1)), geo_ref=metric
+            ... )
+            >>> def centre(op):
+            ...     return float(np.asarray(op(ramp).read_array())[2, 2])
+            >>> round(centre(Slope()), 6)
+            45.0
+            >>> round(centre(Slope(units="radians")), 6) == round(math.pi / 4, 6)
+            True
+            >>> round(centre(Slope(units="percent")), 6)
+            100.0
+
+            ```
+        - Slope of a flat surface is zero in every unit:
+            ```python
             >>> flat = Dataset.from_array(
             ...     arr=np.full((4, 4), 100.0, dtype="float32"),
             ...     geo_ref=GeoReference(top_left_corner=(31.0, 30.0), cell_size=0.01, epsg=4326),
@@ -53,7 +79,7 @@ class Slope(RasterOperation):
     """
 
     band: int = 0
-    units: Literal["degrees", "percent"] = "degrees"
+    units: Literal["degrees", "radians", "percent"] = "degrees"
 
     def apply(self, ds: Dataset) -> Dataset:
         """Return a one-band slope raster.
@@ -64,6 +90,9 @@ class Slope(RasterOperation):
         Returns:
             A new raster of slope values in the configured units.
         """
+        if self.units == "percent":
+            radians = np.asarray(ds.slope(band=self.band, units="radians"))
+            return _like(ds, np.tan(radians) * 100.0)
         return _like(ds, ds.slope(band=self.band, units=self.units))
 
 
