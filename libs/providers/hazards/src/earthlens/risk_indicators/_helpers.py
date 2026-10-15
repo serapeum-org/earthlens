@@ -78,6 +78,19 @@ INFORM_RELEASE_LINK = re.compile(
 #: cannot win the "newest" comparison against a real release.
 INFORM_RELEASE_YEARS = range(2010, 2100)
 
+#: How many times to read the results page before concluding the layout moved.
+#: The page intermittently serves a body with no workbook link at all — not a
+#: changed pattern, since the same regex matches both 2026 workbooks seconds
+#: later — and the first such render failed the live e2e and reddened the whole
+#: hazards lane (issue #1227). Re-reading costs one extra request on the rare
+#: miss and nothing on the common path, while a genuine layout change still
+#: raises, just a few seconds later.
+INFORM_RELEASE_ATTEMPTS: int = 3
+
+#: Linear back-off between those reads: `n * 1s`, so a flap that clears in a
+#: second or two is absorbed without making a real break slow to surface.
+INFORM_RELEASE_BACKOFF_SECONDS: float = 1.0
+
 #: Sheet holding the country scores; its name carries the release year.
 INFORM_RELEASE_SHEET = re.compile(r"^INFORM Risk (\d{4})", re.IGNORECASE)
 
@@ -408,23 +421,31 @@ def inform_release_url(
         tuple[str, int]: The absolute workbook URL and its release year.
 
     Raises:
-        ValueError: If the page carries no plausible release-workbook link,
-            which means the page layout changed and the pattern needs
-            revisiting, or if a link points off the INFORM site.
+        ValueError: If the page still carries no plausible release-workbook
+            link after `INFORM_RELEASE_ATTEMPTS` reads, which means the page
+            layout changed and the pattern needs revisiting, or if a link
+            points off the INFORM site.
         requests.RequestException: If the page cannot be fetched.
     """
     if page in _RELEASE_CACHE:
         return _RELEASE_CACHE[page]
-    html = _client(timeout).get(page).text
-    candidates = [
-        hit
-        for hit in INFORM_RELEASE_LINK.findall(html)
-        if int(hit[1]) in INFORM_RELEASE_YEARS
-    ]
+    client = _client(timeout)
+    for attempt in range(INFORM_RELEASE_ATTEMPTS):
+        html = client.get(page).text
+        candidates = [
+            hit
+            for hit in INFORM_RELEASE_LINK.findall(html)
+            if int(hit[1]) in INFORM_RELEASE_YEARS
+        ]
+        if candidates:
+            break
+        if attempt + 1 < INFORM_RELEASE_ATTEMPTS:
+            time.sleep(INFORM_RELEASE_BACKOFF_SECONDS * (attempt + 1))
     if not candidates:
         raise ValueError(
-            f"No INFORM Risk release workbook link found on {page}; the page "
-            "layout may have changed."
+            f"No INFORM Risk release workbook link found on {page} after "
+            f"{INFORM_RELEASE_ATTEMPTS} attempts; the page layout may have "
+            "changed."
         )
     href, year, _version = max(candidates, key=lambda hit: (int(hit[1]), int(hit[2])))
     url = urljoin(page, href)

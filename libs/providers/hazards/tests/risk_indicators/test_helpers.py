@@ -476,6 +476,45 @@ class TestInformRelease:
         with pytest.raises(ValueError, match="No INFORM Risk release workbook"):
             _helpers.inform_release_url()
 
+    def test_release_url_rereads_a_page_that_rendered_no_link(self, monkeypatch):
+        """A page that renders no link once is re-read before giving up.
+
+        The JRC results page intermittently serves a body with no workbook
+        link at all; the regex is not at fault, because it matches again
+        seconds later. The first such render used to fail the live e2e and
+        redden the whole hazards lane.
+        """
+        pages = [
+            "<p>no downloads</p>",
+            '<a href="/inform-index/Portals/0/InfoRM/2026/'
+            'INFORM_Risk_2026_v072.xlsx">2026</a>',
+        ]
+        monkeypatch.setattr(_helpers, "INFORM_RELEASE_BACKOFF_SECONDS", 0)
+        monkeypatch.setattr(
+            _helpers.HttpClient,
+            "get",
+            lambda self, url, **kwargs: _TextResponse(pages.pop(0)),
+        )
+        url, year = _helpers.inform_release_url()
+        assert year == 2026, "the second read's workbook is used"
+        assert not pages, "both reads were made"
+
+    def test_release_url_stops_rereading_after_the_attempt_budget(self, monkeypatch):
+        """A page that never renders a link still raises, bounded."""
+        reads = []
+        monkeypatch.setattr(_helpers, "INFORM_RELEASE_BACKOFF_SECONDS", 0)
+
+        def _empty(self, url, **kwargs):
+            reads.append(url)
+            return _TextResponse("<p>no downloads</p>")
+
+        monkeypatch.setattr(_helpers.HttpClient, "get", _empty)
+        with pytest.raises(ValueError, match="No INFORM Risk release workbook"):
+            _helpers.inform_release_url()
+        assert len(reads) == _helpers.INFORM_RELEASE_ATTEMPTS, (
+            f"expected {_helpers.INFORM_RELEASE_ATTEMPTS} reads, got {len(reads)}"
+        )
+
     def test_download_reuses_a_cached_workbook(self, monkeypatch, release_workbook):
         """An already-downloaded workbook is reused instead of re-fetched."""
         monkeypatch.setattr(_helpers.HttpClient, "download", _explode_download)
