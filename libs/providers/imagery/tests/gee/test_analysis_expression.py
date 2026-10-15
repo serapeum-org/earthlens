@@ -2,13 +2,20 @@
 
 from __future__ import annotations
 
+import warnings
+
 import numpy as np
 import pytest
 from pydantic import ValidationError
 from pyramids.base.georeference import GeoReference
 from pyramids.dataset import Dataset
 
-from earthlens.gee.analysis.expression import ALLOWED_FUNCTIONS, BandExpression
+from earthlens.gee.analysis.expression import (
+    ALLOWED_FUNCTIONS,
+    FUNCTION_ARITY,
+    BandExpression,
+    _parse,
+)
 
 GEO = GeoReference(top_left_corner=(31.0, 30.0), cell_size=0.01, epsg=4326)
 
@@ -22,6 +29,11 @@ def _two_band(first: float = 0.6, second: float = 0.2) -> Dataset:
         ]
     )
     return Dataset.from_array(arr=stack, geo_ref=GEO, no_data_value=np.nan)
+
+
+def _signed_two_band() -> Dataset:
+    """A raster whose first band is negative, so `abs` changes the answer."""
+    return _two_band(first=-1.0, second=0.2)
 
 
 def _first(ds: Dataset) -> float:
@@ -55,6 +67,10 @@ REFUSED = [
     pytest.param("'text'", id="string-literal"),
     pytest.param("~b0", id="unary-invert"),
     pytest.param("clip(b0, a_min=0, a_max=1)", id="keyword-argument"),
+    pytest.param("abs(b0, b1)", id="arity-too-many"),
+    pytest.param("clip(b0, 0)", id="arity-too-few"),
+    pytest.param("where(b0)", id="arity-one-of-three"),
+    pytest.param("maximum(b0, b1, b1)", id="arity-ufunc-out-slot"),
     pytest.param("b0 +", id="syntax-error"),
     pytest.param("   ", id="blank"),
 ]
@@ -160,3 +176,62 @@ class TestWhatIsRefused:
         """The evaluator walks the tree itself, so builtins are unreachable."""
         with pytest.raises(ValidationError):
             BandExpression(formula="len(b0)")
+
+
+class TestTheHardenedEdges:
+    """Findings from the round-1 review, each pinned by the behaviour it names."""
+
+    def test_an_extra_positional_argument_cannot_overwrite_a_band(self):
+        """A numpy ufunc's second slot is `out=`, so arity has to be exact.
+
+        Before the arity check, `abs(b0, b1) + b1` returned 2.0 - the call had
+        written the absolute value of band 0 into band 1, which the `+ b1` then
+        read back.
+        """
+        source = _signed_two_band()
+        assert _first(
+            BandExpression(formula="abs(b0) + b1").apply(source)
+        ) == pytest.approx(1.2, rel=1e-5)
+        with pytest.raises(ValidationError, match="takes exactly 1 argument"):
+            BandExpression(formula="abs(b0, b1) + b1")
+
+    @pytest.mark.parametrize(
+        "formula", ["1 / 0", "log(0)", "sqrt(0 - 1)"], ids=["divide", "log", "domain"]
+    )
+    def test_a_non_finite_result_becomes_no_data_without_warning(self, formula):
+        """`inf` must not travel downstream, and no warning may escape.
+
+        A caller running under `-W error` would otherwise crash on `log(0)`,
+        and an `inf` in a raster poisons every statistic computed from it.
+        """
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            result = BandExpression(formula=formula).apply(_two_band())
+        assert np.isnan(_first(result))
+
+    def test_the_allow_list_cannot_be_extended_at_runtime(self):
+        """The no-escape promise would be worthless if a caller could add to it."""
+        with pytest.raises(TypeError):
+            ALLOWED_FUNCTIONS["system"] = print  # type: ignore[index]
+
+    def test_every_allowed_function_has_a_declared_arity(self):
+        """A new function without an arity would be callable with any signature."""
+        assert set(ALLOWED_FUNCTIONS) == set(FUNCTION_ARITY)
+
+    def test_the_parse_cache_is_bounded(self):
+        """An unbounded cache grew by one entry per distinct formula, forever."""
+        for offset in range(400):
+            BandExpression(formula=f"b0 + {offset}")
+        assert _parse.cache_info().currsize <= 256
+
+    def test_an_unknown_dtype_is_refused_at_construction(self):
+        """A typo in the dtype should not wait for a raster to surface."""
+        with pytest.raises(ValidationError, match="not a numpy dtype"):
+            BandExpression(formula="b0", dtype="flaot32")
+
+    def test_a_band_name_colliding_with_the_positional_namespace_is_refused(self):
+        """A band called `b1` at index 0 made `b1` silently read band 1."""
+        source = _two_band()
+        source.band_names = ["b1", "other"]
+        with pytest.raises(ValueError, match="collide with the positional namespace"):
+            BandExpression(formula="b1").apply(source)
