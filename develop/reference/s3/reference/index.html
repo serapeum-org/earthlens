@@ -817,6 +817,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -27905,11 +27933,11 @@ by <code>aggregate=</code> to pick the variable. <code>None</code> falls back to
 
 
         <p>Build an unsigned (or profile-signed) <code>boto3</code> S3 client lazily.</p>
-<p>Implements the <code>AbstractAuth</code> contract for
+<p>Implements the :class:<code>~earthlens.base.AbstractAuth</code> contract for
 public AWS Open-Data buckets. <code>configure()</code> constructs the client on
 first use (importing <code>boto3</code> lazily so the package imports without
 the <code>[s3]</code> extra); <code>is_authenticated()</code> reports whether the client
-exists; <code>client</code> is the accessor the backend's fetch step
+exists; :meth:<code>client</code> is the accessor the backend's fetch step
 calls.</p>
 <p>Because the target buckets are public, "authenticated" simply means
 "a client has been built" — there is no token to mint or expire.</p>
@@ -28023,11 +28051,11 @@ calls.</p>
 <span class="normal"><a href="#__codelineno-0-158">158</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="k">class</span><span class="w"> </span><span class="nc">S3Auth</span><span class="p">(</span><span class="n">AbstractAuth</span><span class="p">[</span><span class="n">S3Credentials</span><span class="p">]):</span>
 <a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build an unsigned (or profile-signed) `boto3` S3 client lazily.</span>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">    Implements the `AbstractAuth` contract for</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">    Implements the :class:`~earthlens.base.AbstractAuth` contract for</span>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">    public AWS Open-Data buckets. `configure()` constructs the client on</span>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    first use (importing `boto3` lazily so the package imports without</span>
 <a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    the `[s3]` extra); `is_authenticated()` reports whether the client</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    exists; `client` is the accessor the backend&#39;s fetch step</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    exists; :meth:`client` is the accessor the backend&#39;s fetch step</span>
 <a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    calls.</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">    Because the target buckets are public, &quot;authenticated&quot; simply means</span>
@@ -28048,7 +28076,7 @@ calls.</p>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store credentials and reset the (lazily built) client.</span>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">            credentials: The `S3Credentials` to use. `None`</span>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">            credentials: The :class:`S3Credentials` to use. `None`</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">                defaults to unsigned public access.</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span> <span class="ow">or</span> <span class="n">S3Credentials</span><span class="p">())</span>
@@ -28057,7 +28085,7 @@ calls.</p>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the `boto3` S3 client if it does not exist yet.</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a>
-<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">        Idempotent: returns immediately once `is_authenticated`</span>
+<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">        Idempotent: returns immediately once :meth:`is_authenticated`</span>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">        is `True`. Imports `boto3` / `botocore` lazily so importing the</span>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">        package without the `[s3]` extra does not fail.</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a>
@@ -28157,7 +28185,7 @@ calls.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>S3Credentials</code> to use. <code>None</code>
+                <p>The :class:<code>S3Credentials</code> to use. <code>None</code>
 defaults to unsigned public access.</p>
               </div>
             </td>
@@ -28183,7 +28211,7 @@ defaults to unsigned public access.</p>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Store credentials and reset the (lazily built) client.</span>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">        credentials: The `S3Credentials` to use. `None`</span>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">        credentials: The :class:`S3Credentials` to use. `None`</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">            defaults to unsigned public access.</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span> <span class="ow">or</span> <span class="n">S3Credentials</span><span class="p">())</span>
@@ -28293,7 +28321,7 @@ defaults to unsigned public access.</p>
     <div class="doc doc-contents ">
 
         <p>Build the <code>boto3</code> S3 client if it does not exist yet.</p>
-<p>Idempotent: returns immediately once <code>is_authenticated</code>
+<p>Idempotent: returns immediately once :meth:<code>is_authenticated</code>
 is <code>True</code>. Imports <code>boto3</code> / <code>botocore</code> lazily so importing the
 package without the <code>[s3]</code> extra does not fail.</p>
 
@@ -28362,7 +28390,7 @@ installed. The message names <code>earthlens[s3]</code>.</p>
 <span class="normal"><a href="#__codelineno-0-141">141</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the `boto3` S3 client if it does not exist yet.</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a>
-<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">    Idempotent: returns immediately once `is_authenticated`</span>
+<a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">    Idempotent: returns immediately once :meth:`is_authenticated`</span>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">    is `True`. Imports `boto3` / `botocore` lazily so importing the</span>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">    package without the `[s3]` extra does not fail.</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a>

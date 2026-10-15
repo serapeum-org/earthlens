@@ -817,6 +817,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -25570,8 +25598,8 @@ Global Solar Atlas <code>*.zip</code> URL for <code>"download_zip"</code> rows.<
 <p>Resolves each requested layer id against the bundled catalog and fetches it
 by its declared transport — windowed <code>/vsicurl</code> for the wind COGs,
 download-once-and-cache for the solar ZIPs — writing one cropped GeoTIFF per
-layer. The request is a search/fetch split: <code>_search</code> names one product
-per layer and <code>_fetch</code> realises each (windowed read → GeoTIFF).</p>
+layer. The request is a search/fetch split: :meth:<code>_search</code> names one product
+per layer and :meth:<code>_fetch</code> realises each (windowed read → GeoTIFF).</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -25861,8 +25889,8 @@ are static climatology).</p>
 <a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">    Resolves each requested layer id against the bundled catalog and fetches it</span>
 <a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    by its declared transport — windowed `/vsicurl` for the wind COGs,</span>
 <a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">    download-once-and-cache for the solar ZIPs — writing one cropped GeoTIFF per</span>
-<a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">    layer. The request is a search/fetch split: `_search` names one product</span>
-<a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    per layer and `_fetch` realises each (windowed read → GeoTIFF).</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">    layer. The request is a search/fetch split: :meth:`_search` names one product</span>
+<a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    per layer and :meth:`_fetch` realises each (windowed read → GeoTIFF).</span>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">        OUTPUT_KIND: Fixed `&quot;raster&quot;`; every layer yields a gridded GeoTIFF.</span>
@@ -26005,7 +26033,7 @@ are static climatology).</p>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a>
 <a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">            list[RemoteProduct]: One product per requested layer, carrying its</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">                resolved `Layer` row in `metadata`.</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">                resolved :class:`Layer` row in `metadata`.</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a>        <span class="k">return</span> <span class="p">[</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a>            <span class="n">RemoteProduct</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">layer</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">href</span><span class="o">=</span><span class="n">layer</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="p">})</span>
@@ -26016,7 +26044,7 @@ are static climatology).</p>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch every product by its transport, writing one GeoTIFF each.</span>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            products: The list from `_search`.</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            products: The list from :meth:`_search`.</span>
 <a id="__codelineno-0-212" name="__codelineno-0-212"></a>
 <a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            list[Path]: The written GeoTIFF path(s), in `products` order.</span>
@@ -27941,8 +27969,8 @@ facade-forwarded <code>aggregate=</code> is rejected. All raster I/O goes throug
 <p>Resolves each requested layer id against the bundled catalog and fetches it
 by its declared transport — windowed <code>/vsicurl</code> for the wind COGs,
 download-once-and-cache for the solar ZIPs — writing one cropped GeoTIFF per
-layer. The request is a search/fetch split: <code>_search</code> names one product
-per layer and <code>_fetch</code> realises each (windowed read → GeoTIFF).</p>
+layer. The request is a search/fetch split: :meth:<code>_search</code> names one product
+per layer and :meth:<code>_fetch</code> realises each (windowed read → GeoTIFF).</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -28232,8 +28260,8 @@ are static climatology).</p>
 <a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">    Resolves each requested layer id against the bundled catalog and fetches it</span>
 <a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    by its declared transport — windowed `/vsicurl` for the wind COGs,</span>
 <a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">    download-once-and-cache for the solar ZIPs — writing one cropped GeoTIFF per</span>
-<a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">    layer. The request is a search/fetch split: `_search` names one product</span>
-<a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    per layer and `_fetch` realises each (windowed read → GeoTIFF).</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">    layer. The request is a search/fetch split: :meth:`_search` names one product</span>
+<a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    per layer and :meth:`_fetch` realises each (windowed read → GeoTIFF).</span>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">        OUTPUT_KIND: Fixed `&quot;raster&quot;`; every layer yields a gridded GeoTIFF.</span>
@@ -28376,7 +28404,7 @@ are static climatology).</p>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a>
 <a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">            list[RemoteProduct]: One product per requested layer, carrying its</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">                resolved `Layer` row in `metadata`.</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">                resolved :class:`Layer` row in `metadata`.</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a>        <span class="k">return</span> <span class="p">[</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a>            <span class="n">RemoteProduct</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">layer</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">href</span><span class="o">=</span><span class="n">layer</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="p">})</span>
@@ -28387,7 +28415,7 @@ are static climatology).</p>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch every product by its transport, writing one GeoTIFF each.</span>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            products: The list from `_search`.</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            products: The list from :meth:`_search`.</span>
 <a id="__codelineno-0-212" name="__codelineno-0-212"></a>
 <a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            list[Path]: The written GeoTIFF path(s), in `products` order.</span>

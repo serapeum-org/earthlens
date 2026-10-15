@@ -817,6 +817,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -24135,7 +24163,7 @@ type — do not reuse this one with metric values.</p>
 latitude and longitude. <code>None</code> for backends that work
 on irregular grids or do not need a cell size for their
 request shape (e.g. CHIRPS FTP file lookup, S3 prefix
-listing). Mirrors <code>TemporalExtent.resolution</code> —
+listing). Mirrors :attr:<code>TemporalExtent.resolution</code> —
 the spatial counterpart of the temporal cadence.</p>
               </div>
             </td>
@@ -24381,7 +24409,7 @@ the spatial counterpart of the temporal cadence.</p>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            latitude and longitude. `None` for backends that work</span>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            on irregular grids or do not need a cell size for their</span>
 <a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            request shape (e.g. CHIRPS FTP file lookup, S3 prefix</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            listing). Mirrors `TemporalExtent.resolution` —</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            listing). Mirrors :attr:`TemporalExtent.resolution` —</span>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            the spatial counterpart of the temporal cadence.</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>
@@ -24492,7 +24520,7 @@ the spatial counterpart of the temporal cadence.</p>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
 <a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build from the legacy `[min, max]` pair shape.</span>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        `AbstractDataSource.__init__` accepts `lat_lim` /</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        :class:`AbstractDataSource.__init__` accepts `lat_lim` /</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        `lon_lim` as constructor kwargs in the public API; this</span>
 <a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">        classmethod adapts that shape to the four named fields.</span>
 <a id="__codelineno-0-363" name="__codelineno-0-363"></a>
@@ -24538,7 +24566,7 @@ the spatial counterpart of the temporal cadence.</p>
 <a id="__codelineno-0-403" name="__codelineno-0-403"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">estimate_pixel_dims</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_m</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return `(width_px, height_px)` of this bbox sampled at `scale_m` metres.</span>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">        Thin wrapper over `earthlens.base.spatial.estimate_pixel_dims`</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">        Thin wrapper over :func:`earthlens.base.spatial.estimate_pixel_dims`</span>
 <a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        so every backend can pre-flight a request size without reaching</span>
 <a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        into another subpackage. Useful e.g. for GEE&#39;s 32768-px</span>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        synchronous-export cap or for any &quot;will this download blow up?&quot;</span>
@@ -24828,7 +24856,7 @@ result) and raise for a polygon-<code>aoi=</code> extent.</p>
     <div class="doc doc-contents ">
 
         <p>Return <code>(width_px, height_px)</code> of this bbox sampled at <code>scale_m</code> metres.</p>
-<p>Thin wrapper over <code>earthlens.base.spatial.estimate_pixel_dims</code>
+<p>Thin wrapper over :func:<code>earthlens.base.spatial.estimate_pixel_dims</code>
 so every backend can pre-flight a request size without reaching
 into another subpackage. Useful e.g. for GEE's 32768-px
 synchronous-export cap or for any "will this download blow up?"
@@ -24944,7 +24972,7 @@ check before queuing a job.</p>
 <span class="normal"><a href="#__codelineno-0-430">430</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="k">def</span><span class="w"> </span><span class="nf">estimate_pixel_dims</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_m</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return `(width_px, height_px)` of this bbox sampled at `scale_m` metres.</span>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">    Thin wrapper over `earthlens.base.spatial.estimate_pixel_dims`</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">    Thin wrapper over :func:`earthlens.base.spatial.estimate_pixel_dims`</span>
 <a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">    so every backend can pre-flight a request size without reaching</span>
 <a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">    into another subpackage. Useful e.g. for GEE&#39;s 32768-px</span>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">    synchronous-export cap or for any &quot;will this download blow up?&quot;</span>
@@ -24991,7 +25019,7 @@ check before queuing a job.</p>
     <div class="doc doc-contents ">
 
         <p>Build from the legacy <code>[min, max]</code> pair shape.</p>
-<p><code>AbstractDataSource.__init__</code> accepts <code>lat_lim</code> /
+<p>:class:<code>AbstractDataSource.__init__</code> accepts <code>lat_lim</code> /
 <code>lon_lim</code> as constructor kwargs in the public API; this
 classmethod adapts that shape to the four named fields.</p>
 
@@ -25126,7 +25154,7 @@ shapes).</p>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
 <a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build from the legacy `[min, max]` pair shape.</span>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">    `AbstractDataSource.__init__` accepts `lat_lim` /</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">    :class:`AbstractDataSource.__init__` accepts `lat_lim` /</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">    `lon_lim` as constructor kwargs in the public API; this</span>
 <a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">    classmethod adapts that shape to the four named fields.</span>
 <a id="__codelineno-0-363" name="__codelineno-0-363"></a>
@@ -25180,9 +25208,9 @@ shapes).</p>
 
 
 
-        <p>Per-instance temporal context produced by <code>check_input_dates</code>.</p>
+        <p>Per-instance temporal context produced by :meth:<code>check_input_dates</code>.</p>
 <p>Replaces the <code>self.time</code> dict that earlier versions of
-<code>AbstractDataSource</code> accepted from subclass overrides. The
+:class:<code>AbstractDataSource</code> accepted from subclass overrides. The
 frozen pydantic model enforces presence of every consumer-visible
 field at construction time, so a subclass that returns a malformed
 container fails fast instead of surfacing as <code>KeyError</code> deep
@@ -25207,7 +25235,7 @@ inside the download loop.</p>
             <td>
               <div class="doc-md-description">
                 <p>Inclusive start of the requested window. Typed
-<code>typing.Any</code> because pandas / numpy timestamp types
+:data:<code>~typing.Any</code> because pandas / numpy timestamp types
 are not native pydantic primitives; the cross-field
 validator below enforces <code>start_date &lt;= end_date</code> for
 anything that supports comparison.</p>
@@ -25233,7 +25261,7 @@ anything that supports comparison.</p>
             <td>
               <div class="doc-md-description">
                 <p>Spacing between consecutive entries in
-<code>dates</code>, expressed as a pandas frequency alias —
+:attr:<code>dates</code>, expressed as a pandas frequency alias —
 <code>"D"</code> for daily, <code>"MS"</code> for month-start. Same
 shorthand pandas uses for <code>date_range(freq=...)</code>.</p>
               </div>
@@ -25246,8 +25274,8 @@ shorthand pandas uses for <code>date_range(freq=...)</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>pandas.DatetimeIndex</code> the download loop
-iterates. Typed <code>typing.Any</code> to avoid a hard
+                <p>The :class:<code>pandas.DatetimeIndex</code> the download loop
+iterates. Typed :data:<code>~typing.Any</code> to avoid a hard
 pandas import in the abstract module.</p>
               </div>
             </td>
@@ -25311,10 +25339,10 @@ pandas import in the abstract module.</p>
 <span class="normal"><a href="#__codelineno-0-220">220</a></span>
 <span class="normal"><a href="#__codelineno-0-221">221</a></span>
 <span class="normal"><a href="#__codelineno-0-222">222</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="k">class</span><span class="w"> </span><span class="nc">TemporalExtent</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Per-instance temporal context produced by `check_input_dates`.</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Per-instance temporal context produced by :meth:`check_input_dates`.</span>
 <a id="__codelineno-0-178" name="__codelineno-0-178"></a>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">    Replaces the `self.time` dict that earlier versions of</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">    `AbstractDataSource` accepted from subclass overrides. The</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">    :class:`AbstractDataSource` accepted from subclass overrides. The</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">    frozen pydantic model enforces presence of every consumer-visible</span>
 <a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">    field at construction time, so a subclass that returns a malformed</span>
 <a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">    container fails fast instead of surfacing as `KeyError` deep</span>
@@ -25322,17 +25350,17 @@ pandas import in the abstract module.</p>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">        start_date: Inclusive start of the requested window. Typed</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            `typing.Any` because pandas / numpy timestamp types</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            :data:`~typing.Any` because pandas / numpy timestamp types</span>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">            are not native pydantic primitives; the cross-field</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">            validator below enforces `start_date &lt;= end_date` for</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">            anything that supports comparison.</span>
 <a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">        end_date: Inclusive end of the requested window.</span>
 <a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        resolution: Spacing between consecutive entries in</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">            `dates`, expressed as a pandas frequency alias —</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">            :attr:`dates`, expressed as a pandas frequency alias —</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">            `&quot;D&quot;` for daily, `&quot;MS&quot;` for month-start. Same</span>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">            shorthand pandas uses for `date_range(freq=...)`.</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">        dates: The `pandas.DatetimeIndex` the download loop</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">            iterates. Typed `typing.Any` to avoid a hard</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">        dates: The :class:`pandas.DatetimeIndex` the download loop</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">            iterates. Typed :data:`~typing.Any` to avoid a hard</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">            pandas import in the abstract module.</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>

@@ -817,6 +817,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -24408,7 +24436,7 @@ API. FLODIS needs no credentials — the Zenodo record is public (CC-BY-4.0).</p
         <p>FLODIS observed-flood footprints &lt;-&gt; impacts backend.</p>
 <p>Fetches the FLODIS dataset (Mester, Frieler &amp; Schewe, PIK; Sci Data 10, 482,
 2023) from its pinned static Zenodo record, and returns per-event impact records
-as a <code>pandas.DataFrame</code>. FLODIS is the observed hazard-footprint -&gt; impact
+as a :class:<code>pandas.DataFrame</code>. FLODIS is the observed hazard-footprint -&gt; impact
 bridge: it links EM-DAT fatalities + economic damages (<code>dataset="damages"</code>) and
 IDMC displacements (<code>dataset="displacement"</code>) to Global Flood Database satellite
 flood footprints, adding per-event affected population, GDP and
@@ -24420,19 +24448,19 @@ footprints: the GDIS geometry comes from the shipped <code>emdat</code> backend 
 extents from the shipped <code>gee</code> backend (<code>GLOBAL_FLOOD_DB/MODIS_EVENTS/V1</code>), joined
 on those keys.</p>
 <p>This is a <code>tabular</code> backend: the result is a table of per-event impact rows, not
-a gridded array, so the <code>earthlens.earthlens.EarthLens</code> facade rejects an
+a gridded array, so the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects an
 <code>aggregate=</code> argument.</p>
 <p>FLODIS needs <strong>no credentials</strong> — the Zenodo record is public (CC-BY-4.0) — so
 there is no auth class and no <code>[flodis]</code> extra: the only dependencies (HttpClient,
 pandas) are core.</p>
 <p>Public surface (re-exported from this package):</p>
 <ul>
-<li><code>FLODIS</code> — the backend; instantiate with <code>dataset=</code> and optional
-  <code>country=</code> / <code>gid=</code> / date filters, then call <code>FLODIS.download</code>.</li>
-<li><code>Catalog</code> — loader for the bundled <code>flodis_data_catalog.yaml</code>.</li>
-<li><code>ZenodoRecord</code> / <code>FlodisDataset</code> — the catalog's frozen row
+<li>:class:<code>FLODIS</code> — the backend; instantiate with <code>dataset=</code> and optional
+  <code>country=</code> / <code>gid=</code> / date filters, then call :meth:<code>FLODIS.download</code>.</li>
+<li>:class:<code>Catalog</code> — loader for the bundled <code>flodis_data_catalog.yaml</code>.</li>
+<li>:class:<code>ZenodoRecord</code> / :class:<code>FlodisDataset</code> — the catalog's frozen row
   models.</li>
-<li><code>CATALOG_PATH</code> — path to the bundled catalog YAML; monkey-patchable in
+<li>:data:<code>CATALOG_PATH</code> — path to the bundled catalog YAML; monkey-patchable in
   tests.</li>
 </ul>
 
@@ -24487,8 +24515,8 @@ pandas) are core.</p>
         <p>Catalog for the FLODIS backend.</p>
 <p>Reads the bundled <code>flodis_data_catalog.yaml</code> (shipped as package data) and
 exposes the pinned Zenodo record, the two selectable tables (as
-<code>FlodisDataset</code> rows keyed by <code>dataset</code> under the inherited
-<code>datasets</code> field — the <code>cat["damages"]</code> / <code>"damages" in cat</code> /
+:class:<code>FlodisDataset</code> rows keyed by <code>dataset</code> under the inherited
+:attr:<code>datasets</code> field — the <code>cat["damages"]</code> / <code>"damages" in cat</code> /
 <code>len(cat)</code> dict surface), and the friendly-name -&gt; CSV-header map.
 Instantiate with no arguments (<code>Catalog()</code>).</p>
 
@@ -24510,7 +24538,7 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from a <code>dataset</code> string to its <code>FlodisDataset</code> row.</p>
+                <p>Map from a <code>dataset</code> string to its :class:<code>FlodisDataset</code> row.</p>
               </div>
             </td>
           </tr>
@@ -24521,7 +24549,7 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The pinned <code>ZenodoRecord</code>.</p>
+                <p>The pinned :class:<code>ZenodoRecord</code>.</p>
               </div>
             </td>
           </tr>
@@ -24738,14 +24766,14 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a>
 <a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">    Reads the bundled `flodis_data_catalog.yaml` (shipped as package data) and</span>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">    exposes the pinned Zenodo record, the two selectable tables (as</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">    `FlodisDataset` rows keyed by `dataset` under the inherited</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">    `datasets` field — the `cat[&quot;damages&quot;]` / `&quot;damages&quot; in cat` /</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">    :class:`FlodisDataset` rows keyed by `dataset` under the inherited</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">    :attr:`datasets` field — the `cat[&quot;damages&quot;]` / `&quot;damages&quot; in cat` /</span>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">    `len(cat)` dict surface), and the friendly-name -&gt; CSV-header map.</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">    Instantiate with no arguments (`Catalog()`).</span>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        datasets: Map from a `dataset` string to its `FlodisDataset` row.</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        record: The pinned `ZenodoRecord`.</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        datasets: Map from a `dataset` string to its :class:`FlodisDataset` row.</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        record: The pinned :class:`ZenodoRecord`.</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        columns: Friendly name -&gt; exact FLODIS CSV header.</span>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    Examples:</span>
@@ -24779,7 +24807,7 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FlodisDataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a>    <span class="c1">#: `record` defaults to `None` rather than a placeholder model: the base</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="c1">#: `model_post_init` autoload fills a field only when its current value</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="c1">#: :meth:`model_post_init` autoload fills a field only when its current value</span>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a>    <span class="c1">#: is falsy, and a placeholder model instance is truthy, so it would be</span>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a>    <span class="c1">#: skipped. `None` is falsy, so the bundled record loads as intended.</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="n">record</span><span class="p">:</span> <span class="n">ZenodoRecord</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -24800,10 +24828,10 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">                `CATALOG_PATH`.</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            ValueError: If `catalog_path` does not exist, a required block is</span>
@@ -24828,9 +24856,9 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">parsed</span><span class="p">)</span>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FlodisDataset</span><span class="p">:</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `FlodisDataset` for `name`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`FlodisDataset` for `name`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        Thin typed alias over `get_dataset`.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        Thin typed alias over :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            name: A FLODIS table name (`&quot;damages&quot;` or `&quot;displacement&quot;`).</span>
@@ -25086,8 +25114,8 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>FlodisDataset</code> for <code>name</code>, with a did-you-mean hint.</p>
-<p>Thin typed alias over <code>get_dataset</code>.</p>
+        <p>Return the :class:<code>FlodisDataset</code> for <code>name</code>, with a did-you-mean hint.</p>
+<p>Thin typed alias over :meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -25203,9 +25231,9 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 <span class="normal"><a href="#__codelineno-0-329">329</a></span>
 <span class="normal"><a href="#__codelineno-0-330">330</a></span>
 <span class="normal"><a href="#__codelineno-0-331">331</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="k">def</span><span class="w"> </span><span class="nf">dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FlodisDataset</span><span class="p">:</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `FlodisDataset` for `name`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`FlodisDataset` for `name`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Thin typed alias over `get_dataset`.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Thin typed alias over :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        name: A FLODIS table name (`&quot;damages&quot;` or `&quot;displacement&quot;`).</span>
@@ -25271,7 +25299,7 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the module-level
-<code>CATALOG_PATH</code>.</p>
+:data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -25297,7 +25325,7 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -25381,10 +25409,10 @@ missing, or a row fails validation.</p>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">            `CATALOG_PATH`.</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        ValueError: If `catalog_path` does not exist, a required block is</span>
@@ -25527,7 +25555,7 @@ missing, or a row fails validation.</p>
         <p>FLODIS observed-flood impacts backend (tabular).</p>
 <p>Downloads the selected FLODIS table from its pinned Zenodo release, filters
 it by country / GADM code / date window, and returns a
-<code>pandas.DataFrame</code> carrying the join keys (<code>disasterno</code> for <code>damages</code>,
+:class:<code>pandas.DataFrame</code> carrying the join keys (<code>disasterno</code> for <code>damages</code>,
 <code>GID_1</code> / <code>GID_2</code> for <code>displacement</code>) so a caller can join to the shipped
 <code>emdat</code> (GDIS) footprints and <code>gee</code> (Global Flood Database) extents.</p>
 <p>The record is public (CC-BY-4.0); no credentials are needed.</p>
@@ -26003,7 +26031,7 @@ year the record covers (2000-2018).</p>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    Downloads the selected FLODIS table from its pinned Zenodo release, filters</span>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">    it by country / GADM code / date window, and returns a</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">    `pandas.DataFrame` carrying the join keys (`disasterno` for `damages`,</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">    :class:`pandas.DataFrame` carrying the join keys (`disasterno` for `damages`,</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">    `GID_1` / `GID_2` for `displacement`) so a caller can join to the shipped</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">    `emdat` (GDIS) footprints and `gee` (Global Flood Database) extents.</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>
@@ -26133,7 +26161,7 @@ year the record covers (2000-2018).</p>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="p">)</span>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a>
 <a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Capture the requested bounds as a `SpatialExtent`.</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Capture the requested bounds as a :class:`SpatialExtent`.</span>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            lat_lim: `[min_lat, max_lat]`.</span>
@@ -26151,7 +26179,7 @@ year the record covers (2000-2018).</p>
 <a id="__codelineno-0-343" name="__codelineno-0-343"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-345" name="__codelineno-0-345"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a `TemporalExtent`.</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        FLODIS covers a whole record and is indexed by event year, so `None`</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        bounds are legal and yield a `None`-dated extent.</span>
@@ -26253,7 +26281,7 @@ year the record covers (2000-2018).</p>
 <a id="__codelineno-0-445" name="__codelineno-0-445"></a>
 <a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">        Kept in a dedicated `flodis_source/` sub-directory so it cannot collide</span>
 <a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">        with the filtered CSV `download()` writes into `root_dir` (see</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">        `_load_table`).</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">        :meth:`_load_table`).</span>
 <a id="__codelineno-0-449" name="__codelineno-0-449"></a>
 <a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">            Path: `root_dir/flodis_source/&lt;file&gt;`.</span>
@@ -26313,10 +26341,10 @@ year the record covers (2000-2018).</p>
 <a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download and filter the one product.</span>
 <a id="__codelineno-0-506" name="__codelineno-0-506"></a>
 <a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">            products: The single-element list from `_search`.</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">            products: The single-element list from :meth:`_search`.</span>
 <a id="__codelineno-0-509" name="__codelineno-0-509"></a>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">            list[Any]: One element — the filtered `pandas.DataFrame`.</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">            list[Any]: One element — the filtered :class:`pandas.DataFrame`.</span>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="c1"># Single-product backend: the one table is re-derived from instance state</span>
 <a id="__codelineno-0-514" name="__codelineno-0-514"></a>        <span class="c1"># (`dataset` + filters), so `products` is accepted for the base</span>
@@ -26324,7 +26352,7 @@ year the record covers (2000-2018).</p>
 <a id="__codelineno-0-516" name="__codelineno-0-516"></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_load_table</span><span class="p">())]</span>
 <a id="__codelineno-0-517" name="__codelineno-0-517"></a>
 <a id="__codelineno-0-518" name="__codelineno-0-518"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch`.</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose :meth:`_search` and :meth:`_fetch`.</span>
 <a id="__codelineno-0-520" name="__codelineno-0-520"></a>
 <a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">            list[Any]: The fetched result (one element).</span>
@@ -27049,7 +27077,7 @@ error page served with a 200 status).</p>
 
         <p>One selectable FLODIS table (a row of the catalog's dict surface).</p>
 <p>The <code>dataset</code> string (<code>"damages"</code>, <code>"displacement"</code>) is the parent key in
-<code>Catalog.datasets</code> and is not stored on the row.</p>
+:attr:<code>Catalog.datasets</code> and is not stored on the row.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -27185,7 +27213,7 @@ A caller joins on these to the <code>emdat</code> (GDIS) footprints and <code>ge
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One selectable FLODIS table (a row of the catalog&#39;s dict surface).</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    The `dataset` string (`&quot;damages&quot;`, `&quot;displacement&quot;`) is the parent key in</span>
-<a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    `Catalog.datasets` and is not stored on the row.</span>
+<a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    :attr:`Catalog.datasets` and is not stored on the row.</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">        file: The file name on the Zenodo record</span>
@@ -27635,7 +27663,7 @@ citation and a future refresh check; never used to fetch.</p>
 (EM-DAT fatalities + economic damages) or <code>displacement</code> (IDMC displacements),
 each matched to Global Flood Database satellite footprints — from its pinned
 static Zenodo record, filters it, and returns the per-event impact records as a
-<code>pandas.DataFrame</code>. It is the observed hazard-footprint -&gt; impact bridge:
+:class:<code>pandas.DataFrame</code>. It is the observed hazard-footprint -&gt; impact bridge:
 the global companion to the European <code>hanze</code> backend, and to the raw impact
 tables in <code>emdat</code>.</p>
 <p>Three design points carry this backend:</p>
@@ -27699,7 +27727,7 @@ refused and nothing here imports a gridded-array library (no <code>xarray</code>
         <p>FLODIS observed-flood impacts backend (tabular).</p>
 <p>Downloads the selected FLODIS table from its pinned Zenodo release, filters
 it by country / GADM code / date window, and returns a
-<code>pandas.DataFrame</code> carrying the join keys (<code>disasterno</code> for <code>damages</code>,
+:class:<code>pandas.DataFrame</code> carrying the join keys (<code>disasterno</code> for <code>damages</code>,
 <code>GID_1</code> / <code>GID_2</code> for <code>displacement</code>) so a caller can join to the shipped
 <code>emdat</code> (GDIS) footprints and <code>gee</code> (Global Flood Database) extents.</p>
 <p>The record is public (CC-BY-4.0); no credentials are needed.</p>
@@ -28175,7 +28203,7 @@ year the record covers (2000-2018).</p>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    Downloads the selected FLODIS table from its pinned Zenodo release, filters</span>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">    it by country / GADM code / date window, and returns a</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">    `pandas.DataFrame` carrying the join keys (`disasterno` for `damages`,</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">    :class:`pandas.DataFrame` carrying the join keys (`disasterno` for `damages`,</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">    `GID_1` / `GID_2` for `displacement`) so a caller can join to the shipped</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">    `emdat` (GDIS) footprints and `gee` (Global Flood Database) extents.</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>
@@ -28305,7 +28333,7 @@ year the record covers (2000-2018).</p>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="p">)</span>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a>
 <a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Capture the requested bounds as a `SpatialExtent`.</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Capture the requested bounds as a :class:`SpatialExtent`.</span>
 <a id="__codelineno-0-329" name="__codelineno-0-329"></a>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            lat_lim: `[min_lat, max_lat]`.</span>
@@ -28323,7 +28351,7 @@ year the record covers (2000-2018).</p>
 <a id="__codelineno-0-343" name="__codelineno-0-343"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-345" name="__codelineno-0-345"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a `TemporalExtent`.</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        FLODIS covers a whole record and is indexed by event year, so `None`</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        bounds are legal and yield a `None`-dated extent.</span>
@@ -28425,7 +28453,7 @@ year the record covers (2000-2018).</p>
 <a id="__codelineno-0-445" name="__codelineno-0-445"></a>
 <a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">        Kept in a dedicated `flodis_source/` sub-directory so it cannot collide</span>
 <a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">        with the filtered CSV `download()` writes into `root_dir` (see</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">        `_load_table`).</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">        :meth:`_load_table`).</span>
 <a id="__codelineno-0-449" name="__codelineno-0-449"></a>
 <a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">            Path: `root_dir/flodis_source/&lt;file&gt;`.</span>
@@ -28485,10 +28513,10 @@ year the record covers (2000-2018).</p>
 <a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download and filter the one product.</span>
 <a id="__codelineno-0-506" name="__codelineno-0-506"></a>
 <a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">            products: The single-element list from `_search`.</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">            products: The single-element list from :meth:`_search`.</span>
 <a id="__codelineno-0-509" name="__codelineno-0-509"></a>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">            list[Any]: One element — the filtered `pandas.DataFrame`.</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">            list[Any]: One element — the filtered :class:`pandas.DataFrame`.</span>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="c1"># Single-product backend: the one table is re-derived from instance state</span>
 <a id="__codelineno-0-514" name="__codelineno-0-514"></a>        <span class="c1"># (`dataset` + filters), so `products` is accepted for the base</span>
@@ -28496,7 +28524,7 @@ year the record covers (2000-2018).</p>
 <a id="__codelineno-0-516" name="__codelineno-0-516"></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_filter_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_load_table</span><span class="p">())]</span>
 <a id="__codelineno-0-517" name="__codelineno-0-517"></a>
 <a id="__codelineno-0-518" name="__codelineno-0-518"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch`.</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose :meth:`_search` and :meth:`_fetch`.</span>
 <a id="__codelineno-0-520" name="__codelineno-0-520"></a>
 <a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">            list[Any]: The fetched result (one element).</span>
@@ -29233,21 +29261,21 @@ pinned record, the per-dataset file names and join keys, and the friendly-name
 -&gt; CSV-header map.</p>
 <p>Three shapes are modelled, all frozen:</p>
 <ul>
-<li><code>ZenodoRecord</code> — the pinned record, its DOI, <code>data_period</code>, licence and
+<li>:class:<code>ZenodoRecord</code> — the pinned record, its DOI, <code>data_period</code>, licence and
   attribution. Pinning a record id rather than a moving branch is what makes a
   request reproducible.</li>
-<li><code>FlodisDataset</code> — one selectable table (its Zenodo file name, a
+<li>:class:<code>FlodisDataset</code> — one selectable table (its Zenodo file name, a
   description, and its join-key columns). These are the catalog's dict-surface
   rows, keyed by <code>dataset</code> name (<code>"damages"</code> / <code>"displacement"</code>) under the
-  inherited <code>datasets</code> field.</li>
+  inherited :attr:<code>datasets</code> field.</li>
 <li>the <code>columns</code> map — friendly name -&gt; exact FLODIS CSV header, so the backend
   locates the selector / join-key / impact columns without hard-coding spellings.</li>
 </ul>
-<p><code>Catalog</code> is a thin <code>earthlens.base.AbstractCatalog</code> subclass that
+<p>:class:<code>Catalog</code> is a thin :class:<code>earthlens.base.AbstractCatalog</code> subclass that
 loads the bundled <code>flodis_data_catalog.yaml</code> (shipped as package data) through
-the shared <code>load_catalog</code> (with a
-<code>CatalogParseCache</code>), mirroring
-<code>hanze/catalog.py</code>. <code>CATALOG_PATH</code> is the path to the bundled YAML and is
+the shared :func:<code>~earthlens.base.catalog_source.load_catalog</code> (with a
+:class:<code>~earthlens.base.yaml_loader.CatalogParseCache</code>), mirroring
+<code>hanze/catalog.py</code>. :data:<code>CATALOG_PATH</code> is the path to the bundled YAML and is
 monkey-patchable in tests.</p>
 
 
@@ -29289,8 +29317,8 @@ monkey-patchable in tests.</p>
         <p>Catalog for the FLODIS backend.</p>
 <p>Reads the bundled <code>flodis_data_catalog.yaml</code> (shipped as package data) and
 exposes the pinned Zenodo record, the two selectable tables (as
-<code>FlodisDataset</code> rows keyed by <code>dataset</code> under the inherited
-<code>datasets</code> field — the <code>cat["damages"]</code> / <code>"damages" in cat</code> /
+:class:<code>FlodisDataset</code> rows keyed by <code>dataset</code> under the inherited
+:attr:<code>datasets</code> field — the <code>cat["damages"]</code> / <code>"damages" in cat</code> /
 <code>len(cat)</code> dict surface), and the friendly-name -&gt; CSV-header map.
 Instantiate with no arguments (<code>Catalog()</code>).</p>
 
@@ -29312,7 +29340,7 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from a <code>dataset</code> string to its <code>FlodisDataset</code> row.</p>
+                <p>Map from a <code>dataset</code> string to its :class:<code>FlodisDataset</code> row.</p>
               </div>
             </td>
           </tr>
@@ -29323,7 +29351,7 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The pinned <code>ZenodoRecord</code>.</p>
+                <p>The pinned :class:<code>ZenodoRecord</code>.</p>
               </div>
             </td>
           </tr>
@@ -29540,14 +29568,14 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a>
 <a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">    Reads the bundled `flodis_data_catalog.yaml` (shipped as package data) and</span>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">    exposes the pinned Zenodo record, the two selectable tables (as</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">    `FlodisDataset` rows keyed by `dataset` under the inherited</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">    `datasets` field — the `cat[&quot;damages&quot;]` / `&quot;damages&quot; in cat` /</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">    :class:`FlodisDataset` rows keyed by `dataset` under the inherited</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">    :attr:`datasets` field — the `cat[&quot;damages&quot;]` / `&quot;damages&quot; in cat` /</span>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">    `len(cat)` dict surface), and the friendly-name -&gt; CSV-header map.</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">    Instantiate with no arguments (`Catalog()`).</span>
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        datasets: Map from a `dataset` string to its `FlodisDataset` row.</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        record: The pinned `ZenodoRecord`.</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        datasets: Map from a `dataset` string to its :class:`FlodisDataset` row.</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        record: The pinned :class:`ZenodoRecord`.</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        columns: Friendly name -&gt; exact FLODIS CSV header.</span>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    Examples:</span>
@@ -29581,7 +29609,7 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a>
 <a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FlodisDataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a>    <span class="c1">#: `record` defaults to `None` rather than a placeholder model: the base</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="c1">#: `model_post_init` autoload fills a field only when its current value</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="c1">#: :meth:`model_post_init` autoload fills a field only when its current value</span>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a>    <span class="c1">#: is falsy, and a placeholder model instance is truthy, so it would be</span>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a>    <span class="c1">#: skipped. `None` is falsy, so the bundled record loads as intended.</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="n">record</span><span class="p">:</span> <span class="n">ZenodoRecord</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -29602,10 +29630,10 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">                `CATALOG_PATH`.</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            ValueError: If `catalog_path` does not exist, a required block is</span>
@@ -29630,9 +29658,9 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">parsed</span><span class="p">)</span>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FlodisDataset</span><span class="p">:</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `FlodisDataset` for `name`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`FlodisDataset` for `name`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        Thin typed alias over `get_dataset`.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        Thin typed alias over :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            name: A FLODIS table name (`&quot;damages&quot;` or `&quot;displacement&quot;`).</span>
@@ -29888,8 +29916,8 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>FlodisDataset</code> for <code>name</code>, with a did-you-mean hint.</p>
-<p>Thin typed alias over <code>get_dataset</code>.</p>
+        <p>Return the :class:<code>FlodisDataset</code> for <code>name</code>, with a did-you-mean hint.</p>
+<p>Thin typed alias over :meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -30005,9 +30033,9 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
 <span class="normal"><a href="#__codelineno-0-329">329</a></span>
 <span class="normal"><a href="#__codelineno-0-330">330</a></span>
 <span class="normal"><a href="#__codelineno-0-331">331</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="k">def</span><span class="w"> </span><span class="nf">dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FlodisDataset</span><span class="p">:</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `FlodisDataset` for `name`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`FlodisDataset` for `name`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Thin typed alias over `get_dataset`.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Thin typed alias over :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        name: A FLODIS table name (`&quot;damages&quot;` or `&quot;displacement&quot;`).</span>
@@ -30073,7 +30101,7 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the module-level
-<code>CATALOG_PATH</code>.</p>
+:data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -30099,7 +30127,7 @@ Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -30183,10 +30211,10 @@ missing, or a row fails validation.</p>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">            `CATALOG_PATH`.</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        ValueError: If `catalog_path` does not exist, a required block is</span>
@@ -30328,7 +30356,7 @@ missing, or a row fails validation.</p>
 
         <p>One selectable FLODIS table (a row of the catalog's dict surface).</p>
 <p>The <code>dataset</code> string (<code>"damages"</code>, <code>"displacement"</code>) is the parent key in
-<code>Catalog.datasets</code> and is not stored on the row.</p>
+:attr:<code>Catalog.datasets</code> and is not stored on the row.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -30464,7 +30492,7 @@ A caller joins on these to the <code>emdat</code> (GDIS) footprints and <code>ge
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One selectable FLODIS table (a row of the catalog&#39;s dict surface).</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    The `dataset` string (`&quot;damages&quot;`, `&quot;displacement&quot;`) is the parent key in</span>
-<a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    `Catalog.datasets` and is not stored on the row.</span>
+<a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    :attr:`Catalog.datasets` and is not stored on the row.</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">        file: The file name on the Zenodo record</span>

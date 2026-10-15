@@ -817,6 +817,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -24897,15 +24925,15 @@ this section; this page is the rendered API.</p>
 Management System) area CSV API that returns near-real-time and archival
 <strong>active-fire detections</strong> from MODIS (C6.1) and VIIRS (S-NPP / NOAA-20 /
 NOAA-21) as a pyramids
-<code>pyramids.feature.collection.FeatureCollection</code> of fire-pixel
+:class:<code>~pyramids.feature.collection.FeatureCollection</code> of fire-pixel
 points (CRS <code>EPSG:4326</code>).</p>
 <p>This is a <code>vector</code> backend: the result is a table of geolocated fire
-detections, not a gridded array, so <code>FIRMS.OUTPUT_KIND</code> is
-<code>"vector"</code> and the <code>earthlens.earthlens.EarthLens</code> facade rejects
+detections, not a gridded array, so :data:<code>FIRMS.OUTPUT_KIND</code> is
+<code>"vector"</code> and the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects
 an <code>aggregate=</code> argument for it.</p>
 <p>FIRMS needs a free <strong><code>MAP_KEY</code></strong> (no SDK): the only dependencies are
 <code>requests</code> + <code>pandas</code>, both core, so there is <strong>no <code>[firms]</code> extra</strong> to
-install — the key lives in <code>FirmsAuth</code>, not a dependency.</p>
+install — the key lives in :class:<code>FirmsAuth</code>, not a dependency.</p>
 <p>Sensor selection: for this backend <code>variables</code> is a <code>list[str]</code> of FIRMS
 sensor codes — <code>variables=["VIIRS_SNPP_NRT"]</code>,
 <code>variables=["MODIS_NRT", "VIIRS_SNPP_NRT"]</code> — <strong>not</strong> data-variable
@@ -24914,17 +24942,17 @@ names. This is an intentional, documented overload (the facade makes
 (<code>min_confidence=</code>, <code>day_night=</code>) arrive as explicit keyword arguments.</p>
 <p>Public surface (re-exported from this package):</p>
 <ul>
-<li><code>FIRMS</code> — the backend; instantiate with a date range, a bbox,
-  and <code>variables=[sensor_code, ...]</code>, then call <code>FIRMS.download</code>.</li>
-<li><code>Catalog</code> — pydantic-backed loader for the bundled
+<li>:class:<code>FIRMS</code> — the backend; instantiate with a date range, a bbox,
+  and <code>variables=[sensor_code, ...]</code>, then call :meth:<code>FIRMS.download</code>.</li>
+<li>:class:<code>Catalog</code> — pydantic-backed loader for the bundled
   <code>firms_data_catalog.yaml</code> sensor dispatch table.</li>
-<li><code>Sensor</code> / <code>SensorColumn</code> — one sensor's row and one of
+<li>:class:<code>Sensor</code> / :class:<code>SensorColumn</code> — one sensor's row and one of
   its CSV columns.</li>
-<li><code>FirmsAuth</code> / <code>FirmsCredentials</code> — <code>MAP_KEY</code> resolution.</li>
-<li><code>AuthenticationError</code> — raised when no usable <code>MAP_KEY</code> resolves.</li>
-<li><code>csv_to_fc</code> / <code>empty_fc</code> — the FIRMS CSV → FeatureCollection
+<li>:class:<code>FirmsAuth</code> / :class:<code>FirmsCredentials</code> — <code>MAP_KEY</code> resolution.</li>
+<li>:class:<code>AuthenticationError</code> — raised when no usable <code>MAP_KEY</code> resolves.</li>
+<li>:func:<code>csv_to_fc</code> / :func:<code>empty_fc</code> — the FIRMS CSV → FeatureCollection
   mapper and its empty-result counterpart.</li>
-<li><code>CATALOG_PATH</code> — path to the bundled sensor YAML;
+<li>:data:<code>CATALOG_PATH</code> — path to the bundled sensor YAML;
   monkey-patchable in tests.</li>
 </ul>
 
@@ -24983,7 +25011,7 @@ names. This is an intentional, documented overload (the facade makes
 <code>EarthLens(...).authenticate()</code>, set the <code>FIRMS_MAP_KEY</code> environment
 variable, or request a free key at
 <code>firms.modaps.eosdis.nasa.gov/api/map_key/</code>. A subclass of the
-cross-backend <code>earthlens.base.AuthenticationError</code> so callers
+cross-backend :class:<code>earthlens.base.AuthenticationError</code> so callers
 can catch every backend's auth failure with one <code>except</code> clause.</p>
 
 
@@ -25011,7 +25039,7 @@ can catch every backend's auth failure with one <code>except</code> clause.</p>
 <a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">    `EarthLens(...).authenticate()`, set the `FIRMS_MAP_KEY` environment</span>
 <a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="sd">    variable, or request a free key at</span>
 <a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    `firms.modaps.eosdis.nasa.gov/api/map_key/`. A subclass of the</span>
-<a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    cross-backend `earthlens.base.AuthenticationError` so callers</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    cross-backend :class:`earthlens.base.AuthenticationError` so callers</span>
 <a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="sd">    can catch every backend&#39;s auth failure with one `except` clause.</span>
 <a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
@@ -25040,13 +25068,13 @@ can catch every backend's auth failure with one <code>except</code> clause.</p>
 
         <p>Sensor catalog for the NASA FIRMS backend.</p>
 <p>Reads the bundled <code>firms_data_catalog.yaml</code> (shipped as package
-data) and exposes its <code>sensors:</code> block as a map of <code>Sensor</code>
-rows, keyed by FIRMS source code under the inherited <code>datasets</code>
+data) and exposes its <code>sensors:</code> block as a map of :class:<code>Sensor</code>
+rows, keyed by FIRMS source code under the inherited :attr:<code>datasets</code>
 field. Instantiate with no arguments (<code>Catalog()</code>);
-<code>model_post_init</code> loads and validates the YAML in one pass.
-Resolve a sensor with <code>get_sensor</code> (a thin alias over
-<code>get_dataset</code>) and a single
-column with <code>get_column</code>.</p>
+:func:<code>model_post_init</code> loads and validates the YAML in one pass.
+Resolve a sensor with :meth:<code>get_sensor</code> (a thin alias over
+:meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>) and a single
+column with :meth:<code>get_column</code>.</p>
 <p>There is no <code>available_*</code> index — the listed sensors are the whole
 FIRMS universe (a deliberate deviation from the ECMWF/GEE catalogs,
 shared with GDACS/FDSN).</p>
@@ -25069,7 +25097,7 @@ shared with GDACS/FDSN).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from the FIRMS source code to its <code>Sensor</code>
+                <p>Map from the FIRMS source code to its :class:<code>Sensor</code>
 row.</p>
               </div>
             </td>
@@ -25262,20 +25290,20 @@ row.</p>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Sensor catalog for the NASA FIRMS backend.</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">    Reads the bundled `firms_data_catalog.yaml` (shipped as package</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    data) and exposes its `sensors:` block as a map of `Sensor`</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    rows, keyed by FIRMS source code under the inherited `datasets`</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    data) and exposes its `sensors:` block as a map of :class:`Sensor`</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    rows, keyed by FIRMS source code under the inherited :attr:`datasets`</span>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    field. Instantiate with no arguments (`Catalog()`);</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    `model_post_init` loads and validates the YAML in one pass.</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    Resolve a sensor with `get_sensor` (a thin alias over</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    `get_dataset`) and a single</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    column with `get_column`.</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    :func:`model_post_init` loads and validates the YAML in one pass.</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    Resolve a sensor with :meth:`get_sensor` (a thin alias over</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`) and a single</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    column with :meth:`get_column`.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    There is no `available_*` index — the listed sensors are the whole</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    FIRMS universe (a deliberate deviation from the ECMWF/GEE catalogs,</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">    shared with GDACS/FDSN).</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        datasets: Map from the FIRMS source code to its `Sensor`</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        datasets: Map from the FIRMS source code to its :class:`Sensor`</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            row.</span>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">    Examples:</span>
@@ -25326,14 +25354,14 @@ row.</p>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file has no</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">                `sensors:` block, or a row fails `Sensor` validation.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">                `sensors:` block, or a row fails :class:`Sensor` validation.</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="n">sensors</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
@@ -25342,10 +25370,10 @@ row.</p>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">sensors</span><span class="p">))</span>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sensor</span><span class="p">:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Sensor` for `code`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Sensor` for `code`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        Thin alias over</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        `get_dataset`.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            code: A FIRMS source code (`&quot;VIIRS_SNPP_NRT&quot;`, `&quot;MODIS_NRT&quot;`,</span>
@@ -25363,7 +25391,7 @@ row.</p>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return one column&#39;s metadata for a `(sensor, column)` pair.</span>
 <a id="__codelineno-0-327" name="__codelineno-0-327"></a>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">            code: A FIRMS source code as it appears in `datasets`.</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">            code: A FIRMS source code as it appears in :attr:`datasets`.</span>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">            column: A CSV column name declared under that sensor.</span>
 <a id="__codelineno-0-331" name="__codelineno-0-331"></a>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        Returns:</span>
@@ -25387,7 +25415,7 @@ row.</p>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Leaf accessor for the shared two-arg get_variable contract.</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        Alias of `get_column` so the FIRMS leaf is reachable under</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        Alias of :meth:`get_column` so the FIRMS leaf is reachable under</span>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        the same `get_variable(dataset_key, variable_name)` verb the</span>
 <a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">        other two-level catalogs use.</span>
 <a id="__codelineno-0-356" name="__codelineno-0-356"></a>
@@ -25515,7 +25543,7 @@ row.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A FIRMS source code as it appears in <code>datasets</code>.</p>
+                <p>A FIRMS source code as it appears in :attr:<code>datasets</code>.</p>
               </div>
             </td>
             <td>
@@ -25637,7 +25665,7 @@ row.</p>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return one column&#39;s metadata for a `(sensor, column)` pair.</span>
 <a id="__codelineno-0-327" name="__codelineno-0-327"></a>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        code: A FIRMS source code as it appears in `datasets`.</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        code: A FIRMS source code as it appears in :attr:`datasets`.</span>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        column: A CSV column name declared under that sensor.</span>
 <a id="__codelineno-0-331" name="__codelineno-0-331"></a>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    Returns:</span>
@@ -25674,9 +25702,9 @@ row.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>Sensor</code> for <code>code</code>, with a did-you-mean hint.</p>
+        <p>Return the :class:<code>Sensor</code> for <code>code</code>, with a did-you-mean hint.</p>
 <p>Thin alias over
-<code>get_dataset</code>.</p>
+:meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -25776,10 +25804,10 @@ row.</p>
 <span class="normal"><a href="#__codelineno-0-321">321</a></span>
 <span class="normal"><a href="#__codelineno-0-322">322</a></span>
 <span class="normal"><a href="#__codelineno-0-323">323</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sensor</span><span class="p">:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Sensor` for `code`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Sensor` for `code`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">    Thin alias over</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    `get_dataset`.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        code: A FIRMS source code (`&quot;VIIRS_SNPP_NRT&quot;`, `&quot;MODIS_NRT&quot;`,</span>
@@ -25810,7 +25838,7 @@ row.</p>
     <div class="doc doc-contents ">
 
         <p>Leaf accessor for the shared two-arg get_variable contract.</p>
-<p>Alias of <code>get_column</code> so the FIRMS leaf is reachable under
+<p>Alias of :meth:<code>get_column</code> so the FIRMS leaf is reachable under
 the same <code>get_variable(dataset_key, variable_name)</code> verb the
 other two-level catalogs use.</p>
 
@@ -25904,7 +25932,7 @@ other two-level catalogs use.</p>
 <span class="normal"><a href="#__codelineno-0-364">364</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Leaf accessor for the shared two-arg get_variable contract.</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    Alias of `get_column` so the FIRMS leaf is reachable under</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    Alias of :meth:`get_column` so the FIRMS leaf is reachable under</span>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">    the same `get_variable(dataset_key, variable_name)` verb the</span>
 <a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">    other two-level catalogs use.</span>
 <a id="__codelineno-0-356" name="__codelineno-0-356"></a>
@@ -25961,7 +25989,7 @@ other two-level catalogs use.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the
-module-level <code>CATALOG_PATH</code>.</p>
+module-level :data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -25987,7 +26015,7 @@ module-level <code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -26011,7 +26039,7 @@ module-level <code>CATALOG_PATH</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>If <code>catalog_path</code> does not exist, or if the file has no
-<code>sensors:</code> block, or a row fails <code>Sensor</code> validation.</p>
+<code>sensors:</code> block, or a row fails :class:<code>Sensor</code> validation.</p>
               </div>
             </td>
           </tr>
@@ -26046,14 +26074,14 @@ module-level <code>CATALOG_PATH</code>.</p>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file has no</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            `sensors:` block, or a row fails `Sensor` validation.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            `sensors:` block, or a row fails :class:`Sensor` validation.</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="n">sensors</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
@@ -26097,8 +26125,8 @@ window of fire detections through the same <code>download()</code> shape every
 other earthlens backend uses. Windows longer than the FIRMS 5-day
 per-request cap are chunked, and each <code>(sensor, ≤5-day chunk)</code> is
 one CSV GET; the rows are mapped to a
-<code>pyramids.feature.collection.FeatureCollection</code>.</p>
-<p>FIRMS needs a free <code>MAP_KEY</code>. Supply it to <code>authenticate</code> as
+:class:<code>~pyramids.feature.collection.FeatureCollection</code>.</p>
+<p>FIRMS needs a free <code>MAP_KEY</code>. Supply it to :meth:<code>authenticate</code> as
 <code>api_key=</code>, or set the <code>FIRMS_MAP_KEY</code> environment variable and let
 <code>authenticate()</code> / <code>download()</code> resolve it. Credentials are not a
 constructor argument — the constructor describes only what to fetch.</p>
@@ -26669,9 +26697,9 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    other earthlens backend uses. Windows longer than the FIRMS 5-day</span>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    per-request cap are chunked, and each `(sensor, ≤5-day chunk)` is</span>
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">    one CSV GET; the rows are mapped to a</span>
-<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection`.</span>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    :class:`~pyramids.feature.collection.FeatureCollection`.</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>
-<a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    FIRMS needs a free `MAP_KEY`. Supply it to `authenticate` as</span>
+<a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    FIRMS needs a free `MAP_KEY`. Supply it to :meth:`authenticate` as</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">    `api_key=`, or set the `FIRMS_MAP_KEY` environment variable and let</span>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a><span class="sd">    `authenticate()` / `download()` resolve it. Credentials are not a</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">    constructor argument — the constructor describes only what to fetch.</span>
@@ -26771,17 +26799,17 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a>        <span class="p">)</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FirmsAuth</span><span class="p">:</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the (unconfigured) `FirmsAuth` holder.</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the (unconfigured) :class:`FirmsAuth` holder.</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">        No credentials are resolved here — the constructor describes only</span>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">        what to fetch. The `MAP_KEY` is resolved later by</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        `authenticate` (explicitly via `api_key=`, or from the</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        :meth:`authenticate` (explicitly via `api_key=`, or from the</span>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        `FIRMS_MAP_KEY` environment variable), which `download()` also</span>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        triggers lazily if it has not run.</span>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a>
 <a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            FirmsAuth: An unconfigured auth; `is_authenticated()` is</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">                `False` until `authenticate` resolves a key.</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">                `False` until :meth:`authenticate` resolves a key.</span>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="k">return</span> <span class="n">FirmsAuth</span><span class="p">(</span><span class="n">FirmsCredentials</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a>
@@ -26791,7 +26819,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        The explicit, fail-fast credential step. Pass `api_key=` to use a</span>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        key directly; omit it (or pass `None`) to read the `FIRMS_MAP_KEY`</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        environment variable. Either way the resolved key is held for the</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        subsequent `download`. Calling it again with a different</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        subsequent :meth:`download`. Calling it again with a different</span>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        `api_key` re-arms with the new key. `download()` calls this with</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        no argument on your behalf if you never do, so an explicit call is</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        only needed to pass a key directly or to validate up front.</span>
@@ -26856,10 +26884,10 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a `TemporalExtent`.</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        FIRMS chunks the window into ≤5-day requests internally (see</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        `_search`), so the resolution is kept as the sentinel</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        :meth:`_search`), so the resolution is kept as the sentinel</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">        `&quot;all&quot;` (not a real pandas frequency alias) and `dates`</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        collapses to the two endpoints.</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a>
@@ -26881,7 +26909,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_whole_window_extent</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;List one `RemoteProduct` per `(sensor, ≤5-day chunk)`.</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;List one :class:`RemoteProduct` per `(sensor, ≤5-day chunk)`.</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a>
 <a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        Validates each code in `self.vars` against the bundled catalog</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        (raising with a did-you-mean hint on an unknown sensor), warns</span>
@@ -26951,14 +26979,14 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Warn (do not auto-swap) when the window is outside coverage.</span>
 <a id="__codelineno-0-381" name="__codelineno-0-381"></a>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        An `*_NRT` sensor holds only roughly the last</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        `NRT_RETENTION_DAYS` days; a request for older data returns</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        :data:`NRT_RETENTION_DAYS` days; a request for older data returns</span>
 <a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        a silently empty CSV rather than an error. This logs a loud</span>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        warning naming the `*_SP` archive variant when that variant</span>
 <a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        exists. A request that predates the sensor&#39;s mission start is</span>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        warned the same way.</span>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">            sensor: The resolved `Sensor`.</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">            sensor: The resolved :class:`~earthlens.firms.Sensor`.</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">            start_date: Requested inclusive start.</span>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">            end_date: Requested inclusive end.</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -26999,14 +27027,14 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch each product&#39;s CSV and map it to a FeatureCollection.</span>
 <a id="__codelineno-0-429" name="__codelineno-0-429"></a>
 <a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">        Widens the inherited `-&gt; list[Path]` contract: a vector backend</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">        returns in-memory `FeatureCollection`s, not file paths.</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">        returns in-memory :class:`FeatureCollection`s, not file paths.</span>
 <a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        Each product is one CSV GET issued through the quota back-off</span>
 <a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        (`G2`); the response body is classified before parsing (`G6`) so</span>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">        a FIRMS error-as-HTTP-200 text body never reaches</span>
 <a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        `pandas.read_csv`.</span>
 <a id="__codelineno-0-436" name="__codelineno-0-436"></a>
 <a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">            products: The list returned by `_search`.</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">            products: The list returned by :meth:`_search`.</span>
 <a id="__codelineno-0-439" name="__codelineno-0-439"></a>
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">            list[FeatureCollection]: One collection per product, in the</span>
@@ -27018,7 +27046,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch and map one `(sensor, chunk)` product.</span>
 <a id="__codelineno-0-448" name="__codelineno-0-448"></a>
 <a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">            product: One `RemoteProduct` from `_search`.</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
 <a id="__codelineno-0-451" name="__codelineno-0-451"></a>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">            FeatureCollection: The chunk&#39;s detections (schema-only empty</span>
@@ -27076,10 +27104,10 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose the FIRMS area-CSV URL for one product.</span>
 <a id="__codelineno-0-506" name="__codelineno-0-506"></a>
 <a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">        The bbox path segment is `W,S,E,N` (FIRMS area order). The</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">        `MAP_KEY` is read from the configured `FirmsAuth`.</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">        `MAP_KEY` is read from the configured :class:`FirmsAuth`.</span>
 <a id="__codelineno-0-509" name="__codelineno-0-509"></a>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">            product: One `RemoteProduct` from `_search`.</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a>
 <a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">            str: The fully-formed request URL.</span>
@@ -27101,7 +27129,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;C3 composition with a per-chunk progress bar.</span>
 <a id="__codelineno-0-531" name="__codelineno-0-531"></a>
 <a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">        Mirrors the CMEMS / OpenAQ progress-aware composition: run the</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">        cheap `_search`, then map `_fetch_one` over the</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">        cheap :meth:`_search`, then map :meth:`_fetch_one` over the</span>
 <a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">        products wrapped in a `tqdm` bar (disabled when `progress_bar`</span>
 <a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">        is `False`). Short-circuits on an empty search.</span>
 <a id="__codelineno-0-536" name="__codelineno-0-536"></a>
@@ -27122,8 +27150,8 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-551" name="__codelineno-0-551"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-552" name="__codelineno-0-552"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Query FIRMS and return the matched detections.</span>
 <a id="__codelineno-0-553" name="__codelineno-0-553"></a>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="sd">        Runs the cheap `_search` (sensor validation + chunk</span>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">        planning) then the throttled `_fetch` (one CSV GET per</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="sd">        Runs the cheap :meth:`_search` (sensor validation + chunk</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">        planning) then the throttled :meth:`_fetch` (one CSV GET per</span>
 <a id="__codelineno-0-556" name="__codelineno-0-556"></a><span class="sd">        chunk), concatenates the per-chunk collections into one</span>
 <a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">        FeatureCollection, writes it to one vector file under `path`, and</span>
 <a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">        returns it. An empty result returns — and writes nothing for — a</span>
@@ -27658,7 +27686,7 @@ sensor codes.</p>
 <p>The explicit, fail-fast credential step. Pass <code>api_key=</code> to use a
 key directly; omit it (or pass <code>None</code>) to read the <code>FIRMS_MAP_KEY</code>
 environment variable. Either way the resolved key is held for the
-subsequent <code>download</code>. Calling it again with a different
+subsequent :meth:<code>download</code>. Calling it again with a different
 <code>api_key</code> re-arms with the new key. <code>download()</code> calls this with
 no argument on your behalf if you never do, so an explicit call is
 only needed to pass a key directly or to validate up front.</p>
@@ -27854,7 +27882,7 @@ only needed to pass a key directly or to validate up front.</p>
 <a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">    The explicit, fail-fast credential step. Pass `api_key=` to use a</span>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">    key directly; omit it (or pass `None`) to read the `FIRMS_MAP_KEY`</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">    environment variable. Either way the resolved key is held for the</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">    subsequent `download`. Calling it again with a different</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">    subsequent :meth:`download`. Calling it again with a different</span>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">    `api_key` re-arms with the new key. `download()` calls this with</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">    no argument on your behalf if you never do, so an explicit call is</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    only needed to pass a key directly or to validate up front.</span>
@@ -27929,8 +27957,8 @@ only needed to pass a key directly or to validate up front.</p>
     <div class="doc doc-contents ">
 
         <p>Query FIRMS and return the matched detections.</p>
-<p>Runs the cheap <code>_search</code> (sensor validation + chunk
-planning) then the throttled <code>_fetch</code> (one CSV GET per
+<p>Runs the cheap :meth:<code>_search</code> (sensor validation + chunk
+planning) then the throttled :meth:<code>_fetch</code> (one CSV GET per
 chunk), concatenates the per-chunk collections into one
 FeatureCollection, writes it to one vector file under <code>path</code>, and
 returns it. An empty result returns — and writes nothing for — a
@@ -28045,8 +28073,8 @@ Empty (schema-only) when nothing matched.</p>
 <a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-552" name="__codelineno-0-552"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Query FIRMS and return the matched detections.</span>
 <a id="__codelineno-0-553" name="__codelineno-0-553"></a>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="sd">    Runs the cheap `_search` (sensor validation + chunk</span>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">    planning) then the throttled `_fetch` (one CSV GET per</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="sd">    Runs the cheap :meth:`_search` (sensor validation + chunk</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">    planning) then the throttled :meth:`_fetch` (one CSV GET per</span>
 <a id="__codelineno-0-556" name="__codelineno-0-556"></a><span class="sd">    chunk), concatenates the per-chunk collections into one</span>
 <a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">    FeatureCollection, writes it to one vector file under `path`, and</span>
 <a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">    returns it. An empty result returns — and writes nothing for — a</span>
@@ -28116,15 +28144,15 @@ Empty (schema-only) when nothing matched.</p>
 
 
         <p>Resolve and hold the FIRMS <code>MAP_KEY</code>.</p>
-<p>Implements the <code>earthlens.base.SingleSecretAuth</code> contract for
+<p>Implements the :class:<code>earthlens.base.SingleSecretAuth</code> contract for
 a single-secret backend: it declares its env var and provider name
 and supplies <code>_explicit_credential</code> / <code>_connect</code>, while the inherited
-<code>configure</code> performs the resolution and is idempotent. After a
+:meth:<code>configure</code> performs the resolution and is idempotent. After a
 successful <code>configure()</code>, the key is available via the
-<code>api_key</code> property for the backend to drop into the request
+:attr:<code>api_key</code> property for the backend to drop into the request
 URL.</p>
 <p>The class is a context manager (inherited from
-<code>AbstractAuth</code>): <code>with FirmsAuth(creds) as auth: ...</code> calls
+:class:<code>AbstractAuth</code>): <code>with FirmsAuth(creds) as auth: ...</code> calls
 <code>configure()</code> on enter and the default no-op <code>close()</code> on exit —
 there is no per-instance resource to release.</p>
 
@@ -28145,7 +28173,7 @@ there is no per-instance resource to release.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>FirmsCredentials</code> passed at construction.</p>
+                <p>The :class:<code>FirmsCredentials</code> passed at construction.</p>
               </div>
             </td>
           </tr>
@@ -28248,21 +28276,21 @@ there is no per-instance resource to release.</p>
 <span class="normal"><a href="#__codelineno-0-162">162</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="k">class</span><span class="w"> </span><span class="nc">FirmsAuth</span><span class="p">(</span><span class="n">SingleSecretAuth</span><span class="p">[</span><span class="n">FirmsCredentials</span><span class="p">]):</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve and hold the FIRMS `MAP_KEY`.</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a>
-<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    Implements the `earthlens.base.SingleSecretAuth` contract for</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    Implements the :class:`earthlens.base.SingleSecretAuth` contract for</span>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    a single-secret backend: it declares its env var and provider name</span>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    and supplies `_explicit_credential` / `_connect`, while the inherited</span>
-<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">    `configure` performs the resolution and is idempotent. After a</span>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">    :meth:`configure` performs the resolution and is idempotent. After a</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    successful `configure()`, the key is available via the</span>
-<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    `api_key` property for the backend to drop into the request</span>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    :attr:`api_key` property for the backend to drop into the request</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    URL.</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a><span class="sd">    The class is a context manager (inherited from</span>
-<a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">    `AbstractAuth`): `with FirmsAuth(creds) as auth: ...` calls</span>
+<a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">    :class:`AbstractAuth`): `with FirmsAuth(creds) as auth: ...` calls</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">    `configure()` on enter and the default no-op `close()` on exit —</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">    there is no per-instance resource to release.</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">        _creds: The `FirmsCredentials` passed at construction.</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">        _creds: The :class:`FirmsCredentials` passed at construction.</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a>
 <a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">        - Resolve an explicit key:</span>
@@ -28300,13 +28328,13 @@ there is no per-instance resource to release.</p>
 <a id="__codelineno-0-146" name="__codelineno-0-146"></a>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a>    <span class="nd">@property</span>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">api_key</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved `MAP_KEY`; valid only after `configure`.</span>
+<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved `MAP_KEY`; valid only after :meth:`configure`.</span>
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a>
 <a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">            str: The FIRMS `MAP_KEY` string.</span>
 <a id="__codelineno-0-153" name="__codelineno-0-153"></a>
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">            AuthenticationError: When read before `configure` has</span>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">            AuthenticationError: When read before :meth:`configure` has</span>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">                resolved a key.</span>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -28343,7 +28371,7 @@ there is no per-instance resource to release.</p>
 
     <div class="doc doc-contents ">
 
-        <p>The resolved <code>MAP_KEY</code>; valid only after <code>configure</code>.</p>
+        <p>The resolved <code>MAP_KEY</code>; valid only after :meth:<code>configure</code>.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -28384,7 +28412,7 @@ there is no per-instance resource to release.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>When read before <code>configure</code> has
+                <p>When read before :meth:<code>configure</code> has
 resolved a key.</p>
               </div>
             </td>
@@ -28427,8 +28455,8 @@ resolved a key.</p>
         <p>Frozen value object holding the FIRMS <code>MAP_KEY</code>.</p>
 <p>The key is optional at construction time: <code>None</code> means "resolve from
 the <code>FIRMS_MAP_KEY</code> environment variable at
-<code>FirmsAuth.configure</code> time". The real "is there a usable key?"
-gate is <code>FirmsAuth.configure</code>, not this model.</p>
+:meth:<code>FirmsAuth.configure</code> time". The real "is there a usable key?"
+gate is :meth:<code>FirmsAuth.configure</code>, not this model.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -28449,7 +28477,7 @@ gate is <code>FirmsAuth.configure</code>, not this model.</p>
             <td>
               <div class="doc-md-description">
                 <p>The FIRMS <code>MAP_KEY</code>, stored as a
-<code>pydantic.SecretStr</code> so it is never echoed by
+:class:<code>pydantic.SecretStr</code> so it is never echoed by
 <code>repr(creds)</code> or in logs. <code>None</code> defers resolution to the
 environment variable.</p>
               </div>
@@ -28526,12 +28554,12 @@ environment variable.</p>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">    The key is optional at construction time: `None` means &quot;resolve from</span>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    the `FIRMS_MAP_KEY` environment variable at</span>
-<a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">    `FirmsAuth.configure` time&quot;. The real &quot;is there a usable key?&quot;</span>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    gate is `FirmsAuth.configure`, not this model.</span>
+<a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">    :meth:`FirmsAuth.configure` time&quot;. The real &quot;is there a usable key?&quot;</span>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    gate is :meth:`FirmsAuth.configure`, not this model.</span>
 <a id="__codelineno-0-62" name="__codelineno-0-62"></a>
 <a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">        api_key: The FIRMS `MAP_KEY`, stored as a</span>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">            `pydantic.SecretStr` so it is never echoed by</span>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">            :class:`pydantic.SecretStr` so it is never echoed by</span>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">            `repr(creds)` or in logs. `None` defers resolution to the</span>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">            environment variable.</span>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a>
@@ -28600,8 +28628,8 @@ environment variable.</p>
 
 
         <p>One FIRMS sensor's dispatch row (the "dataset" analog).</p>
-<p>The FIRMS source code is the parent key in <code>Catalog.datasets</code>
-and is repeated here as <code>code</code> so a <code>Sensor</code> carries its
+<p>The FIRMS source code is the parent key in :attr:<code>Catalog.datasets</code>
+and is repeated here as :attr:<code>code</code> so a :class:<code>Sensor</code> carries its
 own identity when passed around outside the catalog.</p>
 
 
@@ -28648,7 +28676,7 @@ the value passed in <code>variables=[...]</code> and used as the URL
               <div class="doc-md-description">
                 <p><code>"MODIS"</code>, <code>"VIIRS"</code>, <code>"GOES"</code>, or <code>"LANDSAT"</code> — selects
 the confidence / brightness schema handling in
-<code>earthlens.firms.events</code>. MODIS and GOES report numeric
+:mod:<code>earthlens.firms.events</code>. MODIS and GOES report numeric
 confidence; VIIRS reports the categorical token <code>l</code>/<code>n</code>/<code>h</code>
 and LANDSAT reports <code>l</code>/<code>m</code>/<code>h</code>. Brightness comes from
 <code>brightness</code> (MODIS), <code>bright_ti4</code> (VIIRS / GOES), or is
@@ -28783,8 +28811,8 @@ absent (LANDSAT carries no brightness or FRP column).</p>
 <span class="normal"><a href="#__codelineno-0-189">189</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="k">class</span><span class="w"> </span><span class="nc">Sensor</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One FIRMS sensor&#39;s dispatch row (the &quot;dataset&quot; analog).</span>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a>
-<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    The FIRMS source code is the parent key in `Catalog.datasets`</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    and is repeated here as `code` so a `Sensor` carries its</span>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    The FIRMS source code is the parent key in :attr:`Catalog.datasets`</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    and is repeated here as :attr:`code` so a :class:`Sensor` carries its</span>
 <a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    own identity when passed around outside the catalog.</span>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a><span class="sd">    Attributes:</span>
@@ -28794,7 +28822,7 @@ absent (LANDSAT carries no brightness or FRP column).</p>
 <a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">        name: Human-readable sensor name used in logs and docs.</span>
 <a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">        family: `&quot;MODIS&quot;`, `&quot;VIIRS&quot;`, `&quot;GOES&quot;`, or `&quot;LANDSAT&quot;` — selects</span>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a><span class="sd">            the confidence / brightness schema handling in</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">            `earthlens.firms.events`. MODIS and GOES report numeric</span>
+<a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">            :mod:`earthlens.firms.events`. MODIS and GOES report numeric</span>
 <a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">            confidence; VIIRS reports the categorical token `l`/`n`/`h`</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">            and LANDSAT reports `l`/`m`/`h`. Brightness comes from</span>
 <a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">            `brightness` (MODIS), `bright_ti4` (VIIRS / GOES), or is</span>
@@ -29129,14 +29157,14 @@ descriptive metadata.</p>
     <div class="doc doc-contents ">
 
         <p>Normalise one sensor's FIRMS CSV frame into a <code>FeatureCollection</code>.</p>
-<p>One row per detection, columns per <code>ATTRIBUTE_COLUMNS</code> plus a
+<p>One row per detection, columns per :data:<code>ATTRIBUTE_COLUMNS</code> plus a
 <code>geometry</code> column of <code>Point(longitude, latitude)</code>. The MODIS/VIIRS
 confidence and brightness schemas are unified (<code>G4</code>), <code>acq_date</code> +
 integer-HHMM <code>acq_time</code> are combined into a tz-aware UTC
 <code>acq_datetime</code>, and the optional <code>min_confidence</code> / <code>day_night</code>
 filters are applied client-side (FIRMS offers no server-side
 equivalent). An empty input frame returns an empty FeatureCollection
-with the same columns/dtypes (see <code>empty_fc</code>).</p>
+with the same columns/dtypes (see :func:<code>empty_fc</code>).</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -29413,14 +29441,14 @@ the filters drop everything.</p>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalise one sensor&#39;s FIRMS CSV frame into a `FeatureCollection`.</span>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a>
-<a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">    One row per detection, columns per `ATTRIBUTE_COLUMNS` plus a</span>
+<a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">    One row per detection, columns per :data:`ATTRIBUTE_COLUMNS` plus a</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">    `geometry` column of `Point(longitude, latitude)`. The MODIS/VIIRS</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">    confidence and brightness schemas are unified (`G4`), `acq_date` +</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">    integer-HHMM `acq_time` are combined into a tz-aware UTC</span>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">    `acq_datetime`, and the optional `min_confidence` / `day_night`</span>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">    filters are applied client-side (FIRMS offers no server-side</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">    equivalent). An empty input frame returns an empty FeatureCollection</span>
-<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    with the same columns/dtypes (see `empty_fc`).</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    with the same columns/dtypes (see :func:`empty_fc`).</span>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">        df: The decoded FIRMS area CSV for one sensor/chunk.</span>
@@ -29550,7 +29578,7 @@ and dtypes back regardless of hit count.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Zero rows, the <code>ATTRIBUTE_COLUMNS</code>
+                <p>Zero rows, the :data:<code>ATTRIBUTE_COLUMNS</code>
 columns with their declared dtypes, an empty <code>geometry</code>
 column, CRS <code>EPSG:4326</code>.</p>
               </div>
@@ -29620,7 +29648,7 @@ column, CRS <code>EPSG:4326</code>.</p>
 <a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">    and dtypes back regardless of hit count.</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        FeatureCollection: Zero rows, the `ATTRIBUTE_COLUMNS`</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        FeatureCollection: Zero rows, the :data:`ATTRIBUTE_COLUMNS`</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">            columns with their declared dtypes, an empty `geometry`</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            column, CRS `EPSG:4326`.</span>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a>
@@ -29680,16 +29708,16 @@ per fire pixel, with brightness, confidence, and fire-radiative-power —
 from the NASA FIRMS (Fire Information for Resource Management System)
 area CSV endpoint, across MODIS (C6.1) and VIIRS (S-NPP / NOAA-20 /
 NOAA-21) sensors. The rows for a <code>[start, end]</code> window over a bbox come
-back as CSV, which <code>earthlens.firms.events</code> maps to a pyramids
-<code>pyramids.feature.collection.FeatureCollection</code> of fire-pixel
+back as CSV, which :mod:<code>earthlens.firms.events</code> maps to a pyramids
+:class:<code>~pyramids.feature.collection.FeatureCollection</code> of fire-pixel
 points.</p>
 <p>This is a <code>vector</code> backend: the on-the-wire result is a table of
 geolocated detections, not a gridded array, so <code>OUTPUT_KIND = "vector"</code>
-and the <code>earthlens.earthlens.EarthLens</code> facade rejects an
+and the :class:<code>earthlens.earthlens.EarthLens</code> facade rejects an
 <code>aggregate=</code> argument (there is no meaningful gridded reduction of a
 detection table). <code>download()</code> returns the in-memory FeatureCollection
 and, as a side effect, writes it to one vector file under <code>path</code>.</p>
-<p>FIRMS needs a free <strong><code>MAP_KEY</code></strong> — pass it to <code>FIRMS.authenticate</code>
+<p>FIRMS needs a free <strong><code>MAP_KEY</code></strong> — pass it to :meth:<code>FIRMS.authenticate</code>
 as <code>api_key=</code>, or set <code>FIRMS_MAP_KEY</code> and let <code>authenticate()</code> /
 <code>download()</code> read it from the environment. It is <em>not</em> a constructor
 argument: the constructor describes only what to fetch. There is no SDK
@@ -29744,8 +29772,8 @@ window of fire detections through the same <code>download()</code> shape every
 other earthlens backend uses. Windows longer than the FIRMS 5-day
 per-request cap are chunked, and each <code>(sensor, ≤5-day chunk)</code> is
 one CSV GET; the rows are mapped to a
-<code>pyramids.feature.collection.FeatureCollection</code>.</p>
-<p>FIRMS needs a free <code>MAP_KEY</code>. Supply it to <code>authenticate</code> as
+:class:<code>~pyramids.feature.collection.FeatureCollection</code>.</p>
+<p>FIRMS needs a free <code>MAP_KEY</code>. Supply it to :meth:<code>authenticate</code> as
 <code>api_key=</code>, or set the <code>FIRMS_MAP_KEY</code> environment variable and let
 <code>authenticate()</code> / <code>download()</code> resolve it. Credentials are not a
 constructor argument — the constructor describes only what to fetch.</p>
@@ -30316,9 +30344,9 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    other earthlens backend uses. Windows longer than the FIRMS 5-day</span>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    per-request cap are chunked, and each `(sensor, ≤5-day chunk)` is</span>
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">    one CSV GET; the rows are mapped to a</span>
-<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection`.</span>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    :class:`~pyramids.feature.collection.FeatureCollection`.</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>
-<a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    FIRMS needs a free `MAP_KEY`. Supply it to `authenticate` as</span>
+<a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    FIRMS needs a free `MAP_KEY`. Supply it to :meth:`authenticate` as</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">    `api_key=`, or set the `FIRMS_MAP_KEY` environment variable and let</span>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a><span class="sd">    `authenticate()` / `download()` resolve it. Credentials are not a</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">    constructor argument — the constructor describes only what to fetch.</span>
@@ -30418,17 +30446,17 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a>        <span class="p">)</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FirmsAuth</span><span class="p">:</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the (unconfigured) `FirmsAuth` holder.</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the (unconfigured) :class:`FirmsAuth` holder.</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">        No credentials are resolved here — the constructor describes only</span>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">        what to fetch. The `MAP_KEY` is resolved later by</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        `authenticate` (explicitly via `api_key=`, or from the</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        :meth:`authenticate` (explicitly via `api_key=`, or from the</span>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        `FIRMS_MAP_KEY` environment variable), which `download()` also</span>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        triggers lazily if it has not run.</span>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a>
 <a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            FirmsAuth: An unconfigured auth; `is_authenticated()` is</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">                `False` until `authenticate` resolves a key.</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">                `False` until :meth:`authenticate` resolves a key.</span>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="k">return</span> <span class="n">FirmsAuth</span><span class="p">(</span><span class="n">FirmsCredentials</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a>
@@ -30438,7 +30466,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        The explicit, fail-fast credential step. Pass `api_key=` to use a</span>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        key directly; omit it (or pass `None`) to read the `FIRMS_MAP_KEY`</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        environment variable. Either way the resolved key is held for the</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        subsequent `download`. Calling it again with a different</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        subsequent :meth:`download`. Calling it again with a different</span>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        `api_key` re-arms with the new key. `download()` calls this with</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">        no argument on your behalf if you never do, so an explicit call is</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">        only needed to pass a key directly or to validate up front.</span>
@@ -30503,10 +30531,10 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a `TemporalExtent`.</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the `[start, end]` window into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        FIRMS chunks the window into ≤5-day requests internally (see</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        `_search`), so the resolution is kept as the sentinel</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        :meth:`_search`), so the resolution is kept as the sentinel</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">        `&quot;all&quot;` (not a real pandas frequency alias) and `dates`</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        collapses to the two endpoints.</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a>
@@ -30528,7 +30556,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_whole_window_extent</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;List one `RemoteProduct` per `(sensor, ≤5-day chunk)`.</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;List one :class:`RemoteProduct` per `(sensor, ≤5-day chunk)`.</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a>
 <a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        Validates each code in `self.vars` against the bundled catalog</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        (raising with a did-you-mean hint on an unknown sensor), warns</span>
@@ -30598,14 +30626,14 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Warn (do not auto-swap) when the window is outside coverage.</span>
 <a id="__codelineno-0-381" name="__codelineno-0-381"></a>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        An `*_NRT` sensor holds only roughly the last</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        `NRT_RETENTION_DAYS` days; a request for older data returns</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        :data:`NRT_RETENTION_DAYS` days; a request for older data returns</span>
 <a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        a silently empty CSV rather than an error. This logs a loud</span>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        warning naming the `*_SP` archive variant when that variant</span>
 <a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        exists. A request that predates the sensor&#39;s mission start is</span>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        warned the same way.</span>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">            sensor: The resolved `Sensor`.</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">            sensor: The resolved :class:`~earthlens.firms.Sensor`.</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">            start_date: Requested inclusive start.</span>
 <a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">            end_date: Requested inclusive end.</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -30646,14 +30674,14 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch each product&#39;s CSV and map it to a FeatureCollection.</span>
 <a id="__codelineno-0-429" name="__codelineno-0-429"></a>
 <a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">        Widens the inherited `-&gt; list[Path]` contract: a vector backend</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">        returns in-memory `FeatureCollection`s, not file paths.</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">        returns in-memory :class:`FeatureCollection`s, not file paths.</span>
 <a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        Each product is one CSV GET issued through the quota back-off</span>
 <a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        (`G2`); the response body is classified before parsing (`G6`) so</span>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">        a FIRMS error-as-HTTP-200 text body never reaches</span>
 <a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        `pandas.read_csv`.</span>
 <a id="__codelineno-0-436" name="__codelineno-0-436"></a>
 <a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">            products: The list returned by `_search`.</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">            products: The list returned by :meth:`_search`.</span>
 <a id="__codelineno-0-439" name="__codelineno-0-439"></a>
 <a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">            list[FeatureCollection]: One collection per product, in the</span>
@@ -30665,7 +30693,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch and map one `(sensor, chunk)` product.</span>
 <a id="__codelineno-0-448" name="__codelineno-0-448"></a>
 <a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">            product: One `RemoteProduct` from `_search`.</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
 <a id="__codelineno-0-451" name="__codelineno-0-451"></a>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">            FeatureCollection: The chunk&#39;s detections (schema-only empty</span>
@@ -30723,10 +30751,10 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose the FIRMS area-CSV URL for one product.</span>
 <a id="__codelineno-0-506" name="__codelineno-0-506"></a>
 <a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">        The bbox path segment is `W,S,E,N` (FIRMS area order). The</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">        `MAP_KEY` is read from the configured `FirmsAuth`.</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">        `MAP_KEY` is read from the configured :class:`FirmsAuth`.</span>
 <a id="__codelineno-0-509" name="__codelineno-0-509"></a>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">            product: One `RemoteProduct` from `_search`.</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">            product: One :class:`RemoteProduct` from :meth:`_search`.</span>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a>
 <a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">            str: The fully-formed request URL.</span>
@@ -30748,7 +30776,7 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;C3 composition with a per-chunk progress bar.</span>
 <a id="__codelineno-0-531" name="__codelineno-0-531"></a>
 <a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">        Mirrors the CMEMS / OpenAQ progress-aware composition: run the</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">        cheap `_search`, then map `_fetch_one` over the</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">        cheap :meth:`_search`, then map :meth:`_fetch_one` over the</span>
 <a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">        products wrapped in a `tqdm` bar (disabled when `progress_bar`</span>
 <a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">        is `False`). Short-circuits on an empty search.</span>
 <a id="__codelineno-0-536" name="__codelineno-0-536"></a>
@@ -30769,8 +30797,8 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-551" name="__codelineno-0-551"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-552" name="__codelineno-0-552"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Query FIRMS and return the matched detections.</span>
 <a id="__codelineno-0-553" name="__codelineno-0-553"></a>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="sd">        Runs the cheap `_search` (sensor validation + chunk</span>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">        planning) then the throttled `_fetch` (one CSV GET per</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="sd">        Runs the cheap :meth:`_search` (sensor validation + chunk</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">        planning) then the throttled :meth:`_fetch` (one CSV GET per</span>
 <a id="__codelineno-0-556" name="__codelineno-0-556"></a><span class="sd">        chunk), concatenates the per-chunk collections into one</span>
 <a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">        FeatureCollection, writes it to one vector file under `path`, and</span>
 <a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">        returns it. An empty result returns — and writes nothing for — a</span>
@@ -31305,7 +31333,7 @@ sensor codes.</p>
 <p>The explicit, fail-fast credential step. Pass <code>api_key=</code> to use a
 key directly; omit it (or pass <code>None</code>) to read the <code>FIRMS_MAP_KEY</code>
 environment variable. Either way the resolved key is held for the
-subsequent <code>download</code>. Calling it again with a different
+subsequent :meth:<code>download</code>. Calling it again with a different
 <code>api_key</code> re-arms with the new key. <code>download()</code> calls this with
 no argument on your behalf if you never do, so an explicit call is
 only needed to pass a key directly or to validate up front.</p>
@@ -31501,7 +31529,7 @@ only needed to pass a key directly or to validate up front.</p>
 <a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">    The explicit, fail-fast credential step. Pass `api_key=` to use a</span>
 <a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">    key directly; omit it (or pass `None`) to read the `FIRMS_MAP_KEY`</span>
 <a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">    environment variable. Either way the resolved key is held for the</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">    subsequent `download`. Calling it again with a different</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">    subsequent :meth:`download`. Calling it again with a different</span>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">    `api_key` re-arms with the new key. `download()` calls this with</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">    no argument on your behalf if you never do, so an explicit call is</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    only needed to pass a key directly or to validate up front.</span>
@@ -31576,8 +31604,8 @@ only needed to pass a key directly or to validate up front.</p>
     <div class="doc doc-contents ">
 
         <p>Query FIRMS and return the matched detections.</p>
-<p>Runs the cheap <code>_search</code> (sensor validation + chunk
-planning) then the throttled <code>_fetch</code> (one CSV GET per
+<p>Runs the cheap :meth:<code>_search</code> (sensor validation + chunk
+planning) then the throttled :meth:<code>_fetch</code> (one CSV GET per
 chunk), concatenates the per-chunk collections into one
 FeatureCollection, writes it to one vector file under <code>path</code>, and
 returns it. An empty result returns — and writes nothing for — a
@@ -31692,8 +31720,8 @@ Empty (schema-only) when nothing matched.</p>
 <a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-552" name="__codelineno-0-552"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Query FIRMS and return the matched detections.</span>
 <a id="__codelineno-0-553" name="__codelineno-0-553"></a>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="sd">    Runs the cheap `_search` (sensor validation + chunk</span>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">    planning) then the throttled `_fetch` (one CSV GET per</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="sd">    Runs the cheap :meth:`_search` (sensor validation + chunk</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">    planning) then the throttled :meth:`_fetch` (one CSV GET per</span>
 <a id="__codelineno-0-556" name="__codelineno-0-556"></a><span class="sd">    chunk), concatenates the per-chunk collections into one</span>
 <a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">    FeatureCollection, writes it to one vector file under `path`, and</span>
 <a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">    returns it. An empty result returns — and writes nothing for — a</span>
@@ -31772,11 +31800,11 @@ vector container, so per the pyramids policy it keeps all geometry/CRS
 handling inside pyramids primitives: earthlens assembles the normalised
 attribute rows, builds a <code>Point</code> geometry column from <code>longitude</code> /
 <code>latitude</code>, and hands the whole thing to
-<code>pyramids.feature.collection.FeatureCollection</code> (a
+:class:<code>pyramids.feature.collection.FeatureCollection</code> (a
 <code>geopandas.GeoDataFrame</code> subclass) tagged <code>EPSG:4326</code>.</p>
-<p>The canonical detection schema lives here as <code>ATTRIBUTE_COLUMNS</code>
+<p>The canonical detection schema lives here as :data:<code>ATTRIBUTE_COLUMNS</code>
 (attribute columns + dtypes) plus the <code>geometry</code> column. Both the
-populated path (<code>csv_to_fc</code>) and the empty path (<code>empty_fc</code>)
+populated path (:func:<code>csv_to_fc</code>) and the empty path (:func:<code>empty_fc</code>)
 produce a FeatureCollection with exactly these columns and dtypes, so a
 downstream <code>to_file</code> never chokes on a schema mismatch between a hit and
 a miss.</p>
@@ -31971,14 +31999,14 @@ schema-only empty collection when every input was empty.</p>
     <div class="doc doc-contents ">
 
         <p>Normalise one sensor's FIRMS CSV frame into a <code>FeatureCollection</code>.</p>
-<p>One row per detection, columns per <code>ATTRIBUTE_COLUMNS</code> plus a
+<p>One row per detection, columns per :data:<code>ATTRIBUTE_COLUMNS</code> plus a
 <code>geometry</code> column of <code>Point(longitude, latitude)</code>. The MODIS/VIIRS
 confidence and brightness schemas are unified (<code>G4</code>), <code>acq_date</code> +
 integer-HHMM <code>acq_time</code> are combined into a tz-aware UTC
 <code>acq_datetime</code>, and the optional <code>min_confidence</code> / <code>day_night</code>
 filters are applied client-side (FIRMS offers no server-side
 equivalent). An empty input frame returns an empty FeatureCollection
-with the same columns/dtypes (see <code>empty_fc</code>).</p>
+with the same columns/dtypes (see :func:<code>empty_fc</code>).</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -32255,14 +32283,14 @@ the filters drop everything.</p>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalise one sensor&#39;s FIRMS CSV frame into a `FeatureCollection`.</span>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a>
-<a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">    One row per detection, columns per `ATTRIBUTE_COLUMNS` plus a</span>
+<a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">    One row per detection, columns per :data:`ATTRIBUTE_COLUMNS` plus a</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">    `geometry` column of `Point(longitude, latitude)`. The MODIS/VIIRS</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">    confidence and brightness schemas are unified (`G4`), `acq_date` +</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a><span class="sd">    integer-HHMM `acq_time` are combined into a tz-aware UTC</span>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">    `acq_datetime`, and the optional `min_confidence` / `day_night`</span>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">    filters are applied client-side (FIRMS offers no server-side</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">    equivalent). An empty input frame returns an empty FeatureCollection</span>
-<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    with the same columns/dtypes (see `empty_fc`).</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    with the same columns/dtypes (see :func:`empty_fc`).</span>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">        df: The decoded FIRMS area CSV for one sensor/chunk.</span>
@@ -32392,7 +32420,7 @@ and dtypes back regardless of hit count.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Zero rows, the <code>ATTRIBUTE_COLUMNS</code>
+                <p>Zero rows, the :data:<code>ATTRIBUTE_COLUMNS</code>
 columns with their declared dtypes, an empty <code>geometry</code>
 column, CRS <code>EPSG:4326</code>.</p>
               </div>
@@ -32462,7 +32490,7 @@ column, CRS <code>EPSG:4326</code>.</p>
 <a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">    and dtypes back regardless of hit count.</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        FeatureCollection: Zero rows, the `ATTRIBUTE_COLUMNS`</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        FeatureCollection: Zero rows, the :data:`ATTRIBUTE_COLUMNS`</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">            columns with their declared dtypes, an empty `geometry`</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            column, CRS `EPSG:4326`.</span>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a>
@@ -32522,8 +32550,8 @@ endpoint, not a curated dataset catalogue, so this "catalog" is small: a
 handful of rows mapping a FIRMS source code (<code>"VIIRS_SNPP_NRT"</code>,
 <code>"MODIS_NRT"</code>, …) to a little metadata. It follows the ECMWF / GEE
 convention where a <strong>sensor plays the "dataset" role and its CSV columns
-play the "variable" role</strong> — a <code>Sensor</code> nests a <code>columns:</code> map of
-<code>SensorColumn</code> rows.</p>
+play the "variable" role</strong> — a :class:<code>Sensor</code> nests a <code>columns:</code> map of
+:class:<code>SensorColumn</code> rows.</p>
 <p>Like <code>gdacs_data_catalog.yaml</code> / <code>fdsn_data_catalog.yaml</code> there is no
 <code>available_*</code> index: the listed sensors <em>are</em> the whole FIRMS universe,
 so an "available vs curated" split would just duplicate the map. Unlike
@@ -32531,12 +32559,12 @@ those two, FIRMS <em>does</em> ship a probe + audit pair (<code>tools/firms/</co
 because the per-sensor CSV column schema varies by sensor family (MODIS
 reports a numeric <code>confidence</code>; VIIRS reports a categorical <code>l</code>/<code>n</code>/<code>h</code>),
 which is exactly the kind of drift a probe pins down.</p>
-<p><code>Catalog</code> is a thin <code>earthlens.base.AbstractCatalog</code>
+<p>:class:<code>Catalog</code> is a thin :class:<code>earthlens.base.AbstractCatalog</code>
 subclass that loads the bundled <code>firms_data_catalog.yaml</code> and exposes
-each row as a <code>Sensor</code>, keyed by code under the inherited
+each row as a :class:<code>Sensor</code>, keyed by code under the inherited
 <code>datasets</code> field — which is what gives it the <code>cat["MODIS_NRT"]</code> /
 <code>"MODIS_NRT" in cat</code> / <code>len(cat)</code> dict-like surface and the did-you-mean
-error for free. <code>CATALOG_PATH</code> is the path to the bundled YAML and
+error for free. :data:<code>CATALOG_PATH</code> is the path to the bundled YAML and
 is monkey-patchable in tests.</p>
 
 
@@ -32577,13 +32605,13 @@ is monkey-patchable in tests.</p>
 
         <p>Sensor catalog for the NASA FIRMS backend.</p>
 <p>Reads the bundled <code>firms_data_catalog.yaml</code> (shipped as package
-data) and exposes its <code>sensors:</code> block as a map of <code>Sensor</code>
-rows, keyed by FIRMS source code under the inherited <code>datasets</code>
+data) and exposes its <code>sensors:</code> block as a map of :class:<code>Sensor</code>
+rows, keyed by FIRMS source code under the inherited :attr:<code>datasets</code>
 field. Instantiate with no arguments (<code>Catalog()</code>);
-<code>model_post_init</code> loads and validates the YAML in one pass.
-Resolve a sensor with <code>get_sensor</code> (a thin alias over
-<code>get_dataset</code>) and a single
-column with <code>get_column</code>.</p>
+:func:<code>model_post_init</code> loads and validates the YAML in one pass.
+Resolve a sensor with :meth:<code>get_sensor</code> (a thin alias over
+:meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>) and a single
+column with :meth:<code>get_column</code>.</p>
 <p>There is no <code>available_*</code> index — the listed sensors are the whole
 FIRMS universe (a deliberate deviation from the ECMWF/GEE catalogs,
 shared with GDACS/FDSN).</p>
@@ -32606,7 +32634,7 @@ shared with GDACS/FDSN).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from the FIRMS source code to its <code>Sensor</code>
+                <p>Map from the FIRMS source code to its :class:<code>Sensor</code>
 row.</p>
               </div>
             </td>
@@ -32799,20 +32827,20 @@ row.</p>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Sensor catalog for the NASA FIRMS backend.</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">    Reads the bundled `firms_data_catalog.yaml` (shipped as package</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    data) and exposes its `sensors:` block as a map of `Sensor`</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    rows, keyed by FIRMS source code under the inherited `datasets`</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    data) and exposes its `sensors:` block as a map of :class:`Sensor`</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    rows, keyed by FIRMS source code under the inherited :attr:`datasets`</span>
 <a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    field. Instantiate with no arguments (`Catalog()`);</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    `model_post_init` loads and validates the YAML in one pass.</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    Resolve a sensor with `get_sensor` (a thin alias over</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    `get_dataset`) and a single</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    column with `get_column`.</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    :func:`model_post_init` loads and validates the YAML in one pass.</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    Resolve a sensor with :meth:`get_sensor` (a thin alias over</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`) and a single</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    column with :meth:`get_column`.</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    There is no `available_*` index — the listed sensors are the whole</span>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    FIRMS universe (a deliberate deviation from the ECMWF/GEE catalogs,</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">    shared with GDACS/FDSN).</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        datasets: Map from the FIRMS source code to its `Sensor`</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        datasets: Map from the FIRMS source code to its :class:`Sensor`</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            row.</span>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a>
 <a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">    Examples:</span>
@@ -32863,14 +32891,14 @@ row.</p>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">                module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file has no</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">                `sensors:` block, or a row fails `Sensor` validation.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">                `sensors:` block, or a row fails :class:`Sensor` validation.</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="n">sensors</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
@@ -32879,10 +32907,10 @@ row.</p>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">sensors</span><span class="p">))</span>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sensor</span><span class="p">:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Sensor` for `code`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Sensor` for `code`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        Thin alias over</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        `get_dataset`.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            code: A FIRMS source code (`&quot;VIIRS_SNPP_NRT&quot;`, `&quot;MODIS_NRT&quot;`,</span>
@@ -32900,7 +32928,7 @@ row.</p>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return one column&#39;s metadata for a `(sensor, column)` pair.</span>
 <a id="__codelineno-0-327" name="__codelineno-0-327"></a>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">            code: A FIRMS source code as it appears in `datasets`.</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">            code: A FIRMS source code as it appears in :attr:`datasets`.</span>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">            column: A CSV column name declared under that sensor.</span>
 <a id="__codelineno-0-331" name="__codelineno-0-331"></a>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        Returns:</span>
@@ -32924,7 +32952,7 @@ row.</p>
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Leaf accessor for the shared two-arg get_variable contract.</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        Alias of `get_column` so the FIRMS leaf is reachable under</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        Alias of :meth:`get_column` so the FIRMS leaf is reachable under</span>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        the same `get_variable(dataset_key, variable_name)` verb the</span>
 <a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">        other two-level catalogs use.</span>
 <a id="__codelineno-0-356" name="__codelineno-0-356"></a>
@@ -33052,7 +33080,7 @@ row.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A FIRMS source code as it appears in <code>datasets</code>.</p>
+                <p>A FIRMS source code as it appears in :attr:<code>datasets</code>.</p>
               </div>
             </td>
             <td>
@@ -33174,7 +33202,7 @@ row.</p>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return one column&#39;s metadata for a `(sensor, column)` pair.</span>
 <a id="__codelineno-0-327" name="__codelineno-0-327"></a>
 <a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        code: A FIRMS source code as it appears in `datasets`.</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        code: A FIRMS source code as it appears in :attr:`datasets`.</span>
 <a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        column: A CSV column name declared under that sensor.</span>
 <a id="__codelineno-0-331" name="__codelineno-0-331"></a>
 <a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    Returns:</span>
@@ -33211,9 +33239,9 @@ row.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>Sensor</code> for <code>code</code>, with a did-you-mean hint.</p>
+        <p>Return the :class:<code>Sensor</code> for <code>code</code>, with a did-you-mean hint.</p>
 <p>Thin alias over
-<code>get_dataset</code>.</p>
+:meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -33313,10 +33341,10 @@ row.</p>
 <span class="normal"><a href="#__codelineno-0-321">321</a></span>
 <span class="normal"><a href="#__codelineno-0-322">322</a></span>
 <span class="normal"><a href="#__codelineno-0-323">323</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sensor</span><span class="p">:</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Sensor` for `code`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Sensor` for `code`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">    Thin alias over</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    `get_dataset`.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        code: A FIRMS source code (`&quot;VIIRS_SNPP_NRT&quot;`, `&quot;MODIS_NRT&quot;`,</span>
@@ -33347,7 +33375,7 @@ row.</p>
     <div class="doc doc-contents ">
 
         <p>Leaf accessor for the shared two-arg get_variable contract.</p>
-<p>Alias of <code>get_column</code> so the FIRMS leaf is reachable under
+<p>Alias of :meth:<code>get_column</code> so the FIRMS leaf is reachable under
 the same <code>get_variable(dataset_key, variable_name)</code> verb the
 other two-level catalogs use.</p>
 
@@ -33441,7 +33469,7 @@ other two-level catalogs use.</p>
 <span class="normal"><a href="#__codelineno-0-364">364</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensorColumn</span><span class="p">:</span>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Leaf accessor for the shared two-arg get_variable contract.</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    Alias of `get_column` so the FIRMS leaf is reachable under</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    Alias of :meth:`get_column` so the FIRMS leaf is reachable under</span>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">    the same `get_variable(dataset_key, variable_name)` verb the</span>
 <a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">    other two-level catalogs use.</span>
 <a id="__codelineno-0-356" name="__codelineno-0-356"></a>
@@ -33498,7 +33526,7 @@ other two-level catalogs use.</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the
-module-level <code>CATALOG_PATH</code>.</p>
+module-level :data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -33524,7 +33552,7 @@ module-level <code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -33548,7 +33576,7 @@ module-level <code>CATALOG_PATH</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>If <code>catalog_path</code> does not exist, or if the file has no
-<code>sensors:</code> block, or a row fails <code>Sensor</code> validation.</p>
+<code>sensors:</code> block, or a row fails :class:<code>Sensor</code> validation.</p>
               </div>
             </td>
           </tr>
@@ -33583,14 +33611,14 @@ module-level <code>CATALOG_PATH</code>.</p>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file has no</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            `sensors:` block, or a row fails `Sensor` validation.</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            `sensors:` block, or a row fails :class:`Sensor` validation.</span>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="n">sensors</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
@@ -33629,8 +33657,8 @@ module-level <code>CATALOG_PATH</code>.</p>
 
 
         <p>One FIRMS sensor's dispatch row (the "dataset" analog).</p>
-<p>The FIRMS source code is the parent key in <code>Catalog.datasets</code>
-and is repeated here as <code>code</code> so a <code>Sensor</code> carries its
+<p>The FIRMS source code is the parent key in :attr:<code>Catalog.datasets</code>
+and is repeated here as :attr:<code>code</code> so a :class:<code>Sensor</code> carries its
 own identity when passed around outside the catalog.</p>
 
 
@@ -33677,7 +33705,7 @@ the value passed in <code>variables=[...]</code> and used as the URL
               <div class="doc-md-description">
                 <p><code>"MODIS"</code>, <code>"VIIRS"</code>, <code>"GOES"</code>, or <code>"LANDSAT"</code> — selects
 the confidence / brightness schema handling in
-<code>earthlens.firms.events</code>. MODIS and GOES report numeric
+:mod:<code>earthlens.firms.events</code>. MODIS and GOES report numeric
 confidence; VIIRS reports the categorical token <code>l</code>/<code>n</code>/<code>h</code>
 and LANDSAT reports <code>l</code>/<code>m</code>/<code>h</code>. Brightness comes from
 <code>brightness</code> (MODIS), <code>bright_ti4</code> (VIIRS / GOES), or is
@@ -33812,8 +33840,8 @@ absent (LANDSAT carries no brightness or FRP column).</p>
 <span class="normal"><a href="#__codelineno-0-189">189</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="k">class</span><span class="w"> </span><span class="nc">Sensor</span><span class="p">(</span><span class="n">SummarisedLeaf</span><span class="p">):</span>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One FIRMS sensor&#39;s dispatch row (the &quot;dataset&quot; analog).</span>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a>
-<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    The FIRMS source code is the parent key in `Catalog.datasets`</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    and is repeated here as `code` so a `Sensor` carries its</span>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    The FIRMS source code is the parent key in :attr:`Catalog.datasets`</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    and is repeated here as :attr:`code` so a :class:`Sensor` carries its</span>
 <a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">    own identity when passed around outside the catalog.</span>
 <a id="__codelineno-0-130" name="__codelineno-0-130"></a>
 <a id="__codelineno-0-131" name="__codelineno-0-131"></a><span class="sd">    Attributes:</span>
@@ -33823,7 +33851,7 @@ absent (LANDSAT carries no brightness or FRP column).</p>
 <a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">        name: Human-readable sensor name used in logs and docs.</span>
 <a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">        family: `&quot;MODIS&quot;`, `&quot;VIIRS&quot;`, `&quot;GOES&quot;`, or `&quot;LANDSAT&quot;` — selects</span>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a><span class="sd">            the confidence / brightness schema handling in</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">            `earthlens.firms.events`. MODIS and GOES report numeric</span>
+<a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">            :mod:`earthlens.firms.events`. MODIS and GOES report numeric</span>
 <a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">            confidence; VIIRS reports the categorical token `l`/`n`/`h`</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">            and LANDSAT reports `l`/`m`/`h`. Brightness comes from</span>
 <a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">            `brightness` (MODIS), `bright_ti4` (VIIRS / GOES), or is</span>
@@ -34206,7 +34234,7 @@ descriptive metadata.</p>
               <div class="doc-md-description">
                 <p><code>"NRT"</code> (near-real-time, last ~2 months) or <code>"SP"</code>
 (standard-quality archive). Drives the
-<code>FIRMS</code> out-of-coverage warning: a
+:class:<code>~earthlens.firms.FIRMS</code> out-of-coverage warning: a
 request for an old window against an <code>*_NRT</code> sensor is
 silently empty upstream, so the backend warns and names the
 <code>*_SP</code> variant.</p>
@@ -34277,7 +34305,7 @@ silently empty upstream, so the backend warns and names the
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">        end: Last date covered, or `None` for an ongoing sensor.</span>
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">        quality: `&quot;NRT&quot;` (near-real-time, last ~2 months) or `&quot;SP&quot;`</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">            (standard-quality archive). Drives the</span>
-<a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">            `FIRMS` out-of-coverage warning: a</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">            :class:`~earthlens.firms.FIRMS` out-of-coverage warning: a</span>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">            request for an old window against an `*_NRT` sensor is</span>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">            silently empty upstream, so the backend warns and names the</span>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">            `*_SP` variant.</span>
@@ -34376,30 +34404,30 @@ silently empty upstream, so the backend warns and names the
     <div class="doc doc-contents first">
 
         <p>Credentials and <code>MAP_KEY</code> resolution for the NASA FIRMS backend.</p>
-<p>Hosts <code>FirmsAuth</code>, an <code>earthlens.base.SingleSecretAuth</code>
+<p>Hosts :class:<code>FirmsAuth</code>, an :class:<code>earthlens.base.SingleSecretAuth</code>
 subclass that resolves a single FIRMS <strong><code>MAP_KEY</code></strong> from, in priority
 order, an explicit <code>api_key=</code> argument or the <code>FIRMS_MAP_KEY</code>
 environment variable. FIRMS requires a (free) key on every request;
 there is no username/password and no saved config-file dance, so this is
-the same single-secret shape as <code>earthlens.openaq.OpenaqAuth</code> —
+the same single-secret shape as :class:<code>earthlens.openaq.OpenaqAuth</code> —
 mirrored on the <code>CmemsAuth</code> resolution chain but without the toolbox
 login.</p>
 <p>Unlike OpenAQ (which attaches its key as an <code>X-API-Key</code> header via a
 dedicated client), FIRMS sends the <code>MAP_KEY</code> as a <strong>path segment</strong> in
 the request URL, so there is no separate client module: the resolved key
-is read back via the <code>FirmsAuth.api_key</code> property and dropped into
-the URL by <code>earthlens.firms.FIRMS</code> directly.</p>
+is read back via the :attr:<code>FirmsAuth.api_key</code> property and dropped into
+the URL by :class:<code>earthlens.firms.FIRMS</code> directly.</p>
 <p>The shape:</p>
 <ul>
-<li><code>FirmsCredentials</code> is a frozen pydantic value object carrying
-  the optional key as a <code>pydantic.SecretStr</code>.</li>
-<li><code>FirmsAuth</code> binds those credentials and lets the shared
-  <code>earthlens.base.SingleSecretAuth.configure</code> resolve the key —
+<li>:class:<code>FirmsCredentials</code> is a frozen pydantic value object carrying
+  the optional key as a :class:<code>pydantic.SecretStr</code>.</li>
+<li>:class:<code>FirmsAuth</code> binds those credentials and lets the shared
+  :meth:<code>earthlens.base.SingleSecretAuth.configure</code> resolve the key —
   explicit key first, then the <code>FIRMS_MAP_KEY</code> env var, then a clear
-  <code>AuthenticationError</code> naming the free-registration URL (never
+  :class:<code>AuthenticationError</code> naming the free-registration URL (never
   an interactive prompt).</li>
 <li><code>configure()</code> is idempotent — a second call after
-  <code>FirmsAuth.is_authenticated</code> returns <code>True</code> short-circuits, so
+  :meth:<code>FirmsAuth.is_authenticated</code> returns <code>True</code> short-circuits, so
   it is safe to call from long-lived workers.</li>
 </ul>
 
@@ -34444,7 +34472,7 @@ the URL by <code>earthlens.firms.FIRMS</code> directly.</p>
 <code>EarthLens(...).authenticate()</code>, set the <code>FIRMS_MAP_KEY</code> environment
 variable, or request a free key at
 <code>firms.modaps.eosdis.nasa.gov/api/map_key/</code>. A subclass of the
-cross-backend <code>earthlens.base.AuthenticationError</code> so callers
+cross-backend :class:<code>earthlens.base.AuthenticationError</code> so callers
 can catch every backend's auth failure with one <code>except</code> clause.</p>
 
 
@@ -34472,7 +34500,7 @@ can catch every backend's auth failure with one <code>except</code> clause.</p>
 <a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">    `EarthLens(...).authenticate()`, set the `FIRMS_MAP_KEY` environment</span>
 <a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="sd">    variable, or request a free key at</span>
 <a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    `firms.modaps.eosdis.nasa.gov/api/map_key/`. A subclass of the</span>
-<a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    cross-backend `earthlens.base.AuthenticationError` so callers</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    cross-backend :class:`earthlens.base.AuthenticationError` so callers</span>
 <a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="sd">    can catch every backend&#39;s auth failure with one `except` clause.</span>
 <a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
@@ -34500,15 +34528,15 @@ can catch every backend's auth failure with one <code>except</code> clause.</p>
 
 
         <p>Resolve and hold the FIRMS <code>MAP_KEY</code>.</p>
-<p>Implements the <code>earthlens.base.SingleSecretAuth</code> contract for
+<p>Implements the :class:<code>earthlens.base.SingleSecretAuth</code> contract for
 a single-secret backend: it declares its env var and provider name
 and supplies <code>_explicit_credential</code> / <code>_connect</code>, while the inherited
-<code>configure</code> performs the resolution and is idempotent. After a
+:meth:<code>configure</code> performs the resolution and is idempotent. After a
 successful <code>configure()</code>, the key is available via the
-<code>api_key</code> property for the backend to drop into the request
+:attr:<code>api_key</code> property for the backend to drop into the request
 URL.</p>
 <p>The class is a context manager (inherited from
-<code>AbstractAuth</code>): <code>with FirmsAuth(creds) as auth: ...</code> calls
+:class:<code>AbstractAuth</code>): <code>with FirmsAuth(creds) as auth: ...</code> calls
 <code>configure()</code> on enter and the default no-op <code>close()</code> on exit —
 there is no per-instance resource to release.</p>
 
@@ -34529,7 +34557,7 @@ there is no per-instance resource to release.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>FirmsCredentials</code> passed at construction.</p>
+                <p>The :class:<code>FirmsCredentials</code> passed at construction.</p>
               </div>
             </td>
           </tr>
@@ -34632,21 +34660,21 @@ there is no per-instance resource to release.</p>
 <span class="normal"><a href="#__codelineno-0-162">162</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="k">class</span><span class="w"> </span><span class="nc">FirmsAuth</span><span class="p">(</span><span class="n">SingleSecretAuth</span><span class="p">[</span><span class="n">FirmsCredentials</span><span class="p">]):</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve and hold the FIRMS `MAP_KEY`.</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a>
-<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    Implements the `earthlens.base.SingleSecretAuth` contract for</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    Implements the :class:`earthlens.base.SingleSecretAuth` contract for</span>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    a single-secret backend: it declares its env var and provider name</span>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    and supplies `_explicit_credential` / `_connect`, while the inherited</span>
-<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">    `configure` performs the resolution and is idempotent. After a</span>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">    :meth:`configure` performs the resolution and is idempotent. After a</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    successful `configure()`, the key is available via the</span>
-<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    `api_key` property for the backend to drop into the request</span>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    :attr:`api_key` property for the backend to drop into the request</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    URL.</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a><span class="sd">    The class is a context manager (inherited from</span>
-<a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">    `AbstractAuth`): `with FirmsAuth(creds) as auth: ...` calls</span>
+<a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">    :class:`AbstractAuth`): `with FirmsAuth(creds) as auth: ...` calls</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">    `configure()` on enter and the default no-op `close()` on exit —</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">    there is no per-instance resource to release.</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a>
 <a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">        _creds: The `FirmsCredentials` passed at construction.</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">        _creds: The :class:`FirmsCredentials` passed at construction.</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a>
 <a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-114" name="__codelineno-0-114"></a><span class="sd">        - Resolve an explicit key:</span>
@@ -34684,13 +34712,13 @@ there is no per-instance resource to release.</p>
 <a id="__codelineno-0-146" name="__codelineno-0-146"></a>
 <a id="__codelineno-0-147" name="__codelineno-0-147"></a>    <span class="nd">@property</span>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">api_key</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved `MAP_KEY`; valid only after `configure`.</span>
+<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved `MAP_KEY`; valid only after :meth:`configure`.</span>
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a>
 <a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">            str: The FIRMS `MAP_KEY` string.</span>
 <a id="__codelineno-0-153" name="__codelineno-0-153"></a>
 <a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">            AuthenticationError: When read before `configure` has</span>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">            AuthenticationError: When read before :meth:`configure` has</span>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">                resolved a key.</span>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -34727,7 +34755,7 @@ there is no per-instance resource to release.</p>
 
     <div class="doc doc-contents ">
 
-        <p>The resolved <code>MAP_KEY</code>; valid only after <code>configure</code>.</p>
+        <p>The resolved <code>MAP_KEY</code>; valid only after :meth:<code>configure</code>.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -34768,7 +34796,7 @@ there is no per-instance resource to release.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>When read before <code>configure</code> has
+                <p>When read before :meth:<code>configure</code> has
 resolved a key.</p>
               </div>
             </td>
@@ -34811,8 +34839,8 @@ resolved a key.</p>
         <p>Frozen value object holding the FIRMS <code>MAP_KEY</code>.</p>
 <p>The key is optional at construction time: <code>None</code> means "resolve from
 the <code>FIRMS_MAP_KEY</code> environment variable at
-<code>FirmsAuth.configure</code> time". The real "is there a usable key?"
-gate is <code>FirmsAuth.configure</code>, not this model.</p>
+:meth:<code>FirmsAuth.configure</code> time". The real "is there a usable key?"
+gate is :meth:<code>FirmsAuth.configure</code>, not this model.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -34833,7 +34861,7 @@ gate is <code>FirmsAuth.configure</code>, not this model.</p>
             <td>
               <div class="doc-md-description">
                 <p>The FIRMS <code>MAP_KEY</code>, stored as a
-<code>pydantic.SecretStr</code> so it is never echoed by
+:class:<code>pydantic.SecretStr</code> so it is never echoed by
 <code>repr(creds)</code> or in logs. <code>None</code> defers resolution to the
 environment variable.</p>
               </div>
@@ -34910,12 +34938,12 @@ environment variable.</p>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a>
 <a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">    The key is optional at construction time: `None` means &quot;resolve from</span>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    the `FIRMS_MAP_KEY` environment variable at</span>
-<a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">    `FirmsAuth.configure` time&quot;. The real &quot;is there a usable key?&quot;</span>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    gate is `FirmsAuth.configure`, not this model.</span>
+<a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">    :meth:`FirmsAuth.configure` time&quot;. The real &quot;is there a usable key?&quot;</span>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    gate is :meth:`FirmsAuth.configure`, not this model.</span>
 <a id="__codelineno-0-62" name="__codelineno-0-62"></a>
 <a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">        api_key: The FIRMS `MAP_KEY`, stored as a</span>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">            `pydantic.SecretStr` so it is never echoed by</span>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">            :class:`pydantic.SecretStr` so it is never echoed by</span>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">            `repr(creds)` or in logs. `None` defers resolution to the</span>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">            environment variable.</span>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a>

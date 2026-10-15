@@ -817,6 +817,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -24237,9 +24265,9 @@
 <p>Subclasses encapsulate the request shape, authentication, and
 download orchestration for a single provider (CHIRPS, ERA5 on AWS
 S3, ECMWF CDS, Google Earth Engine). The base class wires the
-abstract hooks (<code>_initialize</code>, <code>_create_grid</code>,
-<code>_check_input_dates</code>) into a uniform <code>__init__</code> shape and
-exposes a single <code>download</code> entry point.</p>
+abstract hooks (:meth:<code>_initialize</code>, :meth:<code>_create_grid</code>,
+:meth:<code>_check_input_dates</code>) into a uniform <code>__init__</code> shape and
+exposes a single :meth:<code>download</code> entry point.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -24261,11 +24289,11 @@ exposes a single <code>download</code> entry point.</p>
               <div class="doc-md-description">
                 <p>Class-level declaration of the natural output
 shape this backend emits. Read by
-<code>earthlens.earthlens.EarthLens</code> at facade
+:class:<code>earthlens.earthlens.EarthLens</code> at facade
 <code>download()</code> time to gate the <code>aggregate=</code> argument:
 <code>"raster"</code> accepts it (the existing pyramids-backed
 <code>aggregate_netcdf</code> flow); <code>"vector"</code> and <code>"tabular"</code>
-reject it with <code>NotImplementedError</code>; <code>"mixed"</code>
+reject it with :class:<code>NotImplementedError</code>; <code>"mixed"</code>
 forwards it unchanged. Subclasses override the class
 attribute; the default is <code>"raster"</code>.</p>
 <p>Most backends fix <code>OUTPUT_KIND</code> as a class attribute. A few
@@ -24288,7 +24316,7 @@ instance attribute, so both forms work.</p>
             <td>
               <div class="doc-md-description">
                 <p>Whether this backend needs both <code>start</code> and
-<code>end</code>. <code>True</code> (the default) makes <code>__init__</code> reject a
+<code>end</code>. <code>True</code> (the default) makes :meth:<code>__init__</code> reject a
 missing bound up front with an actionable message, instead of
 letting the <code>None</code> reach the subclass's date parsing and surface
 as a bare <code>TypeError: strptime() argument 1 must be str, not
@@ -24313,8 +24341,8 @@ is reduced to <code>lat_lim</code> / <code>lon_lim</code> <em>and</em> carried a
 through <code>earthlens.base.spatial.crop_to_aoi</code> /
 <code>mask_to_geometry</code> (or reading <code>space.geometry</code> itself) and sets
 this to <code>True</code>. When it is <code>False</code>,
-<code>_attach_clip_geometry</code> emits a
-<code>PolygonAoiWarning</code>, because the request silently returns
+:meth:<code>_attach_clip_geometry</code> emits a
+:class:<code>PolygonAoiWarning</code>, because the request silently returns
 the polygon's bounding box — a plausible-looking raster over
 roughly the right area, which is the hardest kind of wrong
 output to notice.</p>
@@ -24350,7 +24378,7 @@ It caches per-request state (<code>self.space</code> / <code>self.time</code>, a
 thread its own instance. Where earthlens itself fans out — ghsl's tile
 downloads run through <code>joblib.Parallel(prefer="threads")</code> — the shared
 helpers take a session from
-<code>earthlens.base.http.thread_local_session</code>, one per thread,
+:func:<code>earthlens.base.http.thread_local_session</code>, one per thread,
 because <code>requests.Session</code> is not guaranteed thread-safe either.</p>
 <p>A consequence worth knowing: <code>min_interval</code> throttling is per
 <code>HttpClient</code>, so N threads holding N clients each wait
@@ -24362,8 +24390,8 @@ what a single-threaded run would produce.</p>
   <summary>Note</summary>
   <p><strong>Processes.</strong> A freshly constructed backend usually pickles, because
 the SDK clients are lazy. Once one materialises — after
-<code>authenticate</code> or the first download — it generally does not, and
-a backend that caches an <code>HttpClient</code> on
+:meth:<code>authenticate</code> or the first download — it generally does not, and
+a backend that caches an :class:<code>~earthlens.base.http.HttpClient</code> on
 <code>self._http</code> (erddap, bathymetry, gee) never does: the client holds a
 <code>threading.Lock</code> for the throttle, and locks do not pickle. (A bare
 <code>requests.Session</code>, perhaps surprisingly, does.)</p>
@@ -26094,18 +26122,18 @@ cannot span processes.</p>
 <a id="__codelineno-0-719" name="__codelineno-0-719"></a><span class="sd">    Subclasses encapsulate the request shape, authentication, and</span>
 <a id="__codelineno-0-720" name="__codelineno-0-720"></a><span class="sd">    download orchestration for a single provider (CHIRPS, ERA5 on AWS</span>
 <a id="__codelineno-0-721" name="__codelineno-0-721"></a><span class="sd">    S3, ECMWF CDS, Google Earth Engine). The base class wires the</span>
-<a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="sd">    abstract hooks (`_initialize`, `_create_grid`,</span>
-<a id="__codelineno-0-723" name="__codelineno-0-723"></a><span class="sd">    `_check_input_dates`) into a uniform `__init__` shape and</span>
-<a id="__codelineno-0-724" name="__codelineno-0-724"></a><span class="sd">    exposes a single `download` entry point.</span>
+<a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="sd">    abstract hooks (:meth:`_initialize`, :meth:`_create_grid`,</span>
+<a id="__codelineno-0-723" name="__codelineno-0-723"></a><span class="sd">    :meth:`_check_input_dates`) into a uniform `__init__` shape and</span>
+<a id="__codelineno-0-724" name="__codelineno-0-724"></a><span class="sd">    exposes a single :meth:`download` entry point.</span>
 <a id="__codelineno-0-725" name="__codelineno-0-725"></a>
 <a id="__codelineno-0-726" name="__codelineno-0-726"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-727" name="__codelineno-0-727"></a><span class="sd">        OUTPUT_KIND: Class-level declaration of the natural output</span>
 <a id="__codelineno-0-728" name="__codelineno-0-728"></a><span class="sd">            shape this backend emits. Read by</span>
-<a id="__codelineno-0-729" name="__codelineno-0-729"></a><span class="sd">            `earthlens.earthlens.EarthLens` at facade</span>
+<a id="__codelineno-0-729" name="__codelineno-0-729"></a><span class="sd">            :class:`earthlens.earthlens.EarthLens` at facade</span>
 <a id="__codelineno-0-730" name="__codelineno-0-730"></a><span class="sd">            `download()` time to gate the `aggregate=` argument:</span>
 <a id="__codelineno-0-731" name="__codelineno-0-731"></a><span class="sd">            `&quot;raster&quot;` accepts it (the existing pyramids-backed</span>
 <a id="__codelineno-0-732" name="__codelineno-0-732"></a><span class="sd">            `aggregate_netcdf` flow); `&quot;vector&quot;` and `&quot;tabular&quot;`</span>
-<a id="__codelineno-0-733" name="__codelineno-0-733"></a><span class="sd">            reject it with `NotImplementedError`; `&quot;mixed&quot;`</span>
+<a id="__codelineno-0-733" name="__codelineno-0-733"></a><span class="sd">            reject it with :class:`NotImplementedError`; `&quot;mixed&quot;`</span>
 <a id="__codelineno-0-734" name="__codelineno-0-734"></a><span class="sd">            forwards it unchanged. Subclasses override the class</span>
 <a id="__codelineno-0-735" name="__codelineno-0-735"></a><span class="sd">            attribute; the default is `&quot;raster&quot;`.</span>
 <a id="__codelineno-0-736" name="__codelineno-0-736"></a>
@@ -26119,7 +26147,7 @@ cannot span processes.</p>
 <a id="__codelineno-0-744" name="__codelineno-0-744"></a><span class="sd">            `ships` product (else `&quot;vector&quot;`). The facade reads the</span>
 <a id="__codelineno-0-745" name="__codelineno-0-745"></a><span class="sd">            instance attribute, so both forms work.</span>
 <a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">        REQUIRES_TIME_WINDOW: Whether this backend needs both `start` and</span>
-<a id="__codelineno-0-747" name="__codelineno-0-747"></a><span class="sd">            `end`. `True` (the default) makes `__init__` reject a</span>
+<a id="__codelineno-0-747" name="__codelineno-0-747"></a><span class="sd">            `end`. `True` (the default) makes :meth:`__init__` reject a</span>
 <a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="sd">            missing bound up front with an actionable message, instead of</span>
 <a id="__codelineno-0-749" name="__codelineno-0-749"></a><span class="sd">            letting the `None` reach the subclass&#39;s date parsing and surface</span>
 <a id="__codelineno-0-750" name="__codelineno-0-750"></a><span class="sd">            as a bare `TypeError: strptime() argument 1 must be str, not</span>
@@ -26134,8 +26162,8 @@ cannot span processes.</p>
 <a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">            through `earthlens.base.spatial.crop_to_aoi` /</span>
 <a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">            `mask_to_geometry` (or reading `space.geometry` itself) and sets</span>
 <a id="__codelineno-0-761" name="__codelineno-0-761"></a><span class="sd">            this to `True`. When it is `False`,</span>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">            `_attach_clip_geometry` emits a</span>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="sd">            `PolygonAoiWarning`, because the request silently returns</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">            :meth:`_attach_clip_geometry` emits a</span>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="sd">            :class:`PolygonAoiWarning`, because the request silently returns</span>
 <a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="sd">            the polygon&#39;s bounding box — a plausible-looking raster over</span>
 <a id="__codelineno-0-765" name="__codelineno-0-765"></a><span class="sd">            roughly the right area, which is the hardest kind of wrong</span>
 <a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">            output to notice.</span>
@@ -26154,7 +26182,7 @@ cannot span processes.</p>
 <a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">        thread its own instance. Where earthlens itself fans out — ghsl&#39;s tile</span>
 <a id="__codelineno-0-780" name="__codelineno-0-780"></a><span class="sd">        downloads run through `joblib.Parallel(prefer=&quot;threads&quot;)` — the shared</span>
 <a id="__codelineno-0-781" name="__codelineno-0-781"></a><span class="sd">        helpers take a session from</span>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a><span class="sd">        `earthlens.base.http.thread_local_session`, one per thread,</span>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a><span class="sd">        :func:`earthlens.base.http.thread_local_session`, one per thread,</span>
 <a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="sd">        because `requests.Session` is not guaranteed thread-safe either.</span>
 <a id="__codelineno-0-784" name="__codelineno-0-784"></a>
 <a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="sd">        A consequence worth knowing: `min_interval` throttling is per</span>
@@ -26165,8 +26193,8 @@ cannot span processes.</p>
 <a id="__codelineno-0-790" name="__codelineno-0-790"></a><span class="sd">    Note:</span>
 <a id="__codelineno-0-791" name="__codelineno-0-791"></a><span class="sd">        **Processes.** A freshly constructed backend usually pickles, because</span>
 <a id="__codelineno-0-792" name="__codelineno-0-792"></a><span class="sd">        the SDK clients are lazy. Once one materialises — after</span>
-<a id="__codelineno-0-793" name="__codelineno-0-793"></a><span class="sd">        `authenticate` or the first download — it generally does not, and</span>
-<a id="__codelineno-0-794" name="__codelineno-0-794"></a><span class="sd">        a backend that caches an `HttpClient` on</span>
+<a id="__codelineno-0-793" name="__codelineno-0-793"></a><span class="sd">        :meth:`authenticate` or the first download — it generally does not, and</span>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a><span class="sd">        a backend that caches an :class:`~earthlens.base.http.HttpClient` on</span>
 <a id="__codelineno-0-795" name="__codelineno-0-795"></a><span class="sd">        `self._http` (erddap, bathymetry, gee) never does: the client holds a</span>
 <a id="__codelineno-0-796" name="__codelineno-0-796"></a><span class="sd">        `threading.Lock` for the throttle, and locks do not pickle. (A bare</span>
 <a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="sd">        `requests.Session`, perhaps surprisingly, does.)</span>
@@ -26194,14 +26222,14 @@ cannot span processes.</p>
 <a id="__codelineno-0-819" name="__codelineno-0-819"></a>
 <a id="__codelineno-0-820" name="__codelineno-0-820"></a>    <span class="c1">#: Optional sentence explaining why this backend refuses `aggregate=`,</span>
 <a id="__codelineno-0-821" name="__codelineno-0-821"></a>    <span class="c1">#: appended to the central message by</span>
-<a id="__codelineno-0-822" name="__codelineno-0-822"></a>    <span class="c1">#: `_refuse_unsupported_aggregate`. Worth setting: the specific reason</span>
+<a id="__codelineno-0-822" name="__codelineno-0-822"></a>    <span class="c1">#: :meth:`_refuse_unsupported_aggregate`. Worth setting: the specific reason</span>
 <a id="__codelineno-0-823" name="__codelineno-0-823"></a>    <span class="c1">#: (&quot;a single static prediction with no temporal axis&quot;) is more use to a</span>
 <a id="__codelineno-0-824" name="__codelineno-0-824"></a>    <span class="c1">#: caller than the generic one.</span>
 <a id="__codelineno-0-825" name="__codelineno-0-825"></a>    <span class="n">AGGREGATE_REFUSAL_REASON</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 <a id="__codelineno-0-826" name="__codelineno-0-826"></a>
 <a id="__codelineno-0-827" name="__codelineno-0-827"></a>    <span class="c1">#: Minimum seconds between consecutive requests to this provider — a</span>
 <a id="__codelineno-0-828" name="__codelineno-0-828"></a>    <span class="c1">#: client-side politeness limit, passed to</span>
-<a id="__codelineno-0-829" name="__codelineno-0-829"></a>    <span class="c1">#: `HttpClient`&#39;s `min_interval`. `0.0` (the</span>
+<a id="__codelineno-0-829" name="__codelineno-0-829"></a>    <span class="c1">#: :class:`~earthlens.base.http.HttpClient`&#39;s `min_interval`. `0.0` (the</span>
 <a id="__codelineno-0-830" name="__codelineno-0-830"></a>    <span class="c1">#: default) means the provider publishes no etiquette we are bound by.</span>
 <a id="__codelineno-0-831" name="__codelineno-0-831"></a>    <span class="c1">#:</span>
 <a id="__codelineno-0-832" name="__codelineno-0-832"></a>    <span class="c1">#: Declared on the backend rather than read from the `providers.yaml`</span>
@@ -26210,7 +26238,7 @@ cannot span processes.</p>
 <a id="__codelineno-0-835" name="__codelineno-0-835"></a>    <span class="c1">#: actually get rate-limited (osm&#39;s Overpass / ohsome) have no provider</span>
 <a id="__codelineno-0-836" name="__codelineno-0-836"></a>    <span class="c1">#: record at all.</span>
 <a id="__codelineno-0-837" name="__codelineno-0-837"></a>    <span class="c1">#:</span>
-<a id="__codelineno-0-838" name="__codelineno-0-838"></a>    <span class="c1">#: The throttle is per `HttpClient`, so a backend fanning out over N</span>
+<a id="__codelineno-0-838" name="__codelineno-0-838"></a>    <span class="c1">#: The throttle is per :class:`HttpClient`, so a backend fanning out over N</span>
 <a id="__codelineno-0-839" name="__codelineno-0-839"></a>    <span class="c1">#: threads with a client each waits `min_interval` N times in parallel — see</span>
 <a id="__codelineno-0-840" name="__codelineno-0-840"></a>    <span class="c1">#: the concurrency note on this class.</span>
 <a id="__codelineno-0-841" name="__codelineno-0-841"></a>    <span class="n">MIN_REQUEST_INTERVAL</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -26220,8 +26248,8 @@ cannot span processes.</p>
 <a id="__codelineno-0-845" name="__codelineno-0-845"></a>
 <a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">        Two independent pieces of wiring run for each concrete backend:</span>
 <a id="__codelineno-0-847" name="__codelineno-0-847"></a>
-<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">        1. `_wrap_download` wraps whichever `download` the class</span>
-<a id="__codelineno-0-849" name="__codelineno-0-849"></a><span class="sd">           defines so `root_dir` is created when a download starts</span>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">        1. :meth:`_wrap_download` wraps whichever `download` the class</span>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a><span class="sd">           defines so :attr:`root_dir` is created when a download starts</span>
 <a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">           rather than at construction. This runs for *every* subclass,</span>
 <a id="__codelineno-0-851" name="__codelineno-0-851"></a><span class="sd">           including one that declares no `__init__` of its own.</span>
 <a id="__codelineno-0-852" name="__codelineno-0-852"></a><span class="sd">        2. The backend&#39;s `__init__` is wrapped so that — whether reached</span>
@@ -26230,7 +26258,7 @@ cannot span processes.</p>
 <a id="__codelineno-0-855" name="__codelineno-0-855"></a>
 <a id="__codelineno-0-856" name="__codelineno-0-856"></a><span class="sd">        The constructor sugar adds:</span>
 <a id="__codelineno-0-857" name="__codelineno-0-857"></a>
-<a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="sd">        * `aoi` (+ `buffer`): any shape `earthlens.base.spatial.normalize_aoi`</span>
+<a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="sd">        * `aoi` (+ `buffer`): any shape :func:`earthlens.base.spatial.normalize_aoi`</span>
 <a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">          understands, reduced to `lat_lim` / `lon_lim`; a backend that</span>
 <a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">          declares its own `aoi` (WorldPop) keeps it;</span>
 <a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">        * `cadence`: a clearer alias for `temporal_resolution`;</span>
@@ -26419,8 +26447,8 @@ cannot span processes.</p>
 <a id="__codelineno-0-1044" name="__codelineno-0-1044"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Make the backend&#39;s own `download` create `root_dir` before it runs.</span>
 <a id="__codelineno-0-1045" name="__codelineno-0-1045"></a>
 <a id="__codelineno-0-1046" name="__codelineno-0-1046"></a><span class="sd">        `root_dir` is resolved at construction but deliberately not created</span>
-<a id="__codelineno-0-1047" name="__codelineno-0-1047"></a><span class="sd">        there (see `_ensure_root_dir`). Rather than make every backend</span>
-<a id="__codelineno-0-1048" name="__codelineno-0-1048"></a><span class="sd">        remember to call it, `__init_subclass__` calls this so the</span>
+<a id="__codelineno-0-1047" name="__codelineno-0-1047"></a><span class="sd">        there (see :meth:`_ensure_root_dir`). Rather than make every backend</span>
+<a id="__codelineno-0-1048" name="__codelineno-0-1048"></a><span class="sd">        remember to call it, :meth:`__init_subclass__` calls this so the</span>
 <a id="__codelineno-0-1049" name="__codelineno-0-1049"></a><span class="sd">        directory exists the moment a real download starts.</span>
 <a id="__codelineno-0-1050" name="__codelineno-0-1050"></a>
 <a id="__codelineno-0-1051" name="__codelineno-0-1051"></a><span class="sd">        The wrap is applied only to a `download` the class defines itself, and</span>
@@ -26496,21 +26524,21 @@ cannot span processes.</p>
 <a id="__codelineno-0-1121" name="__codelineno-0-1121"></a><span class="sd">        Captures the return values of the abstract hooks so subclasses</span>
 <a id="__codelineno-0-1122" name="__codelineno-0-1122"></a><span class="sd">        do not have to wire them onto `self` themselves:</span>
 <a id="__codelineno-0-1123" name="__codelineno-0-1123"></a>
-<a id="__codelineno-0-1124" name="__codelineno-0-1124"></a><span class="sd">        * `self.client` — whatever `_initialize` returns (a CDS</span>
+<a id="__codelineno-0-1124" name="__codelineno-0-1124"></a><span class="sd">        * `self.client` — whatever :meth:`_initialize` returns (a CDS</span>
 <a id="__codelineno-0-1125" name="__codelineno-0-1125"></a><span class="sd">          client, an S3 client, `None` for FTP). Subclasses that</span>
-<a id="__codelineno-0-1126" name="__codelineno-0-1126"></a><span class="sd">          assign `self.client` inside `_initialize` (e.g.</span>
-<a id="__codelineno-0-1127" name="__codelineno-0-1127"></a><span class="sd">          `S3`) keep their own assignment; the parent only sets</span>
-<a id="__codelineno-0-1128" name="__codelineno-0-1128"></a><span class="sd">          the attribute when `_initialize` returns a non-`None`</span>
+<a id="__codelineno-0-1126" name="__codelineno-0-1126"></a><span class="sd">          assign `self.client` inside :meth:`_initialize` (e.g.</span>
+<a id="__codelineno-0-1127" name="__codelineno-0-1127"></a><span class="sd">          :class:`S3`) keep their own assignment; the parent only sets</span>
+<a id="__codelineno-0-1128" name="__codelineno-0-1128"></a><span class="sd">          the attribute when :meth:`_initialize` returns a non-`None`</span>
 <a id="__codelineno-0-1129" name="__codelineno-0-1129"></a><span class="sd">          value.</span>
-<a id="__codelineno-0-1130" name="__codelineno-0-1130"></a><span class="sd">        * `self.space` — the `SpatialExtent` returned by</span>
-<a id="__codelineno-0-1131" name="__codelineno-0-1131"></a><span class="sd">          `_create_grid`.</span>
-<a id="__codelineno-0-1132" name="__codelineno-0-1132"></a><span class="sd">        * `self.time` — the `TemporalExtent` returned by</span>
-<a id="__codelineno-0-1133" name="__codelineno-0-1133"></a><span class="sd">          `_check_input_dates`.</span>
-<a id="__codelineno-0-1134" name="__codelineno-0-1134"></a><span class="sd">        * `self.root_dir` — the absolute `pathlib.Path` of the</span>
+<a id="__codelineno-0-1130" name="__codelineno-0-1130"></a><span class="sd">        * `self.space` — the :class:`SpatialExtent` returned by</span>
+<a id="__codelineno-0-1131" name="__codelineno-0-1131"></a><span class="sd">          :meth:`_create_grid`.</span>
+<a id="__codelineno-0-1132" name="__codelineno-0-1132"></a><span class="sd">        * `self.time` — the :class:`TemporalExtent` returned by</span>
+<a id="__codelineno-0-1133" name="__codelineno-0-1133"></a><span class="sd">          :meth:`_check_input_dates`.</span>
+<a id="__codelineno-0-1134" name="__codelineno-0-1134"></a><span class="sd">        * `self.root_dir` — the absolute :class:`pathlib.Path` of the</span>
 <a id="__codelineno-0-1135" name="__codelineno-0-1135"></a><span class="sd">          output directory. `self.path` is kept as a legacy alias so</span>
 <a id="__codelineno-0-1136" name="__codelineno-0-1136"></a><span class="sd">          older backends (CHIRPS, S3) continue to work. The directory is</span>
 <a id="__codelineno-0-1137" name="__codelineno-0-1137"></a><span class="sd">          *resolved* here but only *created* when a download actually</span>
-<a id="__codelineno-0-1138" name="__codelineno-0-1138"></a><span class="sd">          runs (see `_ensure_root_dir`), so merely constructing a</span>
+<a id="__codelineno-0-1138" name="__codelineno-0-1138"></a><span class="sd">          runs (see :meth:`_ensure_root_dir`), so merely constructing a</span>
 <a id="__codelineno-0-1139" name="__codelineno-0-1139"></a><span class="sd">          backend — to read its catalog, inspect its options, or validate</span>
 <a id="__codelineno-0-1140" name="__codelineno-0-1140"></a><span class="sd">          a request — never litters the filesystem.</span>
 <a id="__codelineno-0-1141" name="__codelineno-0-1141"></a>
@@ -26536,7 +26564,7 @@ cannot span processes.</p>
 <a id="__codelineno-0-1161" name="__codelineno-0-1161"></a><span class="sd">                an already-constructed backend.</span>
 <a id="__codelineno-0-1162" name="__codelineno-0-1162"></a>
 <a id="__codelineno-0-1163" name="__codelineno-0-1163"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-1164" name="__codelineno-0-1164"></a><span class="sd">            ValueError: If `REQUIRES_TIME_WINDOW` is `True` and either</span>
+<a id="__codelineno-0-1164" name="__codelineno-0-1164"></a><span class="sd">            ValueError: If :attr:`REQUIRES_TIME_WINDOW` is `True` and either</span>
 <a id="__codelineno-0-1165" name="__codelineno-0-1165"></a><span class="sd">                `start` or `end` is `None`.</span>
 <a id="__codelineno-0-1166" name="__codelineno-0-1166"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1167" name="__codelineno-0-1167"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_check_time_window</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
@@ -26571,12 +26599,12 @@ cannot span processes.</p>
 <a id="__codelineno-0-1196" name="__codelineno-0-1196"></a><span class="sd">        The single implementation of a policy 40 backends used to each write for</span>
 <a id="__codelineno-0-1197" name="__codelineno-0-1197"></a><span class="sd">        themselves. Two independent questions have to pass:</span>
 <a id="__codelineno-0-1198" name="__codelineno-0-1198"></a>
-<a id="__codelineno-0-1199" name="__codelineno-0-1199"></a><span class="sd">        * `SUPPORTS_AGGREGATE` — does the class wire the reducer at all;</span>
-<a id="__codelineno-0-1200" name="__codelineno-0-1200"></a><span class="sd">        * `OUTPUT_KIND` — is *this instance&#39;s* output gridded. A handful of</span>
+<a id="__codelineno-0-1199" name="__codelineno-0-1199"></a><span class="sd">        * :attr:`SUPPORTS_AGGREGATE` — does the class wire the reducer at all;</span>
+<a id="__codelineno-0-1200" name="__codelineno-0-1200"></a><span class="sd">        * :attr:`OUTPUT_KIND` — is *this instance&#39;s* output gridded. A handful of</span>
 <a id="__codelineno-0-1201" name="__codelineno-0-1201"></a><span class="sd">          backends resolve their kind per request, so a backend that aggregates</span>
 <a id="__codelineno-0-1202" name="__codelineno-0-1202"></a><span class="sd">          its raster datasets must still refuse for a vector one.</span>
 <a id="__codelineno-0-1203" name="__codelineno-0-1203"></a>
-<a id="__codelineno-0-1204" name="__codelineno-0-1204"></a><span class="sd">        A backend may set `AGGREGATE_REFUSAL_REASON` to a sentence saying</span>
+<a id="__codelineno-0-1204" name="__codelineno-0-1204"></a><span class="sd">        A backend may set :attr:`AGGREGATE_REFUSAL_REASON` to a sentence saying</span>
 <a id="__codelineno-0-1205" name="__codelineno-0-1205"></a><span class="sd">        why, which is appended to the message. That is worth doing: &quot;SoilGrids is</span>
 <a id="__codelineno-0-1206" name="__codelineno-0-1206"></a><span class="sd">        a single static prediction with no temporal axis&quot; tells a caller</span>
 <a id="__codelineno-0-1207" name="__codelineno-0-1207"></a><span class="sd">        something the generic sentence cannot.</span>
@@ -26654,10 +26682,10 @@ cannot span processes.</p>
 <a id="__codelineno-0-1279" name="__codelineno-0-1279"></a>        <span class="k">return</span> <span class="n">info</span><span class="o">.</span><span class="n">st_size</span> <span class="o">&gt;</span> <span class="mi">0</span>
 <a id="__codelineno-0-1280" name="__codelineno-0-1280"></a>
 <a id="__codelineno-0-1281" name="__codelineno-0-1281"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_ensure_root_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-1282" name="__codelineno-0-1282"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Create `root_dir` if it does not exist yet, and return it.</span>
+<a id="__codelineno-0-1282" name="__codelineno-0-1282"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Create :attr:`root_dir` if it does not exist yet, and return it.</span>
 <a id="__codelineno-0-1283" name="__codelineno-0-1283"></a>
 <a id="__codelineno-0-1284" name="__codelineno-0-1284"></a><span class="sd">        Called by the `download` wrapper installed in</span>
-<a id="__codelineno-0-1285" name="__codelineno-0-1285"></a><span class="sd">        `__init_subclass__`, so every backend&#39;s output directory exists</span>
+<a id="__codelineno-0-1285" name="__codelineno-0-1285"></a><span class="sd">        :meth:`__init_subclass__`, so every backend&#39;s output directory exists</span>
 <a id="__codelineno-0-1286" name="__codelineno-0-1286"></a><span class="sd">        by the time its own `download` body runs — without construction</span>
 <a id="__codelineno-0-1287" name="__codelineno-0-1287"></a><span class="sd">        itself creating one. Constructing a backend to read its catalog,</span>
 <a id="__codelineno-0-1288" name="__codelineno-0-1288"></a><span class="sd">        inspect `options_for`, or validate a request is a read-only act and</span>
@@ -26670,7 +26698,7 @@ cannot span processes.</p>
 <a id="__codelineno-0-1295" name="__codelineno-0-1295"></a><span class="sd">        preparation from the caller.</span>
 <a id="__codelineno-0-1296" name="__codelineno-0-1296"></a>
 <a id="__codelineno-0-1297" name="__codelineno-0-1297"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-1298" name="__codelineno-0-1298"></a><span class="sd">            Path: The (now existing) `root_dir`.</span>
+<a id="__codelineno-0-1298" name="__codelineno-0-1298"></a><span class="sd">            Path: The (now existing) :attr:`root_dir`.</span>
 <a id="__codelineno-0-1299" name="__codelineno-0-1299"></a>
 <a id="__codelineno-0-1300" name="__codelineno-0-1300"></a><span class="sd">        Note:</span>
 <a id="__codelineno-0-1301" name="__codelineno-0-1301"></a><span class="sd">            Construction resolves `root_dir` without touching the filesystem;</span>
@@ -26683,8 +26711,8 @@ cannot span processes.</p>
 <a id="__codelineno-0-1308" name="__codelineno-0-1308"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_time_window</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-1309" name="__codelineno-0-1309"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Reject a missing `start` / `end` when the backend needs both.</span>
 <a id="__codelineno-0-1310" name="__codelineno-0-1310"></a>
-<a id="__codelineno-0-1311" name="__codelineno-0-1311"></a><span class="sd">        Runs before `_check_input_dates` so a backend that declares</span>
-<a id="__codelineno-0-1312" name="__codelineno-0-1312"></a><span class="sd">        `REQUIRES_TIME_WINDOW` never has to defend against `None`, and</span>
+<a id="__codelineno-0-1311" name="__codelineno-0-1311"></a><span class="sd">        Runs before :meth:`_check_input_dates` so a backend that declares</span>
+<a id="__codelineno-0-1312" name="__codelineno-0-1312"></a><span class="sd">        :attr:`REQUIRES_TIME_WINDOW` never has to defend against `None`, and</span>
 <a id="__codelineno-0-1313" name="__codelineno-0-1313"></a><span class="sd">        the user gets the name of the missing bound rather than a bare</span>
 <a id="__codelineno-0-1314" name="__codelineno-0-1314"></a><span class="sd">        `strptime` `TypeError` from deep inside the subclass.</span>
 <a id="__codelineno-0-1315" name="__codelineno-0-1315"></a>
@@ -26716,10 +26744,10 @@ cannot span processes.</p>
 <a id="__codelineno-0-1341" name="__codelineno-0-1341"></a>
 <a id="__codelineno-0-1342" name="__codelineno-0-1342"></a><span class="sd">        Called by the ergonomic `__init__` wrapper when the request&#39;s</span>
 <a id="__codelineno-0-1343" name="__codelineno-0-1343"></a><span class="sd">        `aoi=` was a polygon rather than a plain bbox. The geometry is</span>
-<a id="__codelineno-0-1344" name="__codelineno-0-1344"></a><span class="sd">        stored on the (frozen) `SpatialExtent` via a copy so that</span>
+<a id="__codelineno-0-1344" name="__codelineno-0-1344"></a><span class="sd">        stored on the (frozen) :class:`SpatialExtent` via a copy so that</span>
 <a id="__codelineno-0-1345" name="__codelineno-0-1345"></a><span class="sd">        raster backends clipping through `pyramids.Dataset.crop` can mask</span>
 <a id="__codelineno-0-1346" name="__codelineno-0-1346"></a><span class="sd">        the fetched bbox down to the exact shape. A no-op when `self.space`</span>
-<a id="__codelineno-0-1347" name="__codelineno-0-1347"></a><span class="sd">        is not a `SpatialExtent`.</span>
+<a id="__codelineno-0-1347" name="__codelineno-0-1347"></a><span class="sd">        is not a :class:`SpatialExtent`.</span>
 <a id="__codelineno-0-1348" name="__codelineno-0-1348"></a>
 <a id="__codelineno-0-1349" name="__codelineno-0-1349"></a><span class="sd">        Backends that do not clip to the polygon (`SUPPORTS_POLYGON_AOI` is</span>
 <a id="__codelineno-0-1350" name="__codelineno-0-1350"></a><span class="sd">        `False`) still get the mask recorded — a later migration then needs no</span>
@@ -26763,12 +26791,12 @@ cannot span processes.</p>
 <a id="__codelineno-0-1388" name="__codelineno-0-1388"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Eagerly establish the backend&#39;s authenticated connection.</span>
 <a id="__codelineno-0-1389" name="__codelineno-0-1389"></a>
 <a id="__codelineno-0-1390" name="__codelineno-0-1390"></a><span class="sd">        The explicit, fail-fast counterpart to the lazy authentication</span>
-<a id="__codelineno-0-1391" name="__codelineno-0-1391"></a><span class="sd">        that otherwise happens on the first `download` / `search`:</span>
+<a id="__codelineno-0-1391" name="__codelineno-0-1391"></a><span class="sd">        that otherwise happens on the first :meth:`download` / `search`:</span>
 <a id="__codelineno-0-1392" name="__codelineno-0-1392"></a><span class="sd">        it opens the network client for backends that have one (those</span>
-<a id="__codelineno-0-1393" name="__codelineno-0-1393"></a><span class="sd">        mixing in `LazyClientMixin` — e.g. GEE, ECMWF, STAC) or</span>
+<a id="__codelineno-0-1393" name="__codelineno-0-1393"></a><span class="sd">        mixing in :class:`LazyClientMixin` — e.g. GEE, ECMWF, STAC) or</span>
 <a id="__codelineno-0-1394" name="__codelineno-0-1394"></a><span class="sd">        runs the credential `configure()` step for backends that hold an</span>
 <a id="__codelineno-0-1395" name="__codelineno-0-1395"></a><span class="sd">        auth object (CMEMS, Earthdata, EUMETSAT, …), raising</span>
-<a id="__codelineno-0-1396" name="__codelineno-0-1396"></a><span class="sd">        `AuthenticationError` on failure. It is a</span>
+<a id="__codelineno-0-1396" name="__codelineno-0-1396"></a><span class="sd">        :class:`~earthlens.base.AuthenticationError` on failure. It is a</span>
 <a id="__codelineno-0-1397" name="__codelineno-0-1397"></a><span class="sd">        no-op for credential-free backends (CHIRPS, GDACS, Overture, …),</span>
 <a id="__codelineno-0-1398" name="__codelineno-0-1398"></a><span class="sd">        and is idempotent.</span>
 <a id="__codelineno-0-1399" name="__codelineno-0-1399"></a>
@@ -26798,8 +26826,8 @@ cannot span processes.</p>
 <a id="__codelineno-0-1423" name="__codelineno-0-1423"></a><span class="sd">        Still abstract, because the *shape* of a backend&#39;s time axis is a real</span>
 <a id="__codelineno-0-1424" name="__codelineno-0-1424"></a><span class="sd">        design decision rather than boilerplate. Most implementations are one</span>
 <a id="__codelineno-0-1425" name="__codelineno-0-1425"></a><span class="sd">        call to one of the three factories below —</span>
-<a id="__codelineno-0-1426" name="__codelineno-0-1426"></a><span class="sd">        `_whole_window_extent`, `_cadence_extent`, or</span>
-<a id="__codelineno-0-1427" name="__codelineno-0-1427"></a><span class="sd">        `_static_extent` — which cover the three archetypes the 48</span>
+<a id="__codelineno-0-1426" name="__codelineno-0-1426"></a><span class="sd">        :meth:`_whole_window_extent`, :meth:`_cadence_extent`, or</span>
+<a id="__codelineno-0-1427" name="__codelineno-0-1427"></a><span class="sd">        :meth:`_static_extent` — which cover the three archetypes the 48</span>
 <a id="__codelineno-0-1428" name="__codelineno-0-1428"></a><span class="sd">        backends fall into; only a genuinely bespoke axis (a provider release</span>
 <a id="__codelineno-0-1429" name="__codelineno-0-1429"></a><span class="sd">        cadence to snap to, a forecast `(cycle, step)` grid) needs its own body.</span>
 <a id="__codelineno-0-1430" name="__codelineno-0-1430"></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -26832,7 +26860,7 @@ cannot span processes.</p>
 <a id="__codelineno-0-1457" name="__codelineno-0-1457"></a>
 <a id="__codelineno-0-1458" name="__codelineno-0-1458"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-1459" name="__codelineno-0-1459"></a><span class="sd">            start: The requested start bound, in any form</span>
-<a id="__codelineno-0-1460" name="__codelineno-0-1460"></a><span class="sd">                `to_datetime` accepts.</span>
+<a id="__codelineno-0-1460" name="__codelineno-0-1460"></a><span class="sd">                :func:`~earthlens.base.to_datetime` accepts.</span>
 <a id="__codelineno-0-1461" name="__codelineno-0-1461"></a><span class="sd">            end: The requested end bound.</span>
 <a id="__codelineno-0-1462" name="__codelineno-0-1462"></a><span class="sd">            fmt: `strptime` format tried first for a string bound.</span>
 <a id="__codelineno-0-1463" name="__codelineno-0-1463"></a><span class="sd">            resolution: The label to record — conventionally `&quot;all&quot;` (one</span>
@@ -26868,7 +26896,7 @@ cannot span processes.</p>
 <a id="__codelineno-0-1493" name="__codelineno-0-1493"></a>
 <a id="__codelineno-0-1494" name="__codelineno-0-1494"></a><span class="sd">        The archetype for a provider addressed one file / request per period.</span>
 <a id="__codelineno-0-1495" name="__codelineno-0-1495"></a><span class="sd">        The cadence is resolved through</span>
-<a id="__codelineno-0-1496" name="__codelineno-0-1496"></a><span class="sd">        `resolve_cadence`, so an unsupported or mistyped</span>
+<a id="__codelineno-0-1496" name="__codelineno-0-1496"></a><span class="sd">        :func:`~earthlens.base.resolve_cadence`, so an unsupported or mistyped</span>
 <a id="__codelineno-0-1497" name="__codelineno-0-1497"></a><span class="sd">        spelling raises instead of silently substituting a different cadence,</span>
 <a id="__codelineno-0-1498" name="__codelineno-0-1498"></a><span class="sd">        and `dates` is the expanded period axis the download loop iterates.</span>
 <a id="__codelineno-0-1499" name="__codelineno-0-1499"></a>
@@ -26948,8 +26976,8 @@ cannot span processes.</p>
 <a id="__codelineno-0-1573" name="__codelineno-0-1573"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <a id="__codelineno-0-1574" name="__codelineno-0-1574"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepare the backend before the extents are built; return its client.</span>
 <a id="__codelineno-0-1575" name="__codelineno-0-1575"></a>
-<a id="__codelineno-0-1576" name="__codelineno-0-1576"></a><span class="sd">        Called once by `__init__`, before `_create_grid` and</span>
-<a id="__codelineno-0-1577" name="__codelineno-0-1577"></a><span class="sd">        `_check_input_dates`. A non-`None` return is captured onto</span>
+<a id="__codelineno-0-1576" name="__codelineno-0-1576"></a><span class="sd">        Called once by :meth:`__init__`, before :meth:`_create_grid` and</span>
+<a id="__codelineno-0-1577" name="__codelineno-0-1577"></a><span class="sd">        :meth:`_check_input_dates`. A non-`None` return is captured onto</span>
 <a id="__codelineno-0-1578" name="__codelineno-0-1578"></a><span class="sd">        `self.client`.</span>
 <a id="__codelineno-0-1579" name="__codelineno-0-1579"></a>
 <a id="__codelineno-0-1580" name="__codelineno-0-1580"></a><span class="sd">        The default does nothing and returns `None` — the right behaviour for a</span>
@@ -26957,7 +26985,7 @@ cannot span processes.</p>
 <a id="__codelineno-0-1582" name="__codelineno-0-1582"></a><span class="sd">        HTTP/FTP endpoint, or a lazily-imported stateless SDK). Backends that</span>
 <a id="__codelineno-0-1583" name="__codelineno-0-1583"></a><span class="sd">        must resolve a catalog row, build an auth object, or open a client</span>
 <a id="__codelineno-0-1584" name="__codelineno-0-1584"></a><span class="sd">        override it. A backend whose client is a *network* connection should</span>
-<a id="__codelineno-0-1585" name="__codelineno-0-1585"></a><span class="sd">        prefer `LazyClientMixin` and keep `_initialize` offline, so</span>
+<a id="__codelineno-0-1585" name="__codelineno-0-1585"></a><span class="sd">        prefer :class:`LazyClientMixin` and keep `_initialize` offline, so</span>
 <a id="__codelineno-0-1586" name="__codelineno-0-1586"></a><span class="sd">        construction never touches the network.</span>
 <a id="__codelineno-0-1587" name="__codelineno-0-1587"></a>
 <a id="__codelineno-0-1588" name="__codelineno-0-1588"></a><span class="sd">        Returns:</span>
@@ -26969,11 +26997,11 @@ cannot span processes.</p>
 <a id="__codelineno-0-1594" name="__codelineno-0-1594"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
 <a id="__codelineno-0-1595" name="__codelineno-0-1595"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Turn the requested lat/lon bounds into this backend&#39;s spatial extent.</span>
 <a id="__codelineno-0-1596" name="__codelineno-0-1596"></a>
-<a id="__codelineno-0-1597" name="__codelineno-0-1597"></a><span class="sd">        Called once by `__init__`; the result is captured onto</span>
+<a id="__codelineno-0-1597" name="__codelineno-0-1597"></a><span class="sd">        Called once by :meth:`__init__`; the result is captured onto</span>
 <a id="__codelineno-0-1598" name="__codelineno-0-1598"></a><span class="sd">        `self.space`.</span>
 <a id="__codelineno-0-1599" name="__codelineno-0-1599"></a>
 <a id="__codelineno-0-1600" name="__codelineno-0-1600"></a><span class="sd">        The default wraps the bounds verbatim in a validated</span>
-<a id="__codelineno-0-1601" name="__codelineno-0-1601"></a><span class="sd">        `SpatialExtent`, which is what all but a handful of backends</span>
+<a id="__codelineno-0-1601" name="__codelineno-0-1601"></a><span class="sd">        :class:`SpatialExtent`, which is what all but a handful of backends</span>
 <a id="__codelineno-0-1602" name="__codelineno-0-1602"></a><span class="sd">        need — most providers accept an arbitrary WGS84 bbox and do any</span>
 <a id="__codelineno-0-1603" name="__codelineno-0-1603"></a><span class="sd">        snapping server-side. Override only to do real work on the bounds:</span>
 <a id="__codelineno-0-1604" name="__codelineno-0-1604"></a><span class="sd">        snap them to the provider&#39;s grid (ecmwf), attach a native cell size</span>
@@ -27000,7 +27028,7 @@ cannot span processes.</p>
 <a id="__codelineno-0-1625" name="__codelineno-0-1625"></a><span class="sd">        arbitrary keywords, which is the opposite of a contract.</span>
 <a id="__codelineno-0-1626" name="__codelineno-0-1626"></a>
 <a id="__codelineno-0-1627" name="__codelineno-0-1627"></a><span class="sd">        Capability-gated arguments appear only where they are honoured</span>
-<a id="__codelineno-0-1628" name="__codelineno-0-1628"></a><span class="sd">        (`aggregate=` on the backends declaring `SUPPORTS_AGGREGATE`,</span>
+<a id="__codelineno-0-1628" name="__codelineno-0-1628"></a><span class="sd">        (`aggregate=` on the backends declaring :attr:`SUPPORTS_AGGREGATE`,</span>
 <a id="__codelineno-0-1629" name="__codelineno-0-1629"></a><span class="sd">        `errors=` where the batch is a loop over independent items, `force=`</span>
 <a id="__codelineno-0-1630" name="__codelineno-0-1630"></a><span class="sd">        where a re-run can skip completed artefacts), alongside genuinely</span>
 <a id="__codelineno-0-1631" name="__codelineno-0-1631"></a><span class="sd">        backend-specific ones (`cores=` on chc, `tailor=` on eumetsat). Read the</span>
@@ -27014,13 +27042,13 @@ cannot span processes.</p>
 <a id="__codelineno-0-1639" name="__codelineno-0-1639"></a><span class="sd">                catch a signature drifting.</span>
 <a id="__codelineno-0-1640" name="__codelineno-0-1640"></a>
 <a id="__codelineno-0-1641" name="__codelineno-0-1641"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-1642" name="__codelineno-0-1642"></a><span class="sd">            Any: The produced artifacts, shaped by `OUTPUT_KIND` —</span>
+<a id="__codelineno-0-1642" name="__codelineno-0-1642"></a><span class="sd">            Any: The produced artifacts, shaped by :attr:`OUTPUT_KIND` —</span>
 <a id="__codelineno-0-1643" name="__codelineno-0-1643"></a><span class="sd">                `&quot;raster&quot;` / `&quot;mixed&quot;` file-writing backends return the written</span>
 <a id="__codelineno-0-1644" name="__codelineno-0-1644"></a><span class="sd">                paths (`list[Path]`); `&quot;vector&quot;` backends return an in-memory</span>
 <a id="__codelineno-0-1645" name="__codelineno-0-1645"></a><span class="sd">                `FeatureCollection` (radar returns a `GeoDataFrame`);</span>
 <a id="__codelineno-0-1646" name="__codelineno-0-1646"></a><span class="sd">                `&quot;tabular&quot;` backends return a `pandas.DataFrame`. Every backend</span>
 <a id="__codelineno-0-1647" name="__codelineno-0-1647"></a><span class="sd">                returns its artifacts; the file-writing ones also leave them on</span>
-<a id="__codelineno-0-1648" name="__codelineno-0-1648"></a><span class="sd">                disk under `root_dir`.</span>
+<a id="__codelineno-0-1648" name="__codelineno-0-1648"></a><span class="sd">                disk under :attr:`root_dir`.</span>
 <a id="__codelineno-0-1649" name="__codelineno-0-1649"></a>
 <a id="__codelineno-0-1650" name="__codelineno-0-1650"></a><span class="sd">        Partial-failure policy across a multi-item batch defaults to</span>
 <a id="__codelineno-0-1651" name="__codelineno-0-1651"></a><span class="sd">        **skip-and-continue** — a failed `(dataset, variable)` / chunk /</span>
@@ -27031,29 +27059,29 @@ cannot span processes.</p>
 <a id="__codelineno-0-1656" name="__codelineno-0-1656"></a><span class="sd">        (`chc`, `cmems`, `ecmwf`, `fdsn`, `nwp`, `radar`, `soilgrids`) make</span>
 <a id="__codelineno-0-1657" name="__codelineno-0-1657"></a><span class="sd">        that policy caller-controllable with an explicit</span>
 <a id="__codelineno-0-1658" name="__codelineno-0-1658"></a><span class="sd">        `errors=&quot;warn&quot; | &quot;raise&quot; | &quot;ignore&quot;` argument, routed through</span>
-<a id="__codelineno-0-1659" name="__codelineno-0-1659"></a><span class="sd">        `check_errors_policy` and `_run_items`. A backend whose</span>
+<a id="__codelineno-0-1659" name="__codelineno-0-1659"></a><span class="sd">        :meth:`check_errors_policy` and :meth:`_run_items`. A backend whose</span>
 <a id="__codelineno-0-1660" name="__codelineno-0-1660"></a><span class="sd">        `download` does not take `errors=` has nothing to apply it to — it</span>
 <a id="__codelineno-0-1661" name="__codelineno-0-1661"></a><span class="sd">        issues one request, or its loop needs per-failure recovery the</span>
 <a id="__codelineno-0-1662" name="__codelineno-0-1662"></a><span class="sd">        shared helper cannot express (chc re-opens its FTP session between</span>
 <a id="__codelineno-0-1663" name="__codelineno-0-1663"></a><span class="sd">        failed dates). So **check the backend&#39;s own `download` signature**</span>
-<a id="__codelineno-0-1664" name="__codelineno-0-1664"></a><span class="sd">        rather than assuming; `_search_fetch_each` also takes</span>
+<a id="__codelineno-0-1664" name="__codelineno-0-1664"></a><span class="sd">        rather than assuming; :meth:`_search_fetch_each` also takes</span>
 <a id="__codelineno-0-1665" name="__codelineno-0-1665"></a><span class="sd">        `errors=` for backends composed from it.</span>
 <a id="__codelineno-0-1666" name="__codelineno-0-1666"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1667" name="__codelineno-0-1667"></a>
 <a id="__codelineno-0-1668" name="__codelineno-0-1668"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <a id="__codelineno-0-1669" name="__codelineno-0-1669"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Send / receive the request(s) this download needs.</span>
 <a id="__codelineno-0-1670" name="__codelineno-0-1670"></a>
-<a id="__codelineno-0-1671" name="__codelineno-0-1671"></a><span class="sd">        Called by `download`. The default</span>
-<a id="__codelineno-0-1672" name="__codelineno-0-1672"></a><span class="sd">        is the search→fetch composition, `_api_via_search_fetch`, which</span>
-<a id="__codelineno-0-1673" name="__codelineno-0-1673"></a><span class="sd">        is what a backend built on the `_search` / `_fetch` split</span>
+<a id="__codelineno-0-1671" name="__codelineno-0-1671"></a><span class="sd">        Called by :meth:`download`. The default</span>
+<a id="__codelineno-0-1672" name="__codelineno-0-1672"></a><span class="sd">        is the search→fetch composition, :meth:`_api_via_search_fetch`, which</span>
+<a id="__codelineno-0-1673" name="__codelineno-0-1673"></a><span class="sd">        is what a backend built on the :meth:`_search` / :meth:`_fetch` split</span>
 <a id="__codelineno-0-1674" name="__codelineno-0-1674"></a><span class="sd">        wants — the great majority. Override it only for a backend that talks</span>
 <a id="__codelineno-0-1675" name="__codelineno-0-1675"></a><span class="sd">        to its provider in one indivisible step and has no listable product</span>
 <a id="__codelineno-0-1676" name="__codelineno-0-1676"></a><span class="sd">        set (chc composes an FTP path per date; ecmwf queues a CDS job; gee</span>
 <a id="__codelineno-0-1677" name="__codelineno-0-1677"></a><span class="sd">        builds an ee chain), or one whose `_fetch` takes no product list.</span>
 <a id="__codelineno-0-1678" name="__codelineno-0-1678"></a>
 <a id="__codelineno-0-1679" name="__codelineno-0-1679"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-1680" name="__codelineno-0-1680"></a><span class="sd">            Whatever `_fetch` returned — see `_fetch` for the</span>
-<a id="__codelineno-0-1681" name="__codelineno-0-1681"></a><span class="sd">            element type, which tracks `OUTPUT_KIND`.</span>
+<a id="__codelineno-0-1680" name="__codelineno-0-1680"></a><span class="sd">            Whatever :meth:`_fetch` returned — see :meth:`_fetch` for the</span>
+<a id="__codelineno-0-1681" name="__codelineno-0-1681"></a><span class="sd">            element type, which tracks :attr:`OUTPUT_KIND`.</span>
 <a id="__codelineno-0-1682" name="__codelineno-0-1682"></a>
 <a id="__codelineno-0-1683" name="__codelineno-0-1683"></a><span class="sd">            Typed `Any` rather than `list[Any]` deliberately: the overrides do</span>
 <a id="__codelineno-0-1684" name="__codelineno-0-1684"></a><span class="sd">            not all return lists. chc returns a per-date mapping and gee a</span>
@@ -27064,7 +27092,7 @@ cannot span processes.</p>
 <a id="__codelineno-0-1689" name="__codelineno-0-1689"></a>
 <a id="__codelineno-0-1690" name="__codelineno-0-1690"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-1691" name="__codelineno-0-1691"></a><span class="sd">            NotImplementedError: If the backend overrides neither this method</span>
-<a id="__codelineno-0-1692" name="__codelineno-0-1692"></a><span class="sd">                nor the `_search` / `_fetch` pair.</span>
+<a id="__codelineno-0-1692" name="__codelineno-0-1692"></a><span class="sd">                nor the :meth:`_search` / :meth:`_fetch` pair.</span>
 <a id="__codelineno-0-1693" name="__codelineno-0-1693"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1694" name="__codelineno-0-1694"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
 <a id="__codelineno-0-1695" name="__codelineno-0-1695"></a>
@@ -27078,7 +27106,7 @@ cannot span processes.</p>
 <a id="__codelineno-0-1703" name="__codelineno-0-1703"></a>    <span class="c1"># New backends (earthlens.stac, earthlens.earthdata, earthlens.fdsn,</span>
 <a id="__codelineno-0-1704" name="__codelineno-0-1704"></a>    <span class="c1"># earthlens.openaq, …) should override `_search` and `_fetch`</span>
 <a id="__codelineno-0-1705" name="__codelineno-0-1705"></a>    <span class="c1"># instead — `_search` returns a list of `RemoteProduct`s and</span>
-<a id="__codelineno-0-1706" name="__codelineno-0-1706"></a>    <span class="c1"># `_fetch` consumes them. The `_api_via_search_fetch` helper</span>
+<a id="__codelineno-0-1706" name="__codelineno-0-1706"></a>    <span class="c1"># `_fetch` consumes them. The :meth:`_api_via_search_fetch` helper</span>
 <a id="__codelineno-0-1707" name="__codelineno-0-1707"></a>    <span class="c1"># is the canonical composition; backends can opt into it by</span>
 <a id="__codelineno-0-1708" name="__codelineno-0-1708"></a>    <span class="c1"># overriding `_api` as `return self._api_via_search_fetch()`.</span>
 <a id="__codelineno-0-1709" name="__codelineno-0-1709"></a>    <span class="c1"># ------------------------------------------------------------------</span>
@@ -27115,9 +27143,9 @@ cannot span processes.</p>
 <a id="__codelineno-0-1740" name="__codelineno-0-1740"></a>        <span class="p">)</span>
 <a id="__codelineno-0-1741" name="__codelineno-0-1741"></a>
 <a id="__codelineno-0-1742" name="__codelineno-0-1742"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-1743" name="__codelineno-0-1743"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return how many products `_search` would yield, without fetching.</span>
+<a id="__codelineno-0-1743" name="__codelineno-0-1743"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return how many products :meth:`_search` would yield, without fetching.</span>
 <a id="__codelineno-0-1744" name="__codelineno-0-1744"></a>
-<a id="__codelineno-0-1745" name="__codelineno-0-1745"></a><span class="sd">        Default implementation runs `_search` and counts the</span>
+<a id="__codelineno-0-1745" name="__codelineno-0-1745"></a><span class="sd">        Default implementation runs :meth:`_search` and counts the</span>
 <a id="__codelineno-0-1746" name="__codelineno-0-1746"></a><span class="sd">        result. Backends with a cheap server-side total (e.g. a STAC</span>
 <a id="__codelineno-0-1747" name="__codelineno-0-1747"></a><span class="sd">        `numberMatched` read with `limit=1`) should override this to</span>
 <a id="__codelineno-0-1748" name="__codelineno-0-1748"></a><span class="sd">        avoid materialising the whole product list.</span>
@@ -27127,7 +27155,7 @@ cannot span processes.</p>
 <a id="__codelineno-0-1752" name="__codelineno-0-1752"></a>
 <a id="__codelineno-0-1753" name="__codelineno-0-1753"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-1754" name="__codelineno-0-1754"></a><span class="sd">            NotImplementedError: When the backend keeps the legacy</span>
-<a id="__codelineno-0-1755" name="__codelineno-0-1755"></a><span class="sd">                `_api`-only flow and implements no `_search`.</span>
+<a id="__codelineno-0-1755" name="__codelineno-0-1755"></a><span class="sd">                `_api`-only flow and implements no :meth:`_search`.</span>
 <a id="__codelineno-0-1756" name="__codelineno-0-1756"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1757" name="__codelineno-0-1757"></a>        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">())</span>
 <a id="__codelineno-0-1758" name="__codelineno-0-1758"></a>
@@ -27147,7 +27175,7 @@ cannot span processes.</p>
 <a id="__codelineno-0-1772" name="__codelineno-0-1772"></a>
 <a id="__codelineno-0-1773" name="__codelineno-0-1773"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-1774" name="__codelineno-0-1774"></a><span class="sd">            list[Any]: One element per product, in `products` order.</span>
-<a id="__codelineno-0-1775" name="__codelineno-0-1775"></a><span class="sd">                The element type tracks `OUTPUT_KIND`: written</span>
+<a id="__codelineno-0-1775" name="__codelineno-0-1775"></a><span class="sd">                The element type tracks :attr:`OUTPUT_KIND`: written</span>
 <a id="__codelineno-0-1776" name="__codelineno-0-1776"></a><span class="sd">                `Path`s for `&quot;raster&quot;` / `&quot;mixed&quot;`, `FeatureCollection`</span>
 <a id="__codelineno-0-1777" name="__codelineno-0-1777"></a><span class="sd">                fragments for `&quot;vector&quot;`, and `DataFrame` fragments for</span>
 <a id="__codelineno-0-1778" name="__codelineno-0-1778"></a><span class="sd">                `&quot;tabular&quot;` (these are concatenated by the backend&#39;s</span>
@@ -27184,7 +27212,7 @@ cannot span processes.</p>
 <a id="__codelineno-0-1809" name="__codelineno-0-1809"></a>
 <a id="__codelineno-0-1810" name="__codelineno-0-1810"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-1811" name="__codelineno-0-1811"></a><span class="sd">            list[Any]: Whatever `_fetch` returned (element type tracks</span>
-<a id="__codelineno-0-1812" name="__codelineno-0-1812"></a><span class="sd">                `OUTPUT_KIND` — see `_fetch`). An empty list</span>
+<a id="__codelineno-0-1812" name="__codelineno-0-1812"></a><span class="sd">                :attr:`OUTPUT_KIND` — see :meth:`_fetch`). An empty list</span>
 <a id="__codelineno-0-1813" name="__codelineno-0-1813"></a><span class="sd">                when `_search` returned no products.</span>
 <a id="__codelineno-0-1814" name="__codelineno-0-1814"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1815" name="__codelineno-0-1815"></a>        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
@@ -27192,16 +27220,16 @@ cannot span processes.</p>
 <a id="__codelineno-0-1817" name="__codelineno-0-1817"></a>            <span class="k">return</span> <span class="p">[]</span>
 <a id="__codelineno-0-1818" name="__codelineno-0-1818"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
 <a id="__codelineno-0-1819" name="__codelineno-0-1819"></a>
-<a id="__codelineno-0-1820" name="__codelineno-0-1820"></a>    <span class="c1">#: The partial-failure policies `_run_items` accepts. `&quot;skip&quot;` is a</span>
+<a id="__codelineno-0-1820" name="__codelineno-0-1820"></a>    <span class="c1">#: The partial-failure policies :meth:`_run_items` accepts. `&quot;skip&quot;` is a</span>
 <a id="__codelineno-0-1821" name="__codelineno-0-1821"></a>    <span class="c1">#: deprecated alias for `&quot;ignore&quot;`, kept because the nwp backend shipped it</span>
 <a id="__codelineno-0-1822" name="__codelineno-0-1822"></a>    <span class="c1">#: before the convention settled on the three names documented on</span>
-<a id="__codelineno-0-1823" name="__codelineno-0-1823"></a>    <span class="c1">#: `download`.</span>
+<a id="__codelineno-0-1823" name="__codelineno-0-1823"></a>    <span class="c1">#: :meth:`download`.</span>
 <a id="__codelineno-0-1824" name="__codelineno-0-1824"></a>    <span class="n">ERROR_POLICIES</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="s2">&quot;skip&quot;</span><span class="p">})</span>
 <a id="__codelineno-0-1825" name="__codelineno-0-1825"></a>
-<a id="__codelineno-0-1826" name="__codelineno-0-1826"></a>    <span class="c1">#: The policy `_run_items` applies when a backend&#39;s own `download`</span>
+<a id="__codelineno-0-1826" name="__codelineno-0-1826"></a>    <span class="c1">#: The policy :meth:`_run_items` applies when a backend&#39;s own `download`</span>
 <a id="__codelineno-0-1827" name="__codelineno-0-1827"></a>    <span class="c1">#: was not given one. Declared here rather than per backend so a loop can</span>
 <a id="__codelineno-0-1828" name="__codelineno-0-1828"></a>    <span class="c1">#: read `self._errors` unconditionally; a `download(errors=...)` overrides</span>
-<a id="__codelineno-0-1829" name="__codelineno-0-1829"></a>    <span class="c1">#: it by assigning the `check_errors_policy` result.</span>
+<a id="__codelineno-0-1829" name="__codelineno-0-1829"></a>    <span class="c1">#: it by assigning the :meth:`check_errors_policy` result.</span>
 <a id="__codelineno-0-1830" name="__codelineno-0-1830"></a>    <span class="n">_errors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;warn&quot;</span>
 <a id="__codelineno-0-1831" name="__codelineno-0-1831"></a>
 <a id="__codelineno-0-1832" name="__codelineno-0-1832"></a>    <span class="c1">#: The total-row cap a backend&#39;s `download(limit=...)` recorded, read by</span>
@@ -27356,13 +27384,13 @@ cannot span processes.</p>
 <a id="__codelineno-0-1981" name="__codelineno-0-1981"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">iter_download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <a id="__codelineno-0-1982" name="__codelineno-0-1982"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Yield the download&#39;s artifacts one item at a time.</span>
 <a id="__codelineno-0-1983" name="__codelineno-0-1983"></a>
-<a id="__codelineno-0-1984" name="__codelineno-0-1984"></a><span class="sd">        The streaming counterpart to `download`, for callers who want to</span>
+<a id="__codelineno-0-1984" name="__codelineno-0-1984"></a><span class="sd">        The streaming counterpart to :meth:`download`, for callers who want to</span>
 <a id="__codelineno-0-1985" name="__codelineno-0-1985"></a><span class="sd">        consume a large vector / tabular result without the whole thing being</span>
 <a id="__codelineno-0-1986" name="__codelineno-0-1986"></a><span class="sd">        resident: each `_search` product&#39;s fragment is yielded as it arrives</span>
 <a id="__codelineno-0-1987" name="__codelineno-0-1987"></a><span class="sd">        and can be dropped before the next is fetched. `download()` remains the</span>
 <a id="__codelineno-0-1988" name="__codelineno-0-1988"></a><span class="sd">        batch form and is unaffected.</span>
 <a id="__codelineno-0-1989" name="__codelineno-0-1989"></a>
-<a id="__codelineno-0-1990" name="__codelineno-0-1990"></a><span class="sd">        The default implementation composes the `_search` / `_fetch_one`</span>
+<a id="__codelineno-0-1990" name="__codelineno-0-1990"></a><span class="sd">        The default implementation composes the `_search` / :meth:`_fetch_one`</span>
 <a id="__codelineno-0-1991" name="__codelineno-0-1991"></a><span class="sd">        split, so any backend with that split gets it for free. A backend whose</span>
 <a id="__codelineno-0-1992" name="__codelineno-0-1992"></a><span class="sd">        fetch is inherently whole-batch (one server-side request for</span>
 <a id="__codelineno-0-1993" name="__codelineno-0-1993"></a><span class="sd">        everything) does not override this and raises below, rather than</span>
@@ -27376,8 +27404,8 @@ cannot span processes.</p>
 <a id="__codelineno-0-2001" name="__codelineno-0-2001"></a>
 <a id="__codelineno-0-2002" name="__codelineno-0-2002"></a><span class="sd">        Yields:</span>
 <a id="__codelineno-0-2003" name="__codelineno-0-2003"></a><span class="sd">            Any: One fragment per product — the same element type</span>
-<a id="__codelineno-0-2004" name="__codelineno-0-2004"></a><span class="sd">                `_fetch` returns for this backend&#39;s</span>
-<a id="__codelineno-0-2005" name="__codelineno-0-2005"></a><span class="sd">                `OUTPUT_KIND`.</span>
+<a id="__codelineno-0-2004" name="__codelineno-0-2004"></a><span class="sd">                :meth:`_fetch` returns for this backend&#39;s</span>
+<a id="__codelineno-0-2005" name="__codelineno-0-2005"></a><span class="sd">                :attr:`OUTPUT_KIND`.</span>
 <a id="__codelineno-0-2006" name="__codelineno-0-2006"></a>
 <a id="__codelineno-0-2007" name="__codelineno-0-2007"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-2008" name="__codelineno-0-2008"></a><span class="sd">            NotImplementedError: When the backend implements neither the</span>
@@ -27463,7 +27491,7 @@ cannot span processes.</p>
 <a id="__codelineno-0-2088" name="__codelineno-0-2088"></a>
 <a id="__codelineno-0-2089" name="__codelineno-0-2089"></a><span class="sd">        The shared form of the skip-and-continue loop the multi-item backends</span>
 <a id="__codelineno-0-2090" name="__codelineno-0-2090"></a><span class="sd">        each hand-rolled, and the reason `errors=` was previously advertised on</span>
-<a id="__codelineno-0-2091" name="__codelineno-0-2091"></a><span class="sd">        `download` but honoured by exactly one backend: without somewhere</span>
+<a id="__codelineno-0-2091" name="__codelineno-0-2091"></a><span class="sd">        :meth:`download` but honoured by exactly one backend: without somewhere</span>
 <a id="__codelineno-0-2092" name="__codelineno-0-2092"></a><span class="sd">        to put the policy, every loop hard-coded &quot;log it and carry on&quot;, so a</span>
 <a id="__codelineno-0-2093" name="__codelineno-0-2093"></a><span class="sd">        caller could not ask for a batch to fail fast.</span>
 <a id="__codelineno-0-2094" name="__codelineno-0-2094"></a>
@@ -27564,7 +27592,7 @@ cannot span processes.</p>
 <a id="__codelineno-0-2189" name="__codelineno-0-2189"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <a id="__codelineno-0-2190" name="__codelineno-0-2190"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply `fn` to each item under the failure policy, yielding as it goes.</span>
 <a id="__codelineno-0-2191" name="__codelineno-0-2191"></a>
-<a id="__codelineno-0-2192" name="__codelineno-0-2192"></a><span class="sd">        The lazy form of `_run_items`, and the single implementation of</span>
+<a id="__codelineno-0-2192" name="__codelineno-0-2192"></a><span class="sd">        The lazy form of :meth:`_run_items`, and the single implementation of</span>
 <a id="__codelineno-0-2193" name="__codelineno-0-2193"></a><span class="sd">        the policy: `_run_items` is `list()` of this plus a summary line. Being</span>
 <a id="__codelineno-0-2194" name="__codelineno-0-2194"></a><span class="sd">        a generator is what lets a bounded caller stop early — under a policy a</span>
 <a id="__codelineno-0-2195" name="__codelineno-0-2195"></a><span class="sd">        cap cannot be turned into a slice of `items`, because failures consume</span>
@@ -27637,7 +27665,7 @@ cannot span processes.</p>
 <a id="__codelineno-0-2262" name="__codelineno-0-2262"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <a id="__codelineno-0-2263" name="__codelineno-0-2263"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log and record one item&#39;s failure under a non-raising policy.</span>
 <a id="__codelineno-0-2264" name="__codelineno-0-2264"></a>
-<a id="__codelineno-0-2265" name="__codelineno-0-2265"></a><span class="sd">        Split out of `_iter_items` so the generator stays a plain</span>
+<a id="__codelineno-0-2265" name="__codelineno-0-2265"></a><span class="sd">        Split out of :meth:`_iter_items` so the generator stays a plain</span>
 <a id="__codelineno-0-2266" name="__codelineno-0-2266"></a><span class="sd">        try/except around the item call.</span>
 <a id="__codelineno-0-2267" name="__codelineno-0-2267"></a>
 <a id="__codelineno-0-2268" name="__codelineno-0-2268"></a><span class="sd">        Args:</span>
@@ -27676,9 +27704,9 @@ cannot span processes.</p>
 <a id="__codelineno-0-2301" name="__codelineno-0-2301"></a><span class="sd">        consumes lazily, so a product past the cap is never requested.</span>
 <a id="__codelineno-0-2302" name="__codelineno-0-2302"></a>
 <a id="__codelineno-0-2303" name="__codelineno-0-2303"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-2304" name="__codelineno-0-2304"></a><span class="sd">            products: The products from `_search`.</span>
+<a id="__codelineno-0-2304" name="__codelineno-0-2304"></a><span class="sd">            products: The products from :meth:`_search`.</span>
 <a id="__codelineno-0-2305" name="__codelineno-0-2305"></a><span class="sd">            limit: Total rows to collect, or `None` for all of them. Usually</span>
-<a id="__codelineno-0-2306" name="__codelineno-0-2306"></a><span class="sd">                `_limit`, recorded by the backend&#39;s `download(limit=...)`.</span>
+<a id="__codelineno-0-2306" name="__codelineno-0-2306"></a><span class="sd">                :attr:`_limit`, recorded by the backend&#39;s `download(limit=...)`.</span>
 <a id="__codelineno-0-2307" name="__codelineno-0-2307"></a>
 <a id="__codelineno-0-2308" name="__codelineno-0-2308"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-2309" name="__codelineno-0-2309"></a><span class="sd">            list[Any]: One fragment per fetched product, the last trimmed when it</span>
@@ -27715,8 +27743,8 @@ cannot span processes.</p>
 <a id="__codelineno-0-2340" name="__codelineno-0-2340"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <a id="__codelineno-0-2341" name="__codelineno-0-2341"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;C3 composition with an optional per-product `tqdm` progress bar.</span>
 <a id="__codelineno-0-2342" name="__codelineno-0-2342"></a>
-<a id="__codelineno-0-2343" name="__codelineno-0-2343"></a><span class="sd">        Like `_api_via_search_fetch`, but maps the per-product</span>
-<a id="__codelineno-0-2344" name="__codelineno-0-2344"></a><span class="sd">        `_fetch_one` hook over the `_search` results so a `tqdm`</span>
+<a id="__codelineno-0-2343" name="__codelineno-0-2343"></a><span class="sd">        Like :meth:`_api_via_search_fetch`, but maps the per-product</span>
+<a id="__codelineno-0-2344" name="__codelineno-0-2344"></a><span class="sd">        :meth:`_fetch_one` hook over the `_search` results so a `tqdm`</span>
 <a id="__codelineno-0-2345" name="__codelineno-0-2345"></a><span class="sd">        bar can show per-item progress — the shared form of the</span>
 <a id="__codelineno-0-2346" name="__codelineno-0-2346"></a><span class="sd">        progress-aware composition several backends (FIRMS, OpenAQ)</span>
 <a id="__codelineno-0-2347" name="__codelineno-0-2347"></a><span class="sd">        previously duplicated. Backends that fetch the whole product</span>
@@ -27732,12 +27760,12 @@ cannot span processes.</p>
 <a id="__codelineno-0-2357" name="__codelineno-0-2357"></a><span class="sd">                `download` accepts `errors=`. `None` — the default —</span>
 <a id="__codelineno-0-2358" name="__codelineno-0-2358"></a><span class="sd">                propagates the first failure, which is what a caller that</span>
 <a id="__codelineno-0-2359" name="__codelineno-0-2359"></a><span class="sd">                never opted into a policy already expects.</span>
-<a id="__codelineno-0-2360" name="__codelineno-0-2360"></a><span class="sd">            label: Noun for the `_run_items` log lines when a policy</span>
+<a id="__codelineno-0-2360" name="__codelineno-0-2360"></a><span class="sd">            label: Noun for the :meth:`_run_items` log lines when a policy</span>
 <a id="__codelineno-0-2361" name="__codelineno-0-2361"></a><span class="sd">                is in force.</span>
 <a id="__codelineno-0-2362" name="__codelineno-0-2362"></a>
 <a id="__codelineno-0-2363" name="__codelineno-0-2363"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-2364" name="__codelineno-0-2364"></a><span class="sd">            list[Any]: One `_fetch_one` result per product</span>
-<a id="__codelineno-0-2365" name="__codelineno-0-2365"></a><span class="sd">                (element type tracks `OUTPUT_KIND`), or `[]` when</span>
+<a id="__codelineno-0-2364" name="__codelineno-0-2364"></a><span class="sd">            list[Any]: One :meth:`_fetch_one` result per product</span>
+<a id="__codelineno-0-2365" name="__codelineno-0-2365"></a><span class="sd">                (element type tracks :attr:`OUTPUT_KIND`), or `[]` when</span>
 <a id="__codelineno-0-2366" name="__codelineno-0-2366"></a><span class="sd">                `_search` matched nothing. With a policy in force, failed</span>
 <a id="__codelineno-0-2367" name="__codelineno-0-2367"></a><span class="sd">                products are absent rather than aborting the batch.</span>
 <a id="__codelineno-0-2368" name="__codelineno-0-2368"></a>
@@ -27827,21 +27855,21 @@ cannot span processes.</p>
 <p>Captures the return values of the abstract hooks so subclasses
 do not have to wire them onto <code>self</code> themselves:</p>
 <ul>
-<li><code>self.client</code> — whatever <code>_initialize</code> returns (a CDS
+<li><code>self.client</code> — whatever :meth:<code>_initialize</code> returns (a CDS
   client, an S3 client, <code>None</code> for FTP). Subclasses that
-  assign <code>self.client</code> inside <code>_initialize</code> (e.g.
-  <code>S3</code>) keep their own assignment; the parent only sets
-  the attribute when <code>_initialize</code> returns a non-<code>None</code>
+  assign <code>self.client</code> inside :meth:<code>_initialize</code> (e.g.
+  :class:<code>S3</code>) keep their own assignment; the parent only sets
+  the attribute when :meth:<code>_initialize</code> returns a non-<code>None</code>
   value.</li>
-<li><code>self.space</code> — the <code>SpatialExtent</code> returned by
-  <code>_create_grid</code>.</li>
-<li><code>self.time</code> — the <code>TemporalExtent</code> returned by
-  <code>_check_input_dates</code>.</li>
-<li><code>self.root_dir</code> — the absolute <code>pathlib.Path</code> of the
+<li><code>self.space</code> — the :class:<code>SpatialExtent</code> returned by
+  :meth:<code>_create_grid</code>.</li>
+<li><code>self.time</code> — the :class:<code>TemporalExtent</code> returned by
+  :meth:<code>_check_input_dates</code>.</li>
+<li><code>self.root_dir</code> — the absolute :class:<code>pathlib.Path</code> of the
   output directory. <code>self.path</code> is kept as a legacy alias so
   older backends (CHIRPS, S3) continue to work. The directory is
   <em>resolved</em> here but only <em>created</em> when a download actually
-  runs (see <code>_ensure_root_dir</code>), so merely constructing a
+  runs (see :meth:<code>_ensure_root_dir</code>), so merely constructing a
   backend — to read its catalog, inspect its options, or validate
   a request — never litters the filesystem.</li>
 </ul>
@@ -28016,7 +28044,7 @@ an already-constructed backend.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>REQUIRES_TIME_WINDOW</code> is <code>True</code> and either
+                <p>If :attr:<code>REQUIRES_TIME_WINDOW</code> is <code>True</code> and either
 <code>start</code> or <code>end</code> is <code>None</code>.</p>
               </div>
             </td>
@@ -28126,21 +28154,21 @@ an already-constructed backend.</p>
 <a id="__codelineno-0-1121" name="__codelineno-0-1121"></a><span class="sd">    Captures the return values of the abstract hooks so subclasses</span>
 <a id="__codelineno-0-1122" name="__codelineno-0-1122"></a><span class="sd">    do not have to wire them onto `self` themselves:</span>
 <a id="__codelineno-0-1123" name="__codelineno-0-1123"></a>
-<a id="__codelineno-0-1124" name="__codelineno-0-1124"></a><span class="sd">    * `self.client` — whatever `_initialize` returns (a CDS</span>
+<a id="__codelineno-0-1124" name="__codelineno-0-1124"></a><span class="sd">    * `self.client` — whatever :meth:`_initialize` returns (a CDS</span>
 <a id="__codelineno-0-1125" name="__codelineno-0-1125"></a><span class="sd">      client, an S3 client, `None` for FTP). Subclasses that</span>
-<a id="__codelineno-0-1126" name="__codelineno-0-1126"></a><span class="sd">      assign `self.client` inside `_initialize` (e.g.</span>
-<a id="__codelineno-0-1127" name="__codelineno-0-1127"></a><span class="sd">      `S3`) keep their own assignment; the parent only sets</span>
-<a id="__codelineno-0-1128" name="__codelineno-0-1128"></a><span class="sd">      the attribute when `_initialize` returns a non-`None`</span>
+<a id="__codelineno-0-1126" name="__codelineno-0-1126"></a><span class="sd">      assign `self.client` inside :meth:`_initialize` (e.g.</span>
+<a id="__codelineno-0-1127" name="__codelineno-0-1127"></a><span class="sd">      :class:`S3`) keep their own assignment; the parent only sets</span>
+<a id="__codelineno-0-1128" name="__codelineno-0-1128"></a><span class="sd">      the attribute when :meth:`_initialize` returns a non-`None`</span>
 <a id="__codelineno-0-1129" name="__codelineno-0-1129"></a><span class="sd">      value.</span>
-<a id="__codelineno-0-1130" name="__codelineno-0-1130"></a><span class="sd">    * `self.space` — the `SpatialExtent` returned by</span>
-<a id="__codelineno-0-1131" name="__codelineno-0-1131"></a><span class="sd">      `_create_grid`.</span>
-<a id="__codelineno-0-1132" name="__codelineno-0-1132"></a><span class="sd">    * `self.time` — the `TemporalExtent` returned by</span>
-<a id="__codelineno-0-1133" name="__codelineno-0-1133"></a><span class="sd">      `_check_input_dates`.</span>
-<a id="__codelineno-0-1134" name="__codelineno-0-1134"></a><span class="sd">    * `self.root_dir` — the absolute `pathlib.Path` of the</span>
+<a id="__codelineno-0-1130" name="__codelineno-0-1130"></a><span class="sd">    * `self.space` — the :class:`SpatialExtent` returned by</span>
+<a id="__codelineno-0-1131" name="__codelineno-0-1131"></a><span class="sd">      :meth:`_create_grid`.</span>
+<a id="__codelineno-0-1132" name="__codelineno-0-1132"></a><span class="sd">    * `self.time` — the :class:`TemporalExtent` returned by</span>
+<a id="__codelineno-0-1133" name="__codelineno-0-1133"></a><span class="sd">      :meth:`_check_input_dates`.</span>
+<a id="__codelineno-0-1134" name="__codelineno-0-1134"></a><span class="sd">    * `self.root_dir` — the absolute :class:`pathlib.Path` of the</span>
 <a id="__codelineno-0-1135" name="__codelineno-0-1135"></a><span class="sd">      output directory. `self.path` is kept as a legacy alias so</span>
 <a id="__codelineno-0-1136" name="__codelineno-0-1136"></a><span class="sd">      older backends (CHIRPS, S3) continue to work. The directory is</span>
 <a id="__codelineno-0-1137" name="__codelineno-0-1137"></a><span class="sd">      *resolved* here but only *created* when a download actually</span>
-<a id="__codelineno-0-1138" name="__codelineno-0-1138"></a><span class="sd">      runs (see `_ensure_root_dir`), so merely constructing a</span>
+<a id="__codelineno-0-1138" name="__codelineno-0-1138"></a><span class="sd">      runs (see :meth:`_ensure_root_dir`), so merely constructing a</span>
 <a id="__codelineno-0-1139" name="__codelineno-0-1139"></a><span class="sd">      backend — to read its catalog, inspect its options, or validate</span>
 <a id="__codelineno-0-1140" name="__codelineno-0-1140"></a><span class="sd">      a request — never litters the filesystem.</span>
 <a id="__codelineno-0-1141" name="__codelineno-0-1141"></a>
@@ -28166,7 +28194,7 @@ an already-constructed backend.</p>
 <a id="__codelineno-0-1161" name="__codelineno-0-1161"></a><span class="sd">            an already-constructed backend.</span>
 <a id="__codelineno-0-1162" name="__codelineno-0-1162"></a>
 <a id="__codelineno-0-1163" name="__codelineno-0-1163"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-1164" name="__codelineno-0-1164"></a><span class="sd">        ValueError: If `REQUIRES_TIME_WINDOW` is `True` and either</span>
+<a id="__codelineno-0-1164" name="__codelineno-0-1164"></a><span class="sd">        ValueError: If :attr:`REQUIRES_TIME_WINDOW` is `True` and either</span>
 <a id="__codelineno-0-1165" name="__codelineno-0-1165"></a><span class="sd">            `start` or `end` is `None`.</span>
 <a id="__codelineno-0-1166" name="__codelineno-0-1166"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-1167" name="__codelineno-0-1167"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_check_time_window</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
@@ -28214,8 +28242,8 @@ an already-constructed backend.</p>
         <p>Give every backend its <code>download</code> wrapper and constructor sugar.</p>
 <p>Two independent pieces of wiring run for each concrete backend:</p>
 <ol>
-<li><code>_wrap_download</code> wraps whichever <code>download</code> the class
-   defines so <code>root_dir</code> is created when a download starts
+<li>:meth:<code>_wrap_download</code> wraps whichever <code>download</code> the class
+   defines so :attr:<code>root_dir</code> is created when a download starts
    rather than at construction. This runs for <em>every</em> subclass,
    including one that declares no <code>__init__</code> of its own.</li>
 <li>The backend's <code>__init__</code> is wrapped so that — whether reached
@@ -28224,7 +28252,7 @@ an already-constructed backend.</p>
 </ol>
 <p>The constructor sugar adds:</p>
 <ul>
-<li><code>aoi</code> (+ <code>buffer</code>): any shape <code>earthlens.base.spatial.normalize_aoi</code>
+<li><code>aoi</code> (+ <code>buffer</code>): any shape :func:<code>earthlens.base.spatial.normalize_aoi</code>
   understands, reduced to <code>lat_lim</code> / <code>lon_lim</code>; a backend that
   declares its own <code>aoi</code> (WorldPop) keeps it;</li>
 <li><code>cadence</code>: a clearer alias for <code>temporal_resolution</code>;</li>
@@ -28477,8 +28505,8 @@ and skips the second wrap.</p>
 <a id="__codelineno-0-845" name="__codelineno-0-845"></a>
 <a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">    Two independent pieces of wiring run for each concrete backend:</span>
 <a id="__codelineno-0-847" name="__codelineno-0-847"></a>
-<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">    1. `_wrap_download` wraps whichever `download` the class</span>
-<a id="__codelineno-0-849" name="__codelineno-0-849"></a><span class="sd">       defines so `root_dir` is created when a download starts</span>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">    1. :meth:`_wrap_download` wraps whichever `download` the class</span>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a><span class="sd">       defines so :attr:`root_dir` is created when a download starts</span>
 <a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">       rather than at construction. This runs for *every* subclass,</span>
 <a id="__codelineno-0-851" name="__codelineno-0-851"></a><span class="sd">       including one that declares no `__init__` of its own.</span>
 <a id="__codelineno-0-852" name="__codelineno-0-852"></a><span class="sd">    2. The backend&#39;s `__init__` is wrapped so that — whether reached</span>
@@ -28487,7 +28515,7 @@ and skips the second wrap.</p>
 <a id="__codelineno-0-855" name="__codelineno-0-855"></a>
 <a id="__codelineno-0-856" name="__codelineno-0-856"></a><span class="sd">    The constructor sugar adds:</span>
 <a id="__codelineno-0-857" name="__codelineno-0-857"></a>
-<a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="sd">    * `aoi` (+ `buffer`): any shape `earthlens.base.spatial.normalize_aoi`</span>
+<a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="sd">    * `aoi` (+ `buffer`): any shape :func:`earthlens.base.spatial.normalize_aoi`</span>
 <a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">      understands, reduced to `lat_lim` / `lon_lim`; a backend that</span>
 <a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">      declares its own `aoi` (WorldPop) keeps it;</span>
 <a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">    * `cadence`: a clearer alias for `temporal_resolution`;</span>
@@ -28689,12 +28717,12 @@ and skips the second wrap.</p>
 
         <p>Eagerly establish the backend's authenticated connection.</p>
 <p>The explicit, fail-fast counterpart to the lazy authentication
-that otherwise happens on the first <code>download</code> / <code>search</code>:
+that otherwise happens on the first :meth:<code>download</code> / <code>search</code>:
 it opens the network client for backends that have one (those
-mixing in <code>LazyClientMixin</code> — e.g. GEE, ECMWF, STAC) or
+mixing in :class:<code>LazyClientMixin</code> — e.g. GEE, ECMWF, STAC) or
 runs the credential <code>configure()</code> step for backends that hold an
 auth object (CMEMS, Earthdata, EUMETSAT, …), raising
-<code>AuthenticationError</code> on failure. It is a
+:class:<code>~earthlens.base.AuthenticationError</code> on failure. It is a
 no-op for credential-free backends (CHIRPS, GDACS, Overture, …),
 and is idempotent.</p>
 
@@ -28789,12 +28817,12 @@ and is idempotent.</p>
 <a id="__codelineno-0-1388" name="__codelineno-0-1388"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Eagerly establish the backend&#39;s authenticated connection.</span>
 <a id="__codelineno-0-1389" name="__codelineno-0-1389"></a>
 <a id="__codelineno-0-1390" name="__codelineno-0-1390"></a><span class="sd">    The explicit, fail-fast counterpart to the lazy authentication</span>
-<a id="__codelineno-0-1391" name="__codelineno-0-1391"></a><span class="sd">    that otherwise happens on the first `download` / `search`:</span>
+<a id="__codelineno-0-1391" name="__codelineno-0-1391"></a><span class="sd">    that otherwise happens on the first :meth:`download` / `search`:</span>
 <a id="__codelineno-0-1392" name="__codelineno-0-1392"></a><span class="sd">    it opens the network client for backends that have one (those</span>
-<a id="__codelineno-0-1393" name="__codelineno-0-1393"></a><span class="sd">    mixing in `LazyClientMixin` — e.g. GEE, ECMWF, STAC) or</span>
+<a id="__codelineno-0-1393" name="__codelineno-0-1393"></a><span class="sd">    mixing in :class:`LazyClientMixin` — e.g. GEE, ECMWF, STAC) or</span>
 <a id="__codelineno-0-1394" name="__codelineno-0-1394"></a><span class="sd">    runs the credential `configure()` step for backends that hold an</span>
 <a id="__codelineno-0-1395" name="__codelineno-0-1395"></a><span class="sd">    auth object (CMEMS, Earthdata, EUMETSAT, …), raising</span>
-<a id="__codelineno-0-1396" name="__codelineno-0-1396"></a><span class="sd">    `AuthenticationError` on failure. It is a</span>
+<a id="__codelineno-0-1396" name="__codelineno-0-1396"></a><span class="sd">    :class:`~earthlens.base.AuthenticationError` on failure. It is a</span>
 <a id="__codelineno-0-1397" name="__codelineno-0-1397"></a><span class="sd">    no-op for credential-free backends (CHIRPS, GDACS, Overture, …),</span>
 <a id="__codelineno-0-1398" name="__codelineno-0-1398"></a><span class="sd">    and is idempotent.</span>
 <a id="__codelineno-0-1399" name="__codelineno-0-1399"></a>
@@ -29272,7 +29300,7 @@ the overrides rather than waving them through. Deliberately <em>not</em>
 <code>**kwargs</code>: putting that here would oblige all 48 overrides to accept
 arbitrary keywords, which is the opposite of a contract.</p>
 <p>Capability-gated arguments appear only where they are honoured
-(<code>aggregate=</code> on the backends declaring <code>SUPPORTS_AGGREGATE</code>,
+(<code>aggregate=</code> on the backends declaring :attr:<code>SUPPORTS_AGGREGATE</code>,
 <code>errors=</code> where the batch is a loop over independent items, <code>force=</code>
 where a re-run can skip completed artefacts), alongside genuinely
 backend-specific ones (<code>cores=</code> on chc, <code>tailor=</code> on eumetsat). Read the
@@ -29329,13 +29357,13 @@ catch a signature drifting.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The produced artifacts, shaped by <code>OUTPUT_KIND</code> —
+                <p>The produced artifacts, shaped by :attr:<code>OUTPUT_KIND</code> —
 <code>"raster"</code> / <code>"mixed"</code> file-writing backends return the written
 paths (<code>list[Path]</code>); <code>"vector"</code> backends return an in-memory
 <code>FeatureCollection</code> (radar returns a <code>GeoDataFrame</code>);
 <code>"tabular"</code> backends return a <code>pandas.DataFrame</code>. Every backend
 returns its artifacts; the file-writing ones also leave them on
-disk under <code>root_dir</code>.</p>
+disk under :attr:<code>root_dir</code>.</p>
               </div>
             </td>
           </tr>
@@ -29349,12 +29377,12 @@ sensor is logged and the batch proceeds, with a summary at the end
 (<code>chc</code>, <code>cmems</code>, <code>ecmwf</code>, <code>fdsn</code>, <code>nwp</code>, <code>radar</code>, <code>soilgrids</code>) make
 that policy caller-controllable with an explicit
 <code>errors="warn" | "raise" | "ignore"</code> argument, routed through
-<code>check_errors_policy</code> and <code>_run_items</code>. A backend whose
+:meth:<code>check_errors_policy</code> and :meth:<code>_run_items</code>. A backend whose
 <code>download</code> does not take <code>errors=</code> has nothing to apply it to — it
 issues one request, or its loop needs per-failure recovery the
 shared helper cannot express (chc re-opens its FTP session between
 failed dates). So <strong>check the backend's own <code>download</code> signature</strong>
-rather than assuming; <code>_search_fetch_each</code> also takes
+rather than assuming; :meth:<code>_search_fetch_each</code> also takes
 <code>errors=</code> for backends composed from it.</p>
 
 
@@ -29420,7 +29448,7 @@ rather than assuming; <code>_search_fetch_each</code> also takes
 <a id="__codelineno-0-1625" name="__codelineno-0-1625"></a><span class="sd">    arbitrary keywords, which is the opposite of a contract.</span>
 <a id="__codelineno-0-1626" name="__codelineno-0-1626"></a>
 <a id="__codelineno-0-1627" name="__codelineno-0-1627"></a><span class="sd">    Capability-gated arguments appear only where they are honoured</span>
-<a id="__codelineno-0-1628" name="__codelineno-0-1628"></a><span class="sd">    (`aggregate=` on the backends declaring `SUPPORTS_AGGREGATE`,</span>
+<a id="__codelineno-0-1628" name="__codelineno-0-1628"></a><span class="sd">    (`aggregate=` on the backends declaring :attr:`SUPPORTS_AGGREGATE`,</span>
 <a id="__codelineno-0-1629" name="__codelineno-0-1629"></a><span class="sd">    `errors=` where the batch is a loop over independent items, `force=`</span>
 <a id="__codelineno-0-1630" name="__codelineno-0-1630"></a><span class="sd">    where a re-run can skip completed artefacts), alongside genuinely</span>
 <a id="__codelineno-0-1631" name="__codelineno-0-1631"></a><span class="sd">    backend-specific ones (`cores=` on chc, `tailor=` on eumetsat). Read the</span>
@@ -29434,13 +29462,13 @@ rather than assuming; <code>_search_fetch_each</code> also takes
 <a id="__codelineno-0-1639" name="__codelineno-0-1639"></a><span class="sd">            catch a signature drifting.</span>
 <a id="__codelineno-0-1640" name="__codelineno-0-1640"></a>
 <a id="__codelineno-0-1641" name="__codelineno-0-1641"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-1642" name="__codelineno-0-1642"></a><span class="sd">        Any: The produced artifacts, shaped by `OUTPUT_KIND` —</span>
+<a id="__codelineno-0-1642" name="__codelineno-0-1642"></a><span class="sd">        Any: The produced artifacts, shaped by :attr:`OUTPUT_KIND` —</span>
 <a id="__codelineno-0-1643" name="__codelineno-0-1643"></a><span class="sd">            `&quot;raster&quot;` / `&quot;mixed&quot;` file-writing backends return the written</span>
 <a id="__codelineno-0-1644" name="__codelineno-0-1644"></a><span class="sd">            paths (`list[Path]`); `&quot;vector&quot;` backends return an in-memory</span>
 <a id="__codelineno-0-1645" name="__codelineno-0-1645"></a><span class="sd">            `FeatureCollection` (radar returns a `GeoDataFrame`);</span>
 <a id="__codelineno-0-1646" name="__codelineno-0-1646"></a><span class="sd">            `&quot;tabular&quot;` backends return a `pandas.DataFrame`. Every backend</span>
 <a id="__codelineno-0-1647" name="__codelineno-0-1647"></a><span class="sd">            returns its artifacts; the file-writing ones also leave them on</span>
-<a id="__codelineno-0-1648" name="__codelineno-0-1648"></a><span class="sd">            disk under `root_dir`.</span>
+<a id="__codelineno-0-1648" name="__codelineno-0-1648"></a><span class="sd">            disk under :attr:`root_dir`.</span>
 <a id="__codelineno-0-1649" name="__codelineno-0-1649"></a>
 <a id="__codelineno-0-1650" name="__codelineno-0-1650"></a><span class="sd">    Partial-failure policy across a multi-item batch defaults to</span>
 <a id="__codelineno-0-1651" name="__codelineno-0-1651"></a><span class="sd">    **skip-and-continue** — a failed `(dataset, variable)` / chunk /</span>
@@ -29451,12 +29479,12 @@ rather than assuming; <code>_search_fetch_each</code> also takes
 <a id="__codelineno-0-1656" name="__codelineno-0-1656"></a><span class="sd">    (`chc`, `cmems`, `ecmwf`, `fdsn`, `nwp`, `radar`, `soilgrids`) make</span>
 <a id="__codelineno-0-1657" name="__codelineno-0-1657"></a><span class="sd">    that policy caller-controllable with an explicit</span>
 <a id="__codelineno-0-1658" name="__codelineno-0-1658"></a><span class="sd">    `errors=&quot;warn&quot; | &quot;raise&quot; | &quot;ignore&quot;` argument, routed through</span>
-<a id="__codelineno-0-1659" name="__codelineno-0-1659"></a><span class="sd">    `check_errors_policy` and `_run_items`. A backend whose</span>
+<a id="__codelineno-0-1659" name="__codelineno-0-1659"></a><span class="sd">    :meth:`check_errors_policy` and :meth:`_run_items`. A backend whose</span>
 <a id="__codelineno-0-1660" name="__codelineno-0-1660"></a><span class="sd">    `download` does not take `errors=` has nothing to apply it to — it</span>
 <a id="__codelineno-0-1661" name="__codelineno-0-1661"></a><span class="sd">    issues one request, or its loop needs per-failure recovery the</span>
 <a id="__codelineno-0-1662" name="__codelineno-0-1662"></a><span class="sd">    shared helper cannot express (chc re-opens its FTP session between</span>
 <a id="__codelineno-0-1663" name="__codelineno-0-1663"></a><span class="sd">    failed dates). So **check the backend&#39;s own `download` signature**</span>
-<a id="__codelineno-0-1664" name="__codelineno-0-1664"></a><span class="sd">    rather than assuming; `_search_fetch_each` also takes</span>
+<a id="__codelineno-0-1664" name="__codelineno-0-1664"></a><span class="sd">    rather than assuming; :meth:`_search_fetch_each` also takes</span>
 <a id="__codelineno-0-1665" name="__codelineno-0-1665"></a><span class="sd">    `errors=` for backends composed from it.</span>
 <a id="__codelineno-0-1666" name="__codelineno-0-1666"></a><span class="sd">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
@@ -29477,12 +29505,12 @@ rather than assuming; <code>_search_fetch_each</code> also takes
     <div class="doc doc-contents ">
 
         <p>Yield the download's artifacts one item at a time.</p>
-<p>The streaming counterpart to <code>download</code>, for callers who want to
+<p>The streaming counterpart to :meth:<code>download</code>, for callers who want to
 consume a large vector / tabular result without the whole thing being
 resident: each <code>_search</code> product's fragment is yielded as it arrives
 and can be dropped before the next is fetched. <code>download()</code> remains the
 batch form and is unaffected.</p>
-<p>The default implementation composes the <code>_search</code> / <code>_fetch_one</code>
+<p>The default implementation composes the <code>_search</code> / :meth:<code>_fetch_one</code>
 split, so any backend with that split gets it for free. A backend whose
 fetch is inherently whole-batch (one server-side request for
 everything) does not override this and raises below, rather than
@@ -29539,8 +29567,8 @@ never fetched.</p>
             <td>
               <div class="doc-md-description">
                 <p>One fragment per product — the same element type
-<code>_fetch</code> returns for this backend's
-<code>OUTPUT_KIND</code>.</p>
+:meth:<code>_fetch</code> returns for this backend's
+:attr:<code>OUTPUT_KIND</code>.</p>
               </div>
             </td>
           </tr>
@@ -29651,13 +29679,13 @@ never fetched.</p>
 <span class="normal"><a href="#__codelineno-0-2035">2035</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1981" name="__codelineno-0-1981"></a><span class="k">def</span><span class="w"> </span><span class="nf">iter_download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <a id="__codelineno-0-1982" name="__codelineno-0-1982"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield the download&#39;s artifacts one item at a time.</span>
 <a id="__codelineno-0-1983" name="__codelineno-0-1983"></a>
-<a id="__codelineno-0-1984" name="__codelineno-0-1984"></a><span class="sd">    The streaming counterpart to `download`, for callers who want to</span>
+<a id="__codelineno-0-1984" name="__codelineno-0-1984"></a><span class="sd">    The streaming counterpart to :meth:`download`, for callers who want to</span>
 <a id="__codelineno-0-1985" name="__codelineno-0-1985"></a><span class="sd">    consume a large vector / tabular result without the whole thing being</span>
 <a id="__codelineno-0-1986" name="__codelineno-0-1986"></a><span class="sd">    resident: each `_search` product&#39;s fragment is yielded as it arrives</span>
 <a id="__codelineno-0-1987" name="__codelineno-0-1987"></a><span class="sd">    and can be dropped before the next is fetched. `download()` remains the</span>
 <a id="__codelineno-0-1988" name="__codelineno-0-1988"></a><span class="sd">    batch form and is unaffected.</span>
 <a id="__codelineno-0-1989" name="__codelineno-0-1989"></a>
-<a id="__codelineno-0-1990" name="__codelineno-0-1990"></a><span class="sd">    The default implementation composes the `_search` / `_fetch_one`</span>
+<a id="__codelineno-0-1990" name="__codelineno-0-1990"></a><span class="sd">    The default implementation composes the `_search` / :meth:`_fetch_one`</span>
 <a id="__codelineno-0-1991" name="__codelineno-0-1991"></a><span class="sd">    split, so any backend with that split gets it for free. A backend whose</span>
 <a id="__codelineno-0-1992" name="__codelineno-0-1992"></a><span class="sd">    fetch is inherently whole-batch (one server-side request for</span>
 <a id="__codelineno-0-1993" name="__codelineno-0-1993"></a><span class="sd">    everything) does not override this and raises below, rather than</span>
@@ -29671,8 +29699,8 @@ never fetched.</p>
 <a id="__codelineno-0-2001" name="__codelineno-0-2001"></a>
 <a id="__codelineno-0-2002" name="__codelineno-0-2002"></a><span class="sd">    Yields:</span>
 <a id="__codelineno-0-2003" name="__codelineno-0-2003"></a><span class="sd">        Any: One fragment per product — the same element type</span>
-<a id="__codelineno-0-2004" name="__codelineno-0-2004"></a><span class="sd">            `_fetch` returns for this backend&#39;s</span>
-<a id="__codelineno-0-2005" name="__codelineno-0-2005"></a><span class="sd">            `OUTPUT_KIND`.</span>
+<a id="__codelineno-0-2004" name="__codelineno-0-2004"></a><span class="sd">            :meth:`_fetch` returns for this backend&#39;s</span>
+<a id="__codelineno-0-2005" name="__codelineno-0-2005"></a><span class="sd">            :attr:`OUTPUT_KIND`.</span>
 <a id="__codelineno-0-2006" name="__codelineno-0-2006"></a>
 <a id="__codelineno-0-2007" name="__codelineno-0-2007"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-2008" name="__codelineno-0-2008"></a><span class="sd">        NotImplementedError: When the backend implements neither the</span>
@@ -29738,29 +29766,29 @@ never fetched.</p>
 <p>Subclasses load a backend-specific catalog (a YAML file, an
 in-code dict, or a remote query) and expose its entries through the
 dict-like surface below — <code>len</code>, <code>in</code>, <code>[key]</code>, iteration and
-<code>get_dataset</code> — plus <code>get_variable</code> for the two-level
-catalogs. The <code>model_post_init</code> hook fills the row fields from
-<code>_autoload</code> only while the field is still falsy, so <code>Catalog()</code>
+:meth:<code>get_dataset</code> — plus :meth:<code>get_variable</code> for the two-level
+catalogs. The :meth:<code>model_post_init</code> hook fills the row fields from
+:meth:<code>_autoload</code> only while the field is still falsy, so <code>Catalog()</code>
 reads from disk and so does <code>Catalog(datasets={})</code> — an empty mapping
 is indistinguishable from an absent one here. Only a non-empty
 <code>Catalog(datasets=...)</code> is kept as handed, and no subclass writes its
 own <code>__init__</code>.</p>
 <p>Generic in <code>RowT</code>, the row model the backend stores. Parameterising
 the base — <code>class Catalog(AbstractCatalog[Dataset])</code> — keeps
-<code>datasets</code>, <code>get_catalog</code>, <code>get_dataset</code> and
+:attr:<code>datasets</code>, :meth:<code>get_catalog</code>, :meth:<code>get_dataset</code> and
 <code>[key]</code> typed as that model instead of degrading to <code>Any</code>. Leaving it
 unparameterised is allowed and changes nothing at runtime.</p>
 <p>Subclasses pass through pydantic's normal <code>BaseModel.__init__</code>
 — declare any backend-specific construction parameters as
 pydantic fields rather than <code>__init__</code> arguments.</p>
-<p><code>get_catalog</code> defaults to returning <code>datasets</code>, which is
+<p>:meth:<code>get_catalog</code> defaults to returning :attr:<code>datasets</code>, which is
 where every backend keeps its rows and what the dict surface below
 already reads, so a subclass storing them there needs no override.
 <strong>A subclass whose rows live in another field must override it</strong> —
-otherwise <code>get_catalog()</code> and the <code>catalog</code> property report an
+otherwise <code>get_catalog()</code> and the :attr:<code>catalog</code> property report an
 empty mapping rather than failing, and a catalog that silently has no
-entries is harder to notice than one that raises. <code>get_variable</code>
-still raises <code>NotImplementedError</code>, since there is no sensible
+entries is harder to notice than one that raises. :meth:<code>get_variable</code>
+still raises :class:<code>NotImplementedError</code>, since there is no sensible
 default for a per-dataset variable level.</p>
 
 
@@ -29826,7 +29854,7 @@ the base <code>providers</code> field. Empty otherwise.</p>
             <td>
               <div class="doc-md-description">
                 <p>Read-only <code>MappingProxyType</code> view over whatever
-<code>get_catalog</code> returns, rebuilt on each access, so it can
+:meth:<code>get_catalog</code> returns, rebuilt on each access, so it can
 neither drift from the rows nor be written through.</p>
               </div>
             </td>
@@ -30252,9 +30280,9 @@ neither drift from the rows nor be written through.</p>
 <a id="__codelineno-0-2446" name="__codelineno-0-2446"></a><span class="sd">    Subclasses load a backend-specific catalog (a YAML file, an</span>
 <a id="__codelineno-0-2447" name="__codelineno-0-2447"></a><span class="sd">    in-code dict, or a remote query) and expose its entries through the</span>
 <a id="__codelineno-0-2448" name="__codelineno-0-2448"></a><span class="sd">    dict-like surface below — `len`, `in`, `[key]`, iteration and</span>
-<a id="__codelineno-0-2449" name="__codelineno-0-2449"></a><span class="sd">    `get_dataset` — plus `get_variable` for the two-level</span>
-<a id="__codelineno-0-2450" name="__codelineno-0-2450"></a><span class="sd">    catalogs. The `model_post_init` hook fills the row fields from</span>
-<a id="__codelineno-0-2451" name="__codelineno-0-2451"></a><span class="sd">    `_autoload` only while the field is still falsy, so `Catalog()`</span>
+<a id="__codelineno-0-2449" name="__codelineno-0-2449"></a><span class="sd">    :meth:`get_dataset` — plus :meth:`get_variable` for the two-level</span>
+<a id="__codelineno-0-2450" name="__codelineno-0-2450"></a><span class="sd">    catalogs. The :meth:`model_post_init` hook fills the row fields from</span>
+<a id="__codelineno-0-2451" name="__codelineno-0-2451"></a><span class="sd">    :meth:`_autoload` only while the field is still falsy, so `Catalog()`</span>
 <a id="__codelineno-0-2452" name="__codelineno-0-2452"></a><span class="sd">    reads from disk and so does `Catalog(datasets={})` — an empty mapping</span>
 <a id="__codelineno-0-2453" name="__codelineno-0-2453"></a><span class="sd">    is indistinguishable from an absent one here. Only a non-empty</span>
 <a id="__codelineno-0-2454" name="__codelineno-0-2454"></a><span class="sd">    `Catalog(datasets=...)` is kept as handed, and no subclass writes its</span>
@@ -30262,7 +30290,7 @@ neither drift from the rows nor be written through.</p>
 <a id="__codelineno-0-2456" name="__codelineno-0-2456"></a>
 <a id="__codelineno-0-2457" name="__codelineno-0-2457"></a><span class="sd">    Generic in `RowT`, the row model the backend stores. Parameterising</span>
 <a id="__codelineno-0-2458" name="__codelineno-0-2458"></a><span class="sd">    the base — `class Catalog(AbstractCatalog[Dataset])` — keeps</span>
-<a id="__codelineno-0-2459" name="__codelineno-0-2459"></a><span class="sd">    `datasets`, `get_catalog`, `get_dataset` and</span>
+<a id="__codelineno-0-2459" name="__codelineno-0-2459"></a><span class="sd">    :attr:`datasets`, :meth:`get_catalog`, :meth:`get_dataset` and</span>
 <a id="__codelineno-0-2460" name="__codelineno-0-2460"></a><span class="sd">    `[key]` typed as that model instead of degrading to `Any`. Leaving it</span>
 <a id="__codelineno-0-2461" name="__codelineno-0-2461"></a><span class="sd">    unparameterised is allowed and changes nothing at runtime.</span>
 <a id="__codelineno-0-2462" name="__codelineno-0-2462"></a>
@@ -30270,14 +30298,14 @@ neither drift from the rows nor be written through.</p>
 <a id="__codelineno-0-2464" name="__codelineno-0-2464"></a><span class="sd">    — declare any backend-specific construction parameters as</span>
 <a id="__codelineno-0-2465" name="__codelineno-0-2465"></a><span class="sd">    pydantic fields rather than `__init__` arguments.</span>
 <a id="__codelineno-0-2466" name="__codelineno-0-2466"></a>
-<a id="__codelineno-0-2467" name="__codelineno-0-2467"></a><span class="sd">    `get_catalog` defaults to returning `datasets`, which is</span>
+<a id="__codelineno-0-2467" name="__codelineno-0-2467"></a><span class="sd">    :meth:`get_catalog` defaults to returning :attr:`datasets`, which is</span>
 <a id="__codelineno-0-2468" name="__codelineno-0-2468"></a><span class="sd">    where every backend keeps its rows and what the dict surface below</span>
 <a id="__codelineno-0-2469" name="__codelineno-0-2469"></a><span class="sd">    already reads, so a subclass storing them there needs no override.</span>
 <a id="__codelineno-0-2470" name="__codelineno-0-2470"></a><span class="sd">    **A subclass whose rows live in another field must override it** —</span>
-<a id="__codelineno-0-2471" name="__codelineno-0-2471"></a><span class="sd">    otherwise `get_catalog()` and the `catalog` property report an</span>
+<a id="__codelineno-0-2471" name="__codelineno-0-2471"></a><span class="sd">    otherwise `get_catalog()` and the :attr:`catalog` property report an</span>
 <a id="__codelineno-0-2472" name="__codelineno-0-2472"></a><span class="sd">    empty mapping rather than failing, and a catalog that silently has no</span>
-<a id="__codelineno-0-2473" name="__codelineno-0-2473"></a><span class="sd">    entries is harder to notice than one that raises. `get_variable`</span>
-<a id="__codelineno-0-2474" name="__codelineno-0-2474"></a><span class="sd">    still raises `NotImplementedError`, since there is no sensible</span>
+<a id="__codelineno-0-2473" name="__codelineno-0-2473"></a><span class="sd">    entries is harder to notice than one that raises. :meth:`get_variable`</span>
+<a id="__codelineno-0-2474" name="__codelineno-0-2474"></a><span class="sd">    still raises :class:`NotImplementedError`, since there is no sensible</span>
 <a id="__codelineno-0-2475" name="__codelineno-0-2475"></a><span class="sd">    default for a per-dataset variable level.</span>
 <a id="__codelineno-0-2476" name="__codelineno-0-2476"></a>
 <a id="__codelineno-0-2477" name="__codelineno-0-2477"></a><span class="sd">    Attributes:</span>
@@ -30292,19 +30320,19 @@ neither drift from the rows nor be written through.</p>
 <a id="__codelineno-0-2486" name="__codelineno-0-2486"></a><span class="sd">        providers: Provider-registry rows, for the backends that populate</span>
 <a id="__codelineno-0-2487" name="__codelineno-0-2487"></a><span class="sd">            the base `providers` field. Empty otherwise.</span>
 <a id="__codelineno-0-2488" name="__codelineno-0-2488"></a><span class="sd">        catalog: Read-only `MappingProxyType` view over whatever</span>
-<a id="__codelineno-0-2489" name="__codelineno-0-2489"></a><span class="sd">            `get_catalog` returns, rebuilt on each access, so it can</span>
+<a id="__codelineno-0-2489" name="__codelineno-0-2489"></a><span class="sd">            :meth:`get_catalog` returns, rebuilt on each access, so it can</span>
 <a id="__codelineno-0-2490" name="__codelineno-0-2490"></a><span class="sd">            neither drift from the rows nor be written through.</span>
 <a id="__codelineno-0-2491" name="__codelineno-0-2491"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-2492" name="__codelineno-0-2492"></a>
 <a id="__codelineno-0-2493" name="__codelineno-0-2493"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <a id="__codelineno-0-2494" name="__codelineno-0-2494"></a>
-<a id="__codelineno-0-2495" name="__codelineno-0-2495"></a>    <span class="c1">#: Short label used by `get_dataset`&#39;s did-you-mean error</span>
+<a id="__codelineno-0-2495" name="__codelineno-0-2495"></a>    <span class="c1">#: Short label used by :meth:`get_dataset`&#39;s did-you-mean error</span>
 <a id="__codelineno-0-2496" name="__codelineno-0-2496"></a>    <span class="c1">#: message — concrete subclasses override (e.g. `&quot;GEE catalog&quot;`,</span>
 <a id="__codelineno-0-2497" name="__codelineno-0-2497"></a>    <span class="c1">#: `&quot;CDS catalog&quot;`, `&quot;CHC catalog&quot;`) so the user sees which</span>
 <a id="__codelineno-0-2498" name="__codelineno-0-2498"></a>    <span class="c1">#: catalog they failed against.</span>
 <a id="__codelineno-0-2499" name="__codelineno-0-2499"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;catalog&quot;</span>
 <a id="__codelineno-0-2500" name="__codelineno-0-2500"></a>
-<a id="__codelineno-0-2501" name="__codelineno-0-2501"></a>    <span class="c1">#: Plural noun for the catalog entries, used in `get_dataset`&#39;s</span>
+<a id="__codelineno-0-2501" name="__codelineno-0-2501"></a>    <span class="c1">#: Plural noun for the catalog entries, used in :meth:`get_dataset`&#39;s</span>
 <a id="__codelineno-0-2502" name="__codelineno-0-2502"></a>    <span class="c1">#: did-you-mean message (`&quot;Known {noun}: [...]&quot;`). Defaults to</span>
 <a id="__codelineno-0-2503" name="__codelineno-0-2503"></a>    <span class="c1">#: `&quot;datasets&quot;`; subclasses whose entries are not &quot;datasets&quot; override</span>
 <a id="__codelineno-0-2504" name="__codelineno-0-2504"></a>    <span class="c1">#: it (e.g. `&quot;parameters&quot;` for the openaq / usgs_water catalogs).</span>
@@ -30316,9 +30344,9 @@ neither drift from the rows nor be written through.</p>
 <a id="__codelineno-0-2510" name="__codelineno-0-2510"></a>
 <a id="__codelineno-0-2511" name="__codelineno-0-2511"></a>    <span class="nd">@property</span>
 <a id="__codelineno-0-2512" name="__codelineno-0-2512"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-0-2513" name="__codelineno-0-2513"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read-only view of the catalog mapping (see `get_catalog`).</span>
+<a id="__codelineno-0-2513" name="__codelineno-0-2513"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read-only view of the catalog mapping (see :meth:`get_catalog`).</span>
 <a id="__codelineno-0-2514" name="__codelineno-0-2514"></a>
-<a id="__codelineno-0-2515" name="__codelineno-0-2515"></a><span class="sd">        For nearly every backend `get_catalog()` returns `datasets`</span>
+<a id="__codelineno-0-2515" name="__codelineno-0-2515"></a><span class="sd">        For nearly every backend `get_catalog()` returns :attr:`datasets`</span>
 <a id="__codelineno-0-2516" name="__codelineno-0-2516"></a><span class="sd">        itself, so `catalog` used to be a second name bound to the very same</span>
 <a id="__codelineno-0-2517" name="__codelineno-0-2517"></a><span class="sd">        `dict` — assigning through one silently rewrote the other, and a</span>
 <a id="__codelineno-0-2518" name="__codelineno-0-2518"></a><span class="sd">        caller who mutated `cat.catalog` corrupted the shared parse cache</span>
@@ -30353,7 +30381,7 @@ neither drift from the rows nor be written through.</p>
 <a id="__codelineno-0-2547" name="__codelineno-0-2547"></a><span class="sd">        The one part of post-init that genuinely differs per backend: *how* the</span>
 <a id="__codelineno-0-2548" name="__codelineno-0-2548"></a><span class="sd">        rows are read. Everything around it — only read when no rows were</span>
 <a id="__codelineno-0-2549" name="__codelineno-0-2549"></a><span class="sd">        supplied, never clobber what the caller passed — is the same everywhere</span>
-<a id="__codelineno-0-2550" name="__codelineno-0-2550"></a><span class="sd">        and lives in `model_post_init`.</span>
+<a id="__codelineno-0-2550" name="__codelineno-0-2550"></a><span class="sd">        and lives in :meth:`model_post_init`.</span>
 <a id="__codelineno-0-2551" name="__codelineno-0-2551"></a>
 <a id="__codelineno-0-2552" name="__codelineno-0-2552"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-2553" name="__codelineno-0-2553"></a><span class="sd">            Mapping[str, Any]: Field name to value, e.g.</span>
@@ -30366,16 +30394,16 @@ neither drift from the rows nor be written through.</p>
 <a id="__codelineno-0-2560" name="__codelineno-0-2560"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fill an empty catalog from disk, then run the subclass&#39;s wiring.</span>
 <a id="__codelineno-0-2561" name="__codelineno-0-2561"></a>
 <a id="__codelineno-0-2562" name="__codelineno-0-2562"></a><span class="sd">        `Catalog()` with no arguments reads from disk, and so does</span>
-<a id="__codelineno-0-2563" name="__codelineno-0-2563"></a><span class="sd">        `Catalog(datasets={})` — the gate is whether `datasets` is falsy,</span>
+<a id="__codelineno-0-2563" name="__codelineno-0-2563"></a><span class="sd">        `Catalog(datasets={})` — the gate is whether :attr:`datasets` is falsy,</span>
 <a id="__codelineno-0-2564" name="__codelineno-0-2564"></a><span class="sd">        and an empty mapping is indistinguishable from an absent one here. A</span>
 <a id="__codelineno-0-2565" name="__codelineno-0-2565"></a><span class="sd">        **non-empty** `datasets=` suppresses the read entirely, so the other</span>
-<a id="__codelineno-0-2566" name="__codelineno-0-2566"></a><span class="sd">        fields `_autoload` would have filled keep their defaults too:</span>
+<a id="__codelineno-0-2566" name="__codelineno-0-2566"></a><span class="sd">        fields :meth:`_autoload` would have filled keep their defaults too:</span>
 <a id="__codelineno-0-2567" name="__codelineno-0-2567"></a><span class="sd">        `Catalog(datasets={...})` is a catalog built from literals, not a</span>
 <a id="__codelineno-0-2568" name="__codelineno-0-2568"></a><span class="sd">        partially-filled one.</span>
 <a id="__codelineno-0-2569" name="__codelineno-0-2569"></a>
 <a id="__codelineno-0-2570" name="__codelineno-0-2570"></a><span class="sd">        Within a read, a field the caller already supplied is never overwritten</span>
 <a id="__codelineno-0-2571" name="__codelineno-0-2571"></a><span class="sd">        — `Catalog(available_datasets=[...])` keeps that list and takes</span>
-<a id="__codelineno-0-2572" name="__codelineno-0-2572"></a><span class="sd">        `datasets` from disk.</span>
+<a id="__codelineno-0-2572" name="__codelineno-0-2572"></a><span class="sd">        :attr:`datasets` from disk.</span>
 <a id="__codelineno-0-2573" name="__codelineno-0-2573"></a>
 <a id="__codelineno-0-2574" name="__codelineno-0-2574"></a><span class="sd">        This used to be written out in all 48 provider catalogs. The bodies</span>
 <a id="__codelineno-0-2575" name="__codelineno-0-2575"></a><span class="sd">        differed only in the loader call, and the surrounding rule had drifted —</span>
@@ -30395,28 +30423,28 @@ neither drift from the rows nor be written through.</p>
 <a id="__codelineno-0-2589" name="__codelineno-0-2589"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">RowT</span><span class="p">]:</span>
 <a id="__codelineno-0-2590" name="__codelineno-0-2590"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the catalog&#39;s rows.</span>
 <a id="__codelineno-0-2591" name="__codelineno-0-2591"></a>
-<a id="__codelineno-0-2592" name="__codelineno-0-2592"></a><span class="sd">        Defaults to `datasets`, which is where every backend keeps</span>
+<a id="__codelineno-0-2592" name="__codelineno-0-2592"></a><span class="sd">        Defaults to :attr:`datasets`, which is where every backend keeps</span>
 <a id="__codelineno-0-2593" name="__codelineno-0-2593"></a><span class="sd">        them and what the inherited dict surface (`len`, `in`, `[]`,</span>
-<a id="__codelineno-0-2594" name="__codelineno-0-2594"></a><span class="sd">        iteration, `get_dataset`) already reads. Raising</span>
+<a id="__codelineno-0-2594" name="__codelineno-0-2594"></a><span class="sd">        iteration, :meth:`get_dataset`) already reads. Raising</span>
 <a id="__codelineno-0-2595" name="__codelineno-0-2595"></a><span class="sd">        `NotImplementedError` here instead made the method mandatory, and</span>
 <a id="__codelineno-0-2596" name="__codelineno-0-2596"></a><span class="sd">        all 61 provider catalogs answered it with the same</span>
 <a id="__codelineno-0-2597" name="__codelineno-0-2597"></a><span class="sd">        `return self.datasets`.</span>
 <a id="__codelineno-0-2598" name="__codelineno-0-2598"></a>
 <a id="__codelineno-0-2599" name="__codelineno-0-2599"></a><span class="sd">        A backend whose catalog is genuinely a different shape still</span>
-<a id="__codelineno-0-2600" name="__codelineno-0-2600"></a><span class="sd">        overrides this. When it does not, and `datasets` is empty,</span>
+<a id="__codelineno-0-2600" name="__codelineno-0-2600"></a><span class="sd">        overrides this. When it does not, and :attr:`datasets` is empty,</span>
 <a id="__codelineno-0-2601" name="__codelineno-0-2601"></a><span class="sd">        the empty mapping is returned but a warning is logged naming the</span>
 <a id="__codelineno-0-2602" name="__codelineno-0-2602"></a><span class="sd">        class — the default cannot tell &quot;no rows yet&quot; from &quot;rows kept in</span>
 <a id="__codelineno-0-2603" name="__codelineno-0-2603"></a><span class="sd">        some other field&quot;, and a catalog that silently has no entries is</span>
 <a id="__codelineno-0-2604" name="__codelineno-0-2604"></a><span class="sd">        harder to notice than one that complains. The warning is emitted</span>
-<a id="__codelineno-0-2605" name="__codelineno-0-2605"></a><span class="sd">        once per class, not once per call: `catalog` recomputes this</span>
+<a id="__codelineno-0-2605" name="__codelineno-0-2605"></a><span class="sd">        once per class, not once per call: :attr:`catalog` recomputes this</span>
 <a id="__codelineno-0-2606" name="__codelineno-0-2606"></a><span class="sd">        on every read, so a caller iterating it would otherwise be warned</span>
 <a id="__codelineno-0-2607" name="__codelineno-0-2607"></a><span class="sd">        on each access.</span>
 <a id="__codelineno-0-2608" name="__codelineno-0-2608"></a>
 <a id="__codelineno-0-2609" name="__codelineno-0-2609"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-2610" name="__codelineno-0-2610"></a><span class="sd">            dict[str, RowT]: The `{key: row}` mapping backing this catalog,</span>
 <a id="__codelineno-0-2611" name="__codelineno-0-2611"></a><span class="sd">            typed as the row model the subclass parameterised the base with.</span>
-<a id="__codelineno-0-2612" name="__codelineno-0-2612"></a><span class="sd">            This is `datasets` itself, not a copy, so callers that</span>
-<a id="__codelineno-0-2613" name="__codelineno-0-2613"></a><span class="sd">            need an unwritable view should read `catalog` instead.</span>
+<a id="__codelineno-0-2612" name="__codelineno-0-2612"></a><span class="sd">            This is :attr:`datasets` itself, not a copy, so callers that</span>
+<a id="__codelineno-0-2613" name="__codelineno-0-2613"></a><span class="sd">            need an unwritable view should read :attr:`catalog` instead.</span>
 <a id="__codelineno-0-2614" name="__codelineno-0-2614"></a>
 <a id="__codelineno-0-2615" name="__codelineno-0-2615"></a><span class="sd">        Examples:</span>
 <a id="__codelineno-0-2616" name="__codelineno-0-2616"></a><span class="sd">            - Read the rows and inspect one:</span>
@@ -30473,7 +30501,7 @@ neither drift from the rows nor be written through.</p>
 <a id="__codelineno-0-2667" name="__codelineno-0-2667"></a>
 <a id="__codelineno-0-2668" name="__codelineno-0-2668"></a><span class="sd">        Single-level catalogs (where one row *is* the leaf — fdsn, gdacs,</span>
 <a id="__codelineno-0-2669" name="__codelineno-0-2669"></a><span class="sd">        radar, openaq, overture, usgs_water) do not implement this; their</span>
-<a id="__codelineno-0-2670" name="__codelineno-0-2670"></a><span class="sd">        rows are addressed directly with `get_dataset` / `[key]`.</span>
+<a id="__codelineno-0-2670" name="__codelineno-0-2670"></a><span class="sd">        rows are addressed directly with :meth:`get_dataset` / `[key]`.</span>
 <a id="__codelineno-0-2671" name="__codelineno-0-2671"></a>
 <a id="__codelineno-0-2672" name="__codelineno-0-2672"></a><span class="sd">        Note:</span>
 <a id="__codelineno-0-2673" name="__codelineno-0-2673"></a><span class="sd">            This supersedes the former single-argument</span>
@@ -30502,7 +30530,7 @@ neither drift from the rows nor be written through.</p>
 <a id="__codelineno-0-2696" name="__codelineno-0-2696"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RowT</span><span class="p">:</span>
 <a id="__codelineno-0-2697" name="__codelineno-0-2697"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the dataset record for `name`, with a did-you-mean hint on miss.</span>
 <a id="__codelineno-0-2698" name="__codelineno-0-2698"></a>
-<a id="__codelineno-0-2699" name="__codelineno-0-2699"></a><span class="sd">        Backend-generic: looks up `name` in `datasets` and raises</span>
+<a id="__codelineno-0-2699" name="__codelineno-0-2699"></a><span class="sd">        Backend-generic: looks up `name` in :attr:`datasets` and raises</span>
 <a id="__codelineno-0-2700" name="__codelineno-0-2700"></a><span class="sd">        `ValueError` (not `KeyError`) with the closest known name when</span>
 <a id="__codelineno-0-2701" name="__codelineno-0-2701"></a><span class="sd">        absent. Concrete subclasses can override to narrow the return</span>
 <a id="__codelineno-0-2702" name="__codelineno-0-2702"></a><span class="sd">        type or customise the error message.</span>
@@ -30515,7 +30543,7 @@ neither drift from the rows nor be written through.</p>
 <a id="__codelineno-0-2709" name="__codelineno-0-2709"></a><span class="sd">            The matching dataset record (type depends on the subclass).</span>
 <a id="__codelineno-0-2710" name="__codelineno-0-2710"></a>
 <a id="__codelineno-0-2711" name="__codelineno-0-2711"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-2712" name="__codelineno-0-2712"></a><span class="sd">            ValueError: If `name` is not a key of `datasets`.</span>
+<a id="__codelineno-0-2712" name="__codelineno-0-2712"></a><span class="sd">            ValueError: If `name` is not a key of :attr:`datasets`.</span>
 <a id="__codelineno-0-2713" name="__codelineno-0-2713"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-2714" name="__codelineno-0-2714"></a>        <span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-0-2715" name="__codelineno-0-2715"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
@@ -30556,8 +30584,8 @@ neither drift from the rows nor be written through.</p>
 <a id="__codelineno-0-2750" name="__codelineno-0-2750"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_provider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <a id="__codelineno-0-2751" name="__codelineno-0-2751"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the provider record for `slug` (with a did-you-mean hint on miss).</span>
 <a id="__codelineno-0-2752" name="__codelineno-0-2752"></a>
-<a id="__codelineno-0-2753" name="__codelineno-0-2753"></a><span class="sd">        The value type depends on the backend&#39;s `providers` field:</span>
-<a id="__codelineno-0-2754" name="__codelineno-0-2754"></a><span class="sd">        most backends store an `earthlens.base.Provider`, but some</span>
+<a id="__codelineno-0-2753" name="__codelineno-0-2753"></a><span class="sd">        The value type depends on the backend&#39;s :attr:`providers` field:</span>
+<a id="__codelineno-0-2754" name="__codelineno-0-2754"></a><span class="sd">        most backends store an :class:`earthlens.base.Provider`, but some</span>
 <a id="__codelineno-0-2755" name="__codelineno-0-2755"></a><span class="sd">        mirror a domain-specific record (earthdata mirrors its</span>
 <a id="__codelineno-0-2756" name="__codelineno-0-2756"></a><span class="sd">        `EarthdataDAAC` from `daacs`, stac its `Endpoint` from</span>
 <a id="__codelineno-0-2757" name="__codelineno-0-2757"></a><span class="sd">        `endpoints`).</span>
@@ -30608,7 +30636,7 @@ neither drift from the rows nor be written through.</p>
 <a id="__codelineno-0-2802" name="__codelineno-0-2802"></a><span class="sd">          across DAACs / mission groups.</span>
 <a id="__codelineno-0-2803" name="__codelineno-0-2803"></a>
 <a id="__codelineno-0-2804" name="__codelineno-0-2804"></a><span class="sd">        Backends without a resolve step address their catalog directly</span>
-<a id="__codelineno-0-2805" name="__codelineno-0-2805"></a><span class="sd">        through `get_dataset` / `__getitem__`.</span>
+<a id="__codelineno-0-2805" name="__codelineno-0-2805"></a><span class="sd">        through :meth:`get_dataset` / `__getitem__`.</span>
 <a id="__codelineno-0-2806" name="__codelineno-0-2806"></a>
 <a id="__codelineno-0-2807" name="__codelineno-0-2807"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-2808" name="__codelineno-0-2808"></a><span class="sd">            key: The logical catalog key to resolve.</span>
@@ -30679,8 +30707,8 @@ neither drift from the rows nor be written through.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Read-only view of the catalog mapping (see <code>get_catalog</code>).</p>
-<p>For nearly every backend <code>get_catalog()</code> returns <code>datasets</code>
+        <p>Read-only view of the catalog mapping (see :meth:<code>get_catalog</code>).</p>
+<p>For nearly every backend <code>get_catalog()</code> returns :attr:<code>datasets</code>
 itself, so <code>catalog</code> used to be a second name bound to the very same
 <code>dict</code> — assigning through one silently rewrote the other, and a
 caller who mutated <code>cat.catalog</code> corrupted the shared parse cache
@@ -30962,19 +30990,19 @@ override.</p>
     <div class="doc doc-contents ">
 
         <p>Return the catalog's rows.</p>
-<p>Defaults to <code>datasets</code>, which is where every backend keeps
+<p>Defaults to :attr:<code>datasets</code>, which is where every backend keeps
 them and what the inherited dict surface (<code>len</code>, <code>in</code>, <code>[]</code>,
-iteration, <code>get_dataset</code>) already reads. Raising
+iteration, :meth:<code>get_dataset</code>) already reads. Raising
 <code>NotImplementedError</code> here instead made the method mandatory, and
 all 61 provider catalogs answered it with the same
 <code>return self.datasets</code>.</p>
 <p>A backend whose catalog is genuinely a different shape still
-overrides this. When it does not, and <code>datasets</code> is empty,
+overrides this. When it does not, and :attr:<code>datasets</code> is empty,
 the empty mapping is returned but a warning is logged naming the
 class — the default cannot tell "no rows yet" from "rows kept in
 some other field", and a catalog that silently has no entries is
 harder to notice than one that complains. The warning is emitted
-once per class, not once per call: <code>catalog</code> recomputes this
+once per class, not once per call: :attr:<code>catalog</code> recomputes this
 on every read, so a caller iterating it would otherwise be warned
 on each access.</p>
 
@@ -31014,7 +31042,7 @@ on each access.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>This is <code>datasets</code> itself, not a copy, so callers that</p>
+                <p>This is :attr:<code>datasets</code> itself, not a copy, so callers that</p>
               </div>
             </td>
           </tr>
@@ -31024,7 +31052,7 @@ on each access.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>need an unwritable view should read <code>catalog</code> instead.</p>
+                <p>need an unwritable view should read :attr:<code>catalog</code> instead.</p>
               </div>
             </td>
           </tr>
@@ -31121,28 +31149,28 @@ on each access.</p>
 <span class="normal"><a href="#__codelineno-0-2651">2651</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2589" name="__codelineno-0-2589"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">RowT</span><span class="p">]:</span>
 <a id="__codelineno-0-2590" name="__codelineno-0-2590"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the catalog&#39;s rows.</span>
 <a id="__codelineno-0-2591" name="__codelineno-0-2591"></a>
-<a id="__codelineno-0-2592" name="__codelineno-0-2592"></a><span class="sd">    Defaults to `datasets`, which is where every backend keeps</span>
+<a id="__codelineno-0-2592" name="__codelineno-0-2592"></a><span class="sd">    Defaults to :attr:`datasets`, which is where every backend keeps</span>
 <a id="__codelineno-0-2593" name="__codelineno-0-2593"></a><span class="sd">    them and what the inherited dict surface (`len`, `in`, `[]`,</span>
-<a id="__codelineno-0-2594" name="__codelineno-0-2594"></a><span class="sd">    iteration, `get_dataset`) already reads. Raising</span>
+<a id="__codelineno-0-2594" name="__codelineno-0-2594"></a><span class="sd">    iteration, :meth:`get_dataset`) already reads. Raising</span>
 <a id="__codelineno-0-2595" name="__codelineno-0-2595"></a><span class="sd">    `NotImplementedError` here instead made the method mandatory, and</span>
 <a id="__codelineno-0-2596" name="__codelineno-0-2596"></a><span class="sd">    all 61 provider catalogs answered it with the same</span>
 <a id="__codelineno-0-2597" name="__codelineno-0-2597"></a><span class="sd">    `return self.datasets`.</span>
 <a id="__codelineno-0-2598" name="__codelineno-0-2598"></a>
 <a id="__codelineno-0-2599" name="__codelineno-0-2599"></a><span class="sd">    A backend whose catalog is genuinely a different shape still</span>
-<a id="__codelineno-0-2600" name="__codelineno-0-2600"></a><span class="sd">    overrides this. When it does not, and `datasets` is empty,</span>
+<a id="__codelineno-0-2600" name="__codelineno-0-2600"></a><span class="sd">    overrides this. When it does not, and :attr:`datasets` is empty,</span>
 <a id="__codelineno-0-2601" name="__codelineno-0-2601"></a><span class="sd">    the empty mapping is returned but a warning is logged naming the</span>
 <a id="__codelineno-0-2602" name="__codelineno-0-2602"></a><span class="sd">    class — the default cannot tell &quot;no rows yet&quot; from &quot;rows kept in</span>
 <a id="__codelineno-0-2603" name="__codelineno-0-2603"></a><span class="sd">    some other field&quot;, and a catalog that silently has no entries is</span>
 <a id="__codelineno-0-2604" name="__codelineno-0-2604"></a><span class="sd">    harder to notice than one that complains. The warning is emitted</span>
-<a id="__codelineno-0-2605" name="__codelineno-0-2605"></a><span class="sd">    once per class, not once per call: `catalog` recomputes this</span>
+<a id="__codelineno-0-2605" name="__codelineno-0-2605"></a><span class="sd">    once per class, not once per call: :attr:`catalog` recomputes this</span>
 <a id="__codelineno-0-2606" name="__codelineno-0-2606"></a><span class="sd">    on every read, so a caller iterating it would otherwise be warned</span>
 <a id="__codelineno-0-2607" name="__codelineno-0-2607"></a><span class="sd">    on each access.</span>
 <a id="__codelineno-0-2608" name="__codelineno-0-2608"></a>
 <a id="__codelineno-0-2609" name="__codelineno-0-2609"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-2610" name="__codelineno-0-2610"></a><span class="sd">        dict[str, RowT]: The `{key: row}` mapping backing this catalog,</span>
 <a id="__codelineno-0-2611" name="__codelineno-0-2611"></a><span class="sd">        typed as the row model the subclass parameterised the base with.</span>
-<a id="__codelineno-0-2612" name="__codelineno-0-2612"></a><span class="sd">        This is `datasets` itself, not a copy, so callers that</span>
-<a id="__codelineno-0-2613" name="__codelineno-0-2613"></a><span class="sd">        need an unwritable view should read `catalog` instead.</span>
+<a id="__codelineno-0-2612" name="__codelineno-0-2612"></a><span class="sd">        This is :attr:`datasets` itself, not a copy, so callers that</span>
+<a id="__codelineno-0-2613" name="__codelineno-0-2613"></a><span class="sd">        need an unwritable view should read :attr:`catalog` instead.</span>
 <a id="__codelineno-0-2614" name="__codelineno-0-2614"></a>
 <a id="__codelineno-0-2615" name="__codelineno-0-2615"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-2616" name="__codelineno-0-2616"></a><span class="sd">        - Read the rows and inspect one:</span>
@@ -31199,7 +31227,7 @@ on each access.</p>
     <div class="doc doc-contents ">
 
         <p>Return the dataset record for <code>name</code>, with a did-you-mean hint on miss.</p>
-<p>Backend-generic: looks up <code>name</code> in <code>datasets</code> and raises
+<p>Backend-generic: looks up <code>name</code> in :attr:<code>datasets</code> and raises
 <code>ValueError</code> (not <code>KeyError</code>) with the closest known name when
 absent. Concrete subclasses can override to narrow the return
 type or customise the error message.</p>
@@ -31275,7 +31303,7 @@ CHC dataset key).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>name</code> is not a key of <code>datasets</code>.</p>
+                <p>If <code>name</code> is not a key of :attr:<code>datasets</code>.</p>
               </div>
             </td>
           </tr>
@@ -31314,7 +31342,7 @@ CHC dataset key).</p>
 <span class="normal"><a href="#__codelineno-0-2722">2722</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2696" name="__codelineno-0-2696"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RowT</span><span class="p">:</span>
 <a id="__codelineno-0-2697" name="__codelineno-0-2697"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the dataset record for `name`, with a did-you-mean hint on miss.</span>
 <a id="__codelineno-0-2698" name="__codelineno-0-2698"></a>
-<a id="__codelineno-0-2699" name="__codelineno-0-2699"></a><span class="sd">    Backend-generic: looks up `name` in `datasets` and raises</span>
+<a id="__codelineno-0-2699" name="__codelineno-0-2699"></a><span class="sd">    Backend-generic: looks up `name` in :attr:`datasets` and raises</span>
 <a id="__codelineno-0-2700" name="__codelineno-0-2700"></a><span class="sd">    `ValueError` (not `KeyError`) with the closest known name when</span>
 <a id="__codelineno-0-2701" name="__codelineno-0-2701"></a><span class="sd">    absent. Concrete subclasses can override to narrow the return</span>
 <a id="__codelineno-0-2702" name="__codelineno-0-2702"></a><span class="sd">    type or customise the error message.</span>
@@ -31327,7 +31355,7 @@ CHC dataset key).</p>
 <a id="__codelineno-0-2709" name="__codelineno-0-2709"></a><span class="sd">        The matching dataset record (type depends on the subclass).</span>
 <a id="__codelineno-0-2710" name="__codelineno-0-2710"></a>
 <a id="__codelineno-0-2711" name="__codelineno-0-2711"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-2712" name="__codelineno-0-2712"></a><span class="sd">        ValueError: If `name` is not a key of `datasets`.</span>
+<a id="__codelineno-0-2712" name="__codelineno-0-2712"></a><span class="sd">        ValueError: If `name` is not a key of :attr:`datasets`.</span>
 <a id="__codelineno-0-2713" name="__codelineno-0-2713"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-2714" name="__codelineno-0-2714"></a>    <span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-0-2715" name="__codelineno-0-2715"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
@@ -31356,8 +31384,8 @@ CHC dataset key).</p>
     <div class="doc doc-contents ">
 
         <p>Return the provider record for <code>slug</code> (with a did-you-mean hint on miss).</p>
-<p>The value type depends on the backend's <code>providers</code> field:
-most backends store an <code>earthlens.base.Provider</code>, but some
+<p>The value type depends on the backend's :attr:<code>providers</code> field:
+most backends store an :class:<code>earthlens.base.Provider</code>, but some
 mirror a domain-specific record (earthdata mirrors its
 <code>EarthdataDAAC</code> from <code>daacs</code>, stac its <code>Endpoint</code> from
 <code>endpoints</code>).</p>
@@ -31484,8 +31512,8 @@ mirror a domain-specific record (earthdata mirrors its
 <span class="normal"><a href="#__codelineno-0-2778">2778</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2750" name="__codelineno-0-2750"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_provider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <a id="__codelineno-0-2751" name="__codelineno-0-2751"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the provider record for `slug` (with a did-you-mean hint on miss).</span>
 <a id="__codelineno-0-2752" name="__codelineno-0-2752"></a>
-<a id="__codelineno-0-2753" name="__codelineno-0-2753"></a><span class="sd">    The value type depends on the backend&#39;s `providers` field:</span>
-<a id="__codelineno-0-2754" name="__codelineno-0-2754"></a><span class="sd">    most backends store an `earthlens.base.Provider`, but some</span>
+<a id="__codelineno-0-2753" name="__codelineno-0-2753"></a><span class="sd">    The value type depends on the backend&#39;s :attr:`providers` field:</span>
+<a id="__codelineno-0-2754" name="__codelineno-0-2754"></a><span class="sd">    most backends store an :class:`earthlens.base.Provider`, but some</span>
 <a id="__codelineno-0-2755" name="__codelineno-0-2755"></a><span class="sd">    mirror a domain-specific record (earthdata mirrors its</span>
 <a id="__codelineno-0-2756" name="__codelineno-0-2756"></a><span class="sd">    `EarthdataDAAC` from `daacs`, stac its `Endpoint` from</span>
 <a id="__codelineno-0-2757" name="__codelineno-0-2757"></a><span class="sd">    `endpoints`).</span>
@@ -31542,7 +31570,7 @@ overrides return their typed leaf row and raise <code>ValueError</code>
 </ul>
 <p>Single-level catalogs (where one row <em>is</em> the leaf — fdsn, gdacs,
 radar, openaq, overture, usgs_water) do not implement this; their
-rows are addressed directly with <code>get_dataset</code> / <code>[key]</code>.</p>
+rows are addressed directly with :meth:<code>get_dataset</code> / <code>[key]</code>.</p>
 
 
 <details class="note" open>
@@ -31705,7 +31733,7 @@ level.</p>
 <a id="__codelineno-0-2667" name="__codelineno-0-2667"></a>
 <a id="__codelineno-0-2668" name="__codelineno-0-2668"></a><span class="sd">    Single-level catalogs (where one row *is* the leaf — fdsn, gdacs,</span>
 <a id="__codelineno-0-2669" name="__codelineno-0-2669"></a><span class="sd">    radar, openaq, overture, usgs_water) do not implement this; their</span>
-<a id="__codelineno-0-2670" name="__codelineno-0-2670"></a><span class="sd">    rows are addressed directly with `get_dataset` / `[key]`.</span>
+<a id="__codelineno-0-2670" name="__codelineno-0-2670"></a><span class="sd">    rows are addressed directly with :meth:`get_dataset` / `[key]`.</span>
 <a id="__codelineno-0-2671" name="__codelineno-0-2671"></a>
 <a id="__codelineno-0-2672" name="__codelineno-0-2672"></a><span class="sd">    Note:</span>
 <a id="__codelineno-0-2673" name="__codelineno-0-2673"></a><span class="sd">        This supersedes the former single-argument</span>
@@ -31747,15 +31775,15 @@ level.</p>
 
         <p>Fill an empty catalog from disk, then run the subclass's wiring.</p>
 <p><code>Catalog()</code> with no arguments reads from disk, and so does
-<code>Catalog(datasets={})</code> — the gate is whether <code>datasets</code> is falsy,
+<code>Catalog(datasets={})</code> — the gate is whether :attr:<code>datasets</code> is falsy,
 and an empty mapping is indistinguishable from an absent one here. A
 <strong>non-empty</strong> <code>datasets=</code> suppresses the read entirely, so the other
-fields <code>_autoload</code> would have filled keep their defaults too:
+fields :meth:<code>_autoload</code> would have filled keep their defaults too:
 <code>Catalog(datasets={...})</code> is a catalog built from literals, not a
 partially-filled one.</p>
 <p>Within a read, a field the caller already supplied is never overwritten
 — <code>Catalog(available_datasets=[...])</code> keeps that list and takes
-<code>datasets</code> from disk.</p>
+:attr:<code>datasets</code> from disk.</p>
 <p>This used to be written out in all 48 provider catalogs. The bodies
 differed only in the loader call, and the surrounding rule had drifted —
 some defaulted <code>available_datasets</code>, some did not — which is the kind of
@@ -31829,16 +31857,16 @@ positionally because pydantic calls it that way.</p>
 <a id="__codelineno-0-2560" name="__codelineno-0-2560"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fill an empty catalog from disk, then run the subclass&#39;s wiring.</span>
 <a id="__codelineno-0-2561" name="__codelineno-0-2561"></a>
 <a id="__codelineno-0-2562" name="__codelineno-0-2562"></a><span class="sd">    `Catalog()` with no arguments reads from disk, and so does</span>
-<a id="__codelineno-0-2563" name="__codelineno-0-2563"></a><span class="sd">    `Catalog(datasets={})` — the gate is whether `datasets` is falsy,</span>
+<a id="__codelineno-0-2563" name="__codelineno-0-2563"></a><span class="sd">    `Catalog(datasets={})` — the gate is whether :attr:`datasets` is falsy,</span>
 <a id="__codelineno-0-2564" name="__codelineno-0-2564"></a><span class="sd">    and an empty mapping is indistinguishable from an absent one here. A</span>
 <a id="__codelineno-0-2565" name="__codelineno-0-2565"></a><span class="sd">    **non-empty** `datasets=` suppresses the read entirely, so the other</span>
-<a id="__codelineno-0-2566" name="__codelineno-0-2566"></a><span class="sd">    fields `_autoload` would have filled keep their defaults too:</span>
+<a id="__codelineno-0-2566" name="__codelineno-0-2566"></a><span class="sd">    fields :meth:`_autoload` would have filled keep their defaults too:</span>
 <a id="__codelineno-0-2567" name="__codelineno-0-2567"></a><span class="sd">    `Catalog(datasets={...})` is a catalog built from literals, not a</span>
 <a id="__codelineno-0-2568" name="__codelineno-0-2568"></a><span class="sd">    partially-filled one.</span>
 <a id="__codelineno-0-2569" name="__codelineno-0-2569"></a>
 <a id="__codelineno-0-2570" name="__codelineno-0-2570"></a><span class="sd">    Within a read, a field the caller already supplied is never overwritten</span>
 <a id="__codelineno-0-2571" name="__codelineno-0-2571"></a><span class="sd">    — `Catalog(available_datasets=[...])` keeps that list and takes</span>
-<a id="__codelineno-0-2572" name="__codelineno-0-2572"></a><span class="sd">    `datasets` from disk.</span>
+<a id="__codelineno-0-2572" name="__codelineno-0-2572"></a><span class="sd">    :attr:`datasets` from disk.</span>
 <a id="__codelineno-0-2573" name="__codelineno-0-2573"></a>
 <a id="__codelineno-0-2574" name="__codelineno-0-2574"></a><span class="sd">    This used to be written out in all 48 provider catalogs. The bodies</span>
 <a id="__codelineno-0-2575" name="__codelineno-0-2575"></a><span class="sd">    differed only in the loader call, and the surrounding rule had drifted —</span>
@@ -31894,7 +31922,7 @@ concrete overrides:</p>
   across DAACs / mission groups.</li>
 </ul>
 <p>Backends without a resolve step address their catalog directly
-through <code>get_dataset</code> / <code>__getitem__</code>.</p>
+through :meth:<code>get_dataset</code> / <code>__getitem__</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -32078,7 +32106,7 @@ endpoint).</p>
 <a id="__codelineno-0-2802" name="__codelineno-0-2802"></a><span class="sd">      across DAACs / mission groups.</span>
 <a id="__codelineno-0-2803" name="__codelineno-0-2803"></a>
 <a id="__codelineno-0-2804" name="__codelineno-0-2804"></a><span class="sd">    Backends without a resolve step address their catalog directly</span>
-<a id="__codelineno-0-2805" name="__codelineno-0-2805"></a><span class="sd">    through `get_dataset` / `__getitem__`.</span>
+<a id="__codelineno-0-2805" name="__codelineno-0-2805"></a><span class="sd">    through :meth:`get_dataset` / `__getitem__`.</span>
 <a id="__codelineno-0-2806" name="__codelineno-0-2806"></a>
 <a id="__codelineno-0-2807" name="__codelineno-0-2807"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-2808" name="__codelineno-0-2808"></a><span class="sd">        key: The logical catalog key to resolve.</span>

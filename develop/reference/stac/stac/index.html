@@ -817,6 +817,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -25534,7 +25562,7 @@ no <code>odc-stac</code> / <code>stackstac</code> dependency.</p>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">        Eager, network-free setup: validate the request, load the catalog,</span>
 <a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">        resolve the endpoint, and build the signer. Returns `None` — the</span>
 <a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">        STAC client itself is opened lazily on first access to</span>
-<a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">        `self.client` (see `_open_client`), so constructing the</span>
+<a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">        `self.client` (see :meth:`_open_client`), so constructing the</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">        backend never opens a connection.</span>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">        Raises:</span>
@@ -25578,7 +25606,7 @@ no <code>odc-stac</code> / <code>stackstac</code> dependency.</p>
 <a id="__codelineno-0-207" name="__codelineno-0-207"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_open_client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Open the STAC API client for the resolved endpoint (lazily).</span>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        Called by `client` on first</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        Called by :attr:`~earthlens.base.LazyClientMixin.client` on first</span>
 <a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        use, so the network round-trip `open_client` makes (reading the</span>
 <a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        API&#39;s landing page) happens at `search()` / `download()` time</span>
 <a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        rather than at construction.</span>
@@ -25626,7 +25654,7 @@ no <code>odc-stac</code> / <code>stackstac</code> dependency.</p>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_input_dates</span><span class="p">(</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span>
 <a id="__codelineno-0-257" name="__codelineno-0-257"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the date window into a `TemporalExtent`.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the date window into a :class:`TemporalExtent`.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-259" name="__codelineno-0-259"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cadence_extent</span><span class="p">(</span>
 <a id="__codelineno-0-260" name="__codelineno-0-260"></a>            <span class="n">start</span><span class="p">,</span>
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a>            <span class="n">end</span><span class="p">,</span>
@@ -25643,7 +25671,7 @@ no <code>odc-stac</code> / <code>stackstac</code> dependency.</p>
 <a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Search every requested collection for the bbox + window.</span>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            One `RemoteProduct` per matched item; the pystac item, its</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">            One :class:`RemoteProduct` per matched item; the pystac item, its</span>
 <a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">            acquisition date, the logical collection key, and the requested</span>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">            asset list ride on `metadata`.</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -25690,7 +25718,7 @@ no <code>odc-stac</code> / <code>stackstac</code> dependency.</p>
 <a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        directly and have no signer hook.</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            products: The list returned by `_search`.</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            products: The list returned by :meth:`_search`.</span>
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            The written COG paths, one per `(collection, date)` group.</span>
@@ -25885,7 +25913,7 @@ no <code>odc-stac</code> / <code>stackstac</code> dependency.</p>
 <a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">            assets: The requested asset keys (used as band names); the first</span>
 <a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">                also defines the output grid for mixed-resolution stacks.</span>
 <a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">            nodata: The no-data marker: a catalog value, or the inherit</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">                sentinel from `_nodata_for`.</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">                sentinel from :meth:`_nodata_for`.</span>
 <a id="__codelineno-0-518" name="__codelineno-0-518"></a>
 <a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">            A pyramids `Dataset` with one band per `band_paths` entry.</span>
@@ -25911,7 +25939,7 @@ no <code>odc-stac</code> / <code>stackstac</code> dependency.</p>
 <a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">            aggregate: Optional aggregation request. Accepted (not rejected)</span>
 <a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">                because `OUTPUT_KIND` is `&quot;raster&quot;`, so the facade forwards it.</span>
 <a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">                When set, the per-date COGs are reduced per time window into</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">                per-window COGs (see `_aggregate_cogs`) and the per-date</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">                per-window COGs (see :meth:`_aggregate_cogs`) and the per-date</span>
 <a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">                intermediates are removed.</span>
 <a id="__codelineno-0-545" name="__codelineno-0-545"></a>
 <a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">        Returns:</span>
@@ -26607,7 +26635,7 @@ search (mainly for tests / smoke pulls).</p>
                 <p>Optional aggregation request. Accepted (not rejected)
 because <code>OUTPUT_KIND</code> is <code>"raster"</code>, so the facade forwards it.
 When set, the per-date COGs are reduced per time window into
-per-window COGs (see <code>_aggregate_cogs</code>) and the per-date
+per-window COGs (see :meth:<code>_aggregate_cogs</code>) and the per-date
 intermediates are removed.</p>
               </div>
             </td>
@@ -26689,7 +26717,7 @@ intermediates are removed.</p>
 <a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">        aggregate: Optional aggregation request. Accepted (not rejected)</span>
 <a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">            because `OUTPUT_KIND` is `&quot;raster&quot;`, so the facade forwards it.</span>
 <a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">            When set, the per-date COGs are reduced per time window into</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">            per-window COGs (see `_aggregate_cogs`) and the per-date</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">            per-window COGs (see :meth:`_aggregate_cogs`) and the per-date</span>
 <a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">            intermediates are removed.</span>
 <a id="__codelineno-0-545" name="__codelineno-0-545"></a>
 <a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">    Returns:</span>
@@ -26743,15 +26771,15 @@ YAML files at <code>src/earthlens/stac/catalog/</code> (<code>planetary-computer
 <code>cdse.yaml</code>, <code>earth-search.yaml</code>, …) plus a single <code>_index.yaml</code> carrying the
 <code>endpoints:</code> map and the per-endpoint <code>available_collections:</code> index. The
 loader unions the per-endpoint <code>collections:</code> blocks into one
-<code>Catalog</code> at construction time (a collection key declared in two files
+:class:<code>Catalog</code> at construction time (a collection key declared in two files
 is a load-time error), the same way the GEE and CMEMS catalogs merge.</p>
 <p>A collection is addressed by a single <em>logical</em> key (e.g. <code>"sentinel-2-l2a"</code>);
-<code>Catalog.resolve</code> maps that key to the actual collection id a given
+:meth:<code>Catalog.resolve</code> maps that key to the actual collection id a given
 endpoint serves (e.g. Earth Search calls it <code>"sentinel-2-c1-l2a"</code>) via the
 collection's per-endpoint <code>aliases</code>. Endpoints carry their URL + signer type +
 region, so the backend can open the right client and build the right signer
 from catalog data alone.</p>
-<p>The bundled catalog directory lives at <code>CATALOG_PATH</code>; tests can
+<p>The bundled catalog directory lives at :data:<code>CATALOG_PATH</code>; tests can
 monkey-patch that attribute to redirect the loader at a temporary directory or
 single YAML file.</p>
 
@@ -27067,12 +27095,12 @@ number is labelled: a bare trailing <code>0</code> reads as a truncation.</p>
 
 
         <p>YAML-backed catalog of STAC endpoints, collections, and assets.</p>
-<p>Reads every <code>*.yaml</code> under <code>CATALOG_PATH</code> on construction and merges
-them into one catalog of typed <code>Endpoint</code> / <code>Collection</code> /
-<code>Asset</code> models. Collections are stored under the inherited
-<code>datasets</code> field (keyed by logical collection key); endpoints live in
-<code>endpoints</code>; the per-endpoint <code>available_collections:</code> index lives in
-<code>available_collections</code>.</p>
+<p>Reads every <code>*.yaml</code> under :data:<code>CATALOG_PATH</code> on construction and merges
+them into one catalog of typed :class:<code>Endpoint</code> / :class:<code>Collection</code> /
+:class:<code>Asset</code> models. Collections are stored under the inherited
+:attr:<code>datasets</code> field (keyed by logical collection key); endpoints live in
+:attr:<code>endpoints</code>; the per-endpoint <code>available_collections:</code> index lives in
+:attr:<code>available_collections</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -27092,7 +27120,7 @@ them into one catalog of typed <code>Endpoint</code> / <code>Collection</code> /
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Endpoint key → <code>Endpoint</code>.</p>
+                <p>Endpoint key → :class:<code>Endpoint</code>.</p>
               </div>
             </td>
           </tr>
@@ -27115,7 +27143,7 @@ endpoint serves (the refreshed index; informational).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Logical collection key → <code>Collection</code>.</p>
+                <p>Logical collection key → :class:<code>Collection</code>.</p>
               </div>
             </td>
           </tr>
@@ -27384,18 +27412,18 @@ endpoint serves (the refreshed index; informational).</p>
 <span class="normal"><a href="#__codelineno-0-582">582</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">[</span><span class="n">Collection</span><span class="p">]):</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;YAML-backed catalog of STAC endpoints, collections, and assets.</span>
 <a id="__codelineno-0-353" name="__codelineno-0-353"></a>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">    Reads every `*.yaml` under `CATALOG_PATH` on construction and merges</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">    them into one catalog of typed `Endpoint` / `Collection` /</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">    `Asset` models. Collections are stored under the inherited</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">    `datasets` field (keyed by logical collection key); endpoints live in</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">    `endpoints`; the per-endpoint `available_collections:` index lives in</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">    `available_collections`.</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">    Reads every `*.yaml` under :data:`CATALOG_PATH` on construction and merges</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">    them into one catalog of typed :class:`Endpoint` / :class:`Collection` /</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">    :class:`Asset` models. Collections are stored under the inherited</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">    :attr:`datasets` field (keyed by logical collection key); endpoints live in</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">    :attr:`endpoints`; the per-endpoint `available_collections:` index lives in</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">    :attr:`available_collections`.</span>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">        endpoints: Endpoint key → `Endpoint`.</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">        endpoints: Endpoint key → :class:`Endpoint`.</span>
 <a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        available_collections: Endpoint key → list of every collection id the</span>
 <a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">            endpoint serves (the refreshed index; informational).</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        datasets: Logical collection key → `Collection`.</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        datasets: Logical collection key → :class:`Collection`.</span>
 <a id="__codelineno-0-366" name="__codelineno-0-366"></a>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        - Construct the catalog and inspect the endpoints it serves:</span>
@@ -27439,7 +27467,7 @@ endpoint serves (the refreshed index; informational).</p>
 <a id="__codelineno-0-406" name="__codelineno-0-406"></a>
 <a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">            ValueError: When auto-loading, propagates the same errors as</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">                `load`.</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">                :meth:`load`.</span>
 <a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-411" name="__codelineno-0-411"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
 <a id="__codelineno-0-412" name="__codelineno-0-412"></a>            <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
@@ -27460,10 +27488,10 @@ endpoint serves (the refreshed index; informational).</p>
 <a id="__codelineno-0-427" name="__codelineno-0-427"></a>
 <a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">            catalog_path: Catalog directory or single `*.yaml` file. Defaults</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">                to module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">                to module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-431" name="__codelineno-0-431"></a>
 <a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a>
 <a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">            ValueError: Propagated from the loader.</span>
@@ -27477,15 +27505,15 @@ endpoint serves (the refreshed index; informational).</p>
 <a id="__codelineno-0-444" name="__codelineno-0-444"></a>        <span class="p">)</span>
 <a id="__codelineno-0-445" name="__codelineno-0-445"></a>
 <a id="__codelineno-0-446" name="__codelineno-0-446"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Collection</span><span class="p">:</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Collection` for `collection_key` (did-you-mean on miss).</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Collection` for `collection_key` (did-you-mean on miss).</span>
 <a id="__codelineno-0-448" name="__codelineno-0-448"></a>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">        Alias of the inherited `get_dataset`; provided for naming clarity.</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">        Alias of the inherited :meth:`get_dataset`; provided for naming clarity.</span>
 <a id="__codelineno-0-450" name="__codelineno-0-450"></a>
 <a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">            collection_key: Logical collection key.</span>
 <a id="__codelineno-0-453" name="__codelineno-0-453"></a>
 <a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">            The matching `Collection`.</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">            The matching :class:`Collection`.</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">            ValueError: If the key is unknown (message suggests the closest key).</span>
@@ -27502,13 +27530,13 @@ endpoint serves (the refreshed index; informational).</p>
 <a id="__codelineno-0-469" name="__codelineno-0-469"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Collection&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">collection_key</span><span class="p">))</span>
 <a id="__codelineno-0-470" name="__codelineno-0-470"></a>
 <a id="__codelineno-0-471" name="__codelineno-0-471"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Endpoint</span><span class="p">:</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Endpoint` for `endpoint_key`.</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`Endpoint` for `endpoint_key`.</span>
 <a id="__codelineno-0-473" name="__codelineno-0-473"></a>
 <a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">            endpoint_key: Endpoint key.</span>
 <a id="__codelineno-0-476" name="__codelineno-0-476"></a>
 <a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">            The matching `Endpoint`.</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">            The matching :class:`Endpoint`.</span>
 <a id="__codelineno-0-479" name="__codelineno-0-479"></a>
 <a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">            ValueError: If the endpoint is unknown.</span>
@@ -27640,8 +27668,8 @@ endpoint serves (the refreshed index; informational).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>Collection</code> for <code>collection_key</code> (did-you-mean on miss).</p>
-<p>Alias of the inherited <code>get_dataset</code>; provided for naming clarity.</p>
+        <p>Return the :class:<code>Collection</code> for <code>collection_key</code> (did-you-mean on miss).</p>
+<p>Alias of the inherited :meth:<code>get_dataset</code>; provided for naming clarity.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -27690,7 +27718,7 @@ endpoint serves (the refreshed index; informational).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The matching <code>Collection</code>.</p>
+                <p>The matching :class:<code>Collection</code>.</p>
               </div>
             </td>
           </tr>
@@ -27757,15 +27785,15 @@ endpoint serves (the refreshed index; informational).</p>
 <span class="normal"><a href="#__codelineno-0-467">467</a></span>
 <span class="normal"><a href="#__codelineno-0-468">468</a></span>
 <span class="normal"><a href="#__codelineno-0-469">469</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Collection</span><span class="p">:</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Collection` for `collection_key` (did-you-mean on miss).</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Collection` for `collection_key` (did-you-mean on miss).</span>
 <a id="__codelineno-0-448" name="__codelineno-0-448"></a>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">    Alias of the inherited `get_dataset`; provided for naming clarity.</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">    Alias of the inherited :meth:`get_dataset`; provided for naming clarity.</span>
 <a id="__codelineno-0-450" name="__codelineno-0-450"></a>
 <a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">        collection_key: Logical collection key.</span>
 <a id="__codelineno-0-453" name="__codelineno-0-453"></a>
 <a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">        The matching `Collection`.</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">        The matching :class:`Collection`.</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        ValueError: If the key is unknown (message suggests the closest key).</span>
@@ -27797,7 +27825,7 @@ endpoint serves (the refreshed index; informational).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>Endpoint</code> for <code>endpoint_key</code>.</p>
+        <p>Return the :class:<code>Endpoint</code> for <code>endpoint_key</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -27846,7 +27874,7 @@ endpoint serves (the refreshed index; informational).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The matching <code>Endpoint</code>.</p>
+                <p>The matching :class:<code>Endpoint</code>.</p>
               </div>
             </td>
           </tr>
@@ -27923,13 +27951,13 @@ endpoint serves (the refreshed index; informational).</p>
 <span class="normal"><a href="#__codelineno-0-499">499</a></span>
 <span class="normal"><a href="#__codelineno-0-500">500</a></span>
 <span class="normal"><a href="#__codelineno-0-501">501</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_endpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Endpoint</span><span class="p">:</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Endpoint` for `endpoint_key`.</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`Endpoint` for `endpoint_key`.</span>
 <a id="__codelineno-0-473" name="__codelineno-0-473"></a>
 <a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">        endpoint_key: Endpoint key.</span>
 <a id="__codelineno-0-476" name="__codelineno-0-476"></a>
 <a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">        The matching `Endpoint`.</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">        The matching :class:`Endpoint`.</span>
 <a id="__codelineno-0-479" name="__codelineno-0-479"></a>
 <a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        ValueError: If the endpoint is unknown.</span>
@@ -27998,7 +28026,7 @@ endpoint serves (the refreshed index; informational).</p>
             <td>
               <div class="doc-md-description">
                 <p>Catalog directory or single <code>*.yaml</code> file. Defaults
-to module-level <code>CATALOG_PATH</code>.</p>
+to module-level :data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -28024,7 +28052,7 @@ to module-level <code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -28083,10 +28111,10 @@ to module-level <code>CATALOG_PATH</code>.</p>
 <a id="__codelineno-0-427" name="__codelineno-0-427"></a>
 <a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        catalog_path: Catalog directory or single `*.yaml` file. Defaults</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">            to module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">            to module-level :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-431" name="__codelineno-0-431"></a>
 <a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-434" name="__codelineno-0-434"></a>
 <a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        ValueError: Propagated from the loader.</span>
@@ -28141,7 +28169,7 @@ discoverable through the <code>AbstractCatalog</code> contract, then
             <td>
               <div class="doc-md-description">
                 <p>When auto-loading, propagates the same errors as
-<code>load</code>.</p>
+:meth:<code>load</code>.</p>
               </div>
             </td>
           </tr>
@@ -28190,7 +28218,7 @@ discoverable through the <code>AbstractCatalog</code> contract, then
 <a id="__codelineno-0-406" name="__codelineno-0-406"></a>
 <a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        ValueError: When auto-loading, propagates the same errors as</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">            `load`.</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">            :meth:`load`.</span>
 <a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-411" name="__codelineno-0-411"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
 <a id="__codelineno-0-412" name="__codelineno-0-412"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
@@ -28793,7 +28821,7 @@ nothing. Resolve with <code>Catalog.resolve_assets</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Asset key → <code>Asset</code> metadata.</p>
+                <p>Asset key → :class:<code>Asset</code> metadata.</p>
               </div>
             </td>
           </tr>
@@ -28928,7 +28956,7 @@ informational only; the actual routing comes from <code>signer</code>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">        cadence: Native revisit cadence label, or `None`.</span>
 <a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">        resolution: Native ground sample distance in metres, or `None`.</span>
 <a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">        extent: Spatial/temporal coverage.</span>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">        assets: Asset key → `Asset` metadata.</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">        assets: Asset key → :class:`Asset` metadata.</span>
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">        signer: Optional per-collection signer override. When set, the backend</span>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">            reads this collection&#39;s assets with this signer instead of the</span>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">            endpoint&#39;s default — e.g. `&quot;aws-requester-pays&quot;` for a collection</span>

@@ -817,6 +817,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -24820,25 +24848,25 @@ through <code>earthaccess</code> + CMR. The MVP fetches whole native granules to
 disk (HTTPS <code>download</code>, or in-region S3 <code>open</code>); server-side subsetting
 (Harmony) and ASF's richer search are deferred.</p>
 <p>Unlike every other earthlens backend, the output shape is
-<strong>per-dataset, not fixed</strong> — <code>EarthData</code> sets <code>OUTPUT_KIND</code> from
+<strong>per-dataset, not fixed</strong> — :class:<code>EarthData</code> sets <code>OUTPUT_KIND</code> from
 the resolved catalog row (<code>raster</code> / <code>vector</code> / <code>tabular</code>).</p>
 <p>Public surface (re-exported from this package):</p>
 <ul>
-<li><code>EarthData</code> — the backend itself; instantiate with a date
+<li>:class:<code>EarthData</code> — the backend itself; instantiate with a date
   range, a bbox, and a <code>{dataset_key: [band, ...]}</code> mapping, then call
-  <code>EarthData.download</code>.</li>
-<li><code>Catalog</code> — pydantic-backed loader for the bundled per-DAAC
+  :meth:<code>EarthData.download</code>.</li>
+<li>:class:<code>Catalog</code> — pydantic-backed loader for the bundled per-DAAC
   <code>catalog/</code> directory.</li>
-<li><code>EarthdataDataset</code> — one curated dataset row (short_name,
+<li>:class:<code>EarthdataDataset</code> — one curated dataset row (short_name,
   version, provider, output_kind, format, cloud-hosting flags, bands).</li>
-<li><code>Band</code> — one band's metadata row (informational).</li>
-<li><code>EarthdataAuth</code> — <code>AbstractAuth</code> wrapper over
+<li>:class:<code>Band</code> — one band's metadata row (informational).</li>
+<li>:class:<code>EarthdataAuth</code> — <code>AbstractAuth</code> wrapper over
   <code>earthaccess.login</code>. Idempotent; safe to call repeatedly.</li>
-<li><code>EarthdataCredentials</code> — frozen value object the auth class
+<li>:class:<code>EarthdataCredentials</code> — frozen value object the auth class
   binds to.</li>
-<li><code>AuthenticationError</code> — raised when EDL login fails; subclass
-  of <code>earthlens.base.AuthenticationError</code>.</li>
-<li><code>CATALOG_PATH</code> — absolute path to the bundled <code>catalog/</code>
+<li>:class:<code>AuthenticationError</code> — raised when EDL login fails; subclass
+  of :class:<code>earthlens.base.AuthenticationError</code>.</li>
+<li>:data:<code>CATALOG_PATH</code> — absolute path to the bundled <code>catalog/</code>
   directory; monkey-patchable to redirect the loader.</li>
 </ul>
 <p>The <code>[earthdata]</code> extra pulls <code>earthaccess&gt;=0.18</code>, which requires
@@ -24888,7 +24916,7 @@ that names a fix: register an Earthdata Login account, set the
 <code>EARTHDATA_USERNAME</code> / <code>EARTHDATA_PASSWORD</code> environment variables,
 or add a <code>urs.earthdata.nasa.gov</code> entry to <code>~/.netrc</code>.</p>
 <p>A subclass of the cross-backend
-<code>earthlens.base.AuthenticationError</code> so callers can catch
+:class:<code>earthlens.base.AuthenticationError</code> so callers can catch
 every backend's auth failure with one <code>except</code> clause.</p>
 
 
@@ -24920,7 +24948,7 @@ every backend's auth failure with one <code>except</code> clause.</p>
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">    or add a `urs.earthdata.nasa.gov` entry to `~/.netrc`.</span>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    A subclass of the cross-backend</span>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    `earthlens.base.AuthenticationError` so callers can catch</span>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    :class:`earthlens.base.AuthenticationError` so callers can catch</span>
 <a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    every backend&#39;s auth failure with one `except` clause.</span>
 <a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
@@ -25117,7 +25145,7 @@ future server-side subset request.</p>
 <p>Reads the bundled <code>catalog/</code> directory (shipped as package data)
 and exposes its consumed top-level sections as typed pydantic
 fields. Instantiate with no arguments (<code>Catalog()</code>) —
-<code>model_post_init</code> parses the YAML and populates every field
+:func:<code>model_post_init</code> parses the YAML and populates every field
 in one pass.</p>
 
 
@@ -25152,7 +25180,7 @@ does not consume it.</p>
             <td>
               <div class="doc-md-description">
                 <p>Structural map keyed by the curated dataset key. Each
-value is an <code>EarthdataDataset</code>.</p>
+value is an :class:<code>EarthdataDataset</code>.</p>
               </div>
             </td>
           </tr>
@@ -25437,7 +25465,7 @@ value is an <code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">    Reads the bundled `catalog/` directory (shipped as package data)</span>
 <a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">    and exposes its consumed top-level sections as typed pydantic</span>
 <a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">    fields. Instantiate with no arguments (`Catalog()`) —</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">    `model_post_init` parses the YAML and populates every field</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">    :func:`model_post_init` parses the YAML and populates every field</span>
 <a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">    in one pass.</span>
 <a id="__codelineno-0-468" name="__codelineno-0-468"></a>
 <a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">    Attributes:</span>
@@ -25445,7 +25473,7 @@ value is an <code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">            CMR walk found per provider (the `C7` index). Runtime code</span>
 <a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">            does not consume it.</span>
 <a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">        datasets: Structural map keyed by the curated dataset key. Each</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">            value is an `EarthdataDataset`.</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">            value is an :class:`EarthdataDataset`.</span>
 <a id="__codelineno-0-475" name="__codelineno-0-475"></a>
 <a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">        - Resolve a curated dataset:</span>
@@ -25478,7 +25506,7 @@ value is an <code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-504" name="__codelineno-0-504"></a>
 <a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">            ValueError: When auto-loading, propagates the same errors</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">                as `load`.</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">                as :meth:`load`.</span>
 <a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-509" name="__codelineno-0-509"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a>            <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
@@ -25500,16 +25528,16 @@ value is an <code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">            catalog_path: Path to the `catalog/` directory or a single</span>
 <a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">                `*.yaml` file. Defaults to module-level</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">                `CATALOG_PATH`.</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">            providers_path: Path to `providers.yaml`. Defaults to</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">                module-level `PROVIDERS_PATH`.</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">                module-level :data:`PROVIDERS_PATH`.</span>
 <a id="__codelineno-0-532" name="__codelineno-0-532"></a>
 <a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-535" name="__codelineno-0-535"></a>
 <a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">            ValueError: Propagated from `_load_providers` /</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">                `_load_catalog_data`, including when a dataset</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">            ValueError: Propagated from :func:`_load_providers` /</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">                :func:`_load_catalog_data`, including when a dataset</span>
 <a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">                row names a `provider:` absent from `providers.yaml`.</span>
 <a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-541" name="__codelineno-0-541"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
@@ -25545,9 +25573,9 @@ value is an <code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-571" name="__codelineno-0-571"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">auto_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EarthdataDataset</span><span class="p">]:</span>
 <a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The machine-derived long-tail rows as a built map.</span>
 <a id="__codelineno-0-573" name="__codelineno-0-573"></a>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="sd">        Builds an `EarthdataDataset` for every auto row — heavy</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="sd">        Builds an :class:`EarthdataDataset` for every auto row — heavy</span>
 <a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">        (~8k rows). For membership or single-key resolution prefer</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">        `get_dataset`, which builds only the one row requested.</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">        :meth:`get_dataset`, which builds only the one row requested.</span>
 <a id="__codelineno-0-577" name="__codelineno-0-577"></a>
 <a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="sd">            dict[str, EarthdataDataset]: Map keyed by `short_name`</span>
@@ -25556,7 +25584,7 @@ value is an <code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-582" name="__codelineno-0-582"></a>        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_auto</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auto_rows</span><span class="p">()}</span>
 <a id="__codelineno-0-583" name="__codelineno-0-583"></a>
 <a id="__codelineno-0-584" name="__codelineno-0-584"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_build_auto</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EarthdataDataset</span><span class="p">:</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the `EarthdataDataset` for one auto row.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the :class:`EarthdataDataset` for one auto row.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-586" name="__codelineno-0-586"></a>        <span class="n">body</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auto_rows</span><span class="p">()[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">&quot;bands&quot;</span><span class="p">}</span>
 <a id="__codelineno-0-587" name="__codelineno-0-587"></a>        <span class="k">return</span> <span class="n">EarthdataDataset</span><span class="p">(</span><span class="o">**</span><span class="n">body</span><span class="p">)</span>
 <a id="__codelineno-0-588" name="__codelineno-0-588"></a>
@@ -25594,7 +25622,7 @@ value is an <code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-620" name="__codelineno-0-620"></a>        <span class="p">)</span>
 <a id="__codelineno-0-621" name="__codelineno-0-621"></a>
 <a id="__codelineno-0-622" name="__codelineno-0-622"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_daac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">provider_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EarthdataDAAC</span><span class="p">:</span>
-<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `EarthdataDAAC` for a CMR provider code.</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`EarthdataDAAC` for a CMR provider code.</span>
 <a id="__codelineno-0-624" name="__codelineno-0-624"></a>
 <a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="sd">            provider_code: A CMR provider code registered in</span>
@@ -25647,7 +25675,7 @@ value is an <code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-673" name="__codelineno-0-673"></a><span class="sd">        them by DAAC.</span>
 <a id="__codelineno-0-674" name="__codelineno-0-674"></a>
 <a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">            key: Curated dataset key (a member of `datasets`).</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">            key: Curated dataset key (a member of :attr:`datasets`).</span>
 <a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">            daac: Optional DAAC id to disambiguate; when given, the</span>
 <a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">                resolved row&#39;s `daac` must match.</span>
 <a id="__codelineno-0-679" name="__codelineno-0-679"></a>
@@ -25658,7 +25686,7 @@ value is an <code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">            ValueError: When `key` is unknown (with a did-you-mean hint)</span>
 <a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">                or when `daac=` is given but does not match the row.</span>
 <a id="__codelineno-0-686" name="__codelineno-0-686"></a><span class="sd">                Both not-found conditions raise `ValueError`, matching</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">                `get_dataset`.</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">                :meth:`get_dataset`.</span>
 <a id="__codelineno-0-688" name="__codelineno-0-688"></a>
 <a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="sd">        Examples:</span>
 <a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">            - Resolve a key and read its provider:</span>
@@ -25715,9 +25743,9 @@ value is an <code>EarthdataDataset</code>.</p>
     <div class="doc doc-contents ">
 
         <p>The machine-derived long-tail rows as a built map.</p>
-<p>Builds an <code>EarthdataDataset</code> for every auto row — heavy
+<p>Builds an :class:<code>EarthdataDataset</code> for every auto row — heavy
 (~8k rows). For membership or single-key resolution prefer
-<code>get_dataset</code>, which builds only the one row requested.</p>
+:meth:<code>get_dataset</code>, which builds only the one row requested.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -25761,7 +25789,7 @@ value is an <code>EarthdataDataset</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>EarthdataDAAC</code> for a CMR provider code.</p>
+        <p>Return the :class:<code>EarthdataDAAC</code> for a CMR provider code.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -25905,7 +25933,7 @@ did-you-mean hint).</p>
 <span class="normal"><a href="#__codelineno-0-662">662</a></span>
 <span class="normal"><a href="#__codelineno-0-663">663</a></span>
 <span class="normal"><a href="#__codelineno-0-664">664</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_daac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">provider_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EarthdataDAAC</span><span class="p">:</span>
-<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `EarthdataDAAC` for a CMR provider code.</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`EarthdataDAAC` for a CMR provider code.</span>
 <a id="__codelineno-0-624" name="__codelineno-0-624"></a>
 <a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="sd">        provider_code: A CMR provider code registered in</span>
@@ -26160,7 +26188,7 @@ key (a bare <code>short_name</code>, e.g. <code>"AA_L2A"</code>).</p>
               <div class="doc-md-description">
                 <p>Path to the <code>catalog/</code> directory or a single
 <code>*.yaml</code> file. Defaults to module-level
-<code>CATALOG_PATH</code>.</p>
+:data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -26177,7 +26205,7 @@ key (a bare <code>short_name</code>, e.g. <code>"AA_L2A"</code>).</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to <code>providers.yaml</code>. Defaults to
-module-level <code>PROVIDERS_PATH</code>.</p>
+module-level :data:<code>PROVIDERS_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -26203,7 +26231,7 @@ module-level <code>PROVIDERS_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -26226,8 +26254,8 @@ module-level <code>PROVIDERS_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Propagated from <code>_load_providers</code> /
-<code>_load_catalog_data</code>, including when a dataset
+                <p>Propagated from :func:<code>_load_providers</code> /
+:func:<code>_load_catalog_data</code>, including when a dataset
 row names a <code>provider:</code> absent from <code>providers.yaml</code>.</p>
               </div>
             </td>
@@ -26293,16 +26321,16 @@ row names a <code>provider:</code> absent from <code>providers.yaml</code>.</p>
 <a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">        catalog_path: Path to the `catalog/` directory or a single</span>
 <a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">            `*.yaml` file. Defaults to module-level</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">            `CATALOG_PATH`.</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">        providers_path: Path to `providers.yaml`. Defaults to</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">            module-level `PROVIDERS_PATH`.</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">            module-level :data:`PROVIDERS_PATH`.</span>
 <a id="__codelineno-0-532" name="__codelineno-0-532"></a>
 <a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-535" name="__codelineno-0-535"></a>
 <a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">        ValueError: Propagated from `_load_providers` /</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">            `_load_catalog_data`, including when a dataset</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">        ValueError: Propagated from :func:`_load_providers` /</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">            :func:`_load_catalog_data`, including when a dataset</span>
 <a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            row names a `provider:` absent from `providers.yaml`.</span>
 <a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-541" name="__codelineno-0-541"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
@@ -26368,7 +26396,7 @@ disk read is skipped.</p>
             <td>
               <div class="doc-md-description">
                 <p>When auto-loading, propagates the same errors
-as <code>load</code>.</p>
+as :meth:<code>load</code>.</p>
               </div>
             </td>
           </tr>
@@ -26409,7 +26437,7 @@ as <code>load</code>.</p>
 <a id="__codelineno-0-504" name="__codelineno-0-504"></a>
 <a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">        ValueError: When auto-loading, propagates the same errors</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            as `load`.</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            as :meth:`load`.</span>
 <a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-509" name="__codelineno-0-509"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
@@ -26464,7 +26492,7 @@ them by DAAC.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Curated dataset key (a member of <code>datasets</code>).</p>
+                <p>Curated dataset key (a member of :attr:<code>datasets</code>).</p>
               </div>
             </td>
             <td>
@@ -26533,7 +26561,7 @@ resolved row's <code>daac</code> must match.</p>
                 <p>When <code>key</code> is unknown (with a did-you-mean hint)
 or when <code>daac=</code> is given but does not match the row.
 Both not-found conditions raise <code>ValueError</code>, matching
-<code>get_dataset</code>.</p>
+:meth:<code>get_dataset</code>.</p>
               </div>
             </td>
           </tr>
@@ -26617,7 +26645,7 @@ Both not-found conditions raise <code>ValueError</code>, matching
 <a id="__codelineno-0-673" name="__codelineno-0-673"></a><span class="sd">    them by DAAC.</span>
 <a id="__codelineno-0-674" name="__codelineno-0-674"></a>
 <a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">        key: Curated dataset key (a member of `datasets`).</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">        key: Curated dataset key (a member of :attr:`datasets`).</span>
 <a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">        daac: Optional DAAC id to disambiguate; when given, the</span>
 <a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">            resolved row&#39;s `daac` must match.</span>
 <a id="__codelineno-0-679" name="__codelineno-0-679"></a>
@@ -26628,7 +26656,7 @@ Both not-found conditions raise <code>ValueError</code>, matching
 <a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">        ValueError: When `key` is unknown (with a did-you-mean hint)</span>
 <a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">            or when `daac=` is given but does not match the row.</span>
 <a id="__codelineno-0-686" name="__codelineno-0-686"></a><span class="sd">            Both not-found conditions raise `ValueError`, matching</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">            `get_dataset`.</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">            :meth:`get_dataset`.</span>
 <a id="__codelineno-0-688" name="__codelineno-0-688"></a>
 <a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">        - Resolve a key and read its provider:</span>
@@ -26711,7 +26739,7 @@ uses. One Earthdata Login authenticates across every DAAC.</p>
             <td>
               <div class="doc-md-description">
                 <p>Class default <code>"raster"</code>, <strong>overridden per
-instance</strong> in <code>__init__</code> from the resolved dataset
+instance</strong> in :meth:<code>__init__</code> from the resolved dataset
 row's <code>output_kind</code> (<code>G1</code>). The facade reads this instance
 value to gate <code>aggregate=</code>.</p>
               </div>
@@ -27311,7 +27339,7 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-64" name="__codelineno-0-64"></a>
 <a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">        OUTPUT_KIND: Class default `&quot;raster&quot;`, **overridden per</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">            instance** in `__init__` from the resolved dataset</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">            instance** in :meth:`__init__` from the resolved dataset</span>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">            row&#39;s `output_kind` (`G1`). The facade reads this instance</span>
 <a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">            value to gate `aggregate=`.</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -27345,8 +27373,8 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">        Resolves every requested dataset key against the catalog</span>
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">        **before** calling the parent constructor, so the per-instance</span>
-<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">        `OUTPUT_KIND` is set from the resolved row(s). The parent</span>
-<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">        `__init__` runs `_initialize` first (EDL login), so the</span>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">        :attr:`OUTPUT_KIND` is set from the resolved row(s). The parent</span>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">        `__init__` runs :meth:`_initialize` first (EDL login), so the</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">        resolution cannot live there — `self.vars` is not yet set at</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">        that point.</span>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a>
@@ -27456,7 +27484,7 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_unify_output_kind</span><span class="p">(</span><span class="n">datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">EarthdataDataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">OutputKind</span><span class="p">:</span>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the single `output_kind` shared by every requested row.</span>
 <a id="__codelineno-0-211" name="__codelineno-0-211"></a>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        A backend instance carries exactly one `OUTPUT_KIND`, so</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        A backend instance carries exactly one :attr:`OUTPUT_KIND`, so</span>
 <a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        a request mixing (say) a raster and a vector dataset is</span>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        ambiguous and rejected here rather than silently honouring the</span>
 <a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        first row&#39;s kind.</span>
@@ -27482,13 +27510,13 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="k">return</span> <span class="n">kinds</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the `EarthdataAuth`; defer the EDL login.</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the :class:`EarthdataAuth`; defer the EDL login.</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        Returns `None` — `earthaccess` keeps the authenticated handle on</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        the `EarthdataAuth` instance (and a persisted token), so</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        the :class:`EarthdataAuth` instance (and a persisted token), so</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        the parent class binds no opaque `self.client`. The EDL login</span>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        (`EarthdataAuth.configure`, which contacts the auth server) is</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        deferred out of construction: it runs on the first `_search`</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        deferred out of construction: it runs on the first :meth:`_search`</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        (CMR granule search authenticates via the idempotent `configure()`),</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        so constructing the backend never authenticates — but note that a</span>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">        dry-run `search()` does, since CMR access goes through the same</span>
@@ -27510,7 +27538,7 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the date range into a `TemporalExtent`.</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the date range into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">            start: Inclusive start date as a string.</span>
@@ -27547,8 +27575,8 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        scoped to the request bbox and time window. The bounding box is</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        passed as the `(west, south, east, north)` tuple CMR expects</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        (lon/lat order). Each returned granule becomes one</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        `RemoteProduct` whose `metadata` carries the raw granule</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        handle and its dataset row, so `_fetch` can group and</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        :class:`RemoteProduct` whose `metadata` carries the raw granule</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        handle and its dataset row, so :meth:`_fetch` can group and</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        fetch without re-querying.</span>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        Returns:</span>
@@ -27615,7 +27643,7 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        cloud-hosted and the caller runs in the DAAC&#39;s region.</span>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a>
 <a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">            products: The products from `_search`.</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">            products: The products from :meth:`_search`.</span>
 <a id="__codelineno-0-372" name="__codelineno-0-372"></a>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">            list[Path]: Local paths of every fetched granule, in</span>
@@ -27643,11 +27671,11 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Group granule handles by their dataset row, preserving order.</span>
 <a id="__codelineno-0-397" name="__codelineno-0-397"></a>
 <a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">        Returns `(dataset, granules)` pairs rather than a dict because</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        `EarthdataDataset` is not hashable (it carries a `bands`</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        :class:`EarthdataDataset` is not hashable (it carries a `bands`</span>
 <a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">        mapping), and grouping is by object identity.</span>
 <a id="__codelineno-0-401" name="__codelineno-0-401"></a>
 <a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">            products: The products from `_search`.</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">            products: The products from :meth:`_search`.</span>
 <a id="__codelineno-0-404" name="__codelineno-0-404"></a>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">            list[tuple[EarthdataDataset, list]]: One pair per dataset,</span>
@@ -27715,7 +27743,7 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-468" name="__codelineno-0-468"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Search CMR, fetch the granules, return their local paths.</span>
 <a id="__codelineno-0-470" name="__codelineno-0-470"></a>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">        Composes `_search` and `_fetch` to pull every</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">        Composes :meth:`_search` and :meth:`_fetch` to pull every</span>
 <a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">        granule matching the request bbox + window to `self.root_dir`</span>
 <a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">        (or in-region S3 handles). When `aggregate` is given, the</span>
 <a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">        fetched granules are reduced per-window via the existing</span>
@@ -27728,7 +27756,7 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">                on the download / open call, so `False` suppresses the</span>
 <a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">                per-granule progress bar.</span>
 <a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">            aggregate: Optional</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">                `earthlens.aggregate.AggregationConfig`. Only</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">                :class:`earthlens.aggregate.AggregationConfig`. Only</span>
 <a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">                reached for a `&quot;raster&quot;` instance.</span>
 <a id="__codelineno-0-486" name="__codelineno-0-486"></a>
 <a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">        Returns:</span>
@@ -27756,12 +27784,12 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">        * The common Earthdata case is a **stack of single-timestep</span>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">          granules** (one file per overpass / half-hour / day, NetCDF</span>
 <a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">          *or* COG). That whole stack is windowed by</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">          `pyramids.dataset.DatasetCollection.groupby` (the STAC</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">          :meth:`pyramids.dataset.DatasetCollection.groupby` (the STAC</span>
 <a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">          path) — one reduced raster per `config.freq` window.</span>
 <a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">        * The rarer case is a **single granule that already carries a</span>
 <a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">          multi-timestep time axis inside it** (one NetCDF cube). Its</span>
 <a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">          internal `time` axis is collapsed by</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">          `pyramids.netcdf.NetCDF.reduce` (the CMEMS path).</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">          :meth:`pyramids.netcdf.NetCDF.reduce` (the CMEMS path).</span>
 <a id="__codelineno-0-518" name="__codelineno-0-518"></a>
 <a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">        A single COG (one timestep, no internal axis) falls through to</span>
 <a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">        the stack path as a one-element stack (a single window).</span>
@@ -27805,7 +27833,7 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">        If the granule has no `time` dimension (a single-timestep file, or</span>
 <a id="__codelineno-0-559" name="__codelineno-0-559"></a><span class="sd">        an HDF-EOS file whose time is not a decodable CF dimension), there</span>
 <a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">        is nothing to collapse — it is treated as a one-element stack and</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">        windowed via `_reduce_stack` instead of raising.</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">        windowed via :meth:`_reduce_stack` instead of raising.</span>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>
 <a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">            path: A single NetCDF / HDF granule, ideally carrying a</span>
@@ -27904,8 +27932,8 @@ value to gate <code>aggregate=</code>.</p>
         <p>Initialise an Earthdata backend instance.</p>
 <p>Resolves every requested dataset key against the catalog
 <strong>before</strong> calling the parent constructor, so the per-instance
-<code>OUTPUT_KIND</code> is set from the resolved row(s). The parent
-<code>__init__</code> runs <code>_initialize</code> first (EDL login), so the
+:attr:<code>OUTPUT_KIND</code> is set from the resolved row(s). The parent
+<code>__init__</code> runs :meth:<code>_initialize</code> first (EDL login), so the
 resolution cannot live there — <code>self.vars</code> is not yet set at
 that point.</p>
 
@@ -28325,8 +28353,8 @@ unknown, or the requested datasets do not all share one
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    Resolves every requested dataset key against the catalog</span>
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">    **before** calling the parent constructor, so the per-instance</span>
-<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    `OUTPUT_KIND` is set from the resolved row(s). The parent</span>
-<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    `__init__` runs `_initialize` first (EDL login), so the</span>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    :attr:`OUTPUT_KIND` is set from the resolved row(s). The parent</span>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    `__init__` runs :meth:`_initialize` first (EDL login), so the</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    resolution cannot live there — `self.vars` is not yet set at</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">    that point.</span>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a>
@@ -28413,7 +28441,7 @@ unknown, or the requested datasets do not all share one
     <div class="doc doc-contents ">
 
         <p>Search CMR, fetch the granules, return their local paths.</p>
-<p>Composes <code>_search</code> and <code>_fetch</code> to pull every
+<p>Composes :meth:<code>_search</code> and :meth:<code>_fetch</code> to pull every
 granule matching the request bbox + window to <code>self.root_dir</code>
 (or in-region S3 handles). When <code>aggregate</code> is given, the
 fetched granules are reduced per-window via the existing
@@ -28461,7 +28489,7 @@ per-granule progress bar.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional
-<code>earthlens.aggregate.AggregationConfig</code>. Only
+:class:<code>earthlens.aggregate.AggregationConfig</code>. Only
 reached for a <code>"raster"</code> instance.</p>
               </div>
             </td>
@@ -28569,7 +28597,7 @@ installed pyramids exposes no <code>NetCDF.reduce</code> /
 <a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Search CMR, fetch the granules, return their local paths.</span>
 <a id="__codelineno-0-470" name="__codelineno-0-470"></a>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">    Composes `_search` and `_fetch` to pull every</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">    Composes :meth:`_search` and :meth:`_fetch` to pull every</span>
 <a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">    granule matching the request bbox + window to `self.root_dir`</span>
 <a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">    (or in-region S3 handles). When `aggregate` is given, the</span>
 <a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">    fetched granules are reduced per-window via the existing</span>
@@ -28582,7 +28610,7 @@ installed pyramids exposes no <code>NetCDF.reduce</code> /
 <a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">            on the download / open call, so `False` suppresses the</span>
 <a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">            per-granule progress bar.</span>
 <a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        aggregate: Optional</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">            `earthlens.aggregate.AggregationConfig`. Only</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">            :class:`earthlens.aggregate.AggregationConfig`. Only</span>
 <a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">            reached for a `&quot;raster&quot;` instance.</span>
 <a id="__codelineno-0-486" name="__codelineno-0-486"></a>
 <a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">    Returns:</span>
@@ -28632,15 +28660,15 @@ installed pyramids exposes no <code>NetCDF.reduce</code> /
 
 
         <p>Authenticate against NASA Earthdata Login (EDL).</p>
-<p>Wraps <code>earthaccess.login</code> in the
-<code>earthlens.base.AbstractAuth</code> contract. Calling
-<code>configure</code> once per process is enough: <code>earthaccess</code>
+<p>Wraps :func:<code>earthaccess.login</code> in the
+:class:<code>earthlens.base.AbstractAuth</code> contract. Calling
+:meth:<code>configure</code> once per process is enough: <code>earthaccess</code>
 persists the resolved token (<code>persist=True</code>), and the returned
-<code>earthaccess.Auth</code> handle — kept on <code>_auth</code> — mints the
+<code>earthaccess.Auth</code> handle — kept on :attr:<code>_auth</code> — mints the
 rotating per-provider S3 credentials the in-region streaming path
-needs via <code>s3_credentials</code>.</p>
+needs via :meth:<code>s3_credentials</code>.</p>
 <p>The class is a context manager (inherited from
-<code>AbstractAuth</code>): <code>with EarthdataAuth(creds) as auth: ...</code>
+:class:<code>AbstractAuth</code>): <code>with EarthdataAuth(creds) as auth: ...</code>
 calls <code>configure()</code> on enter and the default no-op <code>close()</code> on
 exit.</p>
 
@@ -28661,8 +28689,8 @@ exit.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>EarthdataCredentials</code> passed at
-construction. Read by <code>configure</code> to resolve the
+                <p>The :class:<code>EarthdataCredentials</code> passed at
+construction. Read by :meth:<code>configure</code> to resolve the
 login strategy. Treated as write-once.</p>
               </div>
             </td>
@@ -28675,7 +28703,7 @@ login strategy. Treated as write-once.</p>
             <td>
               <div class="doc-md-description">
                 <p>The <code>earthaccess.Auth</code> handle returned by a successful
-<code>login()</code>, or <code>None</code> before <code>configure</code> runs.</p>
+<code>login()</code>, or <code>None</code> before :meth:<code>configure</code> runs.</p>
               </div>
             </td>
           </tr>
@@ -28954,25 +28982,25 @@ login strategy. Treated as write-once.</p>
 <span class="normal"><a href="#__codelineno-0-402">402</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="k">class</span><span class="w"> </span><span class="nc">EarthdataAuth</span><span class="p">(</span><span class="n">AbstractAuth</span><span class="p">[</span><span class="n">EarthdataCredentials</span><span class="p">]):</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Authenticate against NASA Earthdata Login (EDL).</span>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a>
-<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">    Wraps `earthaccess.login` in the</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">    `earthlens.base.AbstractAuth` contract. Calling</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">    `configure` once per process is enough: `earthaccess`</span>
+<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">    Wraps :func:`earthaccess.login` in the</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">    :class:`earthlens.base.AbstractAuth` contract. Calling</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">    :meth:`configure` once per process is enough: `earthaccess`</span>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">    persists the resolved token (`persist=True`), and the returned</span>
-<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">    `earthaccess.Auth` handle — kept on `_auth` — mints the</span>
+<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">    `earthaccess.Auth` handle — kept on :attr:`_auth` — mints the</span>
 <a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">    rotating per-provider S3 credentials the in-region streaming path</span>
-<a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">    needs via `s3_credentials`.</span>
+<a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">    needs via :meth:`s3_credentials`.</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">    The class is a context manager (inherited from</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    `AbstractAuth`): `with EarthdataAuth(creds) as auth: ...`</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    :class:`AbstractAuth`): `with EarthdataAuth(creds) as auth: ...`</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">    calls `configure()` on enter and the default no-op `close()` on</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">    exit.</span>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">        _creds: The `EarthdataCredentials` passed at</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            construction. Read by `configure` to resolve the</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">        _creds: The :class:`EarthdataCredentials` passed at</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            construction. Read by :meth:`configure` to resolve the</span>
 <a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">            login strategy. Treated as write-once.</span>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">        _auth: The `earthaccess.Auth` handle returned by a successful</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">            `login()`, or `None` before `configure` runs.</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">            `login()`, or `None` before :meth:`configure` runs.</span>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">        - Build, configure, inspect — marked `# doctest: +SKIP`</span>
@@ -28992,11 +29020,11 @@ login strategy. Treated as write-once.</p>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store credentials; does not authenticate.</span>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">        Construction is side-effect-free — the user (or the backend&#39;s</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        `_initialize`) must call `configure` (or use the</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        :meth:`_initialize`) must call :meth:`configure` (or use the</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">        context-manager form) to talk to EDL.</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">            credentials: The `EarthdataCredentials` value</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">            credentials: The :class:`EarthdataCredentials` value</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">                object carrying the strategy-resolution rules.</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
@@ -29071,7 +29099,7 @@ login strategy. Treated as write-once.</p>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Authenticate against EDL via `earthaccess.login`.</span>
 <a id="__codelineno-0-276" name="__codelineno-0-276"></a>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        Idempotent — short-circuits when `is_authenticated`</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        Idempotent — short-circuits when :meth:`is_authenticated`</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        already returns `True`. On the first call, resolves the login</span>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        strategy (explicit token / creds → env → netrc → interactive).</span>
 <a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        `earthaccess` has no direct login argument for a token or a</span>
@@ -29080,7 +29108,7 @@ login strategy. Treated as write-once.</p>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        `EARTHDATA_TOKEN` for a bearer token, or `EARTHDATA_USERNAME` /</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        `EARTHDATA_PASSWORD` for a username/password — before login. Then</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        logs in with `persist=True` and keeps the returned</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        `earthaccess.Auth` handle on `_auth`.</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        `earthaccess.Auth` handle on :attr:`_auth`.</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        An explicit credential also has to *win*. `earthaccess` prefers</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        `EARTHDATA_TOKEN` over a username/password pair, so an unrelated token</span>
@@ -29186,7 +29214,7 @@ login strategy. Treated as write-once.</p>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">                (`accessKeyId`, `secretAccessKey`, `sessionToken`, …).</span>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">            AuthenticationError: When `configure` has not run, so</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">            AuthenticationError: When :meth:`configure` has not run, so</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">                no `earthaccess.Auth` handle is available.</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-395" name="__codelineno-0-395"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -29226,7 +29254,7 @@ login strategy. Treated as write-once.</p>
 
         <p>Store credentials; does not authenticate.</p>
 <p>Construction is side-effect-free — the user (or the backend's
-<code>_initialize</code>) must call <code>configure</code> (or use the
+:meth:<code>_initialize</code>) must call :meth:<code>configure</code> (or use the
 context-manager form) to talk to EDL.</p>
 
 
@@ -29250,7 +29278,7 @@ context-manager form) to talk to EDL.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>EarthdataCredentials</code> value
+                <p>The :class:<code>EarthdataCredentials</code> value
 object carrying the strategy-resolution rules.</p>
               </div>
             </td>
@@ -29281,11 +29309,11 @@ object carrying the strategy-resolution rules.</p>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Store credentials; does not authenticate.</span>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">    Construction is side-effect-free — the user (or the backend&#39;s</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">    `_initialize`) must call `configure` (or use the</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">    :meth:`_initialize`) must call :meth:`configure` (or use the</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">    context-manager form) to talk to EDL.</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">        credentials: The `EarthdataCredentials` value</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">        credentials: The :class:`EarthdataCredentials` value</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">            object carrying the strategy-resolution rules.</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
@@ -29309,7 +29337,7 @@ object carrying the strategy-resolution rules.</p>
     <div class="doc doc-contents ">
 
         <p>Authenticate against EDL via <code>earthaccess.login</code>.</p>
-<p>Idempotent — short-circuits when <code>is_authenticated</code>
+<p>Idempotent — short-circuits when :meth:<code>is_authenticated</code>
 already returns <code>True</code>. On the first call, resolves the login
 strategy (explicit token / creds → env → netrc → interactive).
 <code>earthaccess</code> has no direct login argument for a token or a
@@ -29318,7 +29346,7 @@ environment variable its <code>"environment"</code> strategy reads —
 <code>EARTHDATA_TOKEN</code> for a bearer token, or <code>EARTHDATA_USERNAME</code> /
 <code>EARTHDATA_PASSWORD</code> for a username/password — before login. Then
 logs in with <code>persist=True</code> and keeps the returned
-<code>earthaccess.Auth</code> handle on <code>_auth</code>.</p>
+<code>earthaccess.Auth</code> handle on :attr:<code>_auth</code>.</p>
 <p>An explicit credential also has to <em>win</em>. <code>earthaccess</code> prefers
 <code>EARTHDATA_TOKEN</code> over a username/password pair, so an unrelated token
 already in the environment is cleared for the duration of the login.
@@ -29450,7 +29478,7 @@ raises while contacting EDL.</p>
 <span class="normal"><a href="#__codelineno-0-367">367</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Authenticate against EDL via `earthaccess.login`.</span>
 <a id="__codelineno-0-276" name="__codelineno-0-276"></a>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    Idempotent — short-circuits when `is_authenticated`</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    Idempotent — short-circuits when :meth:`is_authenticated`</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">    already returns `True`. On the first call, resolves the login</span>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">    strategy (explicit token / creds → env → netrc → interactive).</span>
 <a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">    `earthaccess` has no direct login argument for a token or a</span>
@@ -29459,7 +29487,7 @@ raises while contacting EDL.</p>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">    `EARTHDATA_TOKEN` for a bearer token, or `EARTHDATA_USERNAME` /</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">    `EARTHDATA_PASSWORD` for a username/password — before login. Then</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">    logs in with `persist=True` and keeps the returned</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    `earthaccess.Auth` handle on `_auth`.</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    `earthaccess.Auth` handle on :attr:`_auth`.</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    An explicit credential also has to *win*. `earthaccess` prefers</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">    `EARTHDATA_TOKEN` over a username/password pair, so an unrelated token</span>
@@ -29644,7 +29672,7 @@ caller wants to read (e.g. <code>"GES_DISC"</code>, <code>"POCLOUD"</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>When <code>configure</code> has not run, so
+                <p>When :meth:<code>configure</code> has not run, so
 no <code>earthaccess.Auth</code> handle is available.</p>
               </div>
             </td>
@@ -29711,7 +29739,7 @@ no <code>earthaccess.Auth</code> handle is available.</p>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            (`accessKeyId`, `secretAccessKey`, `sessionToken`, …).</span>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        AuthenticationError: When `configure` has not run, so</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        AuthenticationError: When :meth:`configure` has not run, so</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">            no `earthaccess.Auth` handle is available.</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -29760,7 +29788,7 @@ OpenAQ's API key — no password needed), an explicit
 username/password, a path to a <code>.netrc</code> file, or no fields at all
 (and rely on env vars / the default <code>~/.netrc</code> / an interactive
 prompt). Validation is intentionally permissive — the real "do these
-creds work?" gate is <code>EarthdataAuth.configure</code>, which talks to
+creds work?" gate is :meth:<code>EarthdataAuth.configure</code>, which talks to
 EDL.</p>
 
 
@@ -29794,7 +29822,7 @@ environment / netrc / prompt".</p>
             <td>
               <div class="doc-md-description">
                 <p>Account password. Stored as
-<code>pydantic.SecretStr</code> so it is never echoed by
+:class:<code>pydantic.SecretStr</code> so it is never echoed by
 <code>repr(creds)</code> or in logs. <code>None</code> means same as
 <code>username</code>.</p>
               </div>
@@ -29809,7 +29837,7 @@ environment / netrc / prompt".</p>
               <div class="doc-md-description">
                 <p>Optional EDL <strong>bearer token</strong> (a long-lived JSON Web
 Token generated from the EDL profile), stored as a
-<code>pydantic.SecretStr</code>. Lets the backend authenticate
+:class:<code>pydantic.SecretStr</code>. Lets the backend authenticate
 without a password — the token-equivalent of GEE's service
 key. <code>configure</code> exports it to <code>EARTHDATA_TOKEN</code>, which
 <code>earthaccess</code>'s environment strategy consumes. <code>None</code> defers
@@ -29922,19 +29950,19 @@ to <code>~/.netrc</code>.</p>
 <a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    username/password, a path to a `.netrc` file, or no fields at all</span>
 <a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">    (and rely on env vars / the default `~/.netrc` / an interactive</span>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    prompt). Validation is intentionally permissive — the real &quot;do these</span>
-<a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">    creds work?&quot; gate is `EarthdataAuth.configure`, which talks to</span>
+<a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">    creds work?&quot; gate is :meth:`EarthdataAuth.configure`, which talks to</span>
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">    EDL.</span>
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">        username: EDL account username. `None` means &quot;look at the</span>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">            environment / netrc / prompt&quot;.</span>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">        password: Account password. Stored as</span>
-<a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">            `pydantic.SecretStr` so it is never echoed by</span>
+<a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">            :class:`pydantic.SecretStr` so it is never echoed by</span>
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">            `repr(creds)` or in logs. `None` means same as</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">            `username`.</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">        token: Optional EDL **bearer token** (a long-lived JSON Web</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">            Token generated from the EDL profile), stored as a</span>
-<a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">            `pydantic.SecretStr`. Lets the backend authenticate</span>
+<a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">            :class:`pydantic.SecretStr`. Lets the backend authenticate</span>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a><span class="sd">            without a password — the token-equivalent of GEE&#39;s service</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">            key. `configure` exports it to `EARTHDATA_TOKEN`, which</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">            `earthaccess`&#39;s environment strategy consumes. `None` defers</span>
@@ -30249,7 +30277,7 @@ for in-region streaming.</p>
         <p>One curated Earthdata dataset row.</p>
 <p>Mirrors a single <code>datasets.&lt;key&gt;:</code> block in one of the per-DAAC
 <code>catalog/*.yaml</code> files. The dataset key itself is the parent key
-in <code>Catalog.datasets</code> and is not stored on the row.</p>
+in :attr:<code>Catalog.datasets</code> and is not stored on the row.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -30424,7 +30452,7 @@ fetch).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>TemporalCoverage</code> — start / end dates.</p>
+                <p>:class:<code>TemporalCoverage</code> — start / end dates.</p>
               </div>
             </td>
           </tr>
@@ -30528,7 +30556,7 @@ fetch).</p>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">    Mirrors a single `datasets.&lt;key&gt;:` block in one of the per-DAAC</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">    `catalog/*.yaml` files. The dataset key itself is the parent key</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">    in `Catalog.datasets` and is not stored on the row.</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">    in :attr:`Catalog.datasets` and is not stored on the row.</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        short_name: CMR `short_name` (the collection identifier the</span>
@@ -30556,7 +30584,7 @@ fetch).</p>
 <a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            Harmony-enabled at all.</span>
 <a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">        bands: Per-band metadata map (informational for whole-granule</span>
 <a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">            fetch).</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">        temporal: `TemporalCoverage` — start / end dates.</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">        temporal: :class:`TemporalCoverage` — start / end dates.</span>
 <a id="__codelineno-0-421" name="__codelineno-0-421"></a>
 <a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">        - Inspect a curated raster row:</span>
@@ -30653,7 +30681,7 @@ vector (GEDI L4A, ICESat-2), and tabular (some ORNL CSV). Every other
 earthlens backend fixes one <code>OUTPUT_KIND</code> as a class attribute; this
 one resolves the requested dataset row(s) in <code>__init__</code> and copies the
 row's <code>output_kind</code> onto <code>self.OUTPUT_KIND</code>. The
-<code>earthlens.earthlens.EarthLens</code> facade reads that per-instance
+:class:<code>earthlens.earthlens.EarthLens</code> facade reads that per-instance
 value at <code>download()</code> time to gate <code>aggregate=</code> (<code>G6</code>): forwarded for
 <code>"raster"</code>, rejected for <code>"vector"</code> / <code>"tabular"</code>.</p>
 <p>A single request may name several datasets, but they must all share
@@ -30727,7 +30755,7 @@ uses. One Earthdata Login authenticates across every DAAC.</p>
             <td>
               <div class="doc-md-description">
                 <p>Class default <code>"raster"</code>, <strong>overridden per
-instance</strong> in <code>__init__</code> from the resolved dataset
+instance</strong> in :meth:<code>__init__</code> from the resolved dataset
 row's <code>output_kind</code> (<code>G1</code>). The facade reads this instance
 value to gate <code>aggregate=</code>.</p>
               </div>
@@ -31327,7 +31355,7 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-64" name="__codelineno-0-64"></a>
 <a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">        OUTPUT_KIND: Class default `&quot;raster&quot;`, **overridden per</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">            instance** in `__init__` from the resolved dataset</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">            instance** in :meth:`__init__` from the resolved dataset</span>
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">            row&#39;s `output_kind` (`G1`). The facade reads this instance</span>
 <a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">            value to gate `aggregate=`.</span>
 <a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -31361,8 +31389,8 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">        Resolves every requested dataset key against the catalog</span>
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">        **before** calling the parent constructor, so the per-instance</span>
-<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">        `OUTPUT_KIND` is set from the resolved row(s). The parent</span>
-<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">        `__init__` runs `_initialize` first (EDL login), so the</span>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">        :attr:`OUTPUT_KIND` is set from the resolved row(s). The parent</span>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">        `__init__` runs :meth:`_initialize` first (EDL login), so the</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">        resolution cannot live there — `self.vars` is not yet set at</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">        that point.</span>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a>
@@ -31472,7 +31500,7 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_unify_output_kind</span><span class="p">(</span><span class="n">datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">EarthdataDataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">OutputKind</span><span class="p">:</span>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the single `output_kind` shared by every requested row.</span>
 <a id="__codelineno-0-211" name="__codelineno-0-211"></a>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        A backend instance carries exactly one `OUTPUT_KIND`, so</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        A backend instance carries exactly one :attr:`OUTPUT_KIND`, so</span>
 <a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        a request mixing (say) a raster and a vector dataset is</span>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        ambiguous and rejected here rather than silently honouring the</span>
 <a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        first row&#39;s kind.</span>
@@ -31498,13 +31526,13 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="k">return</span> <span class="n">kinds</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
 <a id="__codelineno-0-236" name="__codelineno-0-236"></a>
 <a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the `EarthdataAuth`; defer the EDL login.</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the :class:`EarthdataAuth`; defer the EDL login.</span>
 <a id="__codelineno-0-239" name="__codelineno-0-239"></a>
 <a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        Returns `None` — `earthaccess` keeps the authenticated handle on</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        the `EarthdataAuth` instance (and a persisted token), so</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        the :class:`EarthdataAuth` instance (and a persisted token), so</span>
 <a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        the parent class binds no opaque `self.client`. The EDL login</span>
 <a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        (`EarthdataAuth.configure`, which contacts the auth server) is</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        deferred out of construction: it runs on the first `_search`</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        deferred out of construction: it runs on the first :meth:`_search`</span>
 <a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        (CMR granule search authenticates via the idempotent `configure()`),</span>
 <a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        so constructing the backend never authenticates — but note that a</span>
 <a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">        dry-run `search()` does, since CMR access goes through the same</span>
@@ -31526,7 +31554,7 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the date range into a `TemporalExtent`.</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the date range into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">            start: Inclusive start date as a string.</span>
@@ -31563,8 +31591,8 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        scoped to the request bbox and time window. The bounding box is</span>
 <a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        passed as the `(west, south, east, north)` tuple CMR expects</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        (lon/lat order). Each returned granule becomes one</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        `RemoteProduct` whose `metadata` carries the raw granule</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        handle and its dataset row, so `_fetch` can group and</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        :class:`RemoteProduct` whose `metadata` carries the raw granule</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        handle and its dataset row, so :meth:`_fetch` can group and</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        fetch without re-querying.</span>
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        Returns:</span>
@@ -31631,7 +31659,7 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        cloud-hosted and the caller runs in the DAAC&#39;s region.</span>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a>
 <a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">            products: The products from `_search`.</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">            products: The products from :meth:`_search`.</span>
 <a id="__codelineno-0-372" name="__codelineno-0-372"></a>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">            list[Path]: Local paths of every fetched granule, in</span>
@@ -31659,11 +31687,11 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Group granule handles by their dataset row, preserving order.</span>
 <a id="__codelineno-0-397" name="__codelineno-0-397"></a>
 <a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">        Returns `(dataset, granules)` pairs rather than a dict because</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        `EarthdataDataset` is not hashable (it carries a `bands`</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        :class:`EarthdataDataset` is not hashable (it carries a `bands`</span>
 <a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">        mapping), and grouping is by object identity.</span>
 <a id="__codelineno-0-401" name="__codelineno-0-401"></a>
 <a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">            products: The products from `_search`.</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">            products: The products from :meth:`_search`.</span>
 <a id="__codelineno-0-404" name="__codelineno-0-404"></a>
 <a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">            list[tuple[EarthdataDataset, list]]: One pair per dataset,</span>
@@ -31731,7 +31759,7 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-468" name="__codelineno-0-468"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Search CMR, fetch the granules, return their local paths.</span>
 <a id="__codelineno-0-470" name="__codelineno-0-470"></a>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">        Composes `_search` and `_fetch` to pull every</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">        Composes :meth:`_search` and :meth:`_fetch` to pull every</span>
 <a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">        granule matching the request bbox + window to `self.root_dir`</span>
 <a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">        (or in-region S3 handles). When `aggregate` is given, the</span>
 <a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">        fetched granules are reduced per-window via the existing</span>
@@ -31744,7 +31772,7 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">                on the download / open call, so `False` suppresses the</span>
 <a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">                per-granule progress bar.</span>
 <a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">            aggregate: Optional</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">                `earthlens.aggregate.AggregationConfig`. Only</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">                :class:`earthlens.aggregate.AggregationConfig`. Only</span>
 <a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">                reached for a `&quot;raster&quot;` instance.</span>
 <a id="__codelineno-0-486" name="__codelineno-0-486"></a>
 <a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">        Returns:</span>
@@ -31772,12 +31800,12 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">        * The common Earthdata case is a **stack of single-timestep</span>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">          granules** (one file per overpass / half-hour / day, NetCDF</span>
 <a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">          *or* COG). That whole stack is windowed by</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">          `pyramids.dataset.DatasetCollection.groupby` (the STAC</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">          :meth:`pyramids.dataset.DatasetCollection.groupby` (the STAC</span>
 <a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">          path) — one reduced raster per `config.freq` window.</span>
 <a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">        * The rarer case is a **single granule that already carries a</span>
 <a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">          multi-timestep time axis inside it** (one NetCDF cube). Its</span>
 <a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">          internal `time` axis is collapsed by</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">          `pyramids.netcdf.NetCDF.reduce` (the CMEMS path).</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">          :meth:`pyramids.netcdf.NetCDF.reduce` (the CMEMS path).</span>
 <a id="__codelineno-0-518" name="__codelineno-0-518"></a>
 <a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">        A single COG (one timestep, no internal axis) falls through to</span>
 <a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">        the stack path as a one-element stack (a single window).</span>
@@ -31821,7 +31849,7 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">        If the granule has no `time` dimension (a single-timestep file, or</span>
 <a id="__codelineno-0-559" name="__codelineno-0-559"></a><span class="sd">        an HDF-EOS file whose time is not a decodable CF dimension), there</span>
 <a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">        is nothing to collapse — it is treated as a one-element stack and</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">        windowed via `_reduce_stack` instead of raising.</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">        windowed via :meth:`_reduce_stack` instead of raising.</span>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>
 <a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">            path: A single NetCDF / HDF granule, ideally carrying a</span>
@@ -31920,8 +31948,8 @@ value to gate <code>aggregate=</code>.</p>
         <p>Initialise an Earthdata backend instance.</p>
 <p>Resolves every requested dataset key against the catalog
 <strong>before</strong> calling the parent constructor, so the per-instance
-<code>OUTPUT_KIND</code> is set from the resolved row(s). The parent
-<code>__init__</code> runs <code>_initialize</code> first (EDL login), so the
+:attr:<code>OUTPUT_KIND</code> is set from the resolved row(s). The parent
+<code>__init__</code> runs :meth:<code>_initialize</code> first (EDL login), so the
 resolution cannot live there — <code>self.vars</code> is not yet set at
 that point.</p>
 
@@ -32341,8 +32369,8 @@ unknown, or the requested datasets do not all share one
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    Resolves every requested dataset key against the catalog</span>
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">    **before** calling the parent constructor, so the per-instance</span>
-<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    `OUTPUT_KIND` is set from the resolved row(s). The parent</span>
-<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    `__init__` runs `_initialize` first (EDL login), so the</span>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    :attr:`OUTPUT_KIND` is set from the resolved row(s). The parent</span>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    `__init__` runs :meth:`_initialize` first (EDL login), so the</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    resolution cannot live there — `self.vars` is not yet set at</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">    that point.</span>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a>
@@ -32429,7 +32457,7 @@ unknown, or the requested datasets do not all share one
     <div class="doc doc-contents ">
 
         <p>Search CMR, fetch the granules, return their local paths.</p>
-<p>Composes <code>_search</code> and <code>_fetch</code> to pull every
+<p>Composes :meth:<code>_search</code> and :meth:<code>_fetch</code> to pull every
 granule matching the request bbox + window to <code>self.root_dir</code>
 (or in-region S3 handles). When <code>aggregate</code> is given, the
 fetched granules are reduced per-window via the existing
@@ -32477,7 +32505,7 @@ per-granule progress bar.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional
-<code>earthlens.aggregate.AggregationConfig</code>. Only
+:class:<code>earthlens.aggregate.AggregationConfig</code>. Only
 reached for a <code>"raster"</code> instance.</p>
               </div>
             </td>
@@ -32585,7 +32613,7 @@ installed pyramids exposes no <code>NetCDF.reduce</code> /
 <a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Search CMR, fetch the granules, return their local paths.</span>
 <a id="__codelineno-0-470" name="__codelineno-0-470"></a>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">    Composes `_search` and `_fetch` to pull every</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">    Composes :meth:`_search` and :meth:`_fetch` to pull every</span>
 <a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">    granule matching the request bbox + window to `self.root_dir`</span>
 <a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">    (or in-region S3 handles). When `aggregate` is given, the</span>
 <a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">    fetched granules are reduced per-window via the existing</span>
@@ -32598,7 +32626,7 @@ installed pyramids exposes no <code>NetCDF.reduce</code> /
 <a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">            on the download / open call, so `False` suppresses the</span>
 <a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">            per-granule progress bar.</span>
 <a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        aggregate: Optional</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">            `earthlens.aggregate.AggregationConfig`. Only</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">            :class:`earthlens.aggregate.AggregationConfig`. Only</span>
 <a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">            reached for a `&quot;raster&quot;` instance.</span>
 <a id="__codelineno-0-486" name="__codelineno-0-486"></a>
 <a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">    Returns:</span>
@@ -32652,17 +32680,17 @@ installed pyramids exposes no <code>NetCDF.reduce</code> /
     <div class="doc doc-contents first">
 
         <p>Dataset-catalog loader for the NASA Earthdata backend.</p>
-<p>Hosts <code>Catalog</code>, the pydantic-backed reader for the bundled
-Earthdata catalog. Mirrors the shape of <code>earthlens.cmems.catalog</code>
-and <code>earthlens.gee.catalog</code>: the catalog ships as a directory of
+<p>Hosts :class:<code>Catalog</code>, the pydantic-backed reader for the bundled
+Earthdata catalog. Mirrors the shape of :mod:<code>earthlens.cmems.catalog</code>
+and :mod:<code>earthlens.gee.catalog</code>: the catalog ships as a directory of
 per-DAAC YAML files at <code>src/earthlens/earthdata/catalog/</code>
 (<code>ges_disc.yaml</code>, <code>po_daac.yaml</code>, <code>lp_daac.yaml</code>, …) plus a single
 <code>_index.yaml</code> carrying the merged <code>available_datasets:</code> list. Each
 per-DAAC file contributes its <code>datasets:</code> block; the loader unions
-them into one <code>Catalog</code> at construction time.</p>
+them into one :class:<code>Catalog</code> at construction time.</p>
 <p>A dataset key (e.g. <code>"GPM_3IMERGHHL_07"</code>) resolves to an
-<code>EarthdataDataset</code> via <code>Catalog.get_dataset</code> /
-<code>Catalog()["..."]</code> / <code>Catalog.resolve</code>. The row carries the
+:class:<code>EarthdataDataset</code> via :meth:<code>Catalog.get_dataset</code> /
+<code>Catalog()["..."]</code> / :meth:<code>Catalog.resolve</code>. The row carries the
 fields the backend needs to shape a CMR search and a fetch:
 <code>short_name</code> / <code>version</code> / <code>provider</code> (the CMR provider code), the
 per-instance <code>output_kind</code> (<code>G1</code>), the on-disk <code>format</code>, the
@@ -32672,7 +32700,7 @@ in-region S3 streaming path (<code>G4</code>).</p>
 the CMR walk found per provider (the <code>C7</code> auto-generated index); the
 curated <code>datasets:</code> map is the small vetted subset the maintainer
 hand-checks. The path to the bundled catalog directory lives at
-<code>CATALOG_PATH</code>; tests can monkey-patch that module attribute to
+:data:<code>CATALOG_PATH</code>; tests can monkey-patch that module attribute to
 redirect the loader at a temporary directory or single YAML file.</p>
 
 
@@ -32881,7 +32909,7 @@ future server-side subset request.</p>
 <p>Reads the bundled <code>catalog/</code> directory (shipped as package data)
 and exposes its consumed top-level sections as typed pydantic
 fields. Instantiate with no arguments (<code>Catalog()</code>) —
-<code>model_post_init</code> parses the YAML and populates every field
+:func:<code>model_post_init</code> parses the YAML and populates every field
 in one pass.</p>
 
 
@@ -32916,7 +32944,7 @@ does not consume it.</p>
             <td>
               <div class="doc-md-description">
                 <p>Structural map keyed by the curated dataset key. Each
-value is an <code>EarthdataDataset</code>.</p>
+value is an :class:<code>EarthdataDataset</code>.</p>
               </div>
             </td>
           </tr>
@@ -33201,7 +33229,7 @@ value is an <code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">    Reads the bundled `catalog/` directory (shipped as package data)</span>
 <a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">    and exposes its consumed top-level sections as typed pydantic</span>
 <a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">    fields. Instantiate with no arguments (`Catalog()`) —</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">    `model_post_init` parses the YAML and populates every field</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">    :func:`model_post_init` parses the YAML and populates every field</span>
 <a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">    in one pass.</span>
 <a id="__codelineno-0-468" name="__codelineno-0-468"></a>
 <a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">    Attributes:</span>
@@ -33209,7 +33237,7 @@ value is an <code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">            CMR walk found per provider (the `C7` index). Runtime code</span>
 <a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">            does not consume it.</span>
 <a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">        datasets: Structural map keyed by the curated dataset key. Each</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">            value is an `EarthdataDataset`.</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">            value is an :class:`EarthdataDataset`.</span>
 <a id="__codelineno-0-475" name="__codelineno-0-475"></a>
 <a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">        - Resolve a curated dataset:</span>
@@ -33242,7 +33270,7 @@ value is an <code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-504" name="__codelineno-0-504"></a>
 <a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">            ValueError: When auto-loading, propagates the same errors</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">                as `load`.</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">                as :meth:`load`.</span>
 <a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-509" name="__codelineno-0-509"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a>            <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
@@ -33264,16 +33292,16 @@ value is an <code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">            catalog_path: Path to the `catalog/` directory or a single</span>
 <a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">                `*.yaml` file. Defaults to module-level</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">                `CATALOG_PATH`.</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">            providers_path: Path to `providers.yaml`. Defaults to</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">                module-level `PROVIDERS_PATH`.</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">                module-level :data:`PROVIDERS_PATH`.</span>
 <a id="__codelineno-0-532" name="__codelineno-0-532"></a>
 <a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-535" name="__codelineno-0-535"></a>
 <a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">            ValueError: Propagated from `_load_providers` /</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">                `_load_catalog_data`, including when a dataset</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">            ValueError: Propagated from :func:`_load_providers` /</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">                :func:`_load_catalog_data`, including when a dataset</span>
 <a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">                row names a `provider:` absent from `providers.yaml`.</span>
 <a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-541" name="__codelineno-0-541"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
@@ -33309,9 +33337,9 @@ value is an <code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-571" name="__codelineno-0-571"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">auto_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EarthdataDataset</span><span class="p">]:</span>
 <a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The machine-derived long-tail rows as a built map.</span>
 <a id="__codelineno-0-573" name="__codelineno-0-573"></a>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="sd">        Builds an `EarthdataDataset` for every auto row — heavy</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="sd">        Builds an :class:`EarthdataDataset` for every auto row — heavy</span>
 <a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">        (~8k rows). For membership or single-key resolution prefer</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">        `get_dataset`, which builds only the one row requested.</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">        :meth:`get_dataset`, which builds only the one row requested.</span>
 <a id="__codelineno-0-577" name="__codelineno-0-577"></a>
 <a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="sd">            dict[str, EarthdataDataset]: Map keyed by `short_name`</span>
@@ -33320,7 +33348,7 @@ value is an <code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-582" name="__codelineno-0-582"></a>        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_auto</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auto_rows</span><span class="p">()}</span>
 <a id="__codelineno-0-583" name="__codelineno-0-583"></a>
 <a id="__codelineno-0-584" name="__codelineno-0-584"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_build_auto</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EarthdataDataset</span><span class="p">:</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the `EarthdataDataset` for one auto row.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the :class:`EarthdataDataset` for one auto row.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-586" name="__codelineno-0-586"></a>        <span class="n">body</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auto_rows</span><span class="p">()[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">&quot;bands&quot;</span><span class="p">}</span>
 <a id="__codelineno-0-587" name="__codelineno-0-587"></a>        <span class="k">return</span> <span class="n">EarthdataDataset</span><span class="p">(</span><span class="o">**</span><span class="n">body</span><span class="p">)</span>
 <a id="__codelineno-0-588" name="__codelineno-0-588"></a>
@@ -33358,7 +33386,7 @@ value is an <code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-620" name="__codelineno-0-620"></a>        <span class="p">)</span>
 <a id="__codelineno-0-621" name="__codelineno-0-621"></a>
 <a id="__codelineno-0-622" name="__codelineno-0-622"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_daac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">provider_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EarthdataDAAC</span><span class="p">:</span>
-<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `EarthdataDAAC` for a CMR provider code.</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`EarthdataDAAC` for a CMR provider code.</span>
 <a id="__codelineno-0-624" name="__codelineno-0-624"></a>
 <a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="sd">            provider_code: A CMR provider code registered in</span>
@@ -33411,7 +33439,7 @@ value is an <code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-673" name="__codelineno-0-673"></a><span class="sd">        them by DAAC.</span>
 <a id="__codelineno-0-674" name="__codelineno-0-674"></a>
 <a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">            key: Curated dataset key (a member of `datasets`).</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">            key: Curated dataset key (a member of :attr:`datasets`).</span>
 <a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">            daac: Optional DAAC id to disambiguate; when given, the</span>
 <a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">                resolved row&#39;s `daac` must match.</span>
 <a id="__codelineno-0-679" name="__codelineno-0-679"></a>
@@ -33422,7 +33450,7 @@ value is an <code>EarthdataDataset</code>.</p>
 <a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">            ValueError: When `key` is unknown (with a did-you-mean hint)</span>
 <a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">                or when `daac=` is given but does not match the row.</span>
 <a id="__codelineno-0-686" name="__codelineno-0-686"></a><span class="sd">                Both not-found conditions raise `ValueError`, matching</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">                `get_dataset`.</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">                :meth:`get_dataset`.</span>
 <a id="__codelineno-0-688" name="__codelineno-0-688"></a>
 <a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="sd">        Examples:</span>
 <a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">            - Resolve a key and read its provider:</span>
@@ -33479,9 +33507,9 @@ value is an <code>EarthdataDataset</code>.</p>
     <div class="doc doc-contents ">
 
         <p>The machine-derived long-tail rows as a built map.</p>
-<p>Builds an <code>EarthdataDataset</code> for every auto row — heavy
+<p>Builds an :class:<code>EarthdataDataset</code> for every auto row — heavy
 (~8k rows). For membership or single-key resolution prefer
-<code>get_dataset</code>, which builds only the one row requested.</p>
+:meth:<code>get_dataset</code>, which builds only the one row requested.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -33525,7 +33553,7 @@ value is an <code>EarthdataDataset</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>EarthdataDAAC</code> for a CMR provider code.</p>
+        <p>Return the :class:<code>EarthdataDAAC</code> for a CMR provider code.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -33669,7 +33697,7 @@ did-you-mean hint).</p>
 <span class="normal"><a href="#__codelineno-0-662">662</a></span>
 <span class="normal"><a href="#__codelineno-0-663">663</a></span>
 <span class="normal"><a href="#__codelineno-0-664">664</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_daac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">provider_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EarthdataDAAC</span><span class="p">:</span>
-<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `EarthdataDAAC` for a CMR provider code.</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`EarthdataDAAC` for a CMR provider code.</span>
 <a id="__codelineno-0-624" name="__codelineno-0-624"></a>
 <a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="sd">        provider_code: A CMR provider code registered in</span>
@@ -33924,7 +33952,7 @@ key (a bare <code>short_name</code>, e.g. <code>"AA_L2A"</code>).</p>
               <div class="doc-md-description">
                 <p>Path to the <code>catalog/</code> directory or a single
 <code>*.yaml</code> file. Defaults to module-level
-<code>CATALOG_PATH</code>.</p>
+:data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -33941,7 +33969,7 @@ key (a bare <code>short_name</code>, e.g. <code>"AA_L2A"</code>).</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to <code>providers.yaml</code>. Defaults to
-module-level <code>PROVIDERS_PATH</code>.</p>
+module-level :data:<code>PROVIDERS_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -33967,7 +33995,7 @@ module-level <code>PROVIDERS_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -33990,8 +34018,8 @@ module-level <code>PROVIDERS_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Propagated from <code>_load_providers</code> /
-<code>_load_catalog_data</code>, including when a dataset
+                <p>Propagated from :func:<code>_load_providers</code> /
+:func:<code>_load_catalog_data</code>, including when a dataset
 row names a <code>provider:</code> absent from <code>providers.yaml</code>.</p>
               </div>
             </td>
@@ -34057,16 +34085,16 @@ row names a <code>provider:</code> absent from <code>providers.yaml</code>.</p>
 <a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">        catalog_path: Path to the `catalog/` directory or a single</span>
 <a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">            `*.yaml` file. Defaults to module-level</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">            `CATALOG_PATH`.</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">        providers_path: Path to `providers.yaml`. Defaults to</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">            module-level `PROVIDERS_PATH`.</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">            module-level :data:`PROVIDERS_PATH`.</span>
 <a id="__codelineno-0-532" name="__codelineno-0-532"></a>
 <a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-535" name="__codelineno-0-535"></a>
 <a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">        ValueError: Propagated from `_load_providers` /</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">            `_load_catalog_data`, including when a dataset</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">        ValueError: Propagated from :func:`_load_providers` /</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">            :func:`_load_catalog_data`, including when a dataset</span>
 <a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            row names a `provider:` absent from `providers.yaml`.</span>
 <a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-541" name="__codelineno-0-541"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
@@ -34132,7 +34160,7 @@ disk read is skipped.</p>
             <td>
               <div class="doc-md-description">
                 <p>When auto-loading, propagates the same errors
-as <code>load</code>.</p>
+as :meth:<code>load</code>.</p>
               </div>
             </td>
           </tr>
@@ -34173,7 +34201,7 @@ as <code>load</code>.</p>
 <a id="__codelineno-0-504" name="__codelineno-0-504"></a>
 <a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">        ValueError: When auto-loading, propagates the same errors</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            as `load`.</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            as :meth:`load`.</span>
 <a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-509" name="__codelineno-0-509"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
@@ -34228,7 +34256,7 @@ them by DAAC.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Curated dataset key (a member of <code>datasets</code>).</p>
+                <p>Curated dataset key (a member of :attr:<code>datasets</code>).</p>
               </div>
             </td>
             <td>
@@ -34297,7 +34325,7 @@ resolved row's <code>daac</code> must match.</p>
                 <p>When <code>key</code> is unknown (with a did-you-mean hint)
 or when <code>daac=</code> is given but does not match the row.
 Both not-found conditions raise <code>ValueError</code>, matching
-<code>get_dataset</code>.</p>
+:meth:<code>get_dataset</code>.</p>
               </div>
             </td>
           </tr>
@@ -34381,7 +34409,7 @@ Both not-found conditions raise <code>ValueError</code>, matching
 <a id="__codelineno-0-673" name="__codelineno-0-673"></a><span class="sd">    them by DAAC.</span>
 <a id="__codelineno-0-674" name="__codelineno-0-674"></a>
 <a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">        key: Curated dataset key (a member of `datasets`).</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">        key: Curated dataset key (a member of :attr:`datasets`).</span>
 <a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">        daac: Optional DAAC id to disambiguate; when given, the</span>
 <a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">            resolved row&#39;s `daac` must match.</span>
 <a id="__codelineno-0-679" name="__codelineno-0-679"></a>
@@ -34392,7 +34420,7 @@ Both not-found conditions raise <code>ValueError</code>, matching
 <a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">        ValueError: When `key` is unknown (with a did-you-mean hint)</span>
 <a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">            or when `daac=` is given but does not match the row.</span>
 <a id="__codelineno-0-686" name="__codelineno-0-686"></a><span class="sd">            Both not-found conditions raise `ValueError`, matching</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">            `get_dataset`.</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">            :meth:`get_dataset`.</span>
 <a id="__codelineno-0-688" name="__codelineno-0-688"></a>
 <a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">        - Resolve a key and read its provider:</span>
@@ -34690,7 +34718,7 @@ for in-region streaming.</p>
         <p>One curated Earthdata dataset row.</p>
 <p>Mirrors a single <code>datasets.&lt;key&gt;:</code> block in one of the per-DAAC
 <code>catalog/*.yaml</code> files. The dataset key itself is the parent key
-in <code>Catalog.datasets</code> and is not stored on the row.</p>
+in :attr:<code>Catalog.datasets</code> and is not stored on the row.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -34865,7 +34893,7 @@ fetch).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>TemporalCoverage</code> — start / end dates.</p>
+                <p>:class:<code>TemporalCoverage</code> — start / end dates.</p>
               </div>
             </td>
           </tr>
@@ -34969,7 +34997,7 @@ fetch).</p>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">    Mirrors a single `datasets.&lt;key&gt;:` block in one of the per-DAAC</span>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">    `catalog/*.yaml` files. The dataset key itself is the parent key</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">    in `Catalog.datasets` and is not stored on the row.</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">    in :attr:`Catalog.datasets` and is not stored on the row.</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        short_name: CMR `short_name` (the collection identifier the</span>
@@ -34997,7 +35025,7 @@ fetch).</p>
 <a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            Harmony-enabled at all.</span>
 <a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">        bands: Per-band metadata map (informational for whole-granule</span>
 <a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">            fetch).</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">        temporal: `TemporalCoverage` — start / end dates.</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">        temporal: :class:`TemporalCoverage` — start / end dates.</span>
 <a id="__codelineno-0-421" name="__codelineno-0-421"></a>
 <a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">        - Inspect a curated raster row:</span>
@@ -35323,8 +35351,8 @@ mutation invalidates the entry on its own.</p>
     <div class="doc doc-contents first">
 
         <p>Credentials and authentication for the NASA Earthdata backend.</p>
-<p>Hosts <code>EarthdataAuth</code>, an <code>earthlens.base.AbstractAuth</code>
-subclass that wraps <code>earthaccess.login</code>. A single Earthdata
+<p>Hosts :class:<code>EarthdataAuth</code>, an :class:<code>earthlens.base.AbstractAuth</code>
+subclass that wraps :func:<code>earthaccess.login</code>. A single Earthdata
 Login (EDL) account authenticates once and unlocks every DAAC the
 backend reaches through <code>earthaccess</code> + CMR; after a successful
 <code>login()</code> the returned <code>earthaccess.Auth</code> handle also mints the
@@ -35332,15 +35360,15 @@ rotating, per-provider S3 credentials the in-region streaming path
 needs.</p>
 <p>The auth wrapper exists so that:</p>
 <ul>
-<li>The backend can build an <code>EarthdataCredentials</code> value object
+<li>The backend can build an :class:<code>EarthdataCredentials</code> value object
   up front, validate it with pydantic, and pass it through
-  <code>super().__init__(creds)</code> — consistent with <code>CmemsAuth</code>.</li>
+  <code>super().__init__(creds)</code> — consistent with :class:<code>CmemsAuth</code>.</li>
 <li><code>configure()</code> is idempotent — a second call after
   <code>is_authenticated()</code> returns <code>True</code> short-circuits, so it is safe
   to call from long-lived workers without re-authing on every
   <code>download()</code>.</li>
 <li><code>earthaccess</code> login failures are re-raised as the cross-backend
-  <code>earthlens.base.AuthenticationError</code>, so a caller can write
+  :class:<code>earthlens.base.AuthenticationError</code>, so a caller can write
   one <code>except AuthenticationError</code> clause across CMEMS / Earthdata /
   future backends.</li>
 </ul>
@@ -35399,7 +35427,7 @@ that names a fix: register an Earthdata Login account, set the
 <code>EARTHDATA_USERNAME</code> / <code>EARTHDATA_PASSWORD</code> environment variables,
 or add a <code>urs.earthdata.nasa.gov</code> entry to <code>~/.netrc</code>.</p>
 <p>A subclass of the cross-backend
-<code>earthlens.base.AuthenticationError</code> so callers can catch
+:class:<code>earthlens.base.AuthenticationError</code> so callers can catch
 every backend's auth failure with one <code>except</code> clause.</p>
 
 
@@ -35431,7 +35459,7 @@ every backend's auth failure with one <code>except</code> clause.</p>
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">    or add a `urs.earthdata.nasa.gov` entry to `~/.netrc`.</span>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    A subclass of the cross-backend</span>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    `earthlens.base.AuthenticationError` so callers can catch</span>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    :class:`earthlens.base.AuthenticationError` so callers can catch</span>
 <a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    every backend&#39;s auth failure with one `except` clause.</span>
 <a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
@@ -35459,15 +35487,15 @@ every backend's auth failure with one <code>except</code> clause.</p>
 
 
         <p>Authenticate against NASA Earthdata Login (EDL).</p>
-<p>Wraps <code>earthaccess.login</code> in the
-<code>earthlens.base.AbstractAuth</code> contract. Calling
-<code>configure</code> once per process is enough: <code>earthaccess</code>
+<p>Wraps :func:<code>earthaccess.login</code> in the
+:class:<code>earthlens.base.AbstractAuth</code> contract. Calling
+:meth:<code>configure</code> once per process is enough: <code>earthaccess</code>
 persists the resolved token (<code>persist=True</code>), and the returned
-<code>earthaccess.Auth</code> handle — kept on <code>_auth</code> — mints the
+<code>earthaccess.Auth</code> handle — kept on :attr:<code>_auth</code> — mints the
 rotating per-provider S3 credentials the in-region streaming path
-needs via <code>s3_credentials</code>.</p>
+needs via :meth:<code>s3_credentials</code>.</p>
 <p>The class is a context manager (inherited from
-<code>AbstractAuth</code>): <code>with EarthdataAuth(creds) as auth: ...</code>
+:class:<code>AbstractAuth</code>): <code>with EarthdataAuth(creds) as auth: ...</code>
 calls <code>configure()</code> on enter and the default no-op <code>close()</code> on
 exit.</p>
 
@@ -35488,8 +35516,8 @@ exit.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>EarthdataCredentials</code> passed at
-construction. Read by <code>configure</code> to resolve the
+                <p>The :class:<code>EarthdataCredentials</code> passed at
+construction. Read by :meth:<code>configure</code> to resolve the
 login strategy. Treated as write-once.</p>
               </div>
             </td>
@@ -35502,7 +35530,7 @@ login strategy. Treated as write-once.</p>
             <td>
               <div class="doc-md-description">
                 <p>The <code>earthaccess.Auth</code> handle returned by a successful
-<code>login()</code>, or <code>None</code> before <code>configure</code> runs.</p>
+<code>login()</code>, or <code>None</code> before :meth:<code>configure</code> runs.</p>
               </div>
             </td>
           </tr>
@@ -35781,25 +35809,25 @@ login strategy. Treated as write-once.</p>
 <span class="normal"><a href="#__codelineno-0-402">402</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="k">class</span><span class="w"> </span><span class="nc">EarthdataAuth</span><span class="p">(</span><span class="n">AbstractAuth</span><span class="p">[</span><span class="n">EarthdataCredentials</span><span class="p">]):</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Authenticate against NASA Earthdata Login (EDL).</span>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a>
-<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">    Wraps `earthaccess.login` in the</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">    `earthlens.base.AbstractAuth` contract. Calling</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">    `configure` once per process is enough: `earthaccess`</span>
+<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">    Wraps :func:`earthaccess.login` in the</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">    :class:`earthlens.base.AbstractAuth` contract. Calling</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">    :meth:`configure` once per process is enough: `earthaccess`</span>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">    persists the resolved token (`persist=True`), and the returned</span>
-<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">    `earthaccess.Auth` handle — kept on `_auth` — mints the</span>
+<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">    `earthaccess.Auth` handle — kept on :attr:`_auth` — mints the</span>
 <a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">    rotating per-provider S3 credentials the in-region streaming path</span>
-<a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">    needs via `s3_credentials`.</span>
+<a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">    needs via :meth:`s3_credentials`.</span>
 <a id="__codelineno-0-167" name="__codelineno-0-167"></a>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">    The class is a context manager (inherited from</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    `AbstractAuth`): `with EarthdataAuth(creds) as auth: ...`</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">    :class:`AbstractAuth`): `with EarthdataAuth(creds) as auth: ...`</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">    calls `configure()` on enter and the default no-op `close()` on</span>
 <a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">    exit.</span>
 <a id="__codelineno-0-172" name="__codelineno-0-172"></a>
 <a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">        _creds: The `EarthdataCredentials` passed at</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            construction. Read by `configure` to resolve the</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">        _creds: The :class:`EarthdataCredentials` passed at</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            construction. Read by :meth:`configure` to resolve the</span>
 <a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">            login strategy. Treated as write-once.</span>
 <a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">        _auth: The `earthaccess.Auth` handle returned by a successful</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">            `login()`, or `None` before `configure` runs.</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">            `login()`, or `None` before :meth:`configure` runs.</span>
 <a id="__codelineno-0-179" name="__codelineno-0-179"></a>
 <a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">    Examples:</span>
 <a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">        - Build, configure, inspect — marked `# doctest: +SKIP`</span>
@@ -35819,11 +35847,11 @@ login strategy. Treated as write-once.</p>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store credentials; does not authenticate.</span>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">        Construction is side-effect-free — the user (or the backend&#39;s</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        `_initialize`) must call `configure` (or use the</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        :meth:`_initialize`) must call :meth:`configure` (or use the</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">        context-manager form) to talk to EDL.</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">            credentials: The `EarthdataCredentials` value</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">            credentials: The :class:`EarthdataCredentials` value</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">                object carrying the strategy-resolution rules.</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
@@ -35898,7 +35926,7 @@ login strategy. Treated as write-once.</p>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Authenticate against EDL via `earthaccess.login`.</span>
 <a id="__codelineno-0-276" name="__codelineno-0-276"></a>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        Idempotent — short-circuits when `is_authenticated`</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        Idempotent — short-circuits when :meth:`is_authenticated`</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        already returns `True`. On the first call, resolves the login</span>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        strategy (explicit token / creds → env → netrc → interactive).</span>
 <a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        `earthaccess` has no direct login argument for a token or a</span>
@@ -35907,7 +35935,7 @@ login strategy. Treated as write-once.</p>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        `EARTHDATA_TOKEN` for a bearer token, or `EARTHDATA_USERNAME` /</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        `EARTHDATA_PASSWORD` for a username/password — before login. Then</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        logs in with `persist=True` and keeps the returned</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        `earthaccess.Auth` handle on `_auth`.</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        `earthaccess.Auth` handle on :attr:`_auth`.</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        An explicit credential also has to *win*. `earthaccess` prefers</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        `EARTHDATA_TOKEN` over a username/password pair, so an unrelated token</span>
@@ -36013,7 +36041,7 @@ login strategy. Treated as write-once.</p>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">                (`accessKeyId`, `secretAccessKey`, `sessionToken`, …).</span>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">            AuthenticationError: When `configure` has not run, so</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">            AuthenticationError: When :meth:`configure` has not run, so</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">                no `earthaccess.Auth` handle is available.</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-395" name="__codelineno-0-395"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -36053,7 +36081,7 @@ login strategy. Treated as write-once.</p>
 
         <p>Store credentials; does not authenticate.</p>
 <p>Construction is side-effect-free — the user (or the backend's
-<code>_initialize</code>) must call <code>configure</code> (or use the
+:meth:<code>_initialize</code>) must call :meth:<code>configure</code> (or use the
 context-manager form) to talk to EDL.</p>
 
 
@@ -36077,7 +36105,7 @@ context-manager form) to talk to EDL.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>EarthdataCredentials</code> value
+                <p>The :class:<code>EarthdataCredentials</code> value
 object carrying the strategy-resolution rules.</p>
               </div>
             </td>
@@ -36108,11 +36136,11 @@ object carrying the strategy-resolution rules.</p>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Store credentials; does not authenticate.</span>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">    Construction is side-effect-free — the user (or the backend&#39;s</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">    `_initialize`) must call `configure` (or use the</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">    :meth:`_initialize`) must call :meth:`configure` (or use the</span>
 <a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">    context-manager form) to talk to EDL.</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">        credentials: The `EarthdataCredentials` value</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">        credentials: The :class:`EarthdataCredentials` value</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">            object carrying the strategy-resolution rules.</span>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
@@ -36136,7 +36164,7 @@ object carrying the strategy-resolution rules.</p>
     <div class="doc doc-contents ">
 
         <p>Authenticate against EDL via <code>earthaccess.login</code>.</p>
-<p>Idempotent — short-circuits when <code>is_authenticated</code>
+<p>Idempotent — short-circuits when :meth:<code>is_authenticated</code>
 already returns <code>True</code>. On the first call, resolves the login
 strategy (explicit token / creds → env → netrc → interactive).
 <code>earthaccess</code> has no direct login argument for a token or a
@@ -36145,7 +36173,7 @@ environment variable its <code>"environment"</code> strategy reads —
 <code>EARTHDATA_TOKEN</code> for a bearer token, or <code>EARTHDATA_USERNAME</code> /
 <code>EARTHDATA_PASSWORD</code> for a username/password — before login. Then
 logs in with <code>persist=True</code> and keeps the returned
-<code>earthaccess.Auth</code> handle on <code>_auth</code>.</p>
+<code>earthaccess.Auth</code> handle on :attr:<code>_auth</code>.</p>
 <p>An explicit credential also has to <em>win</em>. <code>earthaccess</code> prefers
 <code>EARTHDATA_TOKEN</code> over a username/password pair, so an unrelated token
 already in the environment is cleared for the duration of the login.
@@ -36277,7 +36305,7 @@ raises while contacting EDL.</p>
 <span class="normal"><a href="#__codelineno-0-367">367</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Authenticate against EDL via `earthaccess.login`.</span>
 <a id="__codelineno-0-276" name="__codelineno-0-276"></a>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    Idempotent — short-circuits when `is_authenticated`</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    Idempotent — short-circuits when :meth:`is_authenticated`</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">    already returns `True`. On the first call, resolves the login</span>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">    strategy (explicit token / creds → env → netrc → interactive).</span>
 <a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">    `earthaccess` has no direct login argument for a token or a</span>
@@ -36286,7 +36314,7 @@ raises while contacting EDL.</p>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">    `EARTHDATA_TOKEN` for a bearer token, or `EARTHDATA_USERNAME` /</span>
 <a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">    `EARTHDATA_PASSWORD` for a username/password — before login. Then</span>
 <a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">    logs in with `persist=True` and keeps the returned</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    `earthaccess.Auth` handle on `_auth`.</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    `earthaccess.Auth` handle on :attr:`_auth`.</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    An explicit credential also has to *win*. `earthaccess` prefers</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">    `EARTHDATA_TOKEN` over a username/password pair, so an unrelated token</span>
@@ -36471,7 +36499,7 @@ caller wants to read (e.g. <code>"GES_DISC"</code>, <code>"POCLOUD"</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>When <code>configure</code> has not run, so
+                <p>When :meth:<code>configure</code> has not run, so
 no <code>earthaccess.Auth</code> handle is available.</p>
               </div>
             </td>
@@ -36538,7 +36566,7 @@ no <code>earthaccess.Auth</code> handle is available.</p>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            (`accessKeyId`, `secretAccessKey`, `sessionToken`, …).</span>
 <a id="__codelineno-0-390" name="__codelineno-0-390"></a>
 <a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        AuthenticationError: When `configure` has not run, so</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        AuthenticationError: When :meth:`configure` has not run, so</span>
 <a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">            no `earthaccess.Auth` handle is available.</span>
 <a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -36587,7 +36615,7 @@ OpenAQ's API key — no password needed), an explicit
 username/password, a path to a <code>.netrc</code> file, or no fields at all
 (and rely on env vars / the default <code>~/.netrc</code> / an interactive
 prompt). Validation is intentionally permissive — the real "do these
-creds work?" gate is <code>EarthdataAuth.configure</code>, which talks to
+creds work?" gate is :meth:<code>EarthdataAuth.configure</code>, which talks to
 EDL.</p>
 
 
@@ -36621,7 +36649,7 @@ environment / netrc / prompt".</p>
             <td>
               <div class="doc-md-description">
                 <p>Account password. Stored as
-<code>pydantic.SecretStr</code> so it is never echoed by
+:class:<code>pydantic.SecretStr</code> so it is never echoed by
 <code>repr(creds)</code> or in logs. <code>None</code> means same as
 <code>username</code>.</p>
               </div>
@@ -36636,7 +36664,7 @@ environment / netrc / prompt".</p>
               <div class="doc-md-description">
                 <p>Optional EDL <strong>bearer token</strong> (a long-lived JSON Web
 Token generated from the EDL profile), stored as a
-<code>pydantic.SecretStr</code>. Lets the backend authenticate
+:class:<code>pydantic.SecretStr</code>. Lets the backend authenticate
 without a password — the token-equivalent of GEE's service
 key. <code>configure</code> exports it to <code>EARTHDATA_TOKEN</code>, which
 <code>earthaccess</code>'s environment strategy consumes. <code>None</code> defers
@@ -36749,19 +36777,19 @@ to <code>~/.netrc</code>.</p>
 <a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    username/password, a path to a `.netrc` file, or no fields at all</span>
 <a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">    (and rely on env vars / the default `~/.netrc` / an interactive</span>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    prompt). Validation is intentionally permissive — the real &quot;do these</span>
-<a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">    creds work?&quot; gate is `EarthdataAuth.configure`, which talks to</span>
+<a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">    creds work?&quot; gate is :meth:`EarthdataAuth.configure`, which talks to</span>
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">    EDL.</span>
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">        username: EDL account username. `None` means &quot;look at the</span>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">            environment / netrc / prompt&quot;.</span>
 <a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">        password: Account password. Stored as</span>
-<a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">            `pydantic.SecretStr` so it is never echoed by</span>
+<a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">            :class:`pydantic.SecretStr` so it is never echoed by</span>
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">            `repr(creds)` or in logs. `None` means same as</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">            `username`.</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">        token: Optional EDL **bearer token** (a long-lived JSON Web</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">            Token generated from the EDL profile), stored as a</span>
-<a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">            `pydantic.SecretStr`. Lets the backend authenticate</span>
+<a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">            :class:`pydantic.SecretStr`. Lets the backend authenticate</span>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a><span class="sd">            without a password — the token-equivalent of GEE&#39;s service</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="sd">            key. `configure` exports it to `EARTHDATA_TOKEN`, which</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="sd">            `earthaccess`&#39;s environment strategy consumes. `None` defers</span>

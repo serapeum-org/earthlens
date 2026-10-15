@@ -817,6 +817,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -24707,28 +24735,28 @@ API. HANZE needs no credentials — the Zenodo record is public (CC-BY-4.0).</p>
 <p>Fetches the HANZE (Historical Analysis of Natural Hazards in Europe) database of
 observed European flood events and their impacts (Paprotny et al.) from its
 pinned static Zenodo release, and returns the event / impact records as a
-<code>pandas.DataFrame</code>. It is the observed hazard -&gt; loss record: real floods
+:class:<code>pandas.DataFrame</code>. It is the observed hazard -&gt; loss record: real floods
 with fatalities, persons affected, area flooded and economic losses, against
 which a modelled event set can be validated. Companion to the global <code>emdat</code>
 backend.</p>
 <p>This is a <code>tabular</code> backend by default: the result is a table of event / impact
-rows, not a gridded array, so the <code>earthlens.earthlens.EarthLens</code> facade
+rows, not a gridded array, so the :class:<code>earthlens.earthlens.EarthLens</code> facade
 rejects an <code>aggregate=</code> argument. Passing <code>with_geometry=True</code> instead returns a
-pyramids <code>pyramids.feature.collection.FeatureCollection</code> of the affected
+pyramids :class:<code>~pyramids.feature.collection.FeatureCollection</code> of the affected
 NUTS-3 regions (a per-instance <code>vector</code> output).</p>
 <p>HANZE needs <strong>no credentials</strong> — the Zenodo record is public (CC-BY-4.0) — so
 there is no auth class and no <code>[hanze]</code> extra: the only dependencies (HttpClient,
 pandas, <code>base/archive</code>, pyramids) are all core.</p>
 <p>Public surface (re-exported from this package):</p>
 <ul>
-<li><code>HANZE</code> — the backend; instantiate with a date range and optional
-  <code>country=</code> / <code>region=</code> / <code>flood_type=</code> filters, then call <code>HANZE.download</code>.</li>
-<li><code>Catalog</code> — loader for the bundled <code>hanze_data_catalog.yaml</code>.</li>
-<li><code>ZenodoRecord</code> / <code>HanzeFile</code> / <code>FloodType</code> /
-  <code>GeometryJoin</code> — the catalog's frozen row models.</li>
-<li><code>join_events_to_regions</code> / <code>empty_region_fc</code> — the event -&gt;
+<li>:class:<code>HANZE</code> — the backend; instantiate with a date range and optional
+  <code>country=</code> / <code>region=</code> / <code>flood_type=</code> filters, then call :meth:<code>HANZE.download</code>.</li>
+<li>:class:<code>Catalog</code> — loader for the bundled <code>hanze_data_catalog.yaml</code>.</li>
+<li>:class:<code>ZenodoRecord</code> / :class:<code>HanzeFile</code> / :class:<code>FloodType</code> /
+  :class:<code>GeometryJoin</code> — the catalog's frozen row models.</li>
+<li>:func:<code>join_events_to_regions</code> / :func:<code>empty_region_fc</code> — the event -&gt;
   region-geometry join and its empty-result counterpart.</li>
-<li><code>CATALOG_PATH</code> — path to the bundled catalog YAML; monkey-patchable in
+<li>:data:<code>CATALOG_PATH</code> — path to the bundled catalog YAML; monkey-patchable in
   tests.</li>
 </ul>
 
@@ -24783,8 +24811,8 @@ pandas, <code>base/archive</code>, pyramids) are all core.</p>
         <p>Catalog for the HANZE backend.</p>
 <p>Reads the bundled <code>hanze_data_catalog.yaml</code> (shipped as package data) and
 exposes the pinned Zenodo record, the per-file names, the flood-<code>Type</code>
-vocabulary (as <code>FloodType</code> rows keyed by type under the inherited
-<code>datasets</code> field — the <code>cat["River"]</code> / <code>"River" in cat</code> / <code>len(cat)</code>
+vocabulary (as :class:<code>FloodType</code> rows keyed by type under the inherited
+:attr:<code>datasets</code> field — the <code>cat["River"]</code> / <code>"River" in cat</code> / <code>len(cat)</code>
 dict surface), the friendly-name -&gt; CSV-header map, and the region-geometry
 join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 
@@ -24806,7 +24834,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from a flood-<code>Type</code> string to its <code>FloodType</code> row.</p>
+                <p>Map from a flood-<code>Type</code> string to its :class:<code>FloodType</code> row.</p>
               </div>
             </td>
           </tr>
@@ -24817,7 +24845,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The pinned <code>ZenodoRecord</code>.</p>
+                <p>The pinned :class:<code>ZenodoRecord</code>.</p>
               </div>
             </td>
           </tr>
@@ -24829,7 +24857,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
             <td>
               <div class="doc-md-description">
                 <p>Map from a logical key (<code>"events"</code>, <code>"regions"</code>,
-<code>"region_names"</code>) to its <code>HanzeFile</code>.</p>
+<code>"region_names"</code>) to its :class:<code>HanzeFile</code>.</p>
               </div>
             </td>
           </tr>
@@ -24840,7 +24868,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>GeometryJoin</code> for the region attach.</p>
+                <p>The :class:<code>GeometryJoin</code> for the region attach.</p>
               </div>
             </td>
           </tr>
@@ -25092,17 +25120,17 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    Reads the bundled `hanze_data_catalog.yaml` (shipped as package data) and</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    exposes the pinned Zenodo record, the per-file names, the flood-`Type`</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">    vocabulary (as `FloodType` rows keyed by type under the inherited</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    `datasets` field — the `cat[&quot;River&quot;]` / `&quot;River&quot; in cat` / `len(cat)`</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">    vocabulary (as :class:`FloodType` rows keyed by type under the inherited</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    :attr:`datasets` field — the `cat[&quot;River&quot;]` / `&quot;River&quot; in cat` / `len(cat)`</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    dict surface), the friendly-name -&gt; CSV-header map, and the region-geometry</span>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    join configuration. Instantiate with no arguments (`Catalog()`).</span>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a>
 <a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        datasets: Map from a flood-`Type` string to its `FloodType` row.</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        record: The pinned `ZenodoRecord`.</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        datasets: Map from a flood-`Type` string to its :class:`FloodType` row.</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        record: The pinned :class:`ZenodoRecord`.</span>
 <a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        files: Map from a logical key (`&quot;events&quot;`, `&quot;regions&quot;`,</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            `&quot;region_names&quot;`) to its `HanzeFile`.</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        geometry: The `GeometryJoin` for the region attach.</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            `&quot;region_names&quot;`) to its :class:`HanzeFile`.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        geometry: The :class:`GeometryJoin` for the region attach.</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        columns: Friendly name -&gt; exact HANZE CSV header.</span>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a>
 <a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">    Examples:</span>
@@ -25136,7 +25164,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-355" name="__codelineno-0-355"></a>
 <a id="__codelineno-0-356" name="__codelineno-0-356"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FloodType</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="c1">#: `record` / `geometry` default to `None` rather than a placeholder model:</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>    <span class="c1">#: the base `model_post_init` autoload fills a field only when its</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>    <span class="c1">#: the base :meth:`model_post_init` autoload fills a field only when its</span>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="c1">#: current value is falsy, and a placeholder model instance is truthy, so it</span>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a>    <span class="c1">#: would be skipped and `Catalog()` would keep the placeholder. `None` is</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a>    <span class="c1">#: falsy, so the bundled record / geometry load as intended. `load()` and a</span>
@@ -25161,10 +25189,10 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-380" name="__codelineno-0-380"></a>
 <a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">                `CATALOG_PATH`.</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-384" name="__codelineno-0-384"></a>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            ValueError: If `catalog_path` does not exist, a required block is</span>
@@ -25189,9 +25217,9 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-408" name="__codelineno-0-408"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">parsed</span><span class="p">)</span>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a>
 <a id="__codelineno-0-410" name="__codelineno-0-410"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_flood_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flood_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloodType</span><span class="p">:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `FloodType` for `flood_type`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`FloodType` for `flood_type`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-412" name="__codelineno-0-412"></a>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">        Thin alias over `get_dataset`.</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">        Thin alias over :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-414" name="__codelineno-0-414"></a>
 <a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            flood_type: A HANZE flood-`Type` string (`&quot;River&quot;`, `&quot;Coastal&quot;`,</span>
@@ -25233,7 +25261,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 <a id="__codelineno-0-453" name="__codelineno-0-453"></a>
 <a id="__codelineno-0-454" name="__codelineno-0-454"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HanzeFile</span><span class="p">:</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `HanzeFile` for a logical key.</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`HanzeFile` for a logical key.</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">            key: `&quot;events&quot;`, `&quot;regions&quot;`, or `&quot;region_names&quot;`.</span>
@@ -25475,7 +25503,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>HanzeFile</code> for a logical key.</p>
+        <p>Return the :class:<code>HanzeFile</code> for a logical key.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -25595,7 +25623,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <span class="normal"><a href="#__codelineno-0-476">476</a></span>
 <span class="normal"><a href="#__codelineno-0-477">477</a></span>
 <span class="normal"><a href="#__codelineno-0-478">478</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="k">def</span><span class="w"> </span><span class="nf">file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HanzeFile</span><span class="p">:</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `HanzeFile` for a logical key.</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`HanzeFile` for a logical key.</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        key: `&quot;events&quot;`, `&quot;regions&quot;`, or `&quot;region_names&quot;`.</span>
@@ -25725,8 +25753,8 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>FloodType</code> for <code>flood_type</code>, with a did-you-mean hint.</p>
-<p>Thin alias over <code>get_dataset</code>.</p>
+        <p>Return the :class:<code>FloodType</code> for <code>flood_type</code>, with a did-you-mean hint.</p>
+<p>Thin alias over :meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -25844,9 +25872,9 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <span class="normal"><a href="#__codelineno-0-432">432</a></span>
 <span class="normal"><a href="#__codelineno-0-433">433</a></span>
 <span class="normal"><a href="#__codelineno-0-434">434</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_flood_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flood_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloodType</span><span class="p">:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `FloodType` for `flood_type`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`FloodType` for `flood_type`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-412" name="__codelineno-0-412"></a>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">    Thin alias over `get_dataset`.</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">    Thin alias over :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-414" name="__codelineno-0-414"></a>
 <a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        flood_type: A HANZE flood-`Type` string (`&quot;River&quot;`, `&quot;Coastal&quot;`,</span>
@@ -25913,7 +25941,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the module-level
-<code>CATALOG_PATH</code>.</p>
+:data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -25939,7 +25967,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -26023,10 +26051,10 @@ missing, or a row fails validation.</p>
 <a id="__codelineno-0-380" name="__codelineno-0-380"></a>
 <a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">            `CATALOG_PATH`.</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-384" name="__codelineno-0-384"></a>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">        ValueError: If `catalog_path` does not exist, a required block is</span>
@@ -26082,8 +26110,8 @@ missing, or a row fails validation.</p>
 
         <p>One entry of the HANZE flood-<code>Type</code> vocabulary.</p>
 <p>The type string (<code>"River"</code>, <code>"River/Coastal"</code>) is the parent key in
-<code>Catalog.datasets</code>; the loader copies it onto the row as
-<code>name</code> so a resolved flood type is self-describing.</p>
+:attr:<code>Catalog.datasets</code>; the loader copies it onto the row as
+:attr:<code>name</code> so a resolved flood type is self-describing.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -26181,8 +26209,8 @@ value is rejected at load time, and the field is excluded from
 <a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One entry of the HANZE flood-`Type` vocabulary.</span>
 <a id="__codelineno-0-152" name="__codelineno-0-152"></a>
 <a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">    The type string (`&quot;River&quot;`, `&quot;River/Coastal&quot;`) is the parent key in</span>
-<a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">    `Catalog.datasets`; the loader copies it onto the row as</span>
-<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    `name` so a resolved flood type is self-describing.</span>
+<a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">    :attr:`Catalog.datasets`; the loader copies it onto the row as</span>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    :attr:`name` so a resolved flood type is self-describing.</span>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">        name: The flood type&#39;s catalog key, injected by the loader; the</span>
@@ -26447,8 +26475,8 @@ with the other vector backends.</p>
         <p>HANZE historical-flood-impacts backend (per-instance output kind).</p>
 <p>Downloads the HANZE events / impacts table from its pinned Zenodo release,
 filters it by country / region / flood type / date window, and returns a
-<code>pandas.DataFrame</code>. With <code>with_geometry=True</code> it instead returns a
-<code>pyramids.feature.collection.FeatureCollection</code> of the affected
+:class:<code>pandas.DataFrame</code>. With <code>with_geometry=True</code> it instead returns a
+:class:<code>~pyramids.feature.collection.FeatureCollection</code> of the affected
 NUTS-3 regions.</p>
 <p>The record is public (CC-BY-4.0); no credentials are needed.</p>
 
@@ -26470,7 +26498,7 @@ NUTS-3 regions.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Set <strong>per instance</strong> in <code>__init__</code> — <code>"tabular"</code> by
+                <p>Set <strong>per instance</strong> in :meth:<code>__init__</code> — <code>"tabular"</code> by
 default, <code>"vector"</code> when <code>with_geometry=True</code>. The facade reads it
 to know the return shape and rejects <code>aggregate=</code> for both.</p>
               </div>
@@ -27121,14 +27149,14 @@ year the record covers.</p>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">    Downloads the HANZE events / impacts table from its pinned Zenodo release,</span>
 <a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">    filters it by country / region / flood type / date window, and returns a</span>
-<a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">    `pandas.DataFrame`. With `with_geometry=True` it instead returns a</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection` of the affected</span>
+<a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">    :class:`pandas.DataFrame`. With `with_geometry=True` it instead returns a</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">    :class:`~pyramids.feature.collection.FeatureCollection` of the affected</span>
 <a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">    NUTS-3 regions.</span>
 <a id="__codelineno-0-143" name="__codelineno-0-143"></a>
 <a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">    The record is public (CC-BY-4.0); no credentials are needed.</span>
 <a id="__codelineno-0-145" name="__codelineno-0-145"></a>
 <a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in `__init__` — `&quot;tabular&quot;` by</span>
+<a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in :meth:`__init__` — `&quot;tabular&quot;` by</span>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">            default, `&quot;vector&quot;` when `with_geometry=True`. The facade reads it</span>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">            to know the return shape and rejects `aggregate=` for both.</span>
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="sd">        REQUIRES_TIME_WINDOW: `False` — a request without a window returns every</span>
@@ -27282,7 +27310,7 @@ year the record covers.</p>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;unreachable&quot;</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Capture the requested bounds as a `SpatialExtent`.</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Capture the requested bounds as a :class:`SpatialExtent`.</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            lat_lim: `[min_lat, max_lat]`.</span>
@@ -27300,7 +27328,7 @@ year the record covers.</p>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a `TemporalExtent`.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        HANZE covers a whole record and is indexed by event year, so `None`</span>
 <a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        bounds are legal and yield a `None`-dated extent.</span>
@@ -27563,12 +27591,12 @@ year the record covers.</p>
 <a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download, filter, and shape the one product to the instance&#39;s kind.</span>
 <a id="__codelineno-0-580" name="__codelineno-0-580"></a>
 <a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">            products: The single-element list from `_search`.</span>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">            products: The single-element list from :meth:`_search`.</span>
 <a id="__codelineno-0-583" name="__codelineno-0-583"></a>
 <a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">            list[Any]: One element — a filtered `pandas.DataFrame`</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">            list[Any]: One element — a filtered :class:`pandas.DataFrame`</span>
 <a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">                (tabular), or a</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">                `pyramids.feature.collection.FeatureCollection` of the</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">                :class:`~pyramids.feature.collection.FeatureCollection` of the</span>
 <a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">                affected regions (vector).</span>
 <a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-590" name="__codelineno-0-590"></a>        <span class="n">events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_events</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_load_events</span><span class="p">())</span>
@@ -27613,7 +27641,7 @@ year the record covers.</p>
 <a id="__codelineno-0-629" name="__codelineno-0-629"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">within</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 <a id="__codelineno-0-630" name="__codelineno-0-630"></a>
 <a id="__codelineno-0-631" name="__codelineno-0-631"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-0-632" name="__codelineno-0-632"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch`.</span>
+<a id="__codelineno-0-632" name="__codelineno-0-632"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose :meth:`_search` and :meth:`_fetch`.</span>
 <a id="__codelineno-0-633" name="__codelineno-0-633"></a>
 <a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-635" name="__codelineno-0-635"></a><span class="sd">            list[Any]: The fetched result (one element).</span>
@@ -27631,8 +27659,8 @@ year the record covers.</p>
 <a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">                to the transport, so `False` really does silence it.</span>
 <a id="__codelineno-0-648" name="__codelineno-0-648"></a>
 <a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">            A `pandas.DataFrame` of events + impacts (the default), or a</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">            `pyramids.feature.collection.FeatureCollection` of the</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">            A :class:`pandas.DataFrame` of events + impacts (the default), or a</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">            :class:`~pyramids.feature.collection.FeatureCollection` of the</span>
 <a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">            affected NUTS-3 regions (`with_geometry=True`). Both are also written</span>
 <a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">            under `root_dir`.</span>
 <a id="__codelineno-0-654" name="__codelineno-0-654"></a>
@@ -28231,33 +28259,33 @@ to the transport, so <code>False</code> really does silence it.</p>
     <table>
       <thead>
         <tr>
-          <th>Type</th>
+<th>Name</th>          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td>
+<td><code>A</code></td>            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A <code>pandas.DataFrame</code> of events + impacts (the default), or a</p>
+                <p>class:<code>pandas.DataFrame</code> of events + impacts (the default), or a</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td>
+<td></td>            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>pyramids.feature.collection.FeatureCollection</code> of the</p>
+                <p>class:<code>~pyramids.feature.collection.FeatureCollection</code> of the</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td>
+<td></td>            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
@@ -28267,7 +28295,7 @@ to the transport, so <code>False</code> really does silence it.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td>
+<td></td>            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
@@ -28373,8 +28401,8 @@ the region archive has no <code>&lt;member_stem&gt;.shp</code> member.</p>
 <a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">            to the transport, so `False` really does silence it.</span>
 <a id="__codelineno-0-648" name="__codelineno-0-648"></a>
 <a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">        A `pandas.DataFrame` of events + impacts (the default), or a</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        `pyramids.feature.collection.FeatureCollection` of the</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">        A :class:`pandas.DataFrame` of events + impacts (the default), or a</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        :class:`~pyramids.feature.collection.FeatureCollection` of the</span>
 <a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">        affected NUTS-3 regions (`with_geometry=True`). Both are also written</span>
 <a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">        under `root_dir`.</span>
 <a id="__codelineno-0-654" name="__codelineno-0-654"></a>
@@ -28999,7 +29027,7 @@ count.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Zero rows, the <code>REGION_COLUMNS</code> columns with
+                <p>Zero rows, the :data:<code>REGION_COLUMNS</code> columns with
 their dtypes, an empty <code>geometry</code> column, CRS <code>EPSG:4326</code>.</p>
               </div>
             </td>
@@ -29064,7 +29092,7 @@ their dtypes, an empty <code>geometry</code> column, CRS <code>EPSG:4326</code>.
 <a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="sd">    count.</span>
 <a id="__codelineno-0-121" name="__codelineno-0-121"></a>
 <a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">        FeatureCollection: Zero rows, the `REGION_COLUMNS` columns with</span>
+<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">        FeatureCollection: Zero rows, the :data:`REGION_COLUMNS` columns with</span>
 <a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">            their dtypes, an empty `geometry` column, CRS `EPSG:4326`.</span>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">    Examples:</span>
@@ -29465,22 +29493,22 @@ the boundary file.</p>
 <p><code>HANZE(AbstractDataSource)</code> downloads the HANZE (Historical Analysis of Natural
 Hazards in Europe) database of observed European flood events and their impacts
 (Paprotny et al.) from its pinned static Zenodo release, filters it, and returns
-the event / impact records as a <code>pandas.DataFrame</code>. It is the observed
+the event / impact records as a :class:<code>pandas.DataFrame</code>. It is the observed
 hazard -&gt; loss record — real floods with fatalities, persons affected, area
 flooded and economic losses — so a modelled event set can be validated against
 the <em>observed</em> loss distribution. Companion to the global <code>emdat</code> backend.</p>
 <p>Three design points carry this backend:</p>
 <ul>
 <li><strong>Per-instance <code>OUTPUT_KIND</code>.</strong> The default is <code>tabular</code>, returning a
-  <code>pandas.DataFrame</code> of events + impacts. Passing <code>with_geometry=True</code>
+  :class:<code>pandas.DataFrame</code> of events + impacts. Passing <code>with_geometry=True</code>
   makes the instance <code>vector</code>: it additionally downloads the NUTS-3 region
   boundary shapefile and returns a pyramids
-  <code>pyramids.feature.collection.FeatureCollection</code> of the affected
+  :class:<code>~pyramids.feature.collection.FeatureCollection</code> of the affected
   regions (the <code>emdat</code> / <code>eumetsat</code> per-instance pattern). The facade reads the
   instance attribute to know the return shape and to gate <code>aggregate=</code>.</li>
 <li><strong>Direct file download, not range-read.</strong> HANZE ships small individual Zenodo
   objects (a 618 KB events CSV, a 2.4 MB region zip), so each is fetched whole
-  with <code>HttpClient</code> and cached under <code>path</code> — none
+  with :class:<code>~earthlens.base.http.HttpClient</code> and cached under <code>path</code> — none
   of caravan's multi-GB range-read machinery applies.</li>
 <li><strong>No new dependency.</strong> <code>HttpClient</code> + pandas + <code>base/archive</code> + pyramids are
   all core, and the Zenodo record is public (CC-BY-4.0), so there is no auth and
@@ -29528,8 +29556,8 @@ nothing here imports a gridded-array library (no <code>xarray</code>).</p>
         <p>HANZE historical-flood-impacts backend (per-instance output kind).</p>
 <p>Downloads the HANZE events / impacts table from its pinned Zenodo release,
 filters it by country / region / flood type / date window, and returns a
-<code>pandas.DataFrame</code>. With <code>with_geometry=True</code> it instead returns a
-<code>pyramids.feature.collection.FeatureCollection</code> of the affected
+:class:<code>pandas.DataFrame</code>. With <code>with_geometry=True</code> it instead returns a
+:class:<code>~pyramids.feature.collection.FeatureCollection</code> of the affected
 NUTS-3 regions.</p>
 <p>The record is public (CC-BY-4.0); no credentials are needed.</p>
 
@@ -29551,7 +29579,7 @@ NUTS-3 regions.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Set <strong>per instance</strong> in <code>__init__</code> — <code>"tabular"</code> by
+                <p>Set <strong>per instance</strong> in :meth:<code>__init__</code> — <code>"tabular"</code> by
 default, <code>"vector"</code> when <code>with_geometry=True</code>. The facade reads it
 to know the return shape and rejects <code>aggregate=</code> for both.</p>
               </div>
@@ -30202,14 +30230,14 @@ year the record covers.</p>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">    Downloads the HANZE events / impacts table from its pinned Zenodo release,</span>
 <a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">    filters it by country / region / flood type / date window, and returns a</span>
-<a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">    `pandas.DataFrame`. With `with_geometry=True` it instead returns a</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">    `pyramids.feature.collection.FeatureCollection` of the affected</span>
+<a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">    :class:`pandas.DataFrame`. With `with_geometry=True` it instead returns a</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="sd">    :class:`~pyramids.feature.collection.FeatureCollection` of the affected</span>
 <a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">    NUTS-3 regions.</span>
 <a id="__codelineno-0-143" name="__codelineno-0-143"></a>
 <a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">    The record is public (CC-BY-4.0); no credentials are needed.</span>
 <a id="__codelineno-0-145" name="__codelineno-0-145"></a>
 <a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in `__init__` — `&quot;tabular&quot;` by</span>
+<a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="sd">        OUTPUT_KIND: Set **per instance** in :meth:`__init__` — `&quot;tabular&quot;` by</span>
 <a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">            default, `&quot;vector&quot;` when `with_geometry=True`. The facade reads it</span>
 <a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">            to know the return shape and rejects `aggregate=` for both.</span>
 <a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="sd">        REQUIRES_TIME_WINDOW: `False` — a request without a window returns every</span>
@@ -30363,7 +30391,7 @@ year the record covers.</p>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;unreachable&quot;</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a>
 <a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Capture the requested bounds as a `SpatialExtent`.</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Capture the requested bounds as a :class:`SpatialExtent`.</span>
 <a id="__codelineno-0-302" name="__codelineno-0-302"></a>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            lat_lim: `[min_lat, max_lat]`.</span>
@@ -30381,7 +30409,7 @@ year the record covers.</p>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a `TemporalExtent`.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the optional `[start, end]` window into a :class:`TemporalExtent`.</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        HANZE covers a whole record and is indexed by event year, so `None`</span>
 <a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        bounds are legal and yield a `None`-dated extent.</span>
@@ -30644,12 +30672,12 @@ year the record covers.</p>
 <a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download, filter, and shape the one product to the instance&#39;s kind.</span>
 <a id="__codelineno-0-580" name="__codelineno-0-580"></a>
 <a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">            products: The single-element list from `_search`.</span>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">            products: The single-element list from :meth:`_search`.</span>
 <a id="__codelineno-0-583" name="__codelineno-0-583"></a>
 <a id="__codelineno-0-584" name="__codelineno-0-584"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">            list[Any]: One element — a filtered `pandas.DataFrame`</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a><span class="sd">            list[Any]: One element — a filtered :class:`pandas.DataFrame`</span>
 <a id="__codelineno-0-586" name="__codelineno-0-586"></a><span class="sd">                (tabular), or a</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">                `pyramids.feature.collection.FeatureCollection` of the</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a><span class="sd">                :class:`~pyramids.feature.collection.FeatureCollection` of the</span>
 <a id="__codelineno-0-588" name="__codelineno-0-588"></a><span class="sd">                affected regions (vector).</span>
 <a id="__codelineno-0-589" name="__codelineno-0-589"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-590" name="__codelineno-0-590"></a>        <span class="n">events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_events</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_load_events</span><span class="p">())</span>
@@ -30694,7 +30722,7 @@ year the record covers.</p>
 <a id="__codelineno-0-629" name="__codelineno-0-629"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">within</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 <a id="__codelineno-0-630" name="__codelineno-0-630"></a>
 <a id="__codelineno-0-631" name="__codelineno-0-631"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-0-632" name="__codelineno-0-632"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose `_search` and `_fetch`.</span>
+<a id="__codelineno-0-632" name="__codelineno-0-632"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose :meth:`_search` and :meth:`_fetch`.</span>
 <a id="__codelineno-0-633" name="__codelineno-0-633"></a>
 <a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-635" name="__codelineno-0-635"></a><span class="sd">            list[Any]: The fetched result (one element).</span>
@@ -30712,8 +30740,8 @@ year the record covers.</p>
 <a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">                to the transport, so `False` really does silence it.</span>
 <a id="__codelineno-0-648" name="__codelineno-0-648"></a>
 <a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">            A `pandas.DataFrame` of events + impacts (the default), or a</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">            `pyramids.feature.collection.FeatureCollection` of the</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">            A :class:`pandas.DataFrame` of events + impacts (the default), or a</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">            :class:`~pyramids.feature.collection.FeatureCollection` of the</span>
 <a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">            affected NUTS-3 regions (`with_geometry=True`). Both are also written</span>
 <a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">            under `root_dir`.</span>
 <a id="__codelineno-0-654" name="__codelineno-0-654"></a>
@@ -31312,33 +31340,33 @@ to the transport, so <code>False</code> really does silence it.</p>
     <table>
       <thead>
         <tr>
-          <th>Type</th>
+<th>Name</th>          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td>
+<td><code>A</code></td>            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A <code>pandas.DataFrame</code> of events + impacts (the default), or a</p>
+                <p>class:<code>pandas.DataFrame</code> of events + impacts (the default), or a</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td>
+<td></td>            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>pyramids.feature.collection.FeatureCollection</code> of the</p>
+                <p>class:<code>~pyramids.feature.collection.FeatureCollection</code> of the</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td>
+<td></td>            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
@@ -31348,7 +31376,7 @@ to the transport, so <code>False</code> really does silence it.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td>
+<td></td>            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pyramids.feature.collection.FeatureCollection">FeatureCollection</span></code>
             </td>
             <td>
@@ -31454,8 +31482,8 @@ the region archive has no <code>&lt;member_stem&gt;.shp</code> member.</p>
 <a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">            to the transport, so `False` really does silence it.</span>
 <a id="__codelineno-0-648" name="__codelineno-0-648"></a>
 <a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">        A `pandas.DataFrame` of events + impacts (the default), or a</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        `pyramids.feature.collection.FeatureCollection` of the</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">        A :class:`pandas.DataFrame` of events + impacts (the default), or a</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        :class:`~pyramids.feature.collection.FeatureCollection` of the</span>
 <a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">        affected NUTS-3 regions (`with_geometry=True`). Both are also written</span>
 <a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">        under `root_dir`.</span>
 <a id="__codelineno-0-654" name="__codelineno-0-654"></a>
@@ -31534,22 +31562,22 @@ vocabulary, the friendly-name -&gt; CSV-header map, and the region-geometry join
 configuration.</p>
 <p>Four shapes are modelled, all frozen:</p>
 <ul>
-<li><code>ZenodoRecord</code> — the pinned version record, its concept DOI, <code>version</code>,
+<li>:class:<code>ZenodoRecord</code> — the pinned version record, its concept DOI, <code>version</code>,
   <code>data_period</code>, licence and attribution. Pinning a version rather than the
   moving concept DOI is what makes a request reproducible.</li>
-<li><code>HanzeFile</code> — one downloadable Zenodo object (its name, and the REST
+<li>:class:<code>HanzeFile</code> — one downloadable Zenodo object (its name, and the REST
   content <code>url</code> composed from the pinned record). HANZE ships small individual
   files, so each is a direct download, never a range-read.</li>
-<li><code>FloodType</code> — one row of the <code>Type</code> vocabulary (<code>River</code>, <code>Flash</code>,
+<li>:class:<code>FloodType</code> — one row of the <code>Type</code> vocabulary (<code>River</code>, <code>Flash</code>,
   <code>Coastal</code>, <code>River/Coastal</code>). These are the catalog's dict-surface rows, keyed
-  by type under the inherited <code>datasets</code> field.</li>
-<li><code>GeometryJoin</code> — the region-shapefile join: its member stem, the join
+  by type under the inherited :attr:<code>datasets</code> field.</li>
+<li>:class:<code>GeometryJoin</code> — the region-shapefile join: its member stem, the join
   field (<code>Code</code>), the name field, and the shapefile CRS (<code>EPSG:3035</code>).</li>
 </ul>
-<p><code>Catalog</code> is a thin <code>earthlens.base.AbstractCatalog</code> subclass that
+<p>:class:<code>Catalog</code> is a thin :class:<code>earthlens.base.AbstractCatalog</code> subclass that
 loads the bundled <code>hanze_data_catalog.yaml</code> through the shared
-<code>load_catalog</code> (with a <code>CatalogParseCache</code>),
-mirroring <code>gdacs/catalog.py</code>. <code>CATALOG_PATH</code> is the path to the bundled
+:func:<code>~earthlens.base.catalog_source.load_catalog</code> (with a <code>CatalogParseCache</code>),
+mirroring <code>gdacs/catalog.py</code>. :data:<code>CATALOG_PATH</code> is the path to the bundled
 YAML and is monkey-patchable in tests.</p>
 
 
@@ -31591,8 +31619,8 @@ YAML and is monkey-patchable in tests.</p>
         <p>Catalog for the HANZE backend.</p>
 <p>Reads the bundled <code>hanze_data_catalog.yaml</code> (shipped as package data) and
 exposes the pinned Zenodo record, the per-file names, the flood-<code>Type</code>
-vocabulary (as <code>FloodType</code> rows keyed by type under the inherited
-<code>datasets</code> field — the <code>cat["River"]</code> / <code>"River" in cat</code> / <code>len(cat)</code>
+vocabulary (as :class:<code>FloodType</code> rows keyed by type under the inherited
+:attr:<code>datasets</code> field — the <code>cat["River"]</code> / <code>"River" in cat</code> / <code>len(cat)</code>
 dict surface), the friendly-name -&gt; CSV-header map, and the region-geometry
 join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 
@@ -31614,7 +31642,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Map from a flood-<code>Type</code> string to its <code>FloodType</code> row.</p>
+                <p>Map from a flood-<code>Type</code> string to its :class:<code>FloodType</code> row.</p>
               </div>
             </td>
           </tr>
@@ -31625,7 +31653,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The pinned <code>ZenodoRecord</code>.</p>
+                <p>The pinned :class:<code>ZenodoRecord</code>.</p>
               </div>
             </td>
           </tr>
@@ -31637,7 +31665,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
             <td>
               <div class="doc-md-description">
                 <p>Map from a logical key (<code>"events"</code>, <code>"regions"</code>,
-<code>"region_names"</code>) to its <code>HanzeFile</code>.</p>
+<code>"region_names"</code>) to its :class:<code>HanzeFile</code>.</p>
               </div>
             </td>
           </tr>
@@ -31648,7 +31676,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>GeometryJoin</code> for the region attach.</p>
+                <p>The :class:<code>GeometryJoin</code> for the region attach.</p>
               </div>
             </td>
           </tr>
@@ -31900,17 +31928,17 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a>
 <a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    Reads the bundled `hanze_data_catalog.yaml` (shipped as package data) and</span>
 <a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    exposes the pinned Zenodo record, the per-file names, the flood-`Type`</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">    vocabulary (as `FloodType` rows keyed by type under the inherited</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    `datasets` field — the `cat[&quot;River&quot;]` / `&quot;River&quot; in cat` / `len(cat)`</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">    vocabulary (as :class:`FloodType` rows keyed by type under the inherited</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    :attr:`datasets` field — the `cat[&quot;River&quot;]` / `&quot;River&quot; in cat` / `len(cat)`</span>
 <a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    dict surface), the friendly-name -&gt; CSV-header map, and the region-geometry</span>
 <a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    join configuration. Instantiate with no arguments (`Catalog()`).</span>
 <a id="__codelineno-0-318" name="__codelineno-0-318"></a>
 <a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        datasets: Map from a flood-`Type` string to its `FloodType` row.</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        record: The pinned `ZenodoRecord`.</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        datasets: Map from a flood-`Type` string to its :class:`FloodType` row.</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        record: The pinned :class:`ZenodoRecord`.</span>
 <a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        files: Map from a logical key (`&quot;events&quot;`, `&quot;regions&quot;`,</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            `&quot;region_names&quot;`) to its `HanzeFile`.</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        geometry: The `GeometryJoin` for the region attach.</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            `&quot;region_names&quot;`) to its :class:`HanzeFile`.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        geometry: The :class:`GeometryJoin` for the region attach.</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        columns: Friendly name -&gt; exact HANZE CSV header.</span>
 <a id="__codelineno-0-326" name="__codelineno-0-326"></a>
 <a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">    Examples:</span>
@@ -31944,7 +31972,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-355" name="__codelineno-0-355"></a>
 <a id="__codelineno-0-356" name="__codelineno-0-356"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FloodType</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="c1">#: `record` / `geometry` default to `None` rather than a placeholder model:</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>    <span class="c1">#: the base `model_post_init` autoload fills a field only when its</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>    <span class="c1">#: the base :meth:`model_post_init` autoload fills a field only when its</span>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="c1">#: current value is falsy, and a placeholder model instance is truthy, so it</span>
 <a id="__codelineno-0-360" name="__codelineno-0-360"></a>    <span class="c1">#: would be skipped and `Catalog()` would keep the placeholder. `None` is</span>
 <a id="__codelineno-0-361" name="__codelineno-0-361"></a>    <span class="c1">#: falsy, so the bundled record / geometry load as intended. `load()` and a</span>
@@ -31969,10 +31997,10 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-380" name="__codelineno-0-380"></a>
 <a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">                `CATALOG_PATH`.</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">                :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-384" name="__codelineno-0-384"></a>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">            A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        Raises:</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            ValueError: If `catalog_path` does not exist, a required block is</span>
@@ -31997,9 +32025,9 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-408" name="__codelineno-0-408"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">parsed</span><span class="p">)</span>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a>
 <a id="__codelineno-0-410" name="__codelineno-0-410"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_flood_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flood_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloodType</span><span class="p">:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `FloodType` for `flood_type`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`FloodType` for `flood_type`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-412" name="__codelineno-0-412"></a>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">        Thin alias over `get_dataset`.</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">        Thin alias over :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-414" name="__codelineno-0-414"></a>
 <a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            flood_type: A HANZE flood-`Type` string (`&quot;River&quot;`, `&quot;Coastal&quot;`,</span>
@@ -32041,7 +32069,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 <a id="__codelineno-0-453" name="__codelineno-0-453"></a>
 <a id="__codelineno-0-454" name="__codelineno-0-454"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HanzeFile</span><span class="p">:</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `HanzeFile` for a logical key.</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the :class:`HanzeFile` for a logical key.</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">            key: `&quot;events&quot;`, `&quot;regions&quot;`, or `&quot;region_names&quot;`.</span>
@@ -32283,7 +32311,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>HanzeFile</code> for a logical key.</p>
+        <p>Return the :class:<code>HanzeFile</code> for a logical key.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -32403,7 +32431,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <span class="normal"><a href="#__codelineno-0-476">476</a></span>
 <span class="normal"><a href="#__codelineno-0-477">477</a></span>
 <span class="normal"><a href="#__codelineno-0-478">478</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="k">def</span><span class="w"> </span><span class="nf">file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HanzeFile</span><span class="p">:</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `HanzeFile` for a logical key.</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`HanzeFile` for a logical key.</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        key: `&quot;events&quot;`, `&quot;regions&quot;`, or `&quot;region_names&quot;`.</span>
@@ -32533,8 +32561,8 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the <code>FloodType</code> for <code>flood_type</code>, with a did-you-mean hint.</p>
-<p>Thin alias over <code>get_dataset</code>.</p>
+        <p>Return the :class:<code>FloodType</code> for <code>flood_type</code>, with a did-you-mean hint.</p>
+<p>Thin alias over :meth:<code>~earthlens.base.AbstractCatalog.get_dataset</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -32652,9 +32680,9 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <span class="normal"><a href="#__codelineno-0-432">432</a></span>
 <span class="normal"><a href="#__codelineno-0-433">433</a></span>
 <span class="normal"><a href="#__codelineno-0-434">434</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_flood_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flood_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloodType</span><span class="p">:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `FloodType` for `flood_type`, with a did-you-mean hint.</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the :class:`FloodType` for `flood_type`, with a did-you-mean hint.</span>
 <a id="__codelineno-0-412" name="__codelineno-0-412"></a>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">    Thin alias over `get_dataset`.</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">    Thin alias over :meth:`~earthlens.base.AbstractCatalog.get_dataset`.</span>
 <a id="__codelineno-0-414" name="__codelineno-0-414"></a>
 <a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        flood_type: A HANZE flood-`Type` string (`&quot;River&quot;`, `&quot;Coastal&quot;`,</span>
@@ -32721,7 +32749,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
             <td>
               <div class="doc-md-description">
                 <p>Path to the catalog YAML. Defaults to the module-level
-<code>CATALOG_PATH</code>.</p>
+:data:<code>CATALOG_PATH</code>.</p>
               </div>
             </td>
             <td>
@@ -32747,7 +32775,7 @@ join configuration. Instantiate with no arguments (<code>Catalog()</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A fully-populated <code>Catalog</code>.</p>
+                <p>A fully-populated :class:<code>Catalog</code>.</p>
               </div>
             </td>
           </tr>
@@ -32831,10 +32859,10 @@ missing, or a row fails validation.</p>
 <a id="__codelineno-0-380" name="__codelineno-0-380"></a>
 <a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the module-level</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">            `CATALOG_PATH`.</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">            :data:`CATALOG_PATH`.</span>
 <a id="__codelineno-0-384" name="__codelineno-0-384"></a>
 <a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        A fully-populated :class:`Catalog`.</span>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">        ValueError: If `catalog_path` does not exist, a required block is</span>
@@ -32890,8 +32918,8 @@ missing, or a row fails validation.</p>
 
         <p>One entry of the HANZE flood-<code>Type</code> vocabulary.</p>
 <p>The type string (<code>"River"</code>, <code>"River/Coastal"</code>) is the parent key in
-<code>Catalog.datasets</code>; the loader copies it onto the row as
-<code>name</code> so a resolved flood type is self-describing.</p>
+:attr:<code>Catalog.datasets</code>; the loader copies it onto the row as
+:attr:<code>name</code> so a resolved flood type is self-describing.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -32989,8 +33017,8 @@ value is rejected at load time, and the field is excluded from
 <a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One entry of the HANZE flood-`Type` vocabulary.</span>
 <a id="__codelineno-0-152" name="__codelineno-0-152"></a>
 <a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">    The type string (`&quot;River&quot;`, `&quot;River/Coastal&quot;`) is the parent key in</span>
-<a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">    `Catalog.datasets`; the loader copies it onto the row as</span>
-<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    `name` so a resolved flood type is self-describing.</span>
+<a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">    :attr:`Catalog.datasets`; the loader copies it onto the row as</span>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    :attr:`name` so a resolved flood type is self-describing.</span>
 <a id="__codelineno-0-156" name="__codelineno-0-156"></a>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    Attributes:</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">        name: The flood type&#39;s catalog key, injected by the loader; the</span>
@@ -33836,10 +33864,10 @@ module splits that list, counts how many of the (already-filtered) events touch
 each region, joins those codes to the NUTS-3 boundary polygons on the shapefile's
 <code>Code</code> field, reprojects the result from the shapefile's stored ETRS89-LAEA CRS
 (<code>EPSG:3035</code>) to WGS84, and returns a pyramids
-<code>pyramids.feature.collection.FeatureCollection</code> of one polygon per
+:class:<code>~pyramids.feature.collection.FeatureCollection</code> of one polygon per
 affected region.</p>
-<p>The output schema is the same on the populated path (<code>join_events_to_regions</code>)
-and the empty path (<code>empty_region_fc</code>) — <code>nuts3_code</code>, <code>region_name</code>,
+<p>The output schema is the same on the populated path (:func:<code>join_events_to_regions</code>)
+and the empty path (:func:<code>empty_region_fc</code>) — <code>nuts3_code</code>, <code>region_name</code>,
 <code>n_events</code>, and <code>geometry</code> — so a downstream <code>to_file</code> never chokes on a schema
 mismatch between a hit and a miss.</p>
 <p>Because HANZE's impact figures (fatalities, losses) are per <em>event</em> national /
@@ -33900,7 +33928,7 @@ count.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Zero rows, the <code>REGION_COLUMNS</code> columns with
+                <p>Zero rows, the :data:<code>REGION_COLUMNS</code> columns with
 their dtypes, an empty <code>geometry</code> column, CRS <code>EPSG:4326</code>.</p>
               </div>
             </td>
@@ -33965,7 +33993,7 @@ their dtypes, an empty <code>geometry</code> column, CRS <code>EPSG:4326</code>.
 <a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="sd">    count.</span>
 <a id="__codelineno-0-121" name="__codelineno-0-121"></a>
 <a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">        FeatureCollection: Zero rows, the `REGION_COLUMNS` columns with</span>
+<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">        FeatureCollection: Zero rows, the :data:`REGION_COLUMNS` columns with</span>
 <a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">            their dtypes, an empty `geometry` column, CRS `EPSG:4326`.</span>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">    Examples:</span>

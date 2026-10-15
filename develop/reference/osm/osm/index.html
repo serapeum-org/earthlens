@@ -817,6 +817,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../testing-rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -28808,7 +28836,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-546" name="__codelineno-0-546"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_pbf_client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpClient</span><span class="p">:</span>
 <a id="__codelineno-0-547" name="__codelineno-0-547"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return this instance&#39;s PBF-download client, built once.</span>
 <a id="__codelineno-0-548" name="__codelineno-0-548"></a>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a><span class="sd">        Memoised for the same reason as `_overpass_client`: the pacing</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a><span class="sd">        Memoised for the same reason as :meth:`_overpass_client`: the pacing</span>
 <a id="__codelineno-0-550" name="__codelineno-0-550"></a><span class="sd">        state lives on the client.</span>
 <a id="__codelineno-0-551" name="__codelineno-0-551"></a>
 <a id="__codelineno-0-552" name="__codelineno-0-552"></a><span class="sd">        Returns:</span>
@@ -28831,7 +28859,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one Overpass query: POST the QL (with UA), parse, build geometry.</span>
 <a id="__codelineno-0-570" name="__codelineno-0-570"></a>
 <a id="__codelineno-0-571" name="__codelineno-0-571"></a><span class="sd">        POSTs the resolved Overpass QL to `self._endpoint` through the shared</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="sd">        `HttpClient` (a descriptive</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="sd">        :class:`~earthlens.base.http.HttpClient` (a descriptive</span>
 <a id="__codelineno-0-573" name="__codelineno-0-573"></a><span class="sd">        `User-Agent` — required to avoid the overpass-api.de 406 — applied at</span>
 <a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="sd">        the client level via `default_headers`, and `self._timeout`), parses</span>
 <a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">        the JSON with `overpy.Overpass().parse_json(...)`, and converts the</span>
@@ -29088,7 +29116,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one `bulk` layer: resolve region, fetch-cache, read, bbox-clip.</span>
 <a id="__codelineno-0-827" name="__codelineno-0-827"></a>
 <a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="sd">        Resolves `self._region` to a Geofabrik path, downloads the extract</span>
-<a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="sd">        (cached, via `download_extract`), and reads</span>
+<a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="sd">        (cached, via :func:`~earthlens.osm._pbf.download_extract`), and reads</span>
 <a id="__codelineno-0-830" name="__codelineno-0-830"></a><span class="sd">        the row&#39;s `pyrosm_method` layer into a `FeatureCollection` with the</span>
 <a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">        selected engine (`self._engine`), clipping to the request bbox (`G12`,</span>
 <a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">        `G13`, `G14`). The read stays `xarray`-free (`G7`).</span>
@@ -30989,7 +31017,7 @@ existing, non-empty cached file is reused as-is — no per-call sidecar fetch
 and no re-hashing of a (potentially multi-GB) local file, which the download
 already verified. To pick up a newer Geofabrik extract, delete the cached
 file (it is re-fetched on the next call). A fresh download streams
-atomically (via <code>HttpClient</code>, which follows the
+atomically (via :class:<code>~earthlens.base.http.HttpClient</code>, which follows the
 Geofabrik <code>302</code> redirect and writes a <code>.part</code> renamed on success) and, when
 <code>verify_md5</code> is set, is checked once against the <code>.osm.pbf.md5</code> sidecar — a
 mismatch removes the file and raises. An extract larger than
@@ -31049,7 +31077,7 @@ mismatch removes the file and raises. An extract larger than
             <td>
               <div class="doc-md-description">
                 <p>HTTP client to use. Defaults to a fresh
-<code>HttpClient</code> (retry/back-off on
+:class:<code>~earthlens.base.http.HttpClient</code> (retry/back-off on
 <code>5xx</code>/<code>429</code>).</p>
               </div>
             </td>
@@ -31233,7 +31261,7 @@ sidecar.</p>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">    and no re-hashing of a (potentially multi-GB) local file, which the download</span>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">    already verified. To pick up a newer Geofabrik extract, delete the cached</span>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">    file (it is re-fetched on the next call). A fresh download streams</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">    atomically (via `HttpClient`, which follows the</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">    atomically (via :class:`~earthlens.base.http.HttpClient`, which follows the</span>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">    Geofabrik `302` redirect and writes a `.part` renamed on success) and, when</span>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">    `verify_md5` is set, is checked once against the `.osm.pbf.md5` sidecar — a</span>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">    mismatch removes the file and raises. An extract larger than</span>
@@ -31243,7 +31271,7 @@ sidecar.</p>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        region_path: The Geofabrik path segment, e.g. `&quot;europe/malta&quot;`.</span>
 <a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        cache_dir: Directory the extract is cached in (created if absent).</span>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">        http: HTTP client to use. Defaults to a fresh</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            `HttpClient` (retry/back-off on</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            :class:`~earthlens.base.http.HttpClient` (retry/back-off on</span>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">            `5xx`/`429`).</span>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">        progress: Show a `tqdm` download progress bar.</span>
 <a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        verify_md5: Verify a **freshly-downloaded** file against Geofabrik&#39;s</span>
@@ -34333,7 +34361,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-546" name="__codelineno-0-546"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_pbf_client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpClient</span><span class="p">:</span>
 <a id="__codelineno-0-547" name="__codelineno-0-547"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return this instance&#39;s PBF-download client, built once.</span>
 <a id="__codelineno-0-548" name="__codelineno-0-548"></a>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a><span class="sd">        Memoised for the same reason as `_overpass_client`: the pacing</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a><span class="sd">        Memoised for the same reason as :meth:`_overpass_client`: the pacing</span>
 <a id="__codelineno-0-550" name="__codelineno-0-550"></a><span class="sd">        state lives on the client.</span>
 <a id="__codelineno-0-551" name="__codelineno-0-551"></a>
 <a id="__codelineno-0-552" name="__codelineno-0-552"></a><span class="sd">        Returns:</span>
@@ -34356,7 +34384,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one Overpass query: POST the QL (with UA), parse, build geometry.</span>
 <a id="__codelineno-0-570" name="__codelineno-0-570"></a>
 <a id="__codelineno-0-571" name="__codelineno-0-571"></a><span class="sd">        POSTs the resolved Overpass QL to `self._endpoint` through the shared</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="sd">        `HttpClient` (a descriptive</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="sd">        :class:`~earthlens.base.http.HttpClient` (a descriptive</span>
 <a id="__codelineno-0-573" name="__codelineno-0-573"></a><span class="sd">        `User-Agent` — required to avoid the overpass-api.de 406 — applied at</span>
 <a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="sd">        the client level via `default_headers`, and `self._timeout`), parses</span>
 <a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">        the JSON with `overpy.Overpass().parse_json(...)`, and converts the</span>
@@ -34613,7 +34641,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one `bulk` layer: resolve region, fetch-cache, read, bbox-clip.</span>
 <a id="__codelineno-0-827" name="__codelineno-0-827"></a>
 <a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="sd">        Resolves `self._region` to a Geofabrik path, downloads the extract</span>
-<a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="sd">        (cached, via `download_extract`), and reads</span>
+<a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="sd">        (cached, via :func:`~earthlens.osm._pbf.download_extract`), and reads</span>
 <a id="__codelineno-0-830" name="__codelineno-0-830"></a><span class="sd">        the row&#39;s `pyrosm_method` layer into a `FeatureCollection` with the</span>
 <a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">        selected engine (`self._engine`), clipping to the request bbox (`G12`,</span>
 <a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">        `G13`, `G14`). The read stays `xarray`-free (`G7`).</span>
@@ -40137,7 +40165,7 @@ is reprojected.</p>
   <strong>cache it to disk</strong> (<code>G13</code>). Caching is presence-based: a repeat request for
   the same region reuses the existing cached file as-is (delete it to pick up a
   newer Geofabrik <code>*-latest</code> extract). A <strong>fresh</strong> download is atomic (the
-  shared <code>HttpClient</code> writes a sibling <code>.part</code> and
+  shared :class:<code>~earthlens.base.http.HttpClient</code> writes a sibling <code>.part</code> and
   renames on success) and, by default, integrity-checked against Geofabrik's
   <code>.osm.pbf.md5</code> sidecar; a cache hit is trusted and not re-verified. A multi-GB
   extract logs a large-file warning before it is fetched.</li>
@@ -40195,7 +40223,7 @@ existing, non-empty cached file is reused as-is — no per-call sidecar fetch
 and no re-hashing of a (potentially multi-GB) local file, which the download
 already verified. To pick up a newer Geofabrik extract, delete the cached
 file (it is re-fetched on the next call). A fresh download streams
-atomically (via <code>HttpClient</code>, which follows the
+atomically (via :class:<code>~earthlens.base.http.HttpClient</code>, which follows the
 Geofabrik <code>302</code> redirect and writes a <code>.part</code> renamed on success) and, when
 <code>verify_md5</code> is set, is checked once against the <code>.osm.pbf.md5</code> sidecar — a
 mismatch removes the file and raises. An extract larger than
@@ -40255,7 +40283,7 @@ mismatch removes the file and raises. An extract larger than
             <td>
               <div class="doc-md-description">
                 <p>HTTP client to use. Defaults to a fresh
-<code>HttpClient</code> (retry/back-off on
+:class:<code>~earthlens.base.http.HttpClient</code> (retry/back-off on
 <code>5xx</code>/<code>429</code>).</p>
               </div>
             </td>
@@ -40439,7 +40467,7 @@ sidecar.</p>
 <a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">    and no re-hashing of a (potentially multi-GB) local file, which the download</span>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">    already verified. To pick up a newer Geofabrik extract, delete the cached</span>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">    file (it is re-fetched on the next call). A fresh download streams</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">    atomically (via `HttpClient`, which follows the</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">    atomically (via :class:`~earthlens.base.http.HttpClient`, which follows the</span>
 <a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">    Geofabrik `302` redirect and writes a `.part` renamed on success) and, when</span>
 <a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">    `verify_md5` is set, is checked once against the `.osm.pbf.md5` sidecar — a</span>
 <a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">    mismatch removes the file and raises. An extract larger than</span>
@@ -40449,7 +40477,7 @@ sidecar.</p>
 <a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        region_path: The Geofabrik path segment, e.g. `&quot;europe/malta&quot;`.</span>
 <a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        cache_dir: Directory the extract is cached in (created if absent).</span>
 <a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">        http: HTTP client to use. Defaults to a fresh</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            `HttpClient` (retry/back-off on</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            :class:`~earthlens.base.http.HttpClient` (retry/back-off on</span>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">            `5xx`/`429`).</span>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">        progress: Show a `tqdm` download progress bar.</span>
 <a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        verify_md5: Verify a **freshly-downloaded** file against Geofabrik&#39;s</span>
