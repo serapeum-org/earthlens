@@ -12,9 +12,9 @@ Three design points carry this backend:
 
 * **Per-instance `OUTPUT_KIND` (`G1`).** The resolved dataset's `output_kind` is
   copied onto `self.OUTPUT_KIND` in `__init__`: `vector` returns a pyramids
-  :class:`~pyramids.feature.collection.FeatureCollection` (rgi/glims outlines),
-  `tabular` returns a :class:`pandas.DataFrame` (wgms fluctuations). The
-  :class:`earthlens.earthlens.EarthLens` facade reads the instance attribute to
+  `pyramids.feature.collection.FeatureCollection` (rgi/glims outlines),
+  `tabular` returns a `pandas.DataFrame` (wgms fluctuations). The
+  `earthlens.earthlens.EarthLens` facade reads the instance attribute to
   gate `aggregate=` (rejected for both) and to know the return shape.
 * **Region-download-then-clip (`G6`).** RGI ships per GTN-G region; the backend
   maps the request bbox to the overlapping region(s) (a `region=` override is
@@ -67,10 +67,10 @@ class Glaciers(AbstractDataSource):
 
     Resolves one dataset id to its catalog row, routes the request to that row's
     source (RGI / GLIMS / WGMS), and returns a pyramids
-    :class:`~pyramids.feature.collection.FeatureCollection` (`vector`) or a
-    :class:`pandas.DataFrame` (`tabular`) per the row's `output_kind`. The query
-    is a search/fetch split: :meth:`_search` pins the products (one per
-    overlapping RGI region, or a single GLIMS / WGMS product) and :meth:`_fetch`
+    `pyramids.feature.collection.FeatureCollection` (`vector`) or a
+    `pandas.DataFrame` (`tabular`) per the row's `output_kind`. The query
+    is a search/fetch split: `_search` pins the products (one per
+    overlapping RGI region, or a single GLIMS / WGMS product) and `_fetch`
     downloads + reads each.
 
     All three sources are open, so the backend needs no credentials. `aggregate=`
@@ -78,7 +78,7 @@ class Glaciers(AbstractDataSource):
     gridded rasters (`G8`).
 
     Attributes:
-        OUTPUT_KIND: Set **per instance** in :meth:`__init__` from the resolved
+        OUTPUT_KIND: Set **per instance** in `__init__` from the resolved
             dataset's `output_kind` (`"vector"` or `"tabular"`). The facade reads
             it to gate `aggregate=` and to know the return shape.
     """
@@ -228,7 +228,7 @@ class Glaciers(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse the optional `[start, end]` window into a :class:`TemporalExtent`.
+        """Parse the optional `[start, end]` window into a `TemporalExtent`.
 
         Dates are not part of the request (outlines are an inventory), so `None`
         bounds are allowed and yield a `None`-dated extent.
@@ -303,12 +303,12 @@ class Glaciers(AbstractDataSource):
         """Download + read every product `_search` returned.
 
         Args:
-            products: The list from :meth:`_search`.
+            products: The list from `_search`.
 
         Returns:
-            list: One :class:`~pyramids.feature.collection.FeatureCollection`
+            list: One `pyramids.feature.collection.FeatureCollection`
                 per RGI region / the GLIMS query (`vector`), or a single
-                :class:`pandas.DataFrame` (`tabular`, wgms).
+                `pandas.DataFrame` (`tabular`, wgms).
         """
         return [self._fetch_one(product) for product in products]
 
@@ -316,7 +316,7 @@ class Glaciers(AbstractDataSource):
         """Fetch and read one product per its source.
 
         Args:
-            product: One :class:`RemoteProduct` from :meth:`_search`.
+            product: One `RemoteProduct` from `_search`.
 
         Returns:
             A `FeatureCollection` (rgi/glims) or a `DataFrame` (wgms).
@@ -367,9 +367,9 @@ class Glaciers(AbstractDataSource):
                 fetch is a small loop, so this is a no-op.
 
         Returns:
-            A pyramids :class:`~pyramids.feature.collection.FeatureCollection`
+            A pyramids `pyramids.feature.collection.FeatureCollection`
             (`vector`, rgi/glims; clipped, EPSG:4326) or a
-            :class:`pandas.DataFrame` (`tabular`, wgms; also written to
+            `pandas.DataFrame` (`tabular`, wgms; also written to
             `root_dir`).
 
         Raises:

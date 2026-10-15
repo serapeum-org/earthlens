@@ -1,14 +1,14 @@
 """Private, stateless helpers for the FLOPROS backend.
 
-Three concerns live here so :class:`~earthlens.flopros.backend.FLOPROS` stays a
+Three concerns live here so `FLOPROS` stays a
 thin orchestration layer: the **layer grammar** (turning a `layer=` selection
 into the source `.dbf` columns to read and their public names), the **zip IO**
 (pulling the FLOPROS shapefile — and its sidecars — out of the downloaded NHESS
-supplement zip via the shared :func:`earthlens.base.archive.extract_members`),
+supplement zip via the shared `earthlens.base.archive.extract_members`),
 and the **FeatureCollection assembly** (selecting + renaming the identity and
 chosen layer columns and applying the unit-name / bbox filter). All geometry
 handling stays inside pyramids
-(:class:`~pyramids.feature.collection.FeatureCollection`, itself a
+(`pyramids.feature.collection.FeatureCollection`, itself a
 `geopandas.GeoDataFrame` subclass); this module never imports `xarray`.
 """
 
@@ -76,7 +76,7 @@ def resolve_layers(
 def extract_shapefile(zip_path: Path, stem: str, dest_dir: Path) -> Path:
     """Extract the FLOPROS shapefile (+ sidecars) from the supplement zip.
 
-    Uses the shared :func:`earthlens.base.archive.extract_members` (which guards
+    Uses the shared `earthlens.base.archive.extract_members` (which guards
     against Zip-Slip) to pull every `{stem}.*` shapefile member, then returns
     the extracted `.shp`.
 
@@ -110,10 +110,10 @@ def build_feature_collection(
 
     Args:
         source: The full FLOPROS shapefile read as a
-            :class:`~pyramids.feature.collection.FeatureCollection`.
+            `pyramids.feature.collection.FeatureCollection`.
         identity_columns: The identity columns to keep (`name` / `geonunit` /
             `type_en`).
-        layers: `{public_name: source_column}` from :func:`resolve_layers`.
+        layers: `{public_name: source_column}` from `resolve_layers`.
 
     Returns:
         FeatureCollection: The trimmed, renamed collection, CRS `EPSG:4326`.
@@ -149,9 +149,9 @@ def filter_units(
     (via `GeoDataFrame.cx`). Both filters compose.
 
     Args:
-        collection: The trimmed collection from :func:`build_feature_collection`.
+        collection: The trimmed collection from `build_feature_collection`.
         country: A unit name to match (case-insensitive exact), or `None`.
-        space: The requested :class:`~earthlens.base.SpatialExtent`; a
+        space: The requested `SpatialExtent`; a
             whole-globe extent applies no spatial filter.
 
     Returns:

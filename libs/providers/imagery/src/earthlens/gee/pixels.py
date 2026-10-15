@@ -28,9 +28,9 @@ epic's expectation that this engine would serve an oversize composite
 mosaicking exactly as the `getDownloadURL` path does.
 
 **What it owns.** The decision and the request: the serve/decline verdict
-(:meth:`PixelsEngine.plan`), the output grid (:meth:`PixelsEngine.grid_for`),
-the `computePixels` request body (:meth:`PixelsEngine.request`) and the endpoint
-to initialise against (:meth:`PixelsEngine.endpoint`). `GEE._export_via_pixels`
+(`PixelsEngine.plan`), the output grid (`PixelsEngine.grid_for`),
+the `computePixels` request body (`PixelsEngine.request`) and the endpoint
+to initialise against (`PixelsEngine.endpoint`). `GEE._export_via_pixels`
 posts that body and writes the GeoTIFF it returns, so `engine='pixels'` fetches
 through this engine end to end.
 
@@ -38,7 +38,7 @@ Wiring it exposed a defect worth recording. The backend read "some engine
 accepted" as "the EEDAI reader accepted", so the first request routed here was
 served from stored pixels with the composite silently dropped. An accepted plan
 now has to name its engine, which is why
-:class:`~earthlens.gee.plans.EnginePlan` carries `engine` at all.
+`EnginePlan` carries `engine` at all.
 
 It lands with the `Engine` ABC rather than after it because the ABC's value is
 the claim that a new engine is a subclass plus a registry entry. This engine is
@@ -77,7 +77,7 @@ class PixelsEngine(Engine):
 
     Accepts a computed image, so unlike the EEDAI reader it does not decline a
     `cloud_mask` or `filters`. It sizes its request from an
-    :class:`~earthlens.gee.grid.OutputGrid` rather than deriving a grid of its
+    `OutputGrid` rather than deriving a grid of its
     own, so it cannot disagree with the other engines about the output shape -
     including about the 32768-px per-axis cap, which Earth Engine applies to a
     `computePixels` grid as well, and which `auto_split=True` tiles around.
@@ -125,10 +125,10 @@ class PixelsEngine(Engine):
     ) -> tuple[bool, EnginePlan | None]:
         """Return the plan this engine would serve, given only what sizes it.
 
-        The sizing half of :meth:`plan`, which calls it. Split out because it
+        The sizing half of `plan`, which calls it. Split out because it
         takes only what it uses: the grid follows from the AOI, `crs` and either
         `scale` or a pinned `crs_transform`, so the band count and bucket window
-        :meth:`plan` receives are not parameters here, and a caller after the
+        `plan` receives are not parameters here, and a caller after the
         grid verdict alone need not invent them.
 
         Args:
@@ -165,7 +165,7 @@ class PixelsEngine(Engine):
     ) -> OutputGrid:
         """Return the grid for one window, which may be a tile of the AOI.
 
-        Split out of :meth:`grid_for` so a tiled request sizes each tile the
+        Split out of `grid_for` so a tiled request sizes each tile the
         same way the whole AOI is sized - including keeping a pinned lattice,
         so the tiles still share pixel edges with each other and with any other
         request pinned to the same transform.
@@ -212,7 +212,7 @@ class PixelsEngine(Engine):
         Raises:
             ValueError: If the AOI reprojects to non-finite bounds in the
                 output CRS, `scale` is not a positive number of metres, or a
-                pinned transform is malformed. :meth:`plan` catches this and
+                pinned transform is malformed. `plan` catches this and
                 falls back rather than failing the download.
         """
         bbox, cutline = backend._eedai_window()
@@ -293,7 +293,7 @@ def affine_transform(crs_transform: tuple[float, ...]) -> dict[str, float]:
     """Spell a 6-element transform the way Earth Engine's `PixelGrid` wants it.
 
     The tuple order is the one
-    :meth:`~earthlens.gee.grid.OutputGrid.from_crs_transform` documents, which
+    `from_crs_transform` documents, which
     is also the order Earth Engine's own `crsTransform` lists, so this is a
     renaming and not a reordering.
 

@@ -63,7 +63,7 @@ class _FakeImageCollection:
 
     Chain methods (`filterDate`, `filterBounds`, `select`) return a new
     instance carrying the accumulated call log; the reducer convenience
-    methods (`mean`/`median`/`mosaic`/...) return a :class:`_FakeImage`.
+    methods (`mean`/`median`/`mosaic`/...) return a `_FakeImage`.
     """
 
     def __init__(self, source, calls: list | None = None):
@@ -2155,6 +2155,12 @@ def fake_reader(monkeypatch):
     from earthlens.gee import reader as reader_module
 
     monkeypatch.setattr(reader_module, "import_earthengine_reader", lambda: reader)
+    # `engines.reader_refusal_types()` deliberately runs for real here, rather
+    # than against this fake. It is total since it learned to catch the loader's
+    # ImportError, so it resolves with or without the `[eedai]` extra, and
+    # leaving it unpatched means these tests exercise the production refusal
+    # types instead of a stand-in — the expression whose breakage started this
+    # branch is then covered by every test that reaches a late refusal.
     reader.credential_builds = []
     monkeypatch.setattr(
         backend_module,

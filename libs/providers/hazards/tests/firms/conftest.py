@@ -54,7 +54,7 @@ class _FakeResponse:
 class _FakeFirms:
     """Callable `requests.get` stand-in recording URLs and serving bodies.
 
-    By default every call returns :data:`VIIRS_CSV`. Set `responses` to
+    By default every call returns `VIIRS_CSV`. Set `responses` to
     a list of `_FakeResponse` to serve a scripted sequence (popped in
     order), e.g. a 429 then a CSV for the back-off test.
     """

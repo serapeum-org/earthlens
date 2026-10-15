@@ -1,17 +1,17 @@
 """Generic ERDDAP backend — `ERDDAP(AbstractDataSource)`.
 
 Reaches any public ERDDAP server from one class. A `dataset=<id>`
-selects a curated :class:`~earthlens.erddap.catalog.Dataset` row
+selects a curated `Dataset` row
 (`server_url` + `dataset_id` + `protocol`); the row's `protocol` decides
-the per-instance :attr:`ERDDAP.OUTPUT_KIND` and the realisation path:
+the per-instance `ERDDAP.OUTPUT_KIND` and the realisation path:
 
 * **`tabledap`** → `OUTPUT_KIND = "tabular"`. The request is shaped with
   the **`erddapy`** SDK and realised through `ERDDAP.to_pandas()`, so the
-  result is a :class:`pandas.DataFrame`. The
-  :class:`earthlens.earthlens.EarthLens` facade rejects `aggregate=` for
+  result is a `pandas.DataFrame`. The
+  `earthlens.earthlens.EarthLens` facade rejects `aggregate=` for
   it (a table has no gridded reduction).
 * **`griddap`** → `OUTPUT_KIND = "raster"`. The OPeNDAP `.nc` download
-  URL is built directly (see :func:`earthlens.erddap._helpers.build_griddap_url`)
+  URL is built directly (see `earthlens.erddap._helpers.build_griddap_url`)
   and fetched with a plain HTTP GET — deliberately **not** through the
   erddapy instance, whose `dataset_id` setter eagerly fetches the full
   coordinate axis from the server (a slow / hanging metadata call). The
@@ -80,7 +80,7 @@ _NETCDF_MAGIC: tuple[bytes, ...] = (b"CDF\x01", b"CDF\x02", b"CDF\x05", b"\x89HD
 
 @dataclass(frozen=True)
 class _GridVarInfo:
-    """Minimal `var_info` adapter for :func:`earthlens.aggregate.aggregate_netcdf`.
+    """Minimal `var_info` adapter for `earthlens.aggregate.aggregate_netcdf`.
 
     The aggregator only reads three fields off the catalog row it is
     handed — the in-NetCDF variable name, the output-filename seed, and
@@ -111,12 +111,12 @@ class ERDDAP(AbstractDataSource):
     uniform `download()` shape. The selected `dataset=`'s `protocol`
     fixes the output: `griddap` writes raster NetCDF (and accepts an
     `aggregate=` pyramids reduction), `tabledap` returns a long
-    :class:`pandas.DataFrame`. The query is a search/fetch split:
-    :meth:`_search` names the single resolved product and :meth:`_fetch`
+    `pandas.DataFrame`. The query is a search/fetch split:
+    `_search` names the single resolved product and `_fetch`
     realises it.
 
     Attributes:
-        OUTPUT_KIND: Set **per instance** in :meth:`__init__` from the
+        OUTPUT_KIND: Set **per instance** in `__init__` from the
             resolved dataset's `protocol` (`griddap` → `"raster"`,
             `tabledap` → `"tabular"`) — the sanctioned earthdata /
             eumetsat override. The facade reads it to gate `aggregate=`.
@@ -183,7 +183,7 @@ class ERDDAP(AbstractDataSource):
         """Initialise an ERDDAP backend instance.
 
         Resolves `dataset=` against the catalog and sets the per-instance
-        :attr:`OUTPUT_KIND` **before** calling the parent constructor, so
+        `OUTPUT_KIND` **before** calling the parent constructor, so
         the facade sees the right kind when it gates `aggregate=`.
 
         Args:
@@ -254,7 +254,7 @@ class ERDDAP(AbstractDataSource):
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
-        """Parse the `[start, end]` window into a :class:`TemporalExtent`.
+        """Parse the `[start, end]` window into a `TemporalExtent`.
 
         The whole window is sent to ERDDAP in one request, so `dates`
         collapses to the two endpoints.
@@ -282,7 +282,7 @@ class ERDDAP(AbstractDataSource):
 
         Returns:
             list[RemoteProduct]: One product carrying the resolved
-                :class:`Dataset` row in its `metadata`.
+                `Dataset` row in its `metadata`.
         """
         return [
             RemoteProduct(
@@ -295,8 +295,8 @@ class ERDDAP(AbstractDataSource):
         """Realise the request — a `DataFrame` (tabledap) or a `Path` (griddap).
 
         Widens the inherited `-> list[Path]` contract: a tabledap fetch
-        returns an in-memory frame (the write happens in :meth:`download`
-        via :meth:`_write_table`), a griddap fetch returns the written
+        returns an in-memory frame (the write happens in `download`
+        via `_write_table`), a griddap fetch returns the written
         NetCDF path.
 
         Deliberately takes no `limit=`, unlike the other tabular backends.
@@ -310,7 +310,7 @@ class ERDDAP(AbstractDataSource):
         is claimed; narrowing the date window is the bound available today.
 
         Args:
-            products: The single-element list from :meth:`_search`.
+            products: The single-element list from `_search`.
 
         Returns:
             list: `[pandas.DataFrame]` for tabledap, `[Path]` for griddap.
@@ -398,7 +398,7 @@ class ERDDAP(AbstractDataSource):
         against the NetCDF magic before the file is published, so an HTML
         error page (which ERDDAP sometimes serves with a `200`) never lands
         as a `.nc`. An out-of-coverage / no-data response surfaces as a
-        clear :class:`ValueError` naming the dataset and bbox, not a bare
+        clear `ValueError` naming the dataset and bbox, not a bare
         HTTP stack trace.
 
         Args:
@@ -480,10 +480,10 @@ class ERDDAP(AbstractDataSource):
         Args:
             progress_bar: Accepted for signature parity; ERDDAP issues a
                 single request per call, so there is no per-item bar.
-            aggregate: Optional :class:`~earthlens.aggregate.AggregationConfig`.
+            aggregate: Optional `AggregationConfig`.
                 Accepted **only** for a griddap (raster) dataset, where
                 every downloaded NetCDF is reduced through
-                :func:`earthlens.aggregate.aggregate_netcdf` (the pyramids
+                `earthlens.aggregate.aggregate_netcdf` (the pyramids
                 flow ECMWF uses); when the config's `out_dir` is `None` it
                 defaults to `<root_dir>/aggregated/`. For a tabledap
                 (tabular) dataset a non-`None` `aggregate` raises
@@ -501,7 +501,7 @@ class ERDDAP(AbstractDataSource):
             NotImplementedError: If `aggregate` is not `None` for a
                 tabledap dataset.
             ValueError: If a griddap request is outside the dataset's
-                coverage (from :meth:`_fetch_grid`).
+                coverage (from `_fetch_grid`).
         """
         if self.OUTPUT_KIND == "tabular":
             frames = self._api()
@@ -532,11 +532,11 @@ class ERDDAP(AbstractDataSource):
 
         Mirrors the ECMWF aggregate flow: default the config's `out_dir`
         to `<root_dir>/aggregated/`, then run
-        :func:`earthlens.aggregate.aggregate_netcdf` per requested
+        `earthlens.aggregate.aggregate_netcdf` per requested
         variable on each NetCDF.
 
         Args:
-            nc_paths: The written `.nc` paths from :meth:`_fetch_grid`.
+            nc_paths: The written `.nc` paths from `_fetch_grid`.
             aggregate: The caller's aggregation config.
 
         Returns:

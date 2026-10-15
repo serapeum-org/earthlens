@@ -5,13 +5,13 @@ autonomous-float ocean profiles — temperature, salinity, pressure, and
 (for BGC floats) biogeochemical parameters — from the global Argo array
 of ~4000 active floats. A request is either a bbox + time window over a
 set of parameter names (a **region** selection) or a `float:` / `profile:`
-selector; the backend returns a long-format :class:`pandas.DataFrame`, so
-`OUTPUT_KIND = "tabular"` and the :class:`earthlens.earthlens.EarthLens`
+selector; the backend returns a long-format `pandas.DataFrame`, so
+`OUTPUT_KIND = "tabular"` and the `earthlens.earthlens.EarthLens`
 facade rejects an `aggregate=` argument (gridded ocean fields are the
 CMEMS path).
 
 The selection mode is routed from `variables` (see
-:func:`earthlens.argo._helpers.parse_selection`):
+`earthlens.argo._helpers.parse_selection`):
 
 * a parameter list (`["TEMP", "PSAL"]`, or an empty list) → `.region(...)`
   over the request bbox + time + depth range;
@@ -26,7 +26,7 @@ and the depth envelope with `depth=(min, max)` dbar (default `0–2000`).
 
 Argo is open data — there is no authentication. On a successful fetch the
 backend logs the standard Argo data-acknowledgement statement
-(:data:`earthlens.argo._helpers.ARGO_ACKNOWLEDGEMENT`).
+(`earthlens.argo._helpers.ARGO_ACKNOWLEDGEMENT`).
 """
 
 from __future__ import annotations
@@ -123,9 +123,9 @@ class ARGO(AbstractDataSource):
 
     Fetches autonomous-float ocean profiles for a bbox / float / profile
     selection through the same `download()` shape every other earthlens
-    backend uses, and returns a long-format :class:`pandas.DataFrame`
+    backend uses, and returns a long-format `pandas.DataFrame`
     (one row per measured level). The query is a search/fetch split:
-    :meth:`_search` resolves the single `argopy` request and :meth:`_fetch`
+    `_search` resolves the single `argopy` request and `_fetch`
     realises it to a frame.
 
     Attributes:
@@ -249,7 +249,7 @@ class ARGO(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse the `[start, end]` window into a :class:`TemporalExtent`.
+        """Parse the `[start, end]` window into a `TemporalExtent`.
 
         Argo `.region()` takes the whole window as ISO date bounds in one
         call, so there is no per-date loop; `dates` collapses to the two
@@ -341,10 +341,10 @@ class ARGO(AbstractDataSource):
 
         Widens the inherited `-> list[Path]` contract: a tabular backend
         returns in-memory frames, not file paths (the write happens in
-        :meth:`download` via :meth:`_write_table`).
+        `download` via `_write_table`).
 
         Args:
-            products: The list returned by :meth:`_search`.
+            products: The list returned by `_search`.
 
         Returns:
             list[pd.DataFrame]: One frame per product, same order.
@@ -363,7 +363,7 @@ class ARGO(AbstractDataSource):
         both are normalised here.
 
         Args:
-            product: One :class:`RemoteProduct` from :meth:`_search`.
+            product: One `RemoteProduct` from `_search`.
 
         Returns:
             pd.DataFrame: The realised profile frame, or the canonical
@@ -398,7 +398,7 @@ class ARGO(AbstractDataSource):
 
         Args:
             fetcher: An `argopy.DataFetcher`.
-            selection: The parsed :class:`Selection`.
+            selection: The parsed `Selection`.
 
         Returns:
             The `argopy` access point (a fetcher) ready to realise.

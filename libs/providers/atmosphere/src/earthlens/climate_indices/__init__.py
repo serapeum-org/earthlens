@@ -3,14 +3,14 @@
 Fetches monthly teleconnection-index series (ENSO/ONI, NAO, AO, PDO,
 AMO, SOI, PNA, …) from two open ASCII sources — NOAA PSL and the KNMI
 Climate Explorer — and returns them as a long-format
-:class:`pandas.DataFrame` (`date`, `index`, `value`, `source`). These are
+`pandas.DataFrame` (`date`, `index`, `value`, `source`). These are
 **global scalar monthly series** with no geometry, so the backend is
 `OUTPUT_KIND = "tabular"`: spatial arguments are accepted for signature
 parity but ignored, and `aggregate=` is rejected.
 
-The public surface is the :class:`Catalog` (index id → URL + dialect +
-metadata) and its :class:`Index` rows, plus the two pure ASCII parsers
-:func:`parse_psl` / :func:`parse_climexp`. The :class:`ClimateIndices`
+The public surface is the `Catalog` (index id → URL + dialect +
+metadata) and its `Index` rows, plus the two pure ASCII parsers
+`parse_psl` / `parse_climexp`. The `ClimateIndices`
 backend orchestrates download → parse → long frame.
 """
 

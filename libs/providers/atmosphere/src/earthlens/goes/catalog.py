@@ -1,6 +1,6 @@
 """Product / domain / satellite catalog for the GOES ABI backend.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
+Hosts `Catalog`, the pydantic-backed reader for the bundled
 `goes_data_catalog.yaml`. A GOES request is three-axis: a **satellite**
 (which bucket — `east`/`west` resolve to the current operational
 `noaa-goes19` / `noaa-goes18`), a **product** (which ABI product family,
@@ -11,13 +11,13 @@ prefix and are split by the filename token.
 
 The product is the "dataset" role (the key the user names in
 `dataset=` / `variables={product: [...]}`), so it lives under the
-inherited :attr:`~earthlens.base.AbstractCatalog.datasets` field — which
+inherited `datasets` field — which
 gives the catalog its `cat["abi-l2-mcmip"]` / `"abi-l2-mcmip" in cat` /
 `len(cat)` dict-like surface and the did-you-mean error for free.
 Domains, satellites, and the 16 ABI channels hang off parallel maps.
 
-:data:`CATALOG_PATH` is the path to the bundled YAML;
-:func:`clear_catalog_cache` empties the `(path, mtime)` parse cache.
+`CATALOG_PATH` is the path to the bundled YAML;
+`clear_catalog_cache` empties the `(path, mtime)` parse cache.
 """
 
 from __future__ import annotations
@@ -111,7 +111,7 @@ class GOESProduct(SummarisedLeaf):
     """One curated ABI product family (the "dataset" analog).
 
     The product key (`"abi-l2-mcmip"`) is the parent key in
-    :attr:`Catalog.datasets` and is repeated here as :attr:`product` so a
+    `Catalog.datasets` and is repeated here as `product` so a
     row carries its own identity when passed around outside the catalog.
 
     Attributes:
@@ -122,7 +122,7 @@ class GOESProduct(SummarisedLeaf):
         level: Processing level (`"L1b"` / `"L2"`).
         description: Human-readable summary.
         domains: The domain keys this product publishes (a subset of
-            :attr:`Catalog.domains`), e.g. `["C", "F", "M1", "M2"]`.
+            `Catalog.domains`), e.g. `["C", "F", "M1", "M2"]`.
         band_split: `True` when each ABI channel is a **separate** file
             (`ABI-L1b-Rad`, `ABI-L2-CMIP`) so `variables=` picks which
             granule files are fetched; `False` when one file carries all
@@ -206,7 +206,7 @@ def _parse_block(
 
 
 def _parse_catalog(files: list[Path]) -> dict[str, Any]:
-    """Parse the GOES catalog YAML into a fully-populated :class:`Catalog`.
+    """Parse the GOES catalog YAML into a fully-populated `Catalog`.
 
     Args:
         files: The contributing YAML files (GOES ships a single file).
@@ -244,26 +244,26 @@ class Catalog(AbstractCatalog[GOESProduct]):
     """Product / domain / satellite catalog for the GOES ABI backend.
 
     Reads the bundled `goes_data_catalog.yaml` (shipped as package data)
-    and exposes its `products:` block as a map of :class:`GOESProduct`
-    rows keyed by product key under the inherited :attr:`datasets` field,
-    plus parallel :attr:`domains`, :attr:`satellites`, and
-    :attr:`channels` maps. Instantiate with no arguments (`Catalog()`);
-    :func:`model_post_init` loads and validates the YAML in one pass and
+    and exposes its `products:` block as a map of `GOESProduct`
+    rows keyed by product key under the inherited `datasets` field,
+    plus parallel `domains`, `satellites`, and
+    `channels` maps. Instantiate with no arguments (`Catalog()`);
+    `model_post_init` loads and validates the YAML in one pass and
     caches it by `(path, mtime)`.
 
-    Resolve a product with :meth:`get_product` (a thin alias over
-    :meth:`~earthlens.base.AbstractCatalog.get_dataset`), a domain with
-    :meth:`get_domain`, and a satellite/role to its bucket with
-    :meth:`bucket_for`.
+    Resolve a product with `get_product` (a thin alias over
+    `get_dataset`), a domain with
+    `get_domain`, and a satellite/role to its bucket with
+    `bucket_for`.
 
     Attributes:
-        datasets: Map from product key to its :class:`GOESProduct` row.
+        datasets: Map from product key to its `GOESProduct` row.
         domains: Map from domain key (`"C"`, `"F"`, `"M1"`, `"M2"`) to
-            its :class:`GOESDomain` row.
+            its `GOESDomain` row.
         satellites: Map from role / satellite number (`"east"`, `"19"`)
             to its unsigned bucket name.
         channels: Map from ABI channel token (`"C01"`) to its
-            :class:`GOESChannel` metadata.
+            `GOESChannel` metadata.
         available_datasets: Sorted product keys.
 
     Examples:
@@ -298,13 +298,13 @@ class Catalog(AbstractCatalog[GOESProduct]):
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no products were supplied.
 
-        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by
+        `Catalog()` with no args reads `CATALOG_PATH` (cached by
         `(path, mtime)`); passing `datasets=...` skips the disk read
         (used in tests). Either way the `available_datasets` index is
         derived from the loaded map.
 
         Raises:
-            ValueError: Propagated from :meth:`load` when the YAML is
+            ValueError: Propagated from `load` when the YAML is
                 missing, empty, or has a malformed row.
         """
         if not self.datasets:
@@ -321,10 +321,10 @@ class Catalog(AbstractCatalog[GOESProduct]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the
-                module-level :data:`CATALOG_PATH`.
+                module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If `catalog_path` does not exist, or if the file has no
@@ -336,10 +336,10 @@ class Catalog(AbstractCatalog[GOESProduct]):
         return cls(**payload)
 
     def get_product(self, key: str) -> GOESProduct:
-        """Return the :class:`GOESProduct` for `key`, with a did-you-mean hint.
+        """Return the `GOESProduct` for `key`, with a did-you-mean hint.
 
         Thin alias over
-        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.
+        `get_dataset`.
 
         Args:
             key: A product key (`"abi-l2-mcmip"`, `"abi-l1b-rad"`).
@@ -353,7 +353,7 @@ class Catalog(AbstractCatalog[GOESProduct]):
         return cast("GOESProduct", self.get_dataset(key))
 
     def get_domain(self, key: str) -> GOESDomain:
-        """Return the :class:`GOESDomain` for `key`, with a did-you-mean hint.
+        """Return the `GOESDomain` for `key`, with a did-you-mean hint.
 
         Args:
             key: A domain key (`"C"`, `"F"`, `"M1"`, `"M2"`).

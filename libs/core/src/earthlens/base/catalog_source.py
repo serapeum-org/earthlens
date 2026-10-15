@@ -17,9 +17,9 @@ What was duplicated before this module existed:
 * `clear_catalog_cache` — 48 module-level functions, 44 of them byte-identical,
   with no way to clear them all at once.
 
-The public entry point is :func:`load_catalog`, which composes all three. A
-loader that needs something else can still call :func:`yaml_files_for` and
-:func:`catalog_cache_key` directly.
+The public entry point is `load_catalog`, which composes all three. A
+loader that needs something else can still call `yaml_files_for` and
+`catalog_cache_key` directly.
 """
 
 from __future__ import annotations
@@ -32,15 +32,15 @@ from earthlens.base.yaml_loader import CatalogParseCache
 
 T = TypeVar("T")
 
-#: Every :class:`~earthlens.base.yaml_loader.CatalogParseCache` built anywhere in
-#: the process, so :func:`clear_all_catalog_caches` can empty them in one call.
+#: Every `CatalogParseCache` built anywhere in
+#: the process, so `clear_all_catalog_caches` can empty them in one call.
 #: Registration happens in `CatalogParseCache.__init__`, so a loader that
 #: declares its cache the normal way is covered without doing anything.
 _REGISTRY: list[CatalogParseCache] = []
 
 
 def register_cache(cache: CatalogParseCache) -> None:
-    """Add `cache` to the registry cleared by :func:`clear_all_catalog_caches`.
+    """Add `cache` to the registry cleared by `clear_all_catalog_caches`.
 
     Args:
         cache: The parse cache to register. Registering the same cache twice is
@@ -156,7 +156,7 @@ def catalog_cache_key(path: Path, files: Sequence[Path]) -> tuple[Any, ...]:
     part of the stamp because timestamps are quantised: two writes inside one
     filesystem tick share an mtime, and a content change of different length
     would otherwise be served from cache. The resolved path is always element 0,
-    which is what lets :class:`CatalogParseCache` evict superseded generations
+    which is what lets `CatalogParseCache` evict superseded generations
     for the same catalog.
 
     A file that disappears between the glob and the `stat` degrades to a zero
@@ -164,7 +164,7 @@ def catalog_cache_key(path: Path, files: Sequence[Path]) -> tuple[Any, ...]:
 
     Args:
         path: The catalog directory or file (becomes element 0 of the key).
-        files: The contributing YAML files, from :func:`yaml_files_for`.
+        files: The contributing YAML files, from `yaml_files_for`.
 
     Returns:
         A hashable `(resolved_path, ((file, mtime_ns, size), ...))` key.
@@ -234,7 +234,7 @@ def load_catalog(
 
     Args:
         path: The catalog directory or single YAML file.
-        cache: The module's :class:`CatalogParseCache`.
+        cache: The module's `CatalogParseCache`.
         parse: Callable taking the contributing files and returning the parsed
             catalog. Called only on a cache miss.
         provider: Provider name for the not-found error.
@@ -244,7 +244,7 @@ def load_catalog(
         Whatever `parse` returned, from the cache when the mtimes are unchanged.
 
     Raises:
-        ValueError: If `path` does not exist (see :func:`yaml_files_for`).
+        ValueError: If `path` does not exist (see `yaml_files_for`).
 
     Examples:
         - The parse runs once, then the cached value is reused:

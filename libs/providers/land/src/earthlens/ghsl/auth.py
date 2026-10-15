@@ -4,7 +4,7 @@ The JRC Global Human Settlement Layer is **open data, attribution
 only** — "reuse is authorised provided the source is acknowledged"
 (CC-BY-style). Every artefact is served over plain anonymous HTTPS
 from the JRC JEODPP file tree, so `GHSL` performs no login:
-:meth:`earthlens.ghsl.backend.GHSL._initialize` reads no credentials
+`earthlens.ghsl.backend.GHSL._initialize` reads no credentials
 and the backend works with no key, env var, or config file.
 
 `GhslAuth` exists so the package mirrors the layout of the
@@ -34,7 +34,7 @@ class GhslCredentials(BaseModel, frozen=True):
     """Empty credentials value object for the open GHSL backend.
 
     GHSL needs no secrets; this exists only to satisfy the
-    :class:`~earthlens.base.auth.AbstractAuth` generic contract that
+    `AbstractAuth` generic contract that
     every backend's auth class binds a `pydantic.BaseModel`
     credentials type. It carries no fields.
 

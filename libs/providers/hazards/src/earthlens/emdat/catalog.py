@@ -5,16 +5,16 @@ routes, and this module is the bridge from a dataset id (`"emdat:events"`,
 `"gdis:points"`, `"gdis:polygons"`) to the provider, the output kind, and the
 transport detail needed to fetch it.
 
-:class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog` subclass that
+`Catalog` is a thin `earthlens.base.AbstractCatalog` subclass that
 loads the bundled `emdat_data_catalog.yaml` and exposes each row as a
-:class:`Dataset`. The YAML also ships a `hazard_vocabularies:` block — one
-canonical disaster-type list per source — which :meth:`Catalog.normalize_hazard`
+`Dataset`. The YAML also ships a `hazard_vocabularies:` block — one
+canonical disaster-type list per source — which `Catalog.normalize_hazard`
 uses to turn a caller's spelling into the canonical one for a given dataset.
 Resolve one dataset with
-:meth:`Catalog.get` (a did-you-mean hint on an unknown id); list the shipped ids
-with :meth:`Catalog.available`.
+`Catalog.get` (a did-you-mean hint on an unknown id); list the shipped ids
+with `Catalog.available`.
 
-:data:`CATALOG_PATH` is the path to the bundled YAML.
+`CATALOG_PATH` is the path to the bundled YAML.
 """
 
 from __future__ import annotations
@@ -40,7 +40,7 @@ _CATALOG_CACHE: dict[
     tuple[str, int], tuple[dict[str, Dataset], dict[str, tuple[str, ...]]]
 ] = CatalogParseCache()
 
-#: The two routes a :class:`Dataset` row can name — `dataverse` is the anonymous
+#: The two routes a `Dataset` row can name — `dataverse` is the anonymous
 #: UCLouvain archive, `earthdata` is GDIS behind an Earthdata Login.
 Provider = Literal["dataverse", "earthdata"]
 
@@ -68,10 +68,10 @@ def _load_catalog_data(
     """Parse, validate, and cache the catalog at `path`.
 
     Reads the `datasets:` and `hazard_vocabularies:` blocks and validates each
-    dataset row as a :class:`Dataset`.
+    dataset row as a `Dataset`.
 
     Args:
-        path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
+        path: Path to the catalog YAML (default `CATALOG_PATH`).
 
     Returns:
         A `(datasets, hazard_vocabularies)` pair: the dataset map keyed by id,
@@ -79,7 +79,7 @@ def _load_catalog_data(
 
     Raises:
         ValueError: If the file has no `datasets:` block, or a row fails
-            :class:`Dataset` validation.
+            `Dataset` validation.
     """
     key = catalog_cache_key(path, [path])
     cached = _CATALOG_CACHE.get(key)
@@ -121,10 +121,10 @@ def _load_catalog_data(
 class Dataset(SummarisedLeaf):
     """One EM-DAT catalog row.
 
-    The dataset id is the parent key in :attr:`Catalog.datasets` and is also
-    stored on the row as :attr:`id` so a resolved :class:`Dataset` is
+    The dataset id is the parent key in `Catalog.datasets` and is also
+    stored on the row as `id` so a resolved `Dataset` is
     self-describing. Which transport fields are populated depends on
-    :attr:`provider`; a cross-field validator enforces that the right ones are
+    `provider`; a cross-field validator enforces that the right ones are
     present.
 
     Attributes:
@@ -138,7 +138,7 @@ class Dataset(SummarisedLeaf):
             by `earthlens datasets show`. It is *not* what
             `earthlens datasets search` matches on — that covers provider, id
             and title, and `record_title` prefers `long_name` — which is why
-            the hazard names live in :attr:`long_name` as well.
+            the hazard names live in `long_name` as well.
         dataverse_base: Base URL of the Dataverse installation
             (`provider="dataverse"` only).
         doi: The archive's persistent id (`provider="dataverse"` only).
@@ -167,7 +167,7 @@ class Dataset(SummarisedLeaf):
             `"Start Year"` for the EM-DAT archive). `None` for the GDIS
             GeoPackage, which carries no date field at all.
         year_from_id_prefix: Whether the year must be derived from the 4-digit
-            prefix of :attr:`id_column` (the GDIS GeoPackage).
+            prefix of `id_column` (the GDIS GeoPackage).
         latitude_column: Column holding the latitude, when present.
         longitude_column: Column holding the longitude, when present.
         start_year: First year covered by the dataset.
@@ -282,7 +282,7 @@ class Dataset(SummarisedLeaf):
             filename: A file name from the Dataverse version listing.
 
         Returns:
-            bool: `True` when the name matches :attr:`file_pattern`.
+            bool: `True` when the name matches `file_pattern`.
         """
         return bool(self.file_pattern) and fnmatch.fnmatch(
             filename, cast("str", self.file_pattern)
@@ -293,11 +293,11 @@ class Catalog(AbstractCatalog[Dataset]):
     """Loader for the bundled EM-DAT dataset catalog.
 
     Reads `emdat_data_catalog.yaml` on construction (`Catalog()`) and exposes
-    the parsed rows as :class:`Dataset` models, plus the canonical GDIS hazard
+    the parsed rows as `Dataset` models, plus the canonical GDIS hazard
     vocabulary.
 
     Attributes:
-        datasets: Map from dataset id to its :class:`Dataset` row.
+        datasets: Map from dataset id to its `Dataset` row.
         hazard_vocabularies: Each named disaster-type vocabulary, lower-case and
             stripped. `gdis` holds the eight values GDIS ships; `emdat` holds
             EM-DAT's fuller `Disaster Type` list including technological
@@ -332,8 +332,8 @@ class Catalog(AbstractCatalog[Dataset]):
     _catalog_kind: str = "EM-DAT catalog"
     _entry_noun: str = "datasets"
 
-    #: The dataset rows live in the base :attr:`datasets` field so the inherited
-    #: dict surface (`len`, `in`, `[]`, iteration) and :meth:`get_dataset`'s
+    #: The dataset rows live in the base `datasets` field so the inherited
+    #: dict surface (`len`, `in`, `[]`, iteration) and `get_dataset`'s
     #: did-you-mean hint work unchanged.
     datasets: dict[str, Dataset] = Field(default_factory=dict)
 
@@ -360,10 +360,10 @@ class Catalog(AbstractCatalog[Dataset]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the module-level
-                :data:`CATALOG_PATH`.
+                `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If the file has no `datasets:` block, or a row fails
@@ -374,9 +374,9 @@ class Catalog(AbstractCatalog[Dataset]):
         return cls(datasets=dict(datasets), hazard_vocabularies=dict(vocabularies))
 
     def get(self, dataset_id: str) -> Dataset:
-        """Resolve a dataset id to its :class:`Dataset` row.
+        """Resolve a dataset id to its `Dataset` row.
 
-        Thin wrapper over the inherited :meth:`get_dataset`, which raises a
+        Thin wrapper over the inherited `get_dataset`, which raises a
         `ValueError` with a did-you-mean hint on an unknown id.
 
         Args:

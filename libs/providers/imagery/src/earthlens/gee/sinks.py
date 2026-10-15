@@ -6,13 +6,13 @@
 instead, so a table or a video destination is a new subclass rather than two
 more branches in the same `if/elif`.
 
-Each sink states its own prerequisite through :attr:`Sink.required_config`, which
-is what :class:`~earthlens.gee.configs.ExportConfig`'s validator checks, so the
+Each sink states its own prerequisite through `Sink.required_config`, which
+is what `ExportConfig`'s validator checks, so the
 requirement lives next to the sink that has it.
 
-As with :mod:`earthlens.gee.engines`, the *decision* is here and the *mechanics*
+As with `earthlens.gee.engines`, the *decision* is here and the *mechanics*
 are called back into the backend, so resolving a sink changes no observable
-behaviour. :meth:`Sink.write` is where that decision is made: `GEE._api` hands
+behaviour. `Sink.write` is where that decision is made: `GEE._api` hands
 the composited image to the resolved sink instead of branching on `export_via`,
 and each sink calls the transport it needs - which is also where the
 synchronous sink chooses between `getDownloadURL` and the pixel API.
@@ -45,7 +45,7 @@ class Sink(ABC):
     """One destination: how to address it, how to write to it, how it reads back.
 
     The sink owns the *decision* and calls the backend for the *mechanics*, the
-    same split :mod:`earthlens.gee.engines` uses. :meth:`write` is what `_api`
+    same split `earthlens.gee.engines` uses. `write` is what `_api`
     calls, so adding a destination is a subclass plus a registry entry rather
     than another branch in the export path.
 
@@ -54,7 +54,7 @@ class Sink(ABC):
             from.
         required_config: The field this sink cannot work without, or `None` when
             it needs nothing extra. Named once and read three times:
-            :meth:`validate_config` refuses a request that left it unset, the
+            `validate_config` refuses a request that left it unset, the
             `ExportConfig` validator does the same for a config built directly,
             and a batch sink reads the value off the backend under this name
             when it addresses its destination.
@@ -62,7 +62,7 @@ class Sink(ABC):
             prerequisite whose shape is not obvious from its name.
         is_batch: Whether this sink queues an asynchronous Earth Engine task
             rather than fetching pixels synchronously. `True` for every sink but
-            :class:`UrlSink`.
+            `UrlSink`.
     """
 
     name: ClassVar[str]
@@ -101,7 +101,7 @@ class Sink(ABC):
 
         Returns:
             A `Path` for a synchronous sink, else the destination string, or a
-            :class:`~earthlens.gee.jobs.TaskInfo` when the export was submitted
+            `TaskInfo` when the export was submitted
             without waiting.
         """
 
@@ -266,7 +266,7 @@ class _BatchSink(Sink):
 
         Returns:
             The `to*` keyword arguments — the target plus `fileNamePrefix` for
-            the file-based sinks, which :class:`AssetSink` overrides.
+            the file-based sinks, which `AssetSink` overrides.
         """
         assert self.required_config is not None  # every batch sink declares one
         return {self.target_kwarg: getattr(backend, self.required_config)}

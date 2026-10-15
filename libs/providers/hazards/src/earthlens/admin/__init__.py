@@ -21,8 +21,8 @@ auth module and no extra SDK (the only dependencies are core `requests` and
 is incompatible with redistribution.
 
 The public surface is the
-:class:`~earthlens.admin.backend.AdminBoundaries` backend and the
-:class:`~earthlens.admin.catalog.Catalog` of dataset rows.
+`AdminBoundaries` backend and the
+`Catalog` of dataset rows.
 """
 
 from __future__ import annotations

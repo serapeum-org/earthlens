@@ -72,7 +72,7 @@ def pick_dataverse_file(
     resolve to a stale release, or 404.
 
     Args:
-        files: The listing from :func:`dataverse_file_listing`.
+        files: The listing from `dataverse_file_listing`.
         dataset: The catalog row whose `file_pattern` selects the file.
 
     Returns:

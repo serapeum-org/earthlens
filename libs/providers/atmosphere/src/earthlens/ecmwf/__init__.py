@@ -1,7 +1,7 @@
 """ECMWF / CADS backend (CDS + ADS + EWDS + ECDS + XDS).
 
 Reaches all five CADS instances through one
-:mod:`cdsapi` client and one Personal Access Token, routing each
+`cdsapi` client and one Personal Access Token, routing each
 dataset to its store via the catalog `endpoint`: the Climate Data
 Store (C3S — ERA5, CARRA / CERRA, seasonal, CMIP5 / CORDEX, satellite
 CDRs), the Atmosphere Data Store (CAMS — air quality, greenhouse
@@ -12,27 +12,27 @@ any dataset is also reachable by a raw request through the passthrough.
 
 Public surface (re-exported from this package):
 
-* :class:`ECMWF` — the backend itself; instantiate with a date range,
+* `ECMWF` — the backend itself; instantiate with a date range,
   a bbox, and a list of variable short codes, then call
-  :meth:`ECMWF.download` to fetch every variable.
-* :class:`Catalog` — pydantic-backed loader for the bundled multi-store
+  `ECMWF.download` to fetch every variable.
+* `Catalog` — pydantic-backed loader for the bundled multi-store
   catalog (the `catalog/` directory). Variables are addressed by the
-  `(dataset, variable)` pair via :meth:`Catalog.get_variable`;
-  :attr:`Catalog.available_datasets` is the per-store availability
-  index and :meth:`Catalog.store_for` resolves a dataset's store.
-* :class:`Dataset` — one CDS dataset's section inside the catalog
+  `(dataset, variable)` pair via `Catalog.get_variable`;
+  `Catalog.available_datasets` is the per-store availability
+  index and `Catalog.store_for` resolves a dataset's store.
+* `Dataset` — one CDS dataset's section inside the catalog
   (monthly variant + variables map).
-* :class:`Variable` — one variable's metadata (CDS request name,
+* `Variable` — one variable's metadata (CDS request name,
   NetCDF short name, raw ERA5 unit, pressure-level info).
-* :class:`AuthenticationError` — raised when cdsapi cannot
+* `AuthenticationError` — raised when cdsapi cannot
   authenticate against CDS.
-* :data:`ERA5_GRID_DEGREES` — ERA5 native grid spacing (0.125°),
-  used by :meth:`ECMWF._create_grid` to snap user bboxes.
-* :data:`CATALOG_PATH` — absolute path to the bundled YAML catalog;
+* `ERA5_GRID_DEGREES` — ERA5 native grid spacing (0.125°),
+  used by `ECMWF._create_grid` to snap user bboxes.
+* `CATALOG_PATH` — absolute path to the bundled YAML catalog;
   monkey-patchable to redirect the loader.
 
 The catalog YAML ships with this package as data, loaded by
-:class:`Catalog` from `Path(__file__).parent`.
+`Catalog` from `Path(__file__).parent`.
 
 Examples:
     - List datasets and look up a variable by `(dataset, code)`:

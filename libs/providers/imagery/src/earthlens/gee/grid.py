@@ -15,10 +15,10 @@ Away from the equator those disagree on the column count. Keeping both behind on
 value object with two named constructors makes the disagreement explicit and
 testable, rather than implicit in two method families that happen to differ.
 
-:class:`OutputGrid` is the value; the constructors are
-:meth:`OutputGrid.for_metre_grid` (the EEDAI convention),
-:meth:`OutputGrid.for_earth_engine` (the degree-equivalent one) and
-:meth:`OutputGrid.from_crs_transform` (an explicitly pinned affine grid).
+`OutputGrid` is the value; the constructors are
+`OutputGrid.for_metre_grid` (the EEDAI convention),
+`OutputGrid.for_earth_engine` (the degree-equivalent one) and
+`OutputGrid.from_crs_transform` (an explicitly pinned affine grid).
 
 ```python
 >>> grid = OutputGrid.for_metre_grid((31.2, 29.9, 31.3, 30.0), crs="EPSG:4326", scale=90.0)
@@ -77,7 +77,7 @@ def _lattice_floor(offset: float) -> int:
 
     Returns:
         `floor(offset)`, or the nearest whole index when `offset` is within
-        :data:`_LATTICE_EPSILON` of one.
+        `_LATTICE_EPSILON` of one.
     """
     nearest = round(offset)
     if abs(offset - nearest) <= max(_LATTICE_EPSILON, abs(offset) * 1e-12):
@@ -93,7 +93,7 @@ def _lattice_ceil(offset: float) -> int:
 
     Returns:
         `ceil(offset)`, or the nearest whole index when `offset` is within
-        :data:`_LATTICE_EPSILON` of one.
+        `_LATTICE_EPSILON` of one.
     """
     nearest = round(offset)
     if abs(offset - nearest) <= max(_LATTICE_EPSILON, abs(offset) * 1e-12):
@@ -106,7 +106,7 @@ def validate_crs_transform(crs_transform: object) -> tuple[float, ...] | None:
 
     One definition, called both by `GEE(crs_transform=...)` - so a bad transform
     is refused at construction, before the catalog parse and any request - and by
-    :meth:`OutputGrid.from_crs_transform`, which cannot snap a grid it has not
+    `OutputGrid.from_crs_transform`, which cannot snap a grid it has not
     checked.
 
     Args:
@@ -187,7 +187,7 @@ def validate_crs_transform(crs_transform: object) -> tuple[float, ...] | None:
 def same_epsg_code(region_crs: Any, target: str) -> bool:
     """Compare a CRS pyproj could not parse against the target by EPSG code.
 
-    The last resort when :func:`same_crs`'s object comparison cannot run. A code
+    The last resort when `same_crs`'s object comparison cannot run. A code
     is trusted only against an explicitly `EPSG:` target, so the authority stays
     part of the comparison rather than being dropped — which is what made
     string-parsing the wrong answer in the first place.
@@ -242,7 +242,7 @@ def same_crs(region_crs: Any, target: str) -> bool:
 
     Returns:
         `True` when the two describe the same CRS. When either side cannot be
-        parsed the answer falls back to :func:`same_epsg_code`, which says
+        parsed the answer falls back to `same_epsg_code`, which says
         `True` only for an `EPSG:` target the region reports as its own code,
         and `False` otherwise — so an unresolvable comparison reprojects, which
         is the safe answer.
@@ -294,7 +294,7 @@ def bbox_to_crs(
         The envelope in `crs`; the input is returned unchanged when `crs` is
         already EPSG:4326. An AOI outside the projection's domain comes back
         with infinite bounds rather than raising, which
-        :func:`projected_grid` then rejects by name.
+        `projected_grid` then rejects by name.
 
     Raises:
         pyproj.exceptions.CRSError: If `crs` is not a CRS pyproj can build a
@@ -324,7 +324,7 @@ def bbox_to_latlon(
 ) -> tuple[float, float, float, float]:
     """Bring an envelope in `crs` back to EPSG:4326.
 
-    The inverse of :func:`bbox_to_crs`, which only ever converts *into* an
+    The inverse of `bbox_to_crs`, which only ever converts *into* an
     output CRS. Scene discovery needs the other direction: it queries the Earth
     Engine catalog in lat/lon whatever the request's CRS, and it has to ask about
     the window the read will take.
@@ -648,7 +648,7 @@ class OutputGrid(SummarisedLeaf):
 
         Earth Engine treats `scale` as a uniform degree-equivalent rather than
         shortening longitude by `cos(latitude)`, so away from the equator this
-        produces a different column count from :meth:`for_metre_grid`. That
+        produces a different column count from `for_metre_grid`. That
         difference is real and documented, not a bug in either.
 
         Args:
@@ -919,7 +919,7 @@ class OutputGrid(SummarisedLeaf):
 
         Returns:
             `rows * cols`. Multiply by the band count — or call
-            :meth:`band_pixels` — before comparing against a total-pixel
+            `band_pixels` — before comparing against a total-pixel
             budget.
         """
         return self.rows * self.cols

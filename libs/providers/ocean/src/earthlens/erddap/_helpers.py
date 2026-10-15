@@ -4,8 +4,8 @@ No SDK and no network: these build the request shapes the backend hands
 to erddapy (tabledap) or to a plain HTTP GET (griddap), so they are
 unit-testable in isolation. The two request models differ — tabledap
 uses an erddapy `constraints` dict, griddap uses an OPeNDAP-style URL
-with `(value)` coordinate subsetting — so :func:`build_constraints` is
-protocol-aware and :func:`build_griddap_url` assembles the griddap URL
+with `(value)` coordinate subsetting — so `build_constraints` is
+protocol-aware and `build_griddap_url` assembles the griddap URL
 directly. The exact spellings here were pinned against live erddapy
 `3.2.1` in the A1 gate.
 """
@@ -38,11 +38,11 @@ def build_constraints(
 
     Both protocols share the `>=`/`<=` subset keys; **griddap**
     additionally needs a `{dim}_step` stride per axis (`1` = full
-    resolution), which :func:`build_griddap_url` consumes when it builds
+    resolution), which `build_griddap_url` consumes when it builds
     the OPeNDAP `[(lo):step:(hi)]` ranges. tabledap passes the dict
     straight to `erddapy.ERDDAP.constraints`.
 
-    The framework's :class:`~earthlens.base.SpatialExtent` always carries
+    The framework's `SpatialExtent` always carries
     longitudes in the `[-180, 180]` convention. Some ERDDAP servers
     (notably the UHSLC tide-gauge tabledap datasets) store longitude in
     `[0, 360]` instead, so a raw `[-180, 180]` bound matches nothing.
@@ -54,8 +54,8 @@ def build_constraints(
     for griddap.
 
     Args:
-        space: The request bbox (a :class:`~earthlens.base.SpatialExtent`).
-        time: The request window (a :class:`~earthlens.base.TemporalExtent`).
+        space: The request bbox (a `SpatialExtent`).
+        time: The request window (a `TemporalExtent`).
         protocol: `"tabledap"` or `"griddap"`.
         lon_360: Shift the tabledap longitude bounds from `[-180, 180]`
             into the server's `[0, 360]` convention. No effect on griddap.
@@ -163,7 +163,7 @@ def build_griddap_url(
         variables: Grid variables to request (at least one).
         dim_names: The grid's dimension order (e.g.
             `["time", "latitude", "longitude"]`).
-        constraints: A :func:`build_constraints` griddap dict.
+        constraints: A `build_constraints` griddap dict.
 
     Returns:
         str: The full `…/griddap/<id>.nc?<var>[…][…]…` download URL.

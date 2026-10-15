@@ -17,14 +17,14 @@ lazily, so this package imports without the extra installed.
 
 Public surface (re-exported from this package):
 
-* :class:`NWP` — the backend; instantiate with a date range, a bbox,
+* `NWP` — the backend; instantiate with a date range, a bbox,
   and a `{model_key: [param, ...]}` mapping, then call
-  :meth:`NWP.download`.
-* :class:`Catalog` — pydantic-backed loader for the bundled
+  `NWP.download`.
+* `Catalog` — pydantic-backed loader for the bundled
   `nwp_data_catalog.yaml`.
-* :class:`NWPModel` — one curated model row (provider, cycles, backend,
+* `NWPModel` — one curated model row (provider, cycles, backend,
   mirrors, band → selector map).
-* :data:`CATALOG_PATH` — absolute path to the bundled catalog YAML;
+* `CATALOG_PATH` — absolute path to the bundled catalog YAML;
   monkey-patchable to redirect the loader.
 """
 

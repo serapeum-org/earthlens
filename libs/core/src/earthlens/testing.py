@@ -46,10 +46,10 @@ def unpooled_http_transport(monkeypatch: pytest.MonkeyPatch) -> None:
     `requests.get` — 161 tests would fall through to the real network.
 
     So for the duration of a test the default becomes
-    :class:`~earthlens.base.http.RequestsGet`, which re-resolves `requests` per
+    `RequestsGet`, which re-resolves `requests` per
     call. Every module-level fake keeps driving the transport while production
     keeps its pooled session. A test that needs the shipped default asks for
-    :func:`real_pooled_session`, which switches it back.
+    `real_pooled_session`, which switches it back.
 
     Args:
         monkeypatch: pytest's patcher, so the seam is undone per test.
@@ -200,8 +200,8 @@ _LIVE_SKIP_PREFIX = "live e2e skipped — "
 def skip_live_unavailable(reason: str) -> NoReturn:
     """Skip the current live `e2e` test as an upstream-availability failure.
 
-    Stamps the same `_LIVE_SKIP_PREFIX` the automatic :func:`pytest_runtest_call`
-    hook uses, so the masked-lane guard in :func:`pytest_sessionfinish` still
+    Stamps the same `_LIVE_SKIP_PREFIX` the automatic `pytest_runtest_call`
+    hook uses, so the masked-lane guard in `pytest_sessionfinish` still
     counts the skip. A backend that raises a typed availability error which its
     own e2e test catches — rather than letting the shared hook classify the raw
     exception — calls this instead of a bare `pytest.skip`, so the guard stays

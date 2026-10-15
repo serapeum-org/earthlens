@@ -43,7 +43,7 @@ class FakeErddapClient:
 
 @pytest.fixture
 def fake_erddapy(monkeypatch):
-    """Install a fake `erddapy` module exposing :class:`FakeErddapClient`."""
+    """Install a fake `erddapy` module exposing `FakeErddapClient`."""
     module = types.ModuleType("erddapy")
     module.ERDDAP = FakeErddapClient
     FakeErddapClient.last = None

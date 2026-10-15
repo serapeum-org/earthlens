@@ -1,18 +1,18 @@
 """Dataset-catalog loader for the Humanitarian Data Exchange backend.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for the bundled HDX
-catalog. Mirrors the shape of :mod:`earthlens.earthdata.catalog` and
-:mod:`earthlens.cmems.catalog`: the catalog ships as a directory of
+Hosts `Catalog`, the pydantic-backed reader for the bundled HDX
+catalog. Mirrors the shape of `earthlens.earthdata.catalog` and
+`earthlens.cmems.catalog`: the catalog ships as a directory of
 per-theme YAML files at `src/earthlens/hdx/catalog/`
 (`population.yaml`, `buildings.yaml`, `boundaries.yaml`, …) plus a
 single gzipped `_available.json.gz` carrying the long-tail index
 (the `C7` auto-generated index). Each per-theme file contributes its
-`datasets:` block; the loader unions them into one :class:`Catalog` at
+`datasets:` block; the loader unions them into one `Catalog` at
 construction time.
 
 A friendly dataset key (e.g. `"kontur-population"`) resolves to an
-:class:`HdxDataset` via :meth:`Catalog.get_dataset` / `Catalog()["..."]`
-/ :meth:`Catalog.resolve`. The row carries the fields the backend needs
+`HdxDataset` via `Catalog.get_dataset` / `Catalog()["..."]`
+/ `Catalog.resolve`. The row carries the fields the backend needs
 to address one HDX dataset and filter its resources: the CKAN
 `hdx_id` (the dataset's `name` on `data.humdata.org`), the owning
 `org`, a human `title`, the `themes` it belongs to, the CKAN format
@@ -24,7 +24,7 @@ optional default `resource_filter`, and the informational
 the `C7` refresh tool found for the curated orgs/themes; the curated
 `datasets:` map is the small vetted subset the maintainer hand-checks.
 The path to the bundled catalog directory lives at
-:data:`CATALOG_PATH`; tests can monkey-patch that module attribute to
+`CATALOG_PATH`; tests can monkey-patch that module attribute to
 redirect the loader at a temporary directory or single YAML file.
 """
 
@@ -240,8 +240,8 @@ class HdxDataset(SummarisedLeaf):
 
     Mirrors a single `datasets.<key>:` block in one of the per-theme
     `catalog/*.yaml` files. The friendly dataset key itself is the
-    parent key in :attr:`Catalog.datasets` and is not stored on the
-    row; :attr:`hdx_id` is the CKAN-side identifier the backend reads.
+    parent key in `Catalog.datasets` and is not stored on the
+    row; `hdx_id` is the CKAN-side identifier the backend reads.
 
     Attributes:
         hdx_id: The HDX/CKAN dataset `name` (the identifier
@@ -301,18 +301,18 @@ class Catalog(AbstractCatalog[HdxDataset]):
     Reads the bundled `catalog/` directory (shipped as package data)
     and exposes its consumed top-level sections as typed pydantic
     fields. Instantiate with no arguments (`Catalog()`) —
-    :func:`model_post_init` parses the YAML and populates every field
+    `model_post_init` parses the YAML and populates every field
     in one pass.
 
     Attributes:
         available_datasets: The full index of every HDX dataset id (the
             whole `data.humdata.org` catalogue, ~41k), produced by the
             `refresh --all` tool. Any id here resolves to a thin
-            :class:`HdxDataset` via :meth:`get_dataset` (the long-tail
+            `HdxDataset` via `get_dataset` (the long-tail
             fallback, mirroring `earthlens.earthdata`'s `_auto.json`);
             the curated `datasets` carry vetted metadata.
         datasets: Structural map keyed by the curated dataset key. Each
-            value is an :class:`HdxDataset`.
+            value is an `HdxDataset`.
 
     Examples:
         - A curated key is a member; the long tail resolves but is not:
@@ -329,8 +329,8 @@ class Catalog(AbstractCatalog[HdxDataset]):
     available_datasets: list[str] = Field(default_factory=list)
     datasets: dict[str, HdxDataset] = Field(default_factory=dict)
     #: The full long-tail index `{hdx_id: {org, title}}`, used by
-    #: :meth:`get_dataset` to synthesise enriched rows. Set by
-    #: :meth:`load`; defaults to an empty map.
+    #: `get_dataset` to synthesise enriched rows. Set by
+    #: `load`; defaults to an empty map.
     _available_rows: dict[str, dict] = PrivateAttr(default_factory=dict)
 
     def model_post_init(self, __context: Any) -> None:
@@ -343,7 +343,7 @@ class Catalog(AbstractCatalog[HdxDataset]):
 
         Raises:
             ValueError: When auto-loading, propagates the same errors as
-                :meth:`load`.
+                `load`.
         """
         if self.datasets:
             return
@@ -359,13 +359,13 @@ class Catalog(AbstractCatalog[HdxDataset]):
         Args:
             catalog_path: Path to the `catalog/` directory or a single
                 `*.yaml` file. Defaults to module-level
-                :data:`CATALOG_PATH`.
+                `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
-            ValueError: Propagated from :func:`_load_catalog_data`.
+            ValueError: Propagated from `_load_catalog_data`.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         yaml_available, datasets = _load_catalog_data(catalog_path)
@@ -389,7 +389,7 @@ class Catalog(AbstractCatalog[HdxDataset]):
         Curated `datasets` (hand-vetted, with full metadata) win.
         Otherwise, any id in the full long-tail index (the whole
         `data.humdata.org` catalogue) resolves to a synthesised
-        :class:`HdxDataset` carrying its `hdx_id` plus the `org` / `title`
+        `HdxDataset` carrying its `hdx_id` plus the `org` / `title`
         recorded in `_available.json` (empty for the few ids the CKAN
         `package_search` walk does not expose). The `hdx_id` is the only
         load-bearing field — the backend fetches the dataset live via
@@ -432,14 +432,14 @@ class Catalog(AbstractCatalog[HdxDataset]):
         )
 
     def resolve(self, key: str) -> HdxDataset:
-        """Resolve a curated dataset key to its :class:`HdxDataset` row.
+        """Resolve a curated dataset key to its `HdxDataset` row.
 
-        Thin wrapper over the base :meth:`get_dataset` (which raises a
+        Thin wrapper over the base `get_dataset` (which raises a
         `ValueError` with a did-you-mean hint on an unknown key), named
         `resolve` to match the Earthdata backend's catalog surface.
 
         Args:
-            key: Curated dataset key (a member of :attr:`datasets`).
+            key: Curated dataset key (a member of `datasets`).
 
         Returns:
             HdxDataset: The resolved row.

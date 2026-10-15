@@ -4,17 +4,17 @@ Downloads raster products from the Climate Hazards Center FTP server
 (`data.chc.ucsb.edu`) over anonymous FTP. Every dataset's FTP layout,
 spatial / temporal extent, file pattern, available formats, and per-
 variable metadata is sourced from
-:class:`~earthlens.chc.Catalog`, which loads the bundled per-family
+`Catalog`, which loads the bundled per-family
 `catalog/*.yaml` files. No FTP path or filename is hardcoded here.
 
 The download pipeline (per `(dataset, variable, date)` triple) is:
 
-1. :meth:`_api` — resolve the remote directory + filename from
+1. `_api` — resolve the remote directory + filename from
    `Dataset.ftp_bases` / `Dataset.file_patterns` after substituting the
    per-date placeholders (`{year}`, `{month}`, `{day}`, `{dekad}`,
    `{pentad}`, `{hour}`, `{doy}`), fetch the file via FTP, and clip it
    to the user's bbox.
-2. :meth:`_post_process` — ungzip (when the format is `.gz`), read the
+2. `_post_process` — ungzip (when the format is `.gz`), read the
    raster with `pyramids.Dataset`, clip to the bbox using the
    dataset's own geo-affine (no hardcoded 0.05° grid assumption), and
    write the canonical clipped GeoTIFF.
@@ -23,7 +23,7 @@ The `variables` constructor argument accepts two shapes:
 
 * `list[str]` — legacy CHIRPS-2.0 list-of-variables. The dataset key
   is derived from `temporal_resolution` via
-  :data:`_LEGACY_DATASET_KEY` (`"daily"` → `"global-daily"`,
+  `_LEGACY_DATASET_KEY` (`"daily"` → `"global-daily"`,
   `"monthly"` → `"global-monthly"`).
 * `dict[str, list[str]]` — mapping of CHIRPS dataset key to a list of
   variable codes, e.g.
@@ -244,11 +244,11 @@ class CHIRPS(AbstractDataSource):
     `variables` (either a flat `list[str]` for the legacy
     CHIRPS-2.0 global path, or `dict[str, list[str]]` mapping a
     catalog dataset key to variable codes), then call
-    :meth:`download`.
+    `download`.
 
     Attributes:
         api_url: FTP hostname. Anonymous login; no credentials.
-        catalog: :class:`~earthlens.chc.Catalog` instance loaded
+        catalog: `Catalog` instance loaded
             once at construction; resolves dataset keys to metadata.
     """
 
@@ -265,7 +265,7 @@ class CHIRPS(AbstractDataSource):
 
     @property
     def catalog(self):
-        """The bundled CHC :class:`~earthlens.chc.Catalog` (alias of `_catalog`)."""
+        """The bundled CHC `Catalog` (alias of `_catalog`)."""
         return self._catalog
 
     def __init__(
@@ -398,7 +398,7 @@ class CHIRPS(AbstractDataSource):
         """Parse the user's `[start, end]` window.
 
         Per-dataset date ranges are derived in
-        :meth:`_download_dataset` from each dataset's
+        `_download_dataset` from each dataset's
         `pandas_freq`; this method only stores the outer window so
         consumers (and the abstract base's `self.time`) can see it.
 
@@ -416,9 +416,9 @@ class CHIRPS(AbstractDataSource):
             TemporalExtent: Frozen outer window. Only `start_date` /
             `end_date` carry meaning — `resolution` is a daily
             placeholder and `dates` is an empty
-            :class:`pandas.DatetimeIndex` because CHIRPS download
+            `pandas.DatetimeIndex` because CHIRPS download
             cadence is per-dataset (`pandas_freq` lives on
-            :class:`~earthlens.chc.Dataset`, not on the bbox-level
+            `Dataset`, not on the bbox-level
             outer window). A consumer iterating
             `self.time.dates` would otherwise get a misleading daily
             index for a `monthly` or `6-hourly` dataset.
@@ -439,7 +439,7 @@ class CHIRPS(AbstractDataSource):
             SpatialExtent: Frozen bbox with `resolution=0.05`,
             CHIRPS's primary native cell size. (Datasets at coarser
             pixels, such as WBGT 1° or africa-6-hourly 0.10°, are
-            still clipped correctly because :meth:`_clip_to_bbox`
+            still clipped correctly because `_clip_to_bbox`
             reads the actual pixel size from the downloaded raster.)
         """
         return SpatialExtent.from_pairs(
@@ -561,11 +561,11 @@ class CHIRPS(AbstractDataSource):
         progress_bar: bool = True,
         cores: int | None = None,
     ) -> list[Path]:
-        """Iterate the per-dataset date range and dispatch :meth:`_api`.
+        """Iterate the per-dataset date range and dispatch `_api`.
 
         Branches on `dataset.is_discrete`: datasets that publish a fixed
         set of multi-year archive files (`discrete_files`, e.g. CenTrends)
-        are routed through :meth:`_download_discrete`, which fetches each
+        are routed through `_download_discrete`, which fetches each
         listed filename once instead of doing date substitution.
 
         Returns:
@@ -743,7 +743,7 @@ class CHIRPS(AbstractDataSource):
         Post-processing branches on the catalog's `default_format`:
 
         * 2-D raster formats (`tif`, `cog`, `bil`) are clipped to the
-          user's bbox in place via :meth:`_clip_raster_in_place`, just
+          user's bbox in place via `_clip_raster_in_place`, just
           like the per-date `_post_process` path. CHPclim v2 monthly
           climatology TIFs flow through here.
         * Multi-dim / opaque formats (`netcdf`, `bin`) are passed
@@ -778,11 +778,11 @@ class CHIRPS(AbstractDataSource):
     def _clip_raster_in_place(self, path: Path) -> None:
         """Read a 2-D raster at `path`, clip to `self.space`, write back.
 
-        Used by :meth:`_download_discrete` for `tif` / `cog` / `bil`
+        Used by `_download_discrete` for `tif` / `cog` / `bil`
         outputs. Negative pixels are normalised to -9999 (CHC's
         documented no-data sentinel) and -9999 is declared as the
         output band's no-data value, mirroring the per-date
-        :meth:`_post_process` behaviour.
+        `_post_process` behaviour.
         """
         raster = Dataset.read_file(str(path))
         self._clip_and_normalise(raster).to_file(str(path))
@@ -799,8 +799,8 @@ class CHIRPS(AbstractDataSource):
 
         Args:
             ds_key: Catalog dataset key (e.g. `"global-daily"`).
-            dataset: The :class:`~earthlens.chc.Dataset` row for `ds_key`.
-            var: The :class:`~earthlens.chc.Variable` being downloaded.
+            dataset: The `Dataset` row for `ds_key`.
+            var: The `Variable` being downloaded.
             date: The per-date pandas Timestamp for the request.
             ftp: Optional shared FTP session (L5). When provided, the
                 caller (a sequential `_download_dataset` batch) owns
@@ -877,7 +877,7 @@ class CHIRPS(AbstractDataSource):
         For `MS` (month-start) on `2020-01-01` this gives
         `20200101 / 20200131`; for `10D` on `2020-01-01` it gives
         `20200101 / 20200110`. Other placeholders surface as a
-        `KeyError` that :meth:`_api` catches and logs
+        `KeyError` that `_api` catches and logs
         (`{month_pair}` for CHIRPS v3 2-monthly, `{res}` /
         `{scale}` -- none of those are wired today).
 
@@ -994,7 +994,7 @@ class CHIRPS(AbstractDataSource):
         now-declared -9999 no-data.
 
         The bbox is snapped **outward** to the granule's cell edges first (see
-        :func:`_snap_bbox_outward`), because `crop_to_aoi(touch=False)` keeps
+        `_snap_bbox_outward`), because `crop_to_aoi(touch=False)` keeps
         only cells lying fully inside the box. Passing the raw request would
         drop every partially-covered edge cell, so a CHIRPS output would span
         *less* than the extent the caller asked for. Snapping first makes the

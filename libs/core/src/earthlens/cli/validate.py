@@ -8,7 +8,7 @@ checking each curated entry individually: is it internally coherent
 That is what `validate` does. This is the CLI home for the
 `tools/*/audit_*` checks that are per-entry rather than index-diff.
 
-Each provider plugs a validator into :data:`_VALIDATORS` returning
+Each provider plugs a validator into `_VALIDATORS` returning
 `(checked, issues)`; providers without one report `"unsupported"`.
 """
 
@@ -109,7 +109,7 @@ def _http_head(url: str) -> int:
 
 
 #: Provider id -> a live reachability validator (the `--live` half). May add
-#: a provider not in :data:`_VALIDATORS` (e.g. openeo / ecmwf are live-only).
+#: a provider not in `_VALIDATORS` (e.g. openeo / ecmwf are live-only).
 _LIVE_VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     # Wholly discovery-driven: merged from each provider's `earthlens.cli` table.
     **dispatch_table("live_validator"),
@@ -156,7 +156,7 @@ def validate_one(info: BackendInfo, live: bool = False) -> ValidateResult:
         live: When `True`, also run the live reachability validator.
 
     Returns:
-        The :class:`ValidateResult` for `info`.
+        The `ValidateResult` for `info`.
     """
     offline = _VALIDATORS.get(info.provider)
     live_validator = _LIVE_VALIDATORS.get(info.provider) if live else None

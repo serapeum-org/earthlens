@@ -16,8 +16,8 @@ one; a single-segment request would silently drop 90 % of the disk.
 
 The transport client is **injectable** (`transport_factory=`) so tests
 substitute a fake without touching the network. The default factory
-returns an :class:`FtplibTransport`, a thin wrapper over `ftplib.FTP`
-that resolves credentials from :class:`JaxaAuth` and translates the
+returns an `FtplibTransport`, a thin wrapper over `ftplib.FTP`
+that resolves credentials from `JaxaAuth` and translates the
 protocol's 30-day retention into a client-side guard (`G4`) rather than
 letting a bare `450`/`550` FTP error surface to callers.
 """
@@ -106,9 +106,9 @@ class RetentionError(ValueError):
 class PtreeTransport(Protocol):
     """Minimal transport surface a P-Tree fetch needs.
 
-    Any object implementing this protocol can back :func:`fetch_ptree`;
+    Any object implementing this protocol can back `fetch_ptree`;
     tests supply a fake that never touches the network. The default
-    concrete implementation is :class:`FtplibTransport`.
+    concrete implementation is `FtplibTransport`.
     """
 
     def login(self, user: str, password: str) -> None:
@@ -221,7 +221,7 @@ class FtplibTransport:
                 is created).
 
         Raises:
-            RuntimeError: If :meth:`login` was not called first.
+            RuntimeError: If `login` was not called first.
             FileNotFoundError: When the server rejects the path with
                 `error_perm` (550) or `error_temp` (450) — translated so
                 a caller does not have to import `ftplib` to catch it.
@@ -316,7 +316,7 @@ def _guard_retention(
     *,
     now: dt.datetime | None = None,
 ) -> None:
-    """Raise :class:`RetentionError` if the window is outside the archive.
+    """Raise `RetentionError` if the window is outside the archive.
 
     Guards **both bounds** so a long window that begins inside
     retention but extends past `now` (a `start_date` in the past,
@@ -466,7 +466,7 @@ def fetch_ptree(
             inclusive range. Naive `datetime`s on either bound are
             interpreted as UTC (matches the backend's own strptime
             output).
-        auth: A configured :class:`JaxaAuth` bound to `protocol="ptree"`.
+        auth: A configured `JaxaAuth` bound to `protocol="ptree"`.
             The resolved username / password are passed straight to the
             transport's `login()`.
         out_dir: Output directory (created if missing). Written files
@@ -479,7 +479,7 @@ def fetch_ptree(
             JAXA swaps).
         transport_factory: Injectable transport factory — tests supply a
             fake to avoid the network. `None` uses the stdlib-`ftplib`
-            :class:`FtplibTransport`.
+            `FtplibTransport`.
         now: Injectable "current UTC time" reference. `None` uses
             `datetime.now(UTC)`. Kept for deterministic retention tests.
 

@@ -8,8 +8,8 @@ area** to river flooding, aggregated by admin unit — **country**, **state**, o
 baseline, and seven 2030 climate × socio-economic scenarios (RCP4.5 / RCP8.5 ×
 SSP2 / SSP3). The admin polygons carry the risk attributes, so this is a
 `vector` backend: `download()` returns a pyramids
-:class:`~pyramids.feature.collection.FeatureCollection` (or a geometry-dropped
-`pandas.DataFrame`), and the :class:`earthlens.earthlens.EarthLens` facade
+`pyramids.feature.collection.FeatureCollection` (or a geometry-dropped
+`pandas.DataFrame`), and the `earthlens.earthlens.EarthLens` facade
 rejects an `aggregate=` argument.
 
 This is the flood **impact / exposure** layer. It is distinct from the Aqueduct
@@ -20,16 +20,16 @@ expected-annual damage) is not freely downloadable and is out of scope.
 
 Public surface (re-exported from this package):
 
-* :class:`Aqueduct` — the backend; instantiate with an `admin_level` / `metric`
+* `Aqueduct` — the backend; instantiate with an `admin_level` / `metric`
   / `year` / `scenario` / `return_period` selection and call
-  :meth:`Aqueduct.download`.
-* :class:`Catalog` — loader for the bundled `aqueduct_data_catalog.yaml` (admin
+  `Aqueduct.download`.
+* `Catalog` — loader for the bundled `aqueduct_data_catalog.yaml` (admin
   levels + the indicator / year / scenario / return-period vocabularies).
-* :class:`AdminLevel` — one admin level's download + shapefile spec.
-* :class:`Scenario` — one scenario's code and valid years.
-* :data:`CATALOG_PATH` — path to the bundled catalog YAML; monkey-patchable in
+* `AdminLevel` — one admin level's download + shapefile spec.
+* `Scenario` — one scenario's code and valid years.
+* `CATALOG_PATH` — path to the bundled catalog YAML; monkey-patchable in
   tests.
-* :func:`clear_catalog_cache` — drop the module-level catalog parse cache.
+* `clear_catalog_cache` — drop the module-level catalog parse cache.
 """
 
 from __future__ import annotations

@@ -138,7 +138,7 @@ class TestCatalogTable:
         """A two-row table spanning two providers.
 
         Returns:
-            A small hand-built :class:`CatalogTable`.
+            A small hand-built `CatalogTable`.
         """
         rows = (
             CatalogRow("chc", "chirps-daily", "", "daily", "0.05", ""),

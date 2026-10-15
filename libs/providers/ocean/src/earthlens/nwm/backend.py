@@ -246,7 +246,7 @@ class NWM(AbstractDataSource):
             sites: Explicit `feature_id`s / USGS `gage_id`s to subset to
                 (tabular products only; rejected for a gridded product).
             region: AWS region of the bucket.
-            catalog: Optional pre-built :class:`Catalog` (tests inject
+            catalog: Optional pre-built `Catalog` (tests inject
                 one); defaults to the bundled catalog.
 
         Raises:
@@ -321,7 +321,7 @@ class NWM(AbstractDataSource):
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
-        """Parse the cycle-date window into a :class:`TemporalExtent`.
+        """Parse the cycle-date window into a `TemporalExtent`.
 
         Args:
             start: Inclusive window start.
@@ -341,7 +341,7 @@ class NWM(AbstractDataSource):
 
         An explicit `mode=` wins. Otherwise the window auto-routes: a
         window ending within the operational retention
-        (:data:`OPERATIONAL_RETENTION_DAYS`) is `operational`, an older
+        (`OPERATIONAL_RETENTION_DAYS`) is `operational`, an older
         window is `retrospective`.
 
         Returns:
@@ -443,7 +443,7 @@ class NWM(AbstractDataSource):
         requested step and product, formatting the exact S3 key (no
         re-listing). For the retrospective mode, emits one product per
         requested NWM product carrying the Zarr store URI (read by
-        :meth:`_fetch_retrospective`).
+        `_fetch_retrospective`).
 
         Returns:
             list[RemoteProduct]: One product per item to fetch; each
@@ -495,10 +495,10 @@ class NWM(AbstractDataSource):
           published is logged and skipped).
 
         Subsetting / retrospective for the gridded (raster) products is
-        not yet supported (see :data:`_GRIDDED_SUBSET_MESSAGE`).
+        not yet supported (see `_GRIDDED_SUBSET_MESSAGE`).
 
         Args:
-            products: The products from :meth:`_search`.
+            products: The products from `_search`.
 
         Returns:
             list[Path]: The written paths (NetCDFs for a whole-file
@@ -567,7 +567,7 @@ class NWM(AbstractDataSource):
         `sites=` may carry raw `feature_id` integers (selected directly)
         or USGS `gage_id` strings (joined via the in-file `gage_id`
         coord). Integer-valued entries are returned here; the `gage_id`
-        strings are resolved by :meth:`_gage_ids`.
+        strings are resolved by `_gage_ids`.
 
         Returns:
             list[int] | None: The integer `feature_id`s, or `None` when
@@ -680,10 +680,10 @@ class NWM(AbstractDataSource):
         lazily through the pyramids `LabeledDataset` reader, applies the
         `sites=`/bbox/time selection, and writes a tidy `feature_id ×
         time` Parquet table. Gridded products are deferred (see
-        :data:`_GRIDDED_RETRO_MESSAGE`).
+        `_GRIDDED_RETRO_MESSAGE`).
 
         Args:
-            products: The retrospective products from :meth:`_search`.
+            products: The retrospective products from `_search`.
 
         Returns:
             list[Path]: One written Parquet path per tabular product.
@@ -726,7 +726,7 @@ class NWM(AbstractDataSource):
         the as-fetched source).
 
         Args:
-            products: The operational products from :meth:`_search`.
+            products: The operational products from `_search`.
 
         Returns:
             list[Path]: The written output paths (Parquet for tabular,
@@ -799,7 +799,7 @@ class NWM(AbstractDataSource):
         (a `land` file can be ~220 MB).
 
         Args:
-            product: One :class:`RemoteProduct` from :meth:`_search`.
+            product: One `RemoteProduct` from `_search`.
 
         Returns:
             Path | None: The written path, or `None` when the key was not
@@ -829,8 +829,8 @@ class NWM(AbstractDataSource):
     ) -> list[Path]:
         """Fetch the requested NWM data and return the written paths.
 
-        Runs the cheap :meth:`_search` (key enumeration) then
-        :meth:`_fetch`, which routes by mode and subset:
+        Runs the cheap `_search` (key enumeration) then
+        `_fetch`, which routes by mode and subset:
 
         * a plain operational request downloads the whole-CONUS NetCDFs;
         * a `sites=`/bbox subset or `mode="retrospective"` reads + slices

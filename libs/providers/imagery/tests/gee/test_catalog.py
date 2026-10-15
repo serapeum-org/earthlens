@@ -14,7 +14,7 @@ from earthlens.gee.catalog import Band, Cadence, Catalog, Dataset, Extent
 
 @pytest.fixture(scope="function")
 def shipped_catalog() -> Catalog:
-    """Return a :class:`Catalog` loaded from the bundled YAML.
+    """Return a `Catalog` loaded from the bundled YAML.
 
     Returns:
         Catalog: The package-data catalog.
@@ -61,7 +61,7 @@ datasets:
 
 
 class TestCadence:
-    """Tests for the :class:`Cadence` value object."""
+    """Tests for the `Cadence` value object."""
 
     def test_valid_construction(self):
         """A valid interval/unit pair builds and exposes its parts."""
@@ -92,7 +92,7 @@ class TestCadence:
 
 
 class TestBand:
-    """Tests for the :class:`Band` value object."""
+    """Tests for the `Band` value object."""
 
     def test_minimal_construction_defaults(self):
         """A band with only id+description gets sensible Nones/False defaults."""
@@ -142,7 +142,7 @@ class TestBand:
 
 
 class TestExtent:
-    """Tests for the :class:`Extent` value object."""
+    """Tests for the `Extent` value object."""
 
     def test_completed_dataset(self):
         """A bounded, finished dataset keeps both dates and a None bbox."""
@@ -175,7 +175,7 @@ class TestExtent:
 
 
 class TestDataset:
-    """Tests for the :class:`Dataset` value object."""
+    """Tests for the `Dataset` value object."""
 
     def _image(self) -> Dataset:
         return Dataset(
@@ -214,7 +214,7 @@ class TestDataset:
         assert self._image().is_image_collection is False
 
     def test_get_band_success(self):
-        """`get_band` returns the matching :class:`Band`."""
+        """`get_band` returns the matching `Band`."""
         band = self._image().get_band("elevation")
         assert band.id == "elevation" and band.units == "m"
 
@@ -239,7 +239,7 @@ class TestDataset:
 
 
 class TestCatalog:
-    """Tests for the :class:`Catalog` loader and accessors."""
+    """Tests for the `Catalog` loader and accessors."""
 
     def test_shipped_yaml_loads(self, shipped_catalog: Catalog):
         """The bundled catalog loads with non-empty datasets and asset index."""

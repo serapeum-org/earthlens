@@ -1,4 +1,4 @@
-"""Unit tests for :meth:`ECMWF._api`.
+"""Unit tests for `ECMWF._api`.
 
 Covers the daily request shape (TestApi) and the monthly branch
 (TestApiMonthly). The full set of assertions on request keys, area
@@ -32,7 +32,7 @@ pytestmark = [pytest.mark.unit]
 
 
 class TestApi:
-    """Tests for :meth:`ECMWF._api` — the C1-rewritten request builder."""
+    """Tests for `ECMWF._api` — the C1-rewritten request builder."""
 
     def test_returns_path_under_root_dir(self, ecmwf_stub, single_level_var_info):
         """api() returns <root_dir>/<cds_variable>_<cds_dataset>.nc."""
@@ -482,7 +482,7 @@ class TestApi:
 
 
 class TestApiMonthly:
-    """Tests for :meth:`ECMWF._api` on the monthly path.
+    """Tests for `ECMWF._api` on the monthly path.
 
     After the dataset/product_type decoupling, the user names the
     monthly dataset directly in `variables`; the catalog's
@@ -552,7 +552,7 @@ class TestApiMonthly:
 
 
 class TestBuildRequest:
-    """Tests for :meth:`ECMWF._build_request` (M5 — extracted pure builder)."""
+    """Tests for `ECMWF._build_request` (M5 — extracted pure builder)."""
 
     def test_pressure_level_overrides_the_catalog_level(
         self, ecmwf_stub, pressure_level_var_info

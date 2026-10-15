@@ -3,14 +3,14 @@
 The CatRaRE backend fetches the DWD Catalogue of Radar-based Rainfall Events
 (v2026.01). Two threshold selections are published — `T5` (return period
 >= 5 yr) and `W3` (severity-weighted) — so the catalog exposes them as a map of
-:class:`CatRaReDataset` rows under the inherited :attr:`datasets` field, keyed
+`CatRaReDataset` rows under the inherited `datasets` field, keyed
 `"t5"` / `"w3"`, alongside the shared `base_url`, `version` / `version_tag` /
 `years`, the RADOLAN `source_crs`, the `geometry_layers` stems, the
 `event_columns` to keep, and the `license` / `attribution`. The concrete
-download URL and FileGDB layer name are composed by :meth:`Catalog.download_url`
-/ :meth:`Catalog.layer_name`.
+download URL and FileGDB layer name are composed by `Catalog.download_url`
+/ `Catalog.layer_name`.
 
-:data:`CATALOG_PATH` is the path to the bundled YAML; it is monkey-patchable in
+`CATALOG_PATH` is the path to the bundled YAML; it is monkey-patchable in
 tests.
 """
 
@@ -41,7 +41,7 @@ class CatRaReDataset(SummarisedLeaf):
     """One CatRaRE threshold selection's spec.
 
     The threshold key (`"t5"` / `"w3"`) is the parent key in
-    :attr:`Catalog.datasets`, not stored on the row.
+    `Catalog.datasets`, not stored on the row.
 
     Attributes:
         threshold: The threshold code embedded in the file / layer names
@@ -72,7 +72,7 @@ class CatRaReDataset(SummarisedLeaf):
 def _parse_thresholds(
     rows_yaml: dict[str, Any], path: Path
 ) -> dict[str, CatRaReDataset]:
-    """Validate the `datasets:` rows into :class:`CatRaReDataset` instances.
+    """Validate the `datasets:` rows into `CatRaReDataset` instances.
 
     Args:
         rows_yaml: The raw `name -> body` mapping from the catalog YAML.
@@ -104,10 +104,10 @@ def _load_catalog_data(path: Path) -> dict[str, Any]:
     """Parse, validate, and cache the catalog at `path`.
 
     Args:
-        path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
+        path: Path to the catalog YAML (default `CATALOG_PATH`).
 
     Returns:
-        dict[str, Any]: Every field a :class:`Catalog` is built from.
+        dict[str, Any]: Every field a `Catalog` is built from.
 
     Raises:
         ValueError: If the file has no `datasets:` block or a row fails
@@ -147,14 +147,14 @@ class Catalog(AbstractCatalog[CatRaReDataset]):
     """Catalog for the CatRaRE heavy-rainfall event-catalogue backend.
 
     Reads the bundled `catrare_data_catalog.yaml` (shipped as package data) and
-    exposes its `t5` / `w3` threshold rows under the inherited :attr:`datasets`
+    exposes its `t5` / `w3` threshold rows under the inherited `datasets`
     map, plus the shared metadata used to build a download URL and FileGDB layer
     name. Instantiate with no arguments (`Catalog()`); resolve a threshold with
-    :meth:`get`.
+    `get`.
 
     Attributes:
         datasets: Map from threshold key (`"t5"` / `"w3"`) to its
-            :class:`CatRaReDataset` row.
+            `CatRaReDataset` row.
         base_url: DWD open-data host prefix.
         version: Dotted directory version (`"v2026.01"`).
         version_tag: The tag embedded in file / layer names (`"v2026_01"`).
@@ -225,10 +225,10 @@ class Catalog(AbstractCatalog[CatRaReDataset]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the module-level
-                :data:`CATALOG_PATH`.
+                `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If the file has no `datasets:` block or a row fails
@@ -238,9 +238,9 @@ class Catalog(AbstractCatalog[CatRaReDataset]):
         return cls(**_load_catalog_data(catalog_path))
 
     def get(self, threshold: str) -> CatRaReDataset:
-        """Resolve a threshold key to its :class:`CatRaReDataset` row.
+        """Resolve a threshold key to its `CatRaReDataset` row.
 
-        Thin wrapper over the inherited :meth:`get_dataset`, which raises a
+        Thin wrapper over the inherited `get_dataset`, which raises a
         `ValueError` with a did-you-mean hint on an unknown key.
 
         Args:

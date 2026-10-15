@@ -4,14 +4,14 @@
 teleconnection-index ASCII files from two open sources — NOAA PSL and the
 KNMI Climate Explorer — parses each into a tidy long frame, filters to the
 requested window, and returns the concatenation as a long-format
-:class:`pandas.DataFrame` (`date`, `index`, `value`, `source`).
+`pandas.DataFrame` (`date`, `index`, `value`, `source`).
 
 A request is `variables=[index id, …]` (e.g. `["oni", "nao"]`) + a
 `[start, end]` window; the index id selects the catalogue row, which pins
 the URL and the ASCII dialect. Climate indices are **global scalar
 monthly series** with no geometry, so this is `OUTPUT_KIND = "tabular"`:
 spatial arguments (`lat_lim` / `lon_lim` / `aoi`) are accepted for
-signature parity but ignored, and the :class:`earthlens.earthlens.EarthLens`
+signature parity but ignored, and the `earthlens.earthlens.EarthLens`
 facade rejects a non-`None` `aggregate=` (these are already monthly
 scalars — there is nothing to grid-reduce).
 
@@ -80,9 +80,9 @@ class ClimateIndices(AbstractDataSource):
     catalogue source (NOAA PSL or KNMI Climate Explorer), parses the
     source's ASCII dialect, filters to the `[start, end]` window, and
     returns the concatenation as a long-format
-    :class:`pandas.DataFrame` (`date`, `index`, `value`, `source`). The
-    query is a search/fetch split: :meth:`_search` resolves each id to a
-    catalogue row, and :meth:`_fetch` downloads and parses each one.
+    `pandas.DataFrame` (`date`, `index`, `value`, `source`). The
+    query is a search/fetch split: `_search` resolves each id to a
+    catalogue row, and `_fetch` downloads and parses each one.
 
     Climate indices are global scalar monthly series, so spatial
     arguments are ignored (`G4`) and `aggregate=` is rejected (`G1`).
@@ -167,7 +167,7 @@ class ClimateIndices(AbstractDataSource):
         )
 
     def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Return a global :class:`SpatialExtent` (spatial args ignored).
+        """Return a global `SpatialExtent` (spatial args ignored).
 
         Climate indices have no geometry (`G4`), so the bbox arguments are
         discarded and a whole-globe extent is returned to keep
@@ -189,7 +189,7 @@ class ClimateIndices(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse the `[start, end]` window into a monthly :class:`TemporalExtent`.
+        """Parse the `[start, end]` window into a monthly `TemporalExtent`.
 
         Args:
             start: Inclusive start date string.
@@ -249,10 +249,10 @@ class ClimateIndices(AbstractDataSource):
 
         Widens the inherited `-> list[Path]` contract: a tabular backend
         returns in-memory long-format frames, not file paths (the write
-        happens in :meth:`download` via :meth:`_write_table`).
+        happens in `download` via `_write_table`).
 
         Args:
-            products: The list returned by :meth:`_search`.
+            products: The list returned by `_search`.
 
         Returns:
             list[pd.DataFrame]: One canonical long-schema frame per
@@ -264,7 +264,7 @@ class ClimateIndices(AbstractDataSource):
         """Fetch one index, parse it, stamp it, and filter to the window.
 
         Args:
-            product: One :class:`RemoteProduct` from :meth:`_search`.
+            product: One `RemoteProduct` from `_search`.
 
         Returns:
             pd.DataFrame: The canonical long-schema frame for this index
@@ -305,10 +305,10 @@ class ClimateIndices(AbstractDataSource):
         """GET an index file's body, retrying transient failures.
 
         A transient failure (connection error, timeout, or a 5xx status)
-        is retried up to :data:`_HTTP_RETRIES` times with an exponential
+        is retried up to `_HTTP_RETRIES` times with an exponential
         back-off (`1s`, `2s`); a 4xx (e.g. 404) fails fast since retrying
         a real miss is pointless. The retry engine is
-        :class:`~earthlens.base.http.HttpClient`, configured to match the
+        `HttpClient`, configured to match the
         old hand-rolled loop byte-for-byte on wait sequence and attempt
         count.
 
@@ -391,7 +391,7 @@ class ClimateIndices(AbstractDataSource):
         """Write the long-format table to `root_dir` and return the path.
 
         The filename spells out the requested ids
-        (`climate_indices_oni_nao.csv`) up to :data:`_MAX_STEM_IDS`; beyond
+        (`climate_indices_oni_nao.csv`) up to `_MAX_STEM_IDS`; beyond
         that it is summarised as `climate_indices_<n>_indices.csv` to keep
         the name short.
 

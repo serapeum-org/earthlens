@@ -4,7 +4,7 @@ Caravan is an open community dataset of per-catchment daily **streamflow**,
 **ERA5-Land** meteorological forcing, static catchment **attributes** and basin
 **polygons**, published as static archives on Zenodo. This subpackage fetches
 those archives and assembles the requested catchments into a
-:class:`pandas.DataFrame`.
+`pandas.DataFrame`.
 
 Its headline value is the **GRDC-Caravan** extension: the Global Runoff Data
 Centre's raw portal has no API and forbids redistribution, but its openly
@@ -18,11 +18,11 @@ discharge use `earthlens.usgs_water` (US near-real-time) or GloFAS via
 
 Public surface:
 
-* :class:`Caravan` — the backend itself.
-* :class:`Catalog` — the bundled extension / variable catalog, plus
-  :class:`Extension`, :class:`Version`, :class:`ArchiveFile`, :class:`Source`
-  and :class:`Variable` rows.
-* :data:`CATALOG_PATH` / :func:`clear_catalog_cache` — the catalog file and its
+* `Caravan` — the backend itself.
+* `Catalog` — the bundled extension / variable catalog, plus
+  `Extension`, `Version`, `ArchiveFile`, `Source`
+  and `Variable` rows.
+* `CATALOG_PATH` / `clear_catalog_cache` — the catalog file and its
   parse-cache control.
 """
 

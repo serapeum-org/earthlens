@@ -1,4 +1,4 @@
-"""Unit tests for :meth:`ECMWF._open_client` and the credentials heuristic.
+"""Unit tests for `ECMWF._open_client` and the credentials heuristic.
 
 Covers H3 (the rewritten error message), C2 (only wrap credential-
 shaped errors as `AuthenticationError`), and the contract that
@@ -18,7 +18,7 @@ pytestmark = [pytest.mark.unit]
 
 
 class TestInitialize:
-    """Tests for :meth:`ECMWF._open_client` (H3, C2)."""
+    """Tests for `ECMWF._open_client` (H3, C2)."""
 
     def test_returns_constructed_client_when_credentials_valid(self, monkeypatch):
         """`_open_client()` returns whatever `cdsapi.Client()` returns."""

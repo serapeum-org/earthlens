@@ -5,7 +5,7 @@
 credential separately in `self._eedai_credential`. Every reader call therefore
 re-imported the module and threaded the credential in by hand.
 
-:class:`EedaiReader` binds the module and the credential into one object, so a
+`EedaiReader` binds the module and the credential into one object, so a
 caller asks it for a read rather than assembling one. The guarded import stays
 guarded: the optional dependency is still resolved lazily and still surfaces as
 one clear `ImportError` naming the extra to install.

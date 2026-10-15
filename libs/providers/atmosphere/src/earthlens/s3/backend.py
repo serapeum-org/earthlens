@@ -11,8 +11,8 @@ and crops/reprojects it to the AOI with pyramids — so every dataset is
 driven through one code path and returns the same `list[Path]`.
 
 The download orchestration uses the search/fetch split:
-:meth:`S3._search` plans the products (cheap, no bulk transfer) and
-:meth:`S3._fetch` downloads + localises them. Multi-tile AOIs (Copernicus
+`S3._search` plans the products (cheap, no bulk transfer) and
+`S3._fetch` downloads + localises them. Multi-tile AOIs (Copernicus
 DEM / ESA WorldCover spanning more than one tile) currently yield one
 cropped file per tile; merging them into a single mosaic is deferred to
 the pyramids `PY-1` port.

@@ -1,4 +1,4 @@
-"""Unit tests for :func:`earthlens.ecmwf.backend._unwrap_zipped_netcdf`.
+"""Unit tests for `earthlens.ecmwf.backend._unwrap_zipped_netcdf`.
 
 CDS occasionally returns a zip-wrapped NetCDF even when
 `data_format='netcdf'` was requested (observed consistently on

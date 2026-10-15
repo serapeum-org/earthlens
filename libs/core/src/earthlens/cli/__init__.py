@@ -13,8 +13,8 @@ The entry point is the `earthlens` console script (installed with
 * `earthlens providers …` — inspect the backend registry itself
   (`list`).
 
-The public surface is the Typer application object :data:`app` (and the
-:func:`main` wrapper the console script calls).
+The public surface is the Typer application object `app` (and the
+`main` wrapper the console script calls).
 
 Examples:
     - The application object is the console-script entry point:

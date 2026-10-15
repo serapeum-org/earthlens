@@ -27,7 +27,7 @@ _VSICURL_HTTP_TIMEOUT = 30
 
 #: Approximate metres per degree of latitude at the equator. Retained as
 #: part of the public surface for callers doing their own rough
-#: degree-to-metre sizing. :func:`estimate_pixel_dims` no longer reads it
+#: degree-to-metre sizing. `estimate_pixel_dims` no longer reads it
 #: — the sizing math now delegates to `pyramids.feature.bbox`, which uses
 #: the polar-maximum 111_694 m for the latitude axis (a slightly larger,
 #: safer over-count for a size guard).

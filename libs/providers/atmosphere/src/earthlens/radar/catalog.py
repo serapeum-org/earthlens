@@ -1,6 +1,6 @@
 """Station registry for the NEXRAD radar backend.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for the
+Hosts `Catalog`, the pydantic-backed reader for the
 bundled `radar_data_catalog.yaml` — a curated map of WSR-88D site ids
 (`"KTLX"`) to name / latitude / longitude / state. The catalog gives
 each fetched volume a point geometry and lets a request select the
@@ -8,7 +8,7 @@ radars inside a bounding box.
 
 The catalog is **informational**: any valid four-letter site id can be
 fetched even if it is absent here (the volume just gets no geometry).
-The path to the bundled YAML lives at :data:`CATALOG_PATH`;
+The path to the bundled YAML lives at `CATALOG_PATH`;
 monkey-patch it to redirect the loader in tests.
 """
 
@@ -85,8 +85,8 @@ class Station(SummarisedLeaf):
     """One WSR-88D radar site.
 
     The site id (e.g. `"KTLX"`) is the parent key in
-    :attr:`Catalog.datasets`; the loader copies it onto the row as
-    :attr:`code` so a resolved station is self-describing.
+    `Catalog.datasets`; the loader copies it onto the row as
+    `code` so a resolved station is self-describing.
 
     Attributes:
         code: The station's catalog key (its ICAO id, e.g. `"KABR"`),
@@ -150,7 +150,7 @@ class Catalog(AbstractCatalog[Station]):
         return {"datasets": _load_stations(CATALOG_PATH)}
 
     def get_station(self, site_id: str) -> Station:
-        """Resolve a site id to its :class:`Station` (did-you-mean on miss).
+        """Resolve a site id to its `Station` (did-you-mean on miss).
 
         Args:
             site_id: A four-letter WSR-88D id (e.g. `"KTLX"`).

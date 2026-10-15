@@ -6,12 +6,12 @@ say what kind of thing it carries, so the whole pipeline was implicitly "one
 `ee.Image` per bucket": there was nowhere for a vector or tabular result to go,
 which is what Epics 3-5 need.
 
-:class:`WorkUnit` makes the payload a typed object. :class:`RasterWorkUnit` is
-what every request produces today; :class:`FeatureWorkUnit` exists so a sampler
+`WorkUnit` makes the payload a typed object. `RasterWorkUnit` is
+what every request produces today; `FeatureWorkUnit` exists so a sampler
 or zonal result has a path through the same pipeline without a second one being
 built beside it.
 
-:class:`Artifact` and :class:`DownloadResult` are the other end: what a bucket
+`Artifact` and `DownloadResult` are the other end: what a bucket
 produced, and the collection of those a `download()` returns. They let a caller
 ask for the in-memory pyramids object rather than only a written file, which was
 previously impossible — every terminal method wrote to disk and returned a
@@ -212,7 +212,7 @@ class Artifact(SummarisedLeaf):
     A sink populates the fields that describe what it handed back: a file it
     wrote, a destination URI or submitted task for work it queued, and — when
     `materialize` was asked for — the in-memory object read back from the file.
-    :attr:`value` collapses that to the single thing the pre-Epic-1 contract
+    `value` collapses that to the single thing the pre-Epic-1 contract
     returned.
 
     Attributes:
@@ -279,7 +279,7 @@ class DownloadResult(SummarisedLeaf):
 
     Iterates and indexes like the `list` the method used to return, so a caller
     doing `for path in el.download()` keeps working, while a caller who asked to
-    materialise can reach the in-memory objects through :attr:`objects`.
+    materialise can reach the in-memory objects through `objects`.
 
     Attributes:
         artifacts: One artifact per bucket, in the order they were written.

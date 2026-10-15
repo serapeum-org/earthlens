@@ -1,6 +1,6 @@
 """Matching, filtering and cross-provider ordering for the query commands.
 
-Pure functions over :class:`~earthlens.cli.table.CatalogRow` lists — no
+Pure functions over `CatalogRow` lists — no
 I/O, no Typer — so `where` / `search` / `list` / `facets` all share one
 matching and ordering policy and it can be unit-tested in isolation.
 
@@ -34,7 +34,7 @@ DEFAULT_PROVIDER_PRIORITY: tuple[str, ...] = (
 )
 
 #: Environment variable holding a comma-separated provider precedence that
-#: overrides :data:`DEFAULT_PROVIDER_PRIORITY` when set.
+#: overrides `DEFAULT_PROVIDER_PRIORITY` when set.
 PRIORITY_ENV_VAR = "EARTHLENS_PROVIDER_PRIORITY"
 
 
@@ -42,7 +42,7 @@ def provider_priority() -> list[str]:
     """Return the active provider-precedence list.
 
     Reads `EARTHLENS_PROVIDER_PRIORITY` (comma-separated) when set,
-    otherwise :data:`DEFAULT_PROVIDER_PRIORITY`.
+    otherwise `DEFAULT_PROVIDER_PRIORITY`.
 
     Returns:
         The ordered list of provider ids that sort first.
@@ -69,7 +69,7 @@ def provider_rank(provider: str, priority: list[str] | None = None) -> int:
 
     Args:
         provider: Canonical provider id.
-        priority: Precedence list; defaults to :func:`provider_priority`.
+        priority: Precedence list; defaults to `provider_priority`.
 
     Returns:
         The index of `provider` in the priority list, or a large sentinel
@@ -101,7 +101,7 @@ def sort_rows(
 
     Args:
         rows: The rows to order.
-        priority: Precedence list; defaults to :func:`provider_priority`.
+        priority: Precedence list; defaults to `provider_priority`.
 
     Returns:
         A new sorted list (the input is not mutated).
@@ -147,7 +147,7 @@ def match_rows(
     so "who has this dataset?" surfaces every provider that mirrors it.
     With `exact=True` only rows whose dataset id equals `query` are
     returned. Callers that want exact hits ranked first apply
-    :func:`exact_first`.
+    `exact_first`.
 
     Args:
         rows: The rows to search.
@@ -203,13 +203,13 @@ def exact_first(
     """Order rows with exact dataset-id matches first, then by precedence.
 
     Exact id matches for `query` float to the top (each group still
-    ordered by :func:`sort_rows`), so `where era5` lists the provider
+    ordered by `sort_rows`), so `where era5` lists the provider
     keyed exactly `era5` ahead of the ones that merely mention it.
 
     Args:
         rows: The rows to order.
         query: The query whose exact id matches rank first.
-        priority: Precedence list; defaults to :func:`provider_priority`.
+        priority: Precedence list; defaults to `provider_priority`.
 
     Returns:
         A new ordered list.
@@ -322,7 +322,7 @@ def apply_filters(
 
     Args:
         rows: The rows to filter.
-        filters: A `{facet: value}` mapping (see :func:`parse_filters`).
+        filters: A `{facet: value}` mapping (see `parse_filters`).
 
     Returns:
         The rows where each filtered facet equals its requested value.

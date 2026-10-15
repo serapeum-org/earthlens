@@ -53,11 +53,11 @@ iterator for anything large.
 Arguments:
 
 - `nc_path` — path to the NetCDF on disk.
-- `var_info` — :class:`earthlens.ecmwf.Variable` row (resolves
+- `var_info` — `earthlens.ecmwf.Variable` row (resolves
   `op="auto"` via `is_pre_aggregated` / `is_flux`, drives the output filename via
   `cds_variable`, picks the variable from the NetCDF via
   `nc_variable`).
-- `config` — :class:`AggregationConfig` describing the window,
+- `config` — `AggregationConfig` describing the window,
   reduction, and output location.
 
 ### `iter_aggregate_netcdf(nc_path, var_info, config) -> Iterator[AggregatedWindow]`
@@ -361,11 +361,11 @@ Examples:
 
 ## Related
 
-- :class:`earthlens.aggregate.AggregationConfig` — frozen request
+- `earthlens.aggregate.AggregationConfig` — frozen request
   payload.
-- :func:`earthlens.aggregate.aggregate_netcdf` — the core function.
-- :class:`earthlens.ecmwf.Catalog` — resolves `(dataset, code)` pairs
+- `earthlens.aggregate.aggregate_netcdf` — the core function.
+- `earthlens.ecmwf.Catalog` — resolves `(dataset, code)` pairs
   to the `Variable` rows that drive `op="auto"` and the output
   filename.
-- :meth:`earthlens.ecmwf.ECMWF.download` — accepts the `aggregate`
+- `earthlens.ecmwf.ECMWF.download` — accepts the `aggregate`
   parameter for one-call download-and-aggregate.

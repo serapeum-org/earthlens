@@ -1,6 +1,6 @@
 """Front-end facade that routes downloads to a concrete data-source backend.
 
-The :class:`EarthLens` class is the user-facing entry point of the
+The `EarthLens` class is the user-facing entry point of the
 package. It keeps the choice of backend (CHIRPS, ERA5 on AWS S3, ECMWF
 on the Copernicus Climate Data Store, Google Earth Engine) behind a
 single string key so callers do not have to import each backend module
@@ -53,7 +53,7 @@ DEFAULT_LONGITUDE_LIMIT = [-180.0, 180.0]
 #: (whole-Earth coverage).
 DEFAULT_LATITUDE_LIMIT = [-90.0, 90.0]
 
-#: Raster file suffixes that :func:`_load_path` reads into a pyramids object.
+#: Raster file suffixes that `_load_path` reads into a pyramids object.
 #: A `.nc` is read as a `NetCDF`; every other suffix as a `Dataset`.
 _RASTER_SUFFIXES = frozenset(
     {".tif", ".tiff", ".cog", ".nc", ".nc4", ".bil", ".vrt", ".jp2", ".img"}
@@ -105,10 +105,10 @@ def _load_path(path: Path) -> Any:
 
 
 def _load_result(result: Any) -> Any:
-    """Turn a `download` result into in-memory objects for :meth:`EarthLens.load`.
+    """Turn a `download` result into in-memory objects for `EarthLens.load`.
 
     A list of paths has each raster entry read into a pyramids object (via
-    :func:`_load_path`); non-raster entries (e.g. a `.csv` table) stay as their
+    `_load_path`); non-raster entries (e.g. a `.csv` table) stay as their
     `Path`. A non-list result (a `FeatureCollection` / `GeoDataFrame` /
     `DataFrame` a backend already returns in memory) is passed through.
 
@@ -158,8 +158,8 @@ def _detach_and_cleanup(temp_dir: Path, result: Any) -> Any:
 
     Args:
         temp_dir: The directory created by
-            :meth:`EarthLens._redirect_output_to_tempdir`.
-        result: The value produced by :func:`_load_result`.
+            `EarthLens._redirect_output_to_tempdir`.
+        result: The value produced by `_load_result`.
 
     Returns:
         The result with each file-backed raster swapped for an in-memory copy.
@@ -356,7 +356,7 @@ def _is_missing_dependency(exc: ImportError, module_name: str) -> bool:
 class _LazyRegistry(Mapping):
     """Maps a data-source key to its backend class, importing on demand.
 
-    A read-only :class:`collections.abc.Mapping` over the registered
+    A read-only `collections.abc.Mapping` over the registered
     backend keys: containment, iteration, `len()`, `.keys()` /
     `.values()` / `.items()` all work. The value is resolved on
     `__getitem__`, so backends whose optional SDK is not installed do
@@ -367,7 +367,7 @@ class _LazyRegistry(Mapping):
         _mapping: Internal `key -> (module, class_name, extras_hint,
             default_kwargs)` table populated at construction. `default_kwargs`
             is merged under the user's `**backend_kwargs` by
-            :meth:`EarthLens.__init__`, so an alias key can pre-bind a
+            `EarthLens.__init__`, so an alias key can pre-bind a
             constructor argument (e.g. the STAC `"cdse"` alias pre-binds
             `endpoint="cdse"`) while a user-supplied value still wins.
     """
@@ -453,13 +453,13 @@ class _LazyRegistry(Mapping):
 class EarthLens:
     """Facade that routes a download to the requested backend.
 
-    The class-level :attr:`DataSources` mapping resolves a string key
+    The class-level `DataSources` mapping resolves a string key
     (`"chc"`, `"amazon-s3"`, `"ecmwf"`, or `"gee"` / its alias
     `"google-earth-engine"`) to the concrete
-    :class:`AbstractDataSource` subclass that owns the request shape,
+    `AbstractDataSource` subclass that owns the request shape,
     authentication, and post-processing for that provider. Each
-    backend's SDK is an optional dependency, so :attr:`DataSources`
-    is a :class:`_LazyRegistry`: indexing it imports the backend on
+    backend's SDK is an optional dependency, so `DataSources`
+    is a `_LazyRegistry`: indexing it imports the backend on
     demand and rewrites a missing SDK into a friendly
     `ImportError` naming the extra to install
     (e.g. `pip install earthlens[ecmwf]`).
@@ -469,9 +469,9 @@ class EarthLens:
             Keys are the user-facing names accepted by `data_source`;
             values resolve at access time to the corresponding
             subclasses of
-            :class:`earthlens.base.AbstractDataSource`.
-        datasource: Instance attribute set by :meth:`__init__` —
-            holds the concrete backend that :meth:`download` routes to.
+            `earthlens.base.AbstractDataSource`.
+        datasource: Instance attribute set by `__init__` —
+            holds the concrete backend that `download` routes to.
 
     Examples:
         - Inspect the registered backends:
@@ -523,102 +523,102 @@ class EarthLens:
             ```
 
     See Also:
-        :class:`earthlens.chc.CHIRPS`: CHIRPS rainfall over FTP.
-        :class:`earthlens.s3.S3`: AWS Open-Data datasets over public S3
+        `earthlens.chc.CHIRPS`: CHIRPS rainfall over FTP.
+        `earthlens.s3.S3`: AWS Open-Data datasets over public S3
             (ERA5, Sentinel-2, GOES, Copernicus DEM, ESA WorldCover) +
             an arbitrary-bucket passthrough.
-        :class:`earthlens.asf.ASF`: Alaska Satellite Facility SAR
+        `earthlens.asf.ASF`: Alaska Satellite Facility SAR
             search and InSAR baseline `stack()` via `asf_search`;
             reuses NASA Earthdata Login auth from
-            :class:`earthlens.earthdata.EarthdataAuth`. Keys
+            `earthlens.earthdata.EarthdataAuth`. Keys
             `"asf"` / `"alaska-satellite-facility"`; topic key `"asf:insar"`.
-        :class:`earthlens.cmems.CMEMS`: Copernicus Marine ocean
+        `earthlens.cmems.CMEMS`: Copernicus Marine ocean
             datasets via `copernicusmarine`.
-        :class:`earthlens.earthdata.Earthdata`: NASA EOSDIS granules
+        `earthlens.earthdata.Earthdata`: NASA EOSDIS granules
             across 9 DAACs via `earthaccess` + CMR; the first backend
             whose `OUTPUT_KIND` is per-dataset (raster / vector /
             tabular), not fixed.
-        :class:`earthlens.ecmwf.ECMWF`: ERA5 via the Copernicus
+        `earthlens.ecmwf.ECMWF`: ERA5 via the Copernicus
             Climate Data Store (cdsapi).
-        :class:`earthlens.eumetsat.EUMETSAT`: EUMETSAT Data Store
+        `earthlens.eumetsat.EUMETSAT`: EUMETSAT Data Store
             products (MTG / MSG / Metop / Sentinel-3/-5P/-6 mirrors)
             via `eumdac`; per-collection `OUTPUT_KIND`; key `"eumetsat"`.
-        :class:`earthlens.fdsn.FDSN`: seismic events from the FDSN
+        `earthlens.fdsn.FDSN`: seismic events from the FDSN
             networks (USGS / EMSC / INGV / EarthScope / ISC / GeoNet)
             via `obspy`; the first `vector`-output backend.
-        :class:`earthlens.gee.GEE`: imagery from Google Earth Engine
+        `earthlens.gee.GEE`: imagery from Google Earth Engine
             (`earthengine-api`); keys `"gee"` / `"google-earth-engine"`.
-        :class:`earthlens.gdacs.GDACS`: GDACS multi-hazard disaster
+        `earthlens.gdacs.GDACS`: GDACS multi-hazard disaster
             alerts (public feed, no credentials); key `"gdacs"`.
-        :class:`earthlens.emdat.EMDAT`: CRED EM-DAT disaster events and
+        `earthlens.emdat.EMDAT`: CRED EM-DAT disaster events and
             their geocoded locations — the UCLouvain Dataverse archive
             (`emdat:events`, anonymous, `tabular`, 1900 onwards, natural
             and technological) and GDIS (`gdis:points` / `gdis:polygons`,
             Earthdata Login, `vector`, 1960-2018). Per-instance
             `OUTPUT_KIND`; the archive carries a restricted-use
             `LicenseWarning`; keys `"emdat"` / `"gdis"`.
-        :class:`earthlens.openaq.OpenAQ`: ground-station air-quality
+        `earthlens.openaq.OpenAQ`: ground-station air-quality
             measurements from OpenAQ v3 (tabular `DataFrame`).
-        :class:`earthlens.openeo.OpenEO`: server-side openEO process graphs
+        `earthlens.openeo.OpenEO`: server-side openEO process graphs
             (defaults to CDSE openEO); `raster` output, `aggregate=` is a
             native `aggregate_temporal_period` node; key `"openeo"`.
-        :class:`earthlens.sentinel_hub.SentinelHub`: server-side Sentinel
+        `earthlens.sentinel_hub.SentinelHub`: server-side Sentinel
             Hub render on CDSE (Process / Async / Batch raster, Statistical /
             Batch-Statistical tabular); `mixed` output, evalscript-driven;
             keys `"sentinel-hub"` / `"sentinelhub"`.
-        :class:`earthlens.tropycal.TropicalCyclone`: tropical-cyclone
+        `earthlens.tropycal.TropicalCyclone`: tropical-cyclone
             best tracks via `tropycal` (`vector` output); key
             `"tropycal"`.
-        :class:`earthlens.firms.FIRMS`: NASA FIRMS active-fire
+        `earthlens.firms.FIRMS`: NASA FIRMS active-fire
             detections (MODIS / VIIRS) as a `vector` FeatureCollection;
             free `MAP_KEY`, no extra; key `"firms"`.
-        :class:`earthlens.nwm.NWM`: NOAA National Water Model hydrologic
+        `earthlens.nwm.NWM`: NOAA National Water Model hydrologic
             output — per-reach streamflow (`chrtout`, `tabular`) and
             gridded land surface (`ldasout`, `raster`) — fetched whole
             from the anonymous `noaa-nwm-pds` bucket; tabular subsetting +
             the retrospective Zarr read via pyramids `LabeledDataset`. Keys
             `"nwm"` / `"national-water-model"`.
-        :class:`earthlens.cmip6.CMIP6`: Raw CMIP6 climate projections — the
+        `earthlens.cmip6.CMIP6`: Raw CMIP6 climate projections — the
             full `model x scenario x variable x member` archive as
             analysis-ready Zarr on the open Pangeo `gs://cmip6` bucket. A
             facet tuple (`source_id` / `experiment_id` / `variable_id` /
             `table_id`) resolves to the store(s) and pyramids writes a
             bbox/time NetCDF subset (`raster`); anonymous, no extra. Keys
             `"cmip6"` / `"pangeo-cmip6"`; topic key `"cmip6:climate-projections"`.
-        :class:`earthlens.goes.GOES`: NOAA GOES-R ABI geostationary imagery
+        `earthlens.goes.GOES`: NOAA GOES-R ABI geostationary imagery
             fetched whole (raw NetCDF granules, `raster`) from the anonymous
             `noaa-goes19` / `noaa-goes18` / `noaa-goes16` buckets by
             satellite / product / domain / scan-time window; rides the `[s3]`
             extra (unsigned boto3), no auth, decode is downstream
             (pyramids / satpy); key `"goes"`.
-        :class:`earthlens.hdx.HDX`: Humanitarian Data Exchange resources
+        `earthlens.hdx.HDX`: Humanitarian Data Exchange resources
             via CKAN (`hdx-python-api`); the first `mixed`-output
             backend (downloads CSV / GeoTIFF / GeoPackage / … files
             as-is); public, no credentials; key `"hdx"`.
-        :class:`earthlens.overture.Overture`: Overture Maps Foundation
+        `earthlens.overture.Overture`: Overture Maps Foundation
             GeoParquet (buildings / places / transportation / divisions)
             over public S3 via `overturemaps`; `vector` FeatureCollection
             output with a per-row `license_id` column (and an ODbL
             `LicenseWarning`); no credentials; key `"overture"`.
-        :class:`earthlens.nwp.NWP`: open numerical-weather-prediction
+        `earthlens.nwp.NWP`: open numerical-weather-prediction
             forecasts (NOAA NODD / ECMWF Open Data / DWD) on a forecast
             `(cycle, step)` axis, returned as bbox-cropped COGs; key
             `"nwp"`.
-        :class:`earthlens.radar.Radar`: NEXRAD Level-II radar volumes
+        `earthlens.radar.Radar`: NEXRAD Level-II radar volumes
             assembled from the real-time chunk feed (`vector` inventory);
             keys `"radar"` / `"nexrad"`.
-        :class:`earthlens.usgs_water.USGSWater`: USGS NWIS / Water Data
+        `earthlens.usgs_water.USGSWater`: USGS NWIS / Water Data
             per-site water observations (discharge, gage height,
             water quality, …) via `dataretrieval` as a `tabular`
             `DataFrame`; optional `API_USGS_PAT`, anonymous works; keys
             `"usgs-water"` / `"usgs-nwis"` / `"nwis"`.
-        :class:`earthlens.ghsl.GHSL`: JRC Global Human Settlement Layer
+        `earthlens.ghsl.GHSL`: JRC Global Human Settlement Layer
             (population / built-up / settlement-model grids + R2025A WUP
             projections) over open HTTPS, reprojected / mosaicked / cropped
             to the AOI via `pyramids` as `raster` GeoTIFFs (one per
             product × epoch; `aggregate=` reduces across epochs); no
             credentials; keys `"ghsl"` / `"ghs"`; topic key `"ghsl:human-settlement"`.
-        :class:`earthlens.glaciers.Glaciers`: glacier outlines / fluctuations
+        `earthlens.glaciers.Glaciers`: glacier outlines / fluctuations
             over three open sources — RGI 7.0 per-region outlines (UNESCO
             IHP-WINS) and GLIMS WFS time-series outlines as `vector`
             `FeatureCollection`s clipped to the AOI, and the WGMS Fluctuations
@@ -626,19 +626,19 @@ class EarthLens:
             `tabular` `DataFrame`; per-instance `OUTPUT_KIND`, `aggregate=`
             rejected; no credentials; keys `"glaciers"` / `"rgi"` / `"glims"`
             / `"wgms"`.
-        :class:`earthlens.worldpop.WorldPop`: WorldPop open population data
+        `earthlens.worldpop.WorldPop`: WorldPop open population data
             hub (CC-BY-4.0, no credentials) — per-country / global gridded
             population, density, age/sex, births, projections; mosaic +
             crop to the AOI via `pyramids` with a tidy age/sex table for
             demographic products; `mixed` output; keys `"worldpop"` /
             `"world-pop"`.
-        :class:`earthlens.gbif.GBIF`: GBIF species occurrences via
+        `earthlens.gbif.GBIF`: GBIF species occurrences via
             `pygbif` (anonymous); `vector` occurrence-point
             FeatureCollection; key `"gbif"`.
-        :class:`earthlens.obis.OBIS`: OBIS marine occurrences via
+        `earthlens.obis.OBIS`: OBIS marine occurrences via
             `pyobis` (anonymous); `vector` occurrence-point
             FeatureCollection; key `"obis"`.
-        :class:`earthlens.drought.Drought`: Drought-indicator backend over
+        `earthlens.drought.Drought`: Drought-indicator backend over
             three live services — US Drought Monitor (vector polygons via
             GeoJSON), Copernicus EDO/GDO (raster via the Copernicus drought
             `GetCoverage` REST endpoint), and CSIC SPEIbase (raster via
@@ -646,20 +646,20 @@ class EarthLens:
             discoverability keys (`"drought"` / `"usdm"` / `"edo"` /
             `"gdo"`) all resolve to the same backend; all require an
             explicit `dataset=` kwarg.
-        :class:`earthlens.wdpa.WDPA`: Protected Planet (WDPA)
+        `earthlens.wdpa.WDPA`: Protected Planet (WDPA)
             protected-area polygons via the direct v4 REST API
             (`?token=`); `vector` polygon FeatureCollection; keys
             `"wdpa"` / `"protected-planet"`.
-        :class:`earthlens.iucn.IUCN`: IUCN Red List v4 assessments via
+        `earthlens.iucn.IUCN`: IUCN Red List v4 assessments via
             the direct REST shim (Bearer token); `tabular` `DataFrame`
             (always a CC-BY-NC `LicenseWarning`); keys `"iucn"` /
             `"redlist"`.
-        :class:`earthlens.argo.ARGO`: Argo autonomous-float ocean
+        `earthlens.argo.ARGO`: Argo autonomous-float ocean
             profiles (temperature / salinity / pressure, plus BGC
             parameters) via `argopy` as a `tabular` long-format
             `DataFrame`; region / `float:` / `profile:` selectors, open
             data (no auth); keys `"argo"` / `"argo-floats"` / `"argopy"`.
-        :class:`earthlens.osm.OSM`: OpenStreetMap features over three public,
+        `earthlens.osm.OSM`: OpenStreetMap features over three public,
             keyless download types — `live` (current-state, via Overpass),
             `history` (OSM history / analytics, via ohsome), and `bulk`
             (regional `.osm.pbf` extracts) — as a `vector` FeatureCollection
@@ -693,13 +693,13 @@ class EarthLens:
     ):
         """Resolve the backend and construct it with the user's parameters.
 
-        Validates `data_source` against :attr:`DataSources`, fills in
+        Validates `data_source` against `DataSources`, fills in
         whole-Earth defaults for missing `lat_lim` / `lon_lim`, and
         instantiates the concrete backend bound to `self.datasource`.
 
         Args:
             data_source: Backend key. One of the registered keys in
-                :attr:`DataSources` — `"chc"` (alias `"chirps"`),
+                `DataSources` — `"chc"` (alias `"chirps"`),
                 `"climate-indices"` (alias `"climate_indices"`; topic key
                 `"climate-indices:teleconnections"`),
                 `"amazon-s3"`, `"asf"` (alias
@@ -804,11 +804,11 @@ class EarthLens:
                 Defaults to `None`.
             lat_lim: Legacy latitude pair `[lat_min, lat_max]` — prefer the
                 single `aoi=` channel, which also accepts a bbox. Defaults to
-                :data:`DEFAULT_LATITUDE_LIMIT` (whole Earth). Mutually
+                `DEFAULT_LATITUDE_LIMIT` (whole Earth). Mutually
                 exclusive with `aoi`.
             lon_lim: Legacy longitude pair `[lon_min, lon_max]` — prefer the
                 single `aoi=` channel. Defaults to
-                :data:`DEFAULT_LONGITUDE_LIMIT` (whole Earth). Mutually
+                `DEFAULT_LONGITUDE_LIMIT` (whole Earth). Mutually
                 exclusive with `aoi`.
             fmt: `strptime` format tried first when `start` / `end` are
                 strings; a non-matching string falls back to an ISO-8601
@@ -822,7 +822,7 @@ class EarthLens:
                 `buffer`), a shapely geometry, any `__geo_interface__`
                 object, a GeoJSON geometry / Feature, a WKT string, or a
                 `GeoDataFrame` / `GeoSeries`. Reduced to `lat_lim` /
-                `lon_lim` by :func:`earthlens.base.spatial.normalize_aoi`.
+                `lon_lim` by `earthlens.base.spatial.normalize_aoi`.
                 Passing both `aoi` and `lat_lim` / `lon_lim` raises
                 `ValueError`. Defaults to `None`.
             buffer: Half-width in degrees applied to a `(lon, lat)` point
@@ -843,7 +843,7 @@ class EarthLens:
 
         Raises:
             ValueError: If `data_source` is not a key of
-                :attr:`DataSources`, if both `aoi` and
+                `DataSources`, if both `aoi` and
                 `lat_lim` / `lon_lim` are given, if `buffer` is given
                 without a point `aoi`, or if `aoi` is malformed.
             AuthenticationError: For backends that defer auth
@@ -891,7 +891,7 @@ class EarthLens:
                 ```
             - Construct an ECMWF-backed facade. Marked
               `# doctest: +SKIP` because it builds a real
-              :class:`cdsapi.Client`, which requires
+              `cdsapi.Client`, which requires
               `~/.cdsapirc`:
 
                 ```python
@@ -912,7 +912,7 @@ class EarthLens:
                 ```
 
         See Also:
-            :meth:`download`: Triggers the actual retrieval.
+            `download`: Triggers the actual retrieval.
         """
         # Back-compat for the legacy positional order
         # `EarthLens(variables, data_source, ...)`. `data_source` is now
@@ -1107,7 +1107,7 @@ class EarthLens:
 
     #: Constructor parameter names the facade owns and supplies itself.
     #: Everything else a backend declares is a backend-specific option,
-    #: surfaced by :meth:`options_for` and accepted as a kwarg.
+    #: surfaced by `options_for` and accepted as a kwarg.
     _FACADE_PARAMS = frozenset(
         {
             "self",
@@ -1278,7 +1278,7 @@ class EarthLens:
 
         Args:
             data_source: A registered backend key.
-            key: A curated dataset key (see :meth:`list_datasets`).
+            key: A curated dataset key (see `list_datasets`).
 
         Returns:
             The backend-specific dataset record (carries the dataset's
@@ -1404,9 +1404,9 @@ class EarthLens:
         """Eagerly authenticate the bound backend; raise on failure.
 
         The explicit, fail-fast counterpart to the lazy authentication
-        that otherwise happens on the first :meth:`download` / `search`.
+        that otherwise happens on the first `download` / `search`.
         Delegates to
-        :meth:`earthlens.base.AbstractDataSource.authenticate` — opening
+        `earthlens.base.AbstractDataSource.authenticate` — opening
         the network client or running the credential step — and is a
         no-op for credential-free backends. Lets callers separate "do I
         have valid credentials?" from the download itself, e.g. wrap only
@@ -1465,18 +1465,18 @@ class EarthLens:
 
         The cheap, dry-run half of the search→fetch split: it queries the
         backend's catalog and returns one
-        :class:`~earthlens.base.RemoteProduct` per item that
-        :meth:`download` would fetch, so you can inspect or filter the
+        `RemoteProduct` per item that
+        `download` would fetch, so you can inspect or filter the
         result first.
 
         Returns:
-            One :class:`~earthlens.base.RemoteProduct` per matching item;
+            One `RemoteProduct` per matching item;
             the empty list when nothing matches.
 
         Raises:
             NotImplementedError: If the bound backend keeps the legacy
                 `_api`-only flow (CHIRPS, S3, ECMWF, GEE) and exposes no
-                searchable product list — call :meth:`download` directly.
+                searchable product list — call `download` directly.
 
         Examples:
             - Preview a STAC search without fetching any bytes (live;
@@ -1504,16 +1504,16 @@ class EarthLens:
     def count(self) -> int:
         """Return how many products this request matches, without downloading.
 
-        Uses the backend's :meth:`~earthlens.base.AbstractDataSource._count`
+        Uses the backend's `_count`
         hook, which a backend with a cheap server-side total overrides;
-        otherwise it counts a :meth:`search`.
+        otherwise it counts a `search`.
 
         Returns:
             The number of matching products.
 
         Raises:
             NotImplementedError: If the bound backend exposes no
-                searchable product list (see :meth:`search`).
+                searchable product list (see `search`).
         """
         try:
             return self.datasource._count()
@@ -1526,7 +1526,7 @@ class EarthLens:
     def preview(self, n: int = 10) -> list[dict[str, Any]]:
         """Return the first `n` matching products as plain dicts.
 
-        A notebook-friendly view over :meth:`search`: each product is
+        A notebook-friendly view over `search`: each product is
         flattened to `{"id": ..., "href": ..., **metadata}` for quick
         tabular display before committing to a download.
 
@@ -1539,7 +1539,7 @@ class EarthLens:
 
         Raises:
             NotImplementedError: If the bound backend exposes no
-                searchable product list (see :meth:`search`).
+                searchable product list (see `search`).
         """
         return [
             {"id": product.id, "href": product.href, **product.metadata}
@@ -1564,7 +1564,7 @@ class EarthLens:
         Args:
             progress_bar: Whether the backend should print a per-date
                 progress bar during the loop. Defaults to `True`.
-            aggregate: Optional :class:`earthlens.aggregate.AggregationConfig`.
+            aggregate: Optional `earthlens.aggregate.AggregationConfig`.
                 Two conditions must both hold for it to be forwarded:
                 the backend's `OUTPUT_KIND` is `"raster"` or
                 `"mixed"` — the shapes for which a gridded reduction
@@ -1601,7 +1601,7 @@ class EarthLens:
             AuthenticationError: When the ECMWF backend cannot
                 authenticate against CDS (typically a missing
                 `~/.cdsapirc`). See
-                :class:`earthlens.ecmwf.AuthenticationError`.
+                `earthlens.ecmwf.AuthenticationError`.
             KeyError: When any backend receives an unknown variable
                 code that the catalog cannot resolve.
             NotImplementedError: When `aggregate=` is not `None` and the
@@ -1653,14 +1653,14 @@ class EarthLens:
                 ```
 
         See Also:
-            :meth:`earthlens.chc.CHIRPS.download`: CHIRPS
+            `earthlens.chc.CHIRPS.download`: CHIRPS
                 backend implementation, including the `cores=`
                 keyword for parallel retrieval.
-            :meth:`earthlens.s3.S3.download`: S3/ERA5 backend
+            `earthlens.s3.S3.download`: S3/ERA5 backend
                 implementation.
-            :meth:`earthlens.ecmwf.ECMWF.download`: ECMWF/CDS
+            `earthlens.ecmwf.ECMWF.download`: ECMWF/CDS
                 backend implementation.
-            :meth:`earthlens.gee.GEE.download`: Google Earth Engine
+            `earthlens.gee.GEE.download`: Google Earth Engine
                 backend implementation (`export_via`, the 32768-px
                 synchronous cap).
         """
@@ -1671,7 +1671,7 @@ class EarthLens:
     def iter_download(self, *, limit: int | None = None) -> Iterator[Any]:
         """Stream the backend's artifacts one item at a time.
 
-        The streaming counterpart to :meth:`download`, for a vector / tabular
+        The streaming counterpart to `download`, for a vector / tabular
         result too large to want resident all at once: each product's fragment
         is yielded as it arrives, so a caller can write or reduce it and let it
         go before the next one is fetched.
@@ -1680,7 +1680,7 @@ class EarthLens:
         hook — most search/fetch backends do; a backend that answers the whole
         request in one server-side call cannot, and says so rather than
         pretending. `aggregate=` is not accepted: a reduction needs the whole
-        cube, so ask for it through :meth:`download`.
+        cube, so ask for it through `download`.
 
         Args:
             limit: Total rows / features to yield across every product, or
@@ -1721,7 +1721,7 @@ class EarthLens:
     def _redirect_output_to_tempdir(self) -> None:
         """Point the backend output at a throwaway temp dir for an in-memory load.
 
-        Called by :meth:`load` when `path` was omitted: `load` only needs the
+        Called by `load` when `path` was omitted: `load` only needs the
         in-memory object, so the incidental files go to a fresh temp directory
         instead of the persistent `<output_dir()>/<source>/` default, and a
         load-and-plot run never leaves files in the working tree. Creating the
@@ -1752,8 +1752,8 @@ class EarthLens:
     ) -> Any:
         """Run the `aggregate=` guard, then forward to the backend's `download`.
 
-        The shared fetch path behind :meth:`download` (which first redirects an
-        omitted `path` to the persistent directory) and :meth:`load` (which
+        The shared fetch path behind `download` (which first redirects an
+        omitted `path` to the persistent directory) and `load` (which
         keeps the throwaway temp directory). Rejects a non-`None` `aggregate`
         before the backend is called — for a non-raster backend, and equally
         for a raster one that does not declare `SUPPORTS_AGGREGATE`.
@@ -1799,7 +1799,7 @@ class EarthLens:
     def load(self, *args: object, **kwargs: Any) -> Any:
         """Download and return the data in memory instead of only on disk.
 
-        The lazy-stack convenience: runs :meth:`download` and hands back the
+        The lazy-stack convenience: runs `download` and hands back the
         fetched data as the project's **native pyramids objects** rather than
         leaving the caller to re-open files. Raster outputs are read into a
         `pyramids.Dataset` / `NetCDF` (a `.nc` path becomes a `NetCDF`, every
@@ -1825,8 +1825,8 @@ class EarthLens:
         xarray dependency.
 
         Args:
-            *args: Forwarded positionally to :meth:`download`.
-            **kwargs: Forwarded as keywords to :meth:`download`.
+            *args: Forwarded positionally to `download`.
+            **kwargs: Forwarded as keywords to `download`.
 
         Returns:
             For a raster / mixed backend, a list with each written raster read
@@ -1877,19 +1877,19 @@ def download(
     load: bool = False,
     **backend_kwargs: object,
 ) -> Any:
-    """Construct an :class:`EarthLens` and download in one call.
+    """Construct an `EarthLens` and download in one call.
 
     The one-shot convenience for the common case: it forwards every
-    request argument to :class:`EarthLens` and the run-time arguments to
-    :meth:`EarthLens.download`, so `earthlens.core.download(...)` replaces the
+    request argument to `EarthLens` and the run-time arguments to
+    `EarthLens.download`, so `earthlens.core.download(...)` replaces the
     two-step construct-then-download.
 
     Args:
         data_source: Backend key (see `sorted(EarthLens.DataSources)`).
             Defaults to `"chc"`.
-        variables: Variable specification, as for :class:`EarthLens`.
+        variables: Variable specification, as for `EarthLens`.
         dataset: Explicit dataset / collection key (see
-            :class:`EarthLens`).
+            `EarthLens`).
         start: Inclusive start date (string / `datetime` / `date`).
         end: Inclusive end date.
         time: A single time range (`"a/b"` string / `(a, b)` pair / `slice` /
@@ -1911,17 +1911,17 @@ def download(
             when given). Defaults to `None`.
         fmt: `strptime` format override for string dates.
         progress_bar: Whether the backend prints a progress bar.
-        aggregate: Optional :class:`~earthlens.aggregate.AggregationConfig`.
+        aggregate: Optional `AggregationConfig`.
         load: When `True`, return the data in memory via
-            :meth:`EarthLens.load` (written rasters read into pyramids
+            `EarthLens.load` (written rasters read into pyramids
             `Dataset` / `NetCDF` objects) instead of the written paths.
             Defaults to `False`.
         **backend_kwargs: Extra backend-specific options (see
-            :meth:`EarthLens.options_for`).
+            `EarthLens.options_for`).
 
     Returns:
-        Whatever :meth:`EarthLens.download` returns for the backend, or —
-        when `load=True` — the in-memory objects from :meth:`EarthLens.load`.
+        Whatever `EarthLens.download` returns for the backend, or —
+        when `load=True` — the in-memory objects from `EarthLens.load`.
 
     Examples:
         - One-shot CHIRPS download. Marked `# doctest: +SKIP` because it
@@ -1964,7 +1964,7 @@ def sources() -> list[str]:
     """Return the sorted list of distinct backends, one canonical key each.
 
     The top-level discovery entry point — no class needed to see what
-    backends `earthlens.core.download(...)` / :class:`EarthLens` accept. Alias and
+    backends `earthlens.core.download(...)` / `EarthLens` accept. Alias and
     endpoint keys (`"chirps"` for `"chc"`, `"google-earth-engine"` for
     `"gee"`, the STAC endpoint keys `"planetary-computer"` / `"earth-search"`
     / `"cdse"`, …) still work as `data_source=` values but are collapsed to
@@ -2018,16 +2018,16 @@ def search(
     fmt: str = "%Y-%m-%d",
     **backend_kwargs: object,
 ) -> list[RemoteProduct]:
-    """Construct an :class:`EarthLens` and run a dry-run `search` in one call.
+    """Construct an `EarthLens` and run a dry-run `search` in one call.
 
-    The one-shot counterpart to :func:`download` for the search→fetch split:
-    it forwards every request argument to :class:`EarthLens` and returns
-    :meth:`EarthLens.search` — the products a download *would* fetch — without
+    The one-shot counterpart to `download` for the search→fetch split:
+    it forwards every request argument to `EarthLens` and returns
+    `EarthLens.search` — the products a download *would* fetch — without
     downloading anything.
 
     Args:
-        data_source: Backend key (see :func:`sources`). Defaults to `"chc"`.
-        variables: Variable specification, as for :class:`EarthLens`.
+        data_source: Backend key (see `sources`). Defaults to `"chc"`.
+        variables: Variable specification, as for `EarthLens`.
         dataset: Explicit dataset / collection key.
         start: Inclusive start date (string / `datetime` / `date`).
         end: Inclusive end date.
@@ -2035,7 +2035,7 @@ def search(
             single date) — the ergonomic alternative to `start` / `end`;
             mutually exclusive with them.
         path: Output directory (unused by a dry-run search, but accepted for
-            signature parity with :func:`download`).
+            signature parity with `download`).
         lat_lim: Legacy `[lat_min, lat_max]` pair — prefer `aoi=` (mutually
             exclusive with it).
         lon_lim: Legacy `[lon_min, lon_max]` pair — prefer `aoi=` (mutually
@@ -2048,11 +2048,11 @@ def search(
         **backend_kwargs: Extra backend-specific options.
 
     Returns:
-        One :class:`~earthlens.base.RemoteProduct` per matching item.
+        One `RemoteProduct` per matching item.
 
     Raises:
         NotImplementedError: If the backend exposes no searchable product
-            list (see :meth:`EarthLens.search`).
+            list (see `EarthLens.search`).
 
     Examples:
         - Dry-run a STAC search and inspect the first product id (live;
@@ -2093,7 +2093,7 @@ def find(text: str) -> dict[str, list[str]]:
     """Find which sources expose a dataset matching `text`.
 
     A best-effort, cross-source discovery aid: it runs
-    :meth:`EarthLens.guess_dataset` (case-insensitive substring, then fuzzy)
+    `EarthLens.guess_dataset` (case-insensitive substring, then fuzzy)
     against every registered source and collects the hits. A source whose SDK
     is not installed, or that has no free-text catalog, is skipped rather than
     failing the whole call — so the result covers the installed backends.

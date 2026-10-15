@@ -771,7 +771,7 @@ def _region_needs_endpoint(region: str) -> bool:
     """Return whether a region must be reached at its own S3 endpoint.
 
     True for an AWS opt-in region (the global endpoint rejects it, see
-    :data:`_OPT_IN_REGIONS`) and for any China-partition region (`cn-*`, whose
+    `_OPT_IN_REGIONS`) and for any China-partition region (`cn-*`, whose
     buckets the global `amazonaws.com` endpoint cannot reach at all). Standard
     regions return False: the global endpoint redirects to them, so leaving them
     unpinned keeps cross-region reads working for an endpoint that federates
@@ -830,7 +830,7 @@ class _AnonymousS3Signer:
     contributes real credentials plus `AWS_REQUEST_PAYER`, and is untouched.
 
     When the endpoint declares a `region` that **needs** its own S3 endpoint
-    (see :func:`_region_needs_endpoint`), the signer pins GDAL there
+    (see `_region_needs_endpoint`), the signer pins GDAL there
     (`AWS_REGION` + `AWS_S3_ENDPOINT=s3.<region>.amazonaws.com`), so a `/vsis3/`
     read lands at `<bucket>.s3.<region>.amazonaws.com` rather than the default
     global `<bucket>.s3.amazonaws.com`. This is **required** for a bucket in an
@@ -900,7 +900,7 @@ class _AnonymousS3Signer:
 
         Always emits `AWS_NO_SIGN_REQUEST=YES`. When the signer carries a region
         that needs its own endpoint (opt-in or `cn-*`; see
-        :func:`_region_needs_endpoint`), it additionally emits `AWS_REGION` and
+        `_region_needs_endpoint`), it additionally emits `AWS_REGION` and
         `AWS_S3_ENDPOINT=s3.<region>.amazonaws.com` so a bucket the global
         endpoint would reject is reached at its region-specific endpoint. A
         standard region emits only the no-sign flag, leaving GDAL's redirect to

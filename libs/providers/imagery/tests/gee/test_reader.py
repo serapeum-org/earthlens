@@ -2,14 +2,287 @@
 
 from __future__ import annotations
 
+import ast
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
+import earthlens.gee as gee_package
 from earthlens.gee.auth import AuthenticationError
 from earthlens.gee.reader import EedaiReader
 
 from .test_backend import fake_ee, fake_reader, make_gee  # noqa: F401 - fixtures
+
+_GEE_PACKAGE = Path(gee_package.__file__).parent
+_LOADER = "import_earthengine_reader"
+#: The adapter chain, which may let the loader's `ImportError` out: reaching it
+#: means a read was requested. Paths are relative to the package root so a
+#: same-named module elsewhere in the tree cannot inherit the exemption.
+_LOADER_OWNERS = frozenset({"_eedai.py", "reader.py"})
+
+#: Every loader-call shape the scan has to tell apart, written to a file
+#: because the scan takes a path. Each function's name says which side of the
+#: line it belongs on, and the meta-test below derives what must be flagged
+#: from those names, so adding a shape here extends the expectation with it.
+_SYNTHETIC_CALLERS = '''
+from earthlens.gee._eedai import import_earthengine_reader as load
+
+
+def unguarded():
+    return import_earthengine_reader()
+
+
+def guarded():
+    try:
+        return import_earthengine_reader()
+    except ImportError:
+        return None
+
+
+def unguarded_because_the_handler_catches_the_wrong_thing():
+    try:
+        return import_earthengine_reader()
+    except OSError:
+        return None
+
+
+def unguarded_through_the_module_attribute():
+    return _eedai.import_earthengine_reader()
+
+
+def unguarded_through_an_alias():
+    return load()
+
+
+def guarded_through_the_module_attribute():
+    try:
+        return _eedai.import_earthengine_reader()
+    except ImportError:
+        return None
+
+
+def unguarded_because_the_handler_reraises():
+    try:
+        return import_earthengine_reader()
+    except ImportError:
+        raise
+
+
+def unguarded_because_the_handler_chains():
+    try:
+        return import_earthengine_reader()
+    except ImportError as exc:
+        raise RuntimeError("no reader") from exc
+
+
+def unguarded_because_the_call_runs_later():
+    try:
+
+        def inner():
+            return import_earthengine_reader()
+
+        return inner
+    except ImportError:
+        return None
+
+
+def guarded_by_the_attribute_spelling_of_the_handler():
+    try:
+        return import_earthengine_reader()
+    except builtins.ImportError:
+        return None
+
+
+def guarded_by_a_broad_handler():
+    try:
+        return import_earthengine_reader()
+    except BaseException:
+        return None
+
+
+def unguarded_through_getattr():
+    return getattr(_eedai, "import_earthengine_reader")()
+
+
+def guarded_by_a_bare_handler():
+    try:
+        return import_earthengine_reader()
+    except:
+        return None
+
+
+def guarded_by_a_tuple_handler():
+    try:
+        return import_earthengine_reader()
+    except (OSError, ImportError):
+        return None
+
+
+def unguarded_because_the_tuple_handler_catches_the_wrong_things():
+    try:
+        return import_earthengine_reader()
+    except (OSError, ValueError):
+        return None
+
+
+def unguarded_because_a_lambda_defers_the_call():
+    try:
+        deferred = lambda: import_earthengine_reader()
+    except ImportError:
+        deferred = None
+    return deferred
+
+
+def unguarded_because_a_nested_def_below_the_statement_defers_the_call():
+    try:
+        if _ready:
+
+            def inner():
+                return import_earthengine_reader()
+
+        return None
+    except ImportError:
+        return None
+'''
+
+
+def _top_level_functions_holding(path: Path, lines: set[int]) -> set[str]:
+    """Names of the module-level functions whose body spans any of `lines`.
+
+    Reported by enclosing function rather than by line number so the
+    expectation survives an edit to the fixture, and so a failure names the
+    shape that broke instead of an integer.
+    """
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    return {
+        node.name
+        for node in tree.body
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and lines & set(range(node.lineno, (node.end_lineno or node.lineno) + 1))
+    }
+
+
+_CATCHES_MISSING_MODULE = frozenset(
+    {"ImportError", "ModuleNotFoundError", "Exception", "BaseException"}
+)
+
+
+def _exception_names(node: ast.expr | None) -> set[str]:
+    """The exception names an `except` clause's expression refers to.
+
+    Handles the attribute spelling (`builtins.ImportError`) by its last
+    component, since that is the name that identifies the class.
+    """
+    if isinstance(node, ast.Name):
+        return {node.id}
+    if isinstance(node, ast.Attribute):
+        return {node.attr}
+    if isinstance(node, ast.Tuple):
+        return {name for entry in node.elts for name in _exception_names(entry)}
+    return set()
+
+
+def _handles_missing_module(handler: ast.ExceptHandler) -> bool:
+    """Whether this handler absorbs a missing module rather than re-raising.
+
+    A handler that raises anything - bare `raise`, or a new exception chained
+    from the original - leaves the caller facing a failure, so it does not
+    make the call tolerant even though it names `ImportError`. That shape is
+    real: `reader.py` uses it deliberately, because a read was requested.
+    """
+    if any(isinstance(node, ast.Raise) for node in ast.walk(handler)):
+        return False
+    if handler.type is None:
+        return True
+    return bool(_CATCHES_MISSING_MODULE & _exception_names(handler.type))
+
+
+def _loader_names(tree: ast.Module) -> set[str]:
+    """Local names bound to the loader, following `import ... as` aliases."""
+    names = {_LOADER}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            names |= {
+                alias.asname or alias.name
+                for alias in node.names
+                if alias.name == _LOADER
+            }
+    return names
+
+
+def _is_loader_call(node: ast.AST, names: set[str]) -> bool:
+    """Whether `node` calls the loader, in any spelling the package uses.
+
+    Four shapes count: the bare name, an aliased import of it, the
+    module-attribute form (`_eedai.import_earthengine_reader()`) that this
+    package's own comments prescribe for optional seams, and a `getattr`
+    lookup of it by string.
+    """
+    if not isinstance(node, ast.Call):
+        return False
+    func = node.func
+    if isinstance(func, ast.Name):
+        return func.id in names
+    if isinstance(func, ast.Attribute):
+        return func.attr == _LOADER
+    if (
+        isinstance(func, ast.Call)
+        and isinstance(func.func, ast.Name)
+        and func.func.id == "getattr"
+    ):
+        return any(
+            isinstance(argument, ast.Constant) and argument.value == _LOADER
+            for argument in func.args
+        )
+    return False
+
+
+def _walk_outside_nested_defs(node: ast.AST):
+    """Yield nodes under `node` without descending into a nested definition.
+
+    A call inside a function defined in the `try` body runs when that function
+    is called, long after the `try` has exited, so the handler does not protect
+    it.
+    """
+    stack = [node]
+    while stack:
+        current = stack.pop()
+        yield current
+        for child in ast.iter_child_nodes(current):
+            if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)):
+                continue
+            stack.append(child)
+
+
+def _unguarded_loader_calls(path: Path) -> list[int]:
+    """Line numbers where `path` calls the loader without catching its failure."""
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    names = _loader_names(tree)
+    guarded: set[int] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Try) or not any(
+            _handles_missing_module(handler) for handler in node.handlers
+        ):
+            continue
+        for statement in node.body:
+            # A definition in the `try` body only runs when something calls
+            # it, by which time the handler is long gone, so skip the whole
+            # statement rather than just its nested children.
+            if isinstance(
+                statement, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+            ):
+                continue
+            guarded |= {
+                inner.lineno
+                for inner in _walk_outside_nested_defs(statement)
+                if _is_loader_call(inner, names)
+            }
+    return sorted(
+        node.lineno
+        for node in ast.walk(tree)
+        if _is_loader_call(node, names) and node.lineno not in guarded
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -359,3 +632,73 @@ class TestTheBackendReadsThroughTheAdapter:
 
         source = inspect.getsource(backend_module)
         assert "import_earthengine_reader()" not in source
+
+    def test_every_loader_call_outside_the_adapter_tolerates_a_missing_extra(self):
+        """A caller of the guarded loader either owns it or survives its absence.
+
+        The adapter chain may let the `ImportError` out, because reaching it
+        means a read was requested. Anywhere else the call sits on a path that
+        has to keep working without the `[eedai]` extra, and an unguarded one
+        there is how `engines.reader_refusal_types()` came to raise from inside
+        an `except` clause. A fourth call site now has to make that choice
+        explicitly instead of inheriting the bug.
+        """
+        scanned = sorted(_GEE_PACKAGE.rglob("*.py"))
+        offenders = [
+            f"{path.relative_to(_GEE_PACKAGE).as_posix()}:{line}"
+            for path in scanned
+            if path.relative_to(_GEE_PACKAGE).as_posix() not in _LOADER_OWNERS
+            for line in _unguarded_loader_calls(path)
+        ]
+        assert offenders == [], f"unguarded import_earthengine_reader() at {offenders}"
+
+    def test_the_sweep_enumerates_the_package_it_claims_to_scan(self):
+        """The empty result above means nothing unless the right files were read.
+
+        `offenders == []` is satisfied just as well by a path that resolved
+        wrongly, a glob that matched nothing, or a refactor that moved the
+        modules into a subpackage. Pinning the enumeration - and proving the
+        exemption is load-bearing by checking the owners really do hold
+        unguarded calls - is what makes the empty list evidence.
+        """
+        scanned = {
+            path.relative_to(_GEE_PACKAGE).as_posix()
+            for path in _GEE_PACKAGE.rglob("*.py")
+        }
+        assert {"engines.py", "backend.py", "reader.py", "_eedai.py"} <= scanned, (
+            f"the scan is not reading the package it thinks it is: {sorted(scanned)[:8]}"
+        )
+        exempted = {
+            owner: _unguarded_loader_calls(_GEE_PACKAGE / owner)
+            for owner in _LOADER_OWNERS
+        }
+        assert all(lines for lines in exempted.values()), (
+            f"the owners exemption is no longer load-bearing: {exempted}"
+        )
+
+    def test_the_scan_flags_every_call_shape_no_handler_catches(self, tmp_path):
+        """The guard above passes vacuously unless the scan can actually fail.
+
+        It asserts an empty list, which a scan that found nothing anywhere
+        would also satisfy, so the production sweep says nothing on its own
+        about whether an unguarded call would be caught. The fixture carries
+        every spelling the package uses - bare name, aliased import, module
+        attribute, `getattr` - against every handler shape that decides the
+        answer: one that absorbs, re-raises, chains, catches the wrong thing,
+        names nothing at all, or names a tuple that does or does not include
+        the failure. It also carries the three ways a call escapes the handler
+        by running later - a def statement, a def nested below one, and a
+        lambda.
+        """
+        source = tmp_path / "callers.py"
+        source.write_text(_SYNTHETIC_CALLERS, encoding="utf-8")
+        flagged = set(_unguarded_loader_calls(source))
+        tree = ast.parse(_SYNTHETIC_CALLERS)
+        expected = {
+            node.name
+            for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name.startswith("unguarded")
+        }
+        assert _top_level_functions_holding(source, flagged) == expected, (
+            "the scan must flag exactly the shapes the fixture names 'unguarded'"
+        )
