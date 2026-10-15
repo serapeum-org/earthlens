@@ -2351,3 +2351,79 @@ class TestGdalGuardDetection:
         # banned import itself -- letting it count would have it satisfy the very
         # rule that exists to precede it.
         assert not _imports_pyramids(ast.parse(source).body[0])
+
+
+class TestNoRstRoles:
+    """Docs are rendered as Markdown, so an rST cross-reference role is literal text."""
+
+    #: The roles that were swept out of the repository. mkdocstrings parses
+    #: docstring bodies as Markdown with no rST handler, so `:class:`Foo``
+    #: renders as the text `:class:` followed by inline code - and the three
+    #: hand-written Markdown pages that carried them are in the nav, where a
+    #: reader sees the prefix directly.
+    ROLE = re.compile(r":(?:class|meth|func|data|attr|mod|exc|obj|ref|term):`")
+
+    #: Everything the sweep covered: the six source roots plus the hand-written
+    #: docs, the runnable examples and the CI scripts.
+    SEARCHED = ("libs", "docs", "examples", ".github", "tools")
+
+    SUFFIXES = frozenset({".py", ".md", ".ipynb"})
+
+    #: This module is the one file that must contain the pattern, because its
+    #: negative control below spells out real roles. The exemption is checked
+    #: rather than assumed: `test_the_exemption_is_still_needed` fails if this
+    #: file ever stops carrying one, which would mean the control went missing.
+    SELF = Path(__file__).resolve().relative_to(_ROOT).as_posix()
+
+    def _offenders(self) -> list[str]:
+        """Every file under the searched roots that still carries a role."""
+        found: list[str] = []
+        for root in self.SEARCHED:
+            base = _ROOT / root
+            if not base.exists():
+                continue
+            for path in base.rglob("*"):
+                if not path.is_file() or path.suffix not in self.SUFFIXES:
+                    continue
+                try:
+                    text = path.read_text(encoding="utf-8")
+                except UnicodeDecodeError:
+                    continue
+                relative = path.relative_to(_ROOT).as_posix()
+                if relative != self.SELF and self.ROLE.search(text):
+                    found.append(relative)
+        return sorted(found)
+
+    def test_no_file_carries_an_rst_role(self):
+        """The repository is free of rST roles, and stays that way."""
+        assert self._offenders() == [], (
+            "rST cross-reference roles render as literal text here; use single "
+            f"backticks instead: {self._offenders()}"
+        )
+
+    def test_the_exemption_is_still_needed(self):
+        """The one exempted file must be the one that spells roles out."""
+        text = (_ROOT / self.SELF).read_text(encoding="utf-8")
+        assert self.ROLE.search(text), (
+            f"{self.SELF} no longer carries a role, so its exemption now hides "
+            "whatever else lands there - drop it"
+        )
+
+    def test_the_search_reaches_the_files_it_claims_to(self):
+        """The guard above is only evidence if it actually read the repository."""
+        counted = sum(
+            1
+            for root in self.SEARCHED
+            for path in (_ROOT / root).rglob("*")
+            if (_ROOT / root).exists()
+            and path.is_file()
+            and path.suffix in self.SUFFIXES
+        )
+        assert counted > 1000, f"only {counted} files searched; the roots look wrong"
+
+    def test_the_pattern_matches_a_role_and_spares_plain_code(self):
+        """A negative control, so an empty result cannot come from a dead regex."""
+        assert self.ROLE.search(":class:`Reducer`")
+        assert self.ROLE.search("see :meth:`GEE.download` for the call")
+        assert not self.ROLE.search("`Reducer` is the strategy")
+        assert not self.ROLE.search("a dict like {'a': 'b'} and `x`")
