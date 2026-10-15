@@ -46,7 +46,12 @@ earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 asf = ["asf_search >=12.2.2", "earthlens-imagery[earthdata]"]
 eedai = ["pyramids-eo >=0.8.1,<0.9"]
 eumetsat = ["eumdac >=3.1"]
-gee = ["earthengine-api >=1.7.26", "google-api-python-client >=2.0", "google-cloud-storage >=2.0", "Rtree >=1.0.0", "urllib3 >=1.26"]
+# scikit-learn drives the two client-side learning operations in
+# `earthlens.gee.analysis` (k-means clustering and the supervised classifier).
+# It is imported lazily through `analysis/_sklearn.py`, the same guarded shape
+# `_eedai.py` uses, so the import cost is paid only by a request that asks for
+# one of those operations - but it is declared here because the code imports it.
+gee = ["earthengine-api >=1.7.26", "google-api-python-client >=2.0", "google-cloud-storage >=2.0", "Rtree >=1.0.0", "scikit-learn >=1.5", "urllib3 >=1.26"]
 jaxa = ["jaxa.earth >=0.1.6,<0.2", "gportal >=0.4,<0.5"]
 openeo = ["openeo >=0.47,<0.52"]
 sentinel-hub = ["sentinelhub >=3.11.5"]
