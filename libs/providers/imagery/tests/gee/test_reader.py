@@ -2,14 +2,61 @@
 
 from __future__ import annotations
 
+import ast
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
+import earthlens.gee as gee_package
 from earthlens.gee.auth import AuthenticationError
 from earthlens.gee.reader import EedaiReader
 
 from .test_backend import fake_ee, fake_reader, make_gee  # noqa: F401 - fixtures
+
+_GEE_PACKAGE = Path(gee_package.__file__).parent
+_LOADER = "import_earthengine_reader"
+
+
+def _handles_missing_module(handler: ast.ExceptHandler) -> bool:
+    """Whether this handler catches `ImportError` or something broader."""
+    if handler.type is None:
+        return True
+    names = (
+        [entry.id for entry in handler.type.elts if isinstance(entry, ast.Name)]
+        if isinstance(handler.type, ast.Tuple)
+        else [handler.type.id]
+        if isinstance(handler.type, ast.Name)
+        else []
+    )
+    return bool({"ImportError", "ModuleNotFoundError", "Exception"} & set(names))
+
+
+def _unguarded_loader_calls(path: Path) -> list[int]:
+    """Line numbers where `path` calls the loader without catching its failure."""
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    guarded: set[int] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Try) or not any(
+            _handles_missing_module(handler) for handler in node.handlers
+        ):
+            continue
+        for statement in node.body:
+            guarded |= {
+                inner.lineno
+                for inner in ast.walk(statement)
+                if isinstance(inner, ast.Call)
+                and isinstance(inner.func, ast.Name)
+                and inner.func.id == _LOADER
+            }
+    return sorted(
+        node.lineno
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == _LOADER
+        and node.lineno not in guarded
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -359,3 +406,22 @@ class TestTheBackendReadsThroughTheAdapter:
 
         source = inspect.getsource(backend_module)
         assert "import_earthengine_reader()" not in source
+
+    def test_every_loader_call_outside_the_adapter_tolerates_a_missing_extra(self):
+        """A caller of the guarded loader either owns it or survives its absence.
+
+        The adapter chain may let the `ImportError` out, because reaching it
+        means a read was requested. Anywhere else the call sits on a path that
+        has to keep working without the `[eedai]` extra, and an unguarded one
+        there is how `engines.reader_refusal_types()` came to raise from inside
+        an `except` clause. A fourth call site now has to make that choice
+        explicitly instead of inheriting the bug.
+        """
+        owners = {"_eedai.py", "reader.py"}
+        offenders = [
+            f"{path.name}:{line}"
+            for path in sorted(_GEE_PACKAGE.glob("*.py"))
+            if path.name not in owners
+            for line in _unguarded_loader_calls(path)
+        ]
+        assert offenders == [], f"unguarded import_earthengine_reader() at {offenders}"
