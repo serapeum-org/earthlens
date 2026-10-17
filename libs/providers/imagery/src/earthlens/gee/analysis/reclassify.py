@@ -95,7 +95,7 @@ class Reclassify(RasterOperation):
         if not value:
             raise ValueError("bins is empty, so every value would become no-data")
         for lower, upper, class_value in value:
-            if not lower < upper:
+            if lower >= upper:
                 raise ValueError(
                     f"bin ({lower}, {upper}, {class_value}) matches nothing: "
                     "the lower bound must be below the upper one"
