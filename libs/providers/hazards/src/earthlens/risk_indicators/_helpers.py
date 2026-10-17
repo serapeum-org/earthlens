@@ -78,6 +78,36 @@ INFORM_RELEASE_LINK = re.compile(
 #: cannot win the "newest" comparison against a real release.
 INFORM_RELEASE_YEARS = range(2010, 2100)
 
+#: How many times to read the results page before concluding the layout moved.
+#: The page intermittently serves a body with no workbook link at all — not a
+#: changed pattern, since the same regex matches both 2026 workbooks seconds
+#: later — and the first such render failed the live e2e and reddened the whole
+#: hazards lane (issue #1227). Re-reading costs two extra requests on the rare
+#: miss and nothing on the common path, while a genuine layout change still
+#: raises, just a few seconds later.
+#:
+#: Scope, so the next reader does not assume more: the re-read covers a `200`
+#: carrying *no* matching link. A dropped connection or a 5xx is already
+#: retried inside `HttpClient` and never reaches the loop, and a *partial*
+#: render — one that drops the newest anchor but keeps an older one — is not
+#: covered here, because the loop stops at the first non-empty result. A
+#: partial render on a re-read is therefore accepted and memoised exactly as
+#: one on the first read always was. The hazard predates this loop (issue
+#: #1286), but note the loop gives it more chances to occur: a linkless read
+#: that used to raise now leads to up to two further reads, any of which may
+#: be the partial one.
+INFORM_RELEASE_ATTEMPTS: int = 3
+
+#: Linear back-off between those reads: `n * 1s`, so a flap that clears in a
+#: second or two is absorbed without making a real break slow to surface.
+INFORM_RELEASE_BACKOFF_SECONDS: float = 1.0
+
+#: The retry loop's own handle on `time.sleep`. A separate name, not a direct
+#: `time.sleep` call, because `HttpClient` also backs off inside a single read:
+#: a test that patches the shared `time.sleep` records both and cannot tell
+#: which wait came from where. Patch this to observe only the loop's.
+_sleep = time.sleep
+
 #: Sheet holding the country scores; its name carries the release year.
 INFORM_RELEASE_SHEET = re.compile(r"^INFORM Risk (\d{4})", re.IGNORECASE)
 
@@ -408,23 +438,73 @@ def inform_release_url(
         tuple[str, int]: The absolute workbook URL and its release year.
 
     Raises:
-        ValueError: If the page carries no plausible release-workbook link,
-            which means the page layout changed and the pattern needs
-            revisiting, or if a link points off the INFORM site.
+        ValueError: If the page still carries no plausible release-workbook
+            link after `INFORM_RELEASE_ATTEMPTS` reads, which means the page
+            layout changed and the pattern needs revisiting, or if a link
+            points off the INFORM site.
         requests.RequestException: If the page cannot be fetched.
+
+    Examples:
+        - How many times a linkless page is re-read before the error is
+          raised, and how long each wait between those reads grows by:
+            ```python
+            >>> from earthlens.risk_indicators._helpers import (
+            ...     INFORM_RELEASE_ATTEMPTS,
+            ...     INFORM_RELEASE_BACKOFF_SECONDS,
+            ... )
+            >>> INFORM_RELEASE_ATTEMPTS
+            3
+            >>> INFORM_RELEASE_BACKOFF_SECONDS
+            1.0
+
+            ```
+          The schedule those produce is asserted in
+          `test_release_url_stops_rereading_after_the_attempt_budget`, which
+          records the loop's waits rather than recomputing them here.
+        - Against the live site it answers the newest workbook and its year,
+          which `inform_download_release` then fetches (skipped here because
+          it reads the JRC site, and the newest release changes):
+            ```python
+            >>> from earthlens.risk_indicators._helpers import inform_release_url
+            >>> url, year = inform_release_url()  # doctest: +SKIP
+            >>> year >= 2026  # doctest: +SKIP
+            True
+            >>> url.endswith(".xlsx")  # doctest: +SKIP
+            True
+
+            ```
     """
     if page in _RELEASE_CACHE:
         return _RELEASE_CACHE[page]
-    html = _client(timeout).get(page).text
-    candidates = [
-        hit
-        for hit in INFORM_RELEASE_LINK.findall(html)
-        if int(hit[1]) in INFORM_RELEASE_YEARS
-    ]
+    client = _client(timeout)
+    # Bound before the loop: a budget of zero must still reach the raise below
+    # with the documented `ValueError`, not an `UnboundLocalError`.
+    candidates: list[tuple[str, str, str]] = []
+    for attempt in range(INFORM_RELEASE_ATTEMPTS):
+        html = client.get(page).text
+        candidates = [
+            hit
+            for hit in INFORM_RELEASE_LINK.findall(html)
+            if int(hit[1]) in INFORM_RELEASE_YEARS
+        ]
+        if candidates:
+            if attempt:
+                logger.info(
+                    f"INFORM results page yielded a workbook link on read "
+                    f"{attempt + 1} of {INFORM_RELEASE_ATTEMPTS}."
+                )
+            break
+        if attempt + 1 < INFORM_RELEASE_ATTEMPTS:
+            logger.warning(
+                f"INFORM results page {page} rendered no workbook link "
+                f"(read {attempt + 1} of {INFORM_RELEASE_ATTEMPTS}); re-reading."
+            )
+            _sleep(INFORM_RELEASE_BACKOFF_SECONDS * (attempt + 1))
     if not candidates:
         raise ValueError(
-            f"No INFORM Risk release workbook link found on {page}; the page "
-            "layout may have changed."
+            f"No INFORM Risk release workbook link found on {page} after "
+            f"{INFORM_RELEASE_ATTEMPTS} attempts; the page layout may have "
+            "changed."
         )
     href, year, _version = max(candidates, key=lambda hit: (int(hit[1]), int(hit[2])))
     url = urljoin(page, href)

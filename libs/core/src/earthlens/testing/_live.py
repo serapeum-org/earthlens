@@ -202,6 +202,71 @@ def skip_on_upstream(exc: BaseException) -> NoReturn:
     skip_live_unavailable(reason)
 
 
+def skip_on_public_endpoint_block(exc: BaseException) -> NoReturn:
+    """Skip a *keyless* public endpoint's block, including a bare `403`.
+
+    `skip_on_upstream` forgives `408` / `425` / `429` / `5xx` but deliberately
+    not `403`: against an authenticated service a `403` is a real credential or
+    permission regression, and forgiving it everywhere would hide that. Against
+    an endpoint that takes *no* credentials it cannot be — there is nothing to
+    authenticate — so a `403` there is the service throttling or blacklisting
+    the caller (NOAA ERDDAP rate-limiting a CI runner, #1168; ohsome's front
+    proxy, #1025). A test that knows its endpoint is keyless calls this, so that
+    case skips with the guard prefix instead of reddening the lane.
+
+    Only the `403` is widened. A `404`, a `400`, or a content assertion is not
+    a block, so it falls through to `skip_on_upstream` and still fails; a `429`
+    or `5xx` is forgiven there exactly as before.
+
+    Args:
+        exc: The exception the test caught.
+
+    Raises:
+        Skipped: When the first HTTP status in `exc`'s chain is `403`, or when
+            `skip_on_upstream` recognises an availability failure.
+        BaseException: `exc` unchanged, when it is a real failure.
+
+    Examples:
+        - A keyless endpoint answering `403` is a throttle, so it skips:
+            ```python
+            >>> import requests
+            >>> from earthlens.testing import skip_on_public_endpoint_block
+            >>> resp = requests.Response()
+            >>> resp.status_code = 403
+            >>> err = requests.HTTPError("forbidden", response=resp)
+            >>> try:
+            ...     skip_on_public_endpoint_block(err)
+            ... except BaseException as caught:
+            ...     print(type(caught).__name__)
+            Skipped
+
+            ```
+        - A `404` is a real answer, not a block, so it re-raises:
+            ```python
+            >>> import requests
+            >>> from earthlens.testing import skip_on_public_endpoint_block
+            >>> resp = requests.Response()
+            >>> resp.status_code = 404
+            >>> err = requests.HTTPError("missing", response=resp)
+            >>> try:
+            ...     skip_on_public_endpoint_block(err)
+            ... except requests.HTTPError as caught:
+            ...     print(caught)
+            missing
+
+            ```
+    """
+    for link in exception_chain(exc):
+        status = response_status(link)
+        if status is None:
+            status = status_in_message(str(link), anchored=True)
+        if status is not None:
+            if status == 403:
+                skip_live_unavailable(f"public endpoint returned HTTP {status}")
+            break
+    skip_on_upstream(exc)
+
+
 #: Reachability verdicts keyed on the probed target: `None` when the host
 #: answered, otherwise the reason it did not. Cached for the life of the
 #: process so N tests against one host cost one probe, which is the whole

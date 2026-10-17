@@ -63,7 +63,15 @@ from pathlib import Path
 #: stands behind.
 _EXPECTED_EMPTY = {
     "wdpa": "WDPA_TOKEN not issued yet (awaiting UNEP-WCMC approval)",
-    "osm": "the in-memory pyrosm pbf engine is deliberately opt-in, outside [all]",
+    # Not about credentials. The `osm` lane collects `test_pbf_e2e.py` too (the
+    # directory tagger marks it `osm`), and its pyrosm test skips there for a
+    # missing opt-in SDK - a skip with no availability prefix, which disqualifies
+    # the whole backend from `_availability_only_backends`. So on a simultaneous
+    # Overpass + ohsome + Geofabrik outage the lane would be failed for an outage
+    # it is meant to forgive, with a "supply its credentials" message for a
+    # backend that needs none.
+    "osm": "the pyrosm pbf engine is opt-in and outside [all], so the osm lane "
+    "always carries one skip that is not an availability skip",
     "argo": "argopy pins xarray>=2025.7 and openeo pins <2025.1.2, so the argo "
     "extra cannot join [all] and its SDK is never installed",
     "mswep": "the GloH2O share is granted per person; CI cannot hold one",

@@ -16,6 +16,7 @@ from earthlens.testing import (
     is_upstream_unavailable,
     pytest_runtest_call,
     skip_live_unavailable,
+    skip_on_public_endpoint_block,
 )
 
 
@@ -305,3 +306,38 @@ def test_skip_live_unavailable_stamps_the_guard_prefix() -> None:
         f"skip reason must carry the guard prefix, got {excinfo.value!r}"
     )
     assert "GDACS SEARCH unavailable: boom" in str(excinfo.value)
+
+
+class TestSkipOnPublicEndpointBlock:
+    """Tests for the keyless-endpoint block skip (403 forgiven, 404 not)."""
+
+    def test_bare_403_skips(self) -> None:
+        """A keyless endpoint's 403 is a throttle, so it skips with the prefix."""
+        with pytest.raises(pytest.skip.Exception, match=f"{_LIVE_SKIP_PREFIX}.*403"):
+            skip_on_public_endpoint_block(_WithResponse("forbidden", 403))
+
+    def test_403_wrapped_in_a_value_error_skips(self) -> None:
+        """A 403 reached through a backend's ValueError wrapper still skips."""
+        try:
+            try:
+                raise _WithResponse("forbidden", 403)
+            except Exception as cause:
+                raise ValueError("bathymetry request failed") from cause
+        except ValueError as exc:
+            with pytest.raises(pytest.skip.Exception, match="403"):
+                skip_on_public_endpoint_block(exc)
+
+    def test_404_reraises(self) -> None:
+        """A 404 is a real answer, not a block, so it is re-raised unchanged."""
+        with pytest.raises(_WithResponse, match="missing"):
+            skip_on_public_endpoint_block(_WithResponse("missing", 404))
+
+    def test_429_still_skips_via_the_shared_classifier(self) -> None:
+        """A 429 is forgiven by skip_on_upstream, not special-cased here."""
+        with pytest.raises(pytest.skip.Exception):
+            skip_on_public_endpoint_block(_WithResponse("slow down", 429))
+
+    def test_content_error_reraises(self) -> None:
+        """An error carrying no HTTP status is a real failure, re-raised."""
+        with pytest.raises(ValueError, match="bad bbox"):
+            skip_on_public_endpoint_block(ValueError("bad bbox"))
