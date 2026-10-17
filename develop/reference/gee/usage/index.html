@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -3362,6 +3362,100 @@
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-client-side-raster-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Client-side raster analysis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Client-side raster analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chaining-with" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chaining with &gt;&gt;
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#band-expressions-the-allowed-grammar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Band expressions: the allowed grammar
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terrain-derivatives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Terrain derivatives
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-data-once" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No-data, once
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#learning-operations-need-the-gee-extra" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Learning operations need the [gee] extra
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#combining-a-raster-with-a-companion-raster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Combining a raster with a companion raster
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sensor-specific-spectral-transforms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sensor-specific spectral transforms
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -23911,6 +24005,100 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#7-client-side-raster-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Client-side raster analysis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Client-side raster analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chaining-with" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chaining with &gt;&gt;
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#band-expressions-the-allowed-grammar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Band expressions: the allowed grammar
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terrain-derivatives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Terrain derivatives
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-data-once" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No-data, once
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#learning-operations-need-the-gee-extra" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Learning operations need the [gee] extra
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#combining-a-raster-with-a-companion-raster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Combining a raster with a companion raster
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sensor-specific-spectral-transforms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sensor-specific spectral transforms
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -24324,6 +24512,187 @@ built.</p>
 do <code>EarthLens(data_source="gee", variables={...}, ...).download()</code>; until
 then use <code>earthlens.gee.GEE</code> directly as above. (Tracking: plan task
 <code>H9</code>.)</p>
+<h2 id="7-client-side-raster-analysis"><a class="toclink" href="#7-client-side-raster-analysis">7. Client-side raster analysis</a><a class="headerlink" href="#7-client-side-raster-analysis" title="Permanent link">#</a></h2>
+<p>The operations in <code>earthlens.gee.analysis</code> run <strong>after</strong> the fetch, on the
+in-memory pyramids <code>Dataset</code>. Nothing in them builds, maps over or composites
+an <code>ee.Image</code>, so they are invisible to the engine-eligibility gate described
+in <a href="../server-side-compute/">Server-side computation</a>: a raw EEDAI download
+stays eligible and the analysis happens locally.</p>
+<p>Every operation has one shape — <code>Dataset -&gt; Dataset</code> — and is a frozen value
+object you can keep, compare and reuse:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">GEE</span><span class="p">,</span> <span class="n">Ndvi</span><span class="p">,</span> <span class="n">Reclassify</span><span class="p">,</span> <span class="n">Sieve</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">gee</span> <span class="o">=</span> <span class="n">GEE</span><span class="p">(</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020-06-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2020-06-30&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    <span class="n">request</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;COPERNICUS/S2_SR_HARMONIZED&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;B8&quot;</span><span class="p">,</span> <span class="s2">&quot;B4&quot;</span><span class="p">]},</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">31.0</span><span class="p">],</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">31.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">],</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>    <span class="n">scale</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>    <span class="n">project</span><span class="o">=</span><span class="s2">&quot;my-ee-project&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="p">)</span>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="c1"># Download, then analyse what came back. `analyze` forces materialize=True,</span>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="c1"># because an analysis needs the object rather than the path.</span>
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="n">ndvi</span> <span class="o">=</span> <span class="n">gee</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="n">Ndvi</span><span class="p">(</span><span class="n">nir</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">red</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+</code></pre></div>
+<h3 id="chaining-with"><a class="toclink" href="#chaining-with">Chaining with <code>&gt;&gt;</code></a><a class="headerlink" href="#chaining-with" title="Permanent link">#</a></h3>
+<p><code>&gt;&gt;</code> composes operations into an <code>OperationChain</code>, which is itself an
+operation — so anything that takes one operation takes a chain. Composition
+flattens, so grouping does not change the result:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">vegetation</span> <span class="o">=</span> <span class="n">Ndvi</span><span class="p">(</span><span class="n">nir</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">red</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">Reclassify</span><span class="p">(</span><span class="n">bins</span><span class="o">=</span><span class="p">((</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),))</span> <span class="o">&gt;&gt;</span> <span class="n">Sieve</span><span class="p">(</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="n">min_patch_cells</span><span class="o">=</span><span class="mi">25</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="p">)</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">patches</span> <span class="o">=</span> <span class="n">gee</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="n">vegetation</span><span class="p">)</span>
+</code></pre></div>
+<p>Writing the results to disk names each file after its source granule and the
+chain that produced it, and refuses to replace an existing one unless asked:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">gee</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="n">vegetation</span><span class="p">,</span> <span class="n">write_to</span><span class="o">=</span><span class="s2">&quot;data/vegetation&quot;</span><span class="p">)</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="c1"># -&gt; [PosixPath(&#39;data/vegetation/COPERNICUS_S2_SR_HARMONIZED_B8_B4_20200601_ndvi_reclassify_sieve.tif&#39;)]</span>
+</code></pre></div>
+<h3 id="band-expressions-the-allowed-grammar"><a class="toclink" href="#band-expressions-the-allowed-grammar">Band expressions: the allowed grammar</a><a class="headerlink" href="#band-expressions-the-allowed-grammar" title="Permanent link">#</a></h3>
+<p><code>BandExpression</code> is the general case — an arbitrary formula over the raster's
+bands, addressed either positionally (<code>b0</code>, <code>b1</code>, …) or by the names the raster
+carries:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">BandExpression</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">evi</span> <span class="o">=</span> <span class="n">BandExpression</span><span class="p">(</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    <span class="n">formula</span><span class="o">=</span><span class="s2">&quot;2.5 * (b0 - b1) / (b0 + 6 * b1 - 7.5 * b2 + 1)&quot;</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="p">)</span>
+</code></pre></div>
+<p><strong>There is no <code>eval</code> anywhere in it.</strong> The formula is parsed with <code>ast</code> and
+walked against an allow-list, and anything outside that list is refused <strong>at
+construction</strong> rather than when the raster arrives:</p>
+<table>
+<thead>
+<tr>
+<th>Allowed</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Arithmetic</td>
+<td><code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>//</code> <code>%</code> <code>**</code>, unary <code>+</code> / <code>-</code></td>
+</tr>
+<tr>
+<td>Comparison</td>
+<td><code>&lt;</code> <code>&lt;=</code> <code>&gt;</code> <code>&gt;=</code> <code>==</code> <code>!=</code></td>
+</tr>
+<tr>
+<td>Mask algebra</td>
+<td><code>&amp;</code> <code>|</code> <code>^</code></td>
+</tr>
+<tr>
+<td>Names</td>
+<td><code>b0</code>, <code>b1</code>, … and the raster's own band names</td>
+</tr>
+<tr>
+<td>Numbers</td>
+<td>integer and float literals</td>
+</tr>
+<tr>
+<td>Functions</td>
+<td><code>abs</code> <code>clip</code> <code>exp</code> <code>log</code> <code>log10</code> <code>maximum</code> <code>minimum</code> <code>sqrt</code> <code>where</code> (<code>ALLOWED_FUNCTIONS</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>Everything else raises at construction: attribute access (<code>b0.min()</code>), calls to
+anything not on the list, <code>__import__</code>, <code>open</code>, comprehensions, lambdas,
+conditionals, <code>and</code> / <code>or</code>, string literals, subscripts, keyword arguments and
+starred arguments. Calls are also arity-checked against <code>FUNCTION_ARITY</code>,
+because a numpy ufunc's second positional argument is <code>out=</code> — <code>abs(b0, b1)</code>
+would otherwise write into band 1 and return it.</p>
+<p>A result that is not finite becomes no-data rather than travelling downstream:
+<code>1 / 0</code>, <code>log(0)</code> and <code>sqrt(-1)</code> all produce no-data cells, and no warning
+escapes, so a caller running under <code>-W error</code> is unaffected.</p>
+<h3 id="terrain-derivatives"><a class="toclink" href="#terrain-derivatives">Terrain derivatives</a><a class="headerlink" href="#terrain-derivatives" title="Permanent link">#</a></h3>
+<p><code>Slope</code>, <code>Aspect</code> and <code>Hillshade</code> take an elevation band. Slope reports
+<code>degrees</code> (the default), <code>radians</code> or <code>percent</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">Aspect</span><span class="p">,</span> <span class="n">Hillshade</span><span class="p">,</span> <span class="n">Slope</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">dem</span> <span class="o">=</span> <span class="n">GEE</span><span class="p">(</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2000-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2000-12-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    <span class="n">request</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;USGS/SRTMGL1_003&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;elevation&quot;</span><span class="p">]},</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">31.0</span><span class="p">],</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">31.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">],</span>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>    <span class="n">scale</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>    <span class="n">project</span><span class="o">=</span><span class="s2">&quot;my-ee-project&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="p">)</span>
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="n">steepness</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="n">Slope</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="s2">&quot;degrees&quot;</span><span class="p">))</span>
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="n">in_percent</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="n">Slope</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="s2">&quot;percent&quot;</span><span class="p">))</span>   <span class="c1"># rise over run * 100</span>
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="n">direction</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="n">Aspect</span><span class="p">())</span>                  <span class="c1"># clockwise from north</span>
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="n">relief</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="n">Hillshade</span><span class="p">(</span><span class="n">azimuth</span><span class="o">=</span><span class="mi">315</span><span class="p">,</span> <span class="n">altitude</span><span class="o">=</span><span class="mi">45</span><span class="p">))</span>
+</code></pre></div>
+<p>The units matter: pyramids' <code>slope</code> understands <code>degrees</code> and <code>radians</code> and
+falls through to radians for anything else, so <code>percent</code> is computed here as
+<code>tan(radians) * 100</code> rather than passed down. A 45° slope therefore reads 45.0,
+π/4 and 100.0 in the three units.</p>
+<h3 id="no-data-once"><a class="toclink" href="#no-data-once">No-data, once</a><a class="headerlink" href="#no-data-once" title="Permanent link">#</a></h3>
+<p>Every operation reads its input through one seam that turns the declared
+sentinel into <code>NaN</code>, and writes its output through one that declares a
+sentinel appropriate to the result's own dtype. So a <code>-9999</code> in the input is
+never arithmetic: it does not shift an index, pull a focal mean, enter a
+co-occurrence matrix, match an open-ended reclassification bin, or become a
+cluster of its own. The output declares what <em>its</em> voids are, which is not
+necessarily the input's sentinel — a class raster's unmatched cells, a
+<code>Cluster</code>'s <code>no_data_label</code>, an index's undefined cells.</p>
+<h3 id="learning-operations-need-the-gee-extra"><a class="toclink" href="#learning-operations-need-the-gee-extra">Learning operations need the <code>[gee]</code> extra</a><a class="headerlink" href="#learning-operations-need-the-gee-extra" title="Permanent link">#</a></h3>
+<p><code>Cluster</code> and <code>Classify</code> reach scikit-learn, which ships with the <code>[gee]</code>
+extra. A missing install is reported with the extra to install rather than a
+<code>ModuleNotFoundError</code> from four frames deep.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">Classify</span><span class="p">,</span> <span class="n">Cluster</span><span class="p">,</span> <span class="n">TrainingExtractor</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="n">classes</span> <span class="o">=</span> <span class="n">gee</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="n">Cluster</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="c1"># Supervised, from a label raster on the same grid:</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="n">training</span> <span class="o">=</span> <span class="n">TrainingExtractor</span><span class="p">()</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">source_raster</span><span class="p">,</span> <span class="n">label_raster</span><span class="p">)</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="n">mapped</span> <span class="o">=</span> <span class="n">Classify</span><span class="p">(</span><span class="n">training</span><span class="o">=</span><span class="n">training</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">source_raster</span><span class="p">)</span>
+</code></pre></div>
+<p>A <code>Classify</code> is tied to the bands it was trained on, so applying it to a
+different band set is refused rather than predicted from the wrong features,
+and the forest is fitted once and reused across applications.</p>
+<h3 id="combining-a-raster-with-a-companion-raster"><a class="toclink" href="#combining-a-raster-with-a-companion-raster">Combining a raster with a companion raster</a><a class="headerlink" href="#combining-a-raster-with-a-companion-raster" title="Permanent link">#</a></h3>
+<p>Two operations take a second raster, supplied at construction and used by
+<code>apply</code>. Both are thin, client-side wrappers over pyramids 0.69.0 — pyramids
+owns the GDAL pan-sharpener and the histogram-matching arithmetic.</p>
+<p><code>PanSharpen</code> injects the spatial detail of a high-resolution panchromatic band
+into a coarser multispectral raster (Landsat's 15 m B8 against its 30 m
+multispectral bands, say), producing a fused raster at the pan resolution:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">PanSharpen</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">fused</span> <span class="o">=</span> <span class="n">PanSharpen</span><span class="p">(</span><span class="n">pan</span><span class="o">=</span><span class="n">pan_raster</span><span class="p">)(</span><span class="n">multispectral_raster</span><span class="p">)</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="c1"># or a subset, with explicit Brovey weights:</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">fused</span> <span class="o">=</span> <span class="n">PanSharpen</span><span class="p">(</span><span class="n">pan</span><span class="o">=</span><span class="n">pan_raster</span><span class="p">,</span> <span class="n">bands</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">weights</span><span class="o">=</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">))(</span><span class="n">ms</span><span class="p">)</span>
+</code></pre></div>
+<p><code>MatchHistogram</code> remaps a band so its distribution matches a reference
+acquisition's — the usual way to make two scenes of one area radiometrically
+comparable before differencing. No-data is excluded from both distributions
+and written back as the source's sentinel:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">MatchHistogram</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">comparable</span> <span class="o">=</span> <span class="n">MatchHistogram</span><span class="p">(</span><span class="n">reference</span><span class="o">=</span><span class="n">july_scene</span><span class="p">)(</span><span class="n">june_scene</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="sensor-specific-spectral-transforms"><a class="toclink" href="#sensor-specific-spectral-transforms">Sensor-specific spectral transforms</a><a class="headerlink" href="#sensor-specific-spectral-transforms" title="Permanent link">#</a></h3>
+<p><code>TasseledCap</code> rotates a multi-band reflectance stack into the Kauth-Thomas
+brightness / greenness / wetness components. Unlike the operations above it is
+tied to a <em>sensor</em>: the coefficients are a fixed linear combination over a
+specific band order, which is why they live upstream in pyramids-eo's sensor
+registry rather than here. Because the band order matters, name the input's
+bands and the transform reorders them to the sensor's roles; leave them unnamed
+and it assumes the documented order and only checks the band count.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">TasseledCap</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="c1"># a 6-band Landsat 8 OLI reflectance stack (blue, green, red, nir, swir1, swir2)</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="n">components</span> <span class="o">=</span> <span class="n">TasseledCap</span><span class="p">(</span><span class="n">sensor</span><span class="o">=</span><span class="s2">&quot;landsat8_oli&quot;</span><span class="p">)(</span><span class="n">reflectance_raster</span><span class="p">)</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="c1"># or a subset, in the order you ask for:</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="n">wetness</span> <span class="o">=</span> <span class="n">TasseledCap</span><span class="p">(</span><span class="n">sensor</span><span class="o">=</span><span class="s2">&quot;landsat8_oli&quot;</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;wetness&quot;</span><span class="p">,))(</span><span class="n">reflectance_raster</span><span class="p">)</span>
+</code></pre></div>
+<p>The bundled sensors are <code>landsat5_tm</code>, <code>landsat7_etm</code> and <code>landsat8_oli</code>; the
+input must be a reflectance factor (a DN stack is warned about, not rejected),
+and voids are carried through as NaN in every component.</p>
 
 
 
