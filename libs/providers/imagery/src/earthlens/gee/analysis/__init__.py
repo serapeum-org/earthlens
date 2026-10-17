@@ -17,8 +17,39 @@ The intended shape of a call is therefore download, then analyse:
 ```python
 >>> from earthlens.core import EarthLens
 >>> el = EarthLens(data_source="gee", materialize=True)  # doctest: +SKIP
->>> result = el.download(progress_bar=False)[0]  # doctest: +SKIP
+>>> result = el.download(progress_bar=False)  # doctest: +SKIP
 >>> ndvi = Ndvi(nir=0, red=1)(result.objects[0])  # doctest: +SKIP
+```
+
+`DownloadResult.__getitem__` returns one artifact's *payload*, so
+`download(...)[0]` is already the `Dataset` - the `.objects[0]` then belongs to
+the result, not to the item. Both of these are right, and the second needs no
+`materialize=True`:
+
+```python
+>>> ndvi = Ndvi(nir=0, red=1)(el.download().objects[0])      # doctest: +SKIP
+>>> ndvi = Ndvi(nir=0, red=1)(el.download(materialize=True)[0])  # doctest: +SKIP
+```
+
+The download half needs Earth Engine credentials, so it is skipped here. The
+analysis half is not, and runs on any raster:
+
+```python
+>>> import numpy as np
+>>> from pyramids.base.georeference import GeoReference
+>>> from pyramids.dataset import Dataset
+>>> stack = np.stack([
+...     np.full((2, 2), 0.6, dtype="float32"),
+...     np.full((2, 2), 0.2, dtype="float32"),
+... ])
+>>> raster = Dataset.from_array(
+...     arr=stack,
+...     geo_ref=GeoReference(top_left_corner=(31.0, 30.0), cell_size=0.01, epsg=4326),
+...     no_data_value=np.nan,
+... )
+>>> float(np.asarray(Ndvi(nir=0, red=1)(raster).read_array())[0, 0])
+0.5
+
 ```
 
 Operations compose with `>>`, which builds an `OperationChain` - itself an

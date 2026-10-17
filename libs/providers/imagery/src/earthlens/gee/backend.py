@@ -113,8 +113,10 @@ from earthlens.gee.work import Artifact, DownloadResult, RasterWorkUnit
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from geopandas import GeoDataFrame
+    from pyramids.dataset import Dataset
 
     from earthlens.base.http import HttpClient
+    from earthlens.gee.analysis.base import OperationChain, RasterOperation
 
 __all__ = [
     "GEE",
@@ -1477,11 +1479,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
     def analyze(
         self,
-        ops: Any,
+        ops: RasterOperation | OperationChain | Sequence[RasterOperation],
         *,
         write_to: str | Path | None = None,
         progress_bar: bool = True,
-    ) -> list[Any]:
+        overwrite: bool = False,
+    ) -> list[Dataset | Path]:
         """Download, then run client-side raster operations on what came back.
 
         The operations run *after* the fetch, on the in-memory pyramids object,
@@ -1498,10 +1501,19 @@ class GEE(LazyClientMixin, AbstractDataSource):
             write_to: When given, a directory; each derived raster is written
                 there as a GeoTIFF and its path returned instead of the object.
             progress_bar: Whether the download shows a progress bar.
+            overwrite: Whether an existing output file may be replaced, when
+                `write_to` is given.
 
         Returns:
             One derived `pyramids.dataset.Dataset` per downloaded raster, or one
             `pathlib.Path` each when `write_to` is given.
+
+        Raises:
+            ValueError: If `ops` is not a raster operation, a chain or a
+                sequence of them, or if this backend's sink is a batch one -
+                `export_via="drive"` / `"gcs"` / `"asset"` send the pixels to
+                that destination instead, so there is nothing in memory to
+                analyse.
 
         Examples:
             - Composite, fetch, and take NDVI of what arrived:
@@ -1514,9 +1526,24 @@ class GEE(LazyClientMixin, AbstractDataSource):
         """
         from earthlens.gee.analysis import RasterAnalysis
 
+        # Refuse here rather than letting `download` report it. Its message is
+        # about `materialize=True` - a flag this method sets itself and the
+        # caller never passed - so it reads as a complaint about the wrong
+        # thing when it surfaces from `analyze`. Asked of the resolved sink,
+        # not matched against the `export_via` vocabulary, for the same reason
+        # the constructor resolves it: a newly registered sink must not need an
+        # edit here.
+        if self._sink.is_batch:
+            raise ValueError(
+                f"analyze needs the pixels locally, but this backend exports "
+                f"via {self._sink.name!r}, which queues the work remotely and "
+                "returns a destination. Construct the backend with "
+                "export_via='url' to analyse, or pull the result from the "
+                "destination and run the analysis over those rasters yourself."
+            )
         analysis = RasterAnalysis.of(ops)
         result = self.download(progress_bar=progress_bar, materialize=True)
-        return analysis.run_on_result(result, write_to=write_to)
+        return analysis.run_on_result(result, write_to=write_to, overwrite=overwrite)
 
     def _materialise(self, written: list[Any]) -> DownloadResult:
         """Read each written raster back as an in-memory pyramids object.

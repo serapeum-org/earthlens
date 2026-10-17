@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from pydantic import ValidationError
 from pyramids.base.georeference import GeoReference
 from pyramids.dataset import Dataset
 
@@ -121,11 +122,11 @@ class TestProximity:
 
     def test_an_unknown_unit_is_rejected_at_construction(self):
         """The literal is validated when the operation is built."""
-        with pytest.raises(Exception, match="distance_units"):
+        with pytest.raises(ValidationError, match="distance_units"):
             Proximity(distance_units="metres")
 
     def test_the_target_selection_stays_immutable(self):
         """A tuple field keeps the operation frozen and hashable."""
         operation = Proximity(target_values=(1, 2))
-        with pytest.raises(Exception, match="frozen"):
+        with pytest.raises(ValidationError, match="frozen"):
             operation.target_values = (3,)

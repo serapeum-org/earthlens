@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from pydantic import ValidationError
 from pyramids.base.georeference import GeoReference
 from pyramids.dataset import Dataset
 
@@ -105,7 +106,7 @@ class TestTheNamedPresets:
 
     def test_a_preset_rejects_the_base_class_fields(self):
         """`Ndvi(a=0)` is a typo, not a shortcut to the shared formula."""
-        with pytest.raises(Exception, match="Extra inputs are not permitted"):
+        with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
             Ndvi(a=0)
 
     def test_an_index_composes_in_a_chain(self):

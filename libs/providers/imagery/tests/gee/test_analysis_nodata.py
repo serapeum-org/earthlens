@@ -97,6 +97,7 @@ class TestTheOutputDeclaresItsOwnNoData:
 
     def test_an_unrepresentable_sentinel_is_refused_at_construction(self):
         """NaN cannot be stored in an integer band, so asking for it must fail."""
+        # Deliberately broad: the refusal comes from numpy or pyramids depending on the dtype.
         with pytest.raises(Exception, match="(?i)no_data|integer"):
             Reclassify(bins=((0.0, 1.0, 1),), dtype="uint8", no_data=float("nan"))
 

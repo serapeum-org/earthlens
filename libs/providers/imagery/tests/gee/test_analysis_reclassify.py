@@ -133,6 +133,7 @@ class TestConvertUnits:
 
     def test_an_unknown_unit_is_pyramids_error_to_raise(self):
         """This wrapper carries no unit table, so it does not pre-judge labels."""
+        # Deliberately broad: pyramids raises this, and its type is not part of its public API.
         with pytest.raises(Exception, match="(?i)unit"):
             ConvertUnits(target="bananas").apply(
                 _raster(np.full((2, 2), 300.0, dtype="float32"), units="K")

@@ -6,6 +6,7 @@ import math
 
 import numpy as np
 import pytest
+from pydantic import ValidationError
 from pyramids.base.georeference import GeoReference
 from pyramids.dataset import Dataset
 
@@ -70,7 +71,7 @@ class TestSlope:
 
     def test_an_unknown_unit_is_rejected_at_construction(self):
         """The literal is checked when the operation is built, not when it runs."""
-        with pytest.raises(Exception, match="units"):
+        with pytest.raises(ValidationError, match="units"):
             Slope(units="grads")
 
     def test_the_output_keeps_the_source_grid(self):

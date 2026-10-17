@@ -19,7 +19,7 @@ importing the gee backend should not drag the GIS stack in.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, ConfigDict
 
@@ -214,12 +214,9 @@ class OperationChain(RasterOperation):
         """The number of operations in the chain."""
         return len(self.operations)
 
-    def __iter__(self) -> Any:
-        """Iterate the operations in run order.
-
-        Returns:
-            An iterator over the chain's operations. This shadows pydantic's
-            field iteration deliberately: a chain reads as the sequence it
-            represents, which is what a caller inspecting one expects.
-        """
-        return iter(self.operations)
+    # No `__iter__` override. Yielding the operations instead of pydantic's
+    # `(field, value)` pairs made `dict(chain)` return something that looked
+    # like data but was not: `dict()` iterated the chain, took each operation,
+    # and unpacked it through *its* inherited pydantic `__iter__`, giving
+    # `{('nir', 0): ('red', 1), ('band', 0): ('units', 'degrees')}`. A chain is
+    # iterated through `chain.operations`, which says what it yields.

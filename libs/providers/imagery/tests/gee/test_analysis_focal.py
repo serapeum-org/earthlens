@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from pydantic import ValidationError
 from pyramids.base.georeference import GeoReference
 from pyramids.dataset import Dataset
 
@@ -68,7 +69,7 @@ class TestTheNamedReducers:
 
     def test_a_radius_below_one_is_refused(self):
         """Radius 0 would reduce each cell to itself, which is not a window."""
-        with pytest.raises(Exception, match="radius must be at least 1"):
+        with pytest.raises(ValidationError, match="radius must be at least 1"):
             FocalMean(radius=0)
 
     def test_the_reducers_ignore_no_data_rather_than_propagating_it(self):
@@ -108,7 +109,7 @@ class TestFocalApply:
     def test_the_callable_cannot_be_swapped_after_construction(self):
         """The operation stays a frozen value object despite holding a function."""
         operation = FocalApply(func=_window_span)
-        with pytest.raises(Exception, match="frozen"):
+        with pytest.raises(ValidationError, match="frozen"):
             operation.func = np.nanmax
 
     def test_it_composes_with_a_named_reducer(self):

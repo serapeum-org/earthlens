@@ -134,7 +134,7 @@ class TestComposition:
     def test_the_chain_iterates_its_operations(self):
         """Inspecting a chain yields the operations, not pydantic fields."""
         chain = _Record(tag="x") >> _Record(tag="y")
-        assert [operation.tag for operation in chain] == ["x", "y"]
+        assert [operation.tag for operation in chain.operations] == ["x", "y"]
 
     def test_composing_with_a_non_operation_is_refused(self):
         """`>>` names both sides, rather than failing later inside `apply`."""
@@ -152,3 +152,26 @@ class TestComposition:
         chain = _AddOne(amount=2.0) >> _AddOne(amount=3.0)
         result = chain.apply(_raster(np.zeros((4, 4), dtype="float32")))
         assert float(np.asarray(result.read_array(), dtype="float32").max()) == 5.0
+
+
+class TestTheModelProtocol:
+    """A chain is a pydantic model, and must keep behaving like one."""
+
+    def test_dict_of_a_chain_is_its_fields_not_its_operations(self):
+        """An `__iter__` override made `dict(chain)` look like data.
+
+        Yielding the operations meant `dict()` took each one and unpacked it
+        through *its* inherited pydantic `__iter__`, producing
+        `{('nir', 0): ('red', 1), ...}` - a mapping of tuples to tuples that
+        raised nothing and meant nothing.
+        """
+        chain = _Record(tag="x") >> _Record(tag="y")
+        as_dict = dict(chain)
+        assert set(as_dict) == {"operations"}
+        assert [operation.tag for operation in as_dict["operations"]] == ["x", "y"]
+
+    def test_the_operations_are_reached_through_the_field(self):
+        """`chain.operations` is the documented way to iterate a chain."""
+        chain = _Record(tag="x") >> _Record(tag="y")
+        assert len(chain) == 2
+        assert tuple(operation.tag for operation in chain.operations) == ("x", "y")
