@@ -204,8 +204,6 @@ def _check(node: ast.AST) -> None:
         _check(node.body)
     elif isinstance(node, ast.Constant):
         _check_constant(node)
-    elif isinstance(node, ast.Name):
-        pass
     elif isinstance(node, ast.UnaryOp):
         _check_unaryop(node)
     elif isinstance(node, ast.BinOp):
@@ -214,7 +212,9 @@ def _check(node: ast.AST) -> None:
         _check_compare(node)
     elif isinstance(node, ast.Call):
         _check_call(node)
-    else:
+    elif not isinstance(node, ast.Name):
+        # A bare `ast.Name` is an allowed band reference and needs no check;
+        # anything else is a construct a formula may not contain.
         raise ValueError(f"{type(node).__name__} is not allowed in a band expression")
 
 
