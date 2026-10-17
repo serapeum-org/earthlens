@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING, Literal
 
 import numpy as np
 
+from earthlens.gee.analysis._arrays import read_masked, result_like
 from earthlens.gee.analysis.base import RasterOperation
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -104,8 +105,17 @@ class Slope(RasterOperation):
             A new raster of slope values in the configured units.
         """
         if self.units == "percent":
-            radians = np.asarray(ds.slope(band=self.band, units="radians"))
-            return _like(ds, np.tan(radians) * 100.0)
+            # Read the radians back through the masked seam before the `tan`.
+            # pyramids writes the source sentinel (-9999) at void cells, and
+            # `tan(-9999) * 100` is a plausible 82.44 - declared no-data but
+            # not equal to the sentinel, so a masked read would see it as a
+            # real slope. On a masked read the void is NaN, which `tan`
+            # propagates, and `result_like` declares a NaN sentinel.
+            radians_ds = _like(ds, ds.slope(band=self.band, units="radians"))
+            radians = read_masked(radians_ds, 0)
+            return result_like(
+                ds, np.tan(radians) * 100.0, dtype="float32", no_data=float("nan")
+            )
         return _like(ds, ds.slope(band=self.band, units=self.units))
 
 

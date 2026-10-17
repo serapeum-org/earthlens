@@ -15,6 +15,7 @@ named operations here use the `np.nan*` family for exactly that reason, and
 
 from __future__ import annotations
 
+import warnings
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
@@ -37,12 +38,22 @@ __all__ = [
 def _focal(
     ds: Dataset, func: Callable[[Any], float], radius: int, band: int
 ) -> Dataset:
-    """Run `func` over every window and put the result back on `ds`' grid."""
+    """Run `func` over every window and put the result back on `ds`' grid.
+
+    The reduction runs inside `errstate` and a warning filter, the same
+    hardening `BandExpression` applies: a window that is entirely void makes
+    `np.nanmean` / `np.nanstd` warn ("Mean of empty slice", "Degrees of
+    freedom <= 0"), and under `-W error` that warning is raised - for
+    `np.nanstd` as a confusing `SystemError` from the ufunc dispatcher rather
+    than the original `RuntimeWarning`. The void stays a void regardless; the
+    only effect is that a caller running warnings-as-errors is not crashed.
+    """
     from pyramids.dataset import Dataset as PyramidsDataset
 
-    return PyramidsDataset.dataset_like(
-        ds, ds.focal_apply(func, radius=radius, band=band)
-    )
+    with np.errstate(all="ignore"), warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        reduced = ds.focal_apply(func, radius=radius, band=band)
+    return PyramidsDataset.dataset_like(ds, reduced)
 
 
 class _Window(RasterOperation):

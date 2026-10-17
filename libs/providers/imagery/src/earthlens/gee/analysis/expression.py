@@ -245,7 +245,12 @@ def _evaluate(node: ast.AST, bands: dict[str, Any]) -> Any:
     if isinstance(node, ast.Expression):
         return _evaluate(node.body, bands)
     if isinstance(node, ast.Constant):
-        return node.value
+        # As float, so a formula of pure integer literals follows the same
+        # semantics as band arithmetic (bands are read back as float64). Left
+        # as int, `2 ** -1` raised numpy's "Integers to negative integer
+        # powers are not allowed" at apply time - an internal error for a
+        # formula the allow-list accepts, where `b0 ** -1` is fine.
+        return float(node.value)
     if isinstance(node, ast.Name):
         try:
             return bands[node.id]

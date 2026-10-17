@@ -284,3 +284,23 @@ class TestTheUncoveredBranches:
         """
         with pytest.raises(ValidationError, match="Subscript is not allowed"):
             BandExpression(formula="b0[0]")
+
+
+class TestIntegerLiteralArithmetic:
+    """Round 2 L2: a pure-literal negative power raised a cryptic numpy error."""
+
+    def test_an_integer_literal_negative_power_evaluates(self):
+        """`2 ** -1` is 0.5, not `Integers to negative integer powers`.
+
+        Literals evaluate as float, so integer-literal arithmetic follows the
+        same semantics as band arithmetic, where `b0 ** -1` already worked.
+        """
+        assert _first(BandExpression(formula="2 ** -1").apply(_two_band())) == (
+            pytest.approx(0.5)
+        )
+
+    def test_integer_literal_arithmetic_still_gives_the_right_value(self):
+        """Evaluating as float must not change a plain integer formula."""
+        assert _first(BandExpression(formula="3 * 2 + 1").apply(_two_band())) == (
+            pytest.approx(7.0)
+        )

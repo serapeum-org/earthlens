@@ -22,11 +22,17 @@ from pyramids.base.georeference import GeoReference
 from pyramids.dataset import Dataset
 
 from earthlens.gee.analysis import (
+    Aspect,
     BandExpression,
     Classify,
     Cluster,
+    FocalMean,
+    FocalMedian,
+    FocalStd,
+    Hillshade,
     NormalizedDifference,
     Reclassify,
+    Slope,
     Texture,
     TrainingExtractor,
 )
@@ -203,3 +209,82 @@ class TestTheArraySeam:
         assert source.band_names == ['Band_1', 'Band_2']
         with pytest.raises(IndexError):
             source.band_names = ['first']
+
+
+class TestTheTerrainContractAtVoids:
+    """The no-data contract for the terrain family, the gap round 2 found.
+
+    `Slope`/`Aspect`/`Hillshade` were absent from this suite, and that is why
+    `Slope(units="percent")` shipped leaking the sentinel: it did `tan` on the
+    raw array, where a void still held the finite `-9999`, producing a
+    plausible `82.44` that a masked read took as real.
+    """
+
+    @staticmethod
+    def _ramp_with_a_void() -> Dataset:
+        """A metric ramp with one void cell in the interior."""
+        metric = GeoReference(top_left_corner=(0.0, 0.0), cell_size=1.0, epsg=3857)
+        values = np.tile(np.arange(6, dtype="float32"), (6, 1))
+        values[3, 3] = SENTINEL
+        return Dataset.from_array(arr=values, geo_ref=metric, no_data_value=SENTINEL)
+
+    @pytest.mark.parametrize(
+        "operation",
+        [
+            Slope(),
+            Slope(units="radians"),
+            Slope(units="percent"),
+            Aspect(),
+            Hillshade(),
+        ],
+        ids=["degrees", "radians", "percent", "aspect", "hillshade"],
+    )
+    def test_a_terrain_derivative_masks_the_void(self, operation):
+        """Every terrain path must leave a void masked, percent included."""
+        result = operation.apply(self._ramp_with_a_void())
+        masked = result.read_array(masked=True)
+        assert bool(np.ma.getmaskarray(masked)[3, 3]), (
+            f"{operation.name} reports a real value at a void cell"
+        )
+
+    def test_percent_does_not_report_the_sentinel_as_a_slope(self):
+        """The specific corruption: 82.44 where the DEM had no data."""
+        result = Slope(units="percent").apply(self._ramp_with_a_void())
+        void = float(np.asarray(result.read_array())[3, 3])
+        assert void != pytest.approx(np.tan(SENTINEL) * 100.0), (
+            "the percent path computed tan(-9999)*100 over the sentinel"
+        )
+
+
+class TestWarningsAsErrors:
+    """Round 2 L1: the window reducers crashed a caller running -W error."""
+
+    @staticmethod
+    def _mostly_void() -> Dataset:
+        """A raster whose interior windows are entirely no-data."""
+        values = np.full((7, 7), SENTINEL, dtype="float32")
+        values[0, 0] = 5.0
+        return _raster(values)
+
+    @pytest.mark.parametrize(
+        "operation",
+        [
+            FocalMean(radius=1),
+            FocalStd(radius=1),
+            FocalMedian(radius=1),
+            Texture(radius=1),
+        ],
+        ids=["mean", "std", "median", "texture"],
+    )
+    def test_a_window_full_of_voids_does_not_raise_under_w_error(self, operation):
+        """`BandExpression` is hardened against this; the siblings now are too.
+
+        `np.nanstd` over an all-NaN window otherwise surfaces not even the
+        `RuntimeWarning` but a `SystemError` from the ufunc dispatcher when
+        warnings are errors.
+        """
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            operation.apply(self._mostly_void())

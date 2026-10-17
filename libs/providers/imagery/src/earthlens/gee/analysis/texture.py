@@ -232,11 +232,15 @@ class Texture(RasterOperation):
         if finite.size:
             low, high = float(finite.min()), float(finite.max())
             span = high - low
-            quantised = (
-                np.zeros_like(values)
-                if span == 0
-                else np.floor((values - low) / span * (self.levels - 1))
-            )
+            with np.errstate(invalid="ignore"):
+                # The array still holds NaN at the voids, so `floor` warns
+                # "invalid value encountered in floor" - harmless (the NaN is
+                # masked back in on the next line) but a crash under `-W error`.
+                quantised = (
+                    np.zeros_like(values)
+                    if span == 0
+                    else np.floor((values - low) / span * (self.levels - 1))
+                )
         else:
             quantised = values
         quantised = np.where(np.isfinite(values), quantised, np.nan)
