@@ -54,6 +54,8 @@ _EXPECTED_EXPORTS = {
     "TrainingSet",
     "UNIT_CONVERSIONS",
     "supported_conversions",
+    "PanSharpen",
+    "MatchHistogram",
     # Epic 1 Task 1.1 - the reducer strategy objects and their registry.
     "Reducer",
     "Mean",

@@ -71,4 +71,6 @@ Earth Engine.
 
 ::: earthlens.gee.analysis.classify
 
+::: earthlens.gee.analysis.combine
+
 ::: earthlens.gee.analysis.facade

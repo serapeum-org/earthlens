@@ -130,6 +130,8 @@ engine-eligibility gate:
 * `Cluster` / `Classify`, with `TrainingExtractor` and
   `TrainingSet` — unsupervised and supervised per-pixel learning
   through scikit-learn (the `[gee]` extra).
+* `PanSharpen` / `MatchHistogram` — operations that combine a raster
+  with a companion one (a finer pan band; a reference acquisition).
 
 Two submodules ship more specialised helpers and are intentionally
 **not** re-exported at this top level — import them directly. Both
@@ -205,11 +207,13 @@ from earthlens.gee.analysis import (
     FocalMedian,
     FocalStd,
     Hillshade,
+    MatchHistogram,
     Ndbi,
     Ndvi,
     Ndwi,
     NormalizedDifference,
     OperationChain,
+    PanSharpen,
     Proximity,
     RasterAnalysis,
     RasterOperation,
@@ -292,6 +296,8 @@ from earthlens.gee.work import (
 )
 
 __all__ = [
+    "MatchHistogram",
+    "PanSharpen",
     "UNIT_CONVERSIONS",
     "supported_conversions",
     "GEE",

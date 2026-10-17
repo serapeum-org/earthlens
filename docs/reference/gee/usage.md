@@ -514,3 +514,36 @@ mapped = Classify(training=training).apply(source_raster)
 A `Classify` is tied to the bands it was trained on, so applying it to a
 different band set is refused rather than predicted from the wrong features,
 and the forest is fitted once and reused across applications.
+
+### Combining a raster with a companion raster
+
+Two operations take a second raster, supplied at construction and used by
+`apply`. Both are thin, client-side wrappers over pyramids 0.69.0 — pyramids
+owns the GDAL pan-sharpener and the histogram-matching arithmetic.
+
+`PanSharpen` injects the spatial detail of a high-resolution panchromatic band
+into a coarser multispectral raster (Landsat's 15 m B8 against its 30 m
+multispectral bands, say), producing a fused raster at the pan resolution:
+
+```python
+from earthlens.gee import PanSharpen
+
+fused = PanSharpen(pan=pan_raster)(multispectral_raster)
+# or a subset, with explicit Brovey weights:
+fused = PanSharpen(pan=pan_raster, bands=(0, 1, 2), weights=(0.3, 0.4, 0.3))(ms)
+```
+
+`MatchHistogram` remaps a band so its distribution matches a reference
+acquisition's — the usual way to make two scenes of one area radiometrically
+comparable before differencing. No-data is excluded from both distributions
+and written back as the source's sentinel:
+
+```python
+from earthlens.gee import MatchHistogram
+
+comparable = MatchHistogram(reference=july_scene)(june_scene)
+```
+
+The third transform in this family, `TasseledCap`, is not yet available: its
+per-sensor coefficients over a fixed band order are domain value-semantics that
+belong in pyramids-eo (tracked upstream), not a GIS primitive.

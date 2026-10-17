@@ -75,6 +75,9 @@ The families:
   the ones too small to keep.
 * `Cluster` / `Classify` with `TrainingExtractor` - unsupervised and supervised
   per-pixel learning, both through scikit-learn.
+* `PanSharpen` / `MatchHistogram` - operations that combine a raster with a
+  companion one: fusing in a finer panchromatic band, and matching a band's
+  distribution to a reference acquisition's.
 """
 
 from __future__ import annotations
@@ -82,6 +85,7 @@ from __future__ import annotations
 from earthlens.gee.analysis.base import OperationChain, RasterOperation
 from earthlens.gee.analysis.classify import Classify, TrainingExtractor, TrainingSet
 from earthlens.gee.analysis.cluster import Cluster
+from earthlens.gee.analysis.combine import MatchHistogram, PanSharpen
 from earthlens.gee.analysis.expression import ALLOWED_FUNCTIONS, BandExpression
 from earthlens.gee.analysis.facade import RasterAnalysis
 from earthlens.gee.analysis.focal import (
@@ -103,6 +107,8 @@ from earthlens.gee.analysis.terrain import Aspect, Hillshade, Slope
 from earthlens.gee.analysis.texture import MEASURES, Texture
 
 __all__ = [
+    "MatchHistogram",
+    "PanSharpen",
     "UNIT_CONVERSIONS",
     "supported_conversions",
     "ALLOWED_FUNCTIONS",
