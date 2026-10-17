@@ -37,6 +37,7 @@ matches `NormalizedDifference`, which masks a zero denominator before dividing.
 from __future__ import annotations
 
 import ast
+from collections.abc import Callable, Mapping
 from functools import lru_cache
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any
@@ -56,7 +57,7 @@ __all__ = ["ALLOWED_FUNCTIONS", "FUNCTION_ARITY", "BandExpression"]
 #: purpose: `np.mean` over a band would collapse the raster to a scalar and the
 #: result could not go back on the grid. Read-only, so the no-escape promise
 #: cannot be undone by a caller assigning a new entry.
-ALLOWED_FUNCTIONS = MappingProxyType(
+ALLOWED_FUNCTIONS: Mapping[str, Callable[..., Any]] = MappingProxyType(
     {
         "abs": np.absolute,
         "clip": np.clip,
@@ -317,7 +318,8 @@ def _evaluate(node: ast.AST, bands: dict[str, Any]) -> Any:
         # as int, `2 ** -1` raised numpy's "Integers to negative integer
         # powers are not allowed" at apply time - an internal error for a
         # formula the allow-list accepts, where `b0 ** -1` is fine.
-        return float(node.value)
+        # _check_constant has already established node.value is a plain number.
+        return float(node.value)  # type: ignore[arg-type]
     if isinstance(node, ast.Name):
         return _evaluate_name(node, bands)
     if isinstance(node, ast.UnaryOp):
@@ -326,7 +328,8 @@ def _evaluate(node: ast.AST, bands: dict[str, Any]) -> Any:
         return _evaluate_binop(node, bands)
     if isinstance(node, ast.Compare):
         return _evaluate_compare(node, bands)
-    return _evaluate_call(node, bands)
+    # Only an allowed `ast.Call` can reach here - `_check` admitted nothing else.
+    return _evaluate_call(node, bands)  # type: ignore[arg-type]
 
 
 def _band_namespace(ds: Dataset) -> dict[str, Any]:

@@ -92,8 +92,8 @@ class NormalizedDifference(RasterOperation):
         # warn; masking the denominator first keeps the computation quiet and
         # leaves the undefined cells as NaN for the sentinel below.
         with np.errstate(invalid="ignore", divide="ignore"):
-            index = np.where(total == 0, np.nan, (first - second) / total)
-        return result_like(ds, index, dtype="float32", no_data=float("nan"))
+            ratio = np.where(total == 0, np.nan, (first - second) / total)
+        return result_like(ds, ratio, dtype="float32", no_data=float("nan"))
 
 
 class _NormalizedDifferencePreset(RasterOperation):
@@ -109,8 +109,9 @@ class _NormalizedDifferencePreset(RasterOperation):
     adds nothing else. A fourth preset is then two lines.
     """
 
-    #: The subclass's own field names, in `(a, b)` order.
-    _band_fields: ClassVar[tuple[str, str]] = ()
+    #: The subclass's own field names, in `(a, b)` order (a subclass sets two;
+    #: the base leaves it empty, so the annotation is variable-length).
+    _band_fields: ClassVar[tuple[str, ...]] = ()
 
     def apply(self, ds: Dataset) -> Dataset:
         """Return the index raster for this preset's two bands.

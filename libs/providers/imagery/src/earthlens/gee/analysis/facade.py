@@ -180,9 +180,12 @@ class RasterAnalysis(OperationChain):
         Returns:
             The analysis.
         """
+        # The `_accept_one_or_many` before-validator normalises a sequence, a
+        # chain, or a bare operation into the `tuple[RasterOperation, ...]` the
+        # field declares, so these broader argument types are accepted at runtime.
         if len(operations) == 1 and not isinstance(operations[0], RasterOperation):
-            return cls(operations=operations[0])
-        return cls(operations=operations)
+            return cls(operations=operations[0])  # type: ignore[arg-type]
+        return cls(operations=operations)  # type: ignore[arg-type]
 
     def run(self, ds: Dataset) -> Dataset:
         """Alias for `apply`, which reads better where an analysis is invoked.

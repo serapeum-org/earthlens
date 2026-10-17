@@ -113,7 +113,6 @@ from earthlens.gee.work import Artifact, DownloadResult, RasterWorkUnit
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from geopandas import GeoDataFrame
-    from pyramids.dataset import Dataset
 
     from earthlens.base.http import HttpClient
     from earthlens.gee.analysis.base import OperationChain, RasterOperation
@@ -1484,7 +1483,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         write_to: str | Path | None = None,
         progress_bar: bool = True,
         overwrite: bool = False,
-    ) -> list[Dataset | Path]:
+    ) -> list[PyramidsDataset | Path]:
         """Download, then run client-side raster operations on what came back.
 
         The operations run *after* the fetch, on the in-memory pyramids object,
@@ -1542,8 +1541,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 "destination and run the analysis over those rasters yourself."
             )
         analysis = RasterAnalysis.of(ops)
+        # materialize=True makes download return a DownloadResult (not the path
+        # list the broad return type also admits), which run_on_result requires.
         result = self.download(progress_bar=progress_bar, materialize=True)
-        return analysis.run_on_result(result, write_to=write_to, overwrite=overwrite)
+        return analysis.run_on_result(result, write_to=write_to, overwrite=overwrite)  # type: ignore[arg-type]
 
     def _materialise(self, written: list[Any]) -> DownloadResult:
         """Read each written raster back as an in-memory pyramids object.
