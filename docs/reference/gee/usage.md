@@ -366,3 +366,151 @@ Once the GEE backend is registered in the facade you'll also be able to
 do `EarthLens(data_source="gee", variables={...}, ...).download()`; until
 then use `earthlens.gee.GEE` directly as above. (Tracking: plan task
 `H9`.)
+
+## 7. Client-side raster analysis
+
+The operations in `earthlens.gee.analysis` run **after** the fetch, on the
+in-memory pyramids `Dataset`. Nothing in them builds, maps over or composites
+an `ee.Image`, so they are invisible to the engine-eligibility gate described
+in [Server-side computation](server-side-compute.md): a raw EEDAI download
+stays eligible and the analysis happens locally.
+
+Every operation has one shape — `Dataset -> Dataset` — and is a frozen value
+object you can keep, compare and reuse:
+
+```python
+from earthlens.gee import GEE, Ndvi, Reclassify, Sieve
+
+gee = GEE(
+    start="2020-06-01",
+    end="2020-06-30",
+    request={"COPERNICUS/S2_SR_HARMONIZED": ["B8", "B4"]},
+    lat_lim=[30.0, 31.0],
+    lon_lim=[31.0, 32.0],
+    scale=20,
+    project="my-ee-project",
+)
+
+# Download, then analyse what came back. `analyze` forces materialize=True,
+# because an analysis needs the object rather than the path.
+ndvi = gee.analyze(Ndvi(nir=0, red=1))
+```
+
+### Chaining with `>>`
+
+`>>` composes operations into an `OperationChain`, which is itself an
+operation — so anything that takes one operation takes a chain. Composition
+flattens, so grouping does not change the result:
+
+```python
+vegetation = Ndvi(nir=0, red=1) >> Reclassify(bins=((0.3, 1.0, 1),)) >> Sieve(
+    min_patch_cells=25
+)
+patches = gee.analyze(vegetation)
+```
+
+Writing the results to disk names each file after its source granule and the
+chain that produced it, and refuses to replace an existing one unless asked:
+
+```python
+paths = gee.analyze(vegetation, write_to="data/vegetation")
+# -> [PosixPath('data/vegetation/COPERNICUS_S2_SR_HARMONIZED_B8_B4_20200601_ndvi_reclassify_sieve.tif')]
+```
+
+### Band expressions: the allowed grammar
+
+`BandExpression` is the general case — an arbitrary formula over the raster's
+bands, addressed either positionally (`b0`, `b1`, …) or by the names the raster
+carries:
+
+```python
+from earthlens.gee import BandExpression
+
+evi = BandExpression(
+    formula="2.5 * (b0 - b1) / (b0 + 6 * b1 - 7.5 * b2 + 1)"
+)
+```
+
+**There is no `eval` anywhere in it.** The formula is parsed with `ast` and
+walked against an allow-list, and anything outside that list is refused **at
+construction** rather than when the raster arrives:
+
+| Allowed | |
+|---|---|
+| Arithmetic | `+` `-` `*` `/` `//` `%` `**`, unary `+` / `-` |
+| Comparison | `<` `<=` `>` `>=` `==` `!=` |
+| Mask algebra | `&` `|` `^` |
+| Names | `b0`, `b1`, … and the raster's own band names |
+| Numbers | integer and float literals |
+| Functions | `abs` `clip` `exp` `log` `log10` `maximum` `minimum` `sqrt` `where` (`ALLOWED_FUNCTIONS`) |
+
+Everything else raises at construction: attribute access (`b0.min()`), calls to
+anything not on the list, `__import__`, `open`, comprehensions, lambdas,
+conditionals, `and` / `or`, string literals, subscripts, keyword arguments and
+starred arguments. Calls are also arity-checked against `FUNCTION_ARITY`,
+because a numpy ufunc's second positional argument is `out=` — `abs(b0, b1)`
+would otherwise write into band 1 and return it.
+
+A result that is not finite becomes no-data rather than travelling downstream:
+`1 / 0`, `log(0)` and `sqrt(-1)` all produce no-data cells, and no warning
+escapes, so a caller running under `-W error` is unaffected.
+
+### Terrain derivatives
+
+`Slope`, `Aspect` and `Hillshade` take an elevation band. Slope reports
+`degrees` (the default), `radians` or `percent`:
+
+```python
+from earthlens.gee import Aspect, Hillshade, Slope
+
+dem = GEE(
+    start="2000-01-01",
+    end="2000-12-31",
+    request={"USGS/SRTMGL1_003": ["elevation"]},
+    lat_lim=[30.0, 31.0],
+    lon_lim=[31.0, 32.0],
+    scale=30,
+    project="my-ee-project",
+)
+
+steepness = dem.analyze(Slope(units="degrees"))
+in_percent = dem.analyze(Slope(units="percent"))   # rise over run * 100
+direction = dem.analyze(Aspect())                  # clockwise from north
+relief = dem.analyze(Hillshade(azimuth=315, altitude=45))
+```
+
+The units matter: pyramids' `slope` understands `degrees` and `radians` and
+falls through to radians for anything else, so `percent` is computed here as
+`tan(radians) * 100` rather than passed down. A 45° slope therefore reads 45.0,
+π/4 and 100.0 in the three units.
+
+### No-data, once
+
+Every operation reads its input through one seam that turns the declared
+sentinel into `NaN`, and writes its output through one that declares a
+sentinel appropriate to the result's own dtype. So a `-9999` in the input is
+never arithmetic: it does not shift an index, pull a focal mean, enter a
+co-occurrence matrix, match an open-ended reclassification bin, or become a
+cluster of its own. The output declares what *its* voids are, which is not
+necessarily the input's sentinel — a class raster's unmatched cells, a
+`Cluster`'s `no_data_label`, an index's undefined cells.
+
+### Learning operations need the `[gee]` extra
+
+`Cluster` and `Classify` reach scikit-learn, which ships with the `[gee]`
+extra. A missing install is reported with the extra to install rather than a
+`ModuleNotFoundError` from four frames deep.
+
+```python
+from earthlens.gee import Classify, Cluster, TrainingExtractor
+
+classes = gee.analyze(Cluster(n_clusters=5))
+
+# Supervised, from a label raster on the same grid:
+training = TrainingExtractor().extract(source_raster, label_raster)
+mapped = Classify(training=training).apply(source_raster)
+```
+
+A `Classify` is tied to the bands it was trained on, so applying it to a
+different band set is refused rather than predicted from the wrong features,
+and the forest is fitted once and reused across applications.

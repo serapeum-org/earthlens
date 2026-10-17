@@ -22,6 +22,36 @@ from earthlens.gee import (
 )
 
 _EXPECTED_EXPORTS = {
+    # Epic 2 - the client-side raster analysis subpackage. Re-exported here
+    # per the epic's per-task DoD; the operations themselves live in
+    # `earthlens.gee.analysis`, which keeps its own complete `__all__`.
+    "RasterOperation",
+    "OperationChain",
+    "RasterAnalysis",
+    "NormalizedDifference",
+    "Ndvi",
+    "Ndwi",
+    "Ndbi",
+    "BandExpression",
+    "ALLOWED_FUNCTIONS",
+    "Slope",
+    "Aspect",
+    "Hillshade",
+    "FocalMean",
+    "FocalStd",
+    "FocalMedian",
+    "FocalApply",
+    "Texture",
+    "MEASURES",
+    "Proximity",
+    "Reclassify",
+    "ConvertUnits",
+    "ConnectedComponents",
+    "Sieve",
+    "Cluster",
+    "Classify",
+    "TrainingExtractor",
+    "TrainingSet",
     # Epic 1 Task 1.1 - the reducer strategy objects and their registry.
     "Reducer",
     "Mean",
