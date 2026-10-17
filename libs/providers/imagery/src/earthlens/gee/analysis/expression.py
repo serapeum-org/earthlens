@@ -40,7 +40,7 @@ import ast
 from collections.abc import Callable, Mapping
 from functools import lru_cache
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 from pydantic import field_validator, model_validator
@@ -287,17 +287,31 @@ def _evaluate_call(node: ast.Call, bands: dict[str, Any]) -> Any:
     `_check` admits nothing else, and `_check_call` has already established that
     the target is a plain allowed name with the right arity.
     """
-    target: ast.Name = node.func  # type: ignore[assignment]
+    target = cast("ast.Name", node.func)
     return ALLOWED_FUNCTIONS[target.id](
         *(_evaluate(argument, bands) for argument in node.args)
     )
+
+
+def _evaluate_constant(node: ast.Constant) -> float:
+    """Return a numeric literal as a `float`.
+
+    `_check_constant` has already established the value is a plain `int` or
+    `float`. It is widened to `float` so a formula of pure integer literals
+    follows the same semantics as band arithmetic (bands are read back as
+    `float64`); left as `int`, `2 ** -1` raised numpy's "Integers to negative
+    integer powers are not allowed" at apply time, for a formula the allow-list
+    accepts where `b0 ** -1` is fine.
+    """
+    return float(cast("int | float", node.value))
 
 
 def _evaluate(node: ast.AST, bands: dict[str, Any]) -> Any:
     """Compute `node` against the band arrays in `bands`.
 
     Dispatches each node type to a small evaluator so this stays flat; every
-    node has already been approved by `_check`.
+    node has already been approved by `_check`, which is why the final branch
+    cannot be reached.
 
     Args:
         node: A node that `_check` has already approved.
@@ -311,25 +325,22 @@ def _evaluate(node: ast.AST, bands: dict[str, Any]) -> Any:
         KeyError: If the formula names a band the raster does not have.
     """
     if isinstance(node, ast.Expression):
-        return _evaluate(node.body, bands)
-    if isinstance(node, ast.Constant):
-        # As float, so a formula of pure integer literals follows the same
-        # semantics as band arithmetic (bands are read back as float64). Left
-        # as int, `2 ** -1` raised numpy's "Integers to negative integer
-        # powers are not allowed" at apply time - an internal error for a
-        # formula the allow-list accepts, where `b0 ** -1` is fine.
-        # _check_constant has already established node.value is a plain number.
-        return float(node.value)  # type: ignore[arg-type]
-    if isinstance(node, ast.Name):
-        return _evaluate_name(node, bands)
-    if isinstance(node, ast.UnaryOp):
-        return _evaluate_unaryop(node, bands)
-    if isinstance(node, ast.BinOp):
-        return _evaluate_binop(node, bands)
-    if isinstance(node, ast.Compare):
-        return _evaluate_compare(node, bands)
-    # Only an allowed `ast.Call` can reach here - `_check` admitted nothing else.
-    return _evaluate_call(node, bands)  # type: ignore[arg-type]
+        result = _evaluate(node.body, bands)
+    elif isinstance(node, ast.Constant):
+        result = _evaluate_constant(node)
+    elif isinstance(node, ast.Name):
+        result = _evaluate_name(node, bands)
+    elif isinstance(node, ast.UnaryOp):
+        result = _evaluate_unaryop(node, bands)
+    elif isinstance(node, ast.BinOp):
+        result = _evaluate_binop(node, bands)
+    elif isinstance(node, ast.Compare):
+        result = _evaluate_compare(node, bands)
+    elif isinstance(node, ast.Call):
+        result = _evaluate_call(node, bands)
+    else:  # pragma: no cover - _check admits no other node type
+        raise AssertionError(f"unexpected node {type(node).__name__}")
+    return result
 
 
 def _band_namespace(ds: Dataset) -> dict[str, Any]:

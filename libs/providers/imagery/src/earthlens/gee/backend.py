@@ -57,7 +57,7 @@ import math
 import os
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import ee
 import pandas as pd
@@ -1543,8 +1543,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
         analysis = RasterAnalysis.of(ops)
         # materialize=True makes download return a DownloadResult (not the path
         # list the broad return type also admits), which run_on_result requires.
-        result = self.download(progress_bar=progress_bar, materialize=True)
-        return analysis.run_on_result(result, write_to=write_to, overwrite=overwrite)  # type: ignore[arg-type]
+        result = cast(
+            "DownloadResult",
+            self.download(progress_bar=progress_bar, materialize=True),
+        )
+        return analysis.run_on_result(result, write_to=write_to, overwrite=overwrite)
 
     def _materialise(self, written: list[Any]) -> DownloadResult:
         """Read each written raster back as an in-memory pyramids object.

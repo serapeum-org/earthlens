@@ -180,12 +180,17 @@ class RasterAnalysis(OperationChain):
         Returns:
             The analysis.
         """
-        # The `_accept_one_or_many` before-validator normalises a sequence, a
-        # chain, or a bare operation into the `tuple[RasterOperation, ...]` the
-        # field declares, so these broader argument types are accepted at runtime.
-        if len(operations) == 1 and not isinstance(operations[0], RasterOperation):
-            return cls(operations=operations[0])  # type: ignore[arg-type]
-        return cls(operations=operations)  # type: ignore[arg-type]
+        # A single sequence argument is passed through as-is; otherwise the
+        # positional operations are. Either way the `_accept_one_or_many`
+        # before-validator normalises the value (and raises its own ValueError
+        # for anything unusable), so the pre-validation type is deliberately
+        # dynamic.
+        candidate: Any = (
+            operations[0]
+            if len(operations) == 1 and not isinstance(operations[0], RasterOperation)
+            else operations
+        )
+        return cls(operations=candidate)
 
     def run(self, ds: Dataset) -> Dataset:
         """Alias for `apply`, which reads better where an analysis is invoked.
