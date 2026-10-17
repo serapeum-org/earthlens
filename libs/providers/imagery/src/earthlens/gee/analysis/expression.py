@@ -153,8 +153,43 @@ def _check_call(node: ast.Call) -> None:
         _check(argument)
 
 
+def _check_constant(node: ast.Constant) -> None:
+    """Raise unless the literal is a plain number (a bool is not)."""
+    if isinstance(node.value, bool) or not isinstance(node.value, (int, float)):
+        raise ValueError(f"only numbers are allowed as literals, got {node.value!r}")
+
+
+def _check_unaryop(node: ast.UnaryOp) -> None:
+    """Raise unless the unary operator is `+`/`-`, then check the operand."""
+    if not isinstance(node.op, (ast.UAdd, ast.USub)):
+        raise ValueError(f"unary {type(node.op).__name__} is not allowed")
+    _check(node.operand)
+
+
+def _check_binop(node: ast.BinOp) -> None:
+    """Raise unless the binary operator is allowed, then check both operands."""
+    operator = type(node.op)
+    if operator not in _BINARY_OPERATORS and operator not in _BOOLEAN_OPERATORS:
+        raise ValueError(f"operator {operator.__name__} is not allowed")
+    _check(node.left)
+    _check(node.right)
+
+
+def _check_compare(node: ast.Compare) -> None:
+    """Raise unless every comparison operator is allowed, then check operands."""
+    for operator in node.ops:
+        if type(operator) not in _COMPARISONS:
+            raise ValueError(f"comparison {type(operator).__name__} is not allowed")
+    _check(node.left)
+    for comparator in node.comparators:
+        _check(comparator)
+
+
 def _check(node: ast.AST) -> None:
     """Raise if `node` is not an allowed construct.
+
+    Dispatches each node type to a small checker so the allow-list stays flat
+    and readable rather than one deeply nested function.
 
     Args:
         node: Any node of the parsed formula.
@@ -166,39 +201,20 @@ def _check(node: ast.AST) -> None:
     """
     if isinstance(node, ast.Expression):
         _check(node.body)
-        return
-    if isinstance(node, ast.Constant):
-        if isinstance(node.value, bool) or not isinstance(node.value, (int, float)):
-            raise ValueError(
-                f"only numbers are allowed as literals, got {node.value!r}"
-            )
-        return
-    if isinstance(node, ast.Name):
-        return
-    if isinstance(node, ast.UnaryOp):
-        if not isinstance(node.op, (ast.UAdd, ast.USub)):
-            raise ValueError(f"unary {type(node.op).__name__} is not allowed")
-        _check(node.operand)
-        return
-    if isinstance(node, ast.BinOp):
-        operator = type(node.op)
-        if operator not in _BINARY_OPERATORS and operator not in _BOOLEAN_OPERATORS:
-            raise ValueError(f"operator {operator.__name__} is not allowed")
-        _check(node.left)
-        _check(node.right)
-        return
-    if isinstance(node, ast.Compare):
-        for operator in node.ops:
-            if type(operator) not in _COMPARISONS:
-                raise ValueError(f"comparison {type(operator).__name__} is not allowed")
-        _check(node.left)
-        for comparator in node.comparators:
-            _check(comparator)
-        return
-    if isinstance(node, ast.Call):
+    elif isinstance(node, ast.Constant):
+        _check_constant(node)
+    elif isinstance(node, ast.Name):
+        pass
+    elif isinstance(node, ast.UnaryOp):
+        _check_unaryop(node)
+    elif isinstance(node, ast.BinOp):
+        _check_binop(node)
+    elif isinstance(node, ast.Compare):
+        _check_compare(node)
+    elif isinstance(node, ast.Call):
         _check_call(node)
-        return
-    raise ValueError(f"{type(node).__name__} is not allowed in a band expression")
+    else:
+        raise ValueError(f"{type(node).__name__} is not allowed in a band expression")
 
 
 @lru_cache(maxsize=256)
@@ -228,8 +244,59 @@ def _parse(formula: str) -> ast.Expression:
     return tree
 
 
+def _evaluate_name(node: ast.Name, bands: dict[str, Any]) -> Any:
+    """Return the band array `node` names, or raise naming the available bands."""
+    try:
+        return bands[node.id]
+    except KeyError:
+        raise KeyError(
+            f"the formula refers to {node.id!r}, which is not a band of this "
+            f"raster; available: {sorted(bands)}"
+        ) from None
+
+
+def _evaluate_unaryop(node: ast.UnaryOp, bands: dict[str, Any]) -> Any:
+    """Apply a unary `+`/`-` to the evaluated operand."""
+    value = _evaluate(node.operand, bands)
+    return value if isinstance(node.op, ast.UAdd) else np.negative(value)
+
+
+def _evaluate_binop(node: ast.BinOp, bands: dict[str, Any]) -> Any:
+    """Apply the binary operator to its two evaluated operands."""
+    operator = type(node.op)
+    function = _BINARY_OPERATORS.get(operator) or _BOOLEAN_OPERATORS[operator]
+    return function(_evaluate(node.left, bands), _evaluate(node.right, bands))
+
+
+def _evaluate_compare(node: ast.Compare, bands: dict[str, Any]) -> Any:
+    """Evaluate a (possibly chained) comparison, and-ing the links together."""
+    result = None
+    left = _evaluate(node.left, bands)
+    for operator, comparator in zip(node.ops, node.comparators, strict=True):
+        right = _evaluate(comparator, bands)
+        comparison = _COMPARISONS[type(operator)](left, right)
+        result = comparison if result is None else np.logical_and(result, comparison)
+        left = right
+    return result
+
+
+def _evaluate_call(node: ast.Call, bands: dict[str, Any]) -> Any:
+    """Call the allowed function on its evaluated arguments.
+
+    `_check` admits nothing else, and `_check_call` has already established that
+    the target is a plain allowed name with the right arity.
+    """
+    target: ast.Name = node.func  # type: ignore[assignment]
+    return ALLOWED_FUNCTIONS[target.id](
+        *(_evaluate(argument, bands) for argument in node.args)
+    )
+
+
 def _evaluate(node: ast.AST, bands: dict[str, Any]) -> Any:
     """Compute `node` against the band arrays in `bands`.
+
+    Dispatches each node type to a small evaluator so this stays flat; every
+    node has already been approved by `_check`.
 
     Args:
         node: A node that `_check` has already approved.
@@ -252,38 +319,14 @@ def _evaluate(node: ast.AST, bands: dict[str, Any]) -> Any:
         # formula the allow-list accepts, where `b0 ** -1` is fine.
         return float(node.value)
     if isinstance(node, ast.Name):
-        try:
-            return bands[node.id]
-        except KeyError:
-            raise KeyError(
-                f"the formula refers to {node.id!r}, which is not a band of this "
-                f"raster; available: {sorted(bands)}"
-            ) from None
+        return _evaluate_name(node, bands)
     if isinstance(node, ast.UnaryOp):
-        value = _evaluate(node.operand, bands)
-        return value if isinstance(node.op, ast.UAdd) else np.negative(value)
+        return _evaluate_unaryop(node, bands)
     if isinstance(node, ast.BinOp):
-        operator = type(node.op)
-        function = _BINARY_OPERATORS.get(operator) or _BOOLEAN_OPERATORS[operator]
-        return function(_evaluate(node.left, bands), _evaluate(node.right, bands))
+        return _evaluate_binop(node, bands)
     if isinstance(node, ast.Compare):
-        result = None
-        left = _evaluate(node.left, bands)
-        for operator, comparator in zip(node.ops, node.comparators, strict=True):
-            right = _evaluate(comparator, bands)
-            comparison = _COMPARISONS[type(operator)](left, right)
-            result = (
-                comparison if result is None else np.logical_and(result, comparison)
-            )
-            left = right
-        return result
-    # `_check` admits nothing else, and `_check_call` has already established
-    # that the target is a plain allowed name with the right arity.
-    call: ast.Call = node  # type: ignore[assignment]
-    target: ast.Name = call.func  # type: ignore[assignment]
-    return ALLOWED_FUNCTIONS[target.id](
-        *(_evaluate(argument, bands) for argument in call.args)
-    )
+        return _evaluate_compare(node, bands)
+    return _evaluate_call(node, bands)
 
 
 def _band_namespace(ds: Dataset) -> dict[str, Any]:
