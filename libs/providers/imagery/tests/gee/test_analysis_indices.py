@@ -64,8 +64,10 @@ class TestNormalizedDifference:
 
     def test_a_missing_band_is_named_in_the_error(self):
         """Asking for band 5 of a two-band raster says so."""
+        operation = NormalizedDifference(a=0, b=5)
+        source = _two_band(0.6, 0.2)
         with pytest.raises(IndexError, match=r"band 5 of a raster with 2 band"):
-            NormalizedDifference(a=0, b=5).apply(_two_band(0.6, 0.2))
+            operation.apply(source)
 
     def test_the_source_is_left_alone(self):
         """Computing an index does not touch the raster it read."""

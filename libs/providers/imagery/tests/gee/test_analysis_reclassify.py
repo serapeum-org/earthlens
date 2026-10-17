@@ -140,10 +140,10 @@ class TestConvertUnits:
 
     def test_an_unknown_unit_pair_is_refused_and_lists_the_known_ones(self):
         """The table is this operation's own, so the error is too."""
+        operation = ConvertUnits(target="bananas")
+        source = _raster(np.full((2, 2), 300.0, dtype="float32"), units="K")
         with pytest.raises(ValueError, match="no unit conversion from 'K'"):
-            ConvertUnits(target="bananas").apply(
-                _raster(np.full((2, 2), 300.0, dtype="float32"), units="K")
-            )
+            operation.apply(source)
 
 
 class TestTheUnitTableIsOwnedHere:
@@ -221,14 +221,16 @@ class TestTheUnitTableIsOwnedHere:
     def test_a_band_with_no_declared_unit_says_so(self):
         """There is nothing to convert from, which is worth naming."""
         source = _raster(np.full((2, 2), 300.0, dtype="float64"), units="")
+        operation = ConvertUnits(target="celsius")
         with pytest.raises(ValueError, match="no declared unit"):
-            ConvertUnits(target="celsius").apply(source)
+            operation.apply(source)
 
     def test_a_band_outside_the_raster_is_refused(self):
         """The band index is checked before anything is read."""
         source = _raster(np.full((2, 2), 300.0, dtype="float64"), units="K")
+        operation = ConvertUnits(target="celsius", band=5)
         with pytest.raises(IndexError, match="band 5 was requested"):
-            ConvertUnits(target="celsius", band=5).apply(source)
+            operation.apply(source)
 
     def test_no_deprecation_warning_escapes(self):
         """The point of the change: nothing deprecated is called any more."""

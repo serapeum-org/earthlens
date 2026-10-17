@@ -163,8 +163,9 @@ class TestRunning:
     def test_a_result_with_no_object_says_what_to_do(self):
         """A download without materialize has nothing in memory to analyse."""
         paths_only = DownloadResult(artifacts=(Artifact(path=Path("a.tif")),))
+        analysis = RasterAnalysis.of(Ndvi())
         with pytest.raises(ValueError, match="materialize=True"):
-            RasterAnalysis.of(Ndvi()).run_on_result(paths_only)
+            analysis.run_on_result(paths_only)
 
     def test_write_to_returns_paths_and_writes_them(self, tmp_path):
         """With a directory the derived rasters land on disk."""
@@ -214,8 +215,10 @@ class TestTheBackendMethod:
         """
         from earthlens.gee import GEE
 
+        backend = _bare_backend("drive")
+        ndvi = Ndvi(nir=0, red=1)
         with pytest.raises(ValueError, match="exports via 'drive'"):
-            GEE.analyze(_bare_backend("drive"), Ndvi(nir=0, red=1))
+            GEE.analyze(backend, ndvi)
 
 
 class TestWhatRunOnResultRefuses:
@@ -223,28 +226,33 @@ class TestWhatRunOnResultRefuses:
 
     def test_a_bare_raster_is_told_to_use_run(self):
         """The most likely mistake, and `materialize=True` is not the answer."""
+        analysis = RasterAnalysis.of(Ndvi(nir=0, red=1))
+        raster = _two_band()
         with pytest.raises(TypeError, match="single raster; call run"):
-            RasterAnalysis.of(Ndvi(nir=0, red=1)).run_on_result(_two_band())
+            analysis.run_on_result(raster)
 
     def test_a_list_of_rasters_is_told_how_to_iterate(self):
         """A plain list is the second most likely, and also not a materialize
         problem."""
         rasters = [_two_band(), _two_band()]
+        analysis = RasterAnalysis.of(Ndvi(nir=0, red=1))
         with pytest.raises(TypeError, match="not a sequence of 2"):
-            RasterAnalysis.of(Ndvi(nir=0, red=1)).run_on_result(rasters)
+            analysis.run_on_result(rasters)
 
     def test_an_unrelated_object_is_named(self):
         """Anything else says what it got rather than guessing why."""
+        analysis = RasterAnalysis.of(Ndvi(nir=0, red=1))
         with pytest.raises(TypeError, match="got int, which carries no artifacts"):
-            RasterAnalysis.of(Ndvi(nir=0, red=1)).run_on_result(7)
+            analysis.run_on_result(7)
 
     def test_the_materialize_advice_is_kept_for_the_case_it_fits(self):
         """A real result with paths but no objects is the one that earns it."""
         paths_only = DownloadResult(
             artifacts=(Artifact(path=Path("a.tif")), Artifact(path=Path("b.tif")))
         )
+        analysis = RasterAnalysis.of(Ndvi(nir=0, red=1))
         with pytest.raises(ValueError, match="2 artifact\\(s\\)"):
-            RasterAnalysis.of(Ndvi(nir=0, red=1)).run_on_result(paths_only)
+            analysis.run_on_result(paths_only)
 
 
 class TestOutputNaming:

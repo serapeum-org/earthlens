@@ -169,8 +169,10 @@ class TestWhatIsRefused:
 
     def test_a_missing_band_is_named_when_the_formula_runs(self):
         """A formula cannot know the raster's band count until it is applied."""
+        operation = BandExpression(formula="b7 * 2")
+        source = _two_band()
         with pytest.raises(KeyError, match=r"'b7'.*not a band"):
-            BandExpression(formula="b7 * 2").apply(_two_band())
+            operation.apply(source)
 
     def test_no_formula_can_reach_a_builtin(self):
         """The evaluator walks the tree itself, so builtins are unreachable."""
@@ -233,8 +235,9 @@ class TestTheHardenedEdges:
         """A band called `b1` at index 0 made `b1` silently read band 1."""
         source = _two_band()
         source.band_names = ["b1", "other"]
+        operation = BandExpression(formula="b1")
         with pytest.raises(ValueError, match="collide with the positional namespace"):
-            BandExpression(formula="b1").apply(source)
+            operation.apply(source)
 
 
 class TestTheUncoveredBranches:

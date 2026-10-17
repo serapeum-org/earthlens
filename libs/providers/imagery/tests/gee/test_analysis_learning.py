@@ -90,8 +90,9 @@ class TestCluster:
     def test_an_all_no_data_raster_says_there_is_nothing_to_fit(self):
         """Better a named error than an opaque sklearn failure."""
         empty = _raster(np.full((4, 4), -9999.0, dtype="float32"))
+        operation = Cluster(n_clusters=2)
         with pytest.raises(ValueError, match="nothing to cluster"):
-            Cluster(n_clusters=2).apply(empty)
+            operation.apply(empty)
 
     def test_the_output_keeps_the_source_grid(self):
         """A label raster sits on the same footprint."""
@@ -129,14 +130,18 @@ class TestTrainingExtractor:
         other = Dataset.from_array(
             arr=np.zeros((2, 2), dtype="float32"), geo_ref=GEO, no_data_value=-1.0
         )
+        extractor = TrainingExtractor()
+        source = _raster(TWO_GROUPS)
         with pytest.raises(ValueError, match="must share a grid"):
-            TrainingExtractor().extract(_raster(TWO_GROUPS), other)
+            extractor.extract(source, other)
 
     def test_an_unlabelled_raster_says_there_is_nothing_to_train_on(self):
         """An all-no-data label raster is a mistake worth naming."""
         blank = _raster(np.full((4, 4), -1.0, dtype="float32"), no_data=-1.0)
+        extractor = TrainingExtractor()
+        source = _raster(TWO_GROUPS)
         with pytest.raises(ValueError, match="nothing to train on"):
-            TrainingExtractor().extract(_raster(TWO_GROUPS), blank)
+            extractor.extract(source, blank)
 
 
 class TestTrainingSet:
@@ -185,8 +190,9 @@ class TestClassify:
         stack = Dataset.from_array(
             arr=np.stack([TWO_GROUPS, TWO_GROUPS]), geo_ref=GEO, no_data_value=-9999.0
         )
+        operation = Classify(training=training)
         with pytest.raises(ValueError, match="would not line up"):
-            Classify(training=training).apply(stack)
+            operation.apply(stack)
 
     def test_it_is_reproducible(self):
         """A seeded forest gives the same map twice."""
@@ -263,8 +269,9 @@ class TestTheHardenedLearningEdges:
         )
         training = TrainingExtractor().extract(stack, _marks())
         assert training.bands == (0, 1)
+        operation = Classify(training=training, bands=(1, 0))
         with pytest.raises(ValueError, match="trained on bands"):
-            Classify(training=training, bands=(1, 0)).apply(stack)
+            operation.apply(stack)
 
     def test_the_forest_is_fitted_once_and_reused(self):
         """Refitting per apply cost more than the prediction it enabled."""
@@ -281,8 +288,9 @@ class TestTheHardenedLearningEdges:
         source = _raster(TWO_GROUPS)
         training = TrainingExtractor().extract(source, _marks())
         empty = _raster(np.full((4, 4), -9999.0, dtype="float32"))
+        operation = Classify(training=training)
         with pytest.raises(ValueError, match="nothing to classify"):
-            Classify(training=training).apply(empty)
+            operation.apply(empty)
 
     def test_a_training_set_cannot_be_edited_through_its_arrays(self):
         """`frozen=True` protects the field, not the array it points at."""
@@ -313,8 +321,10 @@ class TestTheHardenedLearningEdges:
             geo_ref=Ref(top_left_corner=(0.0, 0.0), cell_size=1.0, epsg=3857),
             no_data_value=-1.0,
         )
+        extractor = TrainingExtractor()
+        source = _raster(TWO_GROUPS)
         with pytest.raises(ValueError, match="EPSG"):
-            TrainingExtractor().extract(_raster(TWO_GROUPS), other)
+            extractor.extract(source, other)
 
     def test_a_label_raster_at_another_origin_is_refused(self):
         """Same shape and CRS, shifted grid: the cells do not coincide."""
@@ -325,15 +335,18 @@ class TestTheHardenedLearningEdges:
             geo_ref=Ref(top_left_corner=(99.0, 88.0), cell_size=0.01, epsg=4326),
             no_data_value=-1.0,
         )
+        extractor = TrainingExtractor()
+        source = _raster(TWO_GROUPS)
         with pytest.raises(ValueError, match="geotransform"):
-            TrainingExtractor().extract(_raster(TWO_GROUPS), other)
+            extractor.extract(source, other)
 
     def test_non_integer_labels_are_refused_rather_than_truncated(self):
         """Casting 7.6 to 7 silently merges it into a class it is not in."""
         marks = np.full((4, 4), -1.0, dtype="float32")
         marks[0, 0] = 7.6
         marks[0, 3] = 9.4
+        extractor = TrainingExtractor()
+        source = _raster(TWO_GROUPS)
+        labels = _raster(marks, no_data=-1.0)
         with pytest.raises(ValueError, match="non-integer"):
-            TrainingExtractor().extract(
-                _raster(TWO_GROUPS), _raster(marks, no_data=-1.0)
-            )
+            extractor.extract(source, labels)

@@ -58,13 +58,16 @@ class TestPanSharpen:
 
     def test_weights_must_match_the_selected_band_count(self):
         """pyramids rejects a weights/bands length mismatch; surfaced unchanged."""
+        operation = PanSharpen(pan=_pan(), bands=(0, 1), weights=(1.0,))
+        ms = _multispectral()
         with pytest.raises(ValueError):
-            PanSharpen(pan=_pan(), bands=(0, 1), weights=(1.0,)).apply(_multispectral())
+            operation.apply(ms)
 
     def test_an_unknown_algorithm_is_refused_at_construction(self):
         """Only Brovey exists, and the literal is checked when the op is built."""
+        pan = _pan()
         with pytest.raises(ValidationError, match="algorithm"):
-            PanSharpen(pan=_pan(), algorithm="hpf")
+            PanSharpen(pan=pan, algorithm="hpf")
 
     def test_it_is_frozen_despite_holding_a_raster(self):
         """The companion raster travels as part of the value object."""
