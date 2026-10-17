@@ -98,6 +98,12 @@ INFORM_RELEASE_ATTEMPTS: int = 3
 #: second or two is absorbed without making a real break slow to surface.
 INFORM_RELEASE_BACKOFF_SECONDS: float = 1.0
 
+#: The retry loop's own handle on `time.sleep`. A separate name, not a direct
+#: `time.sleep` call, because `HttpClient` also backs off inside a single read:
+#: a test that patches the shared `time.sleep` records both and cannot tell
+#: which wait came from where. Patch this to observe only the loop's.
+_sleep = time.sleep
+
 #: Sheet holding the country scores; its name carries the release year.
 INFORM_RELEASE_SHEET = re.compile(r"^INFORM Risk (\d{4})", re.IGNORECASE)
 
@@ -490,7 +496,7 @@ def inform_release_url(
                 f"INFORM results page {page} rendered no workbook link "
                 f"(read {attempt + 1} of {INFORM_RELEASE_ATTEMPTS}); re-reading."
             )
-            time.sleep(INFORM_RELEASE_BACKOFF_SECONDS * (attempt + 1))
+            _sleep(INFORM_RELEASE_BACKOFF_SECONDS * (attempt + 1))
     if not candidates:
         raise ValueError(
             f"No INFORM Risk release workbook link found on {page} after "

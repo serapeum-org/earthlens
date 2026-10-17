@@ -432,14 +432,29 @@ class TestResolveAdminAndEmpty:
 
 
 def _record_sleeps(monkeypatch) -> list[float]:
-    """Replace the module's `time.sleep` with a recorder and return its log."""
+    """Record the retry loop's waits, leaving `HttpClient`'s own back-off alone.
+
+    Args:
+        monkeypatch: pytest's patcher, so the seam is undone per test.
+
+    Returns:
+        The list the loop appends each wait to, in order.
+    """
     waits: list[float] = []
-    monkeypatch.setattr(_helpers.time, "sleep", waits.append)
+    monkeypatch.setattr(_helpers, "_sleep", waits.append)
     return waits
 
 
 def _serve_in_order(pages: list[str]):
-    """Return a `HttpClient.get` stand-in serving `pages` front to back."""
+    """Build a `HttpClient.get` stand-in serving `pages` front to back.
+
+    Args:
+        pages: Response bodies to hand out, consumed from the front.
+
+    Returns:
+        A callable with `HttpClient.get`'s signature, which fails the test
+        rather than raising `IndexError` if asked for one page too many.
+    """
 
     def _get(self, url, **kwargs):
         assert pages, f"an unexpected extra read of {url}"
