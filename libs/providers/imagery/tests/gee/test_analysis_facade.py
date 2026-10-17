@@ -314,3 +314,23 @@ class TestItIsAChain:
         chain = Ndvi(nir=0, red=1) >> Slope()
         assert len(RasterAnalysis.of(chain, Slope()).operations) == 3
         assert len(RasterAnalysis.of(RasterAnalysis.of(chain)).operations) == 2
+
+
+class TestTheUncoveredBranches:
+    """Round-1 finding M14: reachable paths the suite never took."""
+
+    def test_the_constructor_accepts_one_operation_directly(self):
+        """`of` always passes a tuple, so this branch needed the constructor."""
+        analysis = RasterAnalysis(operations=Ndvi(nir=0, red=1))
+        assert len(analysis.operations) == 1
+        assert analysis.name == "Ndvi"
+
+    def test_an_artifact_with_neither_a_path_nor_a_time_falls_back_to_the_index(
+        self, tmp_path
+    ):
+        """The last resort of the output naming, which nothing else reaches."""
+        result = DownloadResult(artifacts=(Artifact(obj=_two_band()),))
+        written = RasterAnalysis.of(Ndvi(nir=0, red=1)).run_on_result(
+            result, write_to=tmp_path
+        )
+        assert written[0].name == "analysis_0_ndvi.tif"

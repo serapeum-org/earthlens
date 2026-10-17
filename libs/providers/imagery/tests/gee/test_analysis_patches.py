@@ -123,3 +123,36 @@ class TestSieve:
         """Label then sieve is the motivating sequence."""
         chain = ConnectedComponents() >> Sieve(min_patch_cells=2)
         assert chain.apply(_two_patches()).band_count == 1
+
+
+class TestANonZeroBand:
+    """Round-1 finding M14: an entire documented path had no test."""
+
+    def test_labelling_reads_the_band_it_was_asked_for(self):
+        """`cluster` reads band 0, so another band has to be selected first.
+
+        Band 0 here is empty and band 1 holds two patches: labelling band 1
+        must find them, which labelling band 0 cannot.
+        """
+        empty = np.zeros((3, 3), dtype="float32")
+        patches = np.array([[1, 1, 0], [0, 0, 0], [0, 0, 1]], dtype="float32")
+        stack = Dataset.from_array(
+            arr=np.stack([empty, patches]), geo_ref=GEO, no_data_value=-1.0
+        )
+        labelled = ConnectedComponents(band=1, lower_bound=0.5, upper_bound=1.5)
+        assert int(np.asarray(labelled.apply(stack).read_array()).max()) == 2
+        # Band 0 is empty, so labelling it finds nothing. This used to crash:
+        # with `band=0` the whole multi-band array reached `Dataset.cluster`,
+        # which takes no band argument, and it failed inside its own loop.
+        on_band_zero = ConnectedComponents(lower_bound=0.5, upper_bound=1.5)
+        assert int(np.asarray(on_band_zero.apply(stack).read_array()).max()) == 0
+
+    def test_the_selected_band_keeps_the_source_grid(self):
+        """Selecting a band must not move the raster."""
+        stack = Dataset.from_array(
+            arr=np.stack([np.zeros((3, 3), dtype="float32")] * 2),
+            geo_ref=GEO,
+            no_data_value=-1.0,
+        )
+        result = ConnectedComponents(band=1).apply(stack)
+        assert (result.rows, result.columns, result.epsg) == (3, 3, stack.epsg)

@@ -312,7 +312,9 @@ def _band_namespace(ds: Dataset) -> dict[str, Any]:
         # `b0 > 0` is false for a void only by accident of its sign.
         array = read_masked(ds, index)
         bands[f"b{index}"] = array
-        if index < len(names):
+        # pyramids names every band, so the guard is for a shorter list it does
+        # not currently produce; assigning one raises inside pyramids.
+        if index < len(names):  # pragma: no branch
             bands[names[index]] = array
     return bands
 
@@ -457,7 +459,14 @@ class BandExpression(RasterOperation):
             # A formula of literals only (`1 + 1`) evaluates to a scalar;
             # broadcast it so the output is still a raster.
             values = np.full((ds.rows, ds.columns), float(values))
-        if values.shape != (ds.rows, ds.columns):
+        if values.shape != (ds.rows, ds.columns):  # pragma: no cover - see below
+            # Not reachable through any allowed formula: subscripts,
+            # comprehensions and attribute access are all refused at
+            # construction, so every permitted construct is element-wise over
+            # full bands, and a scalar is broadcast just above. Kept as a guard
+            # on the `result_like` call below rather than deleted, so a future
+            # allow-list entry that can change shape fails here with a readable
+            # message instead of writing a malformed raster.
             raise ValueError(
                 f"formula {self.formula!r} produced an array of shape "
                 f"{values.shape}, but this raster is {ds.rows}x{ds.columns}; a "

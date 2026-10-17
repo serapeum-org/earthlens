@@ -171,3 +171,35 @@ class TestTheInputHonoursTheDeclaredNoData:
         source = _raster(np.array([[5.0, SENTINEL]], dtype="float32"))
         result = BandExpression(formula="b0 * 2").apply(source)
         assert np.isnan(np.asarray(result.read_array())[0, 1])
+
+
+class TestTheArraySeam:
+    """The two remaining branches in the shared read/write helpers."""
+
+    def test_a_band_outside_the_raster_is_named(self):
+        """An out-of-range band should say so, not index past the end."""
+        from earthlens.gee.analysis._arrays import read_masked
+
+        source = Dataset.from_array(
+            arr=np.zeros((2, 2), dtype="float32"), geo_ref=GEO, no_data_value=SENTINEL
+        )
+        with pytest.raises(IndexError, match="band 3 was requested"):
+            read_masked(source, 3)
+
+    def test_a_raster_cannot_carry_fewer_names_than_bands(self):
+        """Which is why the namespace's length guard is defensive, not untested.
+
+        pyramids names every band - `band_names` on a two-band raster is
+        `['Band_1', 'Band_2']` - and assigning a shorter list raises, so a
+        namespace built from a short list is unreachable from here.
+        """
+        stack = np.stack(
+            [
+                np.full((2, 2), 0.6, dtype="float32"),
+                np.full((2, 2), 0.2, dtype="float32"),
+            ]
+        )
+        source = Dataset.from_array(arr=stack, geo_ref=GEO, no_data_value=np.nan)
+        assert source.band_names == ['Band_1', 'Band_2']
+        with pytest.raises(IndexError):
+            source.band_names = ['first']

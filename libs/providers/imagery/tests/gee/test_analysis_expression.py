@@ -235,3 +235,52 @@ class TestTheHardenedEdges:
         source.band_names = ["b1", "other"]
         with pytest.raises(ValueError, match="collide with the positional namespace"):
             BandExpression(formula="b1").apply(source)
+
+
+class TestTheUncoveredBranches:
+    """Round-1 finding M14: paths the suite never reached."""
+
+    @pytest.mark.parametrize(
+        ("formula", "expected"),
+        [("-b0", -0.6), ("+b0", 0.6), ("-(b0 - b1)", -0.4)],
+        ids=["negate", "plus", "negate-group"],
+    )
+    def test_a_unary_operator_evaluates(self, formula, expected):
+        """No test used `+x` or `-x`, so neither branch had ever run."""
+        assert _first(BandExpression(formula=formula).apply(_two_band())) == (
+            pytest.approx(expected, rel=1e-5)
+        )
+
+    def test_a_disallowed_unary_operator_says_which(self):
+        """`~b0` is refused, and the message names the operator."""
+        with pytest.raises(ValidationError, match="unary Invert is not allowed"):
+            BandExpression(formula="~b0")
+
+    def test_a_disallowed_binary_operator_says_which(self):
+        """Matrix-multiply is syntactically fine and semantically absent."""
+        with pytest.raises(ValidationError, match="operator MatMult is not allowed"):
+            BandExpression(formula="b0 @ b1")
+
+    def test_a_disallowed_comparison_says_which(self):
+        """`in` is a comparison, and not one a raster formula can mean."""
+        with pytest.raises(ValidationError, match="comparison In is not allowed"):
+            BandExpression(formula="b0 in b1")
+
+    def test_a_keyword_argument_is_refused_by_name(self):
+        """numpy accepts these, and they would reach `out=` among others."""
+        with pytest.raises(ValidationError, match="positional arguments only"):
+            BandExpression(formula="clip(b0, a_min=0, a_max=1)")
+
+    def test_a_starred_argument_is_refused(self):
+        """`f(*args)` would smuggle an unknown arity past the arity check."""
+        with pytest.raises(ValidationError, match="starred argument"):
+            BandExpression(formula="maximum(*b0)")
+
+    def test_a_subscript_is_refused_before_it_could_change_the_shape(self):
+        """The one construct that could produce a wrong shape never compiles.
+
+        Which is why the shape guard in `apply` is unreachable rather than
+        untested: it is a guard on a future allow-list entry.
+        """
+        with pytest.raises(ValidationError, match="Subscript is not allowed"):
+            BandExpression(formula="b0[0]")

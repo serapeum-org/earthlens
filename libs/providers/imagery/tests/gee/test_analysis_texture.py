@@ -147,3 +147,23 @@ class TestConfiguration:
             source.columns,
             source.epsg,
         )
+
+
+class TestTheUncoveredBranches:
+    """Round-1 finding M14: the all-void paths had no test."""
+
+    def test_a_window_of_only_voids_is_undefined(self):
+        """With no finite pair there is no co-occurrence to measure."""
+        voids = np.full((4, 4), -9999.0, dtype="float32")
+        source = Dataset.from_array(arr=voids, geo_ref=GEO, no_data_value=-9999.0)
+        result = np.asarray(
+            Texture(measure="contrast", radius=1).apply(source).read_array()
+        )
+        assert np.isnan(result).all()
+
+    def test_a_raster_with_no_finite_cell_still_returns_a_raster(self):
+        """The quantisation has no range to work with, and must not raise."""
+        voids = np.full((3, 3), -9999.0, dtype="float32")
+        source = Dataset.from_array(arr=voids, geo_ref=GEO, no_data_value=-9999.0)
+        result = Texture(measure="homogeneity", radius=1).apply(source)
+        assert (result.rows, result.columns) == (3, 3)

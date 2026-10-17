@@ -96,14 +96,16 @@ class ConnectedComponents(RasterOperation):
         """
         from pyramids.dataset import Dataset as PyramidsDataset
 
-        if self.band:
-            # `cluster` reads the first band, so select first when asked for
-            # another one rather than silently labelling the wrong band.
-            source = PyramidsDataset.dataset_like(
-                ds, np.asarray(ds.read_array(band=self.band))
-            )
-        else:
-            source = ds
+        # Always select the band, band 0 included. `Dataset.cluster` takes no
+        # band argument and reads the whole array, so on a multi-band raster it
+        # was handed a 3-D array and died inside its own loop with "the truth
+        # value of an array with more than one element is ambiguous" - which
+        # the `if self.band:` form hid for the default band. Selecting
+        # unconditionally also costs nothing on a one-band raster: the array
+        # and the declared no-data are the ones it already had.
+        source = PyramidsDataset.dataset_like(
+            ds, np.asarray(ds.read_array(band=self.band))
+        )
         labels, _next_label, _coordinates, _values = source.cluster(
             self.lower_bound, self.upper_bound
         )
