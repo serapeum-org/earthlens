@@ -123,7 +123,8 @@ engine-eligibility gate:
   `MEASURES` is the grey-level co-occurrence family built on it.
 * `Proximity` — distance from every cell to the nearest target cell.
 * `Reclassify` / `ConvertUnits` — values into classes, or into
-  another physical unit.
+  another physical unit; `UNIT_CONVERSIONS` is the table the latter
+  applies and `supported_conversions` lists its pairs.
 * `ConnectedComponents` / `Sieve` — labelling contiguous patches and
   dropping the ones too small to keep.
 * `Cluster` / `Classify`, with `TrainingExtractor` and
@@ -192,6 +193,7 @@ from __future__ import annotations
 from earthlens.gee.analysis import (
     ALLOWED_FUNCTIONS,
     MEASURES,
+    UNIT_CONVERSIONS,
     Aspect,
     BandExpression,
     Classify,
@@ -217,6 +219,7 @@ from earthlens.gee.analysis import (
     Texture,
     TrainingExtractor,
     TrainingSet,
+    supported_conversions,
 )
 from earthlens.gee.auth import AuthenticationError, EarthEngineAuth
 from earthlens.gee.backend import GEE, CloudMask, CollectionFilter
@@ -289,6 +292,8 @@ from earthlens.gee.work import (
 )
 
 __all__ = [
+    "UNIT_CONVERSIONS",
+    "supported_conversions",
     "GEE",
     "AuthenticationError",
     "CloudMask",

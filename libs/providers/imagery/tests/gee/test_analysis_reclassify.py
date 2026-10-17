@@ -2,13 +2,20 @@
 
 from __future__ import annotations
 
+import warnings
+
 import numpy as np
 import pytest
 from pydantic import ValidationError
 from pyramids.base.georeference import GeoReference
 from pyramids.dataset import Dataset
 
-from earthlens.gee.analysis.reclassify import ConvertUnits, Reclassify
+from earthlens.gee.analysis.reclassify import (
+    UNIT_CONVERSIONS,
+    ConvertUnits,
+    Reclassify,
+    supported_conversions,
+)
 
 GEO = GeoReference(top_left_corner=(31.0, 30.0), cell_size=0.01, epsg=4326)
 
@@ -111,7 +118,7 @@ class TestReclassify:
 
 
 class TestConvertUnits:
-    """Delegating unit conversion to pyramids' table."""
+    """Unit conversion, with the table owned here."""
 
     def test_kelvin_converts_to_celsius(self):
         """300 K is 26.85 degrees Celsius, which pyramids computes."""
@@ -131,10 +138,122 @@ class TestConvertUnits:
         """A chain's name should name the target unit."""
         assert ConvertUnits(target="celsius").name == "ConvertUnits(celsius)"
 
-    def test_an_unknown_unit_is_pyramids_error_to_raise(self):
-        """This wrapper carries no unit table, so it does not pre-judge labels."""
-        # Deliberately broad: pyramids raises this, and its type is not part of its public API.
-        with pytest.raises(Exception, match="(?i)unit"):
+    def test_an_unknown_unit_pair_is_refused_and_lists_the_known_ones(self):
+        """The table is this operation's own, so the error is too."""
+        with pytest.raises(ValueError, match="no unit conversion from 'K'"):
             ConvertUnits(target="bananas").apply(
                 _raster(np.full((2, 2), 300.0, dtype="float32"), units="K")
             )
+
+
+class TestTheUnitTableIsOwnedHere:
+    """Round-1 finding H5: it was built on a method deprecated for removal."""
+
+    @pytest.mark.parametrize(
+        ("source", "target", "value", "expected"),
+        [
+            ("K", "celsius", 273.15, 0.0),
+            ("celsius", "K", 0.0, 273.15),
+            ("Pa", "hPa", 1013.0, 10.13),
+            ("hPa", "Pa", 10.13, 1013.0),
+            ("m s-1", "knots", 1.0, 1.943844),
+            ("knots", "m s-1", 1.943844, 1.0),
+            ("m", "mm", 1.5, 1500.0),
+            ("mm", "m", 1500.0, 1.5),
+        ],
+        ids=lambda value: str(value),
+    )
+    def test_each_pair_converts(self, source, target, value, expected):
+        """Every pair in the table, with a hand-computed expectation."""
+        source_raster = _raster(np.full((2, 2), value, dtype="float64"), units=source)
+        result = ConvertUnits(target=target).apply(source_raster)
+        assert _values(result)[0, 0] == pytest.approx(expected, rel=1e-4, abs=1e-4)
+
+    def test_the_table_matches_what_pyramids_computed(self):
+        """Owning it must not change a single number.
+
+        pyramids keeps the same affine table behind the deprecated
+        `Dataset.convert_units`; this asserts the two agree to within floating
+        point for every pair, so a raster converted here equals one converted
+        there.
+        """
+        for source, target in supported_conversions():
+            values = np.array([[300.0, 1013.0]], dtype="float64")
+            mine = ConvertUnits(target=target).apply(
+                _raster(values.copy(), units=source)
+            )
+            theirs = _raster(values.copy(), units=source)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", DeprecationWarning)
+                expected = theirs.convert_units(target)
+            assert _values(mine) == pytest.approx(
+                np.asarray(expected.read_array(), dtype="float64")
+            ), (source, target)
+
+    def test_converting_to_the_same_unit_is_a_no_op(self):
+        """Asking for the unit a band already has is not an error."""
+        source = _raster(np.full((2, 2), 300.0, dtype="float64"), units="K")
+        assert _values(ConvertUnits(target="K").apply(source))[0, 0] == 300.0
+
+    def test_a_sentinel_is_not_converted(self):
+        """-9999 K in Celsius would be a convincing -10272.15."""
+        values = np.array([[300.0, -9999.0]], dtype="float64")
+        source = _raster(values, units="K")
+        result = ConvertUnits(target="celsius").apply(source)
+        assert _values(result)[0, 0] == pytest.approx(26.85, abs=1e-6)
+        assert _values(result)[0, 1] == -9999.0
+        assert result.no_data_value[0] == -9999.0
+
+    def test_only_the_named_band_is_converted(self):
+        """A multi-band raster keeps the units of the bands not asked for."""
+        stack = np.stack(
+            [np.full((1, 2), 300.0), np.full((1, 2), 1013.0)],
+        )
+        source = Dataset.from_array(arr=stack, geo_ref=GEO)
+        source.band_units = ["K", "hPa"]
+        result = ConvertUnits(target="celsius", band=0).apply(source)
+        assert result.band_units == ["celsius", "hPa"]
+        assert float(np.asarray(result.read_array(band=0))[0, 0]) == pytest.approx(
+            26.85
+        )
+        assert float(np.asarray(result.read_array(band=1))[0, 0]) == 1013.0
+
+    def test_a_band_with_no_declared_unit_says_so(self):
+        """There is nothing to convert from, which is worth naming."""
+        source = _raster(np.full((2, 2), 300.0, dtype="float64"), units="")
+        with pytest.raises(ValueError, match="no declared unit"):
+            ConvertUnits(target="celsius").apply(source)
+
+    def test_a_band_outside_the_raster_is_refused(self):
+        """The band index is checked before anything is read."""
+        source = _raster(np.full((2, 2), 300.0, dtype="float64"), units="K")
+        with pytest.raises(IndexError, match="band 5 was requested"):
+            ConvertUnits(target="celsius", band=5).apply(source)
+
+    def test_no_deprecation_warning_escapes(self):
+        """The point of the change: nothing deprecated is called any more."""
+        source = _raster(np.full((2, 2), 300.0, dtype="float64"), units="K")
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", DeprecationWarning)
+            ConvertUnits(target="celsius").apply(source)
+
+    def test_the_table_cannot_be_extended_at_runtime(self):
+        """A conversion table a caller can edit is not a table."""
+        with pytest.raises(TypeError):
+            UNIT_CONVERSIONS[("K", "furlongs")] = (1.0, 0.0)  # type: ignore[index]
+
+
+class TestConvertUnitsDefaultSentinel:
+    """pyramids declares -9999 even when none is asked for."""
+
+    def test_a_default_sentinel_is_carried_through_the_conversion(self):
+        """A raster built with no explicit no-data still declares one, and it
+        survives the conversion as a sentinel rather than being converted."""
+        ds = Dataset.from_array(
+            arr=np.full((2, 2), 300.0, dtype="float64"), geo_ref=GEO
+        )
+        ds.band_units = ["K"]
+        assert ds.no_data_value[0] == -9999.0
+        result = ConvertUnits(target="celsius").apply(ds)
+        assert _values(result)[0, 0] == pytest.approx(26.85, abs=1e-6)
+        assert result.no_data_value[0] == -9999.0

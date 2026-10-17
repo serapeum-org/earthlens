@@ -69,7 +69,8 @@ The families:
 * `Texture` - grey-level co-occurrence measures, built on the focal window.
 * `Proximity` - distance from every cell to the nearest target cell.
 * `Reclassify` / `ConvertUnits` - rewriting values into classes, or into
-  another physical unit.
+  another physical unit. `UNIT_CONVERSIONS` is the table the latter applies
+  and `supported_conversions()` lists its pairs.
 * `ConnectedComponents` / `Sieve` - labelling contiguous patches and dropping
   the ones too small to keep.
 * `Cluster` / `Classify` with `TrainingExtractor` - unsupervised and supervised
@@ -92,11 +93,18 @@ from earthlens.gee.analysis.focal import (
 from earthlens.gee.analysis.indices import Ndbi, Ndvi, Ndwi, NormalizedDifference
 from earthlens.gee.analysis.patches import ConnectedComponents, Sieve
 from earthlens.gee.analysis.proximity import Proximity
-from earthlens.gee.analysis.reclassify import ConvertUnits, Reclassify
+from earthlens.gee.analysis.reclassify import (
+    UNIT_CONVERSIONS,
+    ConvertUnits,
+    Reclassify,
+    supported_conversions,
+)
 from earthlens.gee.analysis.terrain import Aspect, Hillshade, Slope
 from earthlens.gee.analysis.texture import MEASURES, Texture
 
 __all__ = [
+    "UNIT_CONVERSIONS",
+    "supported_conversions",
     "ALLOWED_FUNCTIONS",
     "MEASURES",
     "Aspect",
