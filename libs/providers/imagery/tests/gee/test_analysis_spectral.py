@@ -58,6 +58,23 @@ class TestTasseledCap:
         tc = TasseledCap(sensor=sensor)(_reflectance())
         assert tc.band_names == ["brightness", "greenness", "wetness"]
 
+    def test_each_sensor_uses_its_own_coefficients(self):
+        """Distinct brightness per sensor proves selection is real, not fixed to OLI."""
+        ds = _reflectance()
+        brightness = {
+            sensor: float(
+                np.asarray(
+                    TasseledCap(sensor=sensor, components=("brightness",))(
+                        ds
+                    ).read_array()
+                )[0, 0]
+            )
+            for sensor in ("landsat8_oli", "landsat7_etm", "landsat5_tm")
+        }
+        assert brightness["landsat8_oli"] == pytest.approx(0.8183, abs=1e-3)
+        assert brightness["landsat7_etm"] == pytest.approx(0.7209, abs=1e-3)
+        assert brightness["landsat5_tm"] == pytest.approx(0.7933, abs=1e-3)
+
     def test_a_component_subset_keeps_the_requested_order(self):
         """Asking for two components yields a two-band raster in that order."""
         tc = TasseledCap(sensor="landsat8_oli", components=("wetness", "brightness"))(
