@@ -50,6 +50,11 @@ class TestTasseledCap:
         assert tc.band_count == 3
         assert tc.epsg == 4326
 
+    def test_a_second_sensor_is_selected_case_insensitively(self):
+        """The sensor is threaded through to its own table, casing aside."""
+        tc = TasseledCap(sensor="LANDSAT5_TM")(_reflectance())
+        assert tc.band_names == ["brightness", "greenness", "wetness"]
+
     def test_a_component_subset_keeps_the_requested_order(self):
         """Asking for two components yields a two-band raster in that order."""
         tc = TasseledCap(sensor="landsat8_oli", components=("wetness", "brightness"))(
@@ -84,6 +89,21 @@ class TestTasseledCap:
         )
         with pytest.raises(TransformError):
             TasseledCap(sensor="landsat8_oli")(three_band)
+
+    def test_empty_components_is_refused(self):
+        """Asking for no components at all has nothing to compute."""
+        with pytest.raises(TransformError):
+            TasseledCap(sensor="landsat8_oli", components=())(_reflectance())
+
+    def test_named_bands_outside_the_sensor_roles_are_refused(self):
+        """A stack whose names do not resolve to the sensor's bands is refused."""
+        arr = np.stack(
+            [np.full((2, 2), (b + 1) * 0.1, dtype="float32") for b in range(6)]
+        )
+        ds = Dataset.from_array(arr=arr, geo_ref=GEO, no_data_value=None)
+        ds.band_names = ["blue", "green", "red", "nir", "swir1", "thermal"]
+        with pytest.raises(TransformError):
+            TasseledCap(sensor="landsat8_oli")(ds)
 
     def test_it_is_frozen(self):
         """The sensor is part of the frozen value object."""
