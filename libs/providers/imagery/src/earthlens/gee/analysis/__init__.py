@@ -78,6 +78,8 @@ The families:
 * `PanSharpen` / `MatchHistogram` - operations that combine a raster with a
   companion one: fusing in a finer panchromatic band, and matching a band's
   distribution to a reference acquisition's.
+* `TasseledCap` - the sensor-specific Kauth-Thomas brightness / greenness /
+  wetness transform, with the per-sensor coefficients from pyramids-eo.
 """
 
 from __future__ import annotations
@@ -103,6 +105,7 @@ from earthlens.gee.analysis.reclassify import (
     Reclassify,
     supported_conversions,
 )
+from earthlens.gee.analysis.spectral import TasseledCap
 from earthlens.gee.analysis.terrain import Aspect, Hillshade, Slope
 from earthlens.gee.analysis.texture import MEASURES, Texture
 
@@ -135,6 +138,7 @@ __all__ = [
     "Reclassify",
     "Sieve",
     "Slope",
+    "TasseledCap",
     "Texture",
     "TrainingExtractor",
     "TrainingSet",

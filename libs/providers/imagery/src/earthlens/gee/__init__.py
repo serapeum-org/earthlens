@@ -132,6 +132,8 @@ engine-eligibility gate:
   through scikit-learn (the `[gee]` extra).
 * `PanSharpen` / `MatchHistogram` — operations that combine a raster
   with a companion one (a finer pan band; a reference acquisition).
+* `TasseledCap` — the sensor-specific brightness / greenness /
+  wetness transform, from pyramids-eo's per-sensor coefficients.
 
 Two submodules ship more specialised helpers and are intentionally
 **not** re-exported at this top level — import them directly. Both
@@ -220,6 +222,7 @@ from earthlens.gee.analysis import (
     Reclassify,
     Sieve,
     Slope,
+    TasseledCap,
     Texture,
     TrainingExtractor,
     TrainingSet,
@@ -298,6 +301,7 @@ from earthlens.gee.work import (
 __all__ = [
     "MatchHistogram",
     "PanSharpen",
+    "TasseledCap",
     "UNIT_CONVERSIONS",
     "supported_conversions",
     "GEE",

@@ -544,6 +544,25 @@ from earthlens.gee import MatchHistogram
 comparable = MatchHistogram(reference=july_scene)(june_scene)
 ```
 
-The third transform in this family, `TasseledCap`, is not yet available: its
-per-sensor coefficients over a fixed band order are domain value-semantics that
-belong in pyramids-eo (tracked upstream), not a GIS primitive.
+### Sensor-specific spectral transforms
+
+`TasseledCap` rotates a multi-band reflectance stack into the Kauth-Thomas
+brightness / greenness / wetness components. Unlike the operations above it is
+tied to a *sensor*: the coefficients are a fixed linear combination over a
+specific band order, which is why they live upstream in pyramids-eo's sensor
+registry rather than here. Because the band order matters, name the input's
+bands and the transform reorders them to the sensor's roles; leave them unnamed
+and it assumes the documented order and only checks the band count.
+
+```python
+from earthlens.gee import TasseledCap
+
+# a 6-band Landsat 8 OLI reflectance stack (blue, green, red, nir, swir1, swir2)
+components = TasseledCap(sensor="landsat8_oli")(reflectance_raster)
+# or a subset, in the order you ask for:
+wetness = TasseledCap(sensor="landsat8_oli", components=("wetness",))(reflectance_raster)
+```
+
+The bundled sensors are `landsat5_tm`, `landsat7_etm` and `landsat8_oli`; the
+input must be a reflectance factor (a DN stack is warned about, not rejected),
+and voids are carried through as NaN in every component.

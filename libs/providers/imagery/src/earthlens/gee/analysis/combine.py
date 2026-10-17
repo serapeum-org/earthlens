@@ -16,10 +16,11 @@ arithmetic - the GIS primitives - so this module carries none of it. The
 companion raster is `arbitrary_types_allowed` for the same reason
 `TrainingSet`'s arrays are: a pyramids `Dataset` is not a pydantic type.
 
-The third member of the plan's Task 2.14, `TasseledCap`, is not here: its
-per-sensor coefficients over a fixed band order are domain value-semantics that
-belong in pyramids-eo (pyramids-eo#117), not a GIS primitive, so it waits on
-that upstream work.
+The third member of the plan's Task 2.14, `TasseledCap`, is a sibling of these
+two - an operation whose input is a raster - but its per-sensor coefficients
+over a fixed band order are domain value-semantics rather than a GIS primitive,
+so it lives in its own module, `analysis.spectral`, and delegates to pyramids-eo
+(pyramids-eo#117) rather than to a pyramids `Dataset` method.
 """
 
 from __future__ import annotations

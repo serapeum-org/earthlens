@@ -83,10 +83,11 @@ worldpop = ["earthlens-land[worldpop]"]
 # carries the bulk-pbf SDK (`osmium`), all wheels, so the whole OSM backend is in
 # `all` with no source build (see #1186). pyrosm (the in-memory pbf engine) is
 # deliberately undeclared and stays opt-in via a manual `pip install pyrosm` (see
-# the hazards pyproject). `eedai` stays out deliberately: installing it flips the
-# GEE backend's default `engine="auto"` onto the pyramids-eo reader, which samples
-# and grids differently from Earth Engine, so it is opt-in rather than something
-# `all` turns on under an existing user.
+# the hazards pyproject). `eedai` is absent from this list because it is now
+# redundant: pyramids-eo became a base dependency of `earthlens-imagery` (it backs
+# `TasseledCap`), so the EEDAI reader is always importable and `engine="auto"`
+# prefers it whenever it can serve a raw fetch. `engine="ee"` still forces Earth
+# Engine's exact sampling, and `[eedai]` is kept only as a no-op alias.
 all = [
     "earthlens[asf]",
     "earthlens[cmems]",
@@ -191,14 +192,15 @@ dev = [
     "notebook",
     "jupyter",
     "commitizen>=4.8.4",
-    # pyramids-eo: the GEE backend's optional EEDAI reader. It is deliberately
-    # out of the `all` extra (installing it activates engine="auto"), so it is
-    # pulled in here instead -- otherwise the tests that pin its
-    # `from_earthengine` signature would skip everywhere and a 0.x contract
-    # change would only surface on a live run. 0.8.1 is the floor because 0.8.0's
-    # tiled read passed no_data_value="none", which pyramids >= 0.61 rejects
-    # (pyramids-eo#111), so every tiled EEDAI read raised.
-    "pyramids-eo >=0.8.1,<0.9",
+    # pyramids-eo is now a base dependency of `earthlens-imagery` (it backs
+    # `TasseledCap`), so `uv sync --extra all` already installs it. This explicit
+    # dev pin is redundant but kept so the floor is visible here too -- the tests
+    # that pin the EEDAI reader's `from_earthengine` signature run against it, so
+    # a 0.x contract change surfaces in CI rather than only on a live run. 0.9.0
+    # is the floor: it added the tasseled-cap transform (pyramids-eo#117), and it
+    # is well past 0.8.1 (whose tiled read passed no_data_value="none", rejected
+    # by pyramids >= 0.61, pyramids-eo#111).
+    "pyramids-eo >=0.9.0,<0.10",
 ]
 # The eclipse showcase notebooks need the geostationary-imagery pieces of
 # pyramids-eo (read_fci_l1c, the composites, the viewing geometry) plus a few small
@@ -211,12 +213,12 @@ notebooks = [
     # viewing geometry it needs. This replaces the satpy / pyresample / pyspectral
     # stack the eclipse notebook used to carry. 0.7 first carried `rayleigh_correct`,
     # `solar_zenith_azimuth`, `satellite_zenith_azimuth` and `relative_azimuth`
-    # (pyramids-eo#91-93), but 0.8 now sets the floor: it is the first release built
-    # against pyramids 0.59's `from_array` / `GeoReference` constructors, and 0.7's
-    # reader still calls the removed `create_from_array`, so the EEDAI path raises
-    # AttributeError against the pyramids floor this project now requires.
-    # Also declared, at the same version, in `dev` -- see the comment there.
-    "pyramids-eo >=0.8.1,<0.9",
+    # (pyramids-eo#91-93). 0.9.0 now sets the floor (it added the tasseled-cap
+    # transform, pyramids-eo#117); it is well past 0.8, the first release built
+    # against pyramids 0.59's `from_array` / `GeoReference` constructors -- 0.7's
+    # reader still called the removed `create_from_array`.
+    # Also declared, at the same version, in `dev` and as an imagery base dep.
+    "pyramids-eo >=0.9.0,<0.10",
     # scipy: feathers the disc edge and softens the limb (ndimage.binary_erosion /
     # gaussian_filter).
     "scipy >=1.11",
