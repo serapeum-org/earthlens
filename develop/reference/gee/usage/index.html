@@ -3432,6 +3432,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#combining-a-raster-with-a-companion-raster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Combining a raster with a companion raster
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -24050,6 +24061,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#combining-a-raster-with-a-companion-raster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Combining a raster with a companion raster
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -24610,6 +24632,30 @@ extra. A missing install is reported with the extra to install rather than a
 <p>A <code>Classify</code> is tied to the bands it was trained on, so applying it to a
 different band set is refused rather than predicted from the wrong features,
 and the forest is fitted once and reused across applications.</p>
+<h3 id="combining-a-raster-with-a-companion-raster"><a class="toclink" href="#combining-a-raster-with-a-companion-raster">Combining a raster with a companion raster</a><a class="headerlink" href="#combining-a-raster-with-a-companion-raster" title="Permanent link">#</a></h3>
+<p>Two operations take a second raster, supplied at construction and used by
+<code>apply</code>. Both are thin, client-side wrappers over pyramids 0.69.0 — pyramids
+owns the GDAL pan-sharpener and the histogram-matching arithmetic.</p>
+<p><code>PanSharpen</code> injects the spatial detail of a high-resolution panchromatic band
+into a coarser multispectral raster (Landsat's 15 m B8 against its 30 m
+multispectral bands, say), producing a fused raster at the pan resolution:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">PanSharpen</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">fused</span> <span class="o">=</span> <span class="n">PanSharpen</span><span class="p">(</span><span class="n">pan</span><span class="o">=</span><span class="n">pan_raster</span><span class="p">)(</span><span class="n">multispectral_raster</span><span class="p">)</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="c1"># or a subset, with explicit Brovey weights:</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">fused</span> <span class="o">=</span> <span class="n">PanSharpen</span><span class="p">(</span><span class="n">pan</span><span class="o">=</span><span class="n">pan_raster</span><span class="p">,</span> <span class="n">bands</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">weights</span><span class="o">=</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">))(</span><span class="n">ms</span><span class="p">)</span>
+</code></pre></div>
+<p><code>MatchHistogram</code> remaps a band so its distribution matches a reference
+acquisition's — the usual way to make two scenes of one area radiometrically
+comparable before differencing. No-data is excluded from both distributions
+and written back as the source's sentinel:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">MatchHistogram</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">comparable</span> <span class="o">=</span> <span class="n">MatchHistogram</span><span class="p">(</span><span class="n">reference</span><span class="o">=</span><span class="n">july_scene</span><span class="p">)(</span><span class="n">june_scene</span><span class="p">)</span>
+</code></pre></div>
+<p>The third transform in this family, <code>TasseledCap</code>, is not yet available: its
+per-sensor coefficients over a fixed band order are domain value-semantics that
+belong in pyramids-eo (tracked upstream), not a GIS primitive.</p>
 
 
 
