@@ -90,8 +90,12 @@ INFORM_RELEASE_YEARS = range(2010, 2100)
 #: carrying *no* matching link. A dropped connection or a 5xx is already
 #: retried inside `HttpClient` and never reaches the loop, and a *partial*
 #: render — one that drops the newest anchor but keeps an older one — is not
-#: covered here, because the loop stops at the first non-empty result. That
-#: last case predates this loop and is unchanged by it.
+#: covered here, because the loop stops at the first non-empty result. A
+#: partial render on a re-read is therefore accepted and memoised exactly as
+#: one on the first read always was. The hazard predates this loop (issue
+#: #1286), but note the loop gives it more chances to occur: a linkless read
+#: that used to raise now leads to up to two further reads, any of which may
+#: be the partial one.
 INFORM_RELEASE_ATTEMPTS: int = 3
 
 #: Linear back-off between those reads: `n * 1s`, so a flap that clears in a
@@ -441,9 +445,8 @@ def inform_release_url(
         requests.RequestException: If the page cannot be fetched.
 
     Examples:
-        - The read budget and its back-off are module constants, so a caller
-          can work out the worst case before paying for it — three reads with
-          waits of 1s and 2s between them:
+        - How many times a linkless page is re-read before the error is
+          raised, and how long each wait between those reads grows by:
             ```python
             >>> from earthlens.risk_indicators._helpers import (
             ...     INFORM_RELEASE_ATTEMPTS,
@@ -451,23 +454,23 @@ def inform_release_url(
             ... )
             >>> INFORM_RELEASE_ATTEMPTS
             3
-            >>> [
-            ...     INFORM_RELEASE_BACKOFF_SECONDS * (n + 1)
-            ...     for n in range(INFORM_RELEASE_ATTEMPTS - 1)
-            ... ]
-            [1.0, 2.0]
+            >>> INFORM_RELEASE_BACKOFF_SECONDS
+            1.0
 
             ```
+          The schedule those produce is asserted in
+          `test_release_url_stops_rereading_after_the_attempt_budget`, which
+          records the loop's waits rather than recomputing them here.
         - Against the live site it answers the newest workbook and its year,
           which `inform_download_release` then fetches (skipped here because
-          it reads the JRC site):
+          it reads the JRC site, and the newest release changes):
             ```python
             >>> from earthlens.risk_indicators._helpers import inform_release_url
             >>> url, year = inform_release_url()  # doctest: +SKIP
-            >>> year  # doctest: +SKIP
-            2026
-            >>> url.rsplit("/", 1)[-1]  # doctest: +SKIP
-            'INFORM_Risk_Mid_2026_v073.xlsx'
+            >>> year >= 2026  # doctest: +SKIP
+            True
+            >>> url.endswith(".xlsx")  # doctest: +SKIP
+            True
 
             ```
     """
