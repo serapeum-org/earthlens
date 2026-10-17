@@ -94,26 +94,33 @@ class TestTasseledCap:
 
     def test_an_unknown_sensor_is_refused(self):
         """A sensor with no bundled table surfaces pyramids-eo's error."""
+        op = TasseledCap(sensor="sentinel99")
+        ds = _reflectance()
         with pytest.raises(UnknownSensorError):
-            TasseledCap(sensor="sentinel99")(_reflectance())
+            op(ds)
 
     def test_an_unknown_component_is_refused(self):
         """A component the sensor does not define is refused."""
+        op = TasseledCap(sensor="landsat8_oli", components=("sparkle",))
+        ds = _reflectance()
         with pytest.raises(TransformError):
-            TasseledCap(sensor="landsat8_oli", components=("sparkle",))(_reflectance())
+            op(ds)
 
     def test_a_wrong_band_count_is_refused(self):
         """An unnamed stack of the wrong band count cannot be the sensor's."""
         three_band = Dataset.from_array(
             arr=np.ones((3, 2, 2), dtype="float32"), geo_ref=GEO, no_data_value=None
         )
+        op = TasseledCap(sensor="landsat8_oli")
         with pytest.raises(TransformError):
-            TasseledCap(sensor="landsat8_oli")(three_band)
+            op(three_band)
 
     def test_empty_components_is_refused(self):
         """Asking for no components at all has nothing to compute."""
+        op = TasseledCap(sensor="landsat8_oli", components=())
+        ds = _reflectance()
         with pytest.raises(TransformError):
-            TasseledCap(sensor="landsat8_oli", components=())(_reflectance())
+            op(ds)
 
     def test_named_bands_outside_the_sensor_roles_are_refused(self):
         """A stack whose names do not resolve to the sensor's bands is refused."""
@@ -122,8 +129,9 @@ class TestTasseledCap:
         )
         ds = Dataset.from_array(arr=arr, geo_ref=GEO, no_data_value=None)
         ds.band_names = ["blue", "green", "red", "nir", "swir1", "thermal"]
+        op = TasseledCap(sensor="landsat8_oli")
         with pytest.raises(TransformError):
-            TasseledCap(sensor="landsat8_oli")(ds)
+            op(ds)
 
     def test_it_is_frozen(self):
         """The sensor is part of the frozen value object."""
@@ -160,8 +168,9 @@ class TestTasseledCap:
         arr = np.full((6, 2, 2), 12000.0, dtype="float32")
         ds = Dataset.from_array(arr=arr, geo_ref=GEO, no_data_value=None)
         ds.band_names = OLI_BANDS
+        op = TasseledCap(sensor="landsat8_oli")
         with pytest.warns(UserWarning, match="reflectance"):
-            TasseledCap(sensor="landsat8_oli")(ds)
+            op(ds)
 
     def test_it_composes_in_a_chain(self):
         """A spectral transform is still an operation, so it chains."""
