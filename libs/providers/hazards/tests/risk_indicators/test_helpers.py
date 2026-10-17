@@ -431,6 +431,20 @@ class TestResolveAdminAndEmpty:
         assert df.empty and list(df.columns) == ["a", "b"]
 
 
+def _record_log() -> list[str]:
+    """Collect loguru messages emitted from here on, newest last.
+
+    Returns:
+        The list each message is appended to, in emission order.
+    """
+    from loguru import logger
+
+    messages: list[str] = []
+    sink_id = logger.add(lambda record: messages.append(record), level="INFO")
+    _ADDED_SINKS.append(sink_id)
+    return messages
+
+
 def _record_sleeps(monkeypatch) -> list[float]:
     """Record the retry loop's waits, leaving `HttpClient`'s own back-off alone.
 
@@ -452,15 +466,32 @@ def _serve_in_order(pages: list[str]):
         pages: Response bodies to hand out, consumed from the front.
 
     Returns:
-        A callable with `HttpClient.get`'s signature, which fails the test
-        rather than raising `IndexError` if asked for one page too many.
+        A callable with `HttpClient.get`'s signature. Reads past the end of
+        `pages` repeat the last body rather than raising, so a test asserts
+        the read count instead of relying on an exception it never triggers.
     """
+    served: list[str] = []
 
     def _get(self, url, **kwargs):
-        assert pages, f"an unexpected extra read of {url}"
-        return _TextResponse(pages.pop(0))
+        served.append(url)
+        return _TextResponse(pages[min(len(served), len(pages)) - 1])
 
+    _get.served = served
     return _get
+
+
+#: Loguru sink ids added by `_record_log`, removed after each test.
+_ADDED_SINKS: list[int] = []
+
+
+@pytest.fixture(autouse=True)
+def _drop_log_sinks():
+    """Remove any sink `_record_log` added, so recorders never outlive a test."""
+    yield
+    from loguru import logger
+
+    while _ADDED_SINKS:
+        logger.remove(_ADDED_SINKS.pop())
 
 
 class TestInformRelease:
@@ -516,11 +547,19 @@ class TestInformRelease:
             'INFORM_Risk_2026_v072.xlsx">2026</a>',
         ]
         waits = _record_sleeps(monkeypatch)
-        monkeypatch.setattr(_helpers.HttpClient, "get", _serve_in_order(pages))
+        serve = _serve_in_order(pages)
+        monkeypatch.setattr(_helpers.HttpClient, "get", serve)
+        messages = _record_log()
         url, year = _helpers.inform_release_url()
         assert year == 2026, "the second read's workbook is used"
-        assert not pages, "both reads were made"
+        assert len(serve.served) == 2, f"exactly two reads: {serve.served}"
         assert waits == [1.0], f"one 1s wait between the two reads: {waits}"
+        assert any("read 1 of 3" in m for m in messages), (
+            f"the re-read must be visible to an operator: {messages}"
+        )
+        assert any("yielded a workbook link on read 2 of 3" in m for m in messages), (
+            f"the recovery must be visible to an operator: {messages}"
+        )
         assert _helpers._RELEASE_CACHE[_helpers.INFORM_RESULTS_PAGE] == (url, 2026), (
             "the recovered workbook must be memoised like a first-read one"
         )

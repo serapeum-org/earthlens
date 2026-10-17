@@ -500,7 +500,7 @@ class TestDeadBackendDetection:
         assert out.count("::error::") == 1, f"expected a single annotation: {out}"
         assert "all 2 collected test(s) skipped" in out, f"wrong verdict: {out}"
 
-    def test_an_exempt_backend_alone_still_leaves_the_lane_green(self, guard, tmp_path):
+    def test_two_exempt_backends_both_leave_the_lane_green(self, guard, tmp_path):
         """An exemption is per backend, so a second exempt backend is exempt too."""
         for backend in ("mswep", "wdpa"):
             assert backend in guard._EXPECTED_EMPTY, (
