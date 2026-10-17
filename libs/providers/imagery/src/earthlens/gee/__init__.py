@@ -101,6 +101,40 @@ anything a string names:
 * `EedaiReader` — the adapter wrapping the optional pyramids-eo
   reader, owning its process-global credential hazard.
 
+Client-side raster analysis (`earthlens.gee.analysis`, re-exported
+here) runs *after* a download, on the in-memory pyramids `Dataset`, so
+none of it reaches Earth Engine and none of it affects the
+engine-eligibility gate:
+
+* `RasterOperation` — the contract every operation implements,
+  `Dataset -> Dataset`; `OperationChain` is the `>>` composition of
+  several, itself an operation; `RasterAnalysis` adds knowing how to
+  take the raster out of a `DownloadResult`, and is what
+  `GEE.analyze` delegates to.
+* `NormalizedDifference` with the presets `Ndvi` / `Ndwi` / `Ndbi`
+  — two-band index arithmetic.
+* `BandExpression` — the general case: a formula over named bands,
+  compiled from an `ast` allow-list (`ALLOWED_FUNCTIONS`) with no
+  `eval`, refused at construction rather than at run time.
+* `Slope` / `Aspect` / `Hillshade` — terrain derivatives of an
+  elevation band.
+* `FocalMean` / `FocalStd` / `FocalMedian` / `FocalApply` —
+  neighbourhood statistics over a square window; `Texture` with
+  `MEASURES` is the grey-level co-occurrence family built on it.
+* `Proximity` — distance from every cell to the nearest target cell.
+* `Reclassify` / `ConvertUnits` — values into classes, or into
+  another physical unit; `UNIT_CONVERSIONS` is the table the latter
+  applies and `supported_conversions` lists its pairs.
+* `ConnectedComponents` / `Sieve` — labelling contiguous patches and
+  dropping the ones too small to keep.
+* `Cluster` / `Classify`, with `TrainingExtractor` and
+  `TrainingSet` — unsupervised and supervised per-pixel learning
+  through scikit-learn (the `[gee]` extra).
+* `PanSharpen` / `MatchHistogram` — operations that combine a raster
+  with a companion one (a finer pan band; a reference acquisition).
+* `TasseledCap` — the sensor-specific brightness / greenness /
+  wetness transform, from pyramids-eo's per-sensor coefficients.
+
 Two submodules ship more specialised helpers and are intentionally
 **not** re-exported at this top level — import them directly. Both
 feed the `GEE` backend's `cloud_mask=` / `filters=` constructor hooks
@@ -160,6 +194,40 @@ Examples:
 
 from __future__ import annotations
 
+from earthlens.gee.analysis import (
+    ALLOWED_FUNCTIONS,
+    MEASURES,
+    UNIT_CONVERSIONS,
+    Aspect,
+    BandExpression,
+    Classify,
+    Cluster,
+    ConnectedComponents,
+    ConvertUnits,
+    FocalApply,
+    FocalMean,
+    FocalMedian,
+    FocalStd,
+    Hillshade,
+    MatchHistogram,
+    Ndbi,
+    Ndvi,
+    Ndwi,
+    NormalizedDifference,
+    OperationChain,
+    PanSharpen,
+    Proximity,
+    RasterAnalysis,
+    RasterOperation,
+    Reclassify,
+    Sieve,
+    Slope,
+    TasseledCap,
+    Texture,
+    TrainingExtractor,
+    TrainingSet,
+    supported_conversions,
+)
 from earthlens.gee.auth import AuthenticationError, EarthEngineAuth
 from earthlens.gee.backend import GEE, CloudMask, CollectionFilter
 from earthlens.gee.catalog import (
@@ -231,6 +299,11 @@ from earthlens.gee.work import (
 )
 
 __all__ = [
+    "MatchHistogram",
+    "PanSharpen",
+    "TasseledCap",
+    "UNIT_CONVERSIONS",
+    "supported_conversions",
     "GEE",
     "AuthenticationError",
     "CloudMask",
@@ -294,4 +367,31 @@ __all__ = [
     "DownloadResult",
     "PixelsEngine",
     "HIGH_VOLUME_ENDPOINT",
+    "RasterOperation",
+    "OperationChain",
+    "RasterAnalysis",
+    "NormalizedDifference",
+    "Ndvi",
+    "Ndwi",
+    "Ndbi",
+    "BandExpression",
+    "ALLOWED_FUNCTIONS",
+    "Slope",
+    "Aspect",
+    "Hillshade",
+    "FocalMean",
+    "FocalStd",
+    "FocalMedian",
+    "FocalApply",
+    "Texture",
+    "MEASURES",
+    "Proximity",
+    "Reclassify",
+    "ConvertUnits",
+    "ConnectedComponents",
+    "Sieve",
+    "Cluster",
+    "Classify",
+    "TrainingExtractor",
+    "TrainingSet",
 ]

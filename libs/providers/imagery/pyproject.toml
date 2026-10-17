@@ -39,18 +39,38 @@ dependencies = [
     # gate before the extra is consulted, so a projected request imports pyproj
     # whether or not the reader is installed.
     "pyproj >=3.7.0",
+    # pyramids-eo: the EO tier on top of pyramids. A base dependency, not an
+    # extra, because `earthlens.gee.analysis.TasseledCap` ships in the analysis
+    # surface and applies pyramids-eo's per-sensor tasseled-cap coefficients
+    # (`pyramids_eo.spectral.tasseled_cap`). 0.9.0 is the floor: it is the
+    # release that added that transform (pyramids-eo#117). One consequence of it
+    # always being present: `engine="auto"` now prefers the EEDAI reader whenever
+    # it can serve a raw fetch -- previously that preference was gated on the
+    # (now redundant) `[eedai]` extra being installed, which was how the reader
+    # stayed opt-in. The reader is still only *reachable* through `engine=`, so
+    # `engine="ee"` keeps Earth Engine's exact semantics.
+    "pyramids-eo >=0.9.0,<0.10",
 ]
 
 [project.optional-dependencies]
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 asf = ["asf_search >=12.2.2", "earthlens-imagery[earthdata]"]
-eedai = ["pyramids-eo >=0.8.1,<0.9"]
+# pyramids-eo is now a base dependency (see `[project.dependencies]`), so this
+# extra is redundant -- retained as a no-op alias so `earthlens-imagery[eedai]`
+# (and the meta-package's `[eedai]`) keep resolving. The floor is kept in step
+# with the base pin.
+eedai = ["pyramids-eo >=0.9.0,<0.10"]
 eumetsat = ["eumdac >=3.1"]
-gee = ["earthengine-api >=1.7.26", "google-api-python-client >=2.0", "google-cloud-storage >=2.0", "Rtree >=1.0.0", "urllib3 >=1.26"]
+# scikit-learn drives the two client-side learning operations in
+# `earthlens.gee.analysis` (k-means clustering and the supervised classifier).
+# It is imported lazily through `analysis/_sklearn.py`, the same guarded shape
+# `_eedai.py` uses, so the import cost is paid only by a request that asks for
+# one of those operations - but it is declared here because the code imports it.
+gee = ["earthengine-api >=1.7.26", "google-api-python-client >=2.0", "google-cloud-storage >=2.0", "Rtree >=1.0.0", "scikit-learn >=1.5", "urllib3 >=1.26"]
 jaxa = ["jaxa.earth >=0.1.6,<0.2", "gportal >=0.4,<0.5"]
 openeo = ["openeo >=0.47,<0.52"]
 sentinel-hub = ["sentinelhub >=3.11.5"]
-stac = ["pyramids-gis[stac] >=0.66.0"]
+stac = ["pyramids-gis[stac] >=0.69.0"]
 
 # This distribution's slice of the facade's data-source table.
 [project.entry-points."earthlens.backends"]
