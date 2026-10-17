@@ -27,8 +27,9 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
 
 __all__ = ["TasseledCap"]
 
-#: The three components of the classic tasseled-cap transform, in the order
-#: pyramids-eo emits them by default.
+#: TasseledCap's default components, in output-band order - the three classic
+#: Kauth-Thomas components. `apply` passes the chosen components to pyramids-eo
+#: explicitly, so this is earthlens's own default, not a mirror of any upstream one.
 _DEFAULT_COMPONENTS: tuple[str, ...] = ("brightness", "greenness", "wetness")
 
 
