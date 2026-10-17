@@ -39,6 +39,11 @@ def _marks() -> Dataset:
     return _raster(marks, no_data=-1.0)
 
 
+def _raise_missing_module(module: str):  # noqa: ANN201
+    """Fail an import the way an uninstalled package does."""
+    raise ImportError(f"No module named {module!r}")
+
+
 class TestCluster:
     """Unsupervised per-pixel k-means."""
 
@@ -234,10 +239,7 @@ class TestTheGuardedImport:
         """The error should say what to install, not fail on an attribute."""
         import earthlens.gee.analysis._sklearn as guard
 
-        def _missing(module: str):
-            raise ImportError(f"No module named {module!r}")
-
-        monkeypatch.setattr(guard.importlib, "import_module", _missing)
+        monkeypatch.setattr(guard.importlib, "import_module", _raise_missing_module)
         with pytest.raises(ImportError, match=r"pip install earthlens\[gee\]"):
             guard.import_cluster()
         with pytest.raises(ImportError, match=r"pip install earthlens\[gee\]"):

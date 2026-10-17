@@ -15,6 +15,7 @@ matrix dense enough to be meaningful in a small window.
 
 from __future__ import annotations
 
+from functools import lru_cache, partial
 from typing import TYPE_CHECKING, Literal
 
 import numpy as np
@@ -60,6 +61,53 @@ def _cooccurrence(window: np.ndarray, levels: int) -> np.ndarray:
     return matrix / total if total else matrix
 
 
+@lru_cache(maxsize=16)
+def _difference_matrix(levels: int) -> np.ndarray:
+    """Return `|i - j|` for a `levels` x `levels` matrix, built once per size.
+
+    Every measure weights a co-occurrence by how far off the diagonal it sits.
+    Rebuilding that weighting inside the window loop cost two array
+    allocations per window - 3,200 of them on a 40x40 raster - for a value
+    that depends only on the level count.
+
+    Args:
+        levels: The number of grey levels.
+
+    Returns:
+        A read-only `(levels, levels)` array of absolute index differences.
+    """
+    rows, columns = np.indices((levels, levels))
+    difference = np.abs(rows - columns).astype("float64")
+    difference.setflags(write=False)
+    return difference
+
+
+def _texture_of_window(flat, *, side: int, levels: int, measure: str) -> float:  # noqa: ANN001
+    """Reduce one flat window to its texture measure.
+
+    At module scope rather than nested inside `apply`, so it is importable and
+    testable on its own and the captured state is an explicit `partial`.
+
+    `scipy.ndimage.generic_filter`, which pyramids' `focal_apply` wraps, pads
+    the border rather than shrinking the window, so every window holds exactly
+    `side * side` values - measured: only size 9 is ever seen for radius 1, and
+    only 25 for radius 2. An earlier version guarded against a short window and
+    returned `nan`; that branch was unreachable and its comment claimed the
+    opposite of what the filter does.
+
+    Args:
+        flat: The window, flattened, with no-data cells as `NaN`.
+        side: The window's edge length, `2 * radius + 1`.
+        levels: The number of grey levels the band was quantised to.
+        measure: One of `MEASURES`.
+
+    Returns:
+        The measure's value for that window.
+    """
+    window = np.asarray(flat, dtype="float64").reshape(side, side)
+    return _measure(_cooccurrence(window, levels), measure)
+
+
 def _measure(matrix: np.ndarray, measure: str) -> float:
     """Reduce a co-occurrence matrix to one number.
 
@@ -72,9 +120,7 @@ def _measure(matrix: np.ndarray, measure: str) -> float:
     """
     if not matrix.any():
         return float("nan")
-    levels = matrix.shape[0]
-    rows, columns = np.indices((levels, levels))
-    difference = np.abs(rows - columns)
+    difference = _difference_matrix(matrix.shape[0])
     if measure == "contrast":
         return float((matrix * difference**2).sum())
     if measure == "dissimilarity":
@@ -194,25 +240,18 @@ class Texture(RasterOperation):
         else:
             quantised = values
         quantised = np.where(np.isfinite(values), quantised, np.nan)
-        side = 2 * self.radius + 1
-        levels = self.levels
-        measure = self.measure
-
-        def _window_texture(flat) -> float:  # noqa: ANN001 - pyramids passes the window
-            """Reduce one window to its texture measure."""
-            window = np.asarray(flat, dtype="float64")
-            if window.size != side * side:
-                # An edge window is padded by the filter; reshape only when it
-                # is square, otherwise there is no spatial structure to read.
-                return float("nan")
-            return _measure(_cooccurrence(window.reshape(side, side), levels), measure)
-
+        reducer = partial(
+            _texture_of_window,
+            side=2 * self.radius + 1,
+            levels=self.levels,
+            measure=self.measure,
+        )
         # The intermediate carries NaN at the voids, declared as such, so
         # `focal_apply` hands the window NaN rather than a sentinel value.
         quantised_ds = result_like(ds, quantised, dtype="float32", no_data=float("nan"))
         return result_like(
             ds,
-            quantised_ds.focal_apply(_window_texture, radius=self.radius, band=0),
+            quantised_ds.focal_apply(reducer, radius=self.radius, band=0),
             dtype="float32",
             no_data=float("nan"),
         )

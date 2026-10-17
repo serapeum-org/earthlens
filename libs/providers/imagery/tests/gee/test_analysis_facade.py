@@ -38,6 +38,19 @@ def _first(ds: Dataset) -> float:
     return float(np.asarray(ds.read_array(), dtype="float64")[0, 0])
 
 
+#: How `GEE.analyze` asked for its download, recorded by the stand-in below.
+#: Module-level because the recorder is too, and a nested helper inside a test
+#: body is against this repo's test conventions.
+_CAPTURED: dict[str, object] = {}
+
+
+def _recording_download(self, *, progress_bar=True, materialize=None, **kwargs):  # noqa: ANN001, ANN201, ARG001
+    """Stand in for `GEE.download`, recording the arguments it was given."""
+    _CAPTURED["materialize"] = materialize
+    _CAPTURED["progress_bar"] = progress_bar
+    return _result(_two_band())
+
+
 class TestConstruction:
     """What `RasterAnalysis` accepts as its operations."""
 
@@ -138,17 +151,10 @@ class TestTheBackendMethod:
         """It must force `materialize=True`, or there is no object to analyse."""
         from earthlens.gee import GEE
 
-        captured: dict[str, object] = {}
-
-        def _fake_download(self, *, progress_bar=True, materialize=None, **kwargs):
-            """Record how the analysis asked for the download."""
-            captured["materialize"] = materialize
-            captured["progress_bar"] = progress_bar
-            return _result(_two_band())
-
-        monkeypatch.setattr(GEE, "download", _fake_download)
+        _CAPTURED.clear()
+        monkeypatch.setattr(GEE, "download", _recording_download)
         derived = GEE.analyze(
             object.__new__(GEE), Ndvi(nir=0, red=1), progress_bar=False
         )
-        assert captured == {"materialize": True, "progress_bar": False}
+        assert _CAPTURED == {"materialize": True, "progress_bar": False}
         assert _first(derived[0]) == pytest.approx(0.5)
