@@ -45,14 +45,17 @@ class TestTasseledCap:
 
     def test_the_default_is_brightness_greenness_wetness(self):
         """With no `components` the classic three come back, named, in order."""
-        tc = TasseledCap(sensor="landsat8_oli")(_reflectance())
+        ds = _reflectance()
+        tc = TasseledCap(sensor="landsat8_oli")(ds)
         assert tc.band_names == ["brightness", "greenness", "wetness"]
         assert tc.band_count == 3
         assert tc.epsg == 4326
+        assert tc.geotransform == ds.geotransform
 
-    def test_a_second_sensor_is_selected_case_insensitively(self):
-        """The sensor is threaded through to its own table, casing aside."""
-        tc = TasseledCap(sensor="LANDSAT5_TM")(_reflectance())
+    @pytest.mark.parametrize("sensor", ["LANDSAT5_TM", "landsat7_etm"])
+    def test_a_named_sensor_is_selected_case_insensitively(self, sensor):
+        """Each bundled sensor is threaded through to its own table, casing aside."""
+        tc = TasseledCap(sensor=sensor)(_reflectance())
         assert tc.band_names == ["brightness", "greenness", "wetness"]
 
     def test_a_component_subset_keeps_the_requested_order(self):
@@ -152,3 +155,4 @@ class TestTasseledCap:
         )
         result = chain.apply(_reflectance())
         assert result.band_count == 1
+        assert float(np.asarray(result.read_array())[0, 0]) == 1.0
