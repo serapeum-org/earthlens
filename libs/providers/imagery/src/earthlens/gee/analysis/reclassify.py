@@ -34,6 +34,11 @@ class Reclassify(RasterOperation):
     so adjacent bins can share an edge without overlapping or leaving a gap.
     Use `-inf` / `inf` for an open end.
 
+    Bins are applied in order, so where two overlap the later one wins:
+    `((0, 10, 1), (5, 15, 2))` labels the 5-to-10 overlap 2. That makes "a
+    general rule, then an exception" expressible as two bins in that order, and
+    it is what the tests pin.
+
     Examples:
         - Three slope classes from a ramp:
             ```python

@@ -130,3 +130,21 @@ class TestProximity:
         operation = Proximity(target_values=(1, 2))
         with pytest.raises(ValidationError, match="frozen"):
             operation.target_values = (3,)
+
+
+class TestAnEmptyTargetList:
+    """Round-1 finding L5: `()` meant the opposite of what it says."""
+
+    def test_an_empty_tuple_is_refused_rather_than_coerced(self):
+        """It used to fall through to "every non-zero cell is a target".
+
+        Measured before the fix: `Proximity(target_values=())` produced output
+        identical to `Proximity()`, so a filter that came back empty silently
+        measured distance to everything.
+        """
+        with pytest.raises(ValidationError, match="target_values is empty"):
+            Proximity(target_values=())
+
+    def test_none_still_means_every_non_zero_cell(self):
+        """The documented default has to keep working."""
+        assert Proximity().target_values is None

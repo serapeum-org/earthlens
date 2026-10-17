@@ -113,3 +113,39 @@ class TestTheNamedPresets:
         """The output of an index is a raster, so it feeds the next operation."""
         chain = OperationChain.of(Ndvi(nir=0, red=1))
         assert _values(chain.apply(_two_band(0.6, 0.2)))[0, 0] == pytest.approx(0.5)
+
+
+class TestThePresetsShareOneApply:
+    """Round-1 finding L11: the delegation was written out three times."""
+
+    @pytest.mark.parametrize(
+        ("preset", "fields"),
+        [(Ndvi, ("nir", "red")), (Ndwi, ("green", "nir")), (Ndbi, ("swir", "nir"))],
+        ids=["ndvi", "ndwi", "ndbi"],
+    )
+    def test_each_preset_declares_its_own_two_bands(self, preset, fields):
+        """The shared `apply` reads the names off the subclass."""
+        assert preset._band_fields == fields
+        assert set(preset.model_fields) == set(fields)
+
+    @pytest.mark.parametrize(
+        ("preset", "kwargs"),
+        [
+            (Ndvi, {"nir": 0, "red": 1}),
+            (Ndwi, {"green": 0, "nir": 1}),
+            (Ndbi, {"swir": 0, "nir": 1}),
+        ],
+        ids=["ndvi", "ndwi", "ndbi"],
+    )
+    def test_each_preset_computes_the_same_as_the_general_form(self, preset, kwargs):
+        """Sharing the body must not change any preset's answer."""
+        source = _two_band(0.6, 0.2)
+        expected = NormalizedDifference(a=0, b=1).apply(source)
+        assert _values(preset(**kwargs).apply(source)) == pytest.approx(
+            _values(expected)
+        )
+
+    def test_a_preset_still_refuses_the_general_forms_field_names(self):
+        """Inheriting `a`/`b` would make `Ndvi(a=0, b=1)` silently ignored."""
+        with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
+            Ndvi(a=0, b=1)

@@ -28,8 +28,21 @@ __all__ = [
 ]
 
 
-def _like(ds: Dataset, array) -> Dataset:  # noqa: ANN001 - array is numpy or dask
-    """Put `array` back on `ds`' grid as a new raster."""
+def _like(ds: Dataset, array: np.ndarray) -> Dataset:
+    """Put `array` back on `ds`' grid as a new raster.
+
+    Annotated `np.ndarray` rather than left open: `Dataset.dataset_like` opens
+    with `if not isinstance(array, np.ndarray): raise TypeError`, and none of
+    these operations passes `chunks=`, so the value is always numpy. The
+    previous `noqa` comment claimed a dask array was possible, which it is not.
+
+    Args:
+        ds: The raster whose grid the result sits on.
+        array: The derivative values.
+
+    Returns:
+        A new georeferenced raster carrying `array`.
+    """
     from pyramids.dataset import Dataset as PyramidsDataset
 
     return PyramidsDataset.dataset_like(ds, array)

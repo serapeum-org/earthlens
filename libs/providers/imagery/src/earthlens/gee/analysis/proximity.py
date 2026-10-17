@@ -11,6 +11,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal
 
+from pydantic import field_validator
+
 from earthlens.gee.analysis.base import RasterOperation
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -53,6 +55,35 @@ class Proximity(RasterOperation):
     max_distance: float | None = None
     nodata: float | None = None
 
+    @field_validator("target_values")
+    @classmethod
+    def _targets_must_not_be_empty(
+        cls, value: tuple[int, ...] | None
+    ) -> tuple[int, ...] | None:
+        """Refuse an empty tuple, which read as the opposite instruction.
+
+        `target_values=()` is falsy, so it fell through to GDAL's default of
+        "every non-zero cell is a target" - measured as output identical to
+        passing nothing at all. An explicit empty collection is more likely a
+        filter that was computed and came back empty, and measuring distance to
+        everything is the worst available answer to that.
+
+        Args:
+            value: The configured target values.
+
+        Returns:
+            The value unchanged, when it is usable.
+
+        Raises:
+            ValueError: If an empty collection was given.
+        """
+        if value is not None and not value:
+            raise ValueError(
+                "target_values is empty; pass None to treat every non-zero "
+                "cell as a target, or name the values to measure distance to"
+            )
+        return value
+
     def apply(self, ds: Dataset) -> Dataset:
         """Return the distance raster.
 
@@ -72,7 +103,9 @@ class Proximity(RasterOperation):
             band=self.band,
             # pyramids takes a list; the field is a tuple so the operation can
             # stay frozen and hashable.
-            target_values=list(self.target_values) if self.target_values else None,
+            target_values=(
+                list(self.target_values) if self.target_values is not None else None
+            ),
             distance_units=self.distance_units,
             max_distance=self.max_distance,
             nodata=self.nodata,

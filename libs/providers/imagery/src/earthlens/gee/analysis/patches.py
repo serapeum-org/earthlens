@@ -33,6 +33,13 @@ class ConnectedComponents(RasterOperation):
     region of in-range cells gets 1, 2, 3 and so on - so counting regions is
     reading the maximum, and selecting one is comparing against its label.
 
+    A no-data cell is outside any finite range, so it becomes background too:
+    `[[1, 1, 0], [0, -1, 0], [0, 0, 1]]` with `no_data_value=-1` labels as
+    `[[1, 1, 0], [0, 0, 0], [0, 0, 2]]`, where the void and the real background
+    are both 0. That is the right default - a void is not a patch - but it
+    means the label raster cannot distinguish "not in a patch" from "no data
+    here"; read that back from the source raster if it matters.
+
     Examples:
         - Two separate patches of ones get two labels:
             ```python
