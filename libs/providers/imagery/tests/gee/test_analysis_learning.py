@@ -244,3 +244,96 @@ class TestTheGuardedImport:
             guard.import_cluster()
         with pytest.raises(ImportError, match=r"pip install earthlens\[gee\]"):
             guard.import_ensemble()
+
+
+class TestTheHardenedLearningEdges:
+    """Round-1 review findings, each pinned by the behaviour it names."""
+
+    def test_a_model_cannot_be_applied_to_a_different_set_of_bands(self):
+        """Equal band counts are not the same bands.
+
+        Trained on bands (0, 1) and applied with `bands=(1, 0)`, the counts
+        agree, so the count check passed and the forest predicted from
+        reversed features.
+        """
+        stack = Dataset.from_array(
+            arr=np.stack([TWO_GROUPS, TWO_GROUPS[:, ::-1]]),
+            geo_ref=GEO,
+            no_data_value=-9999.0,
+        )
+        training = TrainingExtractor().extract(stack, _marks())
+        assert training.bands == (0, 1)
+        with pytest.raises(ValueError, match="trained on bands"):
+            Classify(training=training, bands=(1, 0)).apply(stack)
+
+    def test_the_forest_is_fitted_once_and_reused(self):
+        """Refitting per apply cost more than the prediction it enabled."""
+        source = _raster(TWO_GROUPS)
+        operation = Classify(training=TrainingExtractor().extract(source, _marks()))
+        first = operation.apply(source)
+        fitted = operation._forest
+        second = operation.apply(source)
+        assert fitted is operation._forest
+        assert np.array_equal(_labels(first), _labels(second))
+
+    def test_an_all_no_data_raster_is_refused_like_cluster_refuses_it(self):
+        """The two siblings disagreed: one raised, the other mapped nothing."""
+        source = _raster(TWO_GROUPS)
+        training = TrainingExtractor().extract(source, _marks())
+        empty = _raster(np.full((4, 4), -9999.0, dtype="float32"))
+        with pytest.raises(ValueError, match="nothing to classify"):
+            Classify(training=training).apply(empty)
+
+    def test_a_training_set_cannot_be_edited_through_its_arrays(self):
+        """`frozen=True` protects the field, not the array it points at."""
+        training = TrainingExtractor().extract(_raster(TWO_GROUPS), _marks())
+        with pytest.raises(ValueError, match="read-only"):
+            training.features[0, 0] = 999.0
+        with pytest.raises(ValueError, match="read-only"):
+            training.labels[0] = 999
+
+    def test_sealing_does_not_reach_back_into_the_callers_array(self):
+        """A handed-over array must stay writable for its owner."""
+        features = np.ones((2, 1))
+        TrainingSet(features=features, labels=np.zeros(2))
+        features[0, 0] = 5.0
+        assert features[0, 0] == 5.0
+
+    def test_bands_must_describe_the_feature_columns(self):
+        """A mislabelled pair would misreport what the model was trained on."""
+        with pytest.raises(ValidationError, match="names 3 band"):
+            TrainingSet(features=np.zeros((2, 1)), labels=np.zeros(2), bands=(0, 1, 2))
+
+    def test_a_label_raster_in_another_crs_is_refused(self):
+        """Same shape, different CRS: every label would land on another cell."""
+        from pyramids.base.georeference import GeoReference as Ref
+
+        other = Dataset.from_array(
+            arr=np.full((4, 4), 7.0, dtype="float32"),
+            geo_ref=Ref(top_left_corner=(0.0, 0.0), cell_size=1.0, epsg=3857),
+            no_data_value=-1.0,
+        )
+        with pytest.raises(ValueError, match="EPSG"):
+            TrainingExtractor().extract(_raster(TWO_GROUPS), other)
+
+    def test_a_label_raster_at_another_origin_is_refused(self):
+        """Same shape and CRS, shifted grid: the cells do not coincide."""
+        from pyramids.base.georeference import GeoReference as Ref
+
+        other = Dataset.from_array(
+            arr=np.full((4, 4), 7.0, dtype="float32"),
+            geo_ref=Ref(top_left_corner=(99.0, 88.0), cell_size=0.01, epsg=4326),
+            no_data_value=-1.0,
+        )
+        with pytest.raises(ValueError, match="geotransform"):
+            TrainingExtractor().extract(_raster(TWO_GROUPS), other)
+
+    def test_non_integer_labels_are_refused_rather_than_truncated(self):
+        """Casting 7.6 to 7 silently merges it into a class it is not in."""
+        marks = np.full((4, 4), -1.0, dtype="float32")
+        marks[0, 0] = 7.6
+        marks[0, 3] = 9.4
+        with pytest.raises(ValueError, match="non-integer"):
+            TrainingExtractor().extract(
+                _raster(TWO_GROUPS), _raster(marks, no_data=-1.0)
+            )
