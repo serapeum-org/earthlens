@@ -334,3 +334,23 @@ class TestTheUncoveredBranches:
             result, write_to=tmp_path
         )
         assert written[0].name == "analysis_0_ndvi.tif"
+
+
+class TestANonIterableArgument:
+    """Round 3 L1: a non-iterable bad argument raised a bare TypeError."""
+
+    @pytest.mark.parametrize("bad", [123, 3.5], ids=["int", "float"])
+    def test_a_non_iterable_is_a_validation_error_not_a_bare_type_error(self, bad):
+        """`RasterAnalysis.of(7)` used to raise `'int' object is not iterable`.
+
+        The docstring promises a `ValueError`; `ValidationError` is one, and
+        now the message names what was expected instead of leaking a loop's
+        internal `TypeError`.
+        """
+        with pytest.raises(ValidationError, match="RasterOperation, a chain"):
+            RasterAnalysis.of(bad)
+
+    def test_a_string_is_still_rejected(self):
+        """A str is iterable, so it fails later - but still as a validation error."""
+        with pytest.raises(ValidationError):
+            RasterAnalysis.of("ndvi")

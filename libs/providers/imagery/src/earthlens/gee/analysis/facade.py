@@ -141,11 +141,26 @@ class RasterAnalysis(OperationChain):
         Returns:
             A tuple of operations, with chains flattened one level so a chain
             handed in extends the run rather than nesting inside it.
+
+        Raises:
+            ValueError: If `value` is neither an operation nor iterable - an
+                `int` or `float` would otherwise reach the loop below and raise
+                a bare `TypeError: 'int' object is not iterable`, which pydantic
+                does not fold into the `ValidationError` the caller expects
+                (and which, being a `ValueError` subclass, matches this
+                operation's documented contract).
         """
         if isinstance(value, RasterOperation):
             value = (value,)
+        try:
+            candidates = list(value)
+        except TypeError:
+            raise ValueError(
+                f"operations must be a RasterOperation, a chain, or a sequence "
+                f"of them; got {type(value).__name__}, which is neither"
+            ) from None
         flattened: list[RasterOperation] = []
-        for operation in value:
+        for operation in candidates:
             # One `isinstance` covers both, now that an analysis *is* a chain.
             if isinstance(operation, OperationChain):
                 flattened.extend(operation.operations)
