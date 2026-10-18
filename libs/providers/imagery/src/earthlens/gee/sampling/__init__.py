@@ -32,8 +32,9 @@ from rtree import index
 from earthlens.gee.features import create_feature
 from earthlens.gee.io import feature_collection_to_gdf as _fc_to_gdf
 from earthlens.gee.sampling.base import Sampler
+from earthlens.gee.sampling.point import PointSampler
 
-__all__ = ["Sampler", "sample_points", "sample_points_to_gdf"]
+__all__ = ["PointSampler", "Sampler", "sample_points", "sample_points_to_gdf"]
 
 
 def _reducer_whitelist() -> frozenset[str]:

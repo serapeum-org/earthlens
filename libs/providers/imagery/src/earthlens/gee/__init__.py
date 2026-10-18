@@ -45,6 +45,9 @@ Public surface (re-exported from this package):
 * `sample_points` / `sample_points_to_gdf` — sample a
   raster at point locations via leaf-batched `reduceRegions`; the
   `_to_gdf` variant returns a `GeoDataFrame` via `getInfo()`.
+* `Sampler` / `PointSampler` — the object-oriented sampling family:
+  a frozen base holding `scale_m` + a `Reducer`, and the point
+  strategy the two functions above now wrap.
 * `feature_collection_to_dataframe` /
   `feature_collections_to_dataframe` /
   `feature_collection_to_gdf` — download
@@ -285,7 +288,12 @@ from earthlens.gee.reducers import (
     Sum,
     resolve_reducer,
 )
-from earthlens.gee.sampling import sample_points, sample_points_to_gdf
+from earthlens.gee.sampling import (
+    PointSampler,
+    Sampler,
+    sample_points,
+    sample_points_to_gdf,
+)
 from earthlens.gee.sinks import (
     SINKS,
     AssetSink,
@@ -332,6 +340,8 @@ __all__ = [
     "feature_collections_to_dataframe",
     "sample_points",
     "sample_points_to_gdf",
+    "Sampler",
+    "PointSampler",
     "TaskInfo",
     "list_recent_tasks",
     "get_task_status",
