@@ -119,6 +119,7 @@ _EXPECTED_EXPORTS = {
     "create_geometry",
     "create_feature",
     "GeometryConverter",
+    "FeatureDownloader",
     "sample_points",
     "feature_collection_to_dataframe",
     "feature_collection_to_gdf",

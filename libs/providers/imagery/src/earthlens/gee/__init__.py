@@ -39,6 +39,9 @@ Public surface (re-exported from this package):
   `GeoDataFrame` → `ee.Geometry` / `ee.FeatureCollection` converters.
 * `GeometryConverter` — the configurable, `LineString`-capable class
   form of those converters, shared across the sampling family.
+* `FeatureDownloader` — the class form of the download helpers below,
+  carrying the thread-pool / retry budget and returning a pyramids
+  `FeatureCollection` from its `to_gdf`.
 * `sample_points` / `sample_points_to_gdf` — sample a
   raster at point locations via leaf-batched `reduceRegions`; the
   `_to_gdf` variant returns a `GeoDataFrame` via `getInfo()`.
@@ -292,7 +295,7 @@ from earthlens.gee.sinks import (
     UrlSink,
     resolve_sink,
 )
-from earthlens.gee.vector import GeometryConverter
+from earthlens.gee.vector import FeatureDownloader, GeometryConverter
 from earthlens.gee.work import (
     Artifact,
     DownloadResult,
@@ -323,6 +326,7 @@ __all__ = [
     "create_geometry",
     "create_feature",
     "GeometryConverter",
+    "FeatureDownloader",
     "feature_collection_to_dataframe",
     "feature_collection_to_gdf",
     "feature_collections_to_dataframe",

@@ -16,6 +16,8 @@ the rendered API.
 
 ::: earthlens.gee.vector.geometry
 
+::: earthlens.gee.vector.download
+
 ::: earthlens.gee.reducers
 
 ::: earthlens.gee.engines
