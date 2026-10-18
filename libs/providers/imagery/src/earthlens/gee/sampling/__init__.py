@@ -32,6 +32,7 @@ from rtree import index
 from earthlens.gee.features import create_feature
 from earthlens.gee.io import feature_collection_to_gdf as _fc_to_gdf
 from earthlens.gee.sampling.base import Sampler
+from earthlens.gee.sampling.histogram import ZonalHistogram
 from earthlens.gee.sampling.point import PointSampler
 from earthlens.gee.sampling.random import RandomSampler, StratifiedSampler
 from earthlens.gee.sampling.region import RegionSampler, ZonalStrategy, zonal_stats
@@ -46,6 +47,7 @@ __all__ = [
     "StratifiedSampler",
     "TimeSeriesSampler",
     "TransectSampler",
+    "ZonalHistogram",
     "ZonalStrategy",
     "sample_points",
     "sample_points_to_gdf",

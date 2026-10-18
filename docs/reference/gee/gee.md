@@ -22,6 +22,8 @@ the rendered API.
 
 ::: earthlens.gee.vector.arrays
 
+::: earthlens.gee.vector.vectorize
+
 ::: earthlens.gee.reducers
 
 ::: earthlens.gee.engines
@@ -59,6 +61,8 @@ the rendered API.
 ::: earthlens.gee.sampling.transect
 
 ::: earthlens.gee.sampling.timeseries
+
+::: earthlens.gee.sampling.histogram
 
 ::: earthlens.gee.jobs
 

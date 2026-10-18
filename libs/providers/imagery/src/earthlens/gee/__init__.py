@@ -47,6 +47,9 @@ Public surface (re-exported from this package):
   write one back out, all through a pyramids `FeatureCollection`.
 * `to_numpy` / `to_netcdf` — bridge a downloaded `Dataset` to a numpy
   array and a `DatasetCollection` to NetCDF, both via pyramids.
+* `Vectorize` — raster → polygons, server-side via
+  `ee.Image.reduceToVectors` or client-side via pyramids'
+  `Dataset.to_polygons`.
 * `sample_points` / `sample_points_to_gdf` — sample a
   raster at point locations via leaf-batched `reduceRegions`; the
   `_to_gdf` variant returns a `GeoDataFrame` via `getInfo()`.
@@ -57,6 +60,8 @@ Public surface (re-exported from this package):
   random / stratified training-point, line-transect, and per-point
   time-series strategies. `zonal_stats` is the `RegionSampler`
   convenience wrapper.
+* `ZonalHistogram` — per-zone, per-class pixel counts and areas
+  for a categorical raster (count / fraction / area).
 * `feature_collection_to_dataframe` /
   `feature_collections_to_dataframe` /
   `feature_collection_to_gdf` — download
@@ -307,6 +312,7 @@ from earthlens.gee.sampling import (
     StratifiedSampler,
     TimeSeriesSampler,
     TransectSampler,
+    ZonalHistogram,
     ZonalStrategy,
     sample_points,
     sample_points_to_gdf,
@@ -326,6 +332,7 @@ from earthlens.gee.vector import (
     FeatureDownloader,
     GeometryConverter,
     VectorCodec,
+    Vectorize,
     to_netcdf,
     to_numpy,
 )
@@ -361,6 +368,7 @@ __all__ = [
     "GeometryConverter",
     "FeatureDownloader",
     "VectorCodec",
+    "Vectorize",
     "to_numpy",
     "to_netcdf",
     "feature_collection_to_dataframe",
@@ -375,6 +383,7 @@ __all__ = [
     "StratifiedSampler",
     "TimeSeriesSampler",
     "TransectSampler",
+    "ZonalHistogram",
     "ZonalStrategy",
     "zonal_stats",
     "TaskInfo",

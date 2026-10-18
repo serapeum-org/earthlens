@@ -12,6 +12,8 @@ builds on:
 * `VectorCodec` - read vector files (shp / geojson / gpkg / kml / parquet, and
   CSV point tables) into an `ee.FeatureCollection` and write one back out, every
   read and write going through a pyramids `FeatureCollection`.
+* `Vectorize` - turn a categorical / thresholded raster into polygons, server-side via `ee.Image.reduceToVectors` or client-side via pyramids'
+  `Dataset.to_polygons`.
 * `to_numpy` / `to_netcdf` - bridge a downloaded `Dataset` to a numpy array and a
   `DatasetCollection` to NetCDF, both via pyramids (no `xee` / `xarray`).
 
@@ -26,13 +28,16 @@ from earthlens.gee.vector.arrays import to_netcdf, to_numpy
 from earthlens.gee.vector.codec import VectorCodec
 from earthlens.gee.vector.download import FeatureDownloader, FeatureDownloaderConfig
 from earthlens.gee.vector.geometry import GeometryConverter, GeometryConverterConfig
+from earthlens.gee.vector.vectorize import SYNC_FETCH_LIMIT, Vectorize
 
 __all__ = [
     "FeatureDownloader",
     "FeatureDownloaderConfig",
     "GeometryConverter",
     "GeometryConverterConfig",
+    "SYNC_FETCH_LIMIT",
     "VectorCodec",
+    "Vectorize",
     "to_netcdf",
     "to_numpy",
 ]
