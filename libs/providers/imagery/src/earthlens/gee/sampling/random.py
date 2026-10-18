@@ -33,10 +33,7 @@ __all__ = ["RandomSampler", "StratifiedSampler"]
 class RandomSampler(Sampler):
     """Draw `n_points` random samples over a region.
 
-    Args:
-        scale_m: The pixel scale (metres) at which to sample.
-        n_points: How many pixels to draw.
-        seed: The random seed for reproducibility, or `None`.
+    `scale_m` comes from the `Sampler` base.
 
     Examples:
         - A random sampler carries its point budget and seed:
@@ -49,10 +46,12 @@ class RandomSampler(Sampler):
             ```
     """
 
-    _REGION_GEOM_TYPES: ClassVar[frozenset[str]] = frozenset({"Polygon", "MultiPolygon"})
+    _REGION_GEOM_TYPES: ClassVar[frozenset[str]] = frozenset(
+        {"Polygon", "MultiPolygon"}
+    )
 
-    n_points: int
-    seed: int | None = None
+    n_points: int  # how many pixels to draw
+    seed: int | None = None  # random seed for reproducibility, or None
 
     def sample(self, image: ee.Image, geometry: GeoDataFrame) -> ee.FeatureCollection:
         """Draw random points over the region and read `image` at each.
@@ -83,14 +82,9 @@ class RandomSampler(Sampler):
 class StratifiedSampler(Sampler):
     """Draw per-class training points from a class/label band.
 
-    Args:
-        scale_m: The pixel scale (metres) at which to sample.
-        class_band: The band naming each pixel's class.
-        n_per_class: A scalar count applied to every class, or a
-            `{class_value: count}` mapping for exact per-class counts.
-        class_values: The class values to sample when `n_per_class` is a scalar;
-            `None` samples every class present.
-        seed: The random seed for reproducibility, or `None`.
+    A scalar `n_per_class` draws that many per class; a `{class_value: count}`
+    mapping draws exact per-class counts. `scale_m` comes from the `Sampler`
+    base.
 
     Examples:
         - A mapping gives each class its own count:
@@ -105,12 +99,16 @@ class StratifiedSampler(Sampler):
             ```
     """
 
-    _REGION_GEOM_TYPES: ClassVar[frozenset[str]] = frozenset({"Polygon", "MultiPolygon"})
+    _REGION_GEOM_TYPES: ClassVar[frozenset[str]] = frozenset(
+        {"Polygon", "MultiPolygon"}
+    )
 
-    class_band: str
-    n_per_class: int | dict[int, int]
-    class_values: tuple[int, ...] | None = None
-    seed: int | None = None
+    class_band: str  # the band naming each pixel's class
+    n_per_class: int | dict[int, int]  # scalar count per class, or {class: count}
+    class_values: tuple[int, ...] | None = (
+        None  # classes to draw (scalar case); None = all
+    )
+    seed: int | None = None  # random seed for reproducibility, or None
 
     def sample(self, image: ee.Image, geometry: GeoDataFrame) -> ee.FeatureCollection:
         """Draw per-class points over the region and read `image` at each.
@@ -134,9 +132,7 @@ class StratifiedSampler(Sampler):
         if isinstance(self.n_per_class, dict):
             keys = list(self.n_per_class)
             class_values: list[int] | None = keys
-            class_points: list[int] | None = [
-                self.n_per_class[value] for value in keys
-            ]
+            class_points: list[int] | None = [self.n_per_class[value] for value in keys]
             num_points = 0
         else:
             class_values = (

@@ -40,18 +40,7 @@ class ZonalHistogram(Sampler):
     pixel `count`, the `fraction` of the zone (columns sum to 1), or the ground
     `area` in square metres (summed from `ee.Image.pixelArea()`, correct on a
     geographic CRS). Class columns are labelled from `class_labels` when given,
-    otherwise by the raw integer code.
-
-    Args:
-        scale_m: The pixel scale (metres) for the reduction.
-        class_band: The categorical band whose classes are counted per zone.
-        normalize: `"count"` (pixels), `"fraction"` (of the zone), or `"area"`
-            (m^2). Defaults to `"count"`.
-        class_labels: Maps a class code to a column name; unmapped codes use the
-            raw code as a string. Defaults to `None` (all raw codes).
-        tile_scale: Earth Engine's `tileScale`; raise it (2 or 4) to let an
-            out-of-memory aggregation over a large zone layer succeed. Must be
-            within `0.1`-`16`. Defaults to `1.0`.
+    otherwise by the raw integer code. `scale_m` comes from the `Sampler` base.
 
     Examples:
         - A zonal histogram carries its class band and normalisation:
@@ -77,10 +66,10 @@ class ZonalHistogram(Sampler):
         {"Polygon", "MultiPolygon"}
     )
 
-    class_band: str
-    normalize: Literal["count", "fraction", "area"] = "count"
-    class_labels: dict[int, str] | None = None
-    tile_scale: float = 1.0
+    class_band: str  # the categorical band whose classes are counted per zone
+    normalize: Literal["count", "fraction", "area"] = "count"  # column unit
+    class_labels: dict[int, str] | None = None  # code -> column name; None = raw codes
+    tile_scale: float = 1.0  # Earth Engine tileScale (0.1-16); raise to 2/4 on OOM
 
     @field_validator("tile_scale")
     @classmethod

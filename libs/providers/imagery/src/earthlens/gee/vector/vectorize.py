@@ -50,18 +50,6 @@ class Vectorize(BaseModel):
     `to_polygons` reduces an in-memory pyramids `Dataset` locally. Both carry the
     class value as `label_property`.
 
-    Args:
-        scale_m: The pixel scale (metres) at which to vectorise.
-        geometry_type: `"polygon"`, `"centroid"`, or `"bb"` (bounding box).
-            Defaults to `"polygon"`.
-        eight_connected: Whether diagonally-touching pixels join one polygon.
-            Defaults to `True`.
-        label_property: The property name carrying each polygon's class value.
-            Defaults to `"label"`.
-        reducer: An optional registry reducer name; when given, its statistic is
-            attached to each polygon. Defaults to `None`.
-        max_pixels: The `reduceToVectors` pixel budget. Defaults to `100_000_000`.
-
     Examples:
         - A vectoriser carries its geometry type and connectedness:
             ```python
@@ -84,12 +72,12 @@ class Vectorize(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    scale_m: float
-    geometry_type: Literal["polygon", "centroid", "bb"] = "polygon"
-    eight_connected: bool = True
-    label_property: str = "label"
-    reducer: str | None = None
-    max_pixels: int = 100_000_000
+    scale_m: float  # pixel scale (metres) at which to vectorise
+    geometry_type: Literal["polygon", "centroid", "bb"] = "polygon"  # output shape
+    eight_connected: bool = True  # diagonally-touching pixels join one polygon
+    label_property: str = "label"  # property carrying each polygon's class value
+    reducer: str | None = None  # optional registry reducer attached per polygon
+    max_pixels: int = 100_000_000  # reduceToVectors pixel budget
 
     def to_ee(self, image: ee.Image) -> ee.FeatureCollection:
         """Vectorise `image` server-side with `reduceToVectors`.

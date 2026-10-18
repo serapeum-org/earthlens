@@ -45,16 +45,11 @@ class ZonalStrategy(StrEnum):
 class RegionSampler(Sampler):
     """Reduce an image over each polygon, server-side or client-side.
 
-    Args:
-        scale_m: The pixel scale (metres) for the reduction.
-        strategy: `ZonalStrategy.SERVER` (Earth Engine) or `CLIENT` (pyramids).
-            Defaults to server.
-        stats: The statistics to compute, one column per entry. Each must be a
-            reducer the `earthlens.gee.reducers` registry knows. Defaults to
-            `("mean",)`.
-        tile_scale: Earth Engine's `tileScale` for the server arm; raising it
-            (to 2 or 4) lets an out-of-memory aggregation succeed. Must be within
-            `0.1`-`16`. Defaults to `1.0`.
+    `strategy` fixes where the per-polygon reduction runs: `ZonalStrategy.SERVER`
+    runs `reduceRegions` in Earth Engine, `ZonalStrategy.CLIENT` reduces an
+    in-memory pyramids `Dataset` locally. Either way it returns one row per
+    polygon with a column per requested stat. `scale_m` and `reducer` come from
+    the `Sampler` base.
 
     Examples:
         - A region sampler carries its strategy and requested stats:
@@ -80,9 +75,9 @@ class RegionSampler(Sampler):
         {"Polygon", "MultiPolygon"}
     )
 
-    strategy: ZonalStrategy = ZonalStrategy.SERVER
-    stats: tuple[str, ...] = ("mean",)
-    tile_scale: float = 1.0
+    strategy: ZonalStrategy = ZonalStrategy.SERVER  # Earth Engine or local pyramids
+    stats: tuple[str, ...] = ("mean",)  # one column per registry reducer name
+    tile_scale: float = 1.0  # Earth Engine tileScale (0.1-16); raise to 2/4 on OOM
 
     @field_validator("stats")
     @classmethod

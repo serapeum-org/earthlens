@@ -40,18 +40,6 @@ class TableSink(BaseModel):
     `earthlens.gee.jobs` tracks by id. With `wait_for_export=True` it blocks
     until the task reaches a terminal state first.
 
-    Args:
-        destination: Which `Export.table.to*` factory to use. Defaults to
-            `"drive"`.
-        folder: The Drive folder (`drive`).
-        bucket: The Cloud Storage bucket (`gcs`).
-        asset_id: The asset path (`asset` / `featureview`).
-        table: The BigQuery table (`bigquery`).
-        file_format: The export file format for the file destinations.
-            Defaults to `"CSV"`.
-        wait_for_export: Block until the task finishes before returning.
-            Defaults to `False`.
-
     Examples:
         - A sink is a frozen value object, constructed without Earth Engine:
             ```python
@@ -75,13 +63,15 @@ class TableSink(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    destination: Literal["drive", "gcs", "asset", "bigquery", "featureview"] = "drive"
-    folder: str | None = None
-    bucket: str | None = None
-    asset_id: str | None = None
-    table: str | None = None
-    file_format: str = "CSV"
-    wait_for_export: bool = False
+    destination: Literal["drive", "gcs", "asset", "bigquery", "featureview"] = (
+        "drive"  # Export.table.to* factory
+    )
+    folder: str | None = None  # Drive folder (drive)
+    bucket: str | None = None  # Cloud Storage bucket (gcs)
+    asset_id: str | None = None  # asset path (asset / featureview)
+    table: str | None = None  # BigQuery table (bigquery)
+    file_format: str = "CSV"  # export file format for the file destinations
+    wait_for_export: bool = False  # block until the task finishes
 
     def export(
         self, work_unit: FeatureWorkUnit, *, description: str | None = None
