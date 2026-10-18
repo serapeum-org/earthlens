@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import geopandas as gpd
 import pytest
+from pydantic import ValidationError
 from shapely.geometry import Point, Polygon
 
 from earthlens.gee.sampling import random as random_module
@@ -114,3 +115,22 @@ class TestStratifiedSampler:
             StratifiedSampler(scale_m=30, class_band="lc", n_per_class=10).sample(
                 _FakeImage(), gdf
             )
+
+
+class TestPositiveCounts:
+    """Point budgets must be positive, failing closed at construction."""
+
+    def test_random_n_points_must_be_positive(self):
+        """RandomSampler rejects a non-positive n_points."""
+        with pytest.raises(ValidationError):
+            RandomSampler(scale_m=30, n_points=0)
+
+    def test_stratified_scalar_count_must_be_positive(self):
+        """A non-positive scalar n_per_class is refused."""
+        with pytest.raises(ValidationError):
+            StratifiedSampler(scale_m=30, class_band="lc", n_per_class=0)
+
+    def test_stratified_mapping_count_must_be_positive(self):
+        """A mapped count of zero is refused."""
+        with pytest.raises(ValidationError):
+            StratifiedSampler(scale_m=30, class_band="lc", n_per_class={1: 0})

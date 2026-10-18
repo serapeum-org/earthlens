@@ -20,6 +20,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar, cast
 
+from pydantic import Field, field_validator
+
 from earthlens.gee.sampling.base import Sampler
 from earthlens.gee.vector.geometry import GeometryConverter
 
@@ -50,7 +52,7 @@ class RandomSampler(Sampler):
         {"Polygon", "MultiPolygon"}
     )
 
-    n_points: int  # how many pixels to draw
+    n_points: int = Field(gt=0)  # how many pixels to draw
     seed: int | None = None  # random seed for reproducibility, or None
 
     def sample(self, image: ee.Image, geometry: GeoDataFrame) -> ee.FeatureCollection:
@@ -109,6 +111,25 @@ class StratifiedSampler(Sampler):
         None  # classes to draw (scalar case); None = all
     )
     seed: int | None = None  # random seed for reproducibility, or None
+
+    @field_validator("n_per_class")
+    @classmethod
+    def _counts_are_positive(cls, value: int | dict[int, int]) -> int | dict[int, int]:
+        """Refuse a non-positive per-class count, which would draw nothing.
+
+        Args:
+            value: The scalar count, or the `{class: count}` mapping.
+
+        Returns:
+            `value` unchanged once every count is positive.
+
+        Raises:
+            ValueError: If the scalar, or any mapped count, is not greater than 0.
+        """
+        counts = value.values() if isinstance(value, dict) else [value]
+        if any(count <= 0 for count in counts):
+            raise ValueError("n_per_class counts must be positive")
+        return value
 
     def sample(self, image: ee.Image, geometry: GeoDataFrame) -> ee.FeatureCollection:
         """Draw per-class points over the region and read `image` at each.

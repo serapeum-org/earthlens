@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING, ClassVar, cast
 
 import geopandas as gpd
 import numpy as np
+from pydantic import Field
 
 from earthlens.gee.sampling.base import Sampler
 from earthlens.gee.sampling.point import PointSampler
@@ -51,7 +52,7 @@ class TransectSampler(Sampler):
         {"LineString", "MultiLineString"}
     )
 
-    n_points: int = 100
+    n_points: int = Field(default=100, gt=0)
     band: int = 0
 
     def sample(self, image: ee.Image, geometry: GeoDataFrame) -> ee.FeatureCollection:

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import geopandas as gpd
 import pytest
+from pydantic import ValidationError
 from shapely.geometry import LineString, Point
 
 pytest.importorskip("ee")
@@ -92,3 +93,12 @@ class TestTransectSamplerClient:
         assert dataset.calls[0]["n"] == 12
         assert dataset.calls[0]["band"] == 2
         assert dataset.calls[0]["line"].geom_type == "LineString"
+
+
+class TestPositiveNPoints:
+    """A transect needs a positive point count."""
+
+    def test_n_points_must_be_positive(self):
+        """TransectSampler rejects a non-positive n_points."""
+        with pytest.raises(ValidationError):
+            TransectSampler(scale_m=30, n_points=0)
