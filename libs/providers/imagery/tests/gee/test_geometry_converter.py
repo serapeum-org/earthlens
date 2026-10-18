@@ -136,3 +136,13 @@ class TestToEe:
         )
         with pytest.raises(ValueError, match="row 1 .MultiPoint."):
             GeometryConverter().to_ee(gdf)
+
+
+class TestGeometryConverterProperties:
+    """The converter exposes its configured projection read-only."""
+
+    def test_properties_echo_the_config(self):
+        """epsg / columns return the constructor's values."""
+        converter = GeometryConverter(epsg=3857, columns=["a", "b"])
+        assert converter.epsg == 3857
+        assert converter.columns == ("a", "b")

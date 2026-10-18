@@ -101,3 +101,16 @@ class TestToGdf:
         result = FeatureDownloader().to_gdf(_FakeFC(info={"features": []}))
         assert isinstance(result, FeatureCollection)
         assert len(result) == 0
+
+
+class TestFeatureDownloaderProperties:
+    """The downloader exposes its configured budget read-only."""
+
+    def test_properties_echo_the_config(self):
+        """pool_size / tries / backoff return the constructor's values."""
+        downloader = FeatureDownloader(pool_size=8, tries=3, backoff=1.5)
+        assert (downloader.pool_size, downloader.tries, downloader.backoff) == (
+            8,
+            3,
+            1.5,
+        )
