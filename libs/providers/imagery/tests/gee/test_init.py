@@ -126,6 +126,8 @@ _EXPECTED_EXPORTS = {
     "RegionSampler",
     "RandomSampler",
     "StratifiedSampler",
+    "TimeSeriesSampler",
+    "TransectSampler",
     "ZonalStrategy",
     "zonal_stats",
     "feature_collection_to_dataframe",

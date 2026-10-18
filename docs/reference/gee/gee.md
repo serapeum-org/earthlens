@@ -50,6 +50,10 @@ the rendered API.
 
 ::: earthlens.gee.sampling.random
 
+::: earthlens.gee.sampling.transect
+
+::: earthlens.gee.sampling.timeseries
+
 ::: earthlens.gee.jobs
 
 ::: earthlens.gee.io

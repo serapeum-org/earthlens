@@ -35,6 +35,8 @@ from earthlens.gee.sampling.base import Sampler
 from earthlens.gee.sampling.point import PointSampler
 from earthlens.gee.sampling.random import RandomSampler, StratifiedSampler
 from earthlens.gee.sampling.region import RegionSampler, ZonalStrategy, zonal_stats
+from earthlens.gee.sampling.timeseries import TimeSeriesSampler
+from earthlens.gee.sampling.transect import TransectSampler
 
 __all__ = [
     "PointSampler",
@@ -42,6 +44,8 @@ __all__ = [
     "RegionSampler",
     "Sampler",
     "StratifiedSampler",
+    "TimeSeriesSampler",
+    "TransectSampler",
     "ZonalStrategy",
     "sample_points",
     "sample_points_to_gdf",
