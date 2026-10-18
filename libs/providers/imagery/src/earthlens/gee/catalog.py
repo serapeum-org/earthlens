@@ -310,6 +310,9 @@ class Band(SummarisedLeaf):
         max: Typical / valid maximum DN, or `None`.
         estimated_range: `True` if `min`/`max` are sample-based
             estimates rather than hard bounds.
+        classes: For a categorical band, the integer pixel value to
+            class-name legend from the dataset's STAC `gee:classes`,
+            or `None` for a continuous band.
 
     Examples:
         - Build a reflectance band and read its scaling:
@@ -352,6 +355,7 @@ class Band(SummarisedLeaf):
     min: float | None = None
     max: float | None = None
     estimated_range: bool = False
+    classes: dict[int, str] | None = None
 
 
 class Extent(SummarisedLeaf):
