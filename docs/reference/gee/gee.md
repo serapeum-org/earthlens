@@ -46,6 +46,10 @@ the rendered API.
 
 ::: earthlens.gee.sampling.point
 
+::: earthlens.gee.sampling.region
+
+::: earthlens.gee.sampling.random
+
 ::: earthlens.gee.jobs
 
 ::: earthlens.gee.io

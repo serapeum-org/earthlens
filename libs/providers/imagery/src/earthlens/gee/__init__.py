@@ -45,9 +45,11 @@ Public surface (re-exported from this package):
 * `sample_points` / `sample_points_to_gdf` — sample a
   raster at point locations via leaf-batched `reduceRegions`; the
   `_to_gdf` variant returns a `GeoDataFrame` via `getInfo()`.
-* `Sampler` / `PointSampler` — the object-oriented sampling family:
-  a frozen base holding `scale_m` + a `Reducer`, and the point
-  strategy the two functions above now wrap.
+* `Sampler` / `PointSampler` / `RegionSampler` / `RandomSampler` /
+  `StratifiedSampler` — the object-oriented sampling family: a frozen
+  base holding `scale_m` + a `Reducer`, plus the point, polygon-zonal
+  (with a `ZonalStrategy`) and random / stratified training-point
+  strategies. `zonal_stats` is the `RegionSampler` convenience wrapper.
 * `feature_collection_to_dataframe` /
   `feature_collections_to_dataframe` /
   `feature_collection_to_gdf` — download
@@ -290,9 +292,14 @@ from earthlens.gee.reducers import (
 )
 from earthlens.gee.sampling import (
     PointSampler,
+    RandomSampler,
+    RegionSampler,
     Sampler,
+    StratifiedSampler,
+    ZonalStrategy,
     sample_points,
     sample_points_to_gdf,
+    zonal_stats,
 )
 from earthlens.gee.sinks import (
     SINKS,
@@ -342,6 +349,11 @@ __all__ = [
     "sample_points_to_gdf",
     "Sampler",
     "PointSampler",
+    "RegionSampler",
+    "RandomSampler",
+    "StratifiedSampler",
+    "ZonalStrategy",
+    "zonal_stats",
     "TaskInfo",
     "list_recent_tasks",
     "get_task_status",
