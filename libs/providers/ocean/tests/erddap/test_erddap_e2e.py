@@ -19,6 +19,7 @@ import pandas as pd
 import pytest
 
 from earthlens.earthlens import EarthLens
+from earthlens.testing import skip_on_public_endpoint_block
 
 pytestmark = [pytest.mark.e2e, pytest.mark.erddap]
 
@@ -44,16 +45,19 @@ _GRIDDAP_CASES = [
 @pytest.mark.parametrize("dataset, variable, start, end", _GRIDDAP_CASES)
 def test_griddap_fetches_readable_netcdf(tmp_path, dataset, variable, start, end):
     """Every shipped griddap dataset writes a pyramids-readable NetCDF in-coverage."""
-    result = EarthLens(
-        data_source="erddap",
-        dataset=dataset,
-        variables=[variable],
-        start=start,
-        end=end,
-        lat_lim=[0.0, 1.0],
-        lon_lim=[150.0, 151.0],
-        path=str(tmp_path),
-    ).download()
+    try:
+        result = EarthLens(
+            data_source="erddap",
+            dataset=dataset,
+            variables=[variable],
+            start=start,
+            end=end,
+            lat_lim=[0.0, 1.0],
+            lon_lim=[150.0, 151.0],
+            path=str(tmp_path),
+        ).download()
+    except Exception as exc:  # noqa: BLE001 - keyless-host throttle -> skip
+        skip_on_public_endpoint_block(exc)
 
     assert isinstance(result, list) and result
     nc_path = result[0]
@@ -83,16 +87,19 @@ def test_griddap_out_of_coverage_raises(tmp_path: Path):
 @_offline_skip
 def test_tabledap_ndbc_buoys(tmp_path: Path):
     """A small NDBC buoy tabledap pull returns a pandas DataFrame."""
-    df = EarthLens(
-        data_source="erddap",
-        dataset="cwwcNDBCMet",
-        variables=["station", "time", "WTMP"],
-        start="2023-01-01",
-        end="2023-01-01",
-        lat_lim=[36.0, 37.0],
-        lon_lim=[-123.0, -122.0],
-        path=str(tmp_path),
-    ).download()
+    try:
+        df = EarthLens(
+            data_source="erddap",
+            dataset="cwwcNDBCMet",
+            variables=["station", "time", "WTMP"],
+            start="2023-01-01",
+            end="2023-01-01",
+            lat_lim=[36.0, 37.0],
+            lon_lim=[-123.0, -122.0],
+            path=str(tmp_path),
+        ).download()
+    except Exception as exc:  # noqa: BLE001 - keyless-host throttle -> skip
+        skip_on_public_endpoint_block(exc)
 
     assert isinstance(df, pd.DataFrame)
     assert not df.empty

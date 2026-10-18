@@ -61,6 +61,7 @@ from earthlens.testing._live import (
     require_reachable,
     reset_reachability_cache,
     skip_live_unavailable,
+    skip_on_public_endpoint_block,
     skip_on_upstream,
 )
 from earthlens.testing._markers import MARKERS, pytest_configure
@@ -99,6 +100,7 @@ __all__ = [
     "require_reachable",
     "reset_reachability_cache",
     "skip_live_unavailable",
+    "skip_on_public_endpoint_block",
     "s3_emulator",
     "seed_s3",
     "skip_on_upstream",

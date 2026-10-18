@@ -431,6 +431,69 @@ class TestResolveAdminAndEmpty:
         assert df.empty and list(df.columns) == ["a", "b"]
 
 
+def _record_log() -> list[str]:
+    """Collect loguru messages emitted from here on, newest last.
+
+    Returns:
+        The list each message is appended to, in emission order.
+    """
+    from loguru import logger
+
+    messages: list[str] = []
+    sink_id = logger.add(lambda record: messages.append(record), level="INFO")
+    _ADDED_SINKS.append(sink_id)
+    return messages
+
+
+def _record_sleeps(monkeypatch) -> list[float]:
+    """Record the retry loop's waits, leaving `HttpClient`'s own back-off alone.
+
+    Args:
+        monkeypatch: pytest's patcher, so the seam is undone per test.
+
+    Returns:
+        The list the loop appends each wait to, in order.
+    """
+    waits: list[float] = []
+    monkeypatch.setattr(_helpers, "_sleep", waits.append)
+    return waits
+
+
+def _serve_in_order(pages: list[str]):
+    """Build a `HttpClient.get` stand-in serving `pages` front to back.
+
+    Args:
+        pages: Response bodies to hand out, consumed from the front.
+
+    Returns:
+        A callable with `HttpClient.get`'s signature. Reads past the end of
+        `pages` repeat the last body rather than raising, so a test asserts
+        the read count instead of relying on an exception it never triggers.
+    """
+    served: list[str] = []
+
+    def _get(self, url, **kwargs):
+        served.append(url)
+        return _TextResponse(pages[min(len(served), len(pages)) - 1])
+
+    _get.served = served
+    return _get
+
+
+#: Loguru sink ids added by `_record_log`, removed after each test.
+_ADDED_SINKS: list[int] = []
+
+
+@pytest.fixture(autouse=True)
+def _drop_log_sinks():
+    """Remove any sink `_record_log` added, so recorders never outlive a test."""
+    yield
+    from loguru import logger
+
+    while _ADDED_SINKS:
+        logger.remove(_ADDED_SINKS.pop())
+
+
 class TestInformRelease:
     """Discovery and parsing of the published INFORM Risk release workbook."""
 
@@ -472,6 +535,63 @@ class TestInformRelease:
             _helpers.HttpClient,
             "get",
             lambda self, url, **kwargs: _TextResponse("<p>no downloads</p>"),
+        )
+        with pytest.raises(ValueError, match="No INFORM Risk release workbook"):
+            _helpers.inform_release_url()
+
+    def test_release_url_rereads_a_page_that_rendered_no_link(self, monkeypatch):
+        """A linkless render is re-read, and the recovered workbook memoised."""
+        pages = [
+            "<p>no downloads</p>",
+            '<a href="/inform-index/Portals/0/InfoRM/2026/'
+            'INFORM_Risk_2026_v072.xlsx">2026</a>',
+        ]
+        waits = _record_sleeps(monkeypatch)
+        serve = _serve_in_order(pages)
+        monkeypatch.setattr(_helpers.HttpClient, "get", serve)
+        messages = _record_log()
+        url, year = _helpers.inform_release_url()
+        assert year == 2026, "the second read's workbook is used"
+        assert len(serve.served) == 2, f"exactly two reads: {serve.served}"
+        assert waits == [1.0], f"one 1s wait between the two reads: {waits}"
+        assert any("read 1 of 3" in m for m in messages), (
+            f"the re-read must be visible to an operator: {messages}"
+        )
+        assert any("yielded a workbook link on read 2 of 3" in m for m in messages), (
+            f"the recovery must be visible to an operator: {messages}"
+        )
+        assert _helpers._RELEASE_CACHE[_helpers.INFORM_RESULTS_PAGE] == (url, 2026), (
+            "the recovered workbook must be memoised like a first-read one"
+        )
+
+    def test_release_url_stops_rereading_after_the_attempt_budget(self, monkeypatch):
+        """A page that never renders a link raises after exactly three reads."""
+        reads = []
+        waits = _record_sleeps(monkeypatch)
+
+        def _empty(self, url, **kwargs):
+            reads.append(url)
+            return _TextResponse("<p>no downloads</p>")
+
+        monkeypatch.setattr(_helpers.HttpClient, "get", _empty)
+        with pytest.raises(ValueError, match="No INFORM Risk release workbook"):
+            _helpers.inform_release_url()
+        # The literal, not the constant: reading the budget from the module
+        # under test would let a budget of 1 satisfy this vacuously.
+        assert len(reads) == 3, f"expected 3 reads, got {len(reads)}"
+        assert waits == [1.0, 2.0], (
+            f"linear back-off, and none after the last read: {waits}"
+        )
+
+    def test_release_url_with_no_attempt_budget_still_raises_value_error(
+        self, monkeypatch
+    ):
+        """A zero budget reports the documented error, not an unbound local."""
+        monkeypatch.setattr(_helpers, "INFORM_RELEASE_ATTEMPTS", 0)
+        monkeypatch.setattr(
+            _helpers.HttpClient,
+            "get",
+            lambda self, url, **kwargs: _TextResponse("<p>unused</p>"),
         )
         with pytest.raises(ValueError, match="No INFORM Risk release workbook"):
             _helpers.inform_release_url()

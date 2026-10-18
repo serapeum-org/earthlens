@@ -106,13 +106,21 @@ class TestDeafricaE2E:
     """Digital Earth Africa — anonymous, af-south-1."""
 
     def test_wofs_writes_cog(self, tmp_path: Path):
-        """A one-item WOfS pull over Johannesburg writes a readable COG."""
+        """A one-item WOfS pull over Lake Tana writes a readable COG.
+
+        Lake Tana, not a dry inland city: WOfS is Water Observations from
+        Space, and `max_items=1` keeps a single Landsat scene, so the AOI has
+        to be one the first returned scene covers with real observations. The
+        earlier Johannesburg box returned a scene that clipped to all-nodata
+        over the small window (crop produced no valid pixels); a large
+        permanent lake yields a scene full of valid water/dry classifications.
+        """
         stac = STAC(
             start="2024-01-01",
             end="2024-12-31",
             variables={"deafrica/wofs_ls": ["water"]},
-            lat_lim=[-26.5, -26.0],
-            lon_lim=[28.0, 28.5],
+            lat_lim=[11.9, 12.1],
+            lon_lim=[37.2, 37.4],
             path=str(tmp_path),
             endpoint="deafrica",
             max_items=1,

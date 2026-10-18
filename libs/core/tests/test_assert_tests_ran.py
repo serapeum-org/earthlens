@@ -500,12 +500,15 @@ class TestDeadBackendDetection:
         assert out.count("::error::") == 1, f"expected a single annotation: {out}"
         assert "all 2 collected test(s) skipped" in out, f"wrong verdict: {out}"
 
-    def test_an_exempt_backend_alone_still_leaves_the_lane_green(self, guard, tmp_path):
+    def test_two_exempt_backends_both_leave_the_lane_green(self, guard, tmp_path):
         """An exemption is per backend, so a second exempt backend is exempt too."""
-        assert "osm" in guard._EXPECTED_EMPTY, "osm should be a declared exemption"
+        for backend in ("mswep", "wdpa"):
+            assert backend in guard._EXPECTED_EMPTY, (
+                f"{backend} should be a declared exemption"
+            )
         report = _backend_report(
             tmp_path / "r.xml",
-            ("osm", "a", "pytest.skip"),
+            ("mswep", "a", "pytest.skip"),
             ("wdpa", "b", "pytest.skip"),
             ("erddap", "c", None),
         )

@@ -6,7 +6,7 @@ HTTPS and reads its building footprints — no credentials. Gated behind the `e2
 (`osmium`), while the in-memory `pyrosm` engine needs the opt-in `pyrosm` SDK
 (CI injects it with `uv run --with pyrosm`). A default `pytest` run skips it, a
 missing engine SDK skips these tests (via `skipif`, not a collection-time
-`importorskip`, so the `osm` lane deselects them without a spurious skip line),
+`importorskip`, so a skip is reported per test rather than during collection),
 and a transport failure skips rather than fails. The extract is cached under the
 test's `tmp_path` so the run is self-contained.
 
@@ -26,26 +26,28 @@ from earthlens.earthlens import EarthLens
 from earthlens.osm._pbf import download_extract, read_pbf
 from earthlens.testing import skip_on_upstream
 
-# Gate the SDK requirement as a per-test skipif, not a module-level
-# `importorskip`. A module-level importorskip reports a skip during *collection*,
-# so it surfaces even in the `osm` lane — where these `osm_pbf`-marked tests are
-# deselected and never run — printing a misleading "needs pip install pyrosm"
-# line. As a skipif it only reports for selected tests: the tests skip when an
-# engine SDK is absent (the base install), and deselect silently otherwise.
-_MISSING_SDKS = [
-    name for name in ("pyrosm", "osmium") if importlib.util.find_spec(name) is None
-]
+# Gate each engine on its own SDK, as a per-test skipif rather than a
+# module-level `importorskip` — the latter reports during *collection*, before
+# any marker expression applies, so it prints a misleading "needs pip install
+# pyrosm" line for every lane that merely collects this file.
+#
+# One gate per engine, not one for both. `osmium` ships in the `osm` extra
+# while `pyrosm` is opt-in and outside `[all]`, so a shared
+# `skipif(bool(_MISSING_SDKS))` skipped the pyosmium engine everywhere the
+# pyrosm one was unavailable — including the `osm` lane, which has everything
+# the pyosmium test needs.
+#
+# These tests are not deselected by the `osm` lane: the directory auto-tagger
+# marks everything under `tests/osm/` with `osm`, so they carry both markers
+# and `-m "e2e and osm"` collects all four tests here, not two (verified:
+# `4/197 tests collected`). `-m "e2e and osm_pbf"` collects the two below, and
+# the dedicated lane injects `pyrosm` so both engines run there.
+_PYROSM_MISSING = importlib.util.find_spec("pyrosm") is None
+_OSMIUM_MISSING = importlib.util.find_spec("osmium") is None
 
 pytestmark = [
     pytest.mark.e2e,
     pytest.mark.osm_pbf,
-    pytest.mark.skipif(
-        bool(_MISSING_SDKS),
-        reason=(
-            "the pbf e2e needs " + " + ".join(_MISSING_SDKS) + " (pyrosm via "
-            "`pip install pyrosm`, osmium via the osm extra)"
-        ),
-    ),
 ]
 
 # A dense bbox over Valletta / Sliema — stable, plentiful building coverage, so
@@ -54,6 +56,10 @@ _LAT_LIM = [35.88, 35.94]
 _LON_LIM = [14.48, 14.54]
 
 
+@pytest.mark.skipif(
+    _PYROSM_MISSING,
+    reason="the in-memory pbf engine needs pyrosm (`pip install pyrosm`)",
+)
 class TestPbfLive:
     """A live Geofabrik download + pyrosm read of the Malta extract."""
 
@@ -84,6 +90,10 @@ class TestPbfLive:
         assert "building" in fc.columns
 
 
+@pytest.mark.skipif(
+    _OSMIUM_MISSING,
+    reason="the streaming pbf engine needs osmium (ships in the osm extra)",
+)
 class TestPbfPyosmiumLive:
     """A live Geofabrik download read through the streaming pyosmium engine."""
 

@@ -20,7 +20,7 @@ import numpy as np
 import pytest
 
 from earthlens.earthlens import EarthLens
-from earthlens.testing import skip_live_unavailable
+from earthlens.testing import skip_live_unavailable, skip_on_public_endpoint_block
 
 pytestmark = [pytest.mark.e2e, pytest.mark.bathymetry]
 
@@ -63,13 +63,16 @@ class TestBathymetryLiveFetch:
 
     def test_gebco_subset_writes_ocean_geotiff(self, tmp_path: Path):
         """A small GEBCO 2020 pull lands one GeoTIFF of plausible ocean depths."""
-        paths = EarthLens(
-            data_source="bathymetry",
-            dataset="gebco_2020",
-            lat_lim=_LAT_LIM,
-            lon_lim=_LON_LIM,
-            path=str(tmp_path),
-        ).download(progress_bar=False)
+        try:
+            paths = EarthLens(
+                data_source="bathymetry",
+                dataset="gebco_2020",
+                lat_lim=_LAT_LIM,
+                lon_lim=_LON_LIM,
+                path=str(tmp_path),
+            ).download(progress_bar=False)
+        except Exception as exc:  # noqa: BLE001 - keyless-host throttle -> skip
+            skip_on_public_endpoint_block(exc)
 
         assert len(paths) == 1, f"expected one GeoTIFF, got {paths}"
         assert paths[0].suffix == ".tif" and paths[0].exists()
@@ -80,13 +83,16 @@ class TestBathymetryLiveFetch:
     @pytest.mark.parametrize("dataset", ["etopo1_ice", "etopo1_bedrock"])
     def test_etopo_variants_write_geotiff(self, tmp_path: Path, dataset: str):
         """ETOPO ice and bedrock pulls each land a plausible-elevation GeoTIFF."""
-        paths = EarthLens(
-            data_source="etopo",
-            dataset=dataset,
-            lat_lim=_LAT_LIM,
-            lon_lim=_LON_LIM,
-            path=str(tmp_path),
-        ).download(progress_bar=False)
+        try:
+            paths = EarthLens(
+                data_source="etopo",
+                dataset=dataset,
+                lat_lim=_LAT_LIM,
+                lon_lim=_LON_LIM,
+                path=str(tmp_path),
+            ).download(progress_bar=False)
+        except Exception as exc:  # noqa: BLE001 - keyless-host throttle -> skip
+            skip_on_public_endpoint_block(exc)
 
         assert len(paths) == 1, f"expected one GeoTIFF, got {paths}"
         low, high = _elevation_stats(paths[0])
