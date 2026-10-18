@@ -14,6 +14,16 @@ the rendered API.
 
 ::: earthlens.gee.features
 
+::: earthlens.gee.vector.geometry
+
+::: earthlens.gee.vector.download
+
+::: earthlens.gee.vector.codec
+
+::: earthlens.gee.vector.arrays
+
+::: earthlens.gee.vector.vectorize
+
 ::: earthlens.gee.reducers
 
 ::: earthlens.gee.engines
@@ -21,6 +31,8 @@ the rendered API.
 ::: earthlens.gee.pixels
 
 ::: earthlens.gee.sinks
+
+::: earthlens.gee.table_sink
 
 ::: earthlens.gee.plans
 
@@ -37,6 +49,20 @@ the rendered API.
 ::: earthlens.gee.filters
 
 ::: earthlens.gee.sampling
+
+::: earthlens.gee.sampling.base
+
+::: earthlens.gee.sampling.point
+
+::: earthlens.gee.sampling.region
+
+::: earthlens.gee.sampling.random
+
+::: earthlens.gee.sampling.transect
+
+::: earthlens.gee.sampling.timeseries
+
+::: earthlens.gee.sampling.histogram
 
 ::: earthlens.gee.jobs
 

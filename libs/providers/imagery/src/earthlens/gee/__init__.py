@@ -37,9 +37,31 @@ Public surface (re-exported from this package):
   (`ee.Initialize` against a registered project; base64 key encode/decode).
 * `create_geometry` / `create_feature` — Shapely /
   `GeoDataFrame` → `ee.Geometry` / `ee.FeatureCollection` converters.
+* `GeometryConverter` — the configurable, `LineString`-capable class
+  form of those converters, shared across the sampling family.
+* `FeatureDownloader` — the class form of the download helpers below,
+  carrying the thread-pool / retry budget and returning a pyramids
+  `FeatureCollection` from its `to_gdf`.
+* `VectorCodec` — read vector files (shp / geojson / gpkg / kml /
+  parquet, and CSV point tables) into an `ee.FeatureCollection` and
+  write one back out, all through a pyramids `FeatureCollection`.
+* `to_numpy` / `to_netcdf` — bridge a downloaded `Dataset` to a numpy
+  array and a `DatasetCollection` to NetCDF, both via pyramids.
+* `Vectorize` — raster → polygons, server-side via
+  `ee.Image.reduceToVectors` or client-side via pyramids'
+  `Dataset.to_polygons`.
 * `sample_points` / `sample_points_to_gdf` — sample a
   raster at point locations via leaf-batched `reduceRegions`; the
   `_to_gdf` variant returns a `GeoDataFrame` via `getInfo()`.
+* `Sampler` / `PointSampler` / `RegionSampler` / `RandomSampler` /
+  `StratifiedSampler` / `TransectSampler` / `TimeSeriesSampler` — the
+  object-oriented sampling family: a frozen base holding `scale_m` + a
+  `Reducer`, plus the point, polygon-zonal (with a `ZonalStrategy`),
+  random / stratified training-point, line-transect, and per-point
+  time-series strategies. `zonal_stats` is the `RegionSampler`
+  convenience wrapper.
+* `ZonalHistogram` — per-zone, per-class pixel counts and areas
+  for a categorical raster (count / fraction / area).
 * `feature_collection_to_dataframe` /
   `feature_collections_to_dataframe` /
   `feature_collection_to_gdf` — download
@@ -82,7 +104,9 @@ anything a string names:
   is declined.
 * `Sink`, with `SINKS` and `resolve_sink` — where
   the artifact goes: `UrlSink`, `DriveSink`,
-  `GcsSink`, `AssetSink`. Unlike `reducer=` / `engine=`,
+  `GcsSink`, `AssetSink`, and `TableSink` (the
+  vector/table counterpart, exporting an `ee.FeatureCollection` via
+  `ee.batch.Export.table.*`). Unlike `reducer=` / `engine=`,
   `GEE(export_via=...)` takes the **name** only; pass an instance and
   `ExportConfig` rejects it. Call `resolve_sink` yourself
   when you want the object.
@@ -280,7 +304,20 @@ from earthlens.gee.reducers import (
     Sum,
     resolve_reducer,
 )
-from earthlens.gee.sampling import sample_points, sample_points_to_gdf
+from earthlens.gee.sampling import (
+    PointSampler,
+    RandomSampler,
+    RegionSampler,
+    Sampler,
+    StratifiedSampler,
+    TimeSeriesSampler,
+    TransectSampler,
+    ZonalHistogram,
+    ZonalStrategy,
+    sample_points,
+    sample_points_to_gdf,
+    zonal_stats,
+)
 from earthlens.gee.sinks import (
     SINKS,
     AssetSink,
@@ -289,6 +326,15 @@ from earthlens.gee.sinks import (
     Sink,
     UrlSink,
     resolve_sink,
+)
+from earthlens.gee.table_sink import TableSink
+from earthlens.gee.vector import (
+    FeatureDownloader,
+    GeometryConverter,
+    VectorCodec,
+    Vectorize,
+    to_netcdf,
+    to_numpy,
 )
 from earthlens.gee.work import (
     Artifact,
@@ -319,11 +365,27 @@ __all__ = [
     "EarthEngineAuth",
     "create_geometry",
     "create_feature",
+    "GeometryConverter",
+    "FeatureDownloader",
+    "VectorCodec",
+    "Vectorize",
+    "to_numpy",
+    "to_netcdf",
     "feature_collection_to_dataframe",
     "feature_collection_to_gdf",
     "feature_collections_to_dataframe",
     "sample_points",
     "sample_points_to_gdf",
+    "Sampler",
+    "PointSampler",
+    "RegionSampler",
+    "RandomSampler",
+    "StratifiedSampler",
+    "TimeSeriesSampler",
+    "TransectSampler",
+    "ZonalHistogram",
+    "ZonalStrategy",
+    "zonal_stats",
     "TaskInfo",
     "list_recent_tasks",
     "get_task_status",
@@ -357,6 +419,7 @@ __all__ = [
     "DriveSink",
     "GcsSink",
     "AssetSink",
+    "TableSink",
     "SINKS",
     "resolve_sink",
     "EedaiReader",

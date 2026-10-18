@@ -127,10 +127,10 @@ class TestMovedSymbolsStillResolve:
         assert "mean" in _helpers._COLLECTION_REDUCERS
 
     def test_the_sampling_whitelist_is_still_readable(self):
-        """And `_REDUCER_WHITELIST`."""
-        from earthlens.gee import sampling
+        """And the sampling-reducer vocabulary (now the canonical `sampling_reducers`)."""
+        from earthlens.gee.reducers import sampling_reducers
 
-        assert "first" in sampling._REDUCER_WHITELIST
+        assert "first" in sampling_reducers()
 
     def test_reduce_collection_still_dispatches(self):
         """The helper is a shim now, with unchanged behaviour."""

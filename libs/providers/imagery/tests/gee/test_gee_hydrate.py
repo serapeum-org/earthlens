@@ -10,6 +10,7 @@ import yaml
 from earthlens.gee import _hydrate as hydrate_mod
 from earthlens.gee._hydrate import (
     _band_records,
+    _class_lines,
     _configure_ee,
     _date_window,
     _fetch_asset_payload,
@@ -387,6 +388,76 @@ class TestSpliceBands:
         """A scale of 1 / offset of 0 are defaults and are omitted."""
         out = _splice_bands("    bands: {}\n", [{"id": "B1", "scale": 1, "offset": 0}])
         assert "scale:" not in out and "offset:" not in out
+
+    def test_emits_gee_classes_legend(self):
+        """A band's STAC gee:classes become a quoted, indented classes block."""
+        out = _splice_bands(
+            "    bands: {}\n",
+            [
+                {
+                    "id": "Map",
+                    "gee:classes": [
+                        {"value": 10, "description": "Tree cover"},
+                        {"value": 20, "description": "Shrubland"},
+                    ],
+                }
+            ],
+        )
+        assert "        classes:" in out
+        assert '          10: "Tree cover"' in out
+        assert '          20: "Shrubland"' in out
+
+
+class TestClassLines:
+    """Tests for _class_lines."""
+
+    def test_renders_stac_gee_classes_list(self):
+        """A gee:classes list of {value, description} becomes classes YAML lines."""
+        lines = _class_lines(
+            [
+                {"value": 1, "description": "Water"},
+                {"value": 2, "description": "Forest"},
+            ]
+        )
+        assert lines == [
+            "        classes:",
+            '          1: "Water"',
+            '          2: "Forest"',
+        ]
+
+    def test_renders_plain_mapping(self):
+        """A plain {code: name} mapping is rendered the same way."""
+        assert _class_lines({3: "Urban"}) == [
+            "        classes:",
+            '          3: "Urban"',
+        ]
+
+    def test_empty_for_continuous_band(self):
+        """A falsy legend (continuous band) yields no lines."""
+        assert _class_lines(None) == []
+        assert _class_lines([]) == []
+
+    def test_skips_entries_missing_value_or_name(self):
+        """An entry without a value or a description is dropped."""
+        lines = _class_lines(
+            [
+                {"description": "no value"},
+                {"value": 5},
+                {"value": 6, "description": "kept"},
+            ]
+        )
+        assert lines == ["        classes:", '          6: "kept"']
+
+    def test_skips_non_integer_values(self):
+        """A value that is not integer-coercible is dropped."""
+        assert _class_lines([{"value": "x", "description": "bad"}]) == []
+
+    def test_escapes_quotes_in_description(self):
+        """A description containing a double quote is escaped."""
+        assert _class_lines([{"value": 1, "description": 'a "b" c'}]) == [
+            "        classes:",
+            '          1: "a \\"b\\" c"',
+        ]
 
 
 class TestConfigureEe:

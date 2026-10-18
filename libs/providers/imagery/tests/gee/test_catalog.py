@@ -102,6 +102,7 @@ class TestBand:
         assert band.units is None and band.scale is None and band.offset is None
         assert band.wavelength is None and band.min is None and band.max is None
         assert band.estimated_range is False, "estimated_range should default to False"
+        assert band.classes is None, "classes should default to None"
 
     def test_full_construction(self):
         """All optional band fields round-trip."""
@@ -139,6 +140,16 @@ class TestBand:
         """`id` is required."""
         with pytest.raises(ValidationError):
             Band(description="d")
+
+    def test_classes_legend_round_trips(self):
+        """A categorical band's `classes` legend keeps integer codes and names."""
+        band = Band(id="Map", classes={10: "Tree cover", 20: "Shrubland"})
+        assert band.classes == {10: "Tree cover", 20: "Shrubland"}
+
+    def test_classes_keys_coerced_to_int(self):
+        """String codes from YAML are coerced to integer keys."""
+        band = Band(id="lc", classes={"1": "Water"})
+        assert band.classes == {1: "Water"}
 
 
 class TestExtent:

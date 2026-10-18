@@ -15,6 +15,7 @@ stays pure and fully testable offline.
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
@@ -208,6 +209,45 @@ def _rewrite_stanza(
     return text[: match.start()] + f"  {asset_id}:\n" + block + text[match.end() :]
 
 
+def _class_lines(classes: Any) -> list[str]:
+    """Render a band's categorical legend as indented `classes:` YAML lines.
+
+    Args:
+        classes: A STAC `gee:classes` list of `{value, description}` entries, a
+            plain `{code: name}` mapping, or a falsy value for a continuous band.
+
+    Returns:
+        The YAML lines for the band's `classes:` block, or an empty list when no
+        integer-coded, named class is present.
+    """
+    if isinstance(classes, Mapping):
+        pairs: list[tuple[Any, Any]] = list(classes.items())
+    elif isinstance(classes, list):
+        pairs = [
+            (entry.get("value"), entry.get("description"))
+            for entry in classes
+            if isinstance(entry, Mapping)
+        ]
+    else:
+        pairs = []
+    legend: dict[int, str] = {}
+    for value, name in pairs:
+        if value is None or name is None:
+            continue
+        try:
+            code = int(value)
+        except (TypeError, ValueError):
+            continue
+        legend[code] = str(name)
+    lines: list[str] = []
+    if legend:
+        lines.append("        classes:")
+        for code in legend:
+            safe = legend[code].replace("\\", "\\\\").replace('"', '\\"')
+            lines.append(f'          {code}: "{safe}"')
+    return lines
+
+
 def _splice_bands(block: str, bands: list[dict[str, Any]]) -> str:
     """Replace a stanza's empty `bands:` map with the hydrated band rows."""
     lines = []
@@ -233,6 +273,7 @@ def _splice_bands(block: str, bands: list[dict[str, Any]]) -> str:
         offset = band.get("offset")
         if offset not in (None, 0.0, 0):
             lines.append(f"        offset: {offset}")
+        lines.extend(_class_lines(band.get("gee:classes") or band.get("classes")))
     bands_yaml = "    bands:\n" + "\n".join(lines) + "\n"
     replaced = re.sub(
         r"(?ms)^    bands:[ \t]*(\{\}\s*)?\n(?=^  [A-Za-z0-9/_.-]+:|\Z|\s*$)",

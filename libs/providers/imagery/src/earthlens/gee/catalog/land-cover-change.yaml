@@ -20,6 +20,82 @@ datasets:
         description: Crop-specific land-cover classification
         min: 10
         max: 230
+        classes:
+          10: "Cloud"
+          20: "Water"
+          30: "Exposed Land and Barren"
+          34: "Urban and Developed"
+          35: "Greenhouses"
+          50: "Shrubland"
+          60: "Forest Fire and Burnt Area"
+          80: "Wetland"
+          85: "Peatland"
+          110: "Grassland"
+          120: "Agriculture (undifferentiated)"
+          121: "Cropland"
+          122: "Pasture and Forages"
+          130: "Too Wet to be Seeded"
+          131: "Fallow"
+          132: "Cereals"
+          133: "Barley"
+          134: "Other Grains"
+          135: "Millet"
+          136: "Oats"
+          137: "Rye"
+          138: "Spelt"
+          139: "Triticale"
+          140: "Wheat"
+          141: "Switchgrass"
+          142: "Sorghum"
+          143: "Quinoa"
+          145: "Winter Wheat"
+          146: "Spring Wheat"
+          147: "Corn for Grain"
+          148: "Tobacco"
+          149: "Ginseng"
+          150: "Oilseeds"
+          151: "Borage"
+          152: "Camelina"
+          153: "Canola and Rapeseed"
+          154: "Flaxseed"
+          155: "Mustard"
+          156: "Safflower"
+          157: "Sunflower"
+          158: "Soybeans"
+          159: "Other Oilseeds"
+          160: "Pulses"
+          161: "Other Pulses"
+          162: "Peas"
+          163: "Chickpeas"
+          167: "Beans"
+          168: "Fababeans"
+          174: "Lentils"
+          175: "Vegetables"
+          176: "Tomatoes"
+          177: "Potatoes"
+          178: "Sugarbeets"
+          179: "Other Vegetables"
+          180: "Fruits"
+          181: "Berries"
+          182: "Blueberry"
+          183: "Cranberry"
+          185: "Other Berries"
+          188: "Orchards"
+          189: "Other Fruits"
+          190: "Vineyards"
+          191: "Hops"
+          192: "Sod"
+          193: "Herbs"
+          194: "Nursery"
+          195: "Buckwheat"
+          196: "Canaryseed"
+          197: "Hemp"
+          198: "Vetch"
+          199: "Other Crops"
+          200: "Forest (undifferentiated)"
+          210: "Coniferous"
+          220: "Broadleaf"
+          230: "Mixedwood"
 
   ACA/reef_habitat/v1_0:
     title: Allen Coral Atlas (ACA) - Geomorphic Zonation and Benthic Habitat - v1.0 [deprecated]
@@ -155,6 +231,51 @@ datasets:
     bands:
       landcover:
         description: CORINE land-cover class
+        classes:
+          1: "Artificial surfaces > Urban fabric > Continuous urban fabric"
+          2: "Artificial surfaces > Urban fabric > Discontinuous urban fabric"
+          3: "Artificial surfaces > Industrial, commercial, and transport units > Industrial or commercial units"
+          4: "Artificial surfaces > Industrial, commercial, and transport units > Road and rail networks and associated land"
+          5: "Artificial surfaces > Industrial, commercial, and transport units > Port areas"
+          6: "Artificial surfaces > Industrial, commercial, and transport units > Airports"
+          7: "Artificial surfaces > Mine, dump, and construction sites > Mineral extraction sites"
+          8: "Artificial surfaces > Mine, dump, and construction sites > Dump sites"
+          9: "Artificial surfaces > Mine, dump, and construction sites > Construction sites"
+          10: "Artificial surfaces > Artificial, non-agricultural vegetated areas > Green urban areas"
+          11: "Artificial surfaces > Artificial, non-agricultural vegetated areas > Sport and leisure facilities"
+          12: "Agricultural areas > Arable land > Non-irrigated arable land"
+          13: "Agricultural areas > Arable land > Permanently irrigated land"
+          14: "Agricultural areas > Arable land > Rice fields"
+          15: "Agricultural areas > Permanent crops > Vineyards"
+          16: "Agricultural areas > Permanent crops > Fruit trees and berry plantations"
+          17: "Agricultural areas > Permanent crops > Olive groves"
+          18: "Agricultural areas > Pastures > Pastures"
+          19: "Agricultural areas > Heterogeneous agricultural areas > Annual crops associated with permanent crops"
+          20: "Agricultural areas > Heterogeneous agricultural areas > Complex cultivation patterns"
+          21: "Agricultural areas > Heterogeneous agricultural areas > Land principally occupied by agriculture, with significant areas of natural vegetation"
+          22: "Agricultural areas > Heterogeneous agricultural areas > Agro-forestry areas"
+          23: "Forest and semi natural areas > Forests > Broad-leaved forest"
+          24: "Forest and semi natural areas > Forests > Coniferous forest"
+          25: "Forest and semi natural areas > Forests > Mixed forest"
+          26: "Forest and semi natural areas > Scrub and/or herbaceous vegetation associations > Natural grasslands"
+          27: "Forest and semi natural areas > Scrub and/or herbaceous vegetation associations > Moors and heathland"
+          28: "Forest and semi natural areas > Scrub and/or herbaceous vegetation associations > Sclerophyllous vegetation"
+          29: "Forest and semi natural areas > Scrub and/or herbaceous vegetation associations > Transitional woodland-shrub"
+          30: "Forest and semi natural areas > Open spaces with little or no vegetation > Beaches, dunes, sands"
+          31: "Forest and semi natural areas > Open spaces with little or no vegetation > Bare rocks"
+          32: "Forest and semi natural areas > Open spaces with little or no vegetation > Sparsely vegetated areas"
+          33: "Forest and semi natural areas > Open spaces with little or no vegetation > Burnt areas"
+          34: "Forest and semi natural areas > Open spaces with little or no vegetation > Glaciers and perpetual snow"
+          35: "Wetlands > Inland wetlands > Inland marshes"
+          36: "Wetlands > Inland wetlands > Peat bogs"
+          37: "Wetlands > Maritime wetlands > Salt marshes"
+          38: "Wetlands > Maritime wetlands > Salines"
+          39: "Wetlands > Maritime wetlands > Intertidal flats"
+          40: "Water bodies > Inland waters > Water courses"
+          41: "Water bodies > Inland waters > Water bodies"
+          42: "Water bodies > Marine waters > Coastal lagoons"
+          43: "Water bodies > Marine waters > Estuaries"
+          44: "Water bodies > Marine waters > Sea and ocean"
 
   COPERNICUS/CORINE/V20/100m:
     title: "Copernicus CORINE Land Cover (100m, multi-epoch since 1986)"
@@ -172,6 +293,51 @@ datasets:
     bands:
       landcover:
         description: CORINE land-cover class
+        classes:
+          111: "Artificial surfaces > Urban fabric > Continuous urban fabric"
+          112: "Artificial surfaces > Urban fabric > Discontinuous urban fabric"
+          121: "Artificial surfaces > Industrial, commercial, and transport units > Industrial or commercial units"
+          122: "Artificial surfaces > Industrial, commercial, and transport units > Road and rail networks and associated land"
+          123: "Artificial surfaces > Industrial, commercial, and transport units > Port areas"
+          124: "Artificial surfaces > Industrial, commercial, and transport units > Airports"
+          131: "Artificial surfaces > Mine, dump, and construction sites > Mineral extraction sites"
+          132: "Artificial surfaces > Mine, dump, and construction sites > Dump sites"
+          133: "Artificial surfaces > Mine, dump, and construction sites > Construction sites"
+          141: "Artificial surfaces > Artificial, non-agricultural vegetated areas > Green urban areas"
+          142: "Artificial surfaces > Artificial, non-agricultural vegetated areas > Sport and leisure facilities"
+          211: "Agricultural areas > Arable land > Non-irrigated arable land"
+          212: "Agricultural areas > Arable land > Permanently irrigated land"
+          213: "Agricultural areas > Arable land > Rice fields"
+          221: "Agricultural areas > Permanent crops > Vineyards"
+          222: "Agricultural areas > Permanent crops > Fruit trees and berry plantations"
+          223: "Agricultural areas > Permanent crops > Olive groves"
+          231: "Agricultural areas > Pastures > Pastures"
+          241: "Agricultural areas > Heterogeneous agricultural areas > Annual crops associated with permanent crops"
+          242: "Agricultural areas > Heterogeneous agricultural areas > Complex cultivation patterns"
+          243: "Agricultural areas > Heterogeneous agricultural areas > Land principally occupied by agriculture, with significant areas of natural vegetation"
+          244: "Agricultural areas > Heterogeneous agricultural areas > Agro-forestry areas"
+          311: "Forest and semi natural areas > Forests > Broad-leaved forest"
+          312: "Forest and semi natural areas > Forests > Coniferous forest"
+          313: "Forest and semi natural areas > Forests > Mixed forest"
+          321: "Forest and semi natural areas > Scrub and/or herbaceous vegetation associations > Natural grasslands"
+          322: "Forest and semi natural areas > Scrub and/or herbaceous vegetation associations > Moors and heathland"
+          323: "Forest and semi natural areas > Scrub and/or herbaceous vegetation associations > Sclerophyllous vegetation"
+          324: "Forest and semi natural areas > Scrub and/or herbaceous vegetation associations > Transitional woodland-shrub"
+          331: "Forest and semi natural areas > Open spaces with little or no vegetation > Beaches, dunes, sands"
+          332: "Forest and semi natural areas > Open spaces with little or no vegetation > Bare rocks"
+          333: "Forest and semi natural areas > Open spaces with little or no vegetation > Sparsely vegetated areas"
+          334: "Forest and semi natural areas > Open spaces with little or no vegetation > Burnt areas"
+          335: "Forest and semi natural areas > Open spaces with little or no vegetation > Glaciers and perpetual snow"
+          411: "Wetlands > Inland wetlands > Inland marshes"
+          412: "Wetlands > Inland wetlands > Peat bogs"
+          421: "Wetlands > Maritime wetlands > Salt marshes"
+          422: "Wetlands > Maritime wetlands > Salines"
+          423: "Wetlands > Maritime wetlands > Intertidal flats"
+          511: "Water bodies > Inland waters > Water courses"
+          512: "Water bodies > Inland waters > Water bodies"
+          521: "Water bodies > Marine waters > Coastal lagoons"
+          522: "Water bodies > Marine waters > Estuaries"
+          523: "Water bodies > Marine waters > Sea and ocean"
 
   COPERNICUS/Landcover/100m/Proba-V-C3/Global:
     title: "Copernicus Global Land Cover (CGLS-LC100 Collection 3, Proba-V, 100m, 2015-2019)"
@@ -436,6 +602,18 @@ datasets:
         description: Land-cover class (ESA WorldCover legend, 10-100)
         min: 10
         max: 100
+        classes:
+          10: "Tree cover"
+          20: "Shrubland"
+          30: "Grassland"
+          40: "Cropland"
+          50: "Built-up"
+          60: "Bare / sparse vegetation"
+          70: "Snow and ice"
+          80: "Permanent water bodies"
+          90: "Herbaceous wetland"
+          95: "Mangroves"
+          100: "Moss and lichen"
 
   ESA/WorldCover/v200:
     title: ESA WorldCover 10m v200 (2021)
@@ -454,6 +632,18 @@ datasets:
         description: Land-cover class (ESA WorldCover legend)
         min: 10
         max: 100
+        classes:
+          10: "Tree cover"
+          20: "Shrubland"
+          30: "Grassland"
+          40: "Cropland"
+          50: "Built-up"
+          60: "Bare / sparse vegetation"
+          70: "Snow and ice"
+          80: "Permanent water bodies"
+          90: "Herbaceous wetland"
+          95: "Mangroves"
+          100: "Moss and lichen"
 
   FAO/GHG/1/DROSA_A:
     title: UN FAO Drained Organic Soils Area (Annual) 1.0
@@ -816,6 +1006,16 @@ datasets:
         description: Index of the band with the highest estimated probability
         min: 0
         max: 8
+        classes:
+          0: "water"
+          1: "trees"
+          2: "grass"
+          3: "flooded_vegetation"
+          4: "crops"
+          5: "shrub_and_scrub"
+          6: "built"
+          7: "bare"
+          8: "snow_and_ice"
 
   GOOGLE/GLOBAL_CCDC/V1:
     title: Google Global Landsat-based CCDC Segments (1999-2019)
@@ -2825,14 +3025,66 @@ datasets:
         description: Land cover type 1 — Annual IGBP classification
         min: 1
         max: 17
+        classes:
+          1: "Evergreen Needleleaf Forests: dominated by evergreen conifer trees (canopy >2m). Tree cover >60%."
+          2: "Evergreen Broadleaf Forests: dominated by evergreen broadleaf and palmate trees (canopy >2m). Tree cover >60%."
+          3: "Deciduous Needleleaf Forests: dominated by deciduous needleleaf (larch) trees (canopy >2m). Tree cover >60%."
+          4: "Deciduous Broadleaf Forests: dominated by deciduous broadleaf trees (canopy >2m). Tree cover >60%."
+          5: "Mixed Forests: dominated by neither deciduous nor evergreen (40-60% of each) tree type (canopy >2m). Tree cover >60%."
+          6: "Closed Shrublands: dominated by woody perennials (1-2m height) >60% cover."
+          7: "Open Shrublands: dominated by woody perennials (1-2m height) 10-60% cover."
+          8: "Woody Savannas: tree cover 30-60% (canopy >2m)."
+          9: "Savannas: tree cover 10-30% (canopy >2m)."
+          10: "Grasslands: dominated by herbaceous annuals (<2m)."
+          11: "Permanent Wetlands: permanently inundated lands with 30-60% water cover and >10% vegetated cover."
+          12: "Croplands: at least 60% of area is cultivated cropland."
+          13: "Urban and Built-up Lands: at least 30% impervious surface area including building materials, asphalt and vehicles."
+          14: "Cropland/Natural Vegetation Mosaics: mosaics of small-scale cultivation 40-60% with natural tree, shrub, or herbaceous vegetation."
+          15: "Permanent Snow and Ice: at least 60% of area is covered by snow and ice for at least 10 months of the year."
+          16: "Barren: at least 60% of area is non-vegetated barren (sand, rock, soil) areas with less than 10% vegetation."
+          17: "Water Bodies: at least 60% of area is covered by permanent water bodies."
       LC_Type2:
         description: Land cover type 2 — Annual UMD classification
         min: 0
         max: 15
+        classes:
+          0: "Water Bodies: at least 60% of area is covered by permanent water bodies."
+          1: "Evergreen Needleleaf Forests: dominated by evergreen conifer trees (canopy >2m). Tree cover >60%."
+          2: "Evergreen Broadleaf Forests: dominated by evergreen broadleaf and palmate trees (canopy >2m). Tree cover >60%."
+          3: "Deciduous Needleleaf Forests: dominated by deciduous needleleaf (larch) trees (canopy >2m). Tree cover >60%."
+          4: "Deciduous Broadleaf Forests: dominated by deciduous broadleaf trees (canopy >2m). Tree cover >60%."
+          5: "Mixed Forests: dominated by neither deciduous nor evergreen (40-60% of each) tree type (canopy >2m). Tree cover >60%."
+          6: "Closed Shrublands: dominated by woody perennials (1-2m height) >60% cover."
+          7: "Open Shrublands: dominated by woody perennials (1-2m height) 10-60% cover."
+          8: "Woody Savannas: tree cover 30-60% (canopy >2m)."
+          9: "Savannas: tree cover 10-30% (canopy >2m)."
+          10: "Grasslands: dominated by herbaceous annuals (<2m)."
+          11: "Permanent Wetlands: permanently inundated lands with 30-60% water cover and >10% vegetated cover."
+          12: "Croplands: at least 60% of area is cultivated cropland."
+          13: "Urban and Built-up Lands: at least 30% impervious surface area including building materials, asphalt and vehicles."
+          14: "Cropland/Natural Vegetation Mosaics: mosaics of small-scale cultivation 40-60% with natural tree, shrub, or herbaceous vegetation."
+          15: "Non-Vegetated Lands: at least 60% of area is non-vegetated barren (sand, rock, soil) or permanent snow and ice with less than 10% vegetation."
       LC_Prop1:
         description: FAO-LCCS1 land cover layer
         min: 1
         max: 43
+        classes:
+          1: "Barren: at least of area 60% is non-vegetated barren (sand, rock, soil) or permanent snow/ice with less than 10% vegetation."
+          2: "Permanent Snow and Ice: at least 60% of area is covered by snow and ice for at least 10 months of the year."
+          3: "Water Bodies: at least 60% of area is covered by permanent water bodies."
+          11: "Evergreen Needleleaf Forests: dominated by evergreen conifer trees (>2m). Tree cover >60%."
+          12: "Evergreen Broadleaf Forests: dominated by evergreen broadleaf and palmate trees (>2m). Tree cover >60%."
+          13: "Deciduous Needleleaf Forests: dominated by deciduous needleleaf (larch) trees (>2m). Tree cover >60%."
+          14: "Deciduous Broadleaf Forests: dominated by deciduous broadleaf trees (>2m). Tree cover >60%."
+          15: "Mixed Broadleaf/Needleleaf Forests: co-dominated (40-60%) by broadleaf deciduous and evergreen needleleaf tree (>2m) types. Tree cover >60%."
+          16: "Mixed Broadleaf Evergreen/Deciduous Forests: co-dominated (40-60%) by broadleaf evergreen and deciduous tree (>2m) types. Tree cover >60%."
+          21: "Open Forests: tree cover 30-60% (canopy >2m)."
+          22: "Sparse Forests: tree cover 10-30% (canopy >2m)."
+          31: "Dense Herbaceous: dominated by herbaceous annuals (<2m) at least 60% cover."
+          32: "Sparse Herbaceous: dominated by herbaceous annuals (<2m) 10-60% cover."
+          41: "Dense Shrublands: dominated by woody perennials (1-2m) >60% cover."
+          42: "Shrubland/Grassland Mosaics: dominated by woody perennials (1-2m) 10-60% cover with dense herbaceous annual understory."
+          43: "Sparse Shrublands: dominated by woody perennials (1-2m) 10-60% cover with minimal herbaceous understory."
 
   MODIS/061/MCD12Q2:
     title: "MCD12Q2.061: MODIS Land Cover Dynamics (Phenology) Yearly Global 500m"
@@ -6950,6 +7202,23 @@ datasets:
         description: NLCD land-cover class (Anderson Level II)
         min: 11
         max: 95
+        classes:
+          11: "Open water: areas of open water, generally with less than 25% cover of vegetation or soil."
+          12: "Perennial ice/snow: areas characterized by a perennial cover of ice and/or snow, generally greater than 25% of total cover."
+          21: "Developed, open space: areas with a mixture of some constructed materials, but mostly vegetation in the form of lawn grasses. Impervious surfaces account for less than 20% of total cover. These areas most commonly include large-lot single-family housing units, parks, golf courses, and vegetation planted in developed settings for recreation, erosion control, or aesthetic purposes."
+          22: "Developed, low intensity: areas with a mixture of constructed materials and vegetation. Impervious surfaces account for 20% to 49% percent of total cover. These areas most commonly include single-family housing units."
+          23: "Developed, medium intensity: areas with a mixture of constructed materials and vegetation. Impervious surfaces account for 50% to 79% of the total cover. These areas most commonly include single-family housing units."
+          24: "Developed high intensity: highly developed areas where people reside or work in high numbers. Examples include apartment complexes, row houses, and commercial/industrial. Impervious surfaces account for 80% to 100% of the total cover."
+          31: "Barren land (rock/sand/clay): areas of bedrock, desert pavement, scarps, talus, slides, volcanic material, glacial debris, sand dunes, strip mines, gravel pits, and other accumulations of earthen material. Generally, vegetation accounts for less than 15% of total cover."
+          41: "Deciduous forest: areas dominated by trees generally greater than 5 meters tall, and greater than 20% of total vegetation cover. More than 75% of the tree species shed foliage simultaneously in response to seasonal change."
+          42: "Evergreen forest: areas dominated by trees generally greater than 5 meters tall, and greater than 20% of total vegetation cover. More than 75% of the tree species maintain their leaves all year. Canopy is never without green foliage."
+          43: "Mixed forest: areas dominated by trees generally greater than 5 meters tall, and greater than 20% of total vegetation cover. Neither deciduous nor evergreen species are greater than 75% of total tree cover."
+          52: "Shrub/scrub: areas dominated by shrubs less than 5 meters tall with shrub canopy typically greater than 20% of total vegetation. This class includes true shrubs, young trees in an early successional stage, or trees stunted from environmental conditions."
+          71: "Grassland/herbaceous: areas dominated by gramanoid or herbaceous vegetation, generally greater than 80% of total vegetation. These areas are not subject to intensive management such as tilling, but can be utilized for grazing."
+          81: "Pasture/hay: areas of grasses, legumes, or grass-legume mixtures planted for livestock grazing or the production of seed or hay crops, typically on a perennial cycle. Pasture/hay vegetation accounts for greater than 20% of total vegetation."
+          82: "Cultivated crops: areas used for the production of annual crops, such as corn, soybeans, vegetables, tobacco, and cotton, and also perennial woody crops such as orchards and vineyards. Crop vegetation accounts for greater than 20% of total vegetation. This class also includes all land being actively tilled."
+          90: "Woody wetlands: areas where forest or shrubland vegetation accounts for greater than 20% of vegetative cover and the soil or substrate is periodically saturated with or covered with water."
+          95: "Emergent herbaceous wetlands: areas where perennial herbaceous vegetation accounts for greater than 80% of vegetative cover and the soil or substrate is periodically saturated with or covered with water."
       impervious:
         description: Percent of pixel covered by impervious surface
         units: "%"
@@ -6959,6 +7228,18 @@ datasets:
         description: Impervious sub-class (roads vs structures)
         min: 20
         max: 29
+        classes:
+          0: "Unclassified."
+          20: "Primary road. Interstates and other major roads. Pixels were derived from the 2018 NavStreets Street Data."
+          21: "Secondary road. Non-interstate highways. Pixels were derived from the 2018 NavStreets Street Data."
+          22: "Tertiary road. Any two-lane road. Pixels were derived from the 2018 NavStreets Street Data."
+          23: "Thinned road. Small tertiary roads that generally are not paved and have been removed from the landcover but remain as part of the impervious surface product. Pixels were derived from the 2018 NavStreets Street Data."
+          24: "Non-road non-energy impervious. Developed areas that are generally not roads or energy production; includes residential/commercial/industrial areas, parks, and golf courses."
+          25: "Microsoft buildings. Buildings not captured in the NLCD impervious process, and not included in the nonroad impervious surface class. Pixels derived from the Microsoft US Building Footprints dataset."
+          26: "LCMAP impervious. Impervious pixels from LCMAP that were used to fill in gaps left when roads were updated from previous versions of NLCD."
+          27: "Wind turbines. Pixels derived from the US Wind Turbine Dataset, accessed on 1/9/2020."
+          28: "Well pads. Pixels derived from the 2019 Oil and Natural Gas Wells dataset from the Oak Ridge National Laboratory."
+          29: "Other energy production. Areas previously identified as well pads and wind turbines and classified in coordination with the Landfire project."
 
   USGS/NLCD_RELEASES/2021_REL/TCC/v2021-4:
     title: "USFS Tree Canopy Cover v2021-4 (US, 30m, 2008-2021)"
