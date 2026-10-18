@@ -41,3 +41,38 @@ the rendered API.
 ::: earthlens.gee.jobs
 
 ::: earthlens.gee.io
+
+## Client-side raster analysis
+
+These run after a download, on the in-memory `Dataset`. Nothing here reaches
+Earth Engine.
+
+::: earthlens.gee.analysis
+
+::: earthlens.gee.analysis.base
+
+::: earthlens.gee.analysis.indices
+
+::: earthlens.gee.analysis.expression
+
+::: earthlens.gee.analysis.terrain
+
+::: earthlens.gee.analysis.focal
+
+::: earthlens.gee.analysis.texture
+
+::: earthlens.gee.analysis.proximity
+
+::: earthlens.gee.analysis.reclassify
+
+::: earthlens.gee.analysis.patches
+
+::: earthlens.gee.analysis.cluster
+
+::: earthlens.gee.analysis.classify
+
+::: earthlens.gee.analysis.combine
+
+::: earthlens.gee.analysis.spectral
+
+::: earthlens.gee.analysis.facade
