@@ -11,7 +11,7 @@ from shapely.geometry import MultiPoint, Point, Polygon
 
 ee = pytest.importorskip("ee")
 
-from earthlens.gee.sampling import _REDUCER_WHITELIST  # noqa: E402
+from earthlens.gee.reducers import sampling_reducers  # noqa: E402
 from earthlens.gee.sampling import point as point_module  # noqa: E402
 from earthlens.gee.sampling.point import PointSampler  # noqa: E402
 
@@ -58,7 +58,7 @@ class _FakeConverter:
 def _fake_reducer_namespace():
     """A namespace mimicking `ee.Reducer` for every whitelisted name."""
     return SimpleNamespace(
-        **{name: lambda n=name: f"reducer<{n}>" for name in _REDUCER_WHITELIST}
+        **{name: lambda n=name: f"reducer<{n}>" for name in sampling_reducers()}
     )
 
 
@@ -125,6 +125,17 @@ class TestPointSampler:
         """The reducer is validated when the sampler is built, not at sample."""
         with pytest.raises(ValidationError, match="unsupported reducer 'bogus'"):
             PointSampler(scale_m=30, reducer="bogus")
+
+    def test_mosaic_is_refused_by_default(self):
+        """`mosaic` has no `ee.Reducer`, so the strict default refuses it."""
+        with pytest.raises(ValidationError, match="mosaic"):
+            PointSampler(scale_m=30, reducer="mosaic")
+
+    def test_strict_reducers_false_accepts_any_registry_reducer(self):
+        """Turning the switch off defers the reducer check to Earth Engine."""
+        sampler = PointSampler(scale_m=30, reducer="mosaic", strict_reducers=False)
+        assert sampler.reducer.name == "mosaic"
+        assert sampler.strict_reducers is False
 
     def test_one_reduce_regions_per_leaf_with_the_scale_and_reducer(self, fake_ee):
         """Each rtree leaf yields a matched clip + reduceRegions at the given scale."""

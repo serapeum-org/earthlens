@@ -15,9 +15,9 @@ from __future__ import annotations
 import abc
 from typing import TYPE_CHECKING, ClassVar
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from earthlens.gee.reducers import Reducer, resolve_reducer
+from earthlens.gee.reducers import Reducer, resolve_reducer, sampling_reducers
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     import ee
@@ -69,6 +69,12 @@ class Sampler(BaseModel, abc.ABC):
 
     scale_m: float
     reducer: Reducer = Field(default_factory=lambda: resolve_reducer("first"))
+    #: When True (the default), `reducer` must be one a `sample`/`reduceRegions`
+    #: path can actually run — i.e. a name in `sampling_reducers()` (or a
+    #: `percentile`). This rejects e.g. `mosaic` (an `ImageCollection`-only
+    #: reducer with no `ee.Reducer`) at construction. Set False to accept any
+    #: registry reducer and defer the check to Earth Engine.
+    strict_reducers: bool = True
 
     @field_validator("reducer", mode="before")
     @classmethod
@@ -86,6 +92,31 @@ class Sampler(BaseModel, abc.ABC):
             ValueError: If `value` is a string the registry does not know.
         """
         return resolve_reducer(value)
+
+    @model_validator(mode="after")
+    def _reducer_is_samplable(self) -> Sampler:
+        """Reject a reducer with no `ee.Reducer` when `strict_reducers` is on.
+
+        Returns:
+            The sampler unchanged once the reducer is valid for a sample path.
+
+        Raises:
+            ValueError: If `strict_reducers` and `reducer` is neither a
+                `sampling_reducers()` name nor a `percentile` (e.g. `mosaic`,
+                which has no `ee.Reducer`); the message names the vocabulary.
+        """
+        name = self.reducer.name
+        if (
+            self.strict_reducers
+            and name not in sampling_reducers()
+            and name != "percentile"
+        ):
+            raise ValueError(
+                f"reducer {name!r} has no ee.Reducer for a sample/reduceRegions "
+                f"path; expected one of {sorted(sampling_reducers())} or "
+                "'percentile:<q>'. Pass strict_reducers=False to defer to Earth Engine."
+            )
+        return self
 
     @abc.abstractmethod
     def sample(self, image: ee.Image, geometry: GeoDataFrame) -> ee.FeatureCollection:

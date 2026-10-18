@@ -16,7 +16,6 @@ from types import SimpleNamespace
 import pytest
 
 from earthlens.gee import backend as backend_module
-from earthlens.gee import sampling
 from earthlens.gee.grid import NATIVE_CRS, OutputGrid, bbox_to_latlon
 from earthlens.gee.reducers import (
     REDUCERS,
@@ -240,32 +239,36 @@ class TestSamplingReachesTheRegistry:
     """`percentile now reachable from both paths`, and `mosaic` refused cleanly."""
 
     def test_mosaic_is_refused_with_a_message(self):
-        """It used to reach `getattr(ee.Reducer, "mosaic")` and `AttributeError`."""
-        with pytest.raises(ValueError, match="unsupported reducer 'mosaic'"):
-            sampling._resolve_reducer("mosaic")
+        """A sampler refuses `mosaic` (no `ee.Reducer`) at construction."""
+        from pydantic import ValidationError
+
+        from earthlens.gee.sampling.point import PointSampler
+
+        with pytest.raises(ValidationError, match="mosaic"):
+            PointSampler(scale_m=30, reducer="mosaic")
 
     def test_an_unknown_name_is_still_refused(self):
-        """The pre-epic message, unchanged."""
+        """The pre-epic message, unchanged, now from the registry."""
         with pytest.raises(ValueError, match="unsupported reducer 'p95'"):
-            sampling._resolve_reducer("p95")
+            resolve_reducer("p95")
 
     def test_a_percentile_spec_resolves(self, monkeypatch):
-        """Reachable here for the first time, through the registry."""
+        """Reachable through the registry, bridged to `ee.Reducer.percentile`."""
         import ee
 
         monkeypatch.setattr(
             ee, "Reducer", SimpleNamespace(percentile=lambda qs: ("p", tuple(qs)))
         )
-        assert sampling._resolve_reducer("percentile:90") == ("p", (90.0,))
+        assert resolve_reducer("percentile:90").as_ee_reducer() == ("p", (90.0,))
 
     def test_a_percentile_without_its_argument_says_so(self):
         """The registry's message, which names the spelling."""
         with pytest.raises(ValueError, match="percentile:<q>"):
-            sampling._resolve_reducer("percentile")
+            resolve_reducer("percentile")
 
     def test_the_whitelist_excludes_mosaic(self):
-        """The regression in one line: deriving one set for both let it in."""
-        assert "mosaic" not in sampling._REDUCER_WHITELIST
+        """The regression in one line: `mosaic` is not a sampling reducer."""
+        assert "mosaic" not in sampling_reducers()
 
 
 class TestTheSinkOwnsItsWrite:

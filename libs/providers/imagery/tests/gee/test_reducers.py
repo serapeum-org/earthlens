@@ -318,16 +318,14 @@ class TestBackCompatShim:
         assert set(_helpers._COLLECTION_REDUCERS) == set(collection_reducers())
 
     def test_the_sampling_whitelist_is_a_view_on_the_registry(self):
-        """Region sampling reads the same registry, filtered by capability.
+        """Sampling reads the same registry, filtered by capability.
 
         Not the whole registry: `mosaic` is a collection method and
-        `ee.Reducer.mosaic` does not exist, so taking every name sent
-        `reducer="mosaic"` into an `AttributeError`.
+        `ee.Reducer.mosaic` does not exist, so a sampler refuses
+        `reducer="mosaic"` rather than reaching an `AttributeError`.
         """
-        from earthlens.gee import sampling
         from earthlens.gee.reducers import sampling_reducers
 
-        whitelist = sampling._REDUCER_WHITELIST
-        assert set(whitelist) == set(sampling_reducers())
+        whitelist = sampling_reducers()
         assert {"first", "stdDev", "variance", "count"} <= set(whitelist)
         assert "mosaic" not in whitelist
