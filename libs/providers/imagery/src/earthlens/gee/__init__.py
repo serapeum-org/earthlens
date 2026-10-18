@@ -42,6 +42,11 @@ Public surface (re-exported from this package):
 * `FeatureDownloader` — the class form of the download helpers below,
   carrying the thread-pool / retry budget and returning a pyramids
   `FeatureCollection` from its `to_gdf`.
+* `VectorCodec` — read vector files (shp / geojson / gpkg / kml /
+  parquet, and CSV point tables) into an `ee.FeatureCollection` and
+  write one back out, all through a pyramids `FeatureCollection`.
+* `to_numpy` / `to_netcdf` — bridge a downloaded `Dataset` to a numpy
+  array and a `DatasetCollection` to NetCDF, both via pyramids.
 * `sample_points` / `sample_points_to_gdf` — sample a
   raster at point locations via leaf-batched `reduceRegions`; the
   `_to_gdf` variant returns a `GeoDataFrame` via `getInfo()`.
@@ -314,7 +319,13 @@ from earthlens.gee.sinks import (
     UrlSink,
     resolve_sink,
 )
-from earthlens.gee.vector import FeatureDownloader, GeometryConverter
+from earthlens.gee.vector import (
+    FeatureDownloader,
+    GeometryConverter,
+    VectorCodec,
+    to_netcdf,
+    to_numpy,
+)
 from earthlens.gee.work import (
     Artifact,
     DownloadResult,
@@ -346,6 +357,9 @@ __all__ = [
     "create_feature",
     "GeometryConverter",
     "FeatureDownloader",
+    "VectorCodec",
+    "to_numpy",
+    "to_netcdf",
     "feature_collection_to_dataframe",
     "feature_collection_to_gdf",
     "feature_collections_to_dataframe",

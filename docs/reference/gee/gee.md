@@ -18,6 +18,10 @@ the rendered API.
 
 ::: earthlens.gee.vector.download
 
+::: earthlens.gee.vector.codec
+
+::: earthlens.gee.vector.arrays
+
 ::: earthlens.gee.reducers
 
 ::: earthlens.gee.engines
