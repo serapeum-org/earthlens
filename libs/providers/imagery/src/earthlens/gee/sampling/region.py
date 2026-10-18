@@ -49,7 +49,9 @@ class RegionSampler(Sampler):
     runs `reduceRegions` in Earth Engine, `ZonalStrategy.CLIENT` reduces an
     in-memory pyramids `Dataset` locally. Either way it returns one row per
     polygon with a column per requested stat. `scale_m` and `reducer` come from
-    the `Sampler` base.
+    the `Sampler` base; `scale_m` sets the reduction pixel scale only for the
+    server strategy — the client strategy reduces at the `Dataset`'s own
+    resolution and ignores it.
 
     Examples:
         - A region sampler carries its strategy and requested stats:
