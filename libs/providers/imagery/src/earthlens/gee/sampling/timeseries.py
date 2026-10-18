@@ -44,6 +44,11 @@ class TimeSeriesSampler(Sampler):
     #: backend reports `"tabular"` rather than `"vector"` for this sampler.
     output_kind: ClassVar[str] = "tabular"
 
+    #: A time-series consumes the whole stack of per-bucket images at once (it
+    #: reads each bucket's `system:time_start`), so the backend hands `sample`
+    #: the full list of composited images rather than mapping it per bucket.
+    consumes_stack: ClassVar[bool] = True
+
     wide: bool = False
 
     def sample(self, image: Any, geometry: GeoDataFrame) -> ee.FeatureCollection:
@@ -85,18 +90,28 @@ class TimeSeriesSampler(Sampler):
             A pyramids `FeatureCollection`: one row per (point, timestamp) in long
             form, or one column per timestamp when `wide` is set.
         """
-        from earthlens.gee.vector.download import FeatureDownloader
+        return cast("FeatureCollection", self.backend_to_gdf(image, geometry, crs=crs))
 
-        long_table = FeatureDownloader().to_gdf(self.sample(image, geometry), crs=crs)
+    def _reshape(self, gdf: GeoDataFrame) -> GeoDataFrame:
+        """Pivot the long series to one column per timestamp when `wide`.
+
+        Args:
+            gdf: The downloaded long table (one row per point per bucket), each
+                row carrying `point_id` and `timestamp`.
+
+        Returns:
+            The long table unchanged, or the wide pivot (one column per
+            timestamp per value column) when `wide` is set.
+        """
         if self.wide:
             value_columns = [
                 column
-                for column in long_table.columns
+                for column in gdf.columns
                 if column not in ("point_id", "timestamp", "geometry")
             ]
-            result = long_table.pivot_table(
+            result = gdf.pivot_table(
                 index="point_id", columns="timestamp", values=value_columns
             )
         else:
-            result = long_table
-        return cast("FeatureCollection", result)
+            result = gdf
+        return cast("GeoDataFrame", result)

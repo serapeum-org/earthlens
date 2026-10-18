@@ -1164,6 +1164,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     "its vector/tabular result directly rather than reading pixels back "
                     "from disk. Drop materialize=, or drop the sampler."
                 )
+            sampler._ensure_backend_compatible()  # e.g. refuse RegionSampler(CLIENT)
             self.OUTPUT_KIND = cast("OutputKind", sampler.output_kind)
 
     def _resolve_credentials(self) -> tuple[str | None, str | None, str | None]:
@@ -1501,6 +1502,14 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 "destination. Use export_via='url', or pull the result from "
                 "the destination yourself."
             )
+        if (self.materialize if materialize is None else materialize) and (
+            self._sampler is not None
+        ):
+            raise ValueError(
+                "materialize=True has no effect with a sampler: a sampler returns "
+                "its vector/tabular result directly rather than reading pixels back "
+                "from disk. Drop materialize=, or drop the sampler."
+            )
         # Trigger the lazy Earth Engine auth/init before any `ee` call.
         _ = self.client
         self._cog_warned = False  # the cog= notice is once per run, not per object
@@ -1681,7 +1690,32 @@ class GEE(LazyClientMixin, AbstractDataSource):
         if progress_bar:
             iterator = tqdm(buckets, desc=f"{asset_id} [{','.join(bands)}]", unit="img")
         if self._sampler is not None:
-            return [self._sample_bucket(unit, var_info, bands) for unit in iterator]
+            sampler = cast("Sampler", self._sampler)
+            if sampler.consumes_stack:
+                if not buckets:
+                    return []
+                stack = [unit.payload for unit in buckets]
+                return [
+                    self._sample_payload(
+                        stack,
+                        buckets[0].when,
+                        buckets[0].bucket_start,
+                        buckets[-1].bucket_end,
+                        var_info,
+                        bands,
+                    )
+                ]
+            return [
+                self._sample_payload(
+                    unit.payload,
+                    unit.when,
+                    unit.bucket_start,
+                    unit.bucket_end,
+                    var_info,
+                    bands,
+                )
+                for unit in iterator
+            ]
         return [
             self._api(
                 unit.payload,
@@ -1694,18 +1728,30 @@ class GEE(LazyClientMixin, AbstractDataSource):
             for unit in iterator
         ]
 
-    def _sample_bucket(
-        self, unit: RasterWorkUnit, var_info: Dataset, bands: list[str]
+    def _sample_payload(
+        self,
+        sample_input: Any,
+        when: dt.datetime,
+        bucket_start: dt.datetime,
+        bucket_end: dt.datetime,
+        var_info: Dataset,
+        bands: list[str],
     ) -> GeoDataFrame | TaskInfo:
-        """Sample one composited bucket into a vector/tabular result.
+        """Sample one image (or the whole stack) into a vector/tabular result.
 
-        Routes the sampler's `ee.FeatureCollection` the way the sink does: a
-        synchronous (`"url"`) sink pulls it into an in-memory `GeoDataFrame`
-        through the `FeatureDownloader`, while a batch sink queues it as a
-        table export via `TableSink` and returns the `TaskInfo`.
+        Routes by sink: a synchronous (`"url"`) sink returns the sampler's final
+        reshaped table through `backend_to_gdf` (so a histogram widens and a
+        time-series pivots), while a batch sink queues the sampler's
+        `ee.FeatureCollection` as a table export via `TableSink` and returns the
+        `TaskInfo`. A batch export cannot apply the client-side reshape, so it
+        carries the server-side shape.
 
         Args:
-            unit: The composited bucket, whose `payload` is the `ee.Image`.
+            sample_input: The composited `ee.Image`, or the list of per-bucket
+                images for a `consumes_stack` sampler.
+            when: The representative timestamp, for the output name.
+            bucket_start: The window start, carried onto the work unit.
+            bucket_end: The window end, carried onto the work unit.
             var_info: The catalog entry, for the output name.
             bands: The requested band ids, for the output name.
 
@@ -1714,17 +1760,16 @@ class GEE(LazyClientMixin, AbstractDataSource):
             queued table export.
         """
         from earthlens.gee.table_sink import TableSink
-        from earthlens.gee.vector.download import FeatureDownloader
 
         sampler = cast("Sampler", self._sampler)
-        prefix = f"{slug_asset_id(var_info.id)}_{'-'.join(bands)}_{unit.when:%Y%m%d}"
-        work = FeatureWorkUnit(
-            sampler.sample(unit.payload, self._geometry),
-            unit.when,
-            unit.bucket_start,
-            unit.bucket_end,
-        )
+        prefix = f"{slug_asset_id(var_info.id)}_{'-'.join(bands)}_{when:%Y%m%d}"
         if self._sink.is_batch:
+            work = FeatureWorkUnit(
+                sampler.sample(sample_input, self._geometry),
+                when,
+                bucket_start,
+                bucket_end,
+            )
             file_format = "GeoJSON" if self.OUTPUT_KIND == "vector" else "CSV"
             result: GeoDataFrame | TaskInfo = TableSink(
                 destination=cast('Literal["drive", "gcs", "asset"]', self.export_via),
@@ -1735,7 +1780,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 wait_for_export=self.wait_for_export,
             ).export(work, description=prefix)
         else:
-            result = FeatureDownloader().to_gdf(work.features)
+            result = sampler.backend_to_gdf(sample_input, self._geometry)
         return result
 
     def _build_collection(

@@ -61,6 +61,37 @@ class TestSampler:
             _ConcreteSampler(scale_m=30, bogus=1)
 
 
+class TestBackendSeam:
+    """The uniform seam the GEE backend drives a sampler through."""
+
+    def test_backend_to_gdf_downloads_then_reshapes(self, monkeypatch):
+        """It pulls `sample`'s collection through the downloader, then `_reshape`."""
+
+        class _FakeDownloader:
+            def to_gdf(self, fc, crs=4326):
+                return ("downloaded", fc, crs)
+
+        monkeypatch.setattr(
+            "earthlens.gee.vector.download.FeatureDownloader", _FakeDownloader
+        )
+        out = _ConcreteSampler(scale_m=30).backend_to_gdf("img", "geom", crs=3857)
+        # The default `_reshape` is identity, so the downloaded result passes through.
+        assert out == ("downloaded", "sampled", 3857)
+
+    def test_default_reshape_is_identity(self):
+        """The base `_reshape` returns its input unchanged."""
+        frame = object()
+        assert _ConcreteSampler(scale_m=30)._reshape(frame) is frame
+
+    def test_an_ordinary_sampler_is_backend_compatible(self):
+        """The base compatibility check accepts a sampler with no local strategy."""
+        assert _ConcreteSampler(scale_m=30)._ensure_backend_compatible() is None
+
+    def test_a_sampler_does_not_consume_the_stack_by_default(self):
+        """Only a whole-stack sampler (e.g. time-series) sets `consumes_stack`."""
+        assert _ConcreteSampler.consumes_stack is False
+
+
 class TestValidateGeometry:
     """The shared geometry guard."""
 

@@ -118,6 +118,19 @@ class ZonalHistogram(Sampler):
         )
         return cast("ee.FeatureCollection", collection)
 
+    def _reshape(self, gdf: GeoDataFrame) -> GeoDataFrame:
+        """Widen each zone's downloaded `groups` list into per-class columns.
+
+        Args:
+            gdf: The downloaded zones, each with a `groups` list property.
+
+        Returns:
+            A pyramids `FeatureCollection` with one column per class.
+        """
+        from pyramids.feature import FeatureCollection
+
+        return cast("GeoDataFrame", FeatureCollection(self._widen(gdf)))
+
     def sample_to_gdf(
         self, image: ee.Image, geometry: GeoDataFrame, *, crs: int | str = 4326
     ) -> FeatureCollection:
@@ -131,12 +144,7 @@ class ZonalHistogram(Sampler):
         Returns:
             A pyramids `FeatureCollection`: one row per zone, a column per class.
         """
-        from pyramids.feature import FeatureCollection
-
-        from earthlens.gee.vector.download import FeatureDownloader
-
-        raw = FeatureDownloader().to_gdf(self.sample(image, geometry), crs=crs)
-        return cast("FeatureCollection", FeatureCollection(self._widen(raw)))
+        return cast("FeatureCollection", self.backend_to_gdf(image, geometry, crs=crs))
 
     def _label(self, code: int) -> str:
         """Name a class column from `class_labels`, else the raw code.

@@ -13,7 +13,7 @@ introduced.
 from __future__ import annotations
 
 import abc
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -66,6 +66,11 @@ class Sampler(BaseModel, abc.ABC):
     #: `"vector"` keeps each feature's geometry; a sampler that collapses
     #: geometry (e.g. a time-series table) overrides this to `"tabular"`.
     output_kind: ClassVar[str] = "vector"
+
+    #: Whether `sample` consumes the whole stack of per-bucket images at once
+    #: (the list the GEE backend composites) rather than one image per bucket.
+    #: A time-series sampler sets this True; most samplers reduce one image.
+    consumes_stack: ClassVar[bool] = False
 
     scale_m: float
     reducer: Reducer = Field(default_factory=lambda: resolve_reducer("first"))
@@ -130,6 +135,63 @@ class Sampler(BaseModel, abc.ABC):
         Returns:
             An `ee.FeatureCollection` of the sampled features.
         """
+
+    def _reshape(self, gdf: GeoDataFrame) -> GeoDataFrame:
+        """Reshape the downloaded features into this sampler's final table.
+
+        The default is identity. A sampler that collapses or widens its
+        features client-side — a histogram's per-class columns, a time-series'
+        wide pivot — overrides this; it is applied after the download in both
+        `backend_to_gdf` and the sampler's own `sample_to_gdf`, so the reshape
+        lives in exactly one place.
+
+        Args:
+            gdf: The downloaded features, one row per sampled feature.
+
+        Returns:
+            The reshaped table (identity by default).
+        """
+        return gdf
+
+    def backend_to_gdf(
+        self, image: Any, geometry: GeoDataFrame, *, crs: int | str = 4326
+    ) -> GeoDataFrame:
+        """Sample and return the final reshaped table — the GEE backend's seam.
+
+        The one entry point the backend's synchronous (`export_via="url"`) path
+        calls, uniform across samplers: it runs `sample`, pulls the result
+        through the `FeatureDownloader`, and applies `_reshape`. `image` is a
+        single `ee.Image`, or — when `consumes_stack` — the list of per-bucket
+        images.
+
+        Args:
+            image: A single `ee.Image`, or the list of per-bucket images for a
+                `consumes_stack` sampler.
+            geometry: The `GeoDataFrame` of input geometries.
+            crs: CRS stamped on the pulled collection. Defaults to `4326`.
+
+        Returns:
+            The reshaped table (a pyramids `FeatureCollection`, or a plain frame
+            for a sampler whose `_reshape` collapses the geometry).
+        """
+        from earthlens.gee.vector.download import FeatureDownloader
+
+        downloaded = FeatureDownloader().to_gdf(self.sample(image, geometry), crs=crs)
+        return self._reshape(downloaded)
+
+    def _ensure_backend_compatible(self) -> None:
+        """Raise if this sampler cannot be driven by `GEE.download()`.
+
+        The default is compatible. A sampler whose configured strategy needs
+        local pixels — which the backend's server-side `ee.Image` cannot
+        supply — overrides this to refuse with a message pointing at the
+        standalone `sample_to_gdf` API.
+
+        Raises:
+            ValueError: If the sampler, as configured, cannot run through the
+                backend's server-side path.
+        """
+        return None
 
     @staticmethod
     def _validate_geometry(gdf: GeoDataFrame, allowed: frozenset[str]) -> None:

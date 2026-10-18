@@ -117,6 +117,25 @@ class RegionSampler(Sampler):
             raise ValueError(f"tile_scale must be within [0.1, 16], got {value}")
         return value
 
+    def _ensure_backend_compatible(self) -> None:
+        """Refuse a `CLIENT`-strategy region sampler through `GEE.download()`.
+
+        The backend samples a server-side `ee.Image`, but the client strategy
+        reduces a local in-memory pyramids `Dataset` it cannot supply, so the
+        combination is refused rather than silently falling back to the server.
+
+        Raises:
+            ValueError: If `strategy` is `ZonalStrategy.CLIENT`.
+        """
+        if self.strategy is ZonalStrategy.CLIENT:
+            raise ValueError(
+                "RegionSampler(strategy=CLIENT) can't be driven by GEE.download(): "
+                "the backend samples a server-side ee.Image, but the client "
+                "strategy reduces a local pyramids Dataset. Use strategy=SERVER, "
+                "or materialise the raster and call sample_to_gdf(dataset=...)."
+            )
+        return None
+
     def _combined_reducer(self) -> Any:
         """Fold `stats` into one `ee.Reducer` that shares its inputs.
 
