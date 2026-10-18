@@ -101,8 +101,21 @@ class TestPointSampler:
         with pytest.raises(ValueError, match="row 1 is a Polygon"):
             PointSampler(scale_m=30).sample(_FakeImage(), gdf)
 
-    def test_multipoint_is_accepted(self, fake_ee):
-        """MultiPoint rows pass the type guard."""
+    def test_multipoint_is_accepted(self, fake_ee, monkeypatch):
+        """A MultiPoint row explodes through the real converter and samples cleanly."""
+        from earthlens.gee.vector import geometry as geometry_module
+        from earthlens.gee.vector.geometry import GeometryConverter
+
+        monkeypatch.setattr(point_module, "GeometryConverter", GeometryConverter)
+        monkeypatch.setattr(
+            geometry_module,
+            "ee",
+            SimpleNamespace(
+                Geometry=SimpleNamespace(Point=lambda coords, proj: ("pt", coords)),
+                Feature=lambda geom, props=None: ("feat", geom, props),
+                FeatureCollection=lambda feats: ("fc", list(feats)),
+            ),
+        )
         gdf = gpd.GeoDataFrame(
             {"id": [0]}, geometry=[MultiPoint([(0, 0), (1, 1)])], crs="EPSG:4326"
         )

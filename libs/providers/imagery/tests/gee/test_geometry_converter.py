@@ -6,7 +6,14 @@ from types import SimpleNamespace
 
 import geopandas as gpd
 import pytest
-from shapely.geometry import LineString, MultiPoint, MultiPolygon, Point, Polygon
+from shapely.geometry import (
+    LinearRing,
+    LineString,
+    MultiPoint,
+    MultiPolygon,
+    Point,
+    Polygon,
+)
 
 from earthlens.gee.vector import geometry as geometry_module
 from earthlens.gee.vector.geometry import GeometryConverter, GeometryConverterConfig
@@ -129,12 +136,20 @@ class TestToEe:
         )
         assert len(GeometryConverter().to_ee(gdf).features) == 2
 
+    def test_a_multipoint_row_explodes(self, fake_ee):
+        """A MultiPoint row is exploded to one feature per point part."""
+        gdf = gpd.GeoDataFrame(
+            {"geometry": [MultiPoint([(0, 0), (1, 1)])]}, crs="EPSG:4326"
+        )
+        assert len(GeometryConverter().to_ee(gdf).features) == 2
+
     def test_an_unconvertible_row_is_named(self, fake_ee):
         """A row the converter cannot handle raises naming its index and type."""
         gdf = gpd.GeoDataFrame(
-            {"geometry": [_SQUARE, MultiPoint([(0, 0), (1, 1)])]}, crs="EPSG:4326"
+            {"geometry": [_SQUARE, LinearRing([(0, 0), (1, 0), (1, 1), (0, 0)])]},
+            crs="EPSG:4326",
         )
-        with pytest.raises(ValueError, match="row 1 .MultiPoint."):
+        with pytest.raises(ValueError, match="row 1 .LinearRing."):
             GeometryConverter().to_ee(gdf)
 
 

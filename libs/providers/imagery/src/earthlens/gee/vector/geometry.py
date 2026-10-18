@@ -128,9 +128,9 @@ class GeometryConverter:
             The corresponding `ee.Geometry`.
 
         Raises:
-            NotImplementedError: If the geometry is any other type (e.g.
-                `MultiPolygon`, `MultiPoint`); `to_ee` explodes a `MultiPolygon`
-                into per-polygon rows before reaching this.
+            NotImplementedError: If the geometry is any other type (e.g. a
+                `Multi*` or a `GeometryCollection`); `to_ee` explodes `Multi*`
+                rows into single-part rows before reaching this.
         """
         coords = shapely_geometry.__geo_interface__["coordinates"]
         geom_type = shapely_geometry.geom_type
@@ -152,15 +152,16 @@ class GeometryConverter:
     def to_ee(self, gdf: GeoDataFrame) -> FeatureCollection:
         """Build an `ee.FeatureCollection` from a `GeoDataFrame`.
 
-        A row holding a `MultiPolygon` is exploded into one feature per
-        constituent polygon; every other row converts through `to_ee_geometry`.
-        The non-geometry columns (narrowed to this converter's `columns`, if set)
-        become each feature's property dictionary.
+        A row holding a multi-part geometry (`MultiPolygon` / `MultiPoint` /
+        `MultiLineString`) is exploded into one feature per constituent part,
+        which keeps its property row; every other row converts through
+        `to_ee_geometry`. The non-geometry columns (narrowed to this converter's
+        `columns`, if set) become each feature's property dictionary.
 
         Args:
             gdf: A `GeoDataFrame` (or pyramids `FeatureCollection`, which is one)
                 whose `geometry` column holds `Polygon` / `Point` / `LineString`
-                / `MultiPolygon` geometries.
+                geometries, or their `Multi*` forms (auto-exploded).
 
         Returns:
             An `ee.FeatureCollection` with one feature per (exploded) row.
@@ -171,7 +172,7 @@ class GeometryConverter:
                 missing.
         """
         geom_types = [geom.geom_type for geom in gdf["geometry"]]
-        if "MultiPolygon" in geom_types:
+        if any(geom_type.startswith("Multi") for geom_type in geom_types):
             gdf = gdf.explode(index_parts=True)
         ee_geometries: list[Geometry] = []
         for row_index, geom in enumerate(gdf.geometry):
