@@ -1430,6 +1430,17 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 `earthlens.gee.jobs` (`get_task_status`,
                 `wait_for_task_id`, etc.).
 
+            With a `sampler=` (the vector / tabular paths) the entries are the
+            sampled result per `(dataset, band-set, time-bucket)` instead of a
+            raster destination:
+
+            * a `vector` sampler over `export_via="url"` — a `GeoDataFrame` per
+                bucket (the sampled features pulled back client-side).
+            * a `tabular` sampler over `export_via="url"` — a `DataFrame` per
+                bucket.
+            * a batch sink (`"drive"` / `"gcs"` / `"asset"`) — a `TaskInfo` per
+                bucket, the table export queued remotely through the `TableSink`.
+
         Raises:
             ValueError: On an unknown asset id, an unknown band, or an
                 oversized `"url"` request (see `_api`).
