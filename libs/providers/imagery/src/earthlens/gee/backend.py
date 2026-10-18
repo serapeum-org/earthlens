@@ -1161,12 +1161,29 @@ class GEE(LazyClientMixin, AbstractDataSource):
             path=path,
         )
 
-        # Epic 3 vector/tabular output: when a `sampler` is supplied, each
-        # composited bucket is sampled into an `ee.FeatureCollection` rather
-        # than exported as a raster, and the instance reports its output kind
-        # from the sampler (the jrc backend also overrides OUTPUT_KIND per
-        # instance). With no sampler the class default `"raster"` and the whole
-        # existing download path are untouched.
+        self._configure_sampler(sampler, geometry)
+
+    def _configure_sampler(
+        self, sampler: Sampler | None, geometry: GeoDataFrame | None
+    ) -> None:
+        """Record a sampler and its geometry, setting `OUTPUT_KIND` from it.
+
+        Epic 3 vector/tabular output: when a `sampler` is supplied, each
+        composited bucket is sampled into an `ee.FeatureCollection` rather than
+        exported as a raster, and the instance reports its output kind from the
+        sampler (the jrc backend also overrides `OUTPUT_KIND` per instance).
+        With no sampler the class default `"raster"` and the whole existing
+        download path are untouched.
+
+        Args:
+            sampler: The sampler to drive `download()` with, or `None`.
+            geometry: The geometry the sampler samples over.
+
+        Raises:
+            ValueError: If a sampler is given without a geometry, with
+                `materialize=True`, or in a configuration the backend's
+                server-side path cannot drive (see `_ensure_backend_compatible`).
+        """
         self._sampler = sampler
         self._geometry = geometry
         if sampler is not None:

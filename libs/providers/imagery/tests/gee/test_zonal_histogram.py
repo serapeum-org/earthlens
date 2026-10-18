@@ -134,8 +134,9 @@ class TestSample:
         """A point geometry is not a zone."""
         hist = ZonalHistogram(scale_m=30, class_band="lc")
         points = gpd.GeoDataFrame({"geometry": [Point(0, 0)]}, crs=4326)
+        image = _FakeImage()
         with pytest.raises(ValueError, match="Point"):
-            hist.sample(_FakeImage(), points)
+            hist.sample(image, points)
 
 
 class TestSampleToGdf:

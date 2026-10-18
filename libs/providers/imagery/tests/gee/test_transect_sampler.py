@@ -37,14 +37,16 @@ class TestTransectSamplerServer:
     def test_empty_gdf_is_refused(self):
         """An empty frame is rejected before densifying."""
         empty = gpd.GeoDataFrame({"geometry": []}, crs="EPSG:4326")
+        sampler = TransectSampler(scale_m=30)
         with pytest.raises(ValueError, match="non-empty GeoDataFrame"):
-            TransectSampler(scale_m=30).sample(object(), empty)
+            sampler.sample(object(), empty)
 
     def test_a_point_row_is_refused(self):
         """A non-line geometry raises, naming the offending row."""
         gdf = gpd.GeoDataFrame({"geometry": [Point(0, 0)]}, crs="EPSG:4326")
+        sampler = TransectSampler(scale_m=30)
         with pytest.raises(ValueError, match="row 0 is a Point"):
-            TransectSampler(scale_m=30).sample(object(), gdf)
+            sampler.sample(object(), gdf)
 
     def test_it_densifies_into_ordered_points_with_distance(self, monkeypatch):
         """The line becomes n_points ordered points carrying a dist_m column."""

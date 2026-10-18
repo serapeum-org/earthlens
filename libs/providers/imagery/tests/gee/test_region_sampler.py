@@ -137,14 +137,18 @@ class TestServerStrategy:
     def test_empty_geometry_is_refused(self, fake_server):
         """An empty frame is rejected before any reduction."""
         empty = gpd.GeoDataFrame({"geometry": []}, crs="EPSG:4326")
+        sampler = RegionSampler(scale_m=30)
+        image = _FakeImage()
         with pytest.raises(ValueError, match="non-empty"):
-            RegionSampler(scale_m=30).sample(_FakeImage(), empty)
+            sampler.sample(image, empty)
 
     def test_a_point_row_is_refused(self, fake_server):
         """A non-polygon geometry raises, naming the row."""
         gdf = gpd.GeoDataFrame({"id": [0]}, geometry=[Point(0, 0)], crs="EPSG:4326")
+        sampler = RegionSampler(scale_m=30)
+        image = _FakeImage()
         with pytest.raises(ValueError, match="row 0 is a Point"):
-            RegionSampler(scale_m=30).sample(_FakeImage(), gdf)
+            sampler.sample(image, gdf)
 
 
 class TestSampleToGdf:
@@ -178,10 +182,10 @@ class TestSampleToGdf:
 
     def test_client_without_dataset_is_refused(self):
         """The client strategy needs an in-memory dataset."""
+        sampler = RegionSampler(scale_m=30, strategy=ZonalStrategy.CLIENT)
+        polygons = _polygons()
         with pytest.raises(ValueError, match="in-memory pyramids Dataset"):
-            RegionSampler(scale_m=30, strategy=ZonalStrategy.CLIENT).sample_to_gdf(
-                None, _polygons()
-            )
+            sampler.sample_to_gdf(None, polygons)
 
 
 class TestZonalStatsHelper:

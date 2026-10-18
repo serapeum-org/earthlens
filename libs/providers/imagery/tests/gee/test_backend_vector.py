@@ -102,25 +102,28 @@ class TestOutputKind:
 
     def test_a_sampler_without_geometry_is_refused(self, tmp_path):
         """A sampler needs something to sample over."""
+        sampler = RegionSampler(scale_m=30)
         with pytest.raises(ValueError, match="needs a geometry"):
-            _make_gee(tmp_path, sampler=RegionSampler(scale_m=30))
+            _make_gee(tmp_path, sampler=sampler)
 
     def test_materialize_with_a_sampler_is_refused(self, tmp_path):
         """materialize=True is meaningless with a sampler, so it is refused up-front."""
+        sampler = RegionSampler(scale_m=30)
         with pytest.raises(ValueError, match="materialize=True has no effect"):
             _make_gee(
                 tmp_path,
-                sampler=RegionSampler(scale_m=30),
+                sampler=sampler,
                 geometry=_POLYS,
                 materialize=True,
             )
 
     def test_a_client_region_sampler_is_refused(self, tmp_path):
         """A CLIENT-strategy region sampler can't be driven by the backend."""
+        sampler = RegionSampler(scale_m=30, strategy=ZonalStrategy.CLIENT)
         with pytest.raises(ValueError, match="strategy=CLIENT"):
             _make_gee(
                 tmp_path,
-                sampler=RegionSampler(scale_m=30, strategy=ZonalStrategy.CLIENT),
+                sampler=sampler,
                 geometry=_POLYS,
             )
 
@@ -166,7 +169,8 @@ class TestSamplePayload:
             "img", _WHEN, _WHEN, _WHEN, var_info, ["elevation"]
         )
         assert result == "fake-taskinfo"
-        assert built["destination"] == "drive" and built["folder"] == "exports"
+        assert built["destination"] == "drive"
+        assert built["folder"] == "exports"
         assert built["file_format"] == "GeoJSON"  # vector keeps geometry
         assert built["features"] == "fake-fc"
         assert built["description"] == "USGS_SRTMGL1_003_elevation_20240101"

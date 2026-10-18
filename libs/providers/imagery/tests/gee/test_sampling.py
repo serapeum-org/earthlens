@@ -70,13 +70,15 @@ class TestShimReducerContract:
 
     def test_mosaic_is_refused(self):
         """`mosaic` has no `ee.Reducer`, so the strict default refuses it up front."""
+        gdf = _points_gdf(1)
         with pytest.raises(ValueError, match="mosaic"):
-            sample_points(object(), _points_gdf(1), scale_m=30, reducer="mosaic")
+            sample_points(object(), gdf, scale_m=30, reducer="mosaic")
 
     def test_unknown_reducer_is_refused(self):
         """An unknown reducer name is refused at construction."""
+        gdf = _points_gdf(1)
         with pytest.raises(ValueError, match="unsupported reducer"):
-            sample_points(object(), _points_gdf(1), scale_m=30, reducer="bogus")
+            sample_points(object(), gdf, scale_m=30, reducer="bogus")
 
     def test_empty_gdf_is_refused(self):
         """An empty GeoDataFrame is rejected before any Earth Engine call."""

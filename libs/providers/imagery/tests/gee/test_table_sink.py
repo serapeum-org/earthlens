@@ -97,7 +97,8 @@ class TestTableSinkWrite:
         )
         name, kwargs = fake_export.calls[0]
         assert name == "toDrive"
-        assert kwargs["folder"] == "exports" and kwargs["fileFormat"] == "CSV"
+        assert kwargs["folder"] == "exports"
+        assert kwargs["fileFormat"] == "CSV"
         assert fake_export.task.started is True
         assert result is _SENTINEL
 
@@ -105,7 +106,8 @@ class TestTableSinkWrite:
         """GCS passes the bucket."""
         TableSink(destination="gcs", bucket="my-bucket").write("fc", description="d")
         name, kwargs = fake_export.calls[0]
-        assert name == "toCloudStorage" and kwargs["bucket"] == "my-bucket"
+        assert name == "toCloudStorage"
+        assert kwargs["bucket"] == "my-bucket"
 
     def test_asset(self, fake_export):
         """Asset passes the asset id."""
@@ -113,7 +115,8 @@ class TestTableSinkWrite:
             "fc", description="d"
         )
         name, kwargs = fake_export.calls[0]
-        assert name == "toAsset" and kwargs["assetId"] == "users/me/pts"
+        assert name == "toAsset"
+        assert kwargs["assetId"] == "users/me/pts"
 
     def test_bigquery(self, fake_export):
         """BigQuery passes the table."""
@@ -121,7 +124,8 @@ class TestTableSinkWrite:
             "fc", description="d"
         )
         name, kwargs = fake_export.calls[0]
-        assert name == "toBigQuery" and kwargs["table"] == "proj.ds.tbl"
+        assert name == "toBigQuery"
+        assert kwargs["table"] == "proj.ds.tbl"
 
     def test_featureview(self, fake_export):
         """FeatureView passes the asset id."""
@@ -129,7 +133,8 @@ class TestTableSinkWrite:
             "fc", description="d"
         )
         name, kwargs = fake_export.calls[0]
-        assert name == "toFeatureView" and kwargs["assetId"] == "users/me/fv"
+        assert name == "toFeatureView"
+        assert kwargs["assetId"] == "users/me/fv"
 
     def test_wait_for_export_blocks(self, fake_export):
         """With wait_for_export the task is waited on before the TaskInfo."""
@@ -150,7 +155,8 @@ class TestTableSinkWrite:
             unit, description="my-desc"
         )
         name, kwargs = fake_export.calls[0]
-        assert name == "toDrive" and kwargs["description"] == "my-desc"
+        assert name == "toDrive"
+        assert kwargs["description"] == "my-desc"
         assert result is _SENTINEL
 
     def test_export_default_description_is_the_unit_repr(self, fake_export):

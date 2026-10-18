@@ -70,8 +70,10 @@ class TestRandomSampler:
     def test_a_non_polygon_region_is_refused(self, fake_converter):
         """The bounding region must be a polygon."""
         gdf = gpd.GeoDataFrame({"id": [0]}, geometry=[Point(0, 0)], crs="EPSG:4326")
+        sampler = RandomSampler(scale_m=30, n_points=10)
+        image = _FakeImage()
         with pytest.raises(ValueError, match="row 0 is a Point"):
-            RandomSampler(scale_m=30, n_points=10).sample(_FakeImage(), gdf)
+            sampler.sample(image, gdf)
 
 
 class TestStratifiedSampler:
@@ -111,10 +113,10 @@ class TestStratifiedSampler:
     def test_a_non_polygon_region_is_refused(self, fake_converter):
         """The bounding region must be a polygon."""
         gdf = gpd.GeoDataFrame({"id": [0]}, geometry=[Point(0, 0)], crs="EPSG:4326")
+        sampler = StratifiedSampler(scale_m=30, class_band="lc", n_per_class=10)
+        image = _FakeImage()
         with pytest.raises(ValueError, match="row 0 is a Point"):
-            StratifiedSampler(scale_m=30, class_band="lc", n_per_class=10).sample(
-                _FakeImage(), gdf
-            )
+            sampler.sample(image, gdf)
 
 
 class TestPositiveCounts:

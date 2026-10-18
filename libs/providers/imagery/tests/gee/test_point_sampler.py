@@ -88,8 +88,10 @@ class TestPointSampler:
     def test_empty_gdf_is_refused(self):
         """An empty frame is rejected before any Earth Engine call."""
         empty = gpd.GeoDataFrame({"geometry": []}, crs="EPSG:4326")
+        sampler = PointSampler(scale_m=30)
+        image = _FakeImage()
         with pytest.raises(ValueError, match="non-empty GeoDataFrame"):
-            PointSampler(scale_m=30).sample(_FakeImage(), empty)
+            sampler.sample(image, empty)
 
     def test_a_polygon_row_is_refused(self, fake_ee):
         """A non-point geometry raises, naming the offending row."""
@@ -98,8 +100,10 @@ class TestPointSampler:
             geometry=[Point(0, 0), Polygon([(1, 1), (2, 1), (2, 2), (1, 2)])],
             crs="EPSG:4326",
         )
+        sampler = PointSampler(scale_m=30)
+        image = _FakeImage()
         with pytest.raises(ValueError, match="row 1 is a Polygon"):
-            PointSampler(scale_m=30).sample(_FakeImage(), gdf)
+            sampler.sample(image, gdf)
 
     def test_multipoint_is_accepted(self, fake_ee, monkeypatch):
         """A MultiPoint row explodes through the real converter and samples cleanly."""

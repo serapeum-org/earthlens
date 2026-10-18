@@ -46,7 +46,7 @@ class _FakeFeatureCollection:
         self.features = list(features)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def fake_ee(monkeypatch):
     """Replace the converter module's `ee` with a recording fake."""
     fake = SimpleNamespace(
@@ -99,8 +99,10 @@ class TestToEeGeometry:
 
     def test_an_unsupported_type_is_refused(self, fake_ee):
         """A MultiPoint has no single-geometry factory here."""
+        converter = GeometryConverter()
+        geom = MultiPoint([(0, 0), (1, 1)])
         with pytest.raises(NotImplementedError, match="MultiPoint"):
-            GeometryConverter().to_ee_geometry(MultiPoint([(0, 0), (1, 1)]))
+            converter.to_ee_geometry(geom)
 
 
 class TestToEe:
@@ -149,8 +151,9 @@ class TestToEe:
             {"geometry": [_SQUARE, LinearRing([(0, 0), (1, 0), (1, 1), (0, 0)])]},
             crs="EPSG:4326",
         )
+        converter = GeometryConverter()
         with pytest.raises(ValueError, match="row 1 .LinearRing."):
-            GeometryConverter().to_ee(gdf)
+            converter.to_ee(gdf)
 
 
 class TestGeometryConverterProperties:
