@@ -14,6 +14,8 @@ the rendered API.
 
 ::: earthlens.gee.features
 
+::: earthlens.gee.vector.geometry
+
 ::: earthlens.gee.reducers
 
 ::: earthlens.gee.engines

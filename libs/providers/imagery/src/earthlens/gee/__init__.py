@@ -37,6 +37,8 @@ Public surface (re-exported from this package):
   (`ee.Initialize` against a registered project; base64 key encode/decode).
 * `create_geometry` / `create_feature` — Shapely /
   `GeoDataFrame` → `ee.Geometry` / `ee.FeatureCollection` converters.
+* `GeometryConverter` — the configurable, `LineString`-capable class
+  form of those converters, shared across the sampling family.
 * `sample_points` / `sample_points_to_gdf` — sample a
   raster at point locations via leaf-batched `reduceRegions`; the
   `_to_gdf` variant returns a `GeoDataFrame` via `getInfo()`.
@@ -290,6 +292,7 @@ from earthlens.gee.sinks import (
     UrlSink,
     resolve_sink,
 )
+from earthlens.gee.vector import GeometryConverter
 from earthlens.gee.work import (
     Artifact,
     DownloadResult,
@@ -319,6 +322,7 @@ __all__ = [
     "EarthEngineAuth",
     "create_geometry",
     "create_feature",
+    "GeometryConverter",
     "feature_collection_to_dataframe",
     "feature_collection_to_gdf",
     "feature_collections_to_dataframe",
