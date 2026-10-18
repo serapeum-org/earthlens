@@ -28,8 +28,9 @@ class _FakeFeature:
 class _FakeSampled:
     """A sampled collection whose `map` exercises the stamping function."""
 
-    def __init__(self, image_tag):
+    def __init__(self, image_tag, geometry=None):
         self.image_tag = image_tag
+        self.geometry = geometry
 
     def map(self, fn):
         feature = _FakeFeature()
@@ -63,6 +64,15 @@ def _points() -> gpd.GeoDataFrame:
     return gpd.GeoDataFrame({"geometry": [Point(0, 0)]}, crs="EPSG:4326")
 
 
+_SAMPLE_CALLS: list = []
+
+
+def _recording_sample(self, image, geometry):
+    """Record the geometry a point sampler was handed, for assertion."""
+    _SAMPLE_CALLS.append(geometry)
+    return _FakeSampled(image._time_start, geometry)
+
+
 @pytest.fixture
 def fake_sample(monkeypatch):
     """Patch the empty collection and the delegated PointSampler.sample."""
@@ -72,7 +82,7 @@ def fake_sample(monkeypatch):
     monkeypatch.setattr(
         point_module.PointSampler,
         "sample",
-        lambda self, image, geometry: _FakeSampled(image._time_start),
+        lambda self, image, geometry: _FakeSampled(image._time_start, geometry),
     )
 
 
@@ -90,6 +100,16 @@ class TestTimeSeriesSamplerSample:
             "system:time_start=100",
             "system:time_start=200",
         ]
+
+    def test_a_point_id_is_injected_before_sampling(self, fake_sample, monkeypatch):
+        """Each point carries a stable point_id so the series stays groupable."""
+        _SAMPLE_CALLS.clear()
+        monkeypatch.setattr(point_module.PointSampler, "sample", _recording_sample)
+        points = gpd.GeoDataFrame(
+            {"geometry": [Point(0, 0), Point(1, 1)]}, crs="EPSG:4326"
+        )
+        TimeSeriesSampler(scale_m=30).sample([_FakeImage(100)], points)
+        assert list(_SAMPLE_CALLS[0]["point_id"]) == [0, 1]
 
 
 class TestTimeSeriesSamplerToGdf:
@@ -115,12 +135,12 @@ class TestTimeSeriesSamplerToGdf:
         out = TimeSeriesSampler(scale_m=30).sample_to_gdf([], _points())
         assert out is long_df
 
-    def test_wide_pivots_on_timestamp(self, monkeypatch):
-        """With `wide`, the long table pivots to one column per timestamp."""
+    def test_wide_pivots_on_the_reduced_value_column(self, monkeypatch):
+        """With `wide`, the real band column (not a literal 'value') pivots per timestamp."""
         from earthlens.gee.vector import download as download_module
 
         long_df = pd.DataFrame(
-            {"point_id": [0, 0], "timestamp": [100, 200], "value": [1.0, 2.0]}
+            {"point_id": [0, 0], "timestamp": [100, 200], "elevation": [1.0, 2.0]}
         )
         monkeypatch.setattr(
             download_module.FeatureDownloader,
@@ -131,6 +151,5 @@ class TestTimeSeriesSamplerToGdf:
             ts_module.TimeSeriesSampler, "sample", lambda self, image, geometry: "fc"
         )
         out = TimeSeriesSampler(scale_m=30, wide=True).sample_to_gdf([], _points())
-        assert list(out.columns) == [100, 200]
-        assert out.loc[0, 100] == 1.0
-        assert out.loc[0, 200] == 2.0
+        assert out.loc[0, ("elevation", 100)] == 1.0
+        assert out.loc[0, ("elevation", 200)] == 2.0

@@ -3,10 +3,11 @@
 `TimeSeriesSampler` samples one point set against every image of a time stack -
 one `ee.Image` per time bucket - and returns a long table of one row per point
 per bucket (or a wide table, one column per timestamp, with `wide=True`). Each
-bucket's image is reduced through a shared `PointSampler`, and every resulting
-feature is stamped with that bucket's `system:time_start` as a `timestamp`
-property before the buckets are merged, so the series stays addressable by time
-after the merge.
+bucket's image is reduced through a shared `PointSampler`; every point carries a
+stable `point_id` (its position in the input frame) and every resulting feature is
+stamped with that bucket's `system:time_start` as a `timestamp` property before the
+buckets are merged, so the series stays addressable by point and time after the
+merge (which is what the `wide=True` table pivots on).
 """
 
 from __future__ import annotations
@@ -56,13 +57,15 @@ class TimeSeriesSampler(Sampler):
 
         Returns:
             One long `ee.FeatureCollection` of (points x buckets), every feature
-            carrying a `timestamp` property.
+            carrying a `point_id` (its row position in `geometry`) and a `timestamp`
+            property.
         """
         point_sampler = PointSampler(scale_m=self.scale_m, reducer=self.reducer)
+        indexed = geometry.assign(point_id=list(range(len(geometry))))
         merged = ee.FeatureCollection([])
         for bucket_image in image:
             timestamp = bucket_image.get("system:time_start")
-            stamped = point_sampler.sample(bucket_image, geometry).map(
+            stamped = point_sampler.sample(bucket_image, indexed).map(
                 lambda feature, ts=timestamp: feature.set("timestamp", ts)
             )
             merged = merged.merge(stamped)
@@ -85,11 +88,15 @@ class TimeSeriesSampler(Sampler):
         from earthlens.gee.vector.download import FeatureDownloader
 
         long_table = FeatureDownloader().to_gdf(self.sample(image, geometry), crs=crs)
-        result = (
-            long_table.pivot_table(
-                index="point_id", columns="timestamp", values="value"
+        if self.wide:
+            value_columns = [
+                column
+                for column in long_table.columns
+                if column not in ("point_id", "timestamp", "geometry")
+            ]
+            result = long_table.pivot_table(
+                index="point_id", columns="timestamp", values=value_columns
             )
-            if self.wide
-            else long_table
-        )
+        else:
+            result = long_table
         return cast("FeatureCollection", result)
