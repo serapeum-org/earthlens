@@ -313,8 +313,9 @@ class TestSkipOnPublicEndpointBlock:
 
     def test_bare_403_skips(self) -> None:
         """A keyless endpoint's 403 is a throttle, so it skips with the prefix."""
+        blocked = _WithResponse("forbidden", 403)
         with pytest.raises(pytest.skip.Exception, match=f"{_LIVE_SKIP_PREFIX}.*403"):
-            skip_on_public_endpoint_block(_WithResponse("forbidden", 403))
+            skip_on_public_endpoint_block(blocked)
 
     def test_403_wrapped_in_a_value_error_skips(self) -> None:
         """A 403 reached through a backend's ValueError wrapper still skips."""
@@ -329,15 +330,18 @@ class TestSkipOnPublicEndpointBlock:
 
     def test_404_reraises(self) -> None:
         """A 404 is a real answer, not a block, so it is re-raised unchanged."""
+        missing = _WithResponse("missing", 404)
         with pytest.raises(_WithResponse, match="missing"):
-            skip_on_public_endpoint_block(_WithResponse("missing", 404))
+            skip_on_public_endpoint_block(missing)
 
     def test_429_still_skips_via_the_shared_classifier(self) -> None:
         """A 429 is forgiven by skip_on_upstream, not special-cased here."""
+        throttled = _WithResponse("slow down", 429)
         with pytest.raises(pytest.skip.Exception):
-            skip_on_public_endpoint_block(_WithResponse("slow down", 429))
+            skip_on_public_endpoint_block(throttled)
 
     def test_content_error_reraises(self) -> None:
         """An error carrying no HTTP status is a real failure, re-raised."""
+        bad = ValueError("bad bbox")
         with pytest.raises(ValueError, match="bad bbox"):
-            skip_on_public_endpoint_block(ValueError("bad bbox"))
+            skip_on_public_endpoint_block(bad)
