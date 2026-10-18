@@ -1158,6 +1158,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 raise ValueError(
                     "a sampler needs a geometry to sample over; pass geometry=..."
                 )
+            if self.materialize:
+                raise ValueError(
+                    "materialize=True has no effect with a sampler: a sampler returns "
+                    "its vector/tabular result directly rather than reading pixels back "
+                    "from disk. Drop materialize=, or drop the sampler."
+                )
             self.OUTPUT_KIND = cast("OutputKind", sampler.output_kind)
 
     def _resolve_credentials(self) -> tuple[str | None, str | None, str | None]:

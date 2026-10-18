@@ -71,6 +71,16 @@ class TestOutputKind:
         with pytest.raises(ValueError, match="needs a geometry"):
             _make_gee(tmp_path, sampler=RegionSampler(scale_m=30))
 
+    def test_materialize_with_a_sampler_is_refused(self, tmp_path):
+        """materialize=True is meaningless with a sampler, so it is refused up-front."""
+        with pytest.raises(ValueError, match="materialize=True has no effect"):
+            _make_gee(
+                tmp_path,
+                sampler=RegionSampler(scale_m=30),
+                geometry=_POLYS,
+                materialize=True,
+            )
+
 
 class TestSampleBucket:
     """_sample_bucket routes the sampler's collection by the sink kind."""
