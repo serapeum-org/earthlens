@@ -88,14 +88,14 @@ class TestStratifiedSampler:
         assert image.stratified_kwargs["classBand"] == "lc"
 
     def test_scalar_count_with_named_class_values(self, fake_converter):
-        """Named class_values are forwarded for a scalar count."""
+        """A scalar count with named class_values pairs classValues/classPoints."""
         image = _FakeImage()
         StratifiedSampler(
             scale_m=30, class_band="lc", n_per_class=50, class_values=(1, 2, 3)
         ).sample(image, _region())
         assert image.stratified_kwargs["classValues"] == [1, 2, 3]
-        assert image.stratified_kwargs["classPoints"] is None
-        assert image.stratified_kwargs["numPoints"] == 50
+        assert image.stratified_kwargs["classPoints"] == [50, 50, 50]
+        assert image.stratified_kwargs["numPoints"] == 0
 
     def test_mapping_splits_into_parallel_lists(self, fake_converter):
         """A {class: count} mapping becomes parallel classValues / classPoints."""

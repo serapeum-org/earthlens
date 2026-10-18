@@ -113,8 +113,11 @@ class StratifiedSampler(Sampler):
     def sample(self, image: ee.Image, geometry: GeoDataFrame) -> ee.FeatureCollection:
         """Draw per-class points over the region and read `image` at each.
 
-        A scalar `n_per_class` is passed as `numPoints`; a mapping is split into
-        parallel `classValues` / `classPoints` so each class's count is exact.
+        A bare scalar `n_per_class` is passed as `numPoints`; a scalar with
+        `class_values` set restricts the draw to those classes, each getting that
+        count, as paired `classValues` / `classPoints` (Earth Engine requires the
+        two lists to be the same length); a mapping is split into parallel
+        `classValues` / `classPoints` so each class's count is exact.
 
         Args:
             image: The `ee.Image` to sample.
@@ -134,10 +137,12 @@ class StratifiedSampler(Sampler):
             class_values: list[int] | None = keys
             class_points: list[int] | None = [self.n_per_class[value] for value in keys]
             num_points = 0
+        elif self.class_values is not None:
+            class_values = list(self.class_values)
+            class_points = [self.n_per_class] * len(class_values)
+            num_points = 0
         else:
-            class_values = (
-                list(self.class_values) if self.class_values is not None else None
-            )
+            class_values = None
             class_points = None
             num_points = self.n_per_class
         collection = image.stratifiedSample(
