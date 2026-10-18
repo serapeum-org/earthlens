@@ -16,6 +16,7 @@ or `area` in m^2).
 
 from __future__ import annotations
 
+from functools import lru_cache
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, cast
 
 import ee
@@ -31,6 +32,30 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
 __all__ = ["ZonalHistogram"]
 
 
+@lru_cache(maxsize=256)
+def _catalog_class_labels(dataset_id: str, band_id: str) -> dict[int, str]:
+    """Return a categorical band's class legend from the catalog, or empty.
+
+    Args:
+        dataset_id: The Earth Engine asset id whose catalog entry is read.
+        band_id: The categorical band whose `classes` legend is wanted.
+
+    Returns:
+        The band's `classes` legend (integer code to class name), or an empty
+        mapping when the dataset, the band, or the legend is absent.
+    """
+    from earthlens.gee.catalog import Catalog
+
+    result: dict[int, str] = {}
+    try:
+        band = Catalog().get_band(dataset_id, band_id)
+    except ValueError:
+        band = None
+    if band is not None and band.classes:
+        result = dict(band.classes)
+    return result
+
+
 class ZonalHistogram(Sampler):
     """Per-zone, per-class pixel counts and areas for a categorical raster.
 
@@ -40,7 +65,9 @@ class ZonalHistogram(Sampler):
     pixel `count`, the `fraction` of the zone (columns sum to 1), or the ground
     `area` in square metres (summed from `ee.Image.pixelArea()`, correct on a
     geographic CRS). Class columns are labelled from `class_labels` when given,
-    otherwise by the raw integer code. `scale_m` comes from the `Sampler` base.
+    else from the catalog's `classes` legend when `dataset_id` names a dataset
+    whose `class_band` declares one, else by the raw integer code. `scale_m`
+    comes from the `Sampler` base.
 
     Examples:
         - A zonal histogram carries its class band and normalisation:
@@ -69,6 +96,7 @@ class ZonalHistogram(Sampler):
     class_band: str  # the categorical band whose classes are counted per zone
     normalize: Literal["count", "fraction", "area"] = "count"  # column unit
     class_labels: dict[int, str] | None = None  # code -> column name; None = raw codes
+    dataset_id: str | None = None  # resolve labels from this dataset's catalog legend
     tile_scale: float = 1.0  # Earth Engine tileScale (0.1-16); raise to 2/4 on OOM
 
     @field_validator("tile_scale")
@@ -147,15 +175,24 @@ class ZonalHistogram(Sampler):
         return cast("FeatureCollection", self.backend_to_gdf(image, geometry, crs=crs))
 
     def _label(self, code: int) -> str:
-        """Name a class column from `class_labels`, else the raw code.
+        """Name a class column from `class_labels`, the catalog legend, else the code.
 
         Args:
             code: The integer class value.
 
         Returns:
-            The mapped label, or the code as a string when unmapped.
+            The explicit `class_labels` name when given, else the dataset's
+            catalog `classes` label, falling back to the code as a string.
         """
-        return (self.class_labels or {}).get(code, str(code))
+        if self.class_labels and code in self.class_labels:
+            result = self.class_labels[code]
+        elif self.dataset_id is not None:
+            result = _catalog_class_labels(self.dataset_id, self.class_band).get(
+                code, str(code)
+            )
+        else:
+            result = str(code)
+        return result
 
     def _value(self, group: dict[str, Any], total: float) -> float:
         """Pick the column value for one class group under `normalize`.

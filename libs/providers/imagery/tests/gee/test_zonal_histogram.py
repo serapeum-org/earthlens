@@ -102,13 +102,14 @@ class TestConstruction:
     """The frozen configuration a ZonalHistogram carries."""
 
     def test_defaults(self):
-        """It defaults to raw counts, all-code labels, and tile_scale 1."""
+        """It defaults to raw counts, all-code labels, no dataset, tile_scale 1."""
         hist = ZonalHistogram(scale_m=30, class_band="lc")
-        assert (hist.normalize, hist.class_labels, hist.tile_scale) == (
-            "count",
-            None,
-            1.0,
-        )
+        assert (
+            hist.normalize,
+            hist.class_labels,
+            hist.dataset_id,
+            hist.tile_scale,
+        ) == ("count", None, None, 1.0)
 
     @pytest.mark.parametrize("bad", [0.0, 20.0])
     def test_tile_scale_is_range_checked(self, bad):
@@ -195,3 +196,62 @@ class TestSampleToGdf:
         out = hist.sample_to_gdf(_FakeImage(), _zones(_SQUARE, _SQUARE_2))
         assert "forest" in out.columns
         assert "2" in out.columns
+
+
+class TestCatalogClassLabels:
+    """The catalog-backed class-legend lookup."""
+
+    def setup_method(self):
+        histogram_module._catalog_class_labels.cache_clear()
+
+    def test_reads_a_shipped_categorical_legend(self):
+        """A shipped categorical band's classes resolve from the catalog."""
+        labels = histogram_module._catalog_class_labels("ESA/WorldCover/v100", "Map")
+        assert labels[10] == "Tree cover" and labels[20] == "Shrubland"
+
+    def test_unknown_dataset_is_empty(self):
+        """An unknown dataset id degrades to an empty legend, not an error."""
+        assert histogram_module._catalog_class_labels("NO/SUCH/DATASET", "x") == {}
+
+    def test_continuous_band_is_empty(self):
+        """A band that declares no classes legend resolves to empty."""
+        labels = histogram_module._catalog_class_labels(
+            "COPERNICUS/S2_SR_HARMONIZED", "B4"
+        )
+        assert labels == {}
+
+
+class TestLabelResolution:
+    """How `_label` picks a class column name."""
+
+    def setup_method(self):
+        histogram_module._catalog_class_labels.cache_clear()
+
+    def test_explicit_labels_win_over_catalog(self):
+        """`class_labels` takes precedence over the catalog legend."""
+        hist = ZonalHistogram(
+            scale_m=30,
+            class_band="Map",
+            dataset_id="ESA/WorldCover/v100",
+            class_labels={10: "my forest"},
+        )
+        assert hist._label(10) == "my forest"
+
+    def test_catalog_resolves_when_no_explicit_label(self):
+        """With `dataset_id` set, labels come from the catalog legend."""
+        hist = ZonalHistogram(
+            scale_m=30, class_band="Map", dataset_id="ESA/WorldCover/v100"
+        )
+        assert hist._label(20) == "Shrubland"
+
+    def test_code_absent_from_legend_stays_raw(self):
+        """A code the legend does not cover falls back to its string form."""
+        hist = ZonalHistogram(
+            scale_m=30, class_band="Map", dataset_id="ESA/WorldCover/v100"
+        )
+        assert hist._label(999) == "999"
+
+    def test_no_dataset_no_labels_is_raw(self):
+        """Without `dataset_id` or `class_labels` a code is its string form."""
+        hist = ZonalHistogram(scale_m=30, class_band="lc")
+        assert hist._label(7) == "7"
