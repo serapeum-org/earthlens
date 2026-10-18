@@ -1,5 +1,24 @@
 # Change Log
 
+## 0.28.0 (2026-10-18)
+
+### BREAKING CHANGE
+
+- with pyramids-eo always installed, engine="auto" now
+prefers the EEDAI reader for any raw fetch it can serve, where that
+preference was previously gated on the optional [eedai] extra. The
+reader samples and grids differently from Earth Engine; pass
+engine="ee" to force Earth Engine's exact sampling.
+
+### Feat
+
+- **gee**: add the client-side raster-analysis subpackage (#1287)
+- **gee**: Epic 1 - architectural seams and OOP foundation (#1249)
+
+### Fix
+
+- **gee**: make reader_refusal_types() total, and strip the rST roles repo-wide (#1274)
+
 ## 0.27.1 (2026-10-10)
 
 ### Fix
