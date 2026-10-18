@@ -9,6 +9,7 @@ import geopandas as gpd
 import pytest
 from shapely.geometry import Point, Polygon
 
+from earthlens.gee import backend as backend_module
 from earthlens.gee.backend import GEE
 from earthlens.gee.sampling.histogram import ZonalHistogram
 from earthlens.gee.sampling.region import RegionSampler, ZonalStrategy
@@ -42,6 +43,18 @@ class _FakeSampler:
         return None
 
 
+class _StampImage:
+    """A fake `ee.Image` recording `set(...)` calls and returning itself."""
+
+    def __init__(self, name: str = ""):
+        self.name = name
+        self.props: dict = {}
+
+    def set(self, key, value):
+        self.props[key] = value
+        return self
+
+
 def _make_gee(tmp_path, **overrides) -> GEE:
     """Construct a GEE offline (its client is lazy) with sane defaults."""
     params = dict(
@@ -55,6 +68,19 @@ def _make_gee(tmp_path, **overrides) -> GEE:
     )
     params.update(overrides)
     return GEE(**params)
+
+
+class TestEpochMillis:
+    """The datetime -> ee `system:time_start` conversion."""
+
+    def test_a_naive_datetime_is_read_as_utc(self):
+        """A naive datetime (what `_composite` makes) is treated as UTC."""
+        assert backend_module._epoch_millis(dt.datetime(1970, 1, 1)) == 0
+
+    def test_a_tz_aware_datetime_is_respected(self):
+        """A tz-aware datetime keeps its offset."""
+        aware = dt.datetime(1970, 1, 1, 1, tzinfo=dt.timezone.utc)
+        assert backend_module._epoch_millis(aware) == 3_600_000
 
 
 class TestOutputKind:
@@ -248,8 +274,8 @@ class TestVectorDownload:
         gee = _make_gee(tmp_path, export_via="url", sampler=sampler, geometry=_PTS)
         var_info = SimpleNamespace(id="USGS/SRTMGL1_003", get_band=lambda band: None)
         units = [
-            RasterWorkUnit("imgA", _WHEN, _WHEN, _WHEN),
-            RasterWorkUnit("imgB", _WHEN, _WHEN, _WHEN),
+            RasterWorkUnit(_StampImage("A"), _WHEN, _WHEN, _WHEN),
+            RasterWorkUnit(_StampImage("B"), _WHEN, _WHEN, _WHEN),
         ]
         seen = {}
         monkeypatch.setattr(
@@ -269,7 +295,45 @@ class TestVectorDownload:
         result = gee._download_dataset("USGS/SRTMGL1_003", ["elevation"], False)
         # One result for the whole stack, and the sampler saw the list of images.
         assert result == ["table"]
-        assert seen["image"] == ["imgA", "imgB"]
+        assert [image.name for image in seen["image"]] == ["A", "B"]
+
+    def test_stack_images_are_stamped_with_their_bucket_time(
+        self, tmp_path, monkeypatch
+    ):
+        """Each composited bucket is stamped with its `system:time_start`.
+
+        The compositing reducer strips per-scene time, so without this the
+        time-series would read a null timestamp for every bucket.
+        """
+        gee = _make_gee(
+            tmp_path,
+            export_via="url",
+            sampler=TimeSeriesSampler(scale_m=30),
+            geometry=_PTS,
+        )
+        when_a, when_b = dt.datetime(2024, 1, 1), dt.datetime(2024, 2, 1)
+        img_a, img_b = _StampImage("A"), _StampImage("B")
+        units = [
+            RasterWorkUnit(img_a, when_a, when_a, when_a),
+            RasterWorkUnit(img_b, when_b, when_b, when_b),
+        ]
+        var_info = SimpleNamespace(id="X", get_band=lambda band: None)
+        monkeypatch.setattr(
+            gee, "_catalog", SimpleNamespace(get_dataset=lambda asset: var_info)
+        )
+        monkeypatch.setattr(gee, "_clamp_window_to_extent", lambda vi: (when_a, when_b))
+        monkeypatch.setattr(gee, "_build_collection", lambda *a: "coll")
+        monkeypatch.setattr(gee, "_composite", lambda *a: units)
+        monkeypatch.setattr(
+            TimeSeriesSampler,
+            "backend_to_gdf",
+            lambda self, image, geometry, crs=4326: "table",
+        )
+        gee._download_dataset("X", ["b"], False)
+        expected_a = int(when_a.replace(tzinfo=dt.timezone.utc).timestamp() * 1000)
+        expected_b = int(when_b.replace(tzinfo=dt.timezone.utc).timestamp() * 1000)
+        assert img_a.props["system:time_start"] == expected_a
+        assert img_b.props["system:time_start"] == expected_b
 
     def test_a_stack_sampler_with_no_buckets_returns_empty(self, tmp_path, monkeypatch):
         """A consumes_stack sampler over an empty bucket list yields no results."""

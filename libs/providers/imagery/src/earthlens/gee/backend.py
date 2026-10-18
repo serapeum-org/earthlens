@@ -596,6 +596,22 @@ def _reader_errors(reader: Any) -> tuple[type[BaseException], ...]:
     return tuple(dict.fromkeys(errors))
 
 
+def _epoch_millis(when: dt.datetime) -> int:
+    """Epoch milliseconds for a datetime, for an ee `system:time_start`.
+
+    A naive datetime (which `_composite` produces from the request window) is
+    read as UTC, matching how Earth Engine stamps image times.
+
+    Args:
+        when: The bucket timestamp to convert.
+
+    Returns:
+        Milliseconds since the Unix epoch (UTC).
+    """
+    utc = when if when.tzinfo else when.replace(tzinfo=dt.UTC)
+    return int(utc.timestamp() * 1000)
+
+
 def _validate_filters(
     filters: Iterable[CollectionFilter] | None,
 ) -> tuple[CollectionFilter, ...]:
@@ -1691,11 +1707,30 @@ class GEE(LazyClientMixin, AbstractDataSource):
             iterator = tqdm(buckets, desc=f"{asset_id} [{','.join(bands)}]", unit="img")
         if self._sampler is not None:
             sampler = cast("Sampler", self._sampler)
-            if sampler.consumes_stack:
-                if not buckets:
-                    return []
-                stack = [unit.payload for unit in buckets]
-                return [
+            if not sampler.consumes_stack:
+                sampled = [
+                    self._sample_payload(
+                        unit.payload,
+                        unit.when,
+                        unit.bucket_start,
+                        unit.bucket_end,
+                        var_info,
+                        bands,
+                    )
+                    for unit in iterator
+                ]
+            elif not buckets:
+                sampled = []
+            else:
+                # A whole-stack sampler (time-series) reads each bucket's
+                # `system:time_start`, which the compositing reducer strips, so
+                # stamp each composite with its bucket time before handing the
+                # stack over.
+                stack = [
+                    unit.payload.set("system:time_start", _epoch_millis(unit.when))
+                    for unit in buckets
+                ]
+                sampled = [
                     self._sample_payload(
                         stack,
                         buckets[0].when,
@@ -1705,17 +1740,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                         bands,
                     )
                 ]
-            return [
-                self._sample_payload(
-                    unit.payload,
-                    unit.when,
-                    unit.bucket_start,
-                    unit.bucket_end,
-                    var_info,
-                    bands,
-                )
-                for unit in iterator
-            ]
+            return sampled
         return [
             self._api(
                 unit.payload,
