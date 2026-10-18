@@ -13,7 +13,7 @@ introduced.
 from __future__ import annotations
 
 import abc
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -61,6 +61,11 @@ class Sampler(BaseModel, abc.ABC):
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid", arbitrary_types_allowed=True)
+
+    #: The `OUTPUT_KIND` a `GEE` instance reports when driven by this sampler:
+    #: `"vector"` keeps each feature's geometry; a sampler that collapses
+    #: geometry (e.g. a time-series table) overrides this to `"tabular"`.
+    output_kind: ClassVar[str] = "vector"
 
     scale_m: float
     reducer: Reducer = Field(default_factory=lambda: resolve_reducer("first"))

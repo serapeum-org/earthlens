@@ -109,13 +109,19 @@ from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reader import EedaiReader
 from earthlens.gee.reducers import collection_reducers, resolve_reducer
 from earthlens.gee.sinks import AssetSink, _BatchSink, resolve_sink
-from earthlens.gee.work import Artifact, DownloadResult, RasterWorkUnit
+from earthlens.gee.work import (
+    Artifact,
+    DownloadResult,
+    FeatureWorkUnit,
+    RasterWorkUnit,
+)
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from geopandas import GeoDataFrame
 
     from earthlens.base.http import HttpClient
     from earthlens.gee.analysis.base import OperationChain, RasterOperation
+    from earthlens.gee.sampling.base import Sampler
 
 __all__ = [
     "GEE",
@@ -954,6 +960,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         crs_transform: Sequence[float] | None = None,
         nodata: float | int | None = None,
         high_volume: bool = False,
+        sampler: Sampler | None = None,
+        geometry: GeoDataFrame | None = None,
     ):
         # Validate the cheap (no-I/O) config first so user typos surface
         # before the ~3.3 s cold-cache catalog parse below.
@@ -1136,6 +1144,21 @@ class GEE(LazyClientMixin, AbstractDataSource):
             fmt=fmt,
             path=path,
         )
+
+        # Epic 3 vector/tabular output: when a `sampler` is supplied, each
+        # composited bucket is sampled into an `ee.FeatureCollection` rather
+        # than exported as a raster, and the instance reports its output kind
+        # from the sampler (the jrc backend also overrides OUTPUT_KIND per
+        # instance). With no sampler the class default `"raster"` and the whole
+        # existing download path are untouched.
+        self._sampler = sampler
+        self._geometry = geometry
+        if sampler is not None:
+            if geometry is None:
+                raise ValueError(
+                    "a sampler needs a geometry to sample over; pass geometry=..."
+                )
+            self.OUTPUT_KIND = cast("OutputKind", sampler.output_kind)
 
     def _resolve_credentials(self) -> tuple[str | None, str | None, str | None]:
         """Resolve credentials from explicit values, then the environment.
@@ -1378,7 +1401,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
     def download(
         self, progress_bar: bool = True, *, materialize: bool | None = None
-    ) -> list[Path | str | TaskInfo] | DownloadResult:
+    ) -> list[Path | str | TaskInfo | GeoDataFrame] | DownloadResult:
         """Download every requested band-set of every requested dataset.
 
         Args:
@@ -1465,13 +1488,18 @@ class GEE(LazyClientMixin, AbstractDataSource):
         _ = self.client
         self._cog_warned = False  # the cog= notice is once per run, not per object
         self._property_filter_warned = set()  # same, for the property_filter notice
-        outputs: list[Path | str | TaskInfo] = []
+        outputs: list[Path | str | TaskInfo | GeoDataFrame] = []
         assert isinstance(
             self.vars, dict
         )  # GEE always uses the {asset_id: [band]} form
         for asset_id, bands in self.vars.items():
             outputs.extend(self._download_dataset(asset_id, list(bands), progress_bar))
         written = outputs
+        # The vector/tabular path already holds in-memory GeoDataFrames (or
+        # table TaskInfos), so it never goes through `_materialise`, which reads
+        # written raster paths back off disk.
+        if self._sampler is not None:
+            return written
         if not (self.materialize if materialize is None else materialize):
             return written
         return self._materialise(written)
@@ -1594,7 +1622,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
     def _download_dataset(
         self, asset_id: str, bands: list[str], progress_bar: bool = True
-    ) -> list[Path | str | TaskInfo]:
+    ) -> list[Path | str | TaskInfo | GeoDataFrame]:
         """Download one dataset's requested bands across the time buckets.
 
         Validates `asset_id` and every band against the catalog, clamps
@@ -1635,6 +1663,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         iterator: Iterable = buckets
         if progress_bar:
             iterator = tqdm(buckets, desc=f"{asset_id} [{','.join(bands)}]", unit="img")
+        if self._sampler is not None:
+            return [self._sample_bucket(unit, var_info, bands) for unit in iterator]
         return [
             self._api(
                 unit.payload,
@@ -1646,6 +1676,50 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
             for unit in iterator
         ]
+
+    def _sample_bucket(
+        self, unit: RasterWorkUnit, var_info: Dataset, bands: list[str]
+    ) -> GeoDataFrame | TaskInfo:
+        """Sample one composited bucket into a vector/tabular result.
+
+        Routes the sampler's `ee.FeatureCollection` the way the sink does: a
+        synchronous (`"url"`) sink pulls it into an in-memory `GeoDataFrame`
+        through the `FeatureDownloader`, while a batch sink queues it as a
+        table export via `TableSink` and returns the `TaskInfo`.
+
+        Args:
+            unit: The composited bucket, whose `payload` is the `ee.Image`.
+            var_info: The catalog entry, for the output name.
+            bands: The requested band ids, for the output name.
+
+        Returns:
+            A `GeoDataFrame` for a synchronous sink, or a `TaskInfo` for a
+            queued table export.
+        """
+        from earthlens.gee.table_sink import TableSink
+        from earthlens.gee.vector.download import FeatureDownloader
+
+        sampler = cast("Sampler", self._sampler)
+        prefix = f"{slug_asset_id(var_info.id)}_{'-'.join(bands)}_{unit.when:%Y%m%d}"
+        work = FeatureWorkUnit(
+            sampler.sample(unit.payload, self._geometry),
+            unit.when,
+            unit.bucket_start,
+            unit.bucket_end,
+        )
+        if self._sink.is_batch:
+            file_format = "GeoJSON" if self.OUTPUT_KIND == "vector" else "CSV"
+            result: GeoDataFrame | TaskInfo = TableSink(
+                destination=cast('Literal["drive", "gcs", "asset"]', self.export_via),
+                folder=self.drive_folder,
+                bucket=self.gcs_bucket,
+                asset_id=self.asset_id,
+                file_format=file_format,
+                wait_for_export=self.wait_for_export,
+            ).export(work, description=prefix)
+        else:
+            result = FeatureDownloader().to_gdf(work.features)
+        return result
 
     def _build_collection(
         self, var_info: Dataset, bands: list[str], start: dt.datetime, end: dt.datetime

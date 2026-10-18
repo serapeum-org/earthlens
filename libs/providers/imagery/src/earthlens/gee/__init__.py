@@ -99,7 +99,9 @@ anything a string names:
   is declined.
 * `Sink`, with `SINKS` and `resolve_sink` — where
   the artifact goes: `UrlSink`, `DriveSink`,
-  `GcsSink`, `AssetSink`. Unlike `reducer=` / `engine=`,
+  `GcsSink`, `AssetSink`, and `TableSink` (the
+  vector/table counterpart, exporting an `ee.FeatureCollection` via
+  `ee.batch.Export.table.*`). Unlike `reducer=` / `engine=`,
   `GEE(export_via=...)` takes the **name** only; pass an instance and
   `ExportConfig` rejects it. Call `resolve_sink` yourself
   when you want the object.
@@ -319,6 +321,7 @@ from earthlens.gee.sinks import (
     UrlSink,
     resolve_sink,
 )
+from earthlens.gee.table_sink import TableSink
 from earthlens.gee.vector import (
     FeatureDownloader,
     GeometryConverter,
@@ -407,6 +410,7 @@ __all__ = [
     "DriveSink",
     "GcsSink",
     "AssetSink",
+    "TableSink",
     "SINKS",
     "resolve_sink",
     "EedaiReader",

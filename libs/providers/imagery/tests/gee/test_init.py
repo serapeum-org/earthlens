@@ -90,6 +90,7 @@ _EXPECTED_EXPORTS = {
     "DriveSink",
     "GcsSink",
     "AssetSink",
+    "TableSink",
     "SINKS",
     "resolve_sink",
     # Epic 1 Task 1.5 - the EEDAI reader adapter.

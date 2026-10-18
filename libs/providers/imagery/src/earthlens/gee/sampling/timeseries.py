@@ -11,7 +11,7 @@ after the merge.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 import ee
 
@@ -38,6 +38,10 @@ class TimeSeriesSampler(Sampler):
 
             ```
     """
+
+    #: A time-series collapses each point to a row per timestamp, so the GEE
+    #: backend reports `"tabular"` rather than `"vector"` for this sampler.
+    output_kind: ClassVar[str] = "tabular"
 
     wide: bool = False
 
