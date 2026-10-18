@@ -1,23 +1,30 @@
-"""Sample raster values at point locations via Google Earth Engine.
+"""Sample raster values over geometries via Google Earth Engine.
 
-The single public entry point, `sample_points`, takes an
-`ee.Image` and a `GeoDataFrame` of point geometries and returns an
-`ee.FeatureCollection` where each input point carries the reduced
-raster value(s) from its surrounding pixels as feature properties.
+This package is the `Sampler` family — one `Sampler` subclass per sampling
+pattern, each taking an `ee.Image` (or an in-memory pyramids `Dataset`) and a
+`GeoDataFrame`, and returning an `ee.FeatureCollection` / pyramids
+`FeatureCollection` whose features carry the sampled value(s):
 
-Implementation note — the input points are first inserted into an
-`rtree.index.Index` and grouped into that index's leaves; one
-`image.reduceRegions` call is issued per leaf, with each leaf's
-bounding box used to clip the image first. This keeps the number of
-round-trips bounded by the leaf count rather than the point count
-(one call per point would be wasteful) while still keeping each call's
-clip box tight (one call over the full point set would force EE to
-work over the entire image).
+* `PointSampler` — read the raster at point geometries.
+* `RegionSampler` / `zonal_stats` — per-polygon zonal statistics, server-side
+  (`reduceRegions`) or client-side (a local pyramids reduction).
+* `RandomSampler` / `StratifiedSampler` — draw labelled training points over a
+  region, uniformly or per class.
+* `TransectSampler` — sample a band along a line transect.
+* `TimeSeriesSampler` — sample one geometry across an image collection's time
+  axis, long or wide.
+* `ZonalHistogram` — per-polygon value histograms.
 
-The reducer is selected by name (e.g. `"first"`, `"mean"`,
-`"median"`) and resolved through a fixed whitelist on `ee.Reducer` —
-no `eval`, so a bad name fails closed with a readable error rather
-than executing arbitrary input through the EE attribute lookup.
+Each sampler selects its reducer by name through the shared, whitelisted
+resolver on `ee.Reducer` (no `eval`, so a bad name fails closed with a readable
+error). Point-wise reductions batch their work through an `rtree.index.Index`:
+the points are grouped into the index's leaves and one `image.reduceRegions`
+call is issued per leaf (clipped to that leaf's bounding box), so the number of
+round-trips tracks the leaf count rather than the point count.
+
+`sample_points` / `sample_points_to_gdf` are the original free-function entry
+points for point sampling, kept for back-compat; new code should prefer
+`PointSampler`.
 """
 
 from __future__ import annotations
