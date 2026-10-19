@@ -203,8 +203,13 @@ class TestDownloadContract:
 class TestRoundOneFixesStayFixed:
     """Each of these was a verified defect; a regression must fail loudly."""
 
-    def test_a_percentile_reducer_declines_to_earth_engine(self, make_gee, fake_reader):
-        """It reached the reader verbatim and aborted after fetching scenes."""
+    def test_a_percentile_reducer_reaches_the_client_path(self, make_gee, fake_reader):
+        """Round 2 (M1): percentile is composited client-side via reduce_stack.
+
+        Round 1 declined it to Earth Engine because the name was handed to the
+        reader verbatim; the composite is now done here by pyramids' reduce_time,
+        so the gate admits it like median.
+        """
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
             start="2020-06-01",
@@ -217,11 +222,12 @@ class TestRoundOneFixesStayFixed:
             var_info, 1, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
         )
         assert plan is not None
-        assert not plan.can_serve
-        assert "vocabulary" in plan.reason
+        assert plan.can_serve, plan.reason
 
-    def test_the_decline_never_reaches_the_reader(self, make_gee, fake_reader):
-        """The point of declining early: no scene discovery, no credential."""
+    def test_a_percentile_reducer_is_discovered_not_declined_early(
+        self, make_gee, fake_reader
+    ):
+        """Admission means scene discovery runs, where Round 1 declined before it."""
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
             start="2020-06-01",
@@ -233,15 +239,7 @@ class TestRoundOneFixesStayFixed:
         gee._eedai_collection_fits(
             var_info, 1, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
         )
-        assert fake_reader.calls == []
-
-    def test_the_remedy_names_the_reducers_the_reader_knows(self):
-        """A size remedy for a reducer problem was the mismatch to avoid."""
-        from earthlens.gee.backend import _eedai_remedy
-
-        remedy = _eedai_remedy("reducer='percentile' is not in the reader's vocabulary")
-        assert "median" in remedy
-        assert "smaller bbox" not in remedy
+        assert fake_reader.cost_calls, "percentile must now reach scene discovery"
 
     def test_a_reducer_instance_still_hits_the_mosaic_guard(self, make_gee):
         """An instance is never a member of a set of strings."""

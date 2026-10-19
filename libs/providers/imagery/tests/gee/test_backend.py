@@ -2818,6 +2818,41 @@ class TestEedaiCollections:
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         assert gee._eedai_collection_fits(var_info, 1, self.START, self.END).can_serve
 
+    @pytest.mark.parametrize("reducer", ["percentile:90", "p90", "trend", "sens_slope"])
+    def test_epic4_reducers_reach_the_client_path(self, make_gee, fake_reader, reducer):
+        """percentile / trend / sens_slope are admitted: reduce_stack expresses them."""
+        gee = self._collection_gee(make_gee, reducer=reducer)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert plan.can_serve, plan.reason
+
+    def test_a_percentile_collection_is_composited_client_side(
+        self, make_gee, fake_reader
+    ):
+        """A percentile collection reduces through reduce_stack, not forced to EE."""
+        from pyramids.dataset import Dataset as _PyramidsDataset
+
+        gee = self._collection_gee(make_gee, reducer="p90")
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert plan.can_serve, plan.reason
+        target = gee._export_via_eedai(
+            var_info,
+            ["precipitation"],
+            5566.0,
+            "chirps_p90",
+            plan,
+            self.START,
+            self.END,
+        )
+        assert fake_reader.calls == [], (
+            "a client composite must not use from_earthengine"
+        )
+        assert fake_reader.collection_calls, "the reader must fetch the scene stack"
+        written = _PyramidsDataset.read_file(str(target))
+        expected = float(np.nanpercentile(np.array([1.0, 5.0, 9.0]), 90))
+        assert np.asarray(written.read_array()).ravel()[0] == pytest.approx(expected)
+
     def test_discovery_uses_the_regions_bounds_not_the_bbox(
         self, make_gee, fake_reader
     ):

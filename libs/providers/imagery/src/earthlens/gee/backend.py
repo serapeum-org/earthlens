@@ -88,7 +88,6 @@ from earthlens.gee._extent import (
 )
 from earthlens.gee._filters import PropertyFilter
 from earthlens.gee._helpers import (
-    _COLLECTION_REDUCERS,
     EE_MAX_DIMENSION,
     slug_asset_id,
     split_aoi_for_url,
@@ -408,12 +407,6 @@ def _eedai_remedy(reason: str) -> str:
         return (
             "Pass a statistical reducer (mean/median/min/max/sum), or "
             "engine='ee' to keep Earth Engine's mosaic semantics."
-        )
-    if "not in the reader's vocabulary" in reason:
-        return (
-            "Pass one of the reducers the reader knows "
-            "(mean/median/min/max/mode/sum), or engine='ee', which can express "
-            "any of them."
         )
     if "credential" in reason:
         return "Fix the service key or service account, or use engine='ee'."
@@ -2725,20 +2718,18 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 f"a collection read of {var_info.id} needs a bucket date window; "
                 "_api passes one for every bucket"
             )
-        # Resolve before comparing: `reducer=` accepts a `Reducer` instance as
-        # well as a name, and an instance is never a member of a set of strings,
-        # so testing the raw value let `Mosaic()` walk straight past this guard.
-        reducer = self._reducer_name(var_info)
-        if reducer not in _COLLECTION_REDUCERS:
-            # The reader takes a name from its own vocabulary. Anything outside
-            # it - `percentile` is the first such reducer - would reach the
-            # reader verbatim and raise a `ValueError` that is deliberately not
-            # in `_reader_errors`, aborting the download after the scenes had
-            # already been fetched. Earth Engine can express all of them.
-            return EnginePlan.declined(
-                f"reducer={reducer!r} is not in the reader's vocabulary, so "
-                "Earth Engine composites this instead"
-            )
+        # Resolve to the reducer's canonical name: `reducer=` accepts a name, a
+        # `percentile:<q>` spec, the `p<q>` shorthand or a `Reducer` instance,
+        # and `temporal_reducer_for(...).name` folds all of them to one spelling
+        # (so `percentile:90`, `p90` and `Percentile(q=90)` all read as
+        # `"percentile"`, and an instance can no longer walk past this guard).
+        # Every reducer reaching here is one the client-side `reduce_stack` can
+        # express: the composite is computed here through pyramids' `reduce_time`
+        # (`_composite_collection_via_reader`), not handed to the reader's own
+        # `reducer=`, so `percentile` / `trend` / `sens_slope` are admitted like
+        # `median`. The only decline is `mosaic`, whose last-wins semantics have
+        # no client-side equivalent over a scene stack.
+        reducer = temporal_reducer_for(self.reducer or var_info.default_reducer).name
         if reducer in _EEDAI_UNSUPPORTED_REDUCERS:
             # Checked before the network call: no point discovering scenes for a
             # composite the reader cannot reproduce.
