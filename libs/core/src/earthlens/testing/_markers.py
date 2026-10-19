@@ -89,7 +89,7 @@ MARKERS: dict[str, str] = {
     "slow": "mark test as slow.",
     "soilgrids": "tests for the SoilGrids backend (ISRIC SoilGrids 2.0 soil properties via OGC WCS at maps.isric.org; no extra SDK — core requests + pyramids' Dataset.from_wcs; all public, CC-BY 4.0, no auth).",
     "solar_wind_atlas": "tests for the Solar & Wind Atlas backend (Global Solar Atlas + Global Wind Atlas climatology layers; no extra SDK — core requests + pyramids; GWA windowed /vsicurl COG read, GSA download-then-localise).",
-    "stac": "tests for the STAC backend (requires the `stac` extra: pyramids-gis[stac] → pystac-client + stac-asset).",
+    "stac": "tests for the STAC backend (requires the `stac` extra: pyramids-core[stac] → pystac-client + stac-asset).",
     "tropycal": "tests for the Tropycal cyclone-track backend (requires the `tropycal` extra: tropycal, cartopy).",
     "unit": "in-process unit test, no network or filesystem outside tmp_path.",
     "usgs_water": "tests for the USGS NWIS / Water Data backend (requires the `usgs-water` extra: dataretrieval; anonymous access works).",

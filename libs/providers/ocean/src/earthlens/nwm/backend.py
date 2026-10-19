@@ -538,7 +538,7 @@ class NWM(AbstractDataSource):
             raise ImportError(
                 "NWM subsetting / retrospective reads need the pyramids "
                 "LabeledDataset reader; install `pip install "
-                "earthlens[nwm]` (pyramids-gis[parquet] >= 0.38.0)."
+                "earthlens[nwm]` (pyramids-core[parquet] >= 0.38.0)."
             ) from exc
         return LabeledDataset
 
@@ -557,7 +557,7 @@ class NWM(AbstractDataSource):
             raise ImportError(
                 "NWM gridded subsetting needs the pyramids NetCDF reader; "
                 "install `pip install earthlens[nwm]` "
-                "(pyramids-gis[parquet] >= 0.38.0)."
+                "(pyramids-core[parquet] >= 0.38.0)."
             ) from exc
         return NetCDF
 

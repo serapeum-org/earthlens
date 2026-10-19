@@ -19,7 +19,7 @@ flowchart LR
     registry -->|"imports on demand"| backend["Concrete backend<br/>(AbstractDataSource subclass)"]
     backend --> catalog["Catalog<br/>(pydantic + YAML)"]
     backend --> remote[("Provider<br/>FTP · S3 · HTTP · SDK")]
-    backend --> pyramids["pyramids-gis<br/>clip · convert · write"]
+    backend --> pyramids["pyramids-core<br/>clip · convert · write"]
 ```
 
 The registry is **lazy** and **discovered**, not hard-coded. `earthlens._backends.discover_backends()` merges the
@@ -170,7 +170,7 @@ sequenceDiagram
     participant Registry as _LazyRegistry
     participant DS as Backend
     participant Server as Provider
-    participant Pyramids as pyramids-gis
+    participant Pyramids as pyramids-core
 
     User->>Facade: EarthLens(data_source, start, end, ...)
     Facade->>Registry: resolve key

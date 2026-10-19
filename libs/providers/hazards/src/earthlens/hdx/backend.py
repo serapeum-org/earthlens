@@ -464,7 +464,7 @@ class HDX(AbstractDataSource):
                 pyramids type — a `Dataset` (raster), a
                 `FeatureCollection` (vector), or a `DataFrame` (tabular)
                 — dispatched by the recorded CKAN format label, instead
-                of returning raw paths. Needs `pyramids-gis >= 0.29.0`
+                of returning raw paths. Needs `pyramids-core >= 0.29.0`
                 (which provides `read_resource`); on an older pyramids it
                 is rejected with a clear upgrade message. Defaults to
                 `False` (return paths).
@@ -494,7 +494,7 @@ class HDX(AbstractDataSource):
         """Return `pyramids.read_resource`, or raise a clear upgrade error.
 
         The reader (the `PY-D` capability) is the `pyramids.read_resource`
-        function, available in `pyramids-gis >= 0.29.0`. The package floor
+        function, available in `pyramids-core >= 0.29.0`. The package floor
         already requires that, so this normally just imports; the guard
         stays as defense for a partial / source install that predates the
         reader, surfaced as a `NotImplementedError` (mirroring how the
@@ -512,7 +512,7 @@ class HDX(AbstractDataSource):
         except ImportError as exc:
             raise NotImplementedError(
                 "HDX.download(read=True) needs `pyramids.read_resource` "
-                "(pyramids-gis >= 0.29.0); the installed pyramids does not "
+                "(pyramids-core >= 0.29.0); the installed pyramids does not "
                 "provide it. Upgrade pyramids, or call download() without "
                 "read= to get the resource file paths and read them yourself."
             ) from exc
