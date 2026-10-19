@@ -26,6 +26,7 @@ from earthlens.gee import backend as backend_module
 from earthlens.gee.backend import GEE
 from earthlens.gee.catalog import Dataset, Extent
 from earthlens.gee.cloud_masks import sentinel2_scl
+from earthlens.gee.reducers import temporal_reducer_for
 
 # -- fakes ------------------------------------------------------------------
 
@@ -525,6 +526,86 @@ def make_gee(fake_ee, tmp_path):
 
 
 # -- tests ------------------------------------------------------------------
+
+
+class _PercentileReadyCollection:
+    """A fake collection supporting the `reduce` / `first` percentile chain."""
+
+    def __init__(self, band_names=("precipitation",)):
+        self.reduced_with = None
+        self._band_names = list(band_names)
+
+    def first(self):
+        return self
+
+    def bandNames(self):  # noqa: N802 - mirrors the Earth Engine method name
+        return self._band_names
+
+    def reduce(self, reducer):
+        self.reduced_with = reducer
+        return SimpleNamespace(rename=lambda names: ("renamed", reducer, tuple(names)))
+
+
+class TestReducerStringWidening:
+    """Task 4.6: percentile / trend are first-class `reducer=` strings."""
+
+    def _chirps(self, make_gee, **overrides):
+        """A GEE over a CHIRPS collection, the reducer under test applied."""
+        params = dict(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            start="2020-06-01",
+            end="2020-06-30",
+            scale=5566.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    def test_percentile_shorthand_is_accepted_at_construction(self, make_gee):
+        """`reducer="p90"` constructs and carries the string verbatim."""
+        gee = self._chirps(make_gee, reducer="p90")
+        assert gee.reducer == "p90"
+        assert temporal_reducer_for(gee.reducer).q == 90.0
+
+    def test_trend_is_accepted_at_construction(self, make_gee):
+        """`reducer="trend"` constructs and resolves to the linear-fit reducer."""
+        gee = self._chirps(make_gee, reducer="trend")
+        assert temporal_reducer_for(gee.reducer).name == "trend"
+
+    @pytest.mark.parametrize("spec", ["p0", "p150"])
+    def test_out_of_range_percentile_is_refused_at_construction(self, make_gee, spec):
+        """An out-of-range `p<q>` fails fast, not mid-download."""
+        with pytest.raises(ValueError, match="0 < q <= 100"):
+            self._chirps(make_gee, reducer=spec)
+
+    def test_an_unknown_reducer_is_refused_at_construction(self, make_gee):
+        """An unparseable name is a construction error."""
+        with pytest.raises(ValueError, match="unsupported reducer"):
+            self._chirps(make_gee, reducer="average")
+
+    def test_the_ee_path_composites_with_the_percentile_reducer(
+        self, make_gee, monkeypatch
+    ):
+        """`reducer="p90"` reaches `ee.Reducer.percentile` on the Earth Engine path."""
+        from earthlens.gee import reducers as reducers_module
+
+        monkeypatch.setattr(
+            reducers_module,
+            "ee",
+            SimpleNamespace(
+                Reducer=SimpleNamespace(percentile=lambda qs: ("percentile", tuple(qs)))
+            ),
+        )
+        gee = self._chirps(make_gee, reducer="p90", temporal_resolution="raw")
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        collection = _PercentileReadyCollection()
+        units = list(
+            gee._composite(
+                collection, var_info, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
+            )
+        )
+        assert len(units) == 1
+        assert collection.reduced_with == ("percentile", (90.0,))
+        assert units[0].image[0] == "renamed"
 
 
 class TestInit:

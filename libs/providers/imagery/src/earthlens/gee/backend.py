@@ -109,11 +109,7 @@ from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
 from earthlens.gee.pixels import PixelsEngine
 from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reader import EedaiReader
-from earthlens.gee.reducers import (
-    collection_reducers,
-    resolve_reducer,
-    temporal_reducer_for,
-)
+from earthlens.gee.reducers import temporal_reducer_for
 from earthlens.gee.sinks import AssetSink, _BatchSink, resolve_sink
 from earthlens.gee.work import (
     Artifact,
@@ -690,14 +686,20 @@ class GEE(LazyClientMixin, AbstractDataSource):
             under `engine="auto"` (Earth Engine serves the request instead) and
             an error under `engine="eedai"`.
         reducer: Override the per-dataset `default_reducer` for the
-            temporal composite (`mean` / `median` / `min` / `max` /
-            `mode` / `mosaic` / `sum`, or `percentile:<q>`). `None` (the
-            default) uses each dataset's own `default_reducer`. The registry
-            also holds the region-only reducers `first` / `stdDev` /
-            `variance` / `count`, which collapse pixels inside a region rather
-            than images in a collection; naming one here is refused at
-            construction, since there is nothing for it to composite. Pass
-            those to `sample_points` instead.
+            temporal composite. One of the seven convenience names
+            (`mean` / `median` / `min` / `max` / `mode` / `mosaic` / `sum`),
+            a percentile — `percentile:<q>` or its `p<q>` shorthand
+            (`"p90"`, `"p50"`) — or `"trend"`, the per-pixel linear-fit slope.
+            A percentile and `trend` are first-class here: they run on
+            `engine="ee"` (via `ee.Reducer.percentile` / `linearFit`) and on
+            the client-side EEDAI path alike. `None` (the default) uses each
+            dataset's own `default_reducer`. The registry also holds the
+            region-only reducers `first` / `stdDev` / `variance` / `count`,
+            which collapse pixels inside a region rather than images in a
+            collection; naming one here is refused at construction, since there
+            is nothing for it to composite. Pass those to `sample_points`
+            instead. An out-of-range percentile (`"p150"`) or an unknown name
+            is also refused at construction.
         export_via: How to get pixels out — `"url"` (synchronous
             `getDownloadURL`, capped at 32768 px per axis; the default),
             `"drive"` (asynchronous `ee.batch.Export.image.toDrive`;
@@ -888,7 +890,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
             without `drive_folder` / `"gcs"` without `gcs_bucket` /
             `"asset"` without `asset_id`), a `crs_transform` that is not six
             finite terms with non-zero, unsheared pixel sizes, or a `reducer`
-            that reduces a region rather than a collection; from the parent on
+            that reduces a region rather than a collection, is an unknown name,
+            or is a malformed / out-of-range percentile; from the parent on
             a bad date range; from `_check_input_dates` on an unknown
             `temporal_resolution`; from `_api` on a missing scale or an
             oversized `"url"` request on either pull API (unless
@@ -1024,18 +1027,18 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
         collection_filters = _validate_filters(filters)
         pinned_transform = validate_crs_transform(crs_transform)
-        # Resolved here, not only at composite time: `reducer=` names one
-        # vocabulary now, and four of its members reduce pixels in a region
-        # rather than images in a collection. Refusing at construction keeps
-        # that distinction a config error like every other one, instead of a
-        # failure part-way through a run that has already written buckets.
-        if reducer is not None and not resolve_reducer(reducer).collection_capable:
-            raise ValueError(
-                f"reducer={reducer!r} reduces pixels in a region, not images in "
-                "a collection, so it cannot composite a time bucket; use one of "
-                f"{sorted(collection_reducers())}, 'percentile:<q>', or pass it "
-                "to sample_points(reducer=...) instead."
-            )
+        # Resolved up front, not only at composite time: validating `reducer=`
+        # here turns a region-only reducer (`first` / `stdDev` / `variance` /
+        # `count`), a malformed `percentile` / `p<q>` form, or an out-of-range
+        # percentile into a construction error like every other config mistake,
+        # rather than a failure part-way through a run that has already written
+        # buckets. `temporal_reducer_for` accepts the seven convenience names, a
+        # `percentile:<q>` spec or its `p<q>` shorthand, and `trend`, and refuses
+        # a region-only reducer with a message naming the collection vocabulary —
+        # the same resolver the Earth Engine and client-side composite paths use,
+        # so the accepted set is defined in exactly one place.
+        if reducer is not None:
+            temporal_reducer_for(reducer)
         # Validated by `resolve_engine`, not re-checked here: it owns the one
         # message that can tell "no such engine" apart from "registered but not
         # selectable yet", and a second copy of the vocabulary is what let the
