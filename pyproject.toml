@@ -147,10 +147,10 @@ dev = [
     "psutil >=5.9",
     # matplotlib: example notebooks plot with it; not a runtime dep.
     "matplotlib >=3.5",
-    # pyramids-gis[viz] (cleopatra): the showcase notebooks render rasters and
+    # pyramids-core[viz] (cleopatra): the showcase notebooks render rasters and
     # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
     # runtime dep of earthlens itself.
-    "pyramids-gis[viz] >=0.69.0",
+    "pyramids-core[viz] >=0.70.0",
     # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
     # animation.embed_gif, ArrayGlyph.save_animation); add_reference_map /
     # save_animation(crf=...) landed in 0.22.0, the animate() default
@@ -170,7 +170,7 @@ dev = [
     # the private `_stamp_mark`.
     # [tiles] (pyproj, xyzservices): the satellite showcase textures its globe from
     # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
-    # It arrives transitively through pyramids-gis[viz], but an imported package
+    # It arrives transitively through pyramids-core[viz], but an imported package
     # is declared here rather than relied on to come in sideways.
     "cleopatra[tiles] >=0.42.0",
     "pre-commit >=3.7.1",
@@ -244,11 +244,11 @@ docs = [
     "mkdocs-panzoom-plugin",
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
-    # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
-    "pyramids-gis[viz] >=0.69.0",
+    # pyramids-core[viz] (cleopatra): showcase notebooks plot/animate Datasets.
+    "pyramids-core[viz] >=0.70.0",
     # [tiles] (pyproj, xyzservices): the satellite showcase textures its globe from
     # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
-    # It arrives transitively through pyramids-gis[viz], but an imported package
+    # It arrives transitively through pyramids-core[viz], but an imported package
     # is declared here rather than relied on to come in sideways.
     "cleopatra[tiles] >=0.42.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
@@ -499,7 +499,17 @@ conflicts = [
 # OAuth *client* (earthengine-api -> requests-oauthlib, the Earth Engine auth
 # stack), so the server-side bug is not exploitable here; this satisfies the
 # pip-audit gate, whose policy is to upgrade rather than ignore when a fix exists.
-constraint-dependencies = ["oauthlib>=4.0.0"]
+#
+# pyramids rename floor: the GIS backend's distribution was renamed `pyramids-gis`
+# -> `pyramids-core` at 0.70.0, and earthlens now depends on `pyramids-core`
+# directly. `pyramids-eo` (a dev/notebooks/imagery dependency) still declares the
+# old `pyramids-gis`, which would otherwise resolve to the real 0.69.0 package and
+# ship a second copy of the `pyramids` import alongside `pyramids-core` 0.70.0 --
+# two distributions clobbering the same top-level package. `pyramids-gis` 0.70.0 is
+# a code-free shim that just requires `pyramids-core==0.70.0`, so constraining the
+# transitive to >=0.70.0 collapses both onto the single `pyramids-core` install.
+# Remove once pyramids-eo depends on `pyramids-core` directly (serapeum-org/pyramids-eo#122).
+constraint-dependencies = ["oauthlib>=4.0.0", "pyramids-gis>=0.70.0"]
 
 [tool.uv.workspace]
 members = [

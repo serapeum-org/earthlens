@@ -41,7 +41,7 @@ GS_NO_SIGN_ENV = "GS_NO_SIGN_REQUEST"
 #: remote CF/GeoZarr store — named in the install hint.
 _PYRAMIDS_HINT = (
     "the CMIP6 backend reads Zarr through pyramids; install "
-    "`pip install 'pyramids-gis>=0.38.0'`."
+    "`pip install 'pyramids-core>=0.38.0'`."
 )
 
 
