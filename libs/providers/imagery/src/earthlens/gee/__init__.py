@@ -125,6 +125,13 @@ anything a string names:
   not); `Ccdc` takes a parameter dictionary. The array-valued output is
   surfaced through `SegmentationResult`, with `array` / `band`
   accessors and a `.client` hand-off, never as a plottable `Dataset`.
+* `Climatology` — the reducer *per calendar period across years*
+  (`dayofyear` / `month` / `season`), the grouping xarray's
+  `groupby("time.dayofyear")` expresses, distinct from
+  `CadenceBucketer`'s consecutive buckets. It carries an explicit
+  `baseline` of reference years and resolves its reducer through the
+  Epic-1 registry; `climatology()` returns one image per period and
+  `anomaly()` is the observed-minus-baseline companion.
 * `Engine`, with `ENGINES` and `resolve_engine` —
   what materialises the pixels. `engine="auto"` routes between
   `EedaiEngine` (the pyramids-eo reader) and `EeEngine`
@@ -312,6 +319,7 @@ from earthlens.gee.catalog import (
     Extent,
     Provider,
 )
+from earthlens.gee.climatology import Climatology
 from earthlens.gee.configs import EngineConfig, ExportConfig
 from earthlens.gee.engines import (
     ENGINES,
@@ -472,6 +480,7 @@ __all__ = [
     "LandTrendr",
     "Ccdc",
     "SegmentationResult",
+    "Climatology",
     "EnginePlan",
     "EedaiPlan",
     "OutputGrid",

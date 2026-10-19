@@ -28,6 +28,8 @@ the rendered API.
 
 ::: earthlens.gee.segmentation
 
+::: earthlens.gee.climatology
+
 ::: earthlens.gee.engines
 
 ::: earthlens.gee.pixels
