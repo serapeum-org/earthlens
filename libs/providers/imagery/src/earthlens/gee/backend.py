@@ -67,6 +67,7 @@ from pyramids.dataset.merge import merge_rasters
 from tqdm import tqdm
 
 from earthlens.base import (
+    WHOLE_WINDOW,
     AbstractDataSource,
     LazyClientMixin,
     OutputKind,
@@ -75,6 +76,7 @@ from earthlens.base import (
     date_windows,
     to_datetime,
 )
+from earthlens.gee._composite import _GEE_CADENCES
 from earthlens.gee._eedai import (
     credentials_for,  # noqa: F401 - monkeypatch seam the test suite patches
     eedai_available,  # noqa: F401 - monkeypatch seam the test suite patches
@@ -131,10 +133,14 @@ __all__ = [
     "EedaiPlan",
 ]
 
-# `temporal_resolution` → pandas frequency alias for the per-bucket
-# date range. `"raw"` is special-cased (one bucket spanning the whole
-# request window).
-_RESOLUTION_FREQ: dict[str, str] = {"daily": "D", "monthly": "MS", "yearly": "YS"}
+# `temporal_resolution` → pandas frequency alias for the per-bucket date range,
+# `"raw"` excluded (it is special-cased to one whole-window bucket). Derived from
+# the `CadenceBucketer`'s `_GEE_CADENCES` rather than restated, so the backend's
+# cheap pre-catalog validation and `_check_input_dates` share the one mapping the
+# bucketer resolves against.
+_RESOLUTION_FREQ: dict[str, str] = {
+    cadence: freq for cadence, freq in _GEE_CADENCES.items() if freq != WHOLE_WINDOW
+}
 
 _DEFAULT_HTTP_TIMEOUT_S: float = 300.0
 

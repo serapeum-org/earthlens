@@ -73,6 +73,8 @@ _EXPECTED_EXPORTS = {
     "REDUCERS",
     "resolve_reducer",
     "temporal_reducer_for",
+    # Epic 4 Task 4.7 - the cadence bucketer.
+    "CadenceBucketer",
     # Epic 1 Task 1.6 - the promoted routing verdict.
     "EnginePlan",
     "EedaiPlan",

@@ -101,6 +101,12 @@ anything a string names:
   `p<q>` shorthand, `trend`, or an instance to one. `LinearTrend`
   (`"trend"`) is the per-pixel linear-fit reducer; like `Percentile` it
   is reachable only through the resolver, not the registry.
+* `CadenceBucketer` — turns a `temporal_resolution` (`"raw"` /
+  `"daily"` / `"monthly"` / `"yearly"`) into a pandas frequency and the
+  bucket windows that tile a request, resolving through the framework
+  `resolve_cadence` so an unknown cadence raises rather than silently
+  defaulting. `is_whole_window` is the single home of the `"raw"`
+  one-bucket special case.
 * `Engine`, with `ENGINES` and `resolve_engine` —
   what materialises the pixels. `engine="auto"` routes between
   `EedaiEngine` (the pyramids-eo reader) and `EeEngine`
@@ -228,6 +234,7 @@ Examples:
 
 from __future__ import annotations
 
+from earthlens.gee._composite import CadenceBucketer
 from earthlens.gee.analysis import (
     ALLOWED_FUNCTIONS,
     MEASURES,
@@ -419,6 +426,7 @@ __all__ = [
     "REDUCERS",
     "resolve_reducer",
     "temporal_reducer_for",
+    "CadenceBucketer",
     "EnginePlan",
     "EedaiPlan",
     "OutputGrid",
