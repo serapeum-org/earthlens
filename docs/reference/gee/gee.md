@@ -30,6 +30,8 @@ the rendered API.
 
 ::: earthlens.gee.climatology
 
+::: earthlens.gee.closest
+
 ::: earthlens.gee.engines
 
 ::: earthlens.gee.pixels

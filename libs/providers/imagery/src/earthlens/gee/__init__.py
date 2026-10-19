@@ -132,6 +132,10 @@ anything a string names:
   `baseline` of reference years and resolves its reducer through the
   Epic-1 registry; `climatology()` returns one image per period and
   `anomaly()` is the observed-minus-baseline companion.
+* `ClosestImage` — the collection image nearest a `target` date,
+  within an optional `tolerance`. With a tolerance set, an out-of-range
+  target yields an empty selection rather than silently returning a
+  distant scene.
 * `Engine`, with `ENGINES` and `resolve_engine` —
   what materialises the pixels. `engine="auto"` routes between
   `EedaiEngine` (the pyramids-eo reader) and `EeEngine`
@@ -320,6 +324,7 @@ from earthlens.gee.catalog import (
     Provider,
 )
 from earthlens.gee.climatology import Climatology
+from earthlens.gee.closest import ClosestImage
 from earthlens.gee.configs import EngineConfig, ExportConfig
 from earthlens.gee.engines import (
     ENGINES,
@@ -481,6 +486,7 @@ __all__ = [
     "Ccdc",
     "SegmentationResult",
     "Climatology",
+    "ClosestImage",
     "EnginePlan",
     "EedaiPlan",
     "OutputGrid",

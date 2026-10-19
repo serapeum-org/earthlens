@@ -84,8 +84,9 @@ _EXPECTED_EXPORTS = {
     "LandTrendr",
     "Ccdc",
     "SegmentationResult",
-    # Epic 4 Task 4.13 - the per-period climatology.
+    # Epic 4 Task 4.13 - the per-period climatology and nearest-date selection.
     "Climatology",
+    "ClosestImage",
     # Epic 1 Task 1.6 - the promoted routing verdict.
     "EnginePlan",
     "EedaiPlan",
