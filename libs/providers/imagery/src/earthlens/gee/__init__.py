@@ -115,6 +115,16 @@ anything a string names:
   (`composite_ee`) per time bucket. `GEE._composite` is a thin shim that
   builds one and delegates, so the whole-window special case and the
   per-bucket `filterDate` split live here, not in the backend.
+* `TemporalSegmentation`, with the `LandTrendr` and `Ccdc`
+  subclasses and the `SegmentationResult` they return — Earth
+  Engine's two flagship time-series segmentation algorithms as frozen,
+  validated configs, answering *when did it change* rather than *what
+  was the average*. `LandTrendr` carries Earth Engine's documented
+  defaults and an explicit `invert` flag for the disturbance-sign
+  convention (a vegetation index must be negated, a wetness index must
+  not); `Ccdc` takes a parameter dictionary. The array-valued output is
+  surfaced through `SegmentationResult`, with `array` / `band`
+  accessors and a `.client` hand-off, never as a plottable `Dataset`.
 * `Engine`, with `ENGINES` and `resolve_engine` —
   what materialises the pixels. `engine="auto"` routes between
   `EedaiEngine` (the pyramids-eo reader) and `EeEngine`
@@ -360,6 +370,12 @@ from earthlens.gee.sampling import (
     sample_points_to_gdf,
     zonal_stats,
 )
+from earthlens.gee.segmentation import (
+    Ccdc,
+    LandTrendr,
+    SegmentationResult,
+    TemporalSegmentation,
+)
 from earthlens.gee.sinks import (
     SINKS,
     AssetSink,
@@ -452,6 +468,10 @@ __all__ = [
     "CadenceBucketer",
     "CompositeEngine",
     "Bucket",
+    "TemporalSegmentation",
+    "LandTrendr",
+    "Ccdc",
+    "SegmentationResult",
     "EnginePlan",
     "EedaiPlan",
     "OutputGrid",

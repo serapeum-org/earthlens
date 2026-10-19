@@ -26,6 +26,8 @@ the rendered API.
 
 ::: earthlens.gee.reducers
 
+::: earthlens.gee.segmentation
+
 ::: earthlens.gee.engines
 
 ::: earthlens.gee.pixels

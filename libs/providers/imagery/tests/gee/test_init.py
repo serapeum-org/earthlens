@@ -79,6 +79,11 @@ _EXPECTED_EXPORTS = {
     # Epic 4 Task 4.3 - the composite engine and its bucket value object.
     "CompositeEngine",
     "Bucket",
+    # Epic 4 Task 4.12 - the time-series segmentation configs and their result.
+    "TemporalSegmentation",
+    "LandTrendr",
+    "Ccdc",
+    "SegmentationResult",
     # Epic 1 Task 1.6 - the promoted routing verdict.
     "EnginePlan",
     "EedaiPlan",
