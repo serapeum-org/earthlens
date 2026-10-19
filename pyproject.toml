@@ -509,7 +509,13 @@ conflicts = [
 # a code-free shim that just requires `pyramids-core==0.70.0`, so constraining the
 # transitive to >=0.70.0 collapses both onto the single `pyramids-core` install.
 # Remove once pyramids-eo depends on `pyramids-core` directly (serapeum-org/pyramids-eo#122).
-constraint-dependencies = ["oauthlib>=4.0.0", "pyramids-gis>=0.70.0"]
+#
+# Security floor: pin the transitive `aiohttp` at/above 3.14.4, which fixes three CVEs present in 3.12.15 --
+# CVE-2026-111064 (keepalive timeout not applied before the request body, enabling an idle-connection DoS),
+# GHSA-2g87-pp6c-29x5 (unbounded memory / excessive CPU on attacker-controlled requests) and CVE-2026-111063
+# (the Secure attribute not enforced on a shared cookie). aiohttp arrives only transitively (openeo, s3fs,
+# earthaccess, ...); the floor satisfies the pip-audit gate, whose policy is to upgrade rather than ignore.
+constraint-dependencies = ["oauthlib>=4.0.0", "pyramids-gis>=0.70.0", "aiohttp>=3.14.4"]
 
 [tool.uv.workspace]
 members = [
