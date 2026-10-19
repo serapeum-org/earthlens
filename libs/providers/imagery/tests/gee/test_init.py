@@ -69,6 +69,7 @@ _EXPECTED_EXPORTS = {
     "Percentile",
     # Epic 4 Tasks 4.2 - the time-axis reducers and their resolver.
     "LinearTrend",
+    "SensSlope",
     "TemporalReducer",
     "REDUCERS",
     "resolve_reducer",

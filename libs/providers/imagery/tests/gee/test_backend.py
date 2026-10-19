@@ -573,6 +573,11 @@ class TestReducerStringWidening:
         gee = self._chirps(make_gee, reducer="trend")
         assert temporal_reducer_for(gee.reducer).name == "trend"
 
+    def test_sens_slope_is_accepted_at_construction(self, make_gee):
+        """`reducer="sens_slope"` constructs and resolves to the Theil-Sen reducer."""
+        gee = self._chirps(make_gee, reducer="sens_slope")
+        assert temporal_reducer_for(gee.reducer).name == "sens_slope"
+
     @pytest.mark.parametrize("spec", ["p0", "p150"])
     def test_out_of_range_percentile_is_refused_at_construction(self, make_gee, spec):
         """An out-of-range `p<q>` fails fast, not mid-download."""

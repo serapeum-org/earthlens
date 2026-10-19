@@ -98,9 +98,11 @@ anything a string names:
   stack client-side via `reduce_time`) on top of a `Reducer`; the seven
   convenience names and `Percentile` are all `TemporalReducer`s.
   `temporal_reducer_for` resolves a name, a `percentile:<q>` spec or its
-  `p<q>` shorthand, `trend`, or an instance to one. `LinearTrend`
-  (`"trend"`) is the per-pixel linear-fit reducer; like `Percentile` it
-  is reachable only through the resolver, not the registry.
+  `p<q>` shorthand, `trend`, `sens_slope`, or an instance to one.
+  `LinearTrend` (`"trend"`) is the per-pixel ordinary-least-squares
+  reducer and `SensSlope` (`"sens_slope"`) its robust Theil-Sen
+  counterpart; like `Percentile` both are reachable only through the
+  resolver, not the registry.
 * `CadenceBucketer` — turns a `temporal_resolution` (`"raw"` /
   `"daily"` / `"monthly"` / `"yearly"`) into a pandas frequency and the
   bucket windows that tile a request, resolving through the framework
@@ -325,6 +327,7 @@ from earthlens.gee.reducers import (
     Mosaic,
     Percentile,
     Reducer,
+    SensSlope,
     Sum,
     TemporalReducer,
     resolve_reducer,
@@ -428,6 +431,7 @@ __all__ = [
     "Sum",
     "Percentile",
     "LinearTrend",
+    "SensSlope",
     "TemporalReducer",
     "REDUCERS",
     "resolve_reducer",

@@ -67,6 +67,7 @@ __all__ = [
     "Sum",
     "Percentile",
     "LinearTrend",
+    "SensSlope",
     "First",
     "StdDev",
     "Variance",
@@ -476,6 +477,61 @@ class LinearTrend(TemporalReducer):
         return _reduce_whole_window(stack, times, op="trend", q=None)
 
 
+class SensSlope(TemporalReducer):
+    """Per-pixel Theil-Sen slope (and offset) across the collection.
+
+    The robust counterpart to `LinearTrend`: where `LinearTrend` fits the
+    ordinary least-squares line, `SensSlope` takes the median of the pairwise
+    slopes (Theil-Sen), so a few outlier scenes cannot drag the trend. On the
+    Earth Engine path it is `collection.reduce(ee.Reducer.sensSlope())`, whose
+    output carries `slope` and `offset` bands rather than the inputs'; on the
+    client-side path it is `reduce_time(op="sens_slope")`, the per-pixel
+    Theil-Sen slope in value-units per day. Like `LinearTrend` it is
+    deliberately **not** in `REDUCERS` — it is reachable only through
+    `temporal_reducer_for` (as `"sens_slope"`) or by constructing it directly,
+    so the seven-name collection vocabulary `GEE(reducer=...)` validates against
+    is unchanged.
+    """
+
+    name: ClassVar[str] = "sens_slope"
+    ee_factory: ClassVar[str | None] = None
+
+    def __call__(self, collection: Any) -> Any:
+        """Reduce `collection` to its per-pixel Theil-Sen slope.
+
+        Args:
+            collection: An `ee.ImageCollection`.
+
+        Returns:
+            The `ee.Image` of `ee.Reducer.sensSlope()` (`slope` / `offset`
+            bands).
+        """
+        return collection.reduce(ee.Reducer.sensSlope())
+
+    def apply_ee(self, collection: Any) -> Any:
+        """Collapse `collection` to its Theil-Sen slope `ee.Image`, server-side.
+
+        Args:
+            collection: An `ee.ImageCollection`.
+
+        Returns:
+            The reduced `ee.Image` (`slope` / `offset` bands).
+        """
+        return self(collection)
+
+    def reduce_stack(self, stack: DatasetCollection, times: Sequence) -> Dataset:
+        """Collapse a `DatasetCollection` to its per-pixel Theil-Sen `Dataset`.
+
+        Args:
+            stack: The scene stack to reduce.
+            times: One timestamp per timestep; the trend's x-axis.
+
+        Returns:
+            The `Dataset` of per-pixel Theil-Sen slopes (value-units per day).
+        """
+        return _reduce_whole_window(stack, times, op="sens_slope", q=None)
+
+
 class _RegionReducer(Reducer):
     """A reducer that reduces pixels in a region, not images in a collection.
 
@@ -727,7 +783,7 @@ _PERCENTILE_SHORTHAND = re.compile(r"^p(\d{1,3})$")
 #: whether the offending reducer arrived as an instance or a name.
 _NO_TIME_AXIS = (
     "reduces pixels in a region, not images over time; use a collection reducer "
-    "or 'percentile:<q>' / 'trend'"
+    "or 'percentile:<q>' / 'trend' / 'sens_slope'"
 )
 
 
@@ -758,6 +814,8 @@ def _temporal_reducer_from_str(spec: str) -> TemporalReducer:
         resolved: TemporalReducer = Percentile(q=q)
     elif spec == LinearTrend.name:
         resolved = LinearTrend()
+    elif spec == SensSlope.name:
+        resolved = SensSlope()
     else:
         reducer = resolve_reducer(spec)
         if not isinstance(reducer, TemporalReducer):
@@ -772,13 +830,13 @@ def temporal_reducer_for(spec: str | Reducer) -> TemporalReducer:
     The time-axis counterpart to `resolve_reducer`: it returns a
     `TemporalReducer` for every reducer that can collapse a time bucket — the
     seven band-name-preserving names, a `percentile:<q>` spec or its `p<q>`
-    shorthand, and `trend`. A region-only reducer has no time-axis form and is
-    refused.
+    shorthand, `trend`, and `sens_slope`. A region-only reducer has no time-axis
+    form and is refused.
 
     Args:
         spec: A collection reducer name (`"median"`), a percentile spec
-            (`"percentile:90"`) or its shorthand (`"p90"`), `"trend"`, or an
-            already-built `TemporalReducer`.
+            (`"percentile:90"`) or its shorthand (`"p90"`), `"trend"`,
+            `"sens_slope"`, or an already-built `TemporalReducer`.
 
     Returns:
         The resolved `TemporalReducer`.
@@ -797,10 +855,13 @@ def temporal_reducer_for(spec: str | Reducer) -> TemporalReducer:
             90.0
 
             ```
-        - `trend` resolves to the linear-fit reducer:
+        - `trend` resolves to the linear-fit reducer, `sens_slope` to the
+          Theil-Sen one:
             ```python
             >>> temporal_reducer_for("trend").name
             'trend'
+            >>> temporal_reducer_for("sens_slope").name
+            'sens_slope'
 
             ```
         - A region-only reducer has no time-axis form:
@@ -808,7 +869,7 @@ def temporal_reducer_for(spec: str | Reducer) -> TemporalReducer:
             >>> temporal_reducer_for("stdDev")
             Traceback (most recent call last):
                 ...
-            ValueError: the 'stdDev' reducer reduces pixels in a region, not images over time; use a collection reducer or 'percentile:<q>' / 'trend'
+            ValueError: the 'stdDev' reducer reduces pixels in a region, not images over time; use a collection reducer or 'percentile:<q>' / 'trend' / 'sens_slope'
 
             ```
     """

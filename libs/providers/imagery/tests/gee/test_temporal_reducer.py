@@ -17,6 +17,7 @@ from earthlens.gee.reducers import (
     Mosaic,
     Percentile,
     Reducer,
+    SensSlope,
     Sum,
     TemporalReducer,
     temporal_reducer_for,
@@ -99,6 +100,7 @@ def fake_ee_reducer(monkeypatch):
         Reducer=SimpleNamespace(
             percentile=lambda qs: f"percentile-reducer-{qs}",
             linearFit=lambda: "linear-fit-reducer",
+            sensSlope=lambda: "sens-slope-reducer",
         )
     )
     monkeypatch.setattr(reducers_module, "ee", fake)
@@ -114,9 +116,10 @@ class TestTemporalReducerHierarchy:
         assert isinstance(cls(), TemporalReducer)
 
     def test_percentile_and_trend_are_temporal(self):
-        """`Percentile` and `LinearTrend` are `TemporalReducer`s too."""
+        """`Percentile`, `LinearTrend` and `SensSlope` are `TemporalReducer`s too."""
         assert isinstance(Percentile(q=90), TemporalReducer)
         assert isinstance(LinearTrend(), TemporalReducer)
+        assert isinstance(SensSlope(), TemporalReducer)
 
 
 class TestApplyEe:
@@ -149,6 +152,13 @@ class TestApplyEe:
         assert collection.reduced_with == "linear-fit-reducer"
         assert reduced.renamed_to is None
 
+    def test_sens_slope_uses_sens_slope_reducer(self, fake_ee_reducer):
+        """`sens_slope` reduces with `ee.Reducer.sensSlope()` (no rename)."""
+        collection = _FakeCollection()
+        reduced = SensSlope().apply_ee(collection)
+        assert collection.reduced_with == "sens-slope-reducer"
+        assert reduced.renamed_to is None
+
 
 class TestReduceStack:
     """`reduce_stack` collapses a pyramids scene stack client-side."""
@@ -170,6 +180,33 @@ class TestReduceStack:
         stack = _stack(tmp_path, [1.0, 5.0, 9.0])
         reduced = temporal_reducer_for("trend").reduce_stack(stack, _TIMES)
         assert np.asarray(reduced.read_array()).ravel()[0] > 0
+
+    def test_sens_slope_over_the_stack(self, tmp_path):
+        """A rising stack has a positive per-pixel Theil-Sen slope."""
+        stack = _stack(tmp_path, [1.0, 5.0, 9.0])
+        reduced = temporal_reducer_for("sens_slope").reduce_stack(stack, _TIMES)
+        assert np.asarray(reduced.read_array()).ravel()[0] > 0
+
+    def test_sens_slope_matches_pyramids_reduce_time(self, tmp_path):
+        """`reduce_stack` routes to pyramids' `op="sens_slope"` over one window."""
+        import pandas as pd
+
+        values = [1.0, 5.0, 2.0, 9.0]
+        times = ["2020-01-01", "2020-02-01", "2020-03-01", "2020-04-01"]
+        left = tmp_path / "reduced"
+        right = tmp_path / "expected"
+        left.mkdir()
+        right.mkdir()
+        reduced = SensSlope().reduce_stack(_stack(left, values), times)
+
+        index = pd.DatetimeIndex(pd.to_datetime(times))
+        span_days = int((index.max() - index.min()).days) + 1
+        expected = _stack(right, values).reduce_time(
+            times, freq=f"{span_days}D", op="sens_slope", q=None
+        )[0][1]
+        np.testing.assert_allclose(
+            np.asarray(reduced.read_array()), np.asarray(expected.read_array())
+        )
 
     def test_single_timestep_stack(self, tmp_path):
         """A one-scene stack still reduces to one whole-window dataset."""
@@ -208,6 +245,12 @@ class TestTemporalReducerFor:
     def test_resolves_trend(self):
         """`trend` resolves to a `LinearTrend`, which is not in the registry."""
         assert isinstance(temporal_reducer_for("trend"), LinearTrend)
+
+    def test_resolves_sens_slope(self):
+        """`sens_slope` resolves to a `SensSlope`, which is not in the registry."""
+        reducer = temporal_reducer_for("sens_slope")
+        assert isinstance(reducer, SensSlope)
+        assert reducer.name == "sens_slope"
 
     def test_passes_through_an_instance(self):
         """An already-built `TemporalReducer` is returned unchanged."""
