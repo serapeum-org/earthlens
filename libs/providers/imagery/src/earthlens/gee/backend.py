@@ -3384,6 +3384,79 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
         return True, ""
 
+    def _composite_collection_via_reader(
+        self,
+        reader: EedaiReader,
+        var_info: Dataset,
+        bands: list[str],
+        bbox: tuple[float, float, float, float],
+        cutline: Any,
+        scale: float,
+        bucket_start: dt.datetime | None,
+        bucket_end: dt.datetime | None,
+    ) -> PyramidsDataset:
+        """Fetch a bucket's scene stack and reduce it client-side to one `Dataset`.
+
+        The reader returns the collection's scenes over this bucket's window as a
+        pyramids `DatasetCollection`; the composite is then computed here through
+        the reducer's `reduce_stack` (pyramids `reduce_time`), **not** by handing
+        the reducer name to the reader. The reader's own `reducer=` could not
+        express a true `median` (nor a percentile or trend), so a median EEDAI
+        composite used to be wrong; reducing the stack with pyramids makes it a
+        true per-pixel median, matching Earth Engine within tolerance.
+
+        The no-nodata caveat still applies: the EEDAI driver declares no fill, so
+        a statistical reducer folds a scene's fill pixels into the result where
+        Earth Engine would have masked them (documented on the constructor and in
+        the usage guide). The reducer here is the one the gate already admitted —
+        `mosaic` is declined upstream in `_eedai_collection_fits`, because
+        last-wins has no client-side equivalent over a scene stack.
+
+        Args:
+            reader: The EEDAI adapter owning the credential and the read lock.
+            var_info: The collection's catalog entry; its `id` is the asset.
+            bands: Band ids to read.
+            bbox: The read window in the output CRS.
+            cutline: The region to clip to, or `None`.
+            scale: Output pixel size in metres, sized into the reader's grid.
+            bucket_start: Inclusive start of the bucket's date window.
+            bucket_end: Exclusive end of that window.
+
+        Returns:
+            The reduced `Dataset` for this bucket.
+
+        Raises:
+            ValueError: If the bucket window is missing — an internal contract
+                violation `_api` never produces.
+        """
+        if bucket_start is None or bucket_end is None:
+            raise ValueError(
+                f"a collection read of {var_info.id} needs a bucket window"
+            )
+        reducer = temporal_reducer_for(self.reducer or var_info.default_reducer)
+        collection_kwargs: dict[str, Any] = {
+            "start": bucket_start.strftime("%Y-%m-%d"),
+            "end": self._reader_end(bucket_end, bucket_start),
+            "bands": list(bands),
+            "window": reader.window_type(
+                bbox=bbox,
+                crs=self.crs,
+                shape=self._eedai_output_grid(bbox, scale),
+                resample=self.resample,
+            ),
+            "geometry": cutline,
+        }
+        if self.property_filter is not None:
+            collection_kwargs["property_filter"] = self.property_filter
+        stack = reader.collection_from_earthengine(var_info.id, **collection_kwargs)
+        try:
+            return reducer.reduce_stack(stack, list(stack.time))
+        finally:
+            # The reduced dataset is materialised in memory, independent of the
+            # stack's per-scene handles, so the stack can be released now — which
+            # matters on Windows, where an open scene handle locks its file.
+            close_quietly(stack)
+
     def _export_via_eedai(
         self,
         var_info: Dataset,
@@ -3454,33 +3527,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
             raise ValueError(
                 f"the EEDAI reader cannot serve {var_info.id}: {plan.reason}"
             )
-        composite_kwargs: dict[str, Any] = {}
-        if var_info.is_image_collection:
-            if bucket_start is None or bucket_end is None:
-                raise ValueError(
-                    f"a collection read of {var_info.id} needs a bucket window"
-                )
-            # The reader composites the scenes in this window with the same
-            # reducer the Earth Engine path would use.
-            #
-            # Caveat: the reader takes each band's nodata from the scene's own
-            # dataset, and EEDAI declares none, so its statistical reducers run
-            # unmasked and fold a scene's fill pixels into the result where
-            # Earth Engine would mask them. The values agree wherever the scenes
-            # carry no fill over the AOI. There is no caller-side remedy today -
-            # the composite read takes no `nodata` argument - so closing this
-            # needs the driver (or upstream) to declare the fill. Stated in the
-            # constructor docstring and the usage guide rather than left here,
-            # since it is a user-visible difference, not an implementation note.
-            composite_kwargs = {
-                "start": bucket_start.strftime("%Y-%m-%d"),
-                "end": self._reader_end(bucket_end, bucket_start),
-                # A name, not the resolved object: the reader's `reducer=`
-                # takes one of its own vocabulary's strings.
-                "reducer": self._reducer_name(var_info),
-            }
-            if self.property_filter is not None:
-                composite_kwargs["property_filter"] = self.property_filter
         read_options: dict[str, Any] = {}
         tile_size = plan.tile_size
         if tile_size is not None:
@@ -3495,19 +3541,35 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # `try` as the write: a mosaic that fails partway would otherwise leave
         # its partial file behind.
         try:
-            dataset = reader.from_earthengine(
-                var_info.id,
-                bands=list(bands),
-                window=reader.window_type(
-                    bbox=bbox,
-                    crs=self.crs,
-                    shape=self._eedai_output_grid(bbox, scale),
-                    resample=self.resample,
-                ),
-                geometry=cutline,
-                **composite_kwargs,
-                **read_options,
-            )
+            if var_info.is_image_collection:
+                # A collection is composited client-side: the reader hands back
+                # the bucket's scene stack and pyramids' `reduce_time` collapses
+                # it, so `median` / percentile / trend are computed correctly
+                # rather than approximated by whatever the reader's own
+                # `reducer=` could express.
+                dataset = self._composite_collection_via_reader(
+                    reader,
+                    var_info,
+                    bands,
+                    bbox,
+                    cutline,
+                    scale,
+                    bucket_start,
+                    bucket_end,
+                )
+            else:
+                dataset = reader.from_earthengine(
+                    var_info.id,
+                    bands=list(bands),
+                    window=reader.window_type(
+                        bbox=bbox,
+                        crs=self.crs,
+                        shape=self._eedai_output_grid(bbox, scale),
+                        resample=self.resample,
+                    ),
+                    geometry=cutline,
+                    **read_options,
+                )
             try:
                 if self.cog:
                     dataset.cog.to_cog(str(cog_staged))

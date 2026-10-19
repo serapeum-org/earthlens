@@ -13,10 +13,12 @@ from __future__ import annotations
 import datetime as dt
 import inspect
 import math
+import tempfile
 import zipfile
 from pathlib import Path
 from types import SimpleNamespace
 
+import numpy as np
 import pandas as pd
 import pytest
 import requests
@@ -2182,19 +2184,62 @@ def _bind_to_real_signature(name: str, asset_id: str, kwargs: dict) -> None:
         ) from exc
 
 
+def _build_fake_stack(values, times):
+    """Build a file-backed `DatasetCollection` of constant scenes carrying times.
+
+    Mirrors what `pyramids_eo.collection_from_earthengine` returns — one aligned
+    scene per timestep with the acquisition times as the time axis — but
+    file-backed, because pyramids `reduce_time` (which `reduce_stack` uses) reads
+    a file- or zarr-backed collection. Each scene is a constant 2x2 raster, so
+    the per-pixel reduction has a value the parity test can predict.
+    """
+    from pyramids.dataset import Dataset, DatasetCollection
+    from pyramids.dataset.dataset import GeoReference
+
+    geo = GeoReference(top_left_corner=(31.2, 30.0), cell_size=0.05, epsg=4326)
+    folder = tempfile.mkdtemp()
+    paths = []
+    for i, value in enumerate(values):
+        path = str(Path(folder) / f"scene{i}.tif")
+        Dataset.from_array(
+            np.full((2, 2), float(value)), geo_ref=geo, no_data_value=-9999.0, path=path
+        )
+        paths.append(path)
+    stack = DatasetCollection.from_files(paths)
+    stack.time = list(times)
+    return stack
+
+
 class _FakeReaderModule:
-    """Stand-in for `pyramids_eo.earthengine`; records `from_earthengine`."""
+    """Stand-in for `pyramids_eo.earthengine`; records the reader calls."""
 
     Window = _FakeWindow
 
     def __init__(self):
         self.calls: list[tuple[str, dict]] = []
         self.cost_calls: list[tuple[str, dict]] = []
+        self.collection_calls: list[tuple[str, dict]] = []
         self.dataset = _FakeEedaiDataset()
         # A small, servable collection by default; tests override per case.
         self.cost = SimpleNamespace(scene_count=3, min_pixel_size=5566.0)
         self.cost_error: Exception | None = None
         self.read_error: Exception | None = None
+        #: Per-scene constant values and acquisition times for the stack the
+        #: fake `collection_from_earthengine` hands back; the parity test
+        #: overrides them to a known distribution.
+        self.collection_values: list[float] = [1.0, 5.0, 9.0]
+        self.collection_times: list[str] = [
+            "2020-06-01",
+            "2020-06-02",
+            "2020-06-03",
+        ]
+
+    def collection_from_earthengine(self, asset_id, **kwargs):
+        _bind_to_real_signature("collection_from_earthengine", asset_id, kwargs)
+        self.collection_calls.append((asset_id, kwargs))
+        if self.read_error is not None:
+            raise self.read_error
+        return _build_fake_stack(self.collection_values, self.collection_times)
 
     def estimate_earthengine_cost(self, asset_id, **kwargs):
         _bind_to_real_signature("estimate_earthengine_cost", asset_id, kwargs)
@@ -2420,8 +2465,15 @@ class TestEedaiCollections:
         params.update(overrides)
         return make_gee(**params)
 
-    def test_composite_kwargs_are_forwarded_to_the_reader(self, make_gee, fake_reader):
-        """The reader is asked to composite the bucket's window with the reducer."""
+    def test_the_scene_stack_is_fetched_for_the_bucket_window(
+        self, make_gee, fake_reader
+    ):
+        """The collection read asks for the bucket's scene stack, reduced client-side.
+
+        The reducer is applied by pyramids' `reduce_time` on the returned stack,
+        not handed to the reader, so the collection call carries the window and
+        bands but no `reducer=` keyword.
+        """
         gee = self._collection_gee(make_gee)
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
@@ -2429,12 +2481,47 @@ class TestEedaiCollections:
         gee._export_via_eedai(
             var_info, ["precipitation"], 5566.0, "chirps", plan, self.START, self.END
         )
-        _asset_id, kwargs = fake_reader.calls[0]
+        assert fake_reader.calls == [], "a collection must not use from_earthengine"
+        _asset_id, kwargs = fake_reader.collection_calls[0]
         assert kwargs["start"] == "2020-06-01"
         # The reader's `end` is inclusive while this backend's bucket end is
         # exclusive, so the last covered day is what must be sent.
         assert kwargs["end"] == "2020-06-30"
-        assert kwargs["reducer"] == var_info.default_reducer
+        assert kwargs["bands"] == ["precipitation"]
+        assert "reducer" not in kwargs
+
+    def test_median_composite_equals_the_numpy_median(self, make_gee, fake_reader):
+        """An EEDAI median equals `np.nanmedian` over the scene stack.
+
+        The fix this proves: the composite is pyramids' true per-pixel median of
+        the fetched stack, not whatever the reader's own `reducer=` returned.
+        """
+        from pyramids.dataset import Dataset as _PyramidsDataset
+
+        gee = self._collection_gee(make_gee, reducer="median")
+        fake_reader.collection_values = [2.0, 4.0, 9.0, 11.0]
+        fake_reader.collection_times = [
+            "2020-06-01",
+            "2020-06-08",
+            "2020-06-15",
+            "2020-06-22",
+        ]
+        fake_reader.cost = SimpleNamespace(scene_count=4, min_pixel_size=5566.0)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert plan.can_serve, plan.reason
+        target = gee._export_via_eedai(
+            var_info,
+            ["precipitation"],
+            5566.0,
+            "chirps_med",
+            plan,
+            self.START,
+            self.END,
+        )
+        written = _PyramidsDataset.read_file(str(target))
+        expected = float(np.nanmedian(np.array([2.0, 4.0, 9.0, 11.0])))
+        assert np.asarray(written.read_array()).ravel()[0] == pytest.approx(expected)
 
     def test_single_image_read_sends_no_composite_kwargs(self, make_gee, fake_reader):
         """A static image is read directly, with no start/end/reducer."""
@@ -2590,14 +2677,14 @@ class TestEedaiCollections:
         written = gee.download(progress_bar=False)
         assert len(written) == 3, f"one file per month expected, got {written}"
         assert all(Path(p).is_file() for p in written), written
-        assert len(fake_reader.calls) == 3, (
+        assert len(fake_reader.collection_calls) == 3, (
             "each month must be composited by the reader, not by Earth Engine"
         )
         assert len(fake_reader.cost_calls) == 3, (
             "scene discovery costs one query per bucket, no more and no fewer: "
             f"{len(fake_reader.cost_calls)}"
         )
-        windows = [(k["start"], k["end"]) for _asset, k in fake_reader.calls]
+        windows = [(k["start"], k["end"]) for _asset, k in fake_reader.collection_calls]
         assert windows == [
             ("2020-06-01", "2020-06-30"),
             ("2020-07-01", "2020-07-31"),
@@ -2617,7 +2704,9 @@ class TestEedaiCollections:
         )
         written = gee.download(progress_bar=False)
         assert len(written) == 3, f"the fallback dropped buckets: {written}"
-        assert fake_reader.calls == [], "the declined reducer still reached the reader"
+        assert fake_reader.collection_calls == [], (
+            "the declined reducer still reached the reader"
+        )
 
     def test_the_region_is_reprojected_once_across_buckets(self, make_gee, fake_reader):
         """A many-bucket run must not warp the same region once per bucket.
@@ -2936,7 +3025,7 @@ class TestEedaiCollections:
         )
         _cid, cost_kwargs = fake_reader.cost_calls[0]
         assert cost_kwargs["property_filter"] == "CLOUDY_PIXEL_PERCENTAGE < 20"
-        _rid, read_kwargs = fake_reader.calls[0]
+        _rid, read_kwargs = fake_reader.collection_calls[0]
         assert read_kwargs["property_filter"] == "CLOUDY_PIXEL_PERCENTAGE < 20"
 
     def test_no_property_filter_sends_none_to_the_reader(self, make_gee, fake_reader):
@@ -2947,7 +3036,7 @@ class TestEedaiCollections:
         gee._export_via_eedai(
             var_info, ["precipitation"], 5566.0, "chirps", plan, self.START, self.END
         )
-        _rid, read_kwargs = fake_reader.calls[0]
+        _rid, read_kwargs = fake_reader.collection_calls[0]
         assert "property_filter" not in read_kwargs
 
 

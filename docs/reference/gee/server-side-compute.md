@@ -67,8 +67,12 @@ scene in the bucket and holds them in memory to reduce. It hands the bucket back
 
 - the bucket holds more scenes than the scene cap (currently 500)
 - the scene stack exceeds the single-pass pixel budget (currently 2×10⁸ px)
-- the reducer is `mosaic` — client-side it means *first scene*, in Earth Engine it means *last wins*, so
-  serving it would quietly change the result
+- the reducer is `mosaic` — last-wins in Earth Engine's collection order has no client-side equivalent over
+  a scene stack (it would need per-scene masks the reader does not expose), so **mosaic stays on Earth
+  Engine**; the served reducers (`mean` / `median` / `min` / `max` / `mode` / `sum`) are computed client-side
+  by pyramids' `reduce_time`, so `median` is a true per-pixel median
+- the reducer is a percentile (`percentile:<q>` / `p<q>`) or `trend` — these are not in the reader's
+  collection vocabulary, so Earth Engine composites them (`ee.Reducer.percentile` / `linearFit`) instead
 
 Narrow the window, shorten `temporal_resolution`, add a `property_filter`, or use a coarser `scale` to
 get back under the budget. These thresholds are internal constants, not public API — treat them as

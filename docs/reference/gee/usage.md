@@ -168,19 +168,24 @@ gee = GEE(
 
 A request qualifies when nothing server-side has to shape the image: no
 `cloud_mask`, no `filters`, and `export_via="url"`. That covers both a
-single `ee_type="image"` asset and an `ee_type="image_collection"`, which
-the reader composites client-side per time bucket with the same reducer
-Earth Engine would have used. The output CRS may be `"EPSG:4326"` or any
-metre-based projected CRS. Everything else stays on Earth Engine, which is
-the only engine that can run a computation graph or export to Drive / GCS /
-an asset.
+single `ee_type="image"` asset and an `ee_type="image_collection"`. For a
+collection the reader fetches the bucket's scene stack and the composite is
+computed **client-side by pyramids' own `reduce_time`** — so `median` is a
+true per-pixel median (not an approximation), matching Earth Engine's within
+numerical tolerance where the scenes carry no fill over the AOI. The output
+CRS may be `"EPSG:4326"` or any metre-based projected CRS. Everything else
+stays on Earth Engine, which is the only engine that can run a computation
+graph or export to Drive / GCS / an asset.
 
 A collection is sized before it is served, because the reader downloads
 every scene in the bucket and holds them to reduce. It goes back to Earth
 Engine's server-side reduce when the bucket has too many scenes, when the
-scene stack would not fit one pass, or when the reducer is `mosaic` — Earth
-Engine's is last-wins, while the reader returns the first scene of the
-stack, so they are not the same composite.
+scene stack would not fit one pass, or when the reducer is `mosaic` —
+mosaic is last-wins in Earth Engine's collection order, which has no
+client-side equivalent over a scene stack without per-scene masks the reader
+does not expose, so **mosaic stays on Earth Engine**. A percentile (`"p90"`)
+and `"trend"` are not in the reader's vocabulary either, so they too are
+composited on Earth Engine.
 
 With a collection you can also narrow which scenes are read:
 
@@ -257,9 +262,12 @@ GEE(..., reducer="percentile:90")
 ```
 
 **Reducers.** `mean`, `median`, `min`, `max`, `mode`, `mosaic` and `sum` dispatch to Earth Engine's convenience
-methods, which preserve band names. `Percentile` has to use `reduce`, which suffixes them, so it renames them back —
-making it interchangeable with the rest. `resolve_reducer` accepts a name, a `percentile:<q>` spec or an instance,
-and resolves once per request, so a bad percentile fails before any bucket exports rather than part-way through.
+methods, which preserve band names. A percentile and a per-pixel trend are first-class too: pass
+`reducer="p90"` (or `"percentile:90"`, or `Percentile(q=90)`) and `reducer="trend"`. `Percentile` and the trend
+reducer have to use `reduce`, which suffixes the bands, so they rename them back — making them interchangeable
+with the rest, and they run on `engine="ee"` (via `ee.Reducer.percentile` / `linearFit`) and on the client-side
+EEDAI path. The `reducer=` string is validated at construction, so a bad percentile (`"p150"`) or an unknown name
+fails before any bucket exports rather than part-way through.
 
 **Engines.** `engine=` resolves to an `Engine`, and there are four:
 
