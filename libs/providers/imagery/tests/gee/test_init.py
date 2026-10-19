@@ -75,6 +75,9 @@ _EXPECTED_EXPORTS = {
     "temporal_reducer_for",
     # Epic 4 Task 4.7 - the cadence bucketer.
     "CadenceBucketer",
+    # Epic 4 Task 4.3 - the composite engine and its bucket value object.
+    "CompositeEngine",
+    "Bucket",
     # Epic 1 Task 1.6 - the promoted routing verdict.
     "EnginePlan",
     "EedaiPlan",

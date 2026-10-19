@@ -107,6 +107,12 @@ anything a string names:
   `resolve_cadence` so an unknown cadence raises rather than silently
   defaulting. `is_whole_window` is the single home of the `"raw"`
   one-bucket special case.
+* `CompositeEngine`, over a `TemporalReducer` + a `CadenceBucketer`
+  — buckets a request window and reduces each bucket to one image,
+  yielding one `Bucket` (`buckets`) or one reduced `RasterWorkUnit`
+  (`composite_ee`) per time bucket. `GEE._composite` is a thin shim that
+  builds one and delegates, so the whole-window special case and the
+  per-bucket `filterDate` split live here, not in the backend.
 * `Engine`, with `ENGINES` and `resolve_engine` —
   what materialises the pixels. `engine="auto"` routes between
   `EedaiEngine` (the pyramids-eo reader) and `EeEngine`
@@ -234,7 +240,7 @@ Examples:
 
 from __future__ import annotations
 
-from earthlens.gee._composite import CadenceBucketer
+from earthlens.gee._composite import Bucket, CadenceBucketer, CompositeEngine
 from earthlens.gee.analysis import (
     ALLOWED_FUNCTIONS,
     MEASURES,
@@ -427,6 +433,8 @@ __all__ = [
     "resolve_reducer",
     "temporal_reducer_for",
     "CadenceBucketer",
+    "CompositeEngine",
+    "Bucket",
     "EnginePlan",
     "EedaiPlan",
     "OutputGrid",

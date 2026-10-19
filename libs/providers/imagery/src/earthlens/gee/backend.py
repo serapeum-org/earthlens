@@ -76,7 +76,7 @@ from earthlens.base import (
     date_windows,
     to_datetime,
 )
-from earthlens.gee._composite import _GEE_CADENCES
+from earthlens.gee._composite import _GEE_CADENCES, CadenceBucketer, CompositeEngine
 from earthlens.gee._eedai import (
     credentials_for,  # noqa: F401 - monkeypatch seam the test suite patches
     eedai_available,  # noqa: F401 - monkeypatch seam the test suite patches
@@ -109,13 +109,16 @@ from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
 from earthlens.gee.pixels import PixelsEngine
 from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reader import EedaiReader
-from earthlens.gee.reducers import collection_reducers, resolve_reducer
+from earthlens.gee.reducers import (
+    collection_reducers,
+    resolve_reducer,
+    temporal_reducer_for,
+)
 from earthlens.gee.sinks import AssetSink, _BatchSink, resolve_sink
 from earthlens.gee.work import (
     Artifact,
     DownloadResult,
     FeatureWorkUnit,
-    RasterWorkUnit,
 )
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -1917,30 +1920,19 @@ class GEE(LazyClientMixin, AbstractDataSource):
             (both `datetime.datetime`), which the EEDAI collection path
             re-composites client-side.
         """
-        # Resolved once per request rather than per bucket: a parameterised
-        # reducer (`percentile:90`) validates its argument at resolution time,
-        # so a typo fails before any bucket is exported.
-        reducer = resolve_reducer(self.reducer or var_info.default_reducer)
-        if self.temporal_resolution == "raw" or not var_info.is_image_collection:
-            yield RasterWorkUnit(reducer(collection), start, start, end)
-            return
-        freq = _RESOLUTION_FREQ[self.temporal_resolution]
-        bucket_starts = date_windows(start, end, freq, inclusive="left")
-        for i, bucket_start in enumerate(bucket_starts):
-            bucket_end = (
-                bucket_starts[i + 1]
-                if i + 1 < len(bucket_starts)
-                else pd.Timestamp(end)
-            )
-            window = collection.filterDate(
-                bucket_start.strftime("%Y-%m-%d"), bucket_end.strftime("%Y-%m-%d")
-            )
-            yield RasterWorkUnit(
-                reducer(window),
-                bucket_start.to_pydatetime(),
-                bucket_start.to_pydatetime(),
-                bucket_end.to_pydatetime(),
-            )
+        # The bucketing + per-bucket reduction now live in `CompositeEngine`
+        # (gee/_composite.py); this is the thin shim the epic's OOP refactor
+        # leaves behind, so the `_api` / download seam keeps consuming the same
+        # `RasterWorkUnit`s. The reducer is resolved once per request rather than
+        # per bucket: a parameterised reducer (`percentile:90`) validates its
+        # argument at resolution time, so a typo fails before any bucket exports.
+        engine = CompositeEngine(
+            reducer=temporal_reducer_for(self.reducer or var_info.default_reducer),
+            cadence=CadenceBucketer(self.temporal_resolution),
+        )
+        yield from engine.composite_ee(
+            collection, start, end, is_image_collection=var_info.is_image_collection
+        )
 
     def _api(
         self,
