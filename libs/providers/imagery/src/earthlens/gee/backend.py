@@ -120,6 +120,7 @@ from earthlens.gee.work import (
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from geopandas import GeoDataFrame
+    from pyramids_eo.earthengine import ReadCost
 
     from earthlens.base.http import HttpClient
     from earthlens.gee.analysis.base import OperationChain, RasterOperation
@@ -1480,6 +1481,51 @@ class GEE(LazyClientMixin, AbstractDataSource):
             return written
         return self._materialise(written)
 
+    def estimate_cost(self) -> ReadCost:
+        """Estimate what this request would cost the EEDAI reader to materialise.
+
+        Delegates to the pyramids-eo reader's `estimate_earthengine_cost`, which
+        queries the asset's catalog over the request window and AOI and returns a
+        `ReadCost` — its `scene_count`, `total_size_bytes`, `max_width`,
+        `max_height`, `max_band_count`, `min_pixel_size` and per-scene `scenes`.
+        The same query drives the engine-routing decision internally; this
+        surfaces it so a caller can size a request before downloading.
+
+        The AOI is handed over in `EPSG:4326` (the native CRS EEDA discovers
+        scenes in) and any `property_filter` is applied, exactly as the internal
+        collection-sizing path does. The reader binds the resolved credential
+        itself.
+
+        Returns:
+            The `ReadCost` for the single requested dataset.
+
+        Raises:
+            ValueError: If the request names more than one dataset — a
+                `ReadCost` describes one asset, and its aggregates cannot be
+                meaningfully combined across several.
+            ImportError: If `pyramids-eo` (the `[eedai]` extra) is not installed.
+            AuthenticationError: If the EEDAI credential cannot be built, or
+                another read is in flight under a different service account.
+        """
+        assert isinstance(self.vars, dict)  # GEE always uses {asset_id: [band]}
+        if len(self.vars) != 1:
+            raise ValueError(
+                "estimate_cost() sizes a single dataset, but this request names "
+                f"{len(self.vars)}: {sorted(self.vars)}. Build one GEE per asset "
+                "to estimate each."
+            )
+        asset_id = next(iter(self.vars))
+        return self._eedai_reader().estimate_cost(
+            asset_id,
+            start=self.time.start_date.strftime("%Y-%m-%d"),
+            end=self.time.end_date.strftime("%Y-%m-%d"),
+            # Lat/lon, so labelled as such: upstream reads `bbox` in `crs`, and
+            # passing the output CRS would have degrees read as projected metres.
+            bbox=self._eedai_latlon_aoi(),
+            crs=_EEDAI_NATIVE_CRS,
+            property_filter=self._property_filter_expression(),
+        )
+
     def analyze(
         self,
         ops: RasterOperation | OperationChain | Sequence[RasterOperation],
@@ -2381,11 +2427,17 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 if pinned is not None
                 else f"at scale={scale} m"
             )
+            # Always name the cap the request tripped: `reason` already does when
+            # the Earth Engine grid itself is over a budget, but the upper-bound
+            # estimate can trip the guard while the EE grid fits per-axis, which
+            # left `reason` empty and the cap unnamed. Falling back to the
+            # per-axis cap keeps the dimensions-and-cap contract in every case.
+            budget = reason or f"over the {EE_MAX_DIMENSION:,}-px per-axis cap"
             raise ValueError(
-                f"{var_info.id}: the requested AOI {sized} is "
-                f"{grid.cols}x{grid.rows} px on Earth Engine's grid"
-                f"{f' - {reason}' if reason else ''}. Use a coarser scale, a "
-                "smaller bbox, export_via='drive', or auto_split=True."
+                f"{var_info.id}: the requested AOI {sized} is estimated at "
+                f"{grid.cols}x{grid.rows} px on Earth Engine's grid, {budget}. "
+                "Use a coarser scale, a smaller bbox, export_via='drive', or "
+                "auto_split=True."
             )
         return self._download_one_url_tile(image, region, scale, prefix)
 

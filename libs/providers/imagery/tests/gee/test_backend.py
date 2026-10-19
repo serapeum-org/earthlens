@@ -1663,9 +1663,10 @@ class TestApi:
         with pytest.raises(ValueError, match=r"32,?768-px") as caught:
             gee.download(progress_bar=False)
         message = str(caught.value)
-        # The message quotes the grid Earth Engine would actually build, and
-        # names a way out rather than only refusing.
+        # The message names the estimated dimensions and the per-axis cap the
+        # request tripped, and offers a way out rather than only refusing.
         assert "148427x148427" in message
+        assert "32,768-px per-axis cap" in message
         assert "auto_split=True" in message
 
     def test_missing_scale_raises(self, make_gee):
@@ -3047,6 +3048,41 @@ class TestEedaiCollections:
         )
         _rid, read_kwargs = fake_reader.collection_calls[0]
         assert "property_filter" not in read_kwargs
+
+    def test_estimate_cost_returns_the_reader_readcost(self, make_gee, fake_reader):
+        """`estimate_cost()` surfaces the reader's `ReadCost` for the request."""
+        gee = self._collection_gee(make_gee)
+        fake_reader.cost = SimpleNamespace(
+            scene_count=12, max_width=4096, max_height=2048, min_pixel_size=5566.0
+        )
+        cost = gee.estimate_cost()
+        assert cost is fake_reader.cost
+        asset_id, kwargs = fake_reader.cost_calls[0]
+        assert asset_id == "UCSB-CHG/CHIRPS/DAILY"
+        assert (kwargs["start"], kwargs["end"]) == ("2020-06-01", "2020-06-30")
+        assert kwargs["crs"] == "EPSG:4326"
+        assert kwargs["bbox"] == (31.2, 29.9, 31.3, 30.0)
+
+    def test_estimate_cost_passes_the_property_filter(self, make_gee, fake_reader):
+        """`estimate_cost()` forwards the validated filter as its OGR string."""
+        gee = self._collection_gee(
+            make_gee, property_filter="CLOUDY_PIXEL_PERCENTAGE < 20"
+        )
+        gee.estimate_cost()
+        _asset, kwargs = fake_reader.cost_calls[0]
+        assert kwargs["property_filter"] == "CLOUDY_PIXEL_PERCENTAGE < 20"
+
+    def test_estimate_cost_rejects_a_multi_dataset_request(self, make_gee, fake_reader):
+        """A multi-dataset request cannot yield one `ReadCost`, so it is refused."""
+        gee = self._collection_gee(
+            make_gee,
+            variables={
+                "UCSB-CHG/CHIRPS/DAILY": ["precipitation"],
+                "USGS/SRTMGL1_003": ["elevation"],
+            },
+        )
+        with pytest.raises(ValueError, match="sizes a single dataset"):
+            gee.estimate_cost()
 
 
 class TestEedaiProjectedCrs:
