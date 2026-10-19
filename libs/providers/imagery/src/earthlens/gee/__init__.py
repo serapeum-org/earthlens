@@ -91,6 +91,16 @@ anything a string names:
   region, not images in a collection"). `Percentile` is
   deliberately **not** in the registry — it needs a parameter — so it
   is reachable only as a spec string or an instance.
+* `TemporalReducer`, with `temporal_reducer_for` and `LinearTrend`
+  — the time-axis reducers. A `TemporalReducer` adds `apply_ee`
+  (collapse an `ee.ImageCollection` server-side, preserving band names)
+  and `reduce_stack` (collapse a pyramids `DatasetCollection` scene
+  stack client-side via `reduce_time`) on top of a `Reducer`; the seven
+  convenience names and `Percentile` are all `TemporalReducer`s.
+  `temporal_reducer_for` resolves a name, a `percentile:<q>` spec or its
+  `p<q>` shorthand, `trend`, or an instance to one. `LinearTrend`
+  (`"trend"`) is the per-pixel linear-fit reducer; like `Percentile` it
+  is reachable only through the resolver, not the registry.
 * `Engine`, with `ENGINES` and `resolve_engine` —
   what materialises the pixels. `engine="auto"` routes between
   `EedaiEngine` (the pyramids-eo reader) and `EeEngine`
@@ -293,6 +303,7 @@ from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reader import EedaiReader
 from earthlens.gee.reducers import (
     REDUCERS,
+    LinearTrend,
     Max,
     Mean,
     Median,
@@ -302,7 +313,9 @@ from earthlens.gee.reducers import (
     Percentile,
     Reducer,
     Sum,
+    TemporalReducer,
     resolve_reducer,
+    temporal_reducer_for,
 )
 from earthlens.gee.sampling import (
     PointSampler,
@@ -401,8 +414,11 @@ __all__ = [
     "Mosaic",
     "Sum",
     "Percentile",
+    "LinearTrend",
+    "TemporalReducer",
     "REDUCERS",
     "resolve_reducer",
+    "temporal_reducer_for",
     "EnginePlan",
     "EedaiPlan",
     "OutputGrid",

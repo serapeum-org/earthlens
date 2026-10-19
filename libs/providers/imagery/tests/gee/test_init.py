@@ -67,8 +67,12 @@ _EXPECTED_EXPORTS = {
     "Mosaic",
     "Sum",
     "Percentile",
+    # Epic 4 Tasks 4.2 - the time-axis reducers and their resolver.
+    "LinearTrend",
+    "TemporalReducer",
     "REDUCERS",
     "resolve_reducer",
+    "temporal_reducer_for",
     # Epic 1 Task 1.6 - the promoted routing verdict.
     "EnginePlan",
     "EedaiPlan",
