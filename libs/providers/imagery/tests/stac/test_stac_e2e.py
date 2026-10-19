@@ -3,8 +3,10 @@
 These hit real STAC APIs and write real COGs, so they are marked `e2e` and
 deselected by the default `-m "not e2e"` run. Earth Search is anonymous and
 always runs (given the `[stac]` extra); MPC needs `planetary-computer` installed
-(public, no account); CDSE needs S3 dashboard keys in the environment and skips
-cleanly without them.
+(public, no account); CDSE and usgs-landsat read with credentials taken from the
+environment. Gating is by marker only — `-m e2e` decides whether a test runs — so
+a missing credential or a known defect surfaces as an `xfail` with a stated
+reason, never as a silent env-var skip.
 
 Note on asset keys: the catalog aliases the *collection id* per endpoint but not
 the *asset keys*, which differ across providers (Earth Search exposes
@@ -14,7 +16,6 @@ asset names that endpoint actually serves.
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import pytest
@@ -76,12 +77,28 @@ class TestPlanetaryComputerE2E:
 
 @pytest.mark.stac
 @pytest.mark.e2e
-@pytest.mark.skipif(
-    not (os.environ.get("CDSE_S3_ACCESS_KEY") and os.environ.get("CDSE_S3_SECRET_KEY")),
-    reason="CDSE e2e needs CDSE_S3_ACCESS_KEY / CDSE_S3_SECRET_KEY",
+@pytest.mark.xfail(
+    reason=(
+        "earthlens#1029: a CDSE read routes to real AWS instead of "
+        "eodata.dataspace.copernicus.eu once it fans out to GDAL's VSICurl worker "
+        "threads, so the mosaic writes no output. Verified on pyramids-core 0.70.0 "
+        "that the credentials are valid (a direct Dataset/gdal open of the same "
+        "asset succeeds) and that every pyramids-sanctioned call shape still fails "
+        "- CloudConfig(extra=...), CloudConfig(extra=..., path=[...]) and "
+        "merge_rasters(signer=...) - while the identical config applied globally "
+        "reads it. Upstream: serapeum-org/pyramids#983."
+    ),
+    strict=False,
 )
 class TestCdseE2E:
-    """Copernicus Data Space — S3-credentialled asset reads (gated on keys)."""
+    """Copernicus Data Space — S3-credentialled asset reads.
+
+    Credentials come from `CDSE_S3_ACCESS_KEY` / `CDSE_S3_SECRET_KEY` in the
+    environment, but the `e2e` marker — not an env-var check — decides whether
+    this runs, so it executes under `-m e2e` and reports `xfail` instead of
+    skipping silently. `strict=False`, so it flips to `xpass` as soon as the
+    upstream routing defect is fixed.
+    """
 
     def test_sentinel2_writes_cog(self, tmp_path: Path):
         """A one-item CDSE Sentinel-2 pull writes a readable COG."""
@@ -154,8 +171,21 @@ class TestDeaE2E:
 
 @pytest.mark.stac
 @pytest.mark.e2e
+@pytest.mark.xfail(
+    reason=(
+        "earthlens#938: s3://veda-data-store denies anonymous reads, so the asset "
+        "open fails with AccessDenied. VEDA publishes through its raster API rather "
+        "than as directly-readable public COGs, so this endpoint cannot be served by "
+        "the direct-COG backend as catalogued; #938 carries the disposition."
+    ),
+    strict=False,
+)
 class TestVedaE2E:
-    """NASA VEDA — anonymous, us-west-2."""
+    """NASA VEDA — anonymous, us-west-2.
+
+    Currently `xfail`: the bucket is not anonymously readable (see the marker).
+    `strict=False`, so it flips to `xpass` if VEDA ever opens direct S3 access.
+    """
 
     def test_nldas3_writes_cog(self, tmp_path: Path):
         """A one-item NLDAS-3 pull writes a readable COG."""
@@ -224,14 +254,23 @@ class TestEodcGfmE2E:
 
 @pytest.mark.stac
 @pytest.mark.e2e
-@pytest.mark.skipif(
-    not (
-        os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCESS_KEY")
+@pytest.mark.xfail(
+    reason=(
+        "requester-pays on s3://usgs-landsat: needs valid AWS_ACCESS_KEY_ID / "
+        "AWS_SECRET_ACCESS_KEY, which are not provisioned as repo secrets (the "
+        "credentialled account is billed for the transfer). A provisioning task, "
+        "not a code defect."
     ),
-    reason="usgs-landsat e2e is requester-pays — needs AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY",
+    strict=False,
 )
 class TestUsgsLandsatE2E:
-    """USGS LandsatLook — requester-pays on s3://usgs-landsat (gated on AWS creds)."""
+    """USGS LandsatLook — requester-pays on `s3://usgs-landsat`.
+
+    Credentials come from `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` in the
+    environment; the `e2e` marker decides whether this runs, so it executes under
+    `-m e2e` and reports `xfail` rather than skipping on an env-var check.
+    `strict=False`, so it flips to `xpass` once the secrets are provisioned.
+    """
 
     def test_c2l2_sr_writes_cog(self, tmp_path: Path):
         """A one-item Landsat C2 L2 SR pull over SF Bay writes a readable COG."""
