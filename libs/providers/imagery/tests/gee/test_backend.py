@@ -2369,7 +2369,11 @@ class TestPropertyFilter:
     )
     def test_well_formed_filters_are_accepted(self, make_gee, good):
         """Legitimate expressions, including quoted separators, pass."""
-        assert make_gee(property_filter=good).property_filter == good
+        from earthlens.gee import PropertyFilter
+
+        gee = make_gee(property_filter=good)
+        assert gee.property_filter == PropertyFilter(expression=good)
+        assert gee.property_filter.to_ogr() == good
 
     def test_property_filter_warns_when_earth_engine_serves_the_request(
         self, make_gee, fake_reader, monkeypatch

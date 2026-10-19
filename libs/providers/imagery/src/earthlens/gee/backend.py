@@ -81,6 +81,7 @@ from earthlens.gee._eedai import (
     credentials_for,  # noqa: F401 - monkeypatch seam the test suite patches
     eedai_available,  # noqa: F401 - monkeypatch seam the test suite patches
 )
+from earthlens.gee._filters import PropertyFilter
 from earthlens.gee._helpers import (
     _COLLECTION_REDUCERS,
     EE_MAX_DIMENSION,
@@ -372,111 +373,6 @@ def _discard_quietly(path: Path) -> None:
             stray.unlink(missing_ok=True)
         except OSError as exc:
             logger.debug(f"Could not remove the staging file {stray}: {exc}")
-
-
-def _consume_quoted(text: str, index: int, quote: str) -> tuple[int, str | None]:
-    """Advance past one character inside a quoted literal.
-
-    Args:
-        text: The whole filter.
-        index: The character being consumed.
-        quote: The quote character that opened the literal.
-
-    Returns:
-        The next index, and the quote still in effect (`None` once it closed).
-    """
-    if text[index] != quote:
-        return index + 1, quote
-    # A doubled quote is an escaped one, not the end of the literal.
-    if text[index + 1 : index + 2] == quote:
-        return index + 2, quote
-    return index + 1, None
-
-
-def _scan_property_filter(text: str) -> tuple[int, str | None]:
-    """Walk a filter, raising on structure that would escape the reader's wrapper.
-
-    Args:
-        text: The stripped filter.
-
-    Returns:
-        The final parenthesis depth, and the quote left open (`None` when every
-        literal was closed).
-
-    Raises:
-        ValueError: It closes a parenthesis it never opened, or carries a bare
-            statement separator or SQL comment outside a literal.
-    """
-    depth = 0
-    quote: str | None = None
-    index = 0
-    while index < len(text):
-        if quote is not None:
-            index, quote = _consume_quoted(text, index, quote)
-            continue
-        char = text[index]
-        if char in "'\"":
-            quote = char
-        elif char == "(":
-            depth += 1
-        elif char == ")":
-            depth -= 1
-        elif char == ";" or text.startswith("--", index):
-            raise ValueError(
-                "property_filter must be a single expression; remove the "
-                f"statement separator or comment from {text!r}"
-            )
-        if depth < 0:
-            raise ValueError(
-                "property_filter closes a parenthesis it never opened, which "
-                f"would escape the filter it is combined with: {text!r}"
-            )
-        index += 1
-    return depth, quote
-
-
-def _validate_property_filter(property_filter: object) -> None:
-    """Reject a scene filter that would not survive being wrapped by the reader.
-
-    Upstream splices the value in as `f"{time_filter} AND ({property_filter})"`
-    without escaping, so a fragment that closes the wrapper early escapes it:
-    `1=1) OR (1=1` becomes `time AND (1=1) OR (1=1)`, and the time and space
-    clauses stop constraining anything. Counting parentheses does not catch
-    that - the totals balance - so nesting depth is tracked instead, and depth
-    must never go negative.
-
-    Quoted literals are skipped while scanning, so a `;` or `--` inside a string
-    value is allowed while a bare one is not.
-
-    This is a structural check, not a parser, and it is not a security boundary:
-    build the filter in code, never from untrusted input.
-
-    Args:
-        property_filter: The candidate filter.
-
-    Raises:
-        ValueError: It is not a string, is blank, closes a parenthesis it never
-            opened, leaves one open, has an unterminated quote, or carries a
-            bare statement separator or SQL comment.
-    """
-    if not isinstance(property_filter, str):
-        raise ValueError(
-            "property_filter must be an OGR attribute-filter string "
-            f"(e.g. 'CLOUDY_PIXEL_PERCENTAGE < 20'), got {property_filter!r}"
-        )
-    text = property_filter.strip()
-    if not text:
-        raise ValueError("property_filter must not be blank; pass None instead.")
-
-    depth, quote = _scan_property_filter(text)
-    if quote is not None:
-        raise ValueError(
-            f"property_filter has an unterminated quote: {property_filter!r}"
-        )
-    if depth:
-        raise ValueError(
-            f"property_filter leaves {depth} parenthesis/es unclosed: {property_filter!r}"
-        )
 
 
 def _declaring(reader: Any, nodata: float | int) -> Any:
@@ -997,8 +893,15 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # here was the reason a newly registered sink was still rejected, which
         # made the "adding a sink needs no backend edit" claim false.
         sink = resolve_sink(export_via)
-        if property_filter is not None:
-            _validate_property_filter(property_filter)
+        # Wrapped into a validated value object up front, before the ~3.3 s
+        # catalog parse below, so a malformed filter fails fast like every other
+        # config mistake. The scan that used to be a free function now lives in
+        # `PropertyFilter`, and the reader receives its `.to_ogr()` form.
+        validated_filter = (
+            PropertyFilter(expression=property_filter)
+            if property_filter is not None
+            else None
+        )
         # Both inputs are known now, so refuse now: checking after `download()`
         # meant every export in the run completed - and, with the default
         # `wait_for_export=True`, was polled to completion - before raising,
@@ -1120,9 +1023,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
         self.cog = bool(cog)
         #: Resampling kernel the EEDAI reader warps with (`nearest` by default).
         self.resample = resample
-        #: OGR attribute-filter string narrowing collection scenes on the EEDAI
-        #: path (e.g. `"CLOUDY_PIXEL_PERCENTAGE < 20"`); Earth Engine ignores it.
-        self.property_filter = property_filter
+        #: Validated OGR attribute filter narrowing collection scenes on the
+        #: EEDAI path (e.g. `PropertyFilter(expression="CLOUDY_PIXEL_PERCENTAGE
+        #: < 20")`), or `None`; Earth Engine ignores it. The call sites hand the
+        #: reader its `.to_ogr()` string via `_property_filter_expression`.
+        self.property_filter: PropertyFilter | None = validated_filter
         #: The validated 6-element transform pinning the output grid, or `None`.
         self.crs_transform: tuple[float, ...] | None = pinned_transform
         #: Fill value declared on the pixel API's request, or `None`.
@@ -2484,6 +2389,20 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
         return self._download_one_url_tile(image, region, scale, prefix)
 
+    def _property_filter_expression(self) -> str | None:
+        """Return the validated OGR filter string the reader wants, or `None`.
+
+        The public attribute is a `PropertyFilter` value object (or `None`); the
+        reader and the config snapshot take the plain string, so this is the one
+        seam that unwraps it.
+
+        Returns:
+            The `.to_ogr()` form, or `None` when no filter was given.
+        """
+        return (
+            self.property_filter.to_ogr() if self.property_filter is not None else None
+        )
+
     def _reducer_name(self, var_info: Dataset) -> str:
         """Return the requested reducer as a name, whatever form it arrived in.
 
@@ -2527,7 +2446,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             scale=self.scale,
             cloud_mask=self.cloud_mask,
             filters=tuple(self.filters),
-            property_filter=self.property_filter,
+            property_filter=self._property_filter_expression(),
             region=self.region,
             discover_extent=bool(self.discover_extent),
             high_volume=bool(self.high_volume),
@@ -2829,7 +2748,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 # output CRS here would have degrees read as projected metres
                 # and discover scenes over the wrong ground.
                 crs=_EEDAI_NATIVE_CRS,
-                property_filter=self.property_filter,
+                property_filter=self._property_filter_expression(),
             )
         except _reader_errors(self._eedai_reader().module) as exc:
             # A discovery failure is a fallback, not a crash - but it is
@@ -3446,8 +3365,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             ),
             "geometry": cutline,
         }
-        if self.property_filter is not None:
-            collection_kwargs["property_filter"] = self.property_filter
+        filter_expression = self._property_filter_expression()
+        if filter_expression is not None:
+            collection_kwargs["property_filter"] = filter_expression
         stack = reader.collection_from_earthengine(var_info.id, **collection_kwargs)
         try:
             return reducer.reduce_stack(stack, list(stack.time))

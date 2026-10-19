@@ -148,6 +148,11 @@ anything a string names:
   (dimensions, affine transform, lattice snapping, tiling).
 * `EedaiReader` — the adapter wrapping the optional pyramids-eo
   reader, owning its process-global credential hazard.
+* `PropertyFilter` — the validated OGR attribute filter behind
+  `GEE(property_filter=...)`, which narrows a collection's scenes on
+  the EEDAI path; it runs its structural scan once at construction and
+  hands the reader the checked string through `to_ogr`. The public
+  constructor argument stays a plain string.
 
 Client-side raster analysis (`earthlens.gee.analysis`, re-exported
 here) runs *after* a download, on the in-memory pyramids `Dataset`, so
@@ -243,6 +248,7 @@ Examples:
 from __future__ import annotations
 
 from earthlens.gee._composite import Bucket, CadenceBucketer, CompositeEngine
+from earthlens.gee._filters import PropertyFilter
 from earthlens.gee.analysis import (
     ALLOWED_FUNCTIONS,
     MEASURES,
@@ -459,6 +465,7 @@ __all__ = [
     "SINKS",
     "resolve_sink",
     "EedaiReader",
+    "PropertyFilter",
     "WorkUnit",
     "RasterWorkUnit",
     "FeatureWorkUnit",
