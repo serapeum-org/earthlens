@@ -24331,9 +24331,9 @@ Engine's server-side reduce when the bucket has too many scenes, when the
 scene stack would not fit one pass, or when the reducer is <code>mosaic</code> —
 mosaic is last-wins in Earth Engine's collection order, which has no
 client-side equivalent over a scene stack without per-scene masks the reader
-does not expose, so <strong>mosaic stays on Earth Engine</strong>. A percentile (<code>"p90"</code>)
-and <code>"trend"</code> are not in the reader's vocabulary either, so they too are
-composited on Earth Engine.</p>
+does not expose, so <strong>mosaic stays on Earth Engine</strong>. Every other reducer —
+including a percentile (<code>"p90"</code>), <code>"trend"</code> and <code>"sens_slope"</code> — is computed
+client-side by pyramids' <code>reduce_time</code>, the same path as <code>median</code>.</p>
 <p>With a collection you can also narrow which scenes are read:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">EarthLens</span><span class="p">(</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gee&quot;</span><span class="p">,</span>
@@ -24355,6 +24355,17 @@ reducers fold a scene's fill pixels into the result where Earth Engine would
 mask them. The two agree wherever the scenes carry no fill over the AOI. There
 is no way to supply the fill from here — the composite read takes no <code>nodata</code>
 argument — so pass <code>engine="ee"</code> when you need Earth Engine's masking exactly.</p>
+<p>The client-side reduction — the true per-pixel <code>median</code>, and the <code>"p90"</code> /
+<code>"trend"</code> / <code>"sens_slope"</code> reducers — needs <strong>pyramids-core &gt;= 0.70.0</strong> (the
+distribution formerly published as <code>pyramids-gis</code>; the import name stays
+<code>pyramids</code>), which is where <code>reduce_time</code>'s percentile / linear-trend /
+Theil-Sen operations ship. One known limitation applies today:
+<code>pyramids_eo.collection_from_earthengine</code> hands back an in-memory
+(<code>datasets=</code>-backed) <code>DatasetCollection</code>, which <code>reduce_time</code> cannot consume
+(it reads a file- or zarr-backed collection), so a live <code>engine="eedai"</code>
+collection composite raises a <code>RuntimeError</code>. The wiring is correct and is
+verified against <code>numpy</code> on a file-backed stack; until that upstream reader gap
+is closed, pass <code>engine="ee"</code> for a collection composite.</p>
 <p>What you gain: no 32768-px synchronous cap and no HTTP/zip round-trip,
 so <code>auto_split</code> is unnecessary. What to know before switching:</p>
 <ul>
@@ -24401,11 +24412,12 @@ cannot express.</p>
 </code></pre></div>
 <p><strong>Reducers.</strong> <code>mean</code>, <code>median</code>, <code>min</code>, <code>max</code>, <code>mode</code>, <code>mosaic</code> and <code>sum</code> dispatch to Earth Engine's convenience
 methods, which preserve band names. A percentile and a per-pixel trend are first-class too: pass
-<code>reducer="p90"</code> (or <code>"percentile:90"</code>, or <code>Percentile(q=90)</code>) and <code>reducer="trend"</code>. <code>Percentile</code> and the trend
-reducer have to use <code>reduce</code>, which suffixes the bands, so they rename them back — making them interchangeable
-with the rest, and they run on <code>engine="ee"</code> (via <code>ee.Reducer.percentile</code> / <code>linearFit</code>) and on the client-side
-EEDAI path. The <code>reducer=</code> string is validated at construction, so a bad percentile (<code>"p150"</code>) or an unknown name
-fails before any bucket exports rather than part-way through.</p>
+<code>reducer="p90"</code> (or <code>"percentile:90"</code>, or <code>Percentile(q=90)</code>), <code>reducer="trend"</code> (ordinary least-squares slope),
+or <code>reducer="sens_slope"</code> (the robust Theil-Sen slope). <code>Percentile</code> and the two trend reducers have to use
+<code>reduce</code>, which suffixes the bands, so they rename them back — making them interchangeable with the rest, and
+they run on <code>engine="ee"</code> (via <code>ee.Reducer.percentile</code> / <code>linearFit</code> / <code>sensSlope</code>) and on the client-side EEDAI
+path (via <code>reduce_time</code>). The <code>reducer=</code> string is validated at construction, so a bad percentile (<code>"p150"</code>) or
+an unknown name fails before any bucket exports rather than part-way through.</p>
 <p><strong>Engines.</strong> <code>engine=</code> resolves to an <code>Engine</code>, and there are four:</p>
 <table>
 <thead>
@@ -24482,8 +24494,13 @@ written path, instead of only the paths:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">GEE</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;ee&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">materialize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">result</span><span class="o">.</span><span class="n">paths</span>     <span class="c1"># the written files</span>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">result</span><span class="o">.</span><span class="n">objects</span>   <span class="c1"># the in-memory pyramids Datasets</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>     <span class="c1"># the objects - materialising is what you asked for</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">result</span><span class="o">.</span><span class="n">data</span>      <span class="c1"># one Dataset for a single bucket, a DatasetCollection for a time stack</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>     <span class="c1"># the objects - materialising is what you asked for</span>
 </code></pre></div>
+<p><code>result.data</code> is the single-vs-stack convenience: a one-bucket request (a single image, or a collection that
+reduced to one bucket) hands back a bare pyramids <code>Dataset</code>, while a multi-bucket time series hands back a
+<code>DatasetCollection</code> — ready for <code>reduce_time</code> / <code>groupby</code> / <code>plot</code> / <code>to_netcdf</code> without globbing the output
+directory back.</p>
 <p>Note the one place the stand-in is not transparent: when you materialise, each artifact's value <em>is</em> the object, so
 <code>result</code> iterates and compares as the list of <strong>objects</strong>, not of paths. <code>result.paths</code> is how you get the files.
 Without <code>materialize=</code> nothing changes — <code>download()</code> returns the same plain list of paths it always did.</p>

@@ -3444,6 +3444,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#temporal-helpers-over-a-collection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Temporal helpers over a collection
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -24051,6 +24062,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#temporal-helpers-over-a-collection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Temporal helpers over a collection
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -24139,8 +24161,12 @@ computation is available at all.</p>
 </thead>
 <tbody>
 <tr>
-<td>A temporal composite (<code>mean</code> / <code>median</code> / …)</td>
+<td>A temporal composite (<code>mean</code> / <code>median</code> / <code>p90</code> / <code>trend</code> / …)</td>
 <td><code>reducer=</code>, <code>temporal_resolution=</code></td>
+</tr>
+<tr>
+<td>The composite back in memory, not only on disk</td>
+<td><code>materialize=True</code> → <code>DownloadResult.data</code> (a <code>Dataset</code> or <code>DatasetCollection</code>)</td>
 </tr>
 <tr>
 <td>Scene selection by metadata (cloud cover, orbit, …)</td>
@@ -24240,14 +24266,31 @@ scene in the bucket and holds them in memory to reduce. It hands the bucket back
 <li>the scene stack exceeds the single-pass pixel budget (currently 2×10⁸ px)</li>
 <li>the reducer is <code>mosaic</code> — last-wins in Earth Engine's collection order has no client-side equivalent over
   a scene stack (it would need per-scene masks the reader does not expose), so <strong>mosaic stays on Earth
-  Engine</strong>; the served reducers (<code>mean</code> / <code>median</code> / <code>min</code> / <code>max</code> / <code>mode</code> / <code>sum</code>) are computed client-side
-  by pyramids' <code>reduce_time</code>, so <code>median</code> is a true per-pixel median</li>
-<li>the reducer is a percentile (<code>percentile:&lt;q&gt;</code> / <code>p&lt;q&gt;</code>) or <code>trend</code> — these are not in the reader's
-  collection vocabulary, so Earth Engine composites them (<code>ee.Reducer.percentile</code> / <code>linearFit</code>) instead</li>
+  Engine</strong>. This is the resolution recorded for that case: <code>mosaic</code> is declined client-side and reimplemented
+  nowhere, not quietly approximated. Every other temporal reducer — <code>mean</code> / <code>median</code> / <code>min</code> / <code>max</code> /
+  <code>mode</code> / <code>sum</code>, and the percentile (<code>percentile:&lt;q&gt;</code> / <code>p&lt;q&gt;</code>), <code>trend</code> and <code>sens_slope</code> reducers — is
+  computed client-side by pyramids' <code>reduce_time</code>, so <code>median</code> is a true per-pixel median and a percentile or
+  trend no longer forces the bucket back to Earth Engine</li>
 </ul>
 <p>Narrow the window, shorten <code>temporal_resolution</code>, add a <code>property_filter</code>, or use a coarser <code>scale</code> to
 get back under the budget. These thresholds are internal constants, not public API — treat them as
 current behaviour rather than a contract.</p>
+<div class="admonition note">
+<p class="admonition-title">Client-side reduction needs pyramids-core &gt;= 0.70.0, and the live EEDAI path has a known gap</p>
+<p>The client-side composite — the true per-pixel <code>median</code>, and the <code>percentile</code> / <code>trend</code> / <code>sens_slope</code>
+reducers — runs through pyramids' <code>DatasetCollection.reduce_time</code>, whose <code>median</code> / <code>percentile</code> /
+<code>linear_trend</code> / <code>sens_slope</code> operations ship in <strong>pyramids-core &gt;= 0.70.0</strong> (the distribution formerly
+published as <code>pyramids-gis</code>; the import name stays <code>pyramids</code>). Below that version these reductions are
+unavailable. The no-nodata caveat carries into them: the EEDAI driver declares no fill, so a statistical
+reducer folds a scene's fill pixels into the result where Earth Engine would have masked them — the two
+agree only where the scenes carry no fill over the AOI.</p>
+<p><strong>Known limitation — live EEDAI reduction.</strong> <code>pyramids_eo.collection_from_earthengine</code> currently returns
+an <em>in-memory</em> (<code>datasets=</code>-backed) <code>DatasetCollection</code>, which <code>reduce_time</code> cannot consume — it reads a
+file- or zarr-backed collection — so a live <code>engine="eedai"</code> collection composite (even <code>median</code>) raises
+a <code>RuntimeError</code> today. The earthlens wiring is correct, and the reduction is verified against <code>numpy</code> on
+a file-backed stack; it will work end to end once that upstream reader gap is closed. Until then, pass
+<code>engine="ee"</code> for a collection composite.</p>
+</div>
 <h3 id="the-two-engines-are-not-byte-identical"><a class="toclink" href="#the-two-engines-are-not-byte-identical">The two engines are not byte-identical</a><a class="headerlink" href="#the-two-engines-are-not-byte-identical" title="Permanent link">#</a></h3>
 <p>Worth knowing before you compare outputs:</p>
 <ul>
@@ -24275,7 +24318,7 @@ current behaviour rather than a contract.</p>
 <tbody>
 <tr>
 <td><code>reducer=</code></td>
-<td>temporal reduction: <code>mean</code>, <code>median</code>, <code>min</code>, <code>max</code>, <code>mode</code>, <code>mosaic</code>, <code>sum</code></td>
+<td>temporal reduction: <code>mean</code>, <code>median</code>, <code>min</code>, <code>max</code>, <code>mode</code>, <code>mosaic</code>, <code>sum</code>, a percentile (<code>percentile:&lt;q&gt;</code> / <code>p&lt;q&gt;</code>), <code>trend</code>, <code>sens_slope</code></td>
 </tr>
 <tr>
 <td><code>temporal_resolution=</code></td>
@@ -24498,6 +24541,45 @@ re-do authentication; <code>client</code> is a lazy property that returns the in
 <code>wait_for_export=False</code> and <code>download()</code> returns <code>TaskInfo</code> objects at submission time instead of
 blocking; <code>list_recent_tasks</code>, <code>get_task_status</code>, <code>wait_for_task_id</code>, <code>cancel_task</code> and
 <code>resolve_destination</code> track them. The batch sinks are Earth Engine-only, so <code>engine=</code> is ignored there.</p>
+<h3 id="temporal-helpers-over-a-collection"><a class="toclink" href="#temporal-helpers-over-a-collection">Temporal helpers over a collection</a><a class="headerlink" href="#temporal-helpers-over-a-collection" title="Permanent link">#</a></h3>
+<p>Four frozen, validated config objects build a server-side graph over an <code>ee.ImageCollection</code> you hold — the
+<code>.client</code> collection above, or one you built yourself. They answer the questions a single reducer cannot:
+<em>when did it change</em>, <em>how does this period compare to normal</em>, <em>which scene is nearest a date</em>, and <em>fill the
+holes before reducing</em>. Each is imported from <code>earthlens.gee</code>.</p>
+<p><code>TemporalSegmentation</code> (<code>LandTrendr</code> / <code>Ccdc</code>) finds breakpoints in a per-pixel trajectory — disturbance and
+recovery — and returns a <code>SegmentationResult</code> wrapping the algorithm's array-valued <code>ee.Image</code>, never a
+plottable raster. Mask clouds first; the algorithms assume a clean series:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">LandTrendr</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">nbr</span> <span class="o">=</span> <span class="n">masked_collection</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">img</span><span class="p">:</span> <span class="n">img</span><span class="o">.</span><span class="n">normalizedDifference</span><span class="p">([</span><span class="s2">&quot;B5&quot;</span><span class="p">,</span> <span class="s2">&quot;B7&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;NBR&quot;</span><span class="p">))</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">result</span> <span class="o">=</span> <span class="n">LandTrendr</span><span class="p">(</span><span class="n">maxSegments</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span><span class="n">nbr</span><span class="p">)</span>   <span class="c1"># invert=True by default for a vegetation index</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="n">vertices</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">array</span>                            <span class="c1"># the ee.Array image, for your own getInfo/export</span>
+</code></pre></div>
+<p><code>Climatology</code> reduces a collection <em>per calendar period across a baseline</em> (<code>dayofyear</code> / <code>month</code> / <code>season</code>),
+and <code>anomaly()</code> is the observed-minus-baseline companion:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">Climatology</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">clim</span> <span class="o">=</span> <span class="n">Climatology</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;month&quot;</span><span class="p">,</span> <span class="n">baseline</span><span class="o">=</span><span class="p">(</span><span class="mi">1991</span><span class="p">,</span> <span class="mi">2020</span><span class="p">),</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">monthly</span> <span class="o">=</span> <span class="n">clim</span><span class="o">.</span><span class="n">climatology</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>                       <span class="c1"># one image per month</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="n">june_2024</span> <span class="o">=</span> <span class="n">clim</span><span class="o">.</span><span class="n">anomaly</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">collection_2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>     <span class="c1"># this June vs the 1991-2020 June mean</span>
+</code></pre></div>
+<p><code>ClosestImage</code> selects the scene nearest a target date, within an optional tolerance (an out-of-range target
+with a tolerance set yields an empty selection rather than a distant scene):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClosestImage</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="n">nearest</span> <span class="o">=</span> <span class="n">ClosestImage</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">tolerance</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">15</span><span class="p">))</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+</code></pre></div>
+<p><code>GapFill</code> fills temporal holes <em>before</em> a reduction or sampling, by <code>linear</code> / <code>nearest</code> / <code>harmonic</code>
+interpolation over a within-<code>max_gap</code> neighbour join — <code>max_gap</code> is a refusal, not a hint, so a pixel with no
+valid neighbour in the window stays masked:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">GapFill</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="n">filled</span> <span class="o">=</span> <span class="n">GapFill</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">max_gap</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">30</span><span class="p">))</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+</code></pre></div>
 <h2 id="choosing-an-engine-in-practice"><a class="toclink" href="#choosing-an-engine-in-practice">Choosing an engine, in practice</a><a class="headerlink" href="#choosing-an-engine-in-practice" title="Permanent link">#</a></h2>
 <table>
 <thead>
