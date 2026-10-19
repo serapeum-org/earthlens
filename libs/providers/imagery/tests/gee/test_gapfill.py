@@ -100,14 +100,19 @@ class _FakeJoin:
 
 
 class _FakeReducer:
-    """Records the `linearRegression` reducer the harmonic fit asks for."""
+    """Records the reducers the harmonic fit asks for."""
 
     def __init__(self) -> None:
         self.linear_regressions: list = []
+        self.sums: list = []
 
     def linearRegression(self, **kwargs):  # noqa: N802 - mirrors the ee API
         self.linear_regressions.append(kwargs)
         return ("linearRegression", kwargs)
+
+    def sum(self):
+        self.sums.append("sum")
+        return ("sumReducer",)
 
 
 @pytest.fixture
@@ -224,3 +229,17 @@ class TestHarmonic:
         names = [entry[0] for entry in log]
         assert "updateMask" in names
         assert "sin" in names and "cos" in names
+
+    def test_the_prediction_sums_with_the_sum_reducer(self, fake_ee):
+        """The harmonic prediction reduces with `ee.Reducer.sum()`, not `"sum"`."""
+        log, _, _, fake_reducer = fake_ee
+        GapFill(method="harmonic", max_gap=dt.timedelta(days=60), band="NDVI").fill(
+            _Rec(log)
+        )
+        assert fake_reducer.sums == ["sum"], "the fit must call ee.Reducer.sum()"
+        reduced_with = [
+            entry[1][0]
+            for entry in log
+            if len(entry) == 3 and entry[0] == "reduce" and entry[1]
+        ]
+        assert ("sumReducer",) in reduced_with

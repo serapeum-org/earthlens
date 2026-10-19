@@ -284,7 +284,7 @@ class GapFill(BaseModel):
         predicted = (
             image.select(list(_INDEPENDENTS))
             .multiply(coefficients)
-            .reduce("sum")
+            .reduce(ee.Reducer.sum())
             .rename(self.band)
         )
         filled = image.select(self.band).unmask(predicted.updateMask(neighbour))
