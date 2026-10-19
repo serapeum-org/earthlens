@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23841,7 +23841,7 @@
 </code></pre></div>
 <p>That is the whole install — there is nothing to fetch from conda-forge.</p>
 <p>The GRIB <strong>read</strong> path is pyramids': <code>pyramids.grib.open_grib</code> uses the driver
-bundled in the <code>pyramids-gis</code> wheel, so nothing has to be installed alongside
+bundled in the <code>pyramids-core</code> wheel, so nothing has to be installed alongside
 it.</p>
 <p>The <strong>decode</strong> libraries Herbie needs (<code>cfgrib</code>, <code>eccodes</code>) come in as ordinary
 PyPI dependencies of <code>herbie-data</code>. On Windows the ecCodes binary they bind to

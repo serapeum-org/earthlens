@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24081,7 +24081,7 @@ Hold "Ctrl" to enable pan &amp; zoom
     registry --&gt;|"imports on demand"| backend["Concrete backend&lt;br/&gt;(AbstractDataSource subclass)"]
     backend --&gt; catalog["Catalog&lt;br/&gt;(pydantic + YAML)"]
     backend --&gt; remote[("Provider&lt;br/&gt;FTP · S3 · HTTP · SDK")]
-    backend --&gt; pyramids["pyramids-gis&lt;br/&gt;clip · convert · write"]</code></pre> 
+    backend --&gt; pyramids["pyramids-core&lt;br/&gt;clip · convert · write"]</code></pre> 
     
 </div>
 <p>The registry is <strong>lazy</strong> and <strong>discovered</strong>, not hard-coded. <code>earthlens._backends.discover_backends()</code> merges the
@@ -24302,7 +24302,7 @@ Hold "Ctrl" to enable pan &amp; zoom
     participant Registry as _LazyRegistry
     participant DS as Backend
     participant Server as Provider
-    participant Pyramids as pyramids-gis
+    participant Pyramids as pyramids-core
 
     User-&gt;&gt;Facade: EarthLens(data_source, start, end, ...)
     Facade-&gt;&gt;Registry: resolve key
