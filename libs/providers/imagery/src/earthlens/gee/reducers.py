@@ -42,6 +42,7 @@ Resolve a name (or an already-built object) through `resolve_reducer`:
 
 from __future__ import annotations
 
+import functools
 import re
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, ClassVar
@@ -425,42 +426,119 @@ class Percentile(BaseModel, TemporalReducer):
         return repr(self)
 
 
-class LinearTrend(TemporalReducer):
-    """Per-pixel linear trend (slope and offset) across the collection.
+#: The scene property Earth Engine stamps each image's acquisition time in,
+#: in milliseconds since the Unix epoch.
+_TIME_PROPERTY = "system:time_start"
 
-    On the Earth Engine path it is `collection.reduce(ee.Reducer.linearFit())`,
-    whose output carries `scale` (the slope) and `offset` bands rather than the
-    inputs'; on the client-side path it is `reduce_time(op="trend")`, the
-    per-pixel least-squares slope in value-units per day. Like `Percentile` it is
-    deliberately **not** in `REDUCERS` — it is reachable only through
-    `temporal_reducer_for` (as `"trend"`) or by constructing it directly, so the
-    seven-name collection vocabulary `GEE(reducer=...)` validates against is
-    unchanged.
+#: The band the temporal-slope reducers regress each value band against: the
+#: scene timestamp rescaled to days, so the fitted slope comes out in value-units
+#: per day — the same convention the client-side `reduce_time` trend uses.
+_TIME_BAND = "time"
+
+#: Milliseconds per day, the divisor turning `system:time_start` into days.
+_MILLIS_PER_DAY = 1000 * 60 * 60 * 24
+
+
+def _stamp_time_band(image: Any) -> Any:
+    """Add a day-scaled `time` band to one scene, as a slope's x-axis.
+
+    Args:
+        image: One `ee.Image` of the collection.
+
+    Returns:
+        The image with its `system:time_start` added as a `time` band, in days
+        since the epoch, so a regression against it yields a per-day slope.
+    """
+    image = ee.Image(image)
+    days = image.metadata(_TIME_PROPERTY).divide(_MILLIS_PER_DAY).rename(_TIME_BAND)
+    return image.addBands(days)
+
+
+def _fit_band(name: Any, *, stamped: Any, reducer: Any, slope_band: str) -> Any:
+    """Fit one value band against time and return its renamed slope band.
+
+    Args:
+        name: The value band to fit, an `ee.String` server-side.
+        stamped: The collection carrying the `time` band and the value bands.
+        reducer: The two-input `ee.Reducer` fitting `[time, value]`
+            (`linearFit` or `sensSlope`).
+        slope_band: The reducer's slope output band (`scale` / `slope`).
+
+    Returns:
+        The per-pixel slope `ee.Image` for this band, renamed back to it.
+    """
+    name = ee.String(name)
+    pair = stamped.select(ee.List([_TIME_BAND]).add(name))
+    slope = pair.reduce(reducer).select([slope_band])
+    return slope.rename([name])
+
+
+def _temporal_slope_ee(collection: Any, *, reducer: Any, slope_band: str) -> Any:
+    """Fit a per-pixel temporal slope for every value band, server-side.
+
+    Stamps a `time` band on each scene, fits `[time, value]` per value band with
+    `reducer`, selects the slope output band and renames it back to the value
+    band — a real trend over time, in value-units per day. Without the time
+    band, `ee.Reducer.linearFit()` / `sensSlope()` would see the value bands as
+    their two inputs and regress them against each other rather than against
+    time (and raise on single-band data).
+
+    Args:
+        collection: The filtered `ee.ImageCollection` to reduce.
+        reducer: The two-input `ee.Reducer` (`linearFit` or `sensSlope`).
+        slope_band: The reducer's slope output band (`scale` / `slope`).
+
+    Returns:
+        The reduced `ee.Image` of per-pixel slopes, carrying the input bands.
+    """
+    band_names = collection.first().bandNames()
+    stamped = collection.map(_stamp_time_band)
+    fit = functools.partial(
+        _fit_band, stamped=stamped, reducer=reducer, slope_band=slope_band
+    )
+    slopes = band_names.map(fit)
+    return ee.ImageCollection.fromImages(slopes).toBands().rename(band_names)
+
+
+class LinearTrend(TemporalReducer):
+    """Per-pixel linear trend across the collection, over time.
+
+    On the Earth Engine path it stamps a day-scaled `time` band on each scene
+    and fits `[time, value]` per value band with `ee.Reducer.linearFit()`,
+    selecting the `scale` (slope) output back into the value band; on the
+    client-side path it is `reduce_time(op="trend")`. Both yield the per-pixel
+    least-squares slope in value-units per day, under the input band names. Like
+    `Percentile` it is deliberately **not** in `REDUCERS` — it is reachable only
+    through `temporal_reducer_for` (as `"trend"`) or by constructing it
+    directly, so the seven-name collection vocabulary `GEE(reducer=...)`
+    validates against is unchanged.
     """
 
     name: ClassVar[str] = "trend"
     ee_factory: ClassVar[str | None] = None
 
     def __call__(self, collection: Any) -> Any:
-        """Reduce `collection` to its per-pixel linear fit.
+        """Reduce `collection` to its per-pixel linear trend over time.
 
         Args:
             collection: An `ee.ImageCollection`.
 
         Returns:
-            The `ee.Image` of `ee.Reducer.linearFit()` (`scale` / `offset`
-            bands).
+            The `ee.Image` of per-pixel least-squares slopes (value-units per
+            day), carrying the input band names.
         """
-        return collection.reduce(ee.Reducer.linearFit())
+        return _temporal_slope_ee(
+            collection, reducer=ee.Reducer.linearFit(), slope_band="scale"
+        )
 
     def apply_ee(self, collection: Any) -> Any:
-        """Collapse `collection` to its linear-fit `ee.Image`, server-side.
+        """Collapse `collection` to its linear trend `ee.Image`, server-side.
 
         Args:
             collection: An `ee.ImageCollection`.
 
         Returns:
-            The reduced `ee.Image` (`scale` / `offset` bands).
+            The reduced `ee.Image` of per-pixel slopes (value-units per day).
         """
         return self(collection)
 
@@ -483,10 +561,11 @@ class SensSlope(TemporalReducer):
     The robust counterpart to `LinearTrend`: where `LinearTrend` fits the
     ordinary least-squares line, `SensSlope` takes the median of the pairwise
     slopes (Theil-Sen), so a few outlier scenes cannot drag the trend. On the
-    Earth Engine path it is `collection.reduce(ee.Reducer.sensSlope())`, whose
-    output carries `slope` and `offset` bands rather than the inputs'; on the
-    client-side path it is `reduce_time(op="sens_slope")`, the per-pixel
-    Theil-Sen slope in value-units per day. Like `LinearTrend` it is
+    Earth Engine path it stamps a day-scaled `time` band on each scene and fits
+    `[time, value]` per value band with `ee.Reducer.sensSlope()`, selecting the
+    `slope` output back into the value band; on the client-side path it is
+    `reduce_time(op="sens_slope")`. Both yield the per-pixel Theil-Sen slope in
+    value-units per day, under the input band names. Like `LinearTrend` it is
     deliberately **not** in `REDUCERS` — it is reachable only through
     `temporal_reducer_for` (as `"sens_slope"`) or by constructing it directly,
     so the seven-name collection vocabulary `GEE(reducer=...)` validates against
@@ -497,16 +576,18 @@ class SensSlope(TemporalReducer):
     ee_factory: ClassVar[str | None] = None
 
     def __call__(self, collection: Any) -> Any:
-        """Reduce `collection` to its per-pixel Theil-Sen slope.
+        """Reduce `collection` to its per-pixel Theil-Sen slope over time.
 
         Args:
             collection: An `ee.ImageCollection`.
 
         Returns:
-            The `ee.Image` of `ee.Reducer.sensSlope()` (`slope` / `offset`
-            bands).
+            The `ee.Image` of per-pixel Theil-Sen slopes (value-units per day),
+            carrying the input band names.
         """
-        return collection.reduce(ee.Reducer.sensSlope())
+        return _temporal_slope_ee(
+            collection, reducer=ee.Reducer.sensSlope(), slope_band="slope"
+        )
 
     def apply_ee(self, collection: Any) -> Any:
         """Collapse `collection` to its Theil-Sen slope `ee.Image`, server-side.
@@ -515,7 +596,7 @@ class SensSlope(TemporalReducer):
             collection: An `ee.ImageCollection`.
 
         Returns:
-            The reduced `ee.Image` (`slope` / `offset` bands).
+            The reduced `ee.Image` of per-pixel slopes (value-units per day).
         """
         return self(collection)
 

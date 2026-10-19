@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
+from earthlens.gee import reducers as reducers_module
 from earthlens.gee.reducers import (
     LinearTrend,
     Max,
@@ -107,6 +108,174 @@ def fake_ee_reducer(monkeypatch):
     return fake
 
 
+class _TrendGraph:
+    """What the trend / sens-slope Earth Engine call graph recorded."""
+
+    def __init__(self, band_names):
+        self.band_names = list(band_names)
+        self.time_source = None
+        self.time_divisor = None
+        self.time_band_name = None
+        self.reduce_input = None
+        self.reducer = None
+        self.slope_band = None
+        self.final_rename = None
+
+
+class _GraphBand:
+    """The band `metadata(...)` returns, carrying the time-axis scaling."""
+
+    def __init__(self, graph):
+        self._graph = graph
+
+    def divide(self, divisor):
+        self._graph.time_divisor = divisor
+        return self
+
+    def rename(self, name):
+        self._graph.time_band_name = name
+        return self
+
+
+class _GraphImage:
+    """A stamped scene, or the per-band slope image after `reduce`."""
+
+    def __init__(self, graph):
+        self._graph = graph
+
+    def metadata(self, field):  # noqa: N802 - mirrors the Earth Engine method
+        self._graph.time_source = field
+        return _GraphBand(self._graph)
+
+    def addBands(self, band):  # noqa: N802 - mirrors the Earth Engine method
+        return self
+
+    def select(self, bands):
+        self._graph.slope_band = list(bands)
+        return self
+
+    def rename(self, names):
+        return self
+
+
+class _GraphReducible:
+    """The two-band `[time, value]` collection handed to the reducer."""
+
+    def __init__(self, graph):
+        self._graph = graph
+
+    def reduce(self, reducer):
+        self._graph.reducer = reducer
+        return _GraphImage(self._graph)
+
+
+class _GraphStacked:
+    """The collection after the time band is mapped onto every scene."""
+
+    def __init__(self, graph):
+        self._graph = graph
+
+    def select(self, bands):
+        self._graph.reduce_input = list(bands)
+        return _GraphReducible(self._graph)
+
+
+class _GraphList:
+    """Stands in for an `ee.List` and the server-side band-name list."""
+
+    def __init__(self, graph, items):
+        self._graph = graph
+        self._items = list(items)
+
+    def add(self, item):
+        self._items.append(item)
+        return self
+
+    def map(self, func):
+        func("VALUE")
+        return _GraphList(self._graph, ["slope-image"])
+
+    def __iter__(self):
+        return iter(self._items)
+
+
+class _GraphComposite:
+    """The collection `fromImages` builds, flattened back to the value bands."""
+
+    def __init__(self, graph):
+        self._graph = graph
+
+    def toBands(self):  # noqa: N802 - mirrors the Earth Engine method
+        return self
+
+    def rename(self, names):
+        self._graph.final_rename = list(names)
+        return self
+
+
+class _GraphCollection:
+    """The source collection the trend path reduces."""
+
+    def __init__(self, graph):
+        self._graph = graph
+
+    def first(self):
+        return self
+
+    def bandNames(self):  # noqa: N802 - mirrors the Earth Engine method
+        return _GraphList(self._graph, self._graph.band_names)
+
+    def map(self, func):
+        func(_GraphImage(self._graph))
+        return _GraphStacked(self._graph)
+
+
+def _trend_fake_ee(graph):
+    """An `ee` stand-in that records the trend path's call graph into `graph`."""
+    return SimpleNamespace(
+        Image=lambda image: (
+            image if isinstance(image, _GraphImage) else _GraphImage(graph)
+        ),
+        String=lambda value: value,
+        List=lambda items: _GraphList(graph, items),
+        ImageCollection=SimpleNamespace(
+            fromImages=lambda images: _GraphComposite(graph)
+        ),
+        Reducer=SimpleNamespace(
+            linearFit=lambda: "linear-fit-reducer",
+            sensSlope=lambda: "sens-slope-reducer",
+        ),
+    )
+
+
+class TestTrendStampsTimeBand:
+    """The EE trend path fits a slope over time, not band-against-band."""
+
+    def test_linear_trend_stamps_time_and_fits_time_value(self, monkeypatch):
+        """`trend` adds a day-scaled time band and reduces `[time, value]`."""
+        graph = _TrendGraph(["B4", "B3"])
+        monkeypatch.setattr(reducers_module, "ee", _trend_fake_ee(graph))
+        LinearTrend().apply_ee(_GraphCollection(graph))
+        assert graph.time_source == "system:time_start"
+        assert graph.time_divisor == 1000 * 60 * 60 * 24
+        assert graph.time_band_name == "time"
+        assert graph.reduce_input == ["time", "VALUE"]
+        assert graph.reducer == "linear-fit-reducer"
+        assert graph.slope_band == ["scale"]
+        assert graph.final_rename == ["B4", "B3"]
+
+    def test_sens_slope_stamps_time_and_selects_the_slope_band(self, monkeypatch):
+        """`sens_slope` uses `sensSlope` and selects its `slope` output band."""
+        graph = _TrendGraph(["B4", "B3"])
+        monkeypatch.setattr(reducers_module, "ee", _trend_fake_ee(graph))
+        SensSlope().apply_ee(_GraphCollection(graph))
+        assert graph.time_source == "system:time_start"
+        assert graph.reduce_input == ["time", "VALUE"]
+        assert graph.reducer == "sens-slope-reducer"
+        assert graph.slope_band == ["slope"]
+        assert graph.final_rename == ["B4", "B3"]
+
+
 class TestTemporalReducerHierarchy:
     """The convenience and parameterised reducers are `TemporalReducer`s."""
 
@@ -145,19 +314,23 @@ class TestApplyEe:
         assert collection.reduced_with == "percentile-reducer-[90.0]"
         assert reduced.renamed_to == ["SR_B4", "SR_B3"]
 
-    def test_trend_uses_linear_fit(self, fake_ee_reducer):
-        """`trend` reduces with `ee.Reducer.linearFit()` (no rename)."""
-        collection = _FakeCollection()
-        reduced = LinearTrend().apply_ee(collection)
-        assert collection.reduced_with == "linear-fit-reducer"
-        assert reduced.renamed_to is None
+    def test_trend_fits_a_time_band(self, monkeypatch):
+        """`trend` fits `[time, value]` with `linearFit`, not band-against-band."""
+        graph = _TrendGraph(["B4"])
+        monkeypatch.setattr(reducers_module, "ee", _trend_fake_ee(graph))
+        LinearTrend().apply_ee(_GraphCollection(graph))
+        assert graph.reduce_input == ["time", "VALUE"]
+        assert graph.reducer == "linear-fit-reducer"
+        assert graph.slope_band == ["scale"]
 
-    def test_sens_slope_uses_sens_slope_reducer(self, fake_ee_reducer):
-        """`sens_slope` reduces with `ee.Reducer.sensSlope()` (no rename)."""
-        collection = _FakeCollection()
-        reduced = SensSlope().apply_ee(collection)
-        assert collection.reduced_with == "sens-slope-reducer"
-        assert reduced.renamed_to is None
+    def test_sens_slope_fits_a_time_band(self, monkeypatch):
+        """`sens_slope` fits `[time, value]` with `sensSlope`, selecting `slope`."""
+        graph = _TrendGraph(["B4"])
+        monkeypatch.setattr(reducers_module, "ee", _trend_fake_ee(graph))
+        SensSlope().apply_ee(_GraphCollection(graph))
+        assert graph.reduce_input == ["time", "VALUE"]
+        assert graph.reducer == "sens-slope-reducer"
+        assert graph.slope_band == ["slope"]
 
 
 class TestReduceStack:
