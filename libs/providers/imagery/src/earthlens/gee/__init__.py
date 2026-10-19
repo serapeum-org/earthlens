@@ -136,6 +136,11 @@ anything a string names:
   within an optional `tolerance`. With a tolerance set, an out-of-range
   target yields an empty selection rather than silently returning a
   distant scene.
+* `GapFill` — fills temporal holes in a collection *before* reduction
+  or sampling, by `linear` / `nearest` / `harmonic` interpolation over
+  a within-`max_gap` neighbour join. `max_gap` is a refusal, not a
+  hint: a pixel with no valid neighbour inside the window stays masked
+  rather than being extrapolated across a wider gap.
 * `Engine`, with `ENGINES` and `resolve_engine` —
   what materialises the pixels. `engine="auto"` routes between
   `EedaiEngine` (the pyramids-eo reader) and `EeEngine`
@@ -335,6 +340,7 @@ from earthlens.gee.engines import (
     resolve_engine,
 )
 from earthlens.gee.features import create_feature, create_geometry
+from earthlens.gee.gapfill import GapFill
 from earthlens.gee.grid import OutputGrid
 from earthlens.gee.io import (
     feature_collection_to_dataframe,
@@ -487,6 +493,7 @@ __all__ = [
     "SegmentationResult",
     "Climatology",
     "ClosestImage",
+    "GapFill",
     "EnginePlan",
     "EedaiPlan",
     "OutputGrid",

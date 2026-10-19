@@ -32,6 +32,8 @@ the rendered API.
 
 ::: earthlens.gee.closest
 
+::: earthlens.gee.gapfill
+
 ::: earthlens.gee.engines
 
 ::: earthlens.gee.pixels
