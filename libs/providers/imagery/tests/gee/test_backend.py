@@ -24,6 +24,7 @@ import pytest
 import requests
 
 from earthlens.base import SpatialExtent, TemporalExtent
+from earthlens.gee import ExtentDiscovery
 from earthlens.gee import backend as backend_module
 from earthlens.gee.backend import GEE
 from earthlens.gee.catalog import Dataset, Extent
@@ -1013,12 +1014,12 @@ class TestDiscoverExtent:
     """Tests for the EE-side extent-discovery fallback (L3)."""
 
     def test_default_does_not_query_ee(self, make_gee, monkeypatch):
-        """`discover_extent=False` (the default) never calls `_discover_ee_extent`."""
+        """`discover_extent=False` (the default) never calls `ExtentDiscovery.discover`."""
         calls: list[str] = []
         monkeypatch.setattr(
-            GEE,
-            "_discover_ee_extent",
-            lambda self, var_info: calls.append(var_info.id) or (None, None),
+            ExtentDiscovery,
+            "discover",
+            lambda self, asset_id: calls.append(asset_id) or (None, None),
         )
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
@@ -1039,11 +1040,11 @@ class TestDiscoverExtent:
         ee_max = dt.datetime(2025, 12, 15)
         calls: list[str] = []
 
-        def _fake_discover(self, var_info):
-            calls.append(var_info.id)
+        def _fake_discover(self, asset_id):
+            calls.append(asset_id)
             return dt.datetime(1981, 1, 1), ee_max
 
-        monkeypatch.setattr(GEE, "_discover_ee_extent", _fake_discover)
+        monkeypatch.setattr(ExtentDiscovery, "discover", _fake_discover)
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
             scale=5566.0,
@@ -1061,7 +1062,7 @@ class TestDiscoverExtent:
         assert calls == ["UCSB-CHG/CHIRPS/DAILY"]
 
     def test_discover_extent_falls_back_to_now_on_failure(self, make_gee, monkeypatch):
-        """If `_discover_ee_extent` returns `(None, None)`, fall back to `now()`."""
+        """If `ExtentDiscovery.discover` returns `(None, None)`, fall back to `now()`."""
         fixed_now = dt.datetime(2026, 5, 13)
 
         class _FixedDatetime(dt.datetime):
@@ -1071,9 +1072,9 @@ class TestDiscoverExtent:
 
         monkeypatch.setattr(backend_module.dt, "datetime", _FixedDatetime)
         monkeypatch.setattr(
-            GEE,
-            "_discover_ee_extent",
-            lambda self, var_info: (None, None),
+            ExtentDiscovery,
+            "discover",
+            lambda self, asset_id: (None, None),
         )
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
@@ -1086,8 +1087,8 @@ class TestDiscoverExtent:
         _, end_excl = gee._clamp_window_to_extent(ds)
         assert end_excl == fixed_now + dt.timedelta(days=1)
 
-    def test_real_discover_queries_reduce_columns(self, make_gee, monkeypatch):
-        """`_discover_ee_extent` issues `reduceColumns(minMax, system:time_start)`."""
+    def test_real_discover_queries_reduce_columns(self):
+        """`ExtentDiscovery.discover` issues `reduceColumns(minMax, system:time_start)`."""
         captured: dict = {}
 
         class _FakeReducer:
@@ -1109,14 +1110,10 @@ class TestDiscoverExtent:
                 captured["properties"] = properties
                 return _FakeReducedFC()
 
-        gee = make_gee(discover_extent=True)
-        monkeypatch.setattr(
-            backend_module.ee, "ImageCollection", _FakeCollection, raising=False
+        fake_ee = SimpleNamespace(ImageCollection=_FakeCollection, Reducer=_FakeReducer)
+        min_dt, max_dt = ExtentDiscovery(ee_module=fake_ee).discover(
+            "UCSB-CHG/CHIRPS/DAILY"
         )
-        monkeypatch.setattr(backend_module.ee, "Reducer", _FakeReducer, raising=False)
-
-        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        min_dt, max_dt = gee._discover_ee_extent(ds)
         assert captured["asset"] == "UCSB-CHG/CHIRPS/DAILY"
         assert captured["reducer"] == "REDUCER:minMax"
         assert captured["properties"] == ["system:time_start"]
@@ -1127,8 +1124,8 @@ class TestDiscoverExtent:
             1750000000, tz=dt.timezone.utc
         ).replace(tzinfo=None)
 
-    def test_real_discover_swallows_ee_errors(self, make_gee, monkeypatch):
-        """Network / EE failures inside `_discover_ee_extent` return `(None, None)`."""
+    def test_real_discover_swallows_ee_errors(self):
+        """Network / EE failures inside `discover` return `(None, None)`."""
 
         class _ExplodingCollection:
             def __init__(self, asset_id):
@@ -1137,21 +1134,16 @@ class TestDiscoverExtent:
             def reduceColumns(self, reducer, properties):  # noqa: N802
                 raise RuntimeError("network down")
 
-        gee = make_gee(discover_extent=True)
-        monkeypatch.setattr(
-            backend_module.ee, "ImageCollection", _ExplodingCollection, raising=False
+        fake_ee = SimpleNamespace(
+            ImageCollection=_ExplodingCollection,
+            Reducer=SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
         )
-        monkeypatch.setattr(
-            backend_module.ee,
-            "Reducer",
-            SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
-            raising=False,
+        assert ExtentDiscovery(ee_module=fake_ee).discover("UCSB-CHG/CHIRPS/DAILY") == (
+            None,
+            None,
         )
 
-        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        assert gee._discover_ee_extent(ds) == (None, None)
-
-    def test_real_discover_returns_none_on_empty_minmax(self, make_gee, monkeypatch):
+    def test_real_discover_returns_none_on_empty_minmax(self):
         """An empty collection (no `min`/`max` keys) yields `(None, None)`."""
 
         class _EmptyReducedFC:
@@ -1165,28 +1157,68 @@ class TestDiscoverExtent:
             def reduceColumns(self, reducer, properties):  # noqa: N802
                 return _EmptyReducedFC()
 
-        gee = make_gee(discover_extent=True)
-        monkeypatch.setattr(
-            backend_module.ee, "ImageCollection", _EmptyCollection, raising=False
+        fake_ee = SimpleNamespace(
+            ImageCollection=_EmptyCollection,
+            Reducer=SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
         )
-        monkeypatch.setattr(
-            backend_module.ee,
-            "Reducer",
-            SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
-            raising=False,
+        assert ExtentDiscovery(ee_module=fake_ee).discover("UCSB-CHG/CHIRPS/DAILY") == (
+            None,
+            None,
         )
-        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        assert gee._discover_ee_extent(ds) == (None, None)
+
+    def test_cached_counts_one_query_then_reuses_it(self):
+        """`cached` queries once per asset, including a `(None, None)` result."""
+
+        class _Collection:
+            count = 0
+
+            def __init__(self, asset_id):
+                type(self).count += 1
+
+            def reduceColumns(self, reducer, properties):  # noqa: N802
+                return SimpleNamespace(getInfo=lambda: {})
+
+        fake_ee = SimpleNamespace(
+            ImageCollection=_Collection,
+            Reducer=SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
+        )
+        disc = ExtentDiscovery(ee_module=fake_ee)
+        assert disc.cached("A/B", enabled=True) == (None, None)
+        assert disc.cached("A/B", enabled=True) == (None, None)
+        assert _Collection.count == 1
+        disc.clear()
+        disc.cached("A/B", enabled=True)
+        assert _Collection.count == 2
+
+    def test_cached_disabled_never_queries(self):
+        """`cached(enabled=False)` returns `(None, None)` without a round trip."""
+
+        class _Collection:
+            count = 0
+
+            def __init__(self, asset_id):
+                type(self).count += 1
+
+            def reduceColumns(self, reducer, properties):  # noqa: N802
+                return SimpleNamespace(getInfo=lambda: {"min": 0, "max": 0})
+
+        fake_ee = SimpleNamespace(
+            ImageCollection=_Collection,
+            Reducer=SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
+        )
+        disc = ExtentDiscovery(ee_module=fake_ee)
+        assert disc.cached("A/B", enabled=False) == (None, None)
+        assert _Collection.count == 0
 
     def test_extent_cache_survives_a_none_result(self, make_gee, monkeypatch):
         """A `(None, None)` result still populates the cache (no repeat queries)."""
         calls: list[str] = []
 
-        def _fake_discover(self, var_info):
-            calls.append(var_info.id)
+        def _fake_discover(self, asset_id):
+            calls.append(asset_id)
             return None, None
 
-        monkeypatch.setattr(GEE, "_discover_ee_extent", _fake_discover)
+        monkeypatch.setattr(ExtentDiscovery, "discover", _fake_discover)
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
             scale=5566.0,
@@ -1195,8 +1227,8 @@ class TestDiscoverExtent:
             discover_extent=True,
         )
         ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        gee._maybe_discover_ee_extent(ds)
-        gee._maybe_discover_ee_extent(ds)
+        gee._clamp_window_to_extent(ds)
+        gee._clamp_window_to_extent(ds)
         assert calls == ["UCSB-CHG/CHIRPS/DAILY"]
 
     def test_extent_cache_is_shared_across_gee_instances(
@@ -1207,14 +1239,14 @@ class TestDiscoverExtent:
         """L5: a second `GEE(...)` reuses the cached extent — no extra round trip."""
         calls: list[str] = []
 
-        def _fake_discover(self, var_info):
-            calls.append(var_info.id)
+        def _fake_discover(self, asset_id):
+            calls.append(asset_id)
             return (
                 dt.datetime(2020, 1, 1),
                 dt.datetime(2024, 12, 31),
             )
 
-        monkeypatch.setattr(GEE, "_discover_ee_extent", _fake_discover)
+        monkeypatch.setattr(ExtentDiscovery, "discover", _fake_discover)
 
         gee_a = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
@@ -1224,9 +1256,9 @@ class TestDiscoverExtent:
             discover_extent=True,
         )
         ds = gee_a.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        gee_a._maybe_discover_ee_extent(ds)
+        gee_a._clamp_window_to_extent(ds)
 
-        # Fresh instance — should hit the module-level cache, not re-query EE.
+        # Fresh instance — should hit the shared singleton cache, not re-query EE.
         gee_b = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
             scale=5566.0,
@@ -1234,7 +1266,7 @@ class TestDiscoverExtent:
             end="2099-01-01",
             discover_extent=True,
         )
-        gee_b._maybe_discover_ee_extent(ds)
+        gee_b._clamp_window_to_extent(ds)
 
         assert calls == ["UCSB-CHG/CHIRPS/DAILY"], (
             f"second instance should hit the shared cache; got {calls}"
@@ -1246,11 +1278,11 @@ class TestDiscoverExtent:
 
         calls: list[str] = []
 
-        def _fake_discover(self, var_info):
-            calls.append(var_info.id)
+        def _fake_discover(self, asset_id):
+            calls.append(asset_id)
             return (None, None)
 
-        monkeypatch.setattr(GEE, "_discover_ee_extent", _fake_discover)
+        monkeypatch.setattr(ExtentDiscovery, "discover", _fake_discover)
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
             scale=5566.0,
@@ -1259,9 +1291,9 @@ class TestDiscoverExtent:
             discover_extent=True,
         )
         ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        gee._maybe_discover_ee_extent(ds)
+        gee._clamp_window_to_extent(ds)
         clear_extent_cache()
-        gee._maybe_discover_ee_extent(ds)
+        gee._clamp_window_to_extent(ds)
         assert calls == ["UCSB-CHG/CHIRPS/DAILY", "UCSB-CHG/CHIRPS/DAILY"]
 
 

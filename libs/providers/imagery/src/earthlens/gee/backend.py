@@ -81,6 +81,11 @@ from earthlens.gee._eedai import (
     credentials_for,  # noqa: F401 - monkeypatch seam the test suite patches
     eedai_available,  # noqa: F401 - monkeypatch seam the test suite patches
 )
+from earthlens.gee._extent import (
+    _EXTENT_DISCOVERY,
+    ExtentDiscovery,  # noqa: F401 - re-exported for the public surface
+    clear_extent_cache,  # noqa: F401 - back-compat shim imported by tests/conftest
+)
 from earthlens.gee._filters import PropertyFilter
 from earthlens.gee._helpers import (
     _COLLECTION_REDUCERS,
@@ -265,26 +270,6 @@ CloudMask = Callable[[ee.Image], ee.Image]
 #: An `ee.ImageCollection` filter — collection in, filtered collection out —
 #: applied after `filterDate` / `filterBounds` (see `earthlens.gee.filters`).
 CollectionFilter = Callable[[ee.ImageCollection], ee.ImageCollection]
-
-# Cache of EE-discovered temporal extents per asset id, shared across
-# all `GEE` instances in this process. `_discover_ee_extent` issues an
-# ~2-5 s `reduceColumns(minMax)` round trip per asset — far too
-# expensive to repeat for a second `GEE(...)` construction against the
-# same asset. The cache mirrors `_CATALOG_CACHE` / `_PROVIDERS_CACHE`
-# in `catalog.py`; clear it via `clear_extent_cache` (mostly for
-# tests).
-_EXTENT_CACHE: dict[str, tuple[dt.datetime | None, dt.datetime | None]] = {}
-
-
-def clear_extent_cache() -> None:
-    """Forget every cached EE-discovered temporal extent.
-
-    Mirrors `earthlens.gee.catalog.clear_catalog_cache` for the
-    `discover_extent=True` cache. Primarily useful in tests that need
-    a fresh cache between runs (or when the EE-side data was updated
-    and the in-process cache has gone stale).
-    """
-    _EXTENT_CACHE.clear()
 
 
 def _validate_pure_config(
@@ -3804,9 +3789,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             When `discover_extent=True` was passed at construction
             and the catalog's `end_date` (or `start_date`) is missing,
             the gap is filled by an EE-side
-            `reduceColumns(minMax)` over `system:time_start` via
-            `_discover_ee_extent` (cached per asset for the
-            lifetime of the instance).
+            `reduceColumns(minMax)` over `system:time_start` via the
+            shared `ExtentDiscovery` singleton (cached per asset,
+            process-wide).
         """
         req_start = self.time.start_date
         req_end_excl = self.time.end_date + dt.timedelta(days=1)
@@ -3845,7 +3830,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
             ) + dt.timedelta(days=1)
             return ds_start, ds_end_excl
 
-        _, ee_end = self._maybe_discover_ee_extent(var_info)
+        # The shared `ExtentDiscovery` singleton owns the query and the
+        # per-asset cache, so a second `GEE(...)` against the same asset reuses
+        # the result rather than re-paying the 2-5 s round trip.
+        _, ee_end = _EXTENT_DISCOVERY.cached(var_info.id, enabled=self.discover_extent)
         if ee_end is not None:
             return ds_start, ee_end + dt.timedelta(days=1)
 
@@ -3855,66 +3843,3 @@ class GEE(LazyClientMixin, AbstractDataSource):
             days=1
         )
         return ds_start, ds_end_excl
-
-    def _maybe_discover_ee_extent(
-        self, var_info: Dataset
-    ) -> tuple[dt.datetime | None, dt.datetime | None]:
-        """Cached entry point for `_discover_ee_extent`.
-
-        Reads / writes `_EXTENT_CACHE` (module-level) so a
-        second `GEE(...)` instance querying the same asset doesn't
-        re-issue the 2-5 s `reduceColumns(minMax)` round trip.
-        """
-        if not self.discover_extent:
-            return None, None
-        cached = _EXTENT_CACHE.get(var_info.id)
-        if cached is not None:
-            return cached
-        discovered = self._discover_ee_extent(var_info)
-        _EXTENT_CACHE[var_info.id] = discovered
-        return discovered
-
-    def _discover_ee_extent(
-        self, var_info: Dataset
-    ) -> tuple[dt.datetime | None, dt.datetime | None]:
-        """Query a collection's actual `system:time_start` min/max via EE.
-
-        Issues one `reduceColumns(ee.Reducer.minMax(), ["system:time_start"])
-        .getInfo()` round-trip per asset (callers cache via
-        `_maybe_discover_ee_extent`). On any EE-side failure
-        (network, missing property, image-typed asset) returns
-        `(None, None)` and logs a warning — the caller falls back to
-        the catalog values or `now()`.
-
-        Args:
-            var_info: The catalog entry. Only `var_info.id` is used.
-
-        Returns:
-            `(min_dt, max_dt)` as naive UTC datetimes, or `(None,
-            None)` if the query failed or the collection has no
-            time-stamped images.
-        """
-        try:
-            collection = ee.ImageCollection(var_info.id)
-            result = (
-                collection.reduceColumns(
-                    ee.Reducer.minMax(), ["system:time_start"]
-                ).getInfo()
-                or {}
-            )
-        except Exception as exc:  # noqa: BLE001 - downgrade EE errors to a warning
-            logger.warning(
-                f"discover_extent: reduceColumns(minMax) failed for "
-                f"{var_info.id}: {type(exc).__name__}: {exc}; "
-                "falling back to catalog / now()."
-            )
-            return None, None
-
-        min_ms = result.get("min")
-        max_ms = result.get("max")
-        if min_ms is None or max_ms is None:
-            return None, None
-        return (
-            dt.datetime.fromtimestamp(min_ms / 1000.0, tz=dt.UTC).replace(tzinfo=None),
-            dt.datetime.fromtimestamp(max_ms / 1000.0, tz=dt.UTC).replace(tzinfo=None),
-        )

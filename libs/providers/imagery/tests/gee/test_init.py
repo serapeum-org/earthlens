@@ -107,6 +107,8 @@ _EXPECTED_EXPORTS = {
     "EedaiReader",
     # Epic 4 Task 4.8 - the validated property-filter value object.
     "PropertyFilter",
+    # Epic 4 Task 4.10 - the extent-discovery object and its shared cache.
+    "ExtentDiscovery",
     # Epic 1 Tasks 1.7/1.8 - the payload and return types.
     "WorkUnit",
     "RasterWorkUnit",

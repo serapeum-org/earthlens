@@ -153,6 +153,12 @@ anything a string names:
   the EEDAI path; it runs its structural scan once at construction and
   hands the reader the checked string through `to_ogr`. The public
   constructor argument stays a plain string.
+* `ExtentDiscovery` — owns the Earth Engine `reduceColumns(minMax)`
+  query that fills an open-ended dataset's upper bound under
+  `GEE(discover_extent=True)`, plus the per-asset cache it is kept in.
+  A module-level singleton keeps that cache process-shared, so a
+  second `GEE(...)` against the same asset does not re-pay the round
+  trip.
 
 Client-side raster analysis (`earthlens.gee.analysis`, re-exported
 here) runs *after* a download, on the in-memory pyramids `Dataset`, so
@@ -248,6 +254,7 @@ Examples:
 from __future__ import annotations
 
 from earthlens.gee._composite import Bucket, CadenceBucketer, CompositeEngine
+from earthlens.gee._extent import ExtentDiscovery
 from earthlens.gee._filters import PropertyFilter
 from earthlens.gee.analysis import (
     ALLOWED_FUNCTIONS,
@@ -466,6 +473,7 @@ __all__ = [
     "resolve_sink",
     "EedaiReader",
     "PropertyFilter",
+    "ExtentDiscovery",
     "WorkUnit",
     "RasterWorkUnit",
     "FeatureWorkUnit",
