@@ -436,6 +436,32 @@ class TestTemporalReducerFor:
         with pytest.raises(ValueError, match="0 < q <= 100"):
             temporal_reducer_for(spec)
 
+    @pytest.mark.parametrize("spec", ["percentile:0", "percentile:150"])
+    def test_rejects_out_of_range_percentile_spec(self, spec):
+        """The `percentile:<q>` spec rejects `q=0` / `q>100` at construction."""
+        with pytest.raises(ValueError):
+            temporal_reducer_for(spec)
+
+
+class TestPercentileRange:
+    """`Percentile` enforces `0 < q <= 100` at construction, every spelling."""
+
+    @pytest.mark.parametrize("q", [0, 150])
+    def test_out_of_range_is_refused_at_construction(self, q):
+        """Both `q=0` and `q>100` raise a `ValidationError`."""
+        from pydantic import ValidationError
+
+        with pytest.raises(ValidationError):
+            Percentile(q=q)
+
+    @pytest.mark.parametrize("spec", ["percentile:0", "percentile:150"])
+    def test_resolve_reducer_rejects_out_of_range_spec(self, spec):
+        """`resolve_reducer` rejects the same values the shorthand does."""
+        from earthlens.gee.reducers import resolve_reducer
+
+        with pytest.raises(ValueError):
+            resolve_reducer(spec)
+
     def test_rejects_region_only_name(self):
         """A region-only name has no time-axis form."""
         with pytest.raises(ValueError, match="region"):

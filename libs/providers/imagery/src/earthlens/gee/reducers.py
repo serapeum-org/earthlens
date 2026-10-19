@@ -332,7 +332,9 @@ class Percentile(BaseModel, TemporalReducer):
     interchangeable with every other reducer here.
 
     Attributes:
-        q: The percentile to compute, 0-100 inclusive.
+        q: The percentile to compute, `0 < q <= 100`. Zero is refused at
+            construction because the client-side `reduce_time(op="percentile")`
+            path rejects it, so accepting it would defer the failure to mid-run.
 
     Examples:
         - A 90th-percentile composite, which is a common cloud-robust choice:
@@ -357,7 +359,7 @@ class Percentile(BaseModel, TemporalReducer):
     name: ClassVar[str] = "percentile"
     ee_factory: ClassVar[str | None] = "percentile"
 
-    q: float = Field(ge=0, le=100)
+    q: float = Field(gt=0, le=100)
 
     def __call__(self, collection: Any) -> Any:
         """Reduce `collection` to its per-pixel `q`-th percentile.

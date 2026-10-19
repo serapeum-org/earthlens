@@ -163,15 +163,19 @@ class TestPercentile:
         with pytest.raises(ValidationError):
             Percentile(q=90, quantile=0.9)
 
-    @pytest.mark.parametrize("q", [-1, 101, 1000])
+    @pytest.mark.parametrize("q", [-1, 0, 101, 1000])
     def test_rejects_out_of_range(self, q):
-        """A percentile outside 0-100 is rejected rather than sent to Earth Engine."""
+        """A percentile outside `0 < q <= 100` is rejected at construction.
+
+        `q=0` is refused too: the client-side `reduce_time(op="percentile")`
+        path rejects it, so accepting it would defer the failure to mid-run.
+        """
         with pytest.raises(ValidationError):
             Percentile(q=q)
 
-    @pytest.mark.parametrize("q", [0, 50, 100])
-    def test_accepts_the_inclusive_bounds(self, q):
-        """0 and 100 are valid percentiles."""
+    @pytest.mark.parametrize("q", [0.5, 50, 100])
+    def test_accepts_the_valid_range(self, q):
+        """The smallest positive percentile and the inclusive 100 are valid."""
         assert Percentile(q=q).q == float(q)
 
     def test_repr_includes_the_percentile(self):
