@@ -183,9 +183,9 @@ Engine's server-side reduce when the bucket has too many scenes, when the
 scene stack would not fit one pass, or when the reducer is `mosaic` —
 mosaic is last-wins in Earth Engine's collection order, which has no
 client-side equivalent over a scene stack without per-scene masks the reader
-does not expose, so **mosaic stays on Earth Engine**. A percentile (`"p90"`)
-and `"trend"` are not in the reader's vocabulary either, so they too are
-composited on Earth Engine.
+does not expose, so **mosaic stays on Earth Engine**. Every other reducer —
+including a percentile (`"p90"`), `"trend"` and `"sens_slope"` — is computed
+client-side by pyramids' `reduce_time`, the same path as `median`.
 
 With a collection you can also narrow which scenes are read:
 
@@ -212,6 +212,18 @@ reducers fold a scene's fill pixels into the result where Earth Engine would
 mask them. The two agree wherever the scenes carry no fill over the AOI. There
 is no way to supply the fill from here — the composite read takes no `nodata`
 argument — so pass `engine="ee"` when you need Earth Engine's masking exactly.
+
+The client-side reduction — the true per-pixel `median`, and the `"p90"` /
+`"trend"` / `"sens_slope"` reducers — needs **pyramids-core >= 0.70.0** (the
+distribution formerly published as `pyramids-gis`; the import name stays
+`pyramids`), which is where `reduce_time`'s percentile / linear-trend /
+Theil-Sen operations ship. One known limitation applies today:
+`pyramids_eo.collection_from_earthengine` hands back an in-memory
+(`datasets=`-backed) `DatasetCollection`, which `reduce_time` cannot consume
+(it reads a file- or zarr-backed collection), so a live `engine="eedai"`
+collection composite raises a `RuntimeError`. The wiring is correct and is
+verified against `numpy` on a file-backed stack; until that upstream reader gap
+is closed, pass `engine="ee"` for a collection composite.
 
 What you gain: no 32768-px synchronous cap and no HTTP/zip round-trip,
 so `auto_split` is unnecessary. What to know before switching:
@@ -263,11 +275,12 @@ GEE(..., reducer="percentile:90")
 
 **Reducers.** `mean`, `median`, `min`, `max`, `mode`, `mosaic` and `sum` dispatch to Earth Engine's convenience
 methods, which preserve band names. A percentile and a per-pixel trend are first-class too: pass
-`reducer="p90"` (or `"percentile:90"`, or `Percentile(q=90)`) and `reducer="trend"`. `Percentile` and the trend
-reducer have to use `reduce`, which suffixes the bands, so they rename them back — making them interchangeable
-with the rest, and they run on `engine="ee"` (via `ee.Reducer.percentile` / `linearFit`) and on the client-side
-EEDAI path. The `reducer=` string is validated at construction, so a bad percentile (`"p150"`) or an unknown name
-fails before any bucket exports rather than part-way through.
+`reducer="p90"` (or `"percentile:90"`, or `Percentile(q=90)`), `reducer="trend"` (ordinary least-squares slope),
+or `reducer="sens_slope"` (the robust Theil-Sen slope). `Percentile` and the two trend reducers have to use
+`reduce`, which suffixes the bands, so they rename them back — making them interchangeable with the rest, and
+they run on `engine="ee"` (via `ee.Reducer.percentile` / `linearFit` / `sensSlope`) and on the client-side EEDAI
+path (via `reduce_time`). The `reducer=` string is validated at construction, so a bad percentile (`"p150"`) or
+an unknown name fails before any bucket exports rather than part-way through.
 
 **Engines.** `engine=` resolves to an `Engine`, and there are four:
 
@@ -327,8 +340,14 @@ written path, instead of only the paths:
 result = GEE(..., engine="ee").download(materialize=True)
 result.paths     # the written files
 result.objects   # the in-memory pyramids Datasets
+result.data      # one Dataset for a single bucket, a DatasetCollection for a time stack
 list(result)     # the objects - materialising is what you asked for
 ```
+
+`result.data` is the single-vs-stack convenience: a one-bucket request (a single image, or a collection that
+reduced to one bucket) hands back a bare pyramids `Dataset`, while a multi-bucket time series hands back a
+`DatasetCollection` — ready for `reduce_time` / `groupby` / `plot` / `to_netcdf` without globbing the output
+directory back.
 
 Note the one place the stand-in is not transparent: when you materialise, each artifact's value *is* the object, so
 `result` iterates and compares as the list of **objects**, not of paths. `result.paths` is how you get the files.

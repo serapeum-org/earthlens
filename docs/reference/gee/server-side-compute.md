@@ -12,7 +12,8 @@ computation is available at all.
 
 | You want | Use |
 |---|---|
-| A temporal composite (`mean` / `median` / …) | `reducer=`, `temporal_resolution=` |
+| A temporal composite (`mean` / `median` / `p90` / `trend` / …) | `reducer=`, `temporal_resolution=` |
+| The composite back in memory, not only on disk | `materialize=True` → `DownloadResult.data` (a `Dataset` or `DatasetCollection`) |
 | Scene selection by metadata (cloud cover, orbit, …) | `filters=` |
 | A per-image transform — masking, rescaling, dB conversion | `cloud_mask=` |
 | Anything else Earth Engine can do | `el.datasource.client` — the raw `ee` module, already authenticated |
@@ -69,14 +70,31 @@ scene in the bucket and holds them in memory to reduce. It hands the bucket back
 - the scene stack exceeds the single-pass pixel budget (currently 2×10⁸ px)
 - the reducer is `mosaic` — last-wins in Earth Engine's collection order has no client-side equivalent over
   a scene stack (it would need per-scene masks the reader does not expose), so **mosaic stays on Earth
-  Engine**; the served reducers (`mean` / `median` / `min` / `max` / `mode` / `sum`) are computed client-side
-  by pyramids' `reduce_time`, so `median` is a true per-pixel median
-- the reducer is a percentile (`percentile:<q>` / `p<q>`) or `trend` — these are not in the reader's
-  collection vocabulary, so Earth Engine composites them (`ee.Reducer.percentile` / `linearFit`) instead
+  Engine**. This is the resolution recorded for that case: `mosaic` is declined client-side and reimplemented
+  nowhere, not quietly approximated. Every other temporal reducer — `mean` / `median` / `min` / `max` /
+  `mode` / `sum`, and the percentile (`percentile:<q>` / `p<q>`), `trend` and `sens_slope` reducers — is
+  computed client-side by pyramids' `reduce_time`, so `median` is a true per-pixel median and a percentile or
+  trend no longer forces the bucket back to Earth Engine
 
 Narrow the window, shorten `temporal_resolution`, add a `property_filter`, or use a coarser `scale` to
 get back under the budget. These thresholds are internal constants, not public API — treat them as
 current behaviour rather than a contract.
+
+!!! note "Client-side reduction needs pyramids-core >= 0.70.0, and the live EEDAI path has a known gap"
+    The client-side composite — the true per-pixel `median`, and the `percentile` / `trend` / `sens_slope`
+    reducers — runs through pyramids' `DatasetCollection.reduce_time`, whose `median` / `percentile` /
+    `linear_trend` / `sens_slope` operations ship in **pyramids-core >= 0.70.0** (the distribution formerly
+    published as `pyramids-gis`; the import name stays `pyramids`). Below that version these reductions are
+    unavailable. The no-nodata caveat carries into them: the EEDAI driver declares no fill, so a statistical
+    reducer folds a scene's fill pixels into the result where Earth Engine would have masked them — the two
+    agree only where the scenes carry no fill over the AOI.
+
+    **Known limitation — live EEDAI reduction.** `pyramids_eo.collection_from_earthengine` currently returns
+    an *in-memory* (`datasets=`-backed) `DatasetCollection`, which `reduce_time` cannot consume — it reads a
+    file- or zarr-backed collection — so a live `engine="eedai"` collection composite (even `median`) raises
+    a `RuntimeError` today. The earthlens wiring is correct, and the reduction is verified against `numpy` on
+    a file-backed stack; it will work end to end once that upstream reader gap is closed. Until then, pass
+    `engine="ee"` for a collection composite.
 
 ### The two engines are not byte-identical
 
@@ -101,7 +119,7 @@ Several Earth Engine operations are plain constructor arguments. Nothing here ne
 
 | Argument | Server-side operation |
 |---|---|
-| `reducer=` | temporal reduction: `mean`, `median`, `min`, `max`, `mode`, `mosaic`, `sum` |
+| `reducer=` | temporal reduction: `mean`, `median`, `min`, `max`, `mode`, `mosaic`, `sum`, a percentile (`percentile:<q>` / `p<q>`), `trend`, `sens_slope` |
 | `temporal_resolution=` | `raw` / `daily` / `monthly` / `yearly` bucketing; each bucket is reduced independently |
 | `variables=` | `select(bands)` |
 | `scale=`, `crs=`, `resample=` | resampling and reprojection |
@@ -322,6 +340,59 @@ For a computed image too large for `getDownloadURL`, use the asynchronous sinks.
 `wait_for_export=False` and `download()` returns `TaskInfo` objects at submission time instead of
 blocking; `list_recent_tasks`, `get_task_status`, `wait_for_task_id`, `cancel_task` and
 `resolve_destination` track them. The batch sinks are Earth Engine-only, so `engine=` is ignored there.
+
+### Temporal helpers over a collection
+
+Four frozen, validated config objects build a server-side graph over an `ee.ImageCollection` you hold — the
+`.client` collection above, or one you built yourself. They answer the questions a single reducer cannot:
+*when did it change*, *how does this period compare to normal*, *which scene is nearest a date*, and *fill the
+holes before reducing*. Each is imported from `earthlens.gee`.
+
+`TemporalSegmentation` (`LandTrendr` / `Ccdc`) finds breakpoints in a per-pixel trajectory — disturbance and
+recovery — and returns a `SegmentationResult` wrapping the algorithm's array-valued `ee.Image`, never a
+plottable raster. Mask clouds first; the algorithms assume a clean series:
+
+```python
+from earthlens.gee import LandTrendr
+
+nbr = masked_collection.map(lambda img: img.normalizedDifference(["B5", "B7"]).rename("NBR"))
+result = LandTrendr(maxSegments=6).segment(nbr)   # invert=True by default for a vegetation index
+vertices = result.array                            # the ee.Array image, for your own getInfo/export
+```
+
+`Climatology` reduces a collection *per calendar period across a baseline* (`dayofyear` / `month` / `season`),
+and `anomaly()` is the observed-minus-baseline companion:
+
+```python
+from earthlens.gee import Climatology
+
+clim = Climatology(period="month", baseline=(1991, 2020), reducer="mean")
+monthly = clim.climatology(collection)                       # one image per month
+june_2024 = clim.anomaly(collection, collection_2024, 6)     # this June vs the 1991-2020 June mean
+```
+
+`ClosestImage` selects the scene nearest a target date, within an optional tolerance (an out-of-range target
+with a tolerance set yields an empty selection rather than a distant scene):
+
+```python
+import datetime as dt
+
+from earthlens.gee import ClosestImage
+
+nearest = ClosestImage(target=dt.date(2024, 6, 1), tolerance=dt.timedelta(days=15)).select(collection)
+```
+
+`GapFill` fills temporal holes *before* a reduction or sampling, by `linear` / `nearest` / `harmonic`
+interpolation over a within-`max_gap` neighbour join — `max_gap` is a refusal, not a hint, so a pixel with no
+valid neighbour in the window stays masked:
+
+```python
+import datetime as dt
+
+from earthlens.gee import GapFill
+
+filled = GapFill(method="linear", max_gap=dt.timedelta(days=30)).fill(collection)
+```
 
 ## Choosing an engine, in practice
 
