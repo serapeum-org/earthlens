@@ -380,6 +380,20 @@ class TestClosingAMaterialisedResult:
         """Closing must never raise on an object with no `close`."""
         DownloadResult(artifacts=(Artifact(obj="not a dataset"),)).close()
 
+    def test_close_releases_the_multi_bucket_collection(self, monkeypatch):
+        """The stack `data` opened for a multi-bucket result is closed too."""
+        handle = _Handle()
+        result = DownloadResult(
+            artifacts=(
+                Artifact(path=Path("a.tif"), obj="x"),
+                Artifact(path=Path("b.tif"), obj="y"),
+            )
+        )
+        monkeypatch.setattr(type(result), "collection", lambda self, **k: handle)
+        assert result.data is handle
+        result.close()
+        assert handle.closed
+
     def test_an_unmaterialised_result_closes_cleanly(self):
         """Nothing was opened, so there is nothing to release."""
         DownloadResult(artifacts=(Artifact(path=Path("a.tif")),)).close()
@@ -427,6 +441,16 @@ class TestDataAccessor:
         queued = DownloadResult(artifacts=(Artifact(destination="gs://b/p"),))
         with pytest.raises(ValueError, match="no in-memory object"):
             queued.data
+
+    def test_the_multi_bucket_collection_is_opened_once(self, tmp_path):
+        """`data` memoises the stack, so repeated access does not re-open it."""
+        paths = [
+            self._tif(tmp_path / f"srtm_elev_2020060{i}.tif", i) for i in (1, 2, 3)
+        ]
+        result = DownloadResult(
+            artifacts=tuple(Artifact(path=p, obj="sentinel") for p in paths)
+        )
+        assert result.data is result.data
 
 
 class TestFrozenValueObjects:

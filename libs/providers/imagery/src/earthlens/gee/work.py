@@ -26,7 +26,7 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, ClassVar
 
-from pydantic import ConfigDict
+from pydantic import ConfigDict, PrivateAttr
 
 from earthlens.base.leaves import SummarisedLeaf
 from earthlens.base.raster import close_quietly
@@ -325,6 +325,11 @@ class DownloadResult(SummarisedLeaf):
 
     artifacts: tuple[Artifact, ...] = ()
 
+    #: The multi-bucket stack `data` opened, held so `close()` can release it.
+    #: Opened at most once (memoised) and independent of the per-bucket
+    #: `artifact.obj` handles, which `data` never re-reads for a single bucket.
+    _materialised_collection: Any = PrivateAttr(default=None)
+
     @property
     def values(self) -> list[Any]:
         """Return each artifact's payload, the pre-Epic-1 `list` return.
@@ -470,8 +475,14 @@ class DownloadResult(SummarisedLeaf):
                 "return; download with materialize=True (a batch export returns "
                 "destinations, not data)."
             )
-        result: Any = objects[0] if len(objects) == 1 else self.collection()
-        return result
+        if len(objects) == 1:
+            return objects[0]
+        # Open the stack once and hold it: a fresh `from_files` per access would
+        # leak a GDAL handle set `close()` never saw, locking the files on
+        # Windows. Memoising it gives `close()` the one handle to release.
+        if self._materialised_collection is None:
+            self._materialised_collection = self.collection()
+        return self._materialised_collection
 
     def close(self) -> None:
         """Close every in-memory object this result holds.
@@ -488,6 +499,9 @@ class DownloadResult(SummarisedLeaf):
         """
         for artifact in self.artifacts:
             close_quietly(artifact.obj)
+        # The multi-bucket stack `data` opened is a separate handle set from the
+        # per-bucket `obj`s, so it must be released here too.
+        close_quietly(self._materialised_collection)
 
     def __enter__(self) -> DownloadResult:
         """Return the result, so it can be used as a context manager.
