@@ -24317,18 +24317,23 @@ engines sample differently (see below), so it is opt-in.</p>
 </table>
 <p>A request qualifies when nothing server-side has to shape the image: no
 <code>cloud_mask</code>, no <code>filters</code>, and <code>export_via="url"</code>. That covers both a
-single <code>ee_type="image"</code> asset and an <code>ee_type="image_collection"</code>, which
-the reader composites client-side per time bucket with the same reducer
-Earth Engine would have used. The output CRS may be <code>"EPSG:4326"</code> or any
-metre-based projected CRS. Everything else stays on Earth Engine, which is
-the only engine that can run a computation graph or export to Drive / GCS /
-an asset.</p>
+single <code>ee_type="image"</code> asset and an <code>ee_type="image_collection"</code>. For a
+collection the reader fetches the bucket's scene stack and the composite is
+computed <strong>client-side by pyramids' own <code>reduce_time</code></strong> — so <code>median</code> is a
+true per-pixel median (not an approximation), matching Earth Engine's within
+numerical tolerance where the scenes carry no fill over the AOI. The output
+CRS may be <code>"EPSG:4326"</code> or any metre-based projected CRS. Everything else
+stays on Earth Engine, which is the only engine that can run a computation
+graph or export to Drive / GCS / an asset.</p>
 <p>A collection is sized before it is served, because the reader downloads
 every scene in the bucket and holds them to reduce. It goes back to Earth
 Engine's server-side reduce when the bucket has too many scenes, when the
-scene stack would not fit one pass, or when the reducer is <code>mosaic</code> — Earth
-Engine's is last-wins, while the reader returns the first scene of the
-stack, so they are not the same composite.</p>
+scene stack would not fit one pass, or when the reducer is <code>mosaic</code> —
+mosaic is last-wins in Earth Engine's collection order, which has no
+client-side equivalent over a scene stack without per-scene masks the reader
+does not expose, so <strong>mosaic stays on Earth Engine</strong>. A percentile (<code>"p90"</code>)
+and <code>"trend"</code> are not in the reader's vocabulary either, so they too are
+composited on Earth Engine.</p>
 <p>With a collection you can also narrow which scenes are read:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">EarthLens</span><span class="p">(</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gee&quot;</span><span class="p">,</span>
@@ -24395,9 +24400,12 @@ cannot express.</p>
 <a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="n">GEE</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">&quot;percentile:90&quot;</span><span class="p">)</span>
 </code></pre></div>
 <p><strong>Reducers.</strong> <code>mean</code>, <code>median</code>, <code>min</code>, <code>max</code>, <code>mode</code>, <code>mosaic</code> and <code>sum</code> dispatch to Earth Engine's convenience
-methods, which preserve band names. <code>Percentile</code> has to use <code>reduce</code>, which suffixes them, so it renames them back —
-making it interchangeable with the rest. <code>resolve_reducer</code> accepts a name, a <code>percentile:&lt;q&gt;</code> spec or an instance,
-and resolves once per request, so a bad percentile fails before any bucket exports rather than part-way through.</p>
+methods, which preserve band names. A percentile and a per-pixel trend are first-class too: pass
+<code>reducer="p90"</code> (or <code>"percentile:90"</code>, or <code>Percentile(q=90)</code>) and <code>reducer="trend"</code>. <code>Percentile</code> and the trend
+reducer have to use <code>reduce</code>, which suffixes the bands, so they rename them back — making them interchangeable
+with the rest, and they run on <code>engine="ee"</code> (via <code>ee.Reducer.percentile</code> / <code>linearFit</code>) and on the client-side
+EEDAI path. The <code>reducer=</code> string is validated at construction, so a bad percentile (<code>"p150"</code>) or an unknown name
+fails before any bucket exports rather than part-way through.</p>
 <p><strong>Engines.</strong> <code>engine=</code> resolves to an <code>Engine</code>, and there are four:</p>
 <table>
 <thead>

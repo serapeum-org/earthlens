@@ -24238,8 +24238,12 @@ scene in the bucket and holds them in memory to reduce. It hands the bucket back
 <ul>
 <li>the bucket holds more scenes than the scene cap (currently 500)</li>
 <li>the scene stack exceeds the single-pass pixel budget (currently 2×10⁸ px)</li>
-<li>the reducer is <code>mosaic</code> — client-side it means <em>first scene</em>, in Earth Engine it means <em>last wins</em>, so
-  serving it would quietly change the result</li>
+<li>the reducer is <code>mosaic</code> — last-wins in Earth Engine's collection order has no client-side equivalent over
+  a scene stack (it would need per-scene masks the reader does not expose), so <strong>mosaic stays on Earth
+  Engine</strong>; the served reducers (<code>mean</code> / <code>median</code> / <code>min</code> / <code>max</code> / <code>mode</code> / <code>sum</code>) are computed client-side
+  by pyramids' <code>reduce_time</code>, so <code>median</code> is a true per-pixel median</li>
+<li>the reducer is a percentile (<code>percentile:&lt;q&gt;</code> / <code>p&lt;q&gt;</code>) or <code>trend</code> — these are not in the reader's
+  collection vocabulary, so Earth Engine composites them (<code>ee.Reducer.percentile</code> / <code>linearFit</code>) instead</li>
 </ul>
 <p>Narrow the window, shorten <code>temporal_resolution</code>, add a <code>property_filter</code>, or use a coarser <code>scale</code> to
 get back under the budget. These thresholds are internal constants, not public API — treat them as
