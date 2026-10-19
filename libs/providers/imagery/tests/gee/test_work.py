@@ -385,6 +385,50 @@ class TestClosingAMaterialisedResult:
         DownloadResult(artifacts=(Artifact(path=Path("a.tif")),)).close()
 
 
+class TestDataAccessor:
+    """Task 4.5: `.data` is a `Dataset` (single) or a `DatasetCollection` (stack)."""
+
+    def _tif(self, path, value):
+        """Write a tiny constant GeoTIFF the stack accessor can read back."""
+        import numpy as np
+        from pyramids.dataset import Dataset
+        from pyramids.dataset.dataset import GeoReference
+
+        Dataset.from_array(
+            np.full((2, 2), float(value)),
+            geo_ref=GeoReference(top_left_corner=(0.0, 2.0), cell_size=1.0, epsg=4326),
+            no_data_value=-9999.0,
+            path=str(path),
+        )
+        return path
+
+    def test_a_single_object_returns_the_bare_dataset(self):
+        """A single materialised bucket hands back the object itself."""
+        handle = _Handle()
+        result = DownloadResult(artifacts=(Artifact(path=Path("a.tif"), obj=handle),))
+        assert result.data is handle
+
+    def test_a_multi_bucket_result_returns_a_dataset_collection(self, tmp_path):
+        """A stack of buckets hands back a `DatasetCollection`, one entry per bucket."""
+        from pyramids.dataset import DatasetCollection
+
+        paths = [
+            self._tif(tmp_path / f"srtm_elev_2020060{i}.tif", i) for i in (1, 2, 3)
+        ]
+        result = DownloadResult(
+            artifacts=tuple(Artifact(path=p, obj="sentinel") for p in paths)
+        )
+        data = result.data
+        assert isinstance(data, DatasetCollection)
+        assert len(data) == 3
+
+    def test_no_in_memory_object_is_refused(self):
+        """A batch export (or a non-materialised run) has nothing to return."""
+        queued = DownloadResult(artifacts=(Artifact(destination="gs://b/p"),))
+        with pytest.raises(ValueError, match="no in-memory object"):
+            queued.data
+
+
 class TestFrozenValueObjects:
     """Round 1 made these frozen and strict; that must stay asserted."""
 
