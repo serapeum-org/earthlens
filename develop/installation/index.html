@@ -24145,7 +24145,7 @@ you install the meta-package or a thematic distribution directly:
 <tr>
 <td><code>nwm</code></td>
 <td><a href="https://serapeum-org.github.io/earthlens/reference/nwm/introduction/">NOAA National Water Model</a></td>
-<td><code>earthlens[s3]</code>, <code>pyramids-gis[parquet] &gt;=0.46.0</code></td>
+<td><code>earthlens[s3]</code>, <code>pyramids-core[parquet] &gt;=0.46.0</code></td>
 </tr>
 <tr>
 <td><code>earthdata</code></td>
@@ -24195,7 +24195,7 @@ you install the meta-package or a thematic distribution directly:
 <tr>
 <td><code>stac</code></td>
 <td><a href="https://serapeum-org.github.io/earthlens/reference/stac/introduction/">STAC (SpatioTemporal Asset Catalog)</a></td>
-<td><code>pyramids-gis[stac] &gt;=0.46.0</code></td>
+<td><code>pyramids-core[stac] &gt;=0.46.0</code></td>
 </tr>
 <tr>
 <td><code>openeo</code></td>
@@ -24269,7 +24269,7 @@ you install the meta-package or a thematic distribution directly:
 </tr>
 </tbody>
 </table>
-<p>A bare <code>pip install earthlens</code> installs only the core dependencies (numpy, pandas, pyramids-gis,
+<p>A bare <code>pip install earthlens</code> installs only the core dependencies (numpy, pandas, pyramids-core,
 requests, …), which is enough for every backend with no extra SDK of its own: <strong>geoBoundaries</strong>, <strong>AirNow</strong>, <strong>GEBCO/ETOPO bathymetry</strong>, <strong>CHC/CHIRPS</strong>, <strong>climate teleconnection indices</strong>, <strong>USDM/EDO/GDO/SPEIbase</strong>, <strong>NASA FIRMS</strong>, <strong>GDACS</strong>, <strong>RGI/GLIMS/WGMS glaciers</strong>, <strong>IUCN Red List</strong>, <strong>NREL/National Laboratory of the Rockies</strong>, <strong>OpenAQ</strong>, <strong>PVGIS</strong>, <strong>ThinkHazard!/INFORM</strong>, <strong>Sensor.Community</strong>, <strong>SoilGrids</strong>, <strong>Global Solar/Wind Atlas</strong>, <strong>Protected Planet</strong>.
 Asking the facade for a backend whose extra is missing (e.g. <code>data_source="ecmwf"</code> without
 <code>earthlens[ecmwf]</code>) raises a clear <code>ImportError</code> naming the extra to install.</p>

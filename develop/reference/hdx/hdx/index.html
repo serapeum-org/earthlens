@@ -26332,7 +26332,7 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">                pyramids type — a `Dataset` (raster), a</span>
 <a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">                `FeatureCollection` (vector), or a `DataFrame` (tabular)</span>
 <a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">                — dispatched by the recorded CKAN format label, instead</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">                of returning raw paths. Needs `pyramids-gis &gt;= 0.29.0`</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">                of returning raw paths. Needs `pyramids-core &gt;= 0.29.0`</span>
 <a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">                (which provides `read_resource`); on an older pyramids it</span>
 <a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">                is rejected with a clear upgrade message. Defaults to</span>
 <a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">                `False` (return paths).</span>
@@ -26362,7 +26362,7 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return `pyramids.read_resource`, or raise a clear upgrade error.</span>
 <a id="__codelineno-0-495" name="__codelineno-0-495"></a>
 <a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">        The reader (the `PY-D` capability) is the `pyramids.read_resource`</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">        function, available in `pyramids-gis &gt;= 0.29.0`. The package floor</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">        function, available in `pyramids-core &gt;= 0.29.0`. The package floor</span>
 <a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">        already requires that, so this normally just imports; the guard</span>
 <a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">        stays as defense for a partial / source install that predates the</span>
 <a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">        reader, surfaced as a `NotImplementedError` (mirroring how the</span>
@@ -26380,7 +26380,7 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a>        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
 <a id="__codelineno-0-513" name="__codelineno-0-513"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
 <a id="__codelineno-0-514" name="__codelineno-0-514"></a>                <span class="s2">&quot;HDX.download(read=True) needs `pyramids.read_resource` &quot;</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>                <span class="s2">&quot;(pyramids-gis &gt;= 0.29.0); the installed pyramids does not &quot;</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>                <span class="s2">&quot;(pyramids-core &gt;= 0.29.0); the installed pyramids does not &quot;</span>
 <a id="__codelineno-0-516" name="__codelineno-0-516"></a>                <span class="s2">&quot;provide it. Upgrade pyramids, or call download() without &quot;</span>
 <a id="__codelineno-0-517" name="__codelineno-0-517"></a>                <span class="s2">&quot;read= to get the resource file paths and read them yourself.&quot;</span>
 <a id="__codelineno-0-518" name="__codelineno-0-518"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
@@ -26969,7 +26969,7 @@ progress hook, so this is a no-op.</p>
 pyramids type — a <code>Dataset</code> (raster), a
 <code>FeatureCollection</code> (vector), or a <code>DataFrame</code> (tabular)
 — dispatched by the recorded CKAN format label, instead
-of returning raw paths. Needs <code>pyramids-gis &gt;= 0.29.0</code>
+of returning raw paths. Needs <code>pyramids-core &gt;= 0.29.0</code>
 (which provides <code>read_resource</code>); on an older pyramids it
 is rejected with a clear upgrade message. Defaults to
 <code>False</code> (return paths).</p>
@@ -27086,7 +27086,7 @@ same order — when <code>read=True</code>.</p>
 <a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">            pyramids type — a `Dataset` (raster), a</span>
 <a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">            `FeatureCollection` (vector), or a `DataFrame` (tabular)</span>
 <a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">            — dispatched by the recorded CKAN format label, instead</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">            of returning raw paths. Needs `pyramids-gis &gt;= 0.29.0`</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">            of returning raw paths. Needs `pyramids-core &gt;= 0.29.0`</span>
 <a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">            (which provides `read_resource`); on an older pyramids it</span>
 <a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">            is rejected with a clear upgrade message. Defaults to</span>
 <a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">            `False` (return paths).</span>
@@ -28343,7 +28343,7 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">                pyramids type — a `Dataset` (raster), a</span>
 <a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">                `FeatureCollection` (vector), or a `DataFrame` (tabular)</span>
 <a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">                — dispatched by the recorded CKAN format label, instead</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">                of returning raw paths. Needs `pyramids-gis &gt;= 0.29.0`</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">                of returning raw paths. Needs `pyramids-core &gt;= 0.29.0`</span>
 <a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">                (which provides `read_resource`); on an older pyramids it</span>
 <a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">                is rejected with a clear upgrade message. Defaults to</span>
 <a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">                `False` (return paths).</span>
@@ -28373,7 +28373,7 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return `pyramids.read_resource`, or raise a clear upgrade error.</span>
 <a id="__codelineno-0-495" name="__codelineno-0-495"></a>
 <a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">        The reader (the `PY-D` capability) is the `pyramids.read_resource`</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">        function, available in `pyramids-gis &gt;= 0.29.0`. The package floor</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">        function, available in `pyramids-core &gt;= 0.29.0`. The package floor</span>
 <a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">        already requires that, so this normally just imports; the guard</span>
 <a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">        stays as defense for a partial / source install that predates the</span>
 <a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">        reader, surfaced as a `NotImplementedError` (mirroring how the</span>
@@ -28391,7 +28391,7 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a>        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
 <a id="__codelineno-0-513" name="__codelineno-0-513"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
 <a id="__codelineno-0-514" name="__codelineno-0-514"></a>                <span class="s2">&quot;HDX.download(read=True) needs `pyramids.read_resource` &quot;</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>                <span class="s2">&quot;(pyramids-gis &gt;= 0.29.0); the installed pyramids does not &quot;</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>                <span class="s2">&quot;(pyramids-core &gt;= 0.29.0); the installed pyramids does not &quot;</span>
 <a id="__codelineno-0-516" name="__codelineno-0-516"></a>                <span class="s2">&quot;provide it. Upgrade pyramids, or call download() without &quot;</span>
 <a id="__codelineno-0-517" name="__codelineno-0-517"></a>                <span class="s2">&quot;read= to get the resource file paths and read them yourself.&quot;</span>
 <a id="__codelineno-0-518" name="__codelineno-0-518"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
@@ -28980,7 +28980,7 @@ progress hook, so this is a no-op.</p>
 pyramids type — a <code>Dataset</code> (raster), a
 <code>FeatureCollection</code> (vector), or a <code>DataFrame</code> (tabular)
 — dispatched by the recorded CKAN format label, instead
-of returning raw paths. Needs <code>pyramids-gis &gt;= 0.29.0</code>
+of returning raw paths. Needs <code>pyramids-core &gt;= 0.29.0</code>
 (which provides <code>read_resource</code>); on an older pyramids it
 is rejected with a clear upgrade message. Defaults to
 <code>False</code> (return paths).</p>
@@ -29097,7 +29097,7 @@ same order — when <code>read=True</code>.</p>
 <a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">            pyramids type — a `Dataset` (raster), a</span>
 <a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">            `FeatureCollection` (vector), or a `DataFrame` (tabular)</span>
 <a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">            — dispatched by the recorded CKAN format label, instead</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">            of returning raw paths. Needs `pyramids-gis &gt;= 0.29.0`</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">            of returning raw paths. Needs `pyramids-core &gt;= 0.29.0`</span>
 <a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">            (which provides `read_resource`); on an older pyramids it</span>
 <a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">            is rejected with a clear upgrade message. Defaults to</span>
 <a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">            `False` (return paths).</span>
