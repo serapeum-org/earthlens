@@ -277,9 +277,11 @@ GEE(..., reducer="percentile:90")
 methods, which preserve band names. A percentile and a per-pixel trend are first-class too: pass
 `reducer="p90"` (or `"percentile:90"`, or `Percentile(q=90)`), `reducer="trend"` (ordinary least-squares slope),
 or `reducer="sens_slope"` (the robust Theil-Sen slope). `Percentile` and the two trend reducers have to use
-`reduce`, which suffixes the bands, so they rename them back — making them interchangeable with the rest, and
-they run on `engine="ee"` (via `ee.Reducer.percentile` / `linearFit` / `sensSlope`) and on the client-side EEDAI
-path (via `reduce_time`). The `reducer=` string is validated at construction, so a bad percentile (`"p150"`) or
+`reduce`, which suffixes the bands, so they rename them back — making them interchangeable with the rest. On
+`engine="ee"`, `trend` / `sens_slope` stamp a `system:time_start` time band (in days) and fit `[time, value]`
+with `ee.Reducer.linearFit` / `sensSlope`, so the slope is per-pixel *over time* (value-units per day), while
+`percentile` uses `ee.Reducer.percentile`; on the client-side EEDAI path all three go through `reduce_time`, and
+both paths yield the same per-pixel result. The `reducer=` string is validated at construction, so a bad percentile (`"p150"`) or
 an unknown name fails before any bucket exports rather than part-way through.
 
 **Engines.** `engine=` resolves to an `Engine`, and there are four:
