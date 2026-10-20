@@ -61,5 +61,9 @@ class TestPropertyFilter:
             PropertyFilter(expression="A > 1", extra_field=1)
 
     def test_equality_is_by_value(self):
-        """Two filters with the same expression compare equal."""
-        assert PropertyFilter(expression="A > 1") == PropertyFilter(expression="A > 1")
+        """Equality tracks the expression: same compares equal, different unequal."""
+        one = PropertyFilter(expression="A > 1")
+        same = PropertyFilter(expression="A > 1")
+        different = PropertyFilter(expression="B > 2")
+        assert one == same
+        assert one != different
