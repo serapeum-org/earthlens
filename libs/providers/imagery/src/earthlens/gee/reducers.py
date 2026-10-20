@@ -891,7 +891,7 @@ def _reject_zero_percentile(reducer: Reducer, spec: object) -> None:
     Raises:
         ValueError: If `reducer` is a `Percentile` with `q` not greater than 0.
     """
-    if isinstance(reducer, Percentile) and not 0 < reducer.q:
+    if isinstance(reducer, Percentile) and reducer.q <= 0:
         raise ValueError(
             f"the percentile reducer needs 0 < q <= 100 on the temporal path, "
             f"got {spec!r}"
