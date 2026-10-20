@@ -67,6 +67,7 @@ from pyramids.dataset.merge import merge_rasters
 from tqdm import tqdm
 
 from earthlens.base import (
+    WHOLE_WINDOW,
     AbstractDataSource,
     LazyClientMixin,
     OutputKind,
@@ -75,12 +76,18 @@ from earthlens.base import (
     date_windows,
     to_datetime,
 )
+from earthlens.gee._composite import _GEE_CADENCES, CadenceBucketer, CompositeEngine
 from earthlens.gee._eedai import (
     credentials_for,  # noqa: F401 - monkeypatch seam the test suite patches
     eedai_available,  # noqa: F401 - monkeypatch seam the test suite patches
 )
+from earthlens.gee._extent import (
+    _EXTENT_DISCOVERY,
+    ExtentDiscovery,  # noqa: F401 - re-exported for the public surface
+    clear_extent_cache,  # noqa: F401 - back-compat shim imported by tests/conftest
+)
+from earthlens.gee._filters import PropertyFilter
 from earthlens.gee._helpers import (
-    _COLLECTION_REDUCERS,
     EE_MAX_DIMENSION,
     slug_asset_id,
     split_aoi_for_url,
@@ -107,17 +114,17 @@ from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
 from earthlens.gee.pixels import PixelsEngine
 from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reader import EedaiReader
-from earthlens.gee.reducers import collection_reducers, resolve_reducer
+from earthlens.gee.reducers import temporal_reducer_for
 from earthlens.gee.sinks import AssetSink, _BatchSink, resolve_sink
 from earthlens.gee.work import (
     Artifact,
     DownloadResult,
     FeatureWorkUnit,
-    RasterWorkUnit,
 )
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from geopandas import GeoDataFrame
+    from pyramids_eo.earthengine import ReadCost
 
     from earthlens.base.http import HttpClient
     from earthlens.gee.analysis.base import OperationChain, RasterOperation
@@ -131,10 +138,14 @@ __all__ = [
     "EedaiPlan",
 ]
 
-# `temporal_resolution` → pandas frequency alias for the per-bucket
-# date range. `"raw"` is special-cased (one bucket spanning the whole
-# request window).
-_RESOLUTION_FREQ: dict[str, str] = {"daily": "D", "monthly": "MS", "yearly": "YS"}
+# `temporal_resolution` → pandas frequency alias for the per-bucket date range,
+# `"raw"` excluded (it is special-cased to one whole-window bucket). Derived from
+# the `CadenceBucketer`'s `_GEE_CADENCES` rather than restated, so the backend's
+# cheap pre-catalog validation and `_check_input_dates` share the one mapping the
+# bucketer resolves against.
+_RESOLUTION_FREQ: dict[str, str] = {
+    cadence: freq for cadence, freq in _GEE_CADENCES.items() if freq != WHOLE_WINDOW
+}
 
 _DEFAULT_HTTP_TIMEOUT_S: float = 300.0
 
@@ -259,26 +270,6 @@ CloudMask = Callable[[ee.Image], ee.Image]
 #: applied after `filterDate` / `filterBounds` (see `earthlens.gee.filters`).
 CollectionFilter = Callable[[ee.ImageCollection], ee.ImageCollection]
 
-# Cache of EE-discovered temporal extents per asset id, shared across
-# all `GEE` instances in this process. `_discover_ee_extent` issues an
-# ~2-5 s `reduceColumns(minMax)` round trip per asset — far too
-# expensive to repeat for a second `GEE(...)` construction against the
-# same asset. The cache mirrors `_CATALOG_CACHE` / `_PROVIDERS_CACHE`
-# in `catalog.py`; clear it via `clear_extent_cache` (mostly for
-# tests).
-_EXTENT_CACHE: dict[str, tuple[dt.datetime | None, dt.datetime | None]] = {}
-
-
-def clear_extent_cache() -> None:
-    """Forget every cached EE-discovered temporal extent.
-
-    Mirrors `earthlens.gee.catalog.clear_catalog_cache` for the
-    `discover_extent=True` cache. Primarily useful in tests that need
-    a fresh cache between runs (or when the EE-side data was updated
-    and the in-process cache has gone stale).
-    """
-    _EXTENT_CACHE.clear()
-
 
 def _validate_pure_config(
     start: str,
@@ -369,111 +360,6 @@ def _discard_quietly(path: Path) -> None:
             logger.debug(f"Could not remove the staging file {stray}: {exc}")
 
 
-def _consume_quoted(text: str, index: int, quote: str) -> tuple[int, str | None]:
-    """Advance past one character inside a quoted literal.
-
-    Args:
-        text: The whole filter.
-        index: The character being consumed.
-        quote: The quote character that opened the literal.
-
-    Returns:
-        The next index, and the quote still in effect (`None` once it closed).
-    """
-    if text[index] != quote:
-        return index + 1, quote
-    # A doubled quote is an escaped one, not the end of the literal.
-    if text[index + 1 : index + 2] == quote:
-        return index + 2, quote
-    return index + 1, None
-
-
-def _scan_property_filter(text: str) -> tuple[int, str | None]:
-    """Walk a filter, raising on structure that would escape the reader's wrapper.
-
-    Args:
-        text: The stripped filter.
-
-    Returns:
-        The final parenthesis depth, and the quote left open (`None` when every
-        literal was closed).
-
-    Raises:
-        ValueError: It closes a parenthesis it never opened, or carries a bare
-            statement separator or SQL comment outside a literal.
-    """
-    depth = 0
-    quote: str | None = None
-    index = 0
-    while index < len(text):
-        if quote is not None:
-            index, quote = _consume_quoted(text, index, quote)
-            continue
-        char = text[index]
-        if char in "'\"":
-            quote = char
-        elif char == "(":
-            depth += 1
-        elif char == ")":
-            depth -= 1
-        elif char == ";" or text.startswith("--", index):
-            raise ValueError(
-                "property_filter must be a single expression; remove the "
-                f"statement separator or comment from {text!r}"
-            )
-        if depth < 0:
-            raise ValueError(
-                "property_filter closes a parenthesis it never opened, which "
-                f"would escape the filter it is combined with: {text!r}"
-            )
-        index += 1
-    return depth, quote
-
-
-def _validate_property_filter(property_filter: object) -> None:
-    """Reject a scene filter that would not survive being wrapped by the reader.
-
-    Upstream splices the value in as `f"{time_filter} AND ({property_filter})"`
-    without escaping, so a fragment that closes the wrapper early escapes it:
-    `1=1) OR (1=1` becomes `time AND (1=1) OR (1=1)`, and the time and space
-    clauses stop constraining anything. Counting parentheses does not catch
-    that - the totals balance - so nesting depth is tracked instead, and depth
-    must never go negative.
-
-    Quoted literals are skipped while scanning, so a `;` or `--` inside a string
-    value is allowed while a bare one is not.
-
-    This is a structural check, not a parser, and it is not a security boundary:
-    build the filter in code, never from untrusted input.
-
-    Args:
-        property_filter: The candidate filter.
-
-    Raises:
-        ValueError: It is not a string, is blank, closes a parenthesis it never
-            opened, leaves one open, has an unterminated quote, or carries a
-            bare statement separator or SQL comment.
-    """
-    if not isinstance(property_filter, str):
-        raise ValueError(
-            "property_filter must be an OGR attribute-filter string "
-            f"(e.g. 'CLOUDY_PIXEL_PERCENTAGE < 20'), got {property_filter!r}"
-        )
-    text = property_filter.strip()
-    if not text:
-        raise ValueError("property_filter must not be blank; pass None instead.")
-
-    depth, quote = _scan_property_filter(text)
-    if quote is not None:
-        raise ValueError(
-            f"property_filter has an unterminated quote: {property_filter!r}"
-        )
-    if depth:
-        raise ValueError(
-            f"property_filter leaves {depth} parenthesis/es unclosed: {property_filter!r}"
-        )
-
-
 def _declaring(reader: Any, nodata: float | int) -> Any:
     """Return an in-memory copy of `reader` that declares `nodata`.
 
@@ -521,12 +407,6 @@ def _eedai_remedy(reason: str) -> str:
         return (
             "Pass a statistical reducer (mean/median/min/max/sum), or "
             "engine='ee' to keep Earth Engine's mosaic semantics."
-        )
-    if "not in the reader's vocabulary" in reason:
-        return (
-            "Pass one of the reducers the reader knows "
-            "(mean/median/min/max/mode/sum), or engine='ee', which can express "
-            "any of them."
         )
     if "credential" in reason:
         return "Fix the service key or service account, or use engine='ee'."
@@ -681,14 +561,20 @@ class GEE(LazyClientMixin, AbstractDataSource):
             under `engine="auto"` (Earth Engine serves the request instead) and
             an error under `engine="eedai"`.
         reducer: Override the per-dataset `default_reducer` for the
-            temporal composite (`mean` / `median` / `min` / `max` /
-            `mode` / `mosaic` / `sum`, or `percentile:<q>`). `None` (the
-            default) uses each dataset's own `default_reducer`. The registry
-            also holds the region-only reducers `first` / `stdDev` /
-            `variance` / `count`, which collapse pixels inside a region rather
-            than images in a collection; naming one here is refused at
-            construction, since there is nothing for it to composite. Pass
-            those to `sample_points` instead.
+            temporal composite. One of the seven convenience names
+            (`mean` / `median` / `min` / `max` / `mode` / `mosaic` / `sum`),
+            a percentile — `percentile:<q>` or its `p<q>` shorthand
+            (`"p90"`, `"p50"`) — or `"trend"`, the per-pixel linear-fit slope.
+            A percentile and `trend` are first-class here: they run on
+            `engine="ee"` (via `ee.Reducer.percentile` / `linearFit`) and on
+            the client-side EEDAI path alike. `None` (the default) uses each
+            dataset's own `default_reducer`. The registry also holds the
+            region-only reducers `first` / `stdDev` / `variance` / `count`,
+            which collapse pixels inside a region rather than images in a
+            collection; naming one here is refused at construction, since there
+            is nothing for it to composite. Pass those to `sample_points`
+            instead. An out-of-range percentile (`"p150"`) or an unknown name
+            is also refused at construction.
         export_via: How to get pixels out — `"url"` (synchronous
             `getDownloadURL`, capped at 32768 px per axis; the default),
             `"drive"` (asynchronous `ee.batch.Export.image.toDrive`;
@@ -879,7 +765,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
             without `drive_folder` / `"gcs"` without `gcs_bucket` /
             `"asset"` without `asset_id`), a `crs_transform` that is not six
             finite terms with non-zero, unsheared pixel sizes, or a `reducer`
-            that reduces a region rather than a collection; from the parent on
+            that reduces a region rather than a collection, is an unknown name,
+            or is a malformed / out-of-range percentile; from the parent on
             a bad date range; from `_check_input_dates` on an unknown
             `temporal_resolution`; from `_api` on a missing scale or an
             oversized `"url"` request on either pull API (unless
@@ -985,8 +872,15 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # here was the reason a newly registered sink was still rejected, which
         # made the "adding a sink needs no backend edit" claim false.
         sink = resolve_sink(export_via)
-        if property_filter is not None:
-            _validate_property_filter(property_filter)
+        # Wrapped into a validated value object up front, before the ~3.3 s
+        # catalog parse below, so a malformed filter fails fast like every other
+        # config mistake. The scan that used to be a free function now lives in
+        # `PropertyFilter`, and the reader receives its `.to_ogr()` form.
+        validated_filter = (
+            PropertyFilter(expression=property_filter)
+            if property_filter is not None
+            else None
+        )
         # Both inputs are known now, so refuse now: checking after `download()`
         # meant every export in the run completed - and, with the default
         # `wait_for_export=True`, was polled to completion - before raising,
@@ -1015,18 +909,18 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
         collection_filters = _validate_filters(filters)
         pinned_transform = validate_crs_transform(crs_transform)
-        # Resolved here, not only at composite time: `reducer=` names one
-        # vocabulary now, and four of its members reduce pixels in a region
-        # rather than images in a collection. Refusing at construction keeps
-        # that distinction a config error like every other one, instead of a
-        # failure part-way through a run that has already written buckets.
-        if reducer is not None and not resolve_reducer(reducer).collection_capable:
-            raise ValueError(
-                f"reducer={reducer!r} reduces pixels in a region, not images in "
-                "a collection, so it cannot composite a time bucket; use one of "
-                f"{sorted(collection_reducers())}, 'percentile:<q>', or pass it "
-                "to sample_points(reducer=...) instead."
-            )
+        # Resolved up front, not only at composite time: validating `reducer=`
+        # here turns a region-only reducer (`first` / `stdDev` / `variance` /
+        # `count`), a malformed `percentile` / `p<q>` form, or an out-of-range
+        # percentile into a construction error like every other config mistake,
+        # rather than a failure part-way through a run that has already written
+        # buckets. `temporal_reducer_for` accepts the seven convenience names, a
+        # `percentile:<q>` spec or its `p<q>` shorthand, and `trend`, and refuses
+        # a region-only reducer with a message naming the collection vocabulary —
+        # the same resolver the Earth Engine and client-side composite paths use,
+        # so the accepted set is defined in exactly one place.
+        if reducer is not None:
+            temporal_reducer_for(reducer)
         # Validated by `resolve_engine`, not re-checked here: it owns the one
         # message that can tell "no such engine" apart from "registered but not
         # selectable yet", and a second copy of the vocabulary is what let the
@@ -1108,9 +1002,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
         self.cog = bool(cog)
         #: Resampling kernel the EEDAI reader warps with (`nearest` by default).
         self.resample = resample
-        #: OGR attribute-filter string narrowing collection scenes on the EEDAI
-        #: path (e.g. `"CLOUDY_PIXEL_PERCENTAGE < 20"`); Earth Engine ignores it.
-        self.property_filter = property_filter
+        #: Validated OGR attribute filter narrowing collection scenes on the
+        #: EEDAI path (e.g. `PropertyFilter(expression="CLOUDY_PIXEL_PERCENTAGE
+        #: < 20")`), or `None`; Earth Engine ignores it. The call sites hand the
+        #: reader its `.to_ogr()` string via `_property_filter_expression`.
+        self.property_filter: PropertyFilter | None = validated_filter
         #: The validated 6-element transform pinning the output grid, or `None`.
         self.crs_transform: tuple[float, ...] | None = pinned_transform
         #: Fill value declared on the pixel API's request, or `None`.
@@ -1563,6 +1459,51 @@ class GEE(LazyClientMixin, AbstractDataSource):
             return written
         return self._materialise(written)
 
+    def estimate_cost(self) -> ReadCost:
+        """Estimate what this request would cost the EEDAI reader to materialise.
+
+        Delegates to the pyramids-eo reader's `estimate_earthengine_cost`, which
+        queries the asset's catalog over the request window and AOI and returns a
+        `ReadCost` — its `scene_count`, `total_size_bytes`, `max_width`,
+        `max_height`, `max_band_count`, `min_pixel_size` and per-scene `scenes`.
+        The same query drives the engine-routing decision internally; this
+        surfaces it so a caller can size a request before downloading.
+
+        The AOI is handed over in `EPSG:4326` (the native CRS EEDA discovers
+        scenes in) and any `property_filter` is applied, exactly as the internal
+        collection-sizing path does. The reader binds the resolved credential
+        itself.
+
+        Returns:
+            The `ReadCost` for the single requested dataset.
+
+        Raises:
+            ValueError: If the request names more than one dataset — a
+                `ReadCost` describes one asset, and its aggregates cannot be
+                meaningfully combined across several.
+            ImportError: If `pyramids-eo` (the `[eedai]` extra) is not installed.
+            AuthenticationError: If the EEDAI credential cannot be built, or
+                another read is in flight under a different service account.
+        """
+        assert isinstance(self.vars, dict)  # GEE always uses {asset_id: [band]}
+        if len(self.vars) != 1:
+            raise ValueError(
+                "estimate_cost() sizes a single dataset, but this request names "
+                f"{len(self.vars)}: {sorted(self.vars)}. Build one GEE per asset "
+                "to estimate each."
+            )
+        asset_id = next(iter(self.vars))
+        return self._eedai_reader().estimate_cost(
+            asset_id,
+            start=self.time.start_date.strftime("%Y-%m-%d"),
+            end=self.time.end_date.strftime("%Y-%m-%d"),
+            # Lat/lon, so labelled as such: upstream reads `bbox` in `crs`, and
+            # passing the output CRS would have degrees read as projected metres.
+            bbox=self._eedai_latlon_aoi(),
+            crs=_EEDAI_NATIVE_CRS,
+            property_filter=self._property_filter_expression(),
+        )
+
     def analyze(
         self,
         ops: RasterOperation | OperationChain | Sequence[RasterOperation],
@@ -1911,30 +1852,19 @@ class GEE(LazyClientMixin, AbstractDataSource):
             (both `datetime.datetime`), which the EEDAI collection path
             re-composites client-side.
         """
-        # Resolved once per request rather than per bucket: a parameterised
-        # reducer (`percentile:90`) validates its argument at resolution time,
-        # so a typo fails before any bucket is exported.
-        reducer = resolve_reducer(self.reducer or var_info.default_reducer)
-        if self.temporal_resolution == "raw" or not var_info.is_image_collection:
-            yield RasterWorkUnit(reducer(collection), start, start, end)
-            return
-        freq = _RESOLUTION_FREQ[self.temporal_resolution]
-        bucket_starts = date_windows(start, end, freq, inclusive="left")
-        for i, bucket_start in enumerate(bucket_starts):
-            bucket_end = (
-                bucket_starts[i + 1]
-                if i + 1 < len(bucket_starts)
-                else pd.Timestamp(end)
-            )
-            window = collection.filterDate(
-                bucket_start.strftime("%Y-%m-%d"), bucket_end.strftime("%Y-%m-%d")
-            )
-            yield RasterWorkUnit(
-                reducer(window),
-                bucket_start.to_pydatetime(),
-                bucket_start.to_pydatetime(),
-                bucket_end.to_pydatetime(),
-            )
+        # The bucketing + per-bucket reduction now live in `CompositeEngine`
+        # (gee/_composite.py); this is the thin shim the epic's OOP refactor
+        # leaves behind, so the `_api` / download seam keeps consuming the same
+        # `RasterWorkUnit`s. The reducer is resolved once per request rather than
+        # per bucket: a parameterised reducer (`percentile:90`) validates its
+        # argument at resolution time, so a typo fails before any bucket exports.
+        engine = CompositeEngine(
+            reducer=temporal_reducer_for(self.reducer or var_info.default_reducer),
+            cadence=CadenceBucketer(self.temporal_resolution),
+        )
+        yield from engine.composite_ee(
+            collection, start, end, is_image_collection=var_info.is_image_collection
+        )
 
     def _api(
         self,
@@ -2475,32 +2405,33 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 if pinned is not None
                 else f"at scale={scale} m"
             )
+            # Always name the cap the request tripped: `reason` already does when
+            # the Earth Engine grid itself is over a budget, but the upper-bound
+            # estimate can trip the guard while the EE grid fits per-axis, which
+            # left `reason` empty and the cap unnamed. Falling back to the
+            # per-axis cap keeps the dimensions-and-cap contract in every case.
+            budget = reason or f"over the {EE_MAX_DIMENSION:,}-px per-axis cap"
             raise ValueError(
-                f"{var_info.id}: the requested AOI {sized} is "
-                f"{grid.cols}x{grid.rows} px on Earth Engine's grid"
-                f"{f' - {reason}' if reason else ''}. Use a coarser scale, a "
-                "smaller bbox, export_via='drive', or auto_split=True."
+                f"{var_info.id}: the requested AOI {sized} is estimated at "
+                f"{grid.cols}x{grid.rows} px on Earth Engine's grid, {budget}. "
+                "Use a coarser scale, a smaller bbox, export_via='drive', or "
+                "auto_split=True."
             )
         return self._download_one_url_tile(image, region, scale, prefix)
 
-    def _reducer_name(self, var_info: Dataset) -> str:
-        """Return the requested reducer as a name, whatever form it arrived in.
+    def _property_filter_expression(self) -> str | None:
+        """Return the validated OGR filter string the reader wants, or `None`.
 
-        `reducer=` accepts a name, a `percentile:<q>` spec or a `Reducer`
-        instance, and two places need the *name*: the guard that refuses the
-        reader a composite it would compute differently, and the reader's own
-        `reducer=` keyword, which takes a string from its own vocabulary.
-
-        Args:
-            var_info: The catalog entry, for its `default_reducer`.
+        The public attribute is a `PropertyFilter` value object (or `None`); the
+        reader and the config snapshot take the plain string, so this is the one
+        seam that unwraps it.
 
         Returns:
-            The reducer's registry name.
+            The `.to_ogr()` form, or `None` when no filter was given.
         """
-        requested = self.reducer or var_info.default_reducer
-        if isinstance(requested, str):
-            return requested.split(":", 1)[0]
-        return type(requested).name
+        return (
+            self.property_filter.to_ogr() if self.property_filter is not None else None
+        )
 
     @property
     def _engine_config(self) -> EngineConfig:
@@ -2526,7 +2457,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             scale=self.scale,
             cloud_mask=self.cloud_mask,
             filters=tuple(self.filters),
-            property_filter=self.property_filter,
+            property_filter=self._property_filter_expression(),
             region=self.region,
             discover_extent=bool(self.discover_extent),
             high_volume=bool(self.high_volume),
@@ -2768,25 +2699,25 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 f"a collection read of {var_info.id} needs a bucket date window; "
                 "_api passes one for every bucket"
             )
-        # Resolve before comparing: `reducer=` accepts a `Reducer` instance as
-        # well as a name, and an instance is never a member of a set of strings,
-        # so testing the raw value let `Mosaic()` walk straight past this guard.
-        reducer = self._reducer_name(var_info)
-        if reducer not in _COLLECTION_REDUCERS:
-            # The reader takes a name from its own vocabulary. Anything outside
-            # it - `percentile` is the first such reducer - would reach the
-            # reader verbatim and raise a `ValueError` that is deliberately not
-            # in `_reader_errors`, aborting the download after the scenes had
-            # already been fetched. Earth Engine can express all of them.
-            return EnginePlan.declined(
-                f"reducer={reducer!r} is not in the reader's vocabulary, so "
-                "Earth Engine composites this instead"
-            )
+        # Resolve to the reducer's canonical name: `reducer=` accepts a name, a
+        # `percentile:<q>` spec, the `p<q>` shorthand or a `Reducer` instance,
+        # and `temporal_reducer_for(...).name` folds all of them to one spelling
+        # (so `percentile:90`, `p90` and `Percentile(q=90)` all read as
+        # `"percentile"`, and an instance can no longer walk past this guard).
+        # Every reducer reaching here is one the client-side `reduce_stack` can
+        # express: the composite is computed here through pyramids' `reduce_time`
+        # (`_composite_collection_via_reader`), not handed to the reader's own
+        # `reducer=`, so `percentile` / `trend` / `sens_slope` are admitted like
+        # `median`. The only decline is `mosaic`, whose last-wins semantics have
+        # no client-side equivalent over a scene stack.
+        reducer = temporal_reducer_for(self.reducer or var_info.default_reducer).name
         if reducer in _EEDAI_UNSUPPORTED_REDUCERS:
             # Checked before the network call: no point discovering scenes for a
             # composite the reader cannot reproduce.
             return EnginePlan.declined(
-                f"reducer={reducer!r} does not mean the same thing client-side: Earth Engine's is last-wins, while the reader returns the first scene of the stack, so Earth Engine composites this instead"
+                f"reducer={reducer!r} does not mean the same thing client-side: "
+                "Earth Engine's is last-wins, while the reader returns the first "
+                "scene of the stack, so Earth Engine composites this instead"
             )
         # The adapter, not the raw module: it owns the lock and the identity
         # check around a reader call, which is the whole reason it exists.
@@ -2828,7 +2759,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 # output CRS here would have degrees read as projected metres
                 # and discover scenes over the wrong ground.
                 crs=_EEDAI_NATIVE_CRS,
-                property_filter=self.property_filter,
+                property_filter=self._property_filter_expression(),
             )
         except _reader_errors(self._eedai_reader().module) as exc:
             # A discovery failure is a fallback, not a crash - but it is
@@ -3383,6 +3314,80 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
         return True, ""
 
+    def _composite_collection_via_reader(
+        self,
+        reader: EedaiReader,
+        var_info: Dataset,
+        bands: list[str],
+        bbox: tuple[float, float, float, float],
+        cutline: Any,
+        scale: float,
+        bucket_start: dt.datetime | None,
+        bucket_end: dt.datetime | None,
+    ) -> PyramidsDataset:
+        """Fetch a bucket's scene stack and reduce it client-side to one `Dataset`.
+
+        The reader returns the collection's scenes over this bucket's window as a
+        pyramids `DatasetCollection`; the composite is then computed here through
+        the reducer's `reduce_stack` (pyramids `reduce_time`), **not** by handing
+        the reducer name to the reader. The reader's own `reducer=` could not
+        express a true `median` (nor a percentile or trend), so a median EEDAI
+        composite used to be wrong; reducing the stack with pyramids makes it a
+        true per-pixel median, matching Earth Engine within tolerance.
+
+        The no-nodata caveat still applies: the EEDAI driver declares no fill, so
+        a statistical reducer folds a scene's fill pixels into the result where
+        Earth Engine would have masked them (documented on the constructor and in
+        the usage guide). The reducer here is the one the gate already admitted —
+        `mosaic` is declined upstream in `_eedai_collection_fits`, because
+        last-wins has no client-side equivalent over a scene stack.
+
+        Args:
+            reader: The EEDAI adapter owning the credential and the read lock.
+            var_info: The collection's catalog entry; its `id` is the asset.
+            bands: Band ids to read.
+            bbox: The read window in the output CRS.
+            cutline: The region to clip to, or `None`.
+            scale: Output pixel size in metres, sized into the reader's grid.
+            bucket_start: Inclusive start of the bucket's date window.
+            bucket_end: Exclusive end of that window.
+
+        Returns:
+            The reduced `Dataset` for this bucket.
+
+        Raises:
+            ValueError: If the bucket window is missing — an internal contract
+                violation `_api` never produces.
+        """
+        if bucket_start is None or bucket_end is None:
+            raise ValueError(
+                f"a collection read of {var_info.id} needs a bucket window"
+            )
+        reducer = temporal_reducer_for(self.reducer or var_info.default_reducer)
+        collection_kwargs: dict[str, Any] = {
+            "start": bucket_start.strftime("%Y-%m-%d"),
+            "end": self._reader_end(bucket_end, bucket_start),
+            "bands": list(bands),
+            "window": reader.window_type(
+                bbox=bbox,
+                crs=self.crs,
+                shape=self._eedai_output_grid(bbox, scale),
+                resample=self.resample,
+            ),
+            "geometry": cutline,
+        }
+        filter_expression = self._property_filter_expression()
+        if filter_expression is not None:
+            collection_kwargs["property_filter"] = filter_expression
+        stack = reader.collection_from_earthengine(var_info.id, **collection_kwargs)
+        try:
+            return reducer.reduce_stack(stack, list(stack.time))
+        finally:
+            # The reduced dataset is materialised in memory, independent of the
+            # stack's per-scene handles, so the stack can be released now — which
+            # matters on Windows, where an open scene handle locks its file.
+            close_quietly(stack)
+
     def _export_via_eedai(
         self,
         var_info: Dataset,
@@ -3453,33 +3458,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
             raise ValueError(
                 f"the EEDAI reader cannot serve {var_info.id}: {plan.reason}"
             )
-        composite_kwargs: dict[str, Any] = {}
-        if var_info.is_image_collection:
-            if bucket_start is None or bucket_end is None:
-                raise ValueError(
-                    f"a collection read of {var_info.id} needs a bucket window"
-                )
-            # The reader composites the scenes in this window with the same
-            # reducer the Earth Engine path would use.
-            #
-            # Caveat: the reader takes each band's nodata from the scene's own
-            # dataset, and EEDAI declares none, so its statistical reducers run
-            # unmasked and fold a scene's fill pixels into the result where
-            # Earth Engine would mask them. The values agree wherever the scenes
-            # carry no fill over the AOI. There is no caller-side remedy today -
-            # the composite read takes no `nodata` argument - so closing this
-            # needs the driver (or upstream) to declare the fill. Stated in the
-            # constructor docstring and the usage guide rather than left here,
-            # since it is a user-visible difference, not an implementation note.
-            composite_kwargs = {
-                "start": bucket_start.strftime("%Y-%m-%d"),
-                "end": self._reader_end(bucket_end, bucket_start),
-                # A name, not the resolved object: the reader's `reducer=`
-                # takes one of its own vocabulary's strings.
-                "reducer": self._reducer_name(var_info),
-            }
-            if self.property_filter is not None:
-                composite_kwargs["property_filter"] = self.property_filter
         read_options: dict[str, Any] = {}
         tile_size = plan.tile_size
         if tile_size is not None:
@@ -3494,19 +3472,35 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # `try` as the write: a mosaic that fails partway would otherwise leave
         # its partial file behind.
         try:
-            dataset = reader.from_earthengine(
-                var_info.id,
-                bands=list(bands),
-                window=reader.window_type(
-                    bbox=bbox,
-                    crs=self.crs,
-                    shape=self._eedai_output_grid(bbox, scale),
-                    resample=self.resample,
-                ),
-                geometry=cutline,
-                **composite_kwargs,
-                **read_options,
-            )
+            if var_info.is_image_collection:
+                # A collection is composited client-side: the reader hands back
+                # the bucket's scene stack and pyramids' `reduce_time` collapses
+                # it, so `median` / percentile / trend are computed correctly
+                # rather than approximated by whatever the reader's own
+                # `reducer=` could express.
+                dataset = self._composite_collection_via_reader(
+                    reader,
+                    var_info,
+                    bands,
+                    bbox,
+                    cutline,
+                    scale,
+                    bucket_start,
+                    bucket_end,
+                )
+            else:
+                dataset = reader.from_earthengine(
+                    var_info.id,
+                    bands=list(bands),
+                    window=reader.window_type(
+                        bbox=bbox,
+                        crs=self.crs,
+                        shape=self._eedai_output_grid(bbox, scale),
+                        resample=self.resample,
+                    ),
+                    geometry=cutline,
+                    **read_options,
+                )
             try:
                 if self.cog:
                     dataset.cog.to_cog(str(cog_staged))
@@ -3769,9 +3763,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             When `discover_extent=True` was passed at construction
             and the catalog's `end_date` (or `start_date`) is missing,
             the gap is filled by an EE-side
-            `reduceColumns(minMax)` over `system:time_start` via
-            `_discover_ee_extent` (cached per asset for the
-            lifetime of the instance).
+            `reduceColumns(minMax)` over `system:time_start` via the
+            shared `ExtentDiscovery` singleton (cached per asset,
+            process-wide).
         """
         req_start = self.time.start_date
         req_end_excl = self.time.end_date + dt.timedelta(days=1)
@@ -3810,7 +3804,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
             ) + dt.timedelta(days=1)
             return ds_start, ds_end_excl
 
-        _, ee_end = self._maybe_discover_ee_extent(var_info)
+        # The shared `ExtentDiscovery` singleton owns the query and the
+        # per-asset cache, so a second `GEE(...)` against the same asset reuses
+        # the result rather than re-paying the 2-5 s round trip.
+        _, ee_end = _EXTENT_DISCOVERY.cached(var_info.id, enabled=self.discover_extent)
         if ee_end is not None:
             return ds_start, ee_end + dt.timedelta(days=1)
 
@@ -3820,66 +3817,3 @@ class GEE(LazyClientMixin, AbstractDataSource):
             days=1
         )
         return ds_start, ds_end_excl
-
-    def _maybe_discover_ee_extent(
-        self, var_info: Dataset
-    ) -> tuple[dt.datetime | None, dt.datetime | None]:
-        """Cached entry point for `_discover_ee_extent`.
-
-        Reads / writes `_EXTENT_CACHE` (module-level) so a
-        second `GEE(...)` instance querying the same asset doesn't
-        re-issue the 2-5 s `reduceColumns(minMax)` round trip.
-        """
-        if not self.discover_extent:
-            return None, None
-        cached = _EXTENT_CACHE.get(var_info.id)
-        if cached is not None:
-            return cached
-        discovered = self._discover_ee_extent(var_info)
-        _EXTENT_CACHE[var_info.id] = discovered
-        return discovered
-
-    def _discover_ee_extent(
-        self, var_info: Dataset
-    ) -> tuple[dt.datetime | None, dt.datetime | None]:
-        """Query a collection's actual `system:time_start` min/max via EE.
-
-        Issues one `reduceColumns(ee.Reducer.minMax(), ["system:time_start"])
-        .getInfo()` round-trip per asset (callers cache via
-        `_maybe_discover_ee_extent`). On any EE-side failure
-        (network, missing property, image-typed asset) returns
-        `(None, None)` and logs a warning — the caller falls back to
-        the catalog values or `now()`.
-
-        Args:
-            var_info: The catalog entry. Only `var_info.id` is used.
-
-        Returns:
-            `(min_dt, max_dt)` as naive UTC datetimes, or `(None,
-            None)` if the query failed or the collection has no
-            time-stamped images.
-        """
-        try:
-            collection = ee.ImageCollection(var_info.id)
-            result = (
-                collection.reduceColumns(
-                    ee.Reducer.minMax(), ["system:time_start"]
-                ).getInfo()
-                or {}
-            )
-        except Exception as exc:  # noqa: BLE001 - downgrade EE errors to a warning
-            logger.warning(
-                f"discover_extent: reduceColumns(minMax) failed for "
-                f"{var_info.id}: {type(exc).__name__}: {exc}; "
-                "falling back to catalog / now()."
-            )
-            return None, None
-
-        min_ms = result.get("min")
-        max_ms = result.get("max")
-        if min_ms is None or max_ms is None:
-            return None, None
-        return (
-            dt.datetime.fromtimestamp(min_ms / 1000.0, tz=dt.UTC).replace(tzinfo=None),
-            dt.datetime.fromtimestamp(max_ms / 1000.0, tz=dt.UTC).replace(tzinfo=None),
-        )

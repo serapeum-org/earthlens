@@ -165,14 +165,22 @@ class TestPercentile:
 
     @pytest.mark.parametrize("q", [-1, 101, 1000])
     def test_rejects_out_of_range(self, q):
-        """A percentile outside 0-100 is rejected rather than sent to Earth Engine."""
+        """A percentile outside `0 <= q <= 100` is rejected at construction."""
         with pytest.raises(ValidationError):
             Percentile(q=q)
 
-    @pytest.mark.parametrize("q", [0, 50, 100])
-    def test_accepts_the_inclusive_bounds(self, q):
-        """0 and 100 are valid percentiles."""
+    @pytest.mark.parametrize("q", [0, 0.5, 50, 100])
+    def test_accepts_the_valid_range(self, q):
+        """Zero (the minimum) through the inclusive 100 are valid at construction.
+
+        `q=0` is a legitimate region reducer (the minimum); only the temporal
+        path refuses it, so the model itself accepts it.
+        """
         assert Percentile(q=q).q == float(q)
+
+    def test_zero_is_a_valid_region_minimum(self, fake_ee_reducer):
+        """`Percentile(q=0)` builds the minimum `ee.Reducer.percentile([0])`."""
+        assert Percentile(q=0).as_ee_reducer() == "percentile-reducer-[0.0]"
 
     def test_repr_includes_the_percentile(self):
         """Two percentile reducers must not read identically."""
@@ -213,6 +221,13 @@ class TestResolveReducer:
     def test_resolves_a_fractional_percentile(self):
         """A non-integer percentile is accepted."""
         assert resolve_reducer("percentile:97.5").q == 97.5
+
+    def test_resolves_the_zero_percentile_for_a_region_sample(self, fake_ee_reducer):
+        """`percentile:0` is the minimum, a valid region reducer on this path."""
+        reducer = resolve_reducer("percentile:0")
+        assert isinstance(reducer, Percentile)
+        assert reducer.q == 0.0
+        assert reducer.as_ee_reducer() == "percentile-reducer-[0.0]"
 
     def test_passes_an_instance_through(self):
         """An already-built reducer is returned unchanged, not rebuilt."""

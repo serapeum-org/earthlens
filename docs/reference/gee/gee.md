@@ -26,6 +26,14 @@ the rendered API.
 
 ::: earthlens.gee.reducers
 
+::: earthlens.gee.segmentation
+
+::: earthlens.gee.climatology
+
+::: earthlens.gee.closest
+
+::: earthlens.gee.gapfill
+
 ::: earthlens.gee.engines
 
 ::: earthlens.gee.pixels

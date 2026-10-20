@@ -26,7 +26,7 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, ClassVar
 
-from pydantic import ConfigDict
+from pydantic import ConfigDict, PrivateAttr
 
 from earthlens.base.leaves import SummarisedLeaf
 from earthlens.base.raster import close_quietly
@@ -325,6 +325,11 @@ class DownloadResult(SummarisedLeaf):
 
     artifacts: tuple[Artifact, ...] = ()
 
+    #: The multi-bucket stack `data` opened, held so `close()` can release it.
+    #: Opened at most once (memoised) and independent of the per-bucket
+    #: `artifact.obj` handles, which `data` never re-reads for a single bucket.
+    _materialised_collection: Any = PrivateAttr(default=None)
+
     @property
     def values(self) -> list[Any]:
         """Return each artifact's payload, the pre-Epic-1 `list` return.
@@ -408,6 +413,77 @@ class DownloadResult(SummarisedLeaf):
         options.update(kwargs)
         return DatasetCollection.from_files([str(path) for path in paths], **options)
 
+    @property
+    def data(self) -> Any:
+        """Return the in-memory result as a `Dataset` or a `DatasetCollection`.
+
+        The shape Epic 4 asks for a collection request: a single bucket — a
+        single image, or a one-bucket collection — materialises to a bare
+        pyramids `Dataset`, while a multi-bucket time series materialises to a
+        `DatasetCollection`, the pyramids type for a stack, ready for
+        `reduce_time` / `groupby` / `plot` / `to_netcdf` without the caller
+        globbing the output directory back. The single-vs-stack rule is by
+        object count, which is the same thing: a non-collection request only
+        ever yields one bucket.
+
+        Only meaningful when `download(materialize=True)` produced this result;
+        the default (`materialize=False`) returns the plain list of written
+        paths, which has no `data`. A multi-object result stacks the written
+        rasters through `collection` (pyramids exposes no in-memory
+        `from_datasets`), so it, too, needs `materialize=True`.
+
+        Returns:
+            The single in-memory `Dataset` when the result holds exactly one
+            object, or a `DatasetCollection` stacking the written rasters when it
+            holds several.
+
+        Raises:
+            ValueError: If the result holds no in-memory object — a batch export
+                returns destinations and a non-materialised download returns
+                paths, so there is nothing in memory to hand back; materialise
+                the download first.
+
+        Examples:
+            - A single materialised bucket reads back as the bare object:
+                ```python
+                >>> from pathlib import Path
+                >>> from earthlens.gee.work import Artifact, DownloadResult
+                >>> result = DownloadResult(
+                ...     artifacts=(Artifact(obj="a-dataset", path=Path("x.tif")),)
+                ... )
+                >>> result.data
+                'a-dataset'
+
+                ```
+            - A result carrying no in-memory object says what to do instead:
+                ```python
+                >>> from earthlens.gee.work import Artifact, DownloadResult
+                >>> queued = DownloadResult(
+                ...     artifacts=(Artifact(destination="gs://my-bucket/srtm"),)
+                ... )
+                >>> queued.data  # doctest: +ELLIPSIS
+                Traceback (most recent call last):
+                    ...
+                ValueError: this result holds no in-memory object, ...
+
+                ```
+        """
+        objects = self.objects
+        if not objects:
+            raise ValueError(
+                "this result holds no in-memory object, so there is nothing to "
+                "return; download with materialize=True (a batch export returns "
+                "destinations, not data)."
+            )
+        if len(objects) == 1:
+            return objects[0]
+        # Open the stack once and hold it: a fresh `from_files` per access would
+        # leak a GDAL handle set `close()` never saw, locking the files on
+        # Windows. Memoising it gives `close()` the one handle to release.
+        if self._materialised_collection is None:
+            self._materialised_collection = self.collection()
+        return self._materialised_collection
+
     def close(self) -> None:
         """Close every in-memory object this result holds.
 
@@ -423,6 +499,9 @@ class DownloadResult(SummarisedLeaf):
         """
         for artifact in self.artifacts:
             close_quietly(artifact.obj)
+        # The multi-bucket stack `data` opened is a separate handle set from the
+        # per-bucket `obj`s, so it must be released here too.
+        close_quietly(self._materialised_collection)
 
     def __enter__(self) -> DownloadResult:
         """Return the result, so it can be used as a context manager.

@@ -91,6 +91,56 @@ anything a string names:
   region, not images in a collection"). `Percentile` is
   deliberately **not** in the registry — it needs a parameter — so it
   is reachable only as a spec string or an instance.
+* `TemporalReducer`, with `temporal_reducer_for` and `LinearTrend`
+  — the time-axis reducers. A `TemporalReducer` adds `apply_ee`
+  (collapse an `ee.ImageCollection` server-side, preserving band names)
+  and `reduce_stack` (collapse a pyramids `DatasetCollection` scene
+  stack client-side via `reduce_time`) on top of a `Reducer`; the seven
+  convenience names and `Percentile` are all `TemporalReducer`s.
+  `temporal_reducer_for` resolves a name, a `percentile:<q>` spec or its
+  `p<q>` shorthand, `trend`, `sens_slope`, or an instance to one.
+  `LinearTrend` (`"trend"`) is the per-pixel ordinary-least-squares
+  reducer and `SensSlope` (`"sens_slope"`) its robust Theil-Sen
+  counterpart; like `Percentile` both are reachable only through the
+  resolver, not the registry.
+* `CadenceBucketer` — turns a `temporal_resolution` (`"raw"` /
+  `"daily"` / `"monthly"` / `"yearly"`) into a pandas frequency and the
+  bucket windows that tile a request, resolving through the framework
+  `resolve_cadence` so an unknown cadence raises rather than silently
+  defaulting. `is_whole_window` is the single home of the `"raw"`
+  one-bucket special case.
+* `CompositeEngine`, over a `TemporalReducer` + a `CadenceBucketer`
+  — buckets a request window and reduces each bucket to one image,
+  yielding one `Bucket` (`buckets`) or one reduced `RasterWorkUnit`
+  (`composite_ee`) per time bucket. `GEE._composite` is a thin shim that
+  builds one and delegates, so the whole-window special case and the
+  per-bucket `filterDate` split live here, not in the backend.
+* `TemporalSegmentation`, with the `LandTrendr` and `Ccdc`
+  subclasses and the `SegmentationResult` they return — Earth
+  Engine's two flagship time-series segmentation algorithms as frozen,
+  validated configs, answering *when did it change* rather than *what
+  was the average*. `LandTrendr` carries Earth Engine's documented
+  defaults and an explicit `invert` flag for the disturbance-sign
+  convention (a vegetation index must be negated, a wetness index must
+  not); `Ccdc` takes a parameter dictionary. The array-valued output is
+  surfaced through `SegmentationResult`, with `array` / `band`
+  accessors and a `.client` hand-off, never as a plottable `Dataset`.
+* `Climatology` — the reducer *per calendar period across years*
+  (`dayofyear` / `month` / `season`), the grouping xarray's
+  `groupby("time.dayofyear")` expresses, distinct from
+  `CadenceBucketer`'s consecutive buckets. It carries an explicit
+  `baseline` of reference years and resolves its reducer through the
+  Epic-1 registry; `climatology()` returns one image per period and
+  `anomaly()` is the observed-minus-baseline companion.
+* `ClosestImage` — the collection image nearest a `target` date,
+  within an optional `tolerance`. With a tolerance set, an out-of-range
+  target yields an empty selection rather than silently returning a
+  distant scene.
+* `GapFill` — fills temporal holes in a collection *before* reduction
+  or sampling, by `linear` / `nearest` / `harmonic` interpolation over
+  a within-`max_gap` neighbour join. `max_gap` is a refusal, not a
+  hint: a pixel with no valid neighbour inside the window stays masked
+  rather than being extrapolated across a wider gap.
 * `Engine`, with `ENGINES` and `resolve_engine` —
   what materialises the pixels. `engine="auto"` routes between
   `EedaiEngine` (the pyramids-eo reader) and `EeEngine`
@@ -124,6 +174,17 @@ anything a string names:
   (dimensions, affine transform, lattice snapping, tiling).
 * `EedaiReader` — the adapter wrapping the optional pyramids-eo
   reader, owning its process-global credential hazard.
+* `PropertyFilter` — the validated OGR attribute filter behind
+  `GEE(property_filter=...)`, which narrows a collection's scenes on
+  the EEDAI path; it runs its structural scan once at construction and
+  hands the reader the checked string through `to_ogr`. The public
+  constructor argument stays a plain string.
+* `ExtentDiscovery` — owns the Earth Engine `reduceColumns(minMax)`
+  query that fills an open-ended dataset's upper bound under
+  `GEE(discover_extent=True)`, plus the per-asset cache it is kept in.
+  A module-level singleton keeps that cache process-shared, so a
+  second `GEE(...)` against the same asset does not re-pay the round
+  trip.
 
 Client-side raster analysis (`earthlens.gee.analysis`, re-exported
 here) runs *after* a download, on the in-memory pyramids `Dataset`, so
@@ -218,6 +279,9 @@ Examples:
 
 from __future__ import annotations
 
+from earthlens.gee._composite import Bucket, CadenceBucketer, CompositeEngine
+from earthlens.gee._extent import ExtentDiscovery
+from earthlens.gee._filters import PropertyFilter
 from earthlens.gee.analysis import (
     ALLOWED_FUNCTIONS,
     MEASURES,
@@ -264,6 +328,8 @@ from earthlens.gee.catalog import (
     Extent,
     Provider,
 )
+from earthlens.gee.climatology import Climatology
+from earthlens.gee.closest import ClosestImage
 from earthlens.gee.configs import EngineConfig, ExportConfig
 from earthlens.gee.engines import (
     ENGINES,
@@ -274,6 +340,7 @@ from earthlens.gee.engines import (
     resolve_engine,
 )
 from earthlens.gee.features import create_feature, create_geometry
+from earthlens.gee.gapfill import GapFill
 from earthlens.gee.grid import OutputGrid
 from earthlens.gee.io import (
     feature_collection_to_dataframe,
@@ -293,6 +360,7 @@ from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reader import EedaiReader
 from earthlens.gee.reducers import (
     REDUCERS,
+    LinearTrend,
     Max,
     Mean,
     Median,
@@ -301,8 +369,11 @@ from earthlens.gee.reducers import (
     Mosaic,
     Percentile,
     Reducer,
+    SensSlope,
     Sum,
+    TemporalReducer,
     resolve_reducer,
+    temporal_reducer_for,
 )
 from earthlens.gee.sampling import (
     PointSampler,
@@ -317,6 +388,12 @@ from earthlens.gee.sampling import (
     sample_points,
     sample_points_to_gdf,
     zonal_stats,
+)
+from earthlens.gee.segmentation import (
+    Ccdc,
+    LandTrendr,
+    SegmentationResult,
+    TemporalSegmentation,
 )
 from earthlens.gee.sinks import (
     SINKS,
@@ -401,8 +478,22 @@ __all__ = [
     "Mosaic",
     "Sum",
     "Percentile",
+    "LinearTrend",
+    "SensSlope",
+    "TemporalReducer",
     "REDUCERS",
     "resolve_reducer",
+    "temporal_reducer_for",
+    "CadenceBucketer",
+    "CompositeEngine",
+    "Bucket",
+    "TemporalSegmentation",
+    "LandTrendr",
+    "Ccdc",
+    "SegmentationResult",
+    "Climatology",
+    "ClosestImage",
+    "GapFill",
     "EnginePlan",
     "EedaiPlan",
     "OutputGrid",
@@ -423,6 +514,8 @@ __all__ = [
     "SINKS",
     "resolve_sink",
     "EedaiReader",
+    "PropertyFilter",
+    "ExtentDiscovery",
     "WorkUnit",
     "RasterWorkUnit",
     "FeatureWorkUnit",

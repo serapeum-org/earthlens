@@ -380,9 +380,77 @@ class TestClosingAMaterialisedResult:
         """Closing must never raise on an object with no `close`."""
         DownloadResult(artifacts=(Artifact(obj="not a dataset"),)).close()
 
+    def test_close_releases_the_multi_bucket_collection(self, monkeypatch):
+        """The stack `data` opened for a multi-bucket result is closed too."""
+        handle = _Handle()
+        result = DownloadResult(
+            artifacts=(
+                Artifact(path=Path("a.tif"), obj="x"),
+                Artifact(path=Path("b.tif"), obj="y"),
+            )
+        )
+        monkeypatch.setattr(type(result), "collection", lambda self, **k: handle)
+        assert result.data is handle
+        result.close()
+        assert handle.closed
+
     def test_an_unmaterialised_result_closes_cleanly(self):
         """Nothing was opened, so there is nothing to release."""
         DownloadResult(artifacts=(Artifact(path=Path("a.tif")),)).close()
+
+
+class TestDataAccessor:
+    """Task 4.5: `.data` is a `Dataset` (single) or a `DatasetCollection` (stack)."""
+
+    def _tif(self, path, value):
+        """Write a tiny constant GeoTIFF the stack accessor can read back."""
+        import numpy as np
+        from pyramids.dataset import Dataset
+        from pyramids.dataset.dataset import GeoReference
+
+        Dataset.from_array(
+            np.full((2, 2), float(value)),
+            geo_ref=GeoReference(top_left_corner=(0.0, 2.0), cell_size=1.0, epsg=4326),
+            no_data_value=-9999.0,
+            path=str(path),
+        )
+        return path
+
+    def test_a_single_object_returns_the_bare_dataset(self):
+        """A single materialised bucket hands back the object itself."""
+        handle = _Handle()
+        result = DownloadResult(artifacts=(Artifact(path=Path("a.tif"), obj=handle),))
+        assert result.data is handle
+
+    def test_a_multi_bucket_result_returns_a_dataset_collection(self, tmp_path):
+        """A stack of buckets hands back a `DatasetCollection`, one entry per bucket."""
+        from pyramids.dataset import DatasetCollection
+
+        paths = [
+            self._tif(tmp_path / f"srtm_elev_2020060{i}.tif", i) for i in (1, 2, 3)
+        ]
+        result = DownloadResult(
+            artifacts=tuple(Artifact(path=p, obj="sentinel") for p in paths)
+        )
+        data = result.data
+        assert isinstance(data, DatasetCollection)
+        assert len(data) == 3
+
+    def test_no_in_memory_object_is_refused(self):
+        """A batch export (or a non-materialised run) has nothing to return."""
+        queued = DownloadResult(artifacts=(Artifact(destination="gs://b/p"),))
+        with pytest.raises(ValueError, match="no in-memory object"):
+            queued.data
+
+    def test_the_multi_bucket_collection_is_opened_once(self, tmp_path):
+        """`data` memoises the stack, so repeated access does not re-open it."""
+        paths = [
+            self._tif(tmp_path / f"srtm_elev_2020060{i}.tif", i) for i in (1, 2, 3)
+        ]
+        result = DownloadResult(
+            artifacts=tuple(Artifact(path=p, obj="sentinel") for p in paths)
+        )
+        assert result.data is result.data
 
 
 class TestFrozenValueObjects:

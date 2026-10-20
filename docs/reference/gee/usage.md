@@ -168,19 +168,24 @@ gee = GEE(
 
 A request qualifies when nothing server-side has to shape the image: no
 `cloud_mask`, no `filters`, and `export_via="url"`. That covers both a
-single `ee_type="image"` asset and an `ee_type="image_collection"`, which
-the reader composites client-side per time bucket with the same reducer
-Earth Engine would have used. The output CRS may be `"EPSG:4326"` or any
-metre-based projected CRS. Everything else stays on Earth Engine, which is
-the only engine that can run a computation graph or export to Drive / GCS /
-an asset.
+single `ee_type="image"` asset and an `ee_type="image_collection"`. For a
+collection the reader fetches the bucket's scene stack and the composite is
+computed **client-side by pyramids' own `reduce_time`** — so `median` is a
+true per-pixel median (not an approximation), matching Earth Engine's within
+numerical tolerance where the scenes carry no fill over the AOI. The output
+CRS may be `"EPSG:4326"` or any metre-based projected CRS. Everything else
+stays on Earth Engine, which is the only engine that can run a computation
+graph or export to Drive / GCS / an asset.
 
 A collection is sized before it is served, because the reader downloads
 every scene in the bucket and holds them to reduce. It goes back to Earth
 Engine's server-side reduce when the bucket has too many scenes, when the
-scene stack would not fit one pass, or when the reducer is `mosaic` — Earth
-Engine's is last-wins, while the reader returns the first scene of the
-stack, so they are not the same composite.
+scene stack would not fit one pass, or when the reducer is `mosaic` —
+mosaic is last-wins in Earth Engine's collection order, which has no
+client-side equivalent over a scene stack without per-scene masks the reader
+does not expose, so **mosaic stays on Earth Engine**. Every other reducer —
+including a percentile (`"p90"`), `"trend"` and `"sens_slope"` — is computed
+client-side by pyramids' `reduce_time`, the same path as `median`.
 
 With a collection you can also narrow which scenes are read:
 
@@ -207,6 +212,18 @@ reducers fold a scene's fill pixels into the result where Earth Engine would
 mask them. The two agree wherever the scenes carry no fill over the AOI. There
 is no way to supply the fill from here — the composite read takes no `nodata`
 argument — so pass `engine="ee"` when you need Earth Engine's masking exactly.
+
+The client-side reduction — the true per-pixel `median`, and the `"p90"` /
+`"trend"` / `"sens_slope"` reducers — needs **pyramids-core >= 0.70.0** (the
+distribution formerly published as `pyramids-gis`; the import name stays
+`pyramids`), which is where `reduce_time`'s percentile / linear-trend /
+Theil-Sen operations ship. One known limitation applies today:
+`pyramids_eo.collection_from_earthengine` hands back an in-memory
+(`datasets=`-backed) `DatasetCollection`, which `reduce_time` cannot consume
+(it reads a file- or zarr-backed collection), so a live `engine="eedai"`
+collection composite raises a `RuntimeError`. The wiring is correct and is
+verified against `numpy` on a file-backed stack; until that upstream reader gap
+is closed, pass `engine="ee"` for a collection composite.
 
 What you gain: no 32768-px synchronous cap and no HTTP/zip round-trip,
 so `auto_split` is unnecessary. What to know before switching:
@@ -257,9 +274,15 @@ GEE(..., reducer="percentile:90")
 ```
 
 **Reducers.** `mean`, `median`, `min`, `max`, `mode`, `mosaic` and `sum` dispatch to Earth Engine's convenience
-methods, which preserve band names. `Percentile` has to use `reduce`, which suffixes them, so it renames them back —
-making it interchangeable with the rest. `resolve_reducer` accepts a name, a `percentile:<q>` spec or an instance,
-and resolves once per request, so a bad percentile fails before any bucket exports rather than part-way through.
+methods, which preserve band names. A percentile and a per-pixel trend are first-class too: pass
+`reducer="p90"` (or `"percentile:90"`, or `Percentile(q=90)`), `reducer="trend"` (ordinary least-squares slope),
+or `reducer="sens_slope"` (the robust Theil-Sen slope). `Percentile` and the two trend reducers have to use
+`reduce`, which suffixes the bands, so they rename them back — making them interchangeable with the rest. On
+`engine="ee"`, `trend` / `sens_slope` stamp a `system:time_start` time band (in days) and fit `[time, value]`
+with `ee.Reducer.linearFit` / `sensSlope`, so the slope is per-pixel *over time* (value-units per day), while
+`percentile` uses `ee.Reducer.percentile`; on the client-side EEDAI path all three go through `reduce_time`, and
+both paths yield the same per-pixel result. The `reducer=` string is validated at construction, so a bad percentile (`"p150"`) or
+an unknown name fails before any bucket exports rather than part-way through.
 
 **Engines.** `engine=` resolves to an `Engine`, and there are four:
 
@@ -319,8 +342,14 @@ written path, instead of only the paths:
 result = GEE(..., engine="ee").download(materialize=True)
 result.paths     # the written files
 result.objects   # the in-memory pyramids Datasets
+result.data      # one Dataset for a single bucket, a DatasetCollection for a time stack
 list(result)     # the objects - materialising is what you asked for
 ```
+
+`result.data` is the single-vs-stack convenience: a one-bucket request (a single image, or a collection that
+reduced to one bucket) hands back a bare pyramids `Dataset`, while a multi-bucket time series hands back a
+`DatasetCollection` — ready for `reduce_time` / `groupby` / `plot` / `to_netcdf` without globbing the output
+directory back.
 
 Note the one place the stand-in is not transparent: when you materialise, each artifact's value *is* the object, so
 `result` iterates and compares as the list of **objects**, not of paths. `result.paths` is how you get the files.

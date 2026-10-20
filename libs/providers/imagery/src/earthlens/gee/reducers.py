@@ -42,14 +42,23 @@ Resolve a name (or an already-built object) through `resolve_reducer`:
 
 from __future__ import annotations
 
+import functools
+import re
 from abc import ABC, abstractmethod
-from typing import Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
 import ee
+import pandas as pd
 from pydantic import BaseModel, ConfigDict, Field
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from collections.abc import Sequence
+
+    from pyramids.dataset import Dataset, DatasetCollection
 
 __all__ = [
     "Reducer",
+    "TemporalReducer",
     "Mean",
     "Median",
     "Min",
@@ -58,12 +67,15 @@ __all__ = [
     "Mosaic",
     "Sum",
     "Percentile",
+    "LinearTrend",
+    "SensSlope",
     "First",
     "StdDev",
     "Variance",
     "Count",
     "REDUCERS",
     "resolve_reducer",
+    "temporal_reducer_for",
     "collection_reducers",
     "sampling_reducers",
 ]
@@ -160,7 +172,66 @@ class Reducer(ABC):
         return f"{type(self).__name__}()"
 
 
-class _ConvenienceReducer(Reducer):
+class TemporalReducer(Reducer):
+    """A reducer that also knows the time axis, both server- and client-side.
+
+    The time-axis counterpart to the plain `Reducer`: besides collapsing an
+    `ee.ImageCollection` server-side (`apply_ee`), it can collapse a pyramids
+    `DatasetCollection` scene stack client-side (`reduce_stack`), which the EEDAI
+    path needs when it composites locally rather than on Earth Engine. The seven
+    band-name-preserving convenience reducers and the parameterised `Percentile`
+    / `LinearTrend` are all `TemporalReducer`s, so `temporal_reducer_for` returns
+    one for every name it understands.
+
+    `apply_ee` keeps the fast path: for the zero-arg names it delegates to
+    `reduce_collection`, which dispatches to the collection's own convenience
+    method and so preserves band names. `reduce_stack` maps the reducer onto
+    `DatasetCollection.reduce_time` over a single whole-stack window.
+    """
+
+    def apply_ee(self, collection: Any) -> Any:
+        """Collapse `collection` to one `ee.Image`, server-side.
+
+        Args:
+            collection: An `ee.ImageCollection`.
+
+        Returns:
+            The reduced `ee.Image`, with the original band names preserved.
+
+        Examples:
+            - The zero-arg names dispatch to the band-preserving convenience
+              method, here stood in for by a tiny fake collection:
+                ```python
+                >>> class _Collection:
+                ...     def median(self):
+                ...         return "median-image"
+                >>> Median().apply_ee(_Collection())
+                'median-image'
+
+                ```
+        """
+        from earthlens.gee._helpers import reduce_collection
+
+        return reduce_collection(collection, self.name)
+
+    def reduce_stack(self, stack: DatasetCollection, times: Sequence) -> Dataset:
+        """Collapse a `DatasetCollection` scene stack to one `Dataset`.
+
+        Reduces every timestep into a single whole-window `Dataset` through
+        pyramids' `DatasetCollection.reduce_time`, the client-side counterpart to
+        `apply_ee`.
+
+        Args:
+            stack: The scene stack to reduce.
+            times: One timestamp per timestep, in stack order.
+
+        Returns:
+            The reduced `Dataset`.
+        """
+        return _reduce_whole_window(stack, times, op=self.name, q=None)
+
+
+class _ConvenienceReducer(TemporalReducer):
     """A reducer backed by one of Earth Engine's zero-arg collection methods.
 
     These are the reducers Earth Engine exposes directly on `ImageCollection`
@@ -224,6 +295,26 @@ class Mosaic(_ConvenienceReducer):
     name: ClassVar[str] = "mosaic"
     ee_factory: ClassVar[str | None] = None
 
+    def reduce_stack(self, stack: DatasetCollection, times: Sequence) -> Dataset:
+        """Refuse: a last-wins mosaic has no client-side equivalent.
+
+        Earth Engine's `mosaic` keeps the latest unmasked pixel in collection
+        order, which a scene-by-scene client-side stack cannot reproduce; the
+        EEDAI path composites such a request on Earth Engine instead.
+
+        Args:
+            stack: Ignored — there is no client-side reduction to run.
+            times: Ignored, for the same reason.
+
+        Raises:
+            ValueError: Always.
+        """
+        raise ValueError(
+            "the 'mosaic' reducer is last-wins in Earth Engine's collection "
+            "order, which has no client-side equivalent over a scene stack; "
+            "composite it on Earth Engine instead"
+        )
+
 
 class Sum(_ConvenienceReducer):
     """Per-pixel sum across the collection."""
@@ -231,7 +322,7 @@ class Sum(_ConvenienceReducer):
     name: ClassVar[str] = "sum"
 
 
-class Percentile(BaseModel, Reducer):
+class Percentile(BaseModel, TemporalReducer):
     """Per-pixel percentile across the collection.
 
     The reducer the previous string-dispatch mechanism could not express: Earth
@@ -241,7 +332,11 @@ class Percentile(BaseModel, Reducer):
     interchangeable with every other reducer here.
 
     Attributes:
-        q: The percentile to compute, 0-100 inclusive.
+        q: The percentile to compute, `0 <= q <= 100`. Zero is accepted at
+            construction because it is a valid region reducer (the minimum);
+            only the temporal path refuses it (see `temporal_reducer_for`),
+            where the client-side `reduce_time(op="percentile")` rejects it, so
+            accepting it there would defer the failure to mid-run.
 
     Examples:
         - A 90th-percentile composite, which is a common cloud-robust choice:
@@ -281,6 +376,32 @@ class Percentile(BaseModel, Reducer):
         reduced = collection.reduce(ee.Reducer.percentile([self.q]))
         return reduced.rename(band_names)
 
+    def apply_ee(self, collection: Any) -> Any:
+        """Collapse `collection` to its per-pixel percentile, server-side.
+
+        The parameterised reducer `reduce_collection` cannot express (it has no
+        bare name), so it reuses this class's own `reduce`-and-rename call.
+
+        Args:
+            collection: An `ee.ImageCollection`.
+
+        Returns:
+            The reduced `ee.Image`, with the original band names restored.
+        """
+        return self(collection)
+
+    def reduce_stack(self, stack: DatasetCollection, times: Sequence) -> Dataset:
+        """Collapse a `DatasetCollection` to its per-pixel percentile `Dataset`.
+
+        Args:
+            stack: The scene stack to reduce.
+            times: One timestamp per timestep, in stack order.
+
+        Returns:
+            The reduced `Dataset`.
+        """
+        return _reduce_whole_window(stack, times, op="percentile", q=self.q)
+
     def as_ee_reducer(self) -> Any:
         """Return `ee.Reducer.percentile([q])`.
 
@@ -307,6 +428,221 @@ class Percentile(BaseModel, Reducer):
             The same text as `__repr__`.
         """
         return repr(self)
+
+
+#: The scene property Earth Engine stamps each image's acquisition time in,
+#: in milliseconds since the Unix epoch.
+_TIME_PROPERTY = "system:time_start"
+
+#: The band the temporal-slope reducers regress each value band against: the
+#: scene timestamp rescaled to days, so the fitted slope comes out in value-units
+#: per day — the same convention the client-side `reduce_time` trend uses.
+_TIME_BAND = "time"
+
+#: Milliseconds per day, the divisor turning `system:time_start` into days.
+_MILLIS_PER_DAY = 1000 * 60 * 60 * 24
+
+
+def _stamp_time_band(image: Any) -> Any:
+    """Add a day-scaled `time` band to one scene, as a slope's x-axis.
+
+    Args:
+        image: One `ee.Image` of the collection.
+
+    Returns:
+        The image with its `system:time_start` added as a `time` band, in days
+        since the epoch, so a regression against it yields a per-day slope.
+    """
+    image = ee.Image(image)
+    days = image.metadata(_TIME_PROPERTY).divide(_MILLIS_PER_DAY).rename(_TIME_BAND)
+    return image.addBands(days)
+
+
+def _to_double(image: Any) -> Any:
+    """Cast one stamped scene to double, so the slope reducer sees one type.
+
+    `ee.Reducer.linearFit()` / `sensSlope()` are two-input reducers, and Earth
+    Engine requires the two inputs to be type-homogeneous across every scene of
+    the collection. The value bands arrive in their native per-dataset types,
+    and Earth Engine infers that type from each scene's value range — so two
+    constant scenes of `1` and `5` come back as `Byte<1, 1>` and `Byte<5, 5>`,
+    which it rejects as incompatible (`Mismatched type for band ...`), quite
+    apart from the stamped double `time` band. Casting each stamped
+    `[time, value]` scene to a 64-bit float collapses every band to one common
+    floating type, so the collection is homogeneous.
+
+    Args:
+        image: One stamped `ee.Image` carrying the `time` band and value bands.
+
+    Returns:
+        The image with every band cast to a 64-bit float.
+    """
+    return ee.Image(image).toDouble()
+
+
+def _fit_band(name: Any, *, stamped: Any, reducer: Any, slope_band: str) -> Any:
+    """Fit one value band against time and return its renamed slope band.
+
+    Args:
+        name: The value band to fit, an `ee.String` server-side.
+        stamped: The collection carrying the `time` band and the value bands.
+        reducer: The two-input `ee.Reducer` fitting `[time, value]`
+            (`linearFit` or `sensSlope`).
+        slope_band: The reducer's slope output band (`scale` / `slope`).
+
+    Returns:
+        The per-pixel slope `ee.Image` for this band, renamed back to it.
+    """
+    name = ee.String(name)
+    pair = stamped.select(ee.List([_TIME_BAND]).add(name))
+    slope = pair.reduce(reducer).select([slope_band])
+    return slope.rename([name])
+
+
+def _temporal_slope_ee(collection: Any, *, reducer: Any, slope_band: str) -> Any:
+    """Fit a per-pixel temporal slope for every value band, server-side.
+
+    Stamps a `time` band on each scene, casts every stamped scene to double so
+    the two-input reducer sees one homogeneous type across the collection (see
+    `_to_double`), fits `[time, value]` per value band with `reducer`, selects
+    the slope output band and renames it back to the value band — a real trend
+    over time, in value-units per day. Without the time band,
+    `ee.Reducer.linearFit()` / `sensSlope()` would see the value bands as their
+    two inputs and regress them against each other rather than against time (and
+    raise on single-band data).
+
+    Args:
+        collection: The filtered `ee.ImageCollection` to reduce.
+        reducer: The two-input `ee.Reducer` (`linearFit` or `sensSlope`).
+        slope_band: The reducer's slope output band (`scale` / `slope`).
+
+    Returns:
+        The reduced `ee.Image` of per-pixel slopes, carrying the input bands.
+    """
+    band_names = collection.first().bandNames()
+    stamped = collection.map(_stamp_time_band).map(_to_double)
+    fit = functools.partial(
+        _fit_band, stamped=stamped, reducer=reducer, slope_band=slope_band
+    )
+    slopes = band_names.map(fit)
+    return ee.ImageCollection.fromImages(slopes).toBands().rename(band_names)
+
+
+class LinearTrend(TemporalReducer):
+    """Per-pixel linear trend across the collection, over time.
+
+    On the Earth Engine path it stamps a day-scaled `time` band on each scene
+    and fits `[time, value]` per value band with `ee.Reducer.linearFit()`,
+    selecting the `scale` (slope) output back into the value band; on the
+    client-side path it is `reduce_time(op="trend")`. Both yield the per-pixel
+    least-squares slope in value-units per day, under the input band names. Like
+    `Percentile` it is deliberately **not** in `REDUCERS` — it is reachable only
+    through `temporal_reducer_for` (as `"trend"`) or by constructing it
+    directly, so the seven-name `REDUCERS` registry / `collection_reducers()`
+    set is unchanged (`GEE(reducer=...)` itself validates through
+    `temporal_reducer_for`, which also accepts `trend` / `sens_slope` /
+    `percentile`).
+    """
+
+    name: ClassVar[str] = "trend"
+    ee_factory: ClassVar[str | None] = None
+
+    def __call__(self, collection: Any) -> Any:
+        """Reduce `collection` to its per-pixel linear trend over time.
+
+        Args:
+            collection: An `ee.ImageCollection`.
+
+        Returns:
+            The `ee.Image` of per-pixel least-squares slopes (value-units per
+            day), carrying the input band names.
+        """
+        return _temporal_slope_ee(
+            collection, reducer=ee.Reducer.linearFit(), slope_band="scale"
+        )
+
+    def apply_ee(self, collection: Any) -> Any:
+        """Collapse `collection` to its linear trend `ee.Image`, server-side.
+
+        Args:
+            collection: An `ee.ImageCollection`.
+
+        Returns:
+            The reduced `ee.Image` of per-pixel slopes (value-units per day).
+        """
+        return self(collection)
+
+    def reduce_stack(self, stack: DatasetCollection, times: Sequence) -> Dataset:
+        """Collapse a `DatasetCollection` to its per-pixel trend `Dataset`.
+
+        Args:
+            stack: The scene stack to reduce.
+            times: One timestamp per timestep; the trend's x-axis.
+
+        Returns:
+            The `Dataset` of per-pixel slopes (value-units per day).
+        """
+        return _reduce_whole_window(stack, times, op="trend", q=None)
+
+
+class SensSlope(TemporalReducer):
+    """Per-pixel Theil-Sen slope (and offset) across the collection.
+
+    The robust counterpart to `LinearTrend`: where `LinearTrend` fits the
+    ordinary least-squares line, `SensSlope` takes the median of the pairwise
+    slopes (Theil-Sen), so a few outlier scenes cannot drag the trend. On the
+    Earth Engine path it stamps a day-scaled `time` band on each scene and fits
+    `[time, value]` per value band with `ee.Reducer.sensSlope()`, selecting the
+    `slope` output back into the value band; on the client-side path it is
+    `reduce_time(op="sens_slope")`. Both yield the per-pixel Theil-Sen slope in
+    value-units per day, under the input band names. Like `LinearTrend` it is
+    deliberately **not** in `REDUCERS` — it is reachable only through
+    `temporal_reducer_for` (as `"sens_slope"`) or by constructing it directly,
+    so the seven-name `REDUCERS` registry / `collection_reducers()` set is
+    unchanged (`GEE(reducer=...)` itself validates through
+    `temporal_reducer_for`, which also accepts `trend` / `sens_slope` /
+    `percentile`).
+    """
+
+    name: ClassVar[str] = "sens_slope"
+    ee_factory: ClassVar[str | None] = None
+
+    def __call__(self, collection: Any) -> Any:
+        """Reduce `collection` to its per-pixel Theil-Sen slope over time.
+
+        Args:
+            collection: An `ee.ImageCollection`.
+
+        Returns:
+            The `ee.Image` of per-pixel Theil-Sen slopes (value-units per day),
+            carrying the input band names.
+        """
+        return _temporal_slope_ee(
+            collection, reducer=ee.Reducer.sensSlope(), slope_band="slope"
+        )
+
+    def apply_ee(self, collection: Any) -> Any:
+        """Collapse `collection` to its Theil-Sen slope `ee.Image`, server-side.
+
+        Args:
+            collection: An `ee.ImageCollection`.
+
+        Returns:
+            The reduced `ee.Image` of per-pixel slopes (value-units per day).
+        """
+        return self(collection)
+
+    def reduce_stack(self, stack: DatasetCollection, times: Sequence) -> Dataset:
+        """Collapse a `DatasetCollection` to its per-pixel Theil-Sen `Dataset`.
+
+        Args:
+            stack: The scene stack to reduce.
+            times: One timestamp per timestep; the trend's x-axis.
+
+        Returns:
+            The `Dataset` of per-pixel Theil-Sen slopes (value-units per day).
+        """
+        return _reduce_whole_window(stack, times, op="sens_slope", q=None)
 
 
 class _RegionReducer(Reducer):
@@ -525,3 +861,163 @@ def resolve_reducer(spec: str | Reducer) -> Reducer:
     if argument:
         raise ValueError(f"the {name!r} reducer takes no argument, got {spec!r}")
     return REDUCERS[name]()
+
+
+def _reduce_whole_window(
+    stack: DatasetCollection, times: Sequence, *, op: str, q: float | None
+) -> Dataset:
+    """Reduce an entire scene stack into one `Dataset` with `op`.
+
+    pyramids' `DatasetCollection.reduce_time` buckets by a pandas frequency, so
+    there is no literal "whole window" alias; a day multiple spanning the full
+    `times` range groups every timestep into one window, which is what a single
+    composite bucket reduces to.
+
+    Args:
+        stack: The scene stack to reduce.
+        times: One timestamp per timestep, in stack order.
+        op: The pyramids `reduce_time` operation (`"median"`, `"trend"`, ...).
+        q: The percentile level for `op="percentile"`, else `None`.
+
+    Returns:
+        The single reduced `Dataset`.
+    """
+    index = pd.DatetimeIndex(pd.to_datetime(list(times)))
+    span_days = int((index.max() - index.min()).days) + 1
+    reduced = stack.reduce_time(list(times), freq=f"{span_days}D", op=op, q=q)
+    return reduced[0][1]
+
+
+#: A percentile shorthand like `p90`: the registry-friendly spelling of
+#: `percentile:90` that `temporal_reducer_for` also accepts.
+_PERCENTILE_SHORTHAND = re.compile(r"^p(\d{1,3})$")
+
+#: The message both region-only refusals share, since the suggestion is the same
+#: whether the offending reducer arrived as an instance or a name.
+_NO_TIME_AXIS = (
+    "reduces pixels in a region, not images over time; use a collection reducer "
+    "or 'percentile:<q>' / 'trend' / 'sens_slope'"
+)
+
+
+def _reject_zero_percentile(reducer: Reducer, spec: object) -> None:
+    """Refuse a `q=0` percentile on the temporal path.
+
+    `Percentile(q=0)` is a valid region reducer (the minimum), so the model
+    accepts it; but the client-side `reduce_time(op="percentile")` rejects
+    `q=0`, so the temporal resolver refuses it up front rather than letting the
+    failure surface mid-composite.
+
+    Args:
+        reducer: The resolved reducer to check.
+        spec: The original spelling, named in the error message.
+
+    Raises:
+        ValueError: If `reducer` is a `Percentile` with `q` not greater than 0.
+    """
+    if isinstance(reducer, Percentile) and reducer.q <= 0:
+        raise ValueError(
+            f"the percentile reducer needs 0 < q <= 100 on the temporal path, "
+            f"got {spec!r}"
+        )
+
+
+def _temporal_reducer_from_str(spec: str) -> TemporalReducer:
+    """Resolve a string spec to a `TemporalReducer`.
+
+    The string arm of `temporal_reducer_for`: a `p<q>` shorthand becomes a
+    `Percentile`, `"trend"` a `LinearTrend`, and anything else is resolved
+    through `resolve_reducer` and accepted only if it carries a time-axis form.
+
+    Args:
+        spec: The reducer spelling (see `temporal_reducer_for`).
+
+    Returns:
+        The resolved `TemporalReducer`.
+
+    Raises:
+        ValueError: If the shorthand is out of range, or the name resolves to a
+            region-only reducer or an unknown one.
+    """
+    match = _PERCENTILE_SHORTHAND.match(spec)
+    if match is not None:
+        q = float(match.group(1))
+        if not 0 < q <= 100:
+            raise ValueError(
+                f"the percentile shorthand needs 0 < q <= 100, got {spec!r}"
+            )
+        resolved: TemporalReducer = Percentile(q=q)
+    elif spec == LinearTrend.name:
+        resolved = LinearTrend()
+    elif spec == SensSlope.name:
+        resolved = SensSlope()
+    else:
+        reducer = resolve_reducer(spec)
+        _reject_zero_percentile(reducer, spec)
+        if not isinstance(reducer, TemporalReducer):
+            raise ValueError(f"the {reducer.name!r} reducer {_NO_TIME_AXIS}")
+        resolved = reducer
+    return resolved
+
+
+def temporal_reducer_for(spec: str | Reducer) -> TemporalReducer:
+    """Resolve a name, a percentile shorthand, or an instance to a `TemporalReducer`.
+
+    The time-axis counterpart to `resolve_reducer`: it returns a
+    `TemporalReducer` for every reducer that can collapse a time bucket — the
+    seven band-name-preserving names, a `percentile:<q>` spec or its `p<q>`
+    shorthand, `trend`, and `sens_slope`. A region-only reducer has no time-axis
+    form and is refused.
+
+    Args:
+        spec: A collection reducer name (`"median"`), a percentile spec
+            (`"percentile:90"`) or its shorthand (`"p90"`), `"trend"`,
+            `"sens_slope"`, or an already-built `TemporalReducer`.
+
+    Returns:
+        The resolved `TemporalReducer`.
+
+    Raises:
+        ValueError: If the name is a region-only reducer, an unknown name, or a
+            percentile shorthand outside `0 < q <= 100`.
+        TypeError: If `spec` is neither a string nor a `Reducer`.
+
+    Examples:
+        - A bare name and the percentile shorthand:
+            ```python
+            >>> temporal_reducer_for("median").name
+            'median'
+            >>> temporal_reducer_for("p90").q
+            90.0
+
+            ```
+        - `trend` resolves to the linear-fit reducer, `sens_slope` to the
+          Theil-Sen one:
+            ```python
+            >>> temporal_reducer_for("trend").name
+            'trend'
+            >>> temporal_reducer_for("sens_slope").name
+            'sens_slope'
+
+            ```
+        - A region-only reducer has no time-axis form:
+            ```python
+            >>> temporal_reducer_for("stdDev")
+            Traceback (most recent call last):
+                ...
+            ValueError: the 'stdDev' reducer reduces pixels in a region, not images over time; use a collection reducer or 'percentile:<q>' / 'trend' / 'sens_slope'
+
+            ```
+    """
+    if isinstance(spec, TemporalReducer):
+        _reject_zero_percentile(spec, spec)
+        result: TemporalReducer = spec
+    elif isinstance(spec, Reducer):
+        raise ValueError(f"the {spec.name!r} reducer {_NO_TIME_AXIS}")
+    elif isinstance(spec, str):
+        result = _temporal_reducer_from_str(spec)
+    else:
+        raise TypeError(
+            f"reducer must be a name or a Reducer instance, got {type(spec).__name__}"
+        )
+    return result

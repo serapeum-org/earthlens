@@ -67,8 +67,27 @@ _EXPECTED_EXPORTS = {
     "Mosaic",
     "Sum",
     "Percentile",
+    # Epic 4 Tasks 4.2 - the time-axis reducers and their resolver.
+    "LinearTrend",
+    "SensSlope",
+    "TemporalReducer",
     "REDUCERS",
     "resolve_reducer",
+    "temporal_reducer_for",
+    # Epic 4 Task 4.7 - the cadence bucketer.
+    "CadenceBucketer",
+    # Epic 4 Task 4.3 - the composite engine and its bucket value object.
+    "CompositeEngine",
+    "Bucket",
+    # Epic 4 Task 4.12 - the time-series segmentation configs and their result.
+    "TemporalSegmentation",
+    "LandTrendr",
+    "Ccdc",
+    "SegmentationResult",
+    # Epic 4 Task 4.13 - climatology, nearest-date selection, and gap-filling.
+    "Climatology",
+    "ClosestImage",
+    "GapFill",
     # Epic 1 Task 1.6 - the promoted routing verdict.
     "EnginePlan",
     "EedaiPlan",
@@ -95,6 +114,10 @@ _EXPECTED_EXPORTS = {
     "resolve_sink",
     # Epic 1 Task 1.5 - the EEDAI reader adapter.
     "EedaiReader",
+    # Epic 4 Task 4.8 - the validated property-filter value object.
+    "PropertyFilter",
+    # Epic 4 Task 4.10 - the extent-discovery object and its shared cache.
+    "ExtentDiscovery",
     # Epic 1 Tasks 1.7/1.8 - the payload and return types.
     "WorkUnit",
     "RasterWorkUnit",

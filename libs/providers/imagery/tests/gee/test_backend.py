@@ -13,19 +13,23 @@ from __future__ import annotations
 import datetime as dt
 import inspect
 import math
+import tempfile
 import zipfile
 from pathlib import Path
 from types import SimpleNamespace
 
+import numpy as np
 import pandas as pd
 import pytest
 import requests
 
 from earthlens.base import SpatialExtent, TemporalExtent
+from earthlens.gee import ExtentDiscovery
 from earthlens.gee import backend as backend_module
 from earthlens.gee.backend import GEE
 from earthlens.gee.catalog import Dataset, Extent
 from earthlens.gee.cloud_masks import sentinel2_scl
+from earthlens.gee.reducers import temporal_reducer_for
 
 # -- fakes ------------------------------------------------------------------
 
@@ -527,6 +531,96 @@ def make_gee(fake_ee, tmp_path):
 # -- tests ------------------------------------------------------------------
 
 
+class _PercentileReadyCollection:
+    """A fake collection supporting the `reduce` / `first` percentile chain."""
+
+    def __init__(self, band_names=("precipitation",)):
+        self.reduced_with = None
+        self._band_names = list(band_names)
+
+    def first(self):
+        return self
+
+    def bandNames(self):  # noqa: N802 - mirrors the Earth Engine method name
+        return self._band_names
+
+    def reduce(self, reducer):
+        self.reduced_with = reducer
+        return SimpleNamespace(rename=lambda names: ("renamed", reducer, tuple(names)))
+
+
+class TestReducerStringWidening:
+    """Task 4.6: percentile / trend are first-class `reducer=` strings."""
+
+    def _chirps(self, make_gee, **overrides):
+        """A GEE over a CHIRPS collection, the reducer under test applied."""
+        params = dict(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            start="2020-06-01",
+            end="2020-06-30",
+            scale=5566.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    def test_percentile_shorthand_is_accepted_at_construction(self, make_gee):
+        """`reducer="p90"` constructs and carries the string verbatim."""
+        gee = self._chirps(make_gee, reducer="p90")
+        assert gee.reducer == "p90"
+        assert temporal_reducer_for(gee.reducer).q == 90.0
+
+    def test_trend_is_accepted_at_construction(self, make_gee):
+        """`reducer="trend"` constructs and resolves to the linear-fit reducer."""
+        gee = self._chirps(make_gee, reducer="trend")
+        assert temporal_reducer_for(gee.reducer).name == "trend"
+
+    def test_sens_slope_is_accepted_at_construction(self, make_gee):
+        """`reducer="sens_slope"` constructs and resolves to the Theil-Sen reducer."""
+        gee = self._chirps(make_gee, reducer="sens_slope")
+        assert temporal_reducer_for(gee.reducer).name == "sens_slope"
+
+    @pytest.mark.parametrize("spec", ["p0", "p150", "percentile:0"])
+    def test_out_of_range_percentile_is_refused_at_construction(self, make_gee, spec):
+        """An out-of-range `p<q>` or `percentile:0` fails fast, not mid-download.
+
+        `percentile:0` is a valid region reducer but not a valid temporal one,
+        so `GEE(reducer=...)` — which validates through the temporal resolver —
+        refuses it at construction.
+        """
+        with pytest.raises(ValueError, match="0 < q <= 100"):
+            self._chirps(make_gee, reducer=spec)
+
+    def test_an_unknown_reducer_is_refused_at_construction(self, make_gee):
+        """An unparseable name is a construction error."""
+        with pytest.raises(ValueError, match="unsupported reducer"):
+            self._chirps(make_gee, reducer="average")
+
+    def test_the_ee_path_composites_with_the_percentile_reducer(
+        self, make_gee, monkeypatch
+    ):
+        """`reducer="p90"` reaches `ee.Reducer.percentile` on the Earth Engine path."""
+        from earthlens.gee import reducers as reducers_module
+
+        monkeypatch.setattr(
+            reducers_module,
+            "ee",
+            SimpleNamespace(
+                Reducer=SimpleNamespace(percentile=lambda qs: ("percentile", tuple(qs)))
+            ),
+        )
+        gee = self._chirps(make_gee, reducer="p90", temporal_resolution="raw")
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        collection = _PercentileReadyCollection()
+        units = list(
+            gee._composite(
+                collection, var_info, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
+            )
+        )
+        assert len(units) == 1
+        assert collection.reduced_with == ("percentile", (90.0,))
+        assert units[0].image[0] == "renamed"
+
+
 class TestInit:
     """Tests for `GEE.__init__` and the captured attributes."""
 
@@ -925,12 +1019,12 @@ class TestDiscoverExtent:
     """Tests for the EE-side extent-discovery fallback (L3)."""
 
     def test_default_does_not_query_ee(self, make_gee, monkeypatch):
-        """`discover_extent=False` (the default) never calls `_discover_ee_extent`."""
+        """`discover_extent=False` (the default) never calls `ExtentDiscovery.discover`."""
         calls: list[str] = []
         monkeypatch.setattr(
-            GEE,
-            "_discover_ee_extent",
-            lambda self, var_info: calls.append(var_info.id) or (None, None),
+            ExtentDiscovery,
+            "discover",
+            lambda self, asset_id: calls.append(asset_id) or (None, None),
         )
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
@@ -951,11 +1045,11 @@ class TestDiscoverExtent:
         ee_max = dt.datetime(2025, 12, 15)
         calls: list[str] = []
 
-        def _fake_discover(self, var_info):
-            calls.append(var_info.id)
+        def _fake_discover(self, asset_id):
+            calls.append(asset_id)
             return dt.datetime(1981, 1, 1), ee_max
 
-        monkeypatch.setattr(GEE, "_discover_ee_extent", _fake_discover)
+        monkeypatch.setattr(ExtentDiscovery, "discover", _fake_discover)
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
             scale=5566.0,
@@ -973,7 +1067,7 @@ class TestDiscoverExtent:
         assert calls == ["UCSB-CHG/CHIRPS/DAILY"]
 
     def test_discover_extent_falls_back_to_now_on_failure(self, make_gee, monkeypatch):
-        """If `_discover_ee_extent` returns `(None, None)`, fall back to `now()`."""
+        """If `ExtentDiscovery.discover` returns `(None, None)`, fall back to `now()`."""
         fixed_now = dt.datetime(2026, 5, 13)
 
         class _FixedDatetime(dt.datetime):
@@ -983,9 +1077,9 @@ class TestDiscoverExtent:
 
         monkeypatch.setattr(backend_module.dt, "datetime", _FixedDatetime)
         monkeypatch.setattr(
-            GEE,
-            "_discover_ee_extent",
-            lambda self, var_info: (None, None),
+            ExtentDiscovery,
+            "discover",
+            lambda self, asset_id: (None, None),
         )
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
@@ -998,8 +1092,8 @@ class TestDiscoverExtent:
         _, end_excl = gee._clamp_window_to_extent(ds)
         assert end_excl == fixed_now + dt.timedelta(days=1)
 
-    def test_real_discover_queries_reduce_columns(self, make_gee, monkeypatch):
-        """`_discover_ee_extent` issues `reduceColumns(minMax, system:time_start)`."""
+    def test_real_discover_queries_reduce_columns(self):
+        """`ExtentDiscovery.discover` issues `reduceColumns(minMax, system:time_start)`."""
         captured: dict = {}
 
         class _FakeReducer:
@@ -1021,14 +1115,10 @@ class TestDiscoverExtent:
                 captured["properties"] = properties
                 return _FakeReducedFC()
 
-        gee = make_gee(discover_extent=True)
-        monkeypatch.setattr(
-            backend_module.ee, "ImageCollection", _FakeCollection, raising=False
+        fake_ee = SimpleNamespace(ImageCollection=_FakeCollection, Reducer=_FakeReducer)
+        min_dt, max_dt = ExtentDiscovery(ee_module=fake_ee).discover(
+            "UCSB-CHG/CHIRPS/DAILY"
         )
-        monkeypatch.setattr(backend_module.ee, "Reducer", _FakeReducer, raising=False)
-
-        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        min_dt, max_dt = gee._discover_ee_extent(ds)
         assert captured["asset"] == "UCSB-CHG/CHIRPS/DAILY"
         assert captured["reducer"] == "REDUCER:minMax"
         assert captured["properties"] == ["system:time_start"]
@@ -1039,8 +1129,8 @@ class TestDiscoverExtent:
             1750000000, tz=dt.timezone.utc
         ).replace(tzinfo=None)
 
-    def test_real_discover_swallows_ee_errors(self, make_gee, monkeypatch):
-        """Network / EE failures inside `_discover_ee_extent` return `(None, None)`."""
+    def test_real_discover_swallows_ee_errors(self):
+        """Network / EE failures inside `discover` return `(None, None)`."""
 
         class _ExplodingCollection:
             def __init__(self, asset_id):
@@ -1049,21 +1139,16 @@ class TestDiscoverExtent:
             def reduceColumns(self, reducer, properties):  # noqa: N802
                 raise RuntimeError("network down")
 
-        gee = make_gee(discover_extent=True)
-        monkeypatch.setattr(
-            backend_module.ee, "ImageCollection", _ExplodingCollection, raising=False
+        fake_ee = SimpleNamespace(
+            ImageCollection=_ExplodingCollection,
+            Reducer=SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
         )
-        monkeypatch.setattr(
-            backend_module.ee,
-            "Reducer",
-            SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
-            raising=False,
+        assert ExtentDiscovery(ee_module=fake_ee).discover("UCSB-CHG/CHIRPS/DAILY") == (
+            None,
+            None,
         )
 
-        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        assert gee._discover_ee_extent(ds) == (None, None)
-
-    def test_real_discover_returns_none_on_empty_minmax(self, make_gee, monkeypatch):
+    def test_real_discover_returns_none_on_empty_minmax(self):
         """An empty collection (no `min`/`max` keys) yields `(None, None)`."""
 
         class _EmptyReducedFC:
@@ -1077,28 +1162,68 @@ class TestDiscoverExtent:
             def reduceColumns(self, reducer, properties):  # noqa: N802
                 return _EmptyReducedFC()
 
-        gee = make_gee(discover_extent=True)
-        monkeypatch.setattr(
-            backend_module.ee, "ImageCollection", _EmptyCollection, raising=False
+        fake_ee = SimpleNamespace(
+            ImageCollection=_EmptyCollection,
+            Reducer=SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
         )
-        monkeypatch.setattr(
-            backend_module.ee,
-            "Reducer",
-            SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
-            raising=False,
+        assert ExtentDiscovery(ee_module=fake_ee).discover("UCSB-CHG/CHIRPS/DAILY") == (
+            None,
+            None,
         )
-        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        assert gee._discover_ee_extent(ds) == (None, None)
+
+    def test_cached_counts_one_query_then_reuses_it(self):
+        """`cached` queries once per asset, including a `(None, None)` result."""
+
+        class _Collection:
+            count = 0
+
+            def __init__(self, asset_id):
+                type(self).count += 1
+
+            def reduceColumns(self, reducer, properties):  # noqa: N802
+                return SimpleNamespace(getInfo=lambda: {})
+
+        fake_ee = SimpleNamespace(
+            ImageCollection=_Collection,
+            Reducer=SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
+        )
+        disc = ExtentDiscovery(ee_module=fake_ee)
+        assert disc.cached("A/B", enabled=True) == (None, None)
+        assert disc.cached("A/B", enabled=True) == (None, None)
+        assert _Collection.count == 1
+        disc.clear()
+        disc.cached("A/B", enabled=True)
+        assert _Collection.count == 2
+
+    def test_cached_disabled_never_queries(self):
+        """`cached(enabled=False)` returns `(None, None)` without a round trip."""
+
+        class _Collection:
+            count = 0
+
+            def __init__(self, asset_id):
+                type(self).count += 1
+
+            def reduceColumns(self, reducer, properties):  # noqa: N802
+                return SimpleNamespace(getInfo=lambda: {"min": 0, "max": 0})
+
+        fake_ee = SimpleNamespace(
+            ImageCollection=_Collection,
+            Reducer=SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
+        )
+        disc = ExtentDiscovery(ee_module=fake_ee)
+        assert disc.cached("A/B", enabled=False) == (None, None)
+        assert _Collection.count == 0
 
     def test_extent_cache_survives_a_none_result(self, make_gee, monkeypatch):
         """A `(None, None)` result still populates the cache (no repeat queries)."""
         calls: list[str] = []
 
-        def _fake_discover(self, var_info):
-            calls.append(var_info.id)
+        def _fake_discover(self, asset_id):
+            calls.append(asset_id)
             return None, None
 
-        monkeypatch.setattr(GEE, "_discover_ee_extent", _fake_discover)
+        monkeypatch.setattr(ExtentDiscovery, "discover", _fake_discover)
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
             scale=5566.0,
@@ -1107,8 +1232,8 @@ class TestDiscoverExtent:
             discover_extent=True,
         )
         ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        gee._maybe_discover_ee_extent(ds)
-        gee._maybe_discover_ee_extent(ds)
+        gee._clamp_window_to_extent(ds)
+        gee._clamp_window_to_extent(ds)
         assert calls == ["UCSB-CHG/CHIRPS/DAILY"]
 
     def test_extent_cache_is_shared_across_gee_instances(
@@ -1119,14 +1244,14 @@ class TestDiscoverExtent:
         """L5: a second `GEE(...)` reuses the cached extent — no extra round trip."""
         calls: list[str] = []
 
-        def _fake_discover(self, var_info):
-            calls.append(var_info.id)
+        def _fake_discover(self, asset_id):
+            calls.append(asset_id)
             return (
                 dt.datetime(2020, 1, 1),
                 dt.datetime(2024, 12, 31),
             )
 
-        monkeypatch.setattr(GEE, "_discover_ee_extent", _fake_discover)
+        monkeypatch.setattr(ExtentDiscovery, "discover", _fake_discover)
 
         gee_a = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
@@ -1136,9 +1261,9 @@ class TestDiscoverExtent:
             discover_extent=True,
         )
         ds = gee_a.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        gee_a._maybe_discover_ee_extent(ds)
+        gee_a._clamp_window_to_extent(ds)
 
-        # Fresh instance — should hit the module-level cache, not re-query EE.
+        # Fresh instance — should hit the shared singleton cache, not re-query EE.
         gee_b = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
             scale=5566.0,
@@ -1146,7 +1271,7 @@ class TestDiscoverExtent:
             end="2099-01-01",
             discover_extent=True,
         )
-        gee_b._maybe_discover_ee_extent(ds)
+        gee_b._clamp_window_to_extent(ds)
 
         assert calls == ["UCSB-CHG/CHIRPS/DAILY"], (
             f"second instance should hit the shared cache; got {calls}"
@@ -1158,11 +1283,11 @@ class TestDiscoverExtent:
 
         calls: list[str] = []
 
-        def _fake_discover(self, var_info):
-            calls.append(var_info.id)
+        def _fake_discover(self, asset_id):
+            calls.append(asset_id)
             return (None, None)
 
-        monkeypatch.setattr(GEE, "_discover_ee_extent", _fake_discover)
+        monkeypatch.setattr(ExtentDiscovery, "discover", _fake_discover)
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
             scale=5566.0,
@@ -1171,9 +1296,9 @@ class TestDiscoverExtent:
             discover_extent=True,
         )
         ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        gee._maybe_discover_ee_extent(ds)
+        gee._clamp_window_to_extent(ds)
         clear_extent_cache()
-        gee._maybe_discover_ee_extent(ds)
+        gee._clamp_window_to_extent(ds)
         assert calls == ["UCSB-CHG/CHIRPS/DAILY", "UCSB-CHG/CHIRPS/DAILY"]
 
 
@@ -1575,9 +1700,10 @@ class TestApi:
         with pytest.raises(ValueError, match=r"32,?768-px") as caught:
             gee.download(progress_bar=False)
         message = str(caught.value)
-        # The message quotes the grid Earth Engine would actually build, and
-        # names a way out rather than only refusing.
+        # The message names the estimated dimensions and the per-axis cap the
+        # request tripped, and offers a way out rather than only refusing.
         assert "148427x148427" in message
+        assert "32,768-px per-axis cap" in message
         assert "auto_split=True" in message
 
     def test_missing_scale_raises(self, make_gee):
@@ -2101,19 +2227,62 @@ def _bind_to_real_signature(name: str, asset_id: str, kwargs: dict) -> None:
         ) from exc
 
 
+def _build_fake_stack(values, times):
+    """Build a file-backed `DatasetCollection` of constant scenes carrying times.
+
+    Mirrors what `pyramids_eo.collection_from_earthengine` returns — one aligned
+    scene per timestep with the acquisition times as the time axis — but
+    file-backed, because pyramids `reduce_time` (which `reduce_stack` uses) reads
+    a file- or zarr-backed collection. Each scene is a constant 2x2 raster, so
+    the per-pixel reduction has a value the parity test can predict.
+    """
+    from pyramids.dataset import Dataset, DatasetCollection
+    from pyramids.dataset.dataset import GeoReference
+
+    geo = GeoReference(top_left_corner=(31.2, 30.0), cell_size=0.05, epsg=4326)
+    folder = tempfile.mkdtemp()
+    paths = []
+    for i, value in enumerate(values):
+        path = str(Path(folder) / f"scene{i}.tif")
+        Dataset.from_array(
+            np.full((2, 2), float(value)), geo_ref=geo, no_data_value=-9999.0, path=path
+        )
+        paths.append(path)
+    stack = DatasetCollection.from_files(paths)
+    stack.time = list(times)
+    return stack
+
+
 class _FakeReaderModule:
-    """Stand-in for `pyramids_eo.earthengine`; records `from_earthengine`."""
+    """Stand-in for `pyramids_eo.earthengine`; records the reader calls."""
 
     Window = _FakeWindow
 
     def __init__(self):
         self.calls: list[tuple[str, dict]] = []
         self.cost_calls: list[tuple[str, dict]] = []
+        self.collection_calls: list[tuple[str, dict]] = []
         self.dataset = _FakeEedaiDataset()
         # A small, servable collection by default; tests override per case.
         self.cost = SimpleNamespace(scene_count=3, min_pixel_size=5566.0)
         self.cost_error: Exception | None = None
         self.read_error: Exception | None = None
+        #: Per-scene constant values and acquisition times for the stack the
+        #: fake `collection_from_earthengine` hands back; the parity test
+        #: overrides them to a known distribution.
+        self.collection_values: list[float] = [1.0, 5.0, 9.0]
+        self.collection_times: list[str] = [
+            "2020-06-01",
+            "2020-06-02",
+            "2020-06-03",
+        ]
+
+    def collection_from_earthengine(self, asset_id, **kwargs):
+        _bind_to_real_signature("collection_from_earthengine", asset_id, kwargs)
+        self.collection_calls.append((asset_id, kwargs))
+        if self.read_error is not None:
+            raise self.read_error
+        return _build_fake_stack(self.collection_values, self.collection_times)
 
     def estimate_earthengine_cost(self, asset_id, **kwargs):
         _bind_to_real_signature("estimate_earthengine_cost", asset_id, kwargs)
@@ -2238,7 +2407,11 @@ class TestPropertyFilter:
     )
     def test_well_formed_filters_are_accepted(self, make_gee, good):
         """Legitimate expressions, including quoted separators, pass."""
-        assert make_gee(property_filter=good).property_filter == good
+        from earthlens.gee import PropertyFilter
+
+        gee = make_gee(property_filter=good)
+        assert gee.property_filter == PropertyFilter(expression=good)
+        assert gee.property_filter.to_ogr() == good
 
     def test_property_filter_warns_when_earth_engine_serves_the_request(
         self, make_gee, fake_reader, monkeypatch
@@ -2339,8 +2512,15 @@ class TestEedaiCollections:
         params.update(overrides)
         return make_gee(**params)
 
-    def test_composite_kwargs_are_forwarded_to_the_reader(self, make_gee, fake_reader):
-        """The reader is asked to composite the bucket's window with the reducer."""
+    def test_the_scene_stack_is_fetched_for_the_bucket_window(
+        self, make_gee, fake_reader
+    ):
+        """The collection read asks for the bucket's scene stack, reduced client-side.
+
+        The reducer is applied by pyramids' `reduce_time` on the returned stack,
+        not handed to the reader, so the collection call carries the window and
+        bands but no `reducer=` keyword.
+        """
         gee = self._collection_gee(make_gee)
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
@@ -2348,12 +2528,47 @@ class TestEedaiCollections:
         gee._export_via_eedai(
             var_info, ["precipitation"], 5566.0, "chirps", plan, self.START, self.END
         )
-        _asset_id, kwargs = fake_reader.calls[0]
+        assert fake_reader.calls == [], "a collection must not use from_earthengine"
+        _asset_id, kwargs = fake_reader.collection_calls[0]
         assert kwargs["start"] == "2020-06-01"
         # The reader's `end` is inclusive while this backend's bucket end is
         # exclusive, so the last covered day is what must be sent.
         assert kwargs["end"] == "2020-06-30"
-        assert kwargs["reducer"] == var_info.default_reducer
+        assert kwargs["bands"] == ["precipitation"]
+        assert "reducer" not in kwargs
+
+    def test_median_composite_equals_the_numpy_median(self, make_gee, fake_reader):
+        """An EEDAI median equals `np.nanmedian` over the scene stack.
+
+        The fix this proves: the composite is pyramids' true per-pixel median of
+        the fetched stack, not whatever the reader's own `reducer=` returned.
+        """
+        from pyramids.dataset import Dataset as _PyramidsDataset
+
+        gee = self._collection_gee(make_gee, reducer="median")
+        fake_reader.collection_values = [2.0, 4.0, 9.0, 11.0]
+        fake_reader.collection_times = [
+            "2020-06-01",
+            "2020-06-08",
+            "2020-06-15",
+            "2020-06-22",
+        ]
+        fake_reader.cost = SimpleNamespace(scene_count=4, min_pixel_size=5566.0)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert plan.can_serve, plan.reason
+        target = gee._export_via_eedai(
+            var_info,
+            ["precipitation"],
+            5566.0,
+            "chirps_med",
+            plan,
+            self.START,
+            self.END,
+        )
+        written = _PyramidsDataset.read_file(str(target))
+        expected = float(np.nanmedian(np.array([2.0, 4.0, 9.0, 11.0])))
+        assert np.asarray(written.read_array()).ravel()[0] == pytest.approx(expected)
 
     def test_single_image_read_sends_no_composite_kwargs(self, make_gee, fake_reader):
         """A static image is read directly, with no start/end/reducer."""
@@ -2509,14 +2724,14 @@ class TestEedaiCollections:
         written = gee.download(progress_bar=False)
         assert len(written) == 3, f"one file per month expected, got {written}"
         assert all(Path(p).is_file() for p in written), written
-        assert len(fake_reader.calls) == 3, (
+        assert len(fake_reader.collection_calls) == 3, (
             "each month must be composited by the reader, not by Earth Engine"
         )
         assert len(fake_reader.cost_calls) == 3, (
             "scene discovery costs one query per bucket, no more and no fewer: "
             f"{len(fake_reader.cost_calls)}"
         )
-        windows = [(k["start"], k["end"]) for _asset, k in fake_reader.calls]
+        windows = [(k["start"], k["end"]) for _asset, k in fake_reader.collection_calls]
         assert windows == [
             ("2020-06-01", "2020-06-30"),
             ("2020-07-01", "2020-07-31"),
@@ -2536,7 +2751,9 @@ class TestEedaiCollections:
         )
         written = gee.download(progress_bar=False)
         assert len(written) == 3, f"the fallback dropped buckets: {written}"
-        assert fake_reader.calls == [], "the declined reducer still reached the reader"
+        assert fake_reader.collection_calls == [], (
+            "the declined reducer still reached the reader"
+        )
 
     def test_the_region_is_reprojected_once_across_buckets(self, make_gee, fake_reader):
         """A many-bucket run must not warp the same region once per bucket.
@@ -2605,6 +2822,41 @@ class TestEedaiCollections:
         gee = self._collection_gee(make_gee, reducer="median")
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         assert gee._eedai_collection_fits(var_info, 1, self.START, self.END).can_serve
+
+    @pytest.mark.parametrize("reducer", ["percentile:90", "p90", "trend", "sens_slope"])
+    def test_epic4_reducers_reach_the_client_path(self, make_gee, fake_reader, reducer):
+        """percentile / trend / sens_slope are admitted: reduce_stack expresses them."""
+        gee = self._collection_gee(make_gee, reducer=reducer)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert plan.can_serve, plan.reason
+
+    def test_a_percentile_collection_is_composited_client_side(
+        self, make_gee, fake_reader
+    ):
+        """A percentile collection reduces through reduce_stack, not forced to EE."""
+        from pyramids.dataset import Dataset as _PyramidsDataset
+
+        gee = self._collection_gee(make_gee, reducer="p90")
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert plan.can_serve, plan.reason
+        target = gee._export_via_eedai(
+            var_info,
+            ["precipitation"],
+            5566.0,
+            "chirps_p90",
+            plan,
+            self.START,
+            self.END,
+        )
+        assert fake_reader.calls == [], (
+            "a client composite must not use from_earthengine"
+        )
+        assert fake_reader.collection_calls, "the reader must fetch the scene stack"
+        written = _PyramidsDataset.read_file(str(target))
+        expected = float(np.nanpercentile(np.array([1.0, 5.0, 9.0]), 90))
+        assert np.asarray(written.read_array()).ravel()[0] == pytest.approx(expected)
 
     def test_discovery_uses_the_regions_bounds_not_the_bbox(
         self, make_gee, fake_reader
@@ -2855,7 +3107,7 @@ class TestEedaiCollections:
         )
         _cid, cost_kwargs = fake_reader.cost_calls[0]
         assert cost_kwargs["property_filter"] == "CLOUDY_PIXEL_PERCENTAGE < 20"
-        _rid, read_kwargs = fake_reader.calls[0]
+        _rid, read_kwargs = fake_reader.collection_calls[0]
         assert read_kwargs["property_filter"] == "CLOUDY_PIXEL_PERCENTAGE < 20"
 
     def test_no_property_filter_sends_none_to_the_reader(self, make_gee, fake_reader):
@@ -2866,8 +3118,43 @@ class TestEedaiCollections:
         gee._export_via_eedai(
             var_info, ["precipitation"], 5566.0, "chirps", plan, self.START, self.END
         )
-        _rid, read_kwargs = fake_reader.calls[0]
+        _rid, read_kwargs = fake_reader.collection_calls[0]
         assert "property_filter" not in read_kwargs
+
+    def test_estimate_cost_returns_the_reader_readcost(self, make_gee, fake_reader):
+        """`estimate_cost()` surfaces the reader's `ReadCost` for the request."""
+        gee = self._collection_gee(make_gee)
+        fake_reader.cost = SimpleNamespace(
+            scene_count=12, max_width=4096, max_height=2048, min_pixel_size=5566.0
+        )
+        cost = gee.estimate_cost()
+        assert cost is fake_reader.cost
+        asset_id, kwargs = fake_reader.cost_calls[0]
+        assert asset_id == "UCSB-CHG/CHIRPS/DAILY"
+        assert (kwargs["start"], kwargs["end"]) == ("2020-06-01", "2020-06-30")
+        assert kwargs["crs"] == "EPSG:4326"
+        assert kwargs["bbox"] == (31.2, 29.9, 31.3, 30.0)
+
+    def test_estimate_cost_passes_the_property_filter(self, make_gee, fake_reader):
+        """`estimate_cost()` forwards the validated filter as its OGR string."""
+        gee = self._collection_gee(
+            make_gee, property_filter="CLOUDY_PIXEL_PERCENTAGE < 20"
+        )
+        gee.estimate_cost()
+        _asset, kwargs = fake_reader.cost_calls[0]
+        assert kwargs["property_filter"] == "CLOUDY_PIXEL_PERCENTAGE < 20"
+
+    def test_estimate_cost_rejects_a_multi_dataset_request(self, make_gee, fake_reader):
+        """A multi-dataset request cannot yield one `ReadCost`, so it is refused."""
+        gee = self._collection_gee(
+            make_gee,
+            variables={
+                "UCSB-CHG/CHIRPS/DAILY": ["precipitation"],
+                "USGS/SRTMGL1_003": ["elevation"],
+            },
+        )
+        with pytest.raises(ValueError, match="sizes a single dataset"):
+            gee.estimate_cost()
 
 
 class TestEedaiProjectedCrs:

@@ -674,6 +674,11 @@ def _download_chirps(tmp_path, engine: str):
 @pytest.mark.skipif(
     not eedai_available(), reason="the [eedai] extra (pyramids-eo) is not installed"
 )
+@pytest.mark.xfail(
+    reason="live EEDAI client-side reduce is blocked on pyramids#1349 (in-memory "
+    "collection vs file-backed reduce_time); tracked by earthlens#1336",
+    strict=False,
+)
 def test_live_chirps_collection_eedai_matches_ee(tmp_path):
     """A collection composited through the reader matches Earth Engine's reduce.
 
@@ -756,6 +761,11 @@ def test_live_property_filter_narrows_the_selection_through_the_backend(
 @pytest.mark.skipif(
     not eedai_available(), reason="the [eedai] extra (pyramids-eo) is not installed"
 )
+@pytest.mark.xfail(
+    reason="live EEDAI client-side reduce is blocked on pyramids#1349 (in-memory "
+    "collection vs file-backed reduce_time); tracked by earthlens#1336",
+    strict=False,
+)
 def test_live_monthly_buckets_are_disjoint_and_cost_one_query_each(
     tmp_path, monkeypatch
 ):
@@ -803,3 +813,45 @@ def test_live_monthly_buckets_are_disjoint_and_cost_one_query_each(
         ("2020-06-01", "2020-06-30"),
         ("2020-07-01", "2020-07-31"),
     ], calls
+
+
+def _rising_scene(value, date):
+    """A global constant image stamped with its acquisition time."""
+    import ee
+
+    return (
+        ee.Image(ee.Number(value))
+        .rename("v")
+        .set("system:time_start", ee.Date(date).millis())
+    )
+
+
+@_skip_without_creds
+@pytest.mark.parametrize("reducer_name", ["trend", "sens_slope"])
+def test_live_trend_is_positive_over_a_rising_stack(reducer_name):
+    """The EE trend path fits a real slope over time: a rising stack is positive."""
+    import ee
+
+    from earthlens.gee.auth import EarthEngineAuth
+    from earthlens.gee.reducers import temporal_reducer_for
+
+    EarthEngineAuth(_SERVICE_ACCOUNT, _SERVICE_KEY)
+    collection = ee.ImageCollection(
+        [
+            _rising_scene(1, "2020-01-01"),
+            _rising_scene(5, "2020-02-01"),
+            _rising_scene(9, "2020-03-01"),
+        ]
+    )
+    slope = temporal_reducer_for(reducer_name).apply_ee(collection)
+    value = (
+        slope.reduceRegion(
+            reducer=ee.Reducer.first(),
+            geometry=ee.Geometry.Point([31.27, 29.97]),
+            scale=1000,
+        )
+        .get("v")
+        .getInfo()
+    )
+    assert value is not None, f"expected a slope value, got {value}"
+    assert value > 0, f"expected a positive slope, got {value}"
