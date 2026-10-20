@@ -116,10 +116,12 @@ class _TrendGraph:
         self.time_source = None
         self.time_divisor = None
         self.time_band_name = None
-        self.reduce_input = None
+        self.reduce_inputs: list[list[str]] = []
+        self.fit_band_names: list[str] = []
         self.reducer = None
         self.slope_band = None
-        self.final_rename = None
+        self.toBands_prefixed: list[str] | None = None
+        self.final_rename: list[str] | None = None
 
 
 class _GraphBand:
@@ -142,6 +144,7 @@ class _GraphImage:
 
     def __init__(self, graph):
         self._graph = graph
+        self.band_name = None
 
     def metadata(self, field):  # noqa: N802 - mirrors the Earth Engine method
         self._graph.time_source = field
@@ -155,6 +158,11 @@ class _GraphImage:
         return self
 
     def rename(self, names):
+        # The per-band slope's single-band rename: record which value band this
+        # slope image ends up carrying, so `toBands` can index-prefix it and the
+        # positional rename can be checked for a count / order mismatch.
+        self.band_name = list(names)[0]
+        self._graph.fit_band_names.append(self.band_name)
         return self
 
 
@@ -176,7 +184,7 @@ class _GraphStacked:
         self._graph = graph
 
     def select(self, bands):
-        self._graph.reduce_input = list(bands)
+        self._graph.reduce_inputs.append(list(bands))
         return _GraphReducible(self._graph)
 
 
@@ -192,8 +200,9 @@ class _GraphList:
         return self
 
     def map(self, func):
-        func("VALUE")
-        return _GraphList(self._graph, ["slope-image"])
+        # Map the per-band fit over EVERY band name, as `ee.List.map` does, so
+        # the multi-band fan-out is exercised instead of one hardcoded band.
+        return _GraphList(self._graph, [func(item) for item in self._items])
 
     def __iter__(self):
         return iter(self._items)
@@ -202,14 +211,31 @@ class _GraphList:
 class _GraphComposite:
     """The collection `fromImages` builds, flattened back to the value bands."""
 
-    def __init__(self, graph):
+    def __init__(self, graph, images):
         self._graph = graph
+        self._images = list(images)
+        self._prefixed: list[str] = []
 
     def toBands(self):  # noqa: N802 - mirrors the Earth Engine method
+        # `toBands` names each single-band image `"<index>_<band>"` in list
+        # order — the contract the positional rename then relies on.
+        self._prefixed = [
+            f"{i}_{image.band_name}" for i, image in enumerate(self._images)
+        ]
+        self._graph.toBands_prefixed = list(self._prefixed)
         return self
 
     def rename(self, names):
-        self._graph.final_rename = list(names)
+        # EE's rename is positional and needs one name per band, so a fan-out
+        # that produced the wrong number of slope images blows up here rather
+        # than silently echoing the band names back (the old tautology).
+        names = list(names)
+        if len(names) != len(self._prefixed):
+            raise ValueError(
+                f"toBands produced {len(self._prefixed)} band(s) but rename got "
+                f"{len(names)} name(s)"
+            )
+        self._graph.final_rename = names
         return self
 
 
@@ -239,7 +265,7 @@ def _trend_fake_ee(graph):
         String=lambda value: value,
         List=lambda items: _GraphList(graph, items),
         ImageCollection=SimpleNamespace(
-            fromImages=lambda images: _GraphComposite(graph)
+            fromImages=lambda images: _GraphComposite(graph, images)
         ),
         Reducer=SimpleNamespace(
             linearFit=lambda: "linear-fit-reducer",
@@ -252,16 +278,21 @@ class TestTrendStampsTimeBand:
     """The EE trend path fits a slope over time, not band-against-band."""
 
     def test_linear_trend_stamps_time_and_fits_time_value(self, monkeypatch):
-        """`trend` adds a day-scaled time band and reduces `[time, value]`."""
+        """`trend` adds a day-scaled time band and fits `[time, value]` per band."""
         graph = _TrendGraph(["B4", "B3"])
         monkeypatch.setattr(reducers_module, "ee", _trend_fake_ee(graph))
         LinearTrend().apply_ee(_GraphCollection(graph))
         assert graph.time_source == "system:time_start"
         assert graph.time_divisor == 1000 * 60 * 60 * 24
         assert graph.time_band_name == "time"
-        assert graph.reduce_input == ["time", "VALUE"]
+        # The fit runs once per value band, each against the time band, in order:
+        assert graph.reduce_inputs == [["time", "B4"], ["time", "B3"]]
+        assert graph.fit_band_names == ["B4", "B3"]
         assert graph.reducer == "linear-fit-reducer"
         assert graph.slope_band == ["scale"]
+        # `toBands` yields one index-prefixed band per slope image and the
+        # positional rename (count-checked) maps them back to the value bands:
+        assert graph.toBands_prefixed == ["0_B4", "1_B3"]
         assert graph.final_rename == ["B4", "B3"]
 
     def test_sens_slope_stamps_time_and_selects_the_slope_band(self, monkeypatch):
@@ -270,10 +301,36 @@ class TestTrendStampsTimeBand:
         monkeypatch.setattr(reducers_module, "ee", _trend_fake_ee(graph))
         SensSlope().apply_ee(_GraphCollection(graph))
         assert graph.time_source == "system:time_start"
-        assert graph.reduce_input == ["time", "VALUE"]
+        assert graph.reduce_inputs == [["time", "B4"], ["time", "B3"]]
+        assert graph.fit_band_names == ["B4", "B3"]
         assert graph.reducer == "sens-slope-reducer"
         assert graph.slope_band == ["slope"]
+        assert graph.toBands_prefixed == ["0_B4", "1_B3"]
         assert graph.final_rename == ["B4", "B3"]
+
+    def test_trend_fans_out_over_every_band_of_a_wider_stack(self, monkeypatch):
+        """A three-band stack fits three slopes, kept in input order."""
+        graph = _TrendGraph(["red", "green", "blue"])
+        monkeypatch.setattr(reducers_module, "ee", _trend_fake_ee(graph))
+        LinearTrend().apply_ee(_GraphCollection(graph))
+        assert graph.fit_band_names == ["red", "green", "blue"]
+        assert len(graph.reduce_inputs) == len(graph.band_names)
+        assert graph.toBands_prefixed == ["0_red", "1_green", "2_blue"]
+        assert graph.final_rename == ["red", "green", "blue"]
+
+    def test_a_band_count_mismatch_breaks_the_positional_rename(self):
+        """A fan-out that drops a band fails the `toBands().rename()` contract.
+
+        Guards the guard: the strengthened fake models EE's positional rename,
+        so one slope image against two value bands raises rather than silently
+        echoing the names back.
+        """
+        graph = _TrendGraph(["B4", "B3"])
+        slope = _GraphImage(graph)
+        slope.band_name = "B4"
+        composite = _GraphComposite(graph, _GraphList(graph, [slope]))
+        with pytest.raises(ValueError, match="band"):
+            composite.toBands().rename(["B4", "B3"])
 
 
 class TestTemporalReducerHierarchy:
@@ -319,7 +376,7 @@ class TestApplyEe:
         graph = _TrendGraph(["B4"])
         monkeypatch.setattr(reducers_module, "ee", _trend_fake_ee(graph))
         LinearTrend().apply_ee(_GraphCollection(graph))
-        assert graph.reduce_input == ["time", "VALUE"]
+        assert graph.reduce_inputs == [["time", "B4"]]
         assert graph.reducer == "linear-fit-reducer"
         assert graph.slope_band == ["scale"]
 
@@ -328,7 +385,7 @@ class TestApplyEe:
         graph = _TrendGraph(["B4"])
         monkeypatch.setattr(reducers_module, "ee", _trend_fake_ee(graph))
         SensSlope().apply_ee(_GraphCollection(graph))
-        assert graph.reduce_input == ["time", "VALUE"]
+        assert graph.reduce_inputs == [["time", "B4"]]
         assert graph.reducer == "sens-slope-reducer"
         assert graph.slope_band == ["slope"]
 
