@@ -2433,25 +2433,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
             self.property_filter.to_ogr() if self.property_filter is not None else None
         )
 
-    def _reducer_name(self, var_info: Dataset) -> str:
-        """Return the requested reducer as a name, whatever form it arrived in.
-
-        `reducer=` accepts a name, a `percentile:<q>` spec or a `Reducer`
-        instance, and two places need the *name*: the guard that refuses the
-        reader a composite it would compute differently, and the reader's own
-        `reducer=` keyword, which takes a string from its own vocabulary.
-
-        Args:
-            var_info: The catalog entry, for its `default_reducer`.
-
-        Returns:
-            The reducer's registry name.
-        """
-        requested = self.reducer or var_info.default_reducer
-        if isinstance(requested, str):
-            return requested.split(":", 1)[0]
-        return type(requested).name
-
     @property
     def _engine_config(self) -> EngineConfig:
         """Return the engine settings as one value object, built from the live ones.

@@ -242,7 +242,7 @@ class TestRoundOneFixesStayFixed:
         assert fake_reader.cost_calls, "percentile must now reach scene discovery"
 
     def test_a_reducer_instance_still_hits_the_mosaic_guard(self, make_gee):
-        """An instance is never a member of a set of strings."""
+        """A `Mosaic()` instance is declined client-side, like the string form."""
         from earthlens.gee.reducers import Mosaic
 
         gee = make_gee(
@@ -252,31 +252,13 @@ class TestRoundOneFixesStayFixed:
             scale=5566.0,
             reducer=Mosaic(),
         )
-        assert gee._reducer_name(gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")) == (
-            "mosaic"
-        )
-
-    @pytest.mark.parametrize(
-        ("spec", "expected"),
-        [
-            ("median", "median"),
-            ("percentile:90", "percentile"),
-            (None, "mean"),
-        ],
-    )
-    def test_the_reducer_name_is_resolved_from_every_spelling(
-        self, make_gee, spec, expected
-    ):
-        """The guard and the reader-forward both need the name, not the form."""
-        gee = make_gee(
-            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
-            start="2020-06-01",
-            end="2020-06-30",
-            scale=5566.0,
-            reducer=spec,
-        )
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        assert gee._reducer_name(var_info) == expected
+        plan = gee._eedai_collection_fits(
+            var_info, 1, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
+        )
+        assert plan is not None
+        assert not plan.can_serve
+        assert "last-wins" in plan.reason
 
     def test_the_no_scenes_marker_is_one_literal(self):
         """Two copies matched by prefix would let the bucket-skip drift."""
