@@ -674,6 +674,11 @@ def _download_chirps(tmp_path, engine: str):
 @pytest.mark.skipif(
     not eedai_available(), reason="the [eedai] extra (pyramids-eo) is not installed"
 )
+@pytest.mark.xfail(
+    reason="live EEDAI client-side reduce is blocked on pyramids#1349 (in-memory "
+    "collection vs file-backed reduce_time); tracked by earthlens#1336",
+    strict=False,
+)
 def test_live_chirps_collection_eedai_matches_ee(tmp_path):
     """A collection composited through the reader matches Earth Engine's reduce.
 
@@ -755,6 +760,11 @@ def test_live_property_filter_narrows_the_selection_through_the_backend(
 @_skip_without_creds
 @pytest.mark.skipif(
     not eedai_available(), reason="the [eedai] extra (pyramids-eo) is not installed"
+)
+@pytest.mark.xfail(
+    reason="live EEDAI client-side reduce is blocked on pyramids#1349 (in-memory "
+    "collection vs file-backed reduce_time); tracked by earthlens#1336",
+    strict=False,
 )
 def test_live_monthly_buckets_are_disjoint_and_cost_one_query_each(
     tmp_path, monkeypatch
