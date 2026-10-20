@@ -2715,7 +2715,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # Checked before the network call: no point discovering scenes for a
             # composite the reader cannot reproduce.
             return EnginePlan.declined(
-                f"reducer={reducer!r} does not mean the same thing client-side: Earth Engine's is last-wins, while the reader returns the first scene of the stack, so Earth Engine composites this instead"
+                f"reducer={reducer!r} does not mean the same thing client-side: "
+                "Earth Engine's is last-wins, while the reader returns the first "
+                "scene of the stack, so Earth Engine composites this instead"
             )
         # The adapter, not the raw module: it owns the lock and the identity
         # check around a reader call, which is the whole reason it exists.
