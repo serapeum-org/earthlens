@@ -116,6 +116,7 @@ class _TrendGraph:
         self.time_source = None
         self.time_divisor = None
         self.time_band_name = None
+        self.cast_to_double = False
         self.reduce_inputs: list[list[str]] = []
         self.fit_band_names: list[str] = []
         self.reducer = None
@@ -153,6 +154,13 @@ class _GraphImage:
     def addBands(self, band):  # noqa: N802 - mirrors the Earth Engine method
         return self
 
+    def toDouble(self):  # noqa: N802 - mirrors the Earth Engine method
+        # Record that the stamped scene was cast to a common floating type, so a
+        # future removal of the homogeneity cast fails this non-e2e test rather
+        # than only the live lane.
+        self._graph.cast_to_double = True
+        return self
+
     def select(self, bands):
         self._graph.slope_band = list(bands)
         return self
@@ -182,6 +190,12 @@ class _GraphStacked:
 
     def __init__(self, graph):
         self._graph = graph
+
+    def map(self, func):
+        # The second map in the trend path casts every stamped scene to double;
+        # drive it over one scene so `_to_double` runs and records the cast.
+        func(_GraphImage(self._graph))
+        return self
 
     def select(self, bands):
         self._graph.reduce_inputs.append(list(bands))
@@ -285,6 +299,9 @@ class TestTrendStampsTimeBand:
         assert graph.time_source == "system:time_start"
         assert graph.time_divisor == 1000 * 60 * 60 * 24
         assert graph.time_band_name == "time"
+        # Every stamped scene is cast to a common floating type, so Earth Engine
+        # sees a homogeneous collection rather than per-value byte types:
+        assert graph.cast_to_double is True
         # The fit runs once per value band, each against the time band, in order:
         assert graph.reduce_inputs == [["time", "B4"], ["time", "B3"]]
         assert graph.fit_band_names == ["B4", "B3"]
@@ -301,6 +318,7 @@ class TestTrendStampsTimeBand:
         monkeypatch.setattr(reducers_module, "ee", _trend_fake_ee(graph))
         SensSlope().apply_ee(_GraphCollection(graph))
         assert graph.time_source == "system:time_start"
+        assert graph.cast_to_double is True
         assert graph.reduce_inputs == [["time", "B4"], ["time", "B3"]]
         assert graph.fit_band_names == ["B4", "B3"]
         assert graph.reducer == "sens-slope-reducer"

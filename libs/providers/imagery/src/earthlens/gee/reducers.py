@@ -458,6 +458,28 @@ def _stamp_time_band(image: Any) -> Any:
     return image.addBands(days)
 
 
+def _to_double(image: Any) -> Any:
+    """Cast one stamped scene to double, so the slope reducer sees one type.
+
+    `ee.Reducer.linearFit()` / `sensSlope()` are two-input reducers, and Earth
+    Engine requires the two inputs to be type-homogeneous across every scene of
+    the collection. The value bands arrive in their native per-dataset types,
+    and Earth Engine infers that type from each scene's value range — so two
+    constant scenes of `1` and `5` come back as `Byte<1, 1>` and `Byte<5, 5>`,
+    which it rejects as incompatible (`Mismatched type for band ...`), quite
+    apart from the stamped double `time` band. Casting each stamped
+    `[time, value]` scene to a 64-bit float collapses every band to one common
+    floating type, so the collection is homogeneous.
+
+    Args:
+        image: One stamped `ee.Image` carrying the `time` band and value bands.
+
+    Returns:
+        The image with every band cast to a 64-bit float.
+    """
+    return ee.Image(image).toDouble()
+
+
 def _fit_band(name: Any, *, stamped: Any, reducer: Any, slope_band: str) -> Any:
     """Fit one value band against time and return its renamed slope band.
 
@@ -480,12 +502,14 @@ def _fit_band(name: Any, *, stamped: Any, reducer: Any, slope_band: str) -> Any:
 def _temporal_slope_ee(collection: Any, *, reducer: Any, slope_band: str) -> Any:
     """Fit a per-pixel temporal slope for every value band, server-side.
 
-    Stamps a `time` band on each scene, fits `[time, value]` per value band with
-    `reducer`, selects the slope output band and renames it back to the value
-    band — a real trend over time, in value-units per day. Without the time
-    band, `ee.Reducer.linearFit()` / `sensSlope()` would see the value bands as
-    their two inputs and regress them against each other rather than against
-    time (and raise on single-band data).
+    Stamps a `time` band on each scene, casts every stamped scene to double so
+    the two-input reducer sees one homogeneous type across the collection (see
+    `_to_double`), fits `[time, value]` per value band with `reducer`, selects
+    the slope output band and renames it back to the value band — a real trend
+    over time, in value-units per day. Without the time band,
+    `ee.Reducer.linearFit()` / `sensSlope()` would see the value bands as their
+    two inputs and regress them against each other rather than against time (and
+    raise on single-band data).
 
     Args:
         collection: The filtered `ee.ImageCollection` to reduce.
@@ -496,7 +520,7 @@ def _temporal_slope_ee(collection: Any, *, reducer: Any, slope_band: str) -> Any
         The reduced `ee.Image` of per-pixel slopes, carrying the input bands.
     """
     band_names = collection.first().bandNames()
-    stamped = collection.map(_stamp_time_band)
+    stamped = collection.map(_stamp_time_band).map(_to_double)
     fit = functools.partial(
         _fit_band, stamped=stamped, reducer=reducer, slope_band=slope_band
     )
