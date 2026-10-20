@@ -514,8 +514,10 @@ class LinearTrend(TemporalReducer):
     least-squares slope in value-units per day, under the input band names. Like
     `Percentile` it is deliberately **not** in `REDUCERS` — it is reachable only
     through `temporal_reducer_for` (as `"trend"`) or by constructing it
-    directly, so the seven-name collection vocabulary `GEE(reducer=...)`
-    validates against is unchanged.
+    directly, so the seven-name `REDUCERS` registry / `collection_reducers()`
+    set is unchanged (`GEE(reducer=...)` itself validates through
+    `temporal_reducer_for`, which also accepts `trend` / `sens_slope` /
+    `percentile`).
     """
 
     name: ClassVar[str] = "trend"
@@ -572,8 +574,10 @@ class SensSlope(TemporalReducer):
     value-units per day, under the input band names. Like `LinearTrend` it is
     deliberately **not** in `REDUCERS` — it is reachable only through
     `temporal_reducer_for` (as `"sens_slope"`) or by constructing it directly,
-    so the seven-name collection vocabulary `GEE(reducer=...)` validates against
-    is unchanged.
+    so the seven-name `REDUCERS` registry / `collection_reducers()` set is
+    unchanged (`GEE(reducer=...)` itself validates through
+    `temporal_reducer_for`, which also accepts `trend` / `sens_slope` /
+    `percentile`).
     """
 
     name: ClassVar[str] = "sens_slope"
