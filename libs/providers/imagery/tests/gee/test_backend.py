@@ -579,9 +579,14 @@ class TestReducerStringWidening:
         gee = self._chirps(make_gee, reducer="sens_slope")
         assert temporal_reducer_for(gee.reducer).name == "sens_slope"
 
-    @pytest.mark.parametrize("spec", ["p0", "p150"])
+    @pytest.mark.parametrize("spec", ["p0", "p150", "percentile:0"])
     def test_out_of_range_percentile_is_refused_at_construction(self, make_gee, spec):
-        """An out-of-range `p<q>` fails fast, not mid-download."""
+        """An out-of-range `p<q>` or `percentile:0` fails fast, not mid-download.
+
+        `percentile:0` is a valid region reducer but not a valid temporal one,
+        so `GEE(reducer=...)` — which validates through the temporal resolver —
+        refuses it at construction.
+        """
         with pytest.raises(ValueError, match="0 < q <= 100"):
             self._chirps(make_gee, reducer=spec)
 

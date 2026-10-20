@@ -332,9 +332,11 @@ class Percentile(BaseModel, TemporalReducer):
     interchangeable with every other reducer here.
 
     Attributes:
-        q: The percentile to compute, `0 < q <= 100`. Zero is refused at
-            construction because the client-side `reduce_time(op="percentile")`
-            path rejects it, so accepting it would defer the failure to mid-run.
+        q: The percentile to compute, `0 <= q <= 100`. Zero is accepted at
+            construction because it is a valid region reducer (the minimum);
+            only the temporal path refuses it (see `temporal_reducer_for`),
+            where the client-side `reduce_time(op="percentile")` rejects it, so
+            accepting it there would defer the failure to mid-run.
 
     Examples:
         - A 90th-percentile composite, which is a common cloud-robust choice:
@@ -359,7 +361,7 @@ class Percentile(BaseModel, TemporalReducer):
     name: ClassVar[str] = "percentile"
     ee_factory: ClassVar[str | None] = "percentile"
 
-    q: float = Field(gt=0, le=100)
+    q: float = Field(ge=0, le=100)
 
     def __call__(self, collection: Any) -> Any:
         """Reduce `collection` to its per-pixel `q`-th percentile.
@@ -870,6 +872,28 @@ _NO_TIME_AXIS = (
 )
 
 
+def _reject_zero_percentile(reducer: Reducer, spec: object) -> None:
+    """Refuse a `q=0` percentile on the temporal path.
+
+    `Percentile(q=0)` is a valid region reducer (the minimum), so the model
+    accepts it; but the client-side `reduce_time(op="percentile")` rejects
+    `q=0`, so the temporal resolver refuses it up front rather than letting the
+    failure surface mid-composite.
+
+    Args:
+        reducer: The resolved reducer to check.
+        spec: The original spelling, named in the error message.
+
+    Raises:
+        ValueError: If `reducer` is a `Percentile` with `q` not greater than 0.
+    """
+    if isinstance(reducer, Percentile) and not 0 < reducer.q:
+        raise ValueError(
+            f"the percentile reducer needs 0 < q <= 100 on the temporal path, "
+            f"got {spec!r}"
+        )
+
+
 def _temporal_reducer_from_str(spec: str) -> TemporalReducer:
     """Resolve a string spec to a `TemporalReducer`.
 
@@ -901,6 +925,7 @@ def _temporal_reducer_from_str(spec: str) -> TemporalReducer:
         resolved = SensSlope()
     else:
         reducer = resolve_reducer(spec)
+        _reject_zero_percentile(reducer, spec)
         if not isinstance(reducer, TemporalReducer):
             raise ValueError(f"the {reducer.name!r} reducer {_NO_TIME_AXIS}")
         resolved = reducer
@@ -957,6 +982,7 @@ def temporal_reducer_for(spec: str | Reducer) -> TemporalReducer:
             ```
     """
     if isinstance(spec, TemporalReducer):
+        _reject_zero_percentile(spec, spec)
         result: TemporalReducer = spec
     elif isinstance(spec, Reducer):
         raise ValueError(f"the {spec.name!r} reducer {_NO_TIME_AXIS}")

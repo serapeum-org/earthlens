@@ -444,23 +444,33 @@ class TestTemporalReducerFor:
 
 
 class TestPercentileRange:
-    """`Percentile` enforces `0 < q <= 100` at construction, every spelling."""
+    """`Percentile` enforces `0 <= q <= 100`; the temporal path adds `0 < q`."""
 
-    @pytest.mark.parametrize("q", [0, 150])
+    @pytest.mark.parametrize("q", [-1, 150])
     def test_out_of_range_is_refused_at_construction(self, q):
-        """Both `q=0` and `q>100` raise a `ValidationError`."""
+        """A negative percentile and `q>100` raise a `ValidationError`.
+
+        `q=0` is accepted at construction — it is the valid region minimum; the
+        temporal resolver is what refuses it (see `TestTemporalReducerFor`).
+        """
         from pydantic import ValidationError
 
         with pytest.raises(ValidationError):
             Percentile(q=q)
 
-    @pytest.mark.parametrize("spec", ["percentile:0", "percentile:150"])
+    @pytest.mark.parametrize("spec", ["percentile:-1", "percentile:150"])
     def test_resolve_reducer_rejects_out_of_range_spec(self, spec):
-        """`resolve_reducer` rejects the same values the shorthand does."""
+        """`resolve_reducer` rejects below-zero and above-100, but allows `q=0`."""
         from earthlens.gee.reducers import resolve_reducer
 
         with pytest.raises(ValueError):
             resolve_reducer(spec)
+
+    def test_resolve_reducer_allows_the_zero_percentile(self):
+        """`resolve_reducer` keeps `percentile:0` — the region minimum."""
+        from earthlens.gee.reducers import resolve_reducer
+
+        assert resolve_reducer("percentile:0").q == 0.0
 
     def test_rejects_region_only_name(self):
         """A region-only name has no time-axis form."""
