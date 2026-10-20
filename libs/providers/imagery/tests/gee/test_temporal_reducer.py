@@ -329,8 +329,9 @@ class TestTrendStampsTimeBand:
         slope = _GraphImage(graph)
         slope.band_name = "B4"
         composite = _GraphComposite(graph, _GraphList(graph, [slope]))
+        bands = composite.toBands()
         with pytest.raises(ValueError, match="band"):
-            composite.toBands().rename(["B4", "B3"])
+            bands.rename(["B4", "B3"])
 
 
 class TestTemporalReducerHierarchy:
@@ -447,8 +448,9 @@ class TestReduceStack:
     def test_mosaic_has_no_client_side_form(self, tmp_path):
         """`mosaic` refuses a client-side stack reduction."""
         stack = _stack(tmp_path, [1.0, 5.0])
+        mosaic = Mosaic()
         with pytest.raises(ValueError, match="last-wins"):
-            Mosaic().reduce_stack(stack, ["2020-01-01", "2020-02-01"])
+            mosaic.reduce_stack(stack, ["2020-01-01", "2020-02-01"])
 
 
 class TestTemporalReducerFor:
@@ -538,8 +540,9 @@ class TestPercentileRange:
         """A region-only instance is refused with the same reason."""
         from earthlens.gee.reducers import First
 
+        reducer = First()
         with pytest.raises(ValueError, match="region"):
-            temporal_reducer_for(First())
+            temporal_reducer_for(reducer)
 
     def test_rejects_unknown_name(self):
         """An unknown name raises through `resolve_reducer`."""

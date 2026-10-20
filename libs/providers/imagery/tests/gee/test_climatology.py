@@ -213,14 +213,18 @@ class TestAnomaly:
     def test_an_out_of_range_month_is_refused(self, fake_ee):
         """A month outside 1-12 fails loudly, not silently."""
         clim = Climatology(period="month", baseline=(1991, 2020))
+        observed = _FakeCollection([])
+        baseline = _FakeCollection([])
         with pytest.raises(ValueError, match="valid month"):
-            clim.anomaly(_FakeCollection([]), _FakeCollection([]), 13)
+            clim.anomaly(observed, baseline, 13)
 
     def test_an_unknown_season_is_refused(self, fake_ee):
         """A season name outside the four is refused."""
         clim = Climatology(period="season", baseline=(1991, 2020))
+        observed = _FakeCollection([])
+        baseline = _FakeCollection([])
         with pytest.raises(ValueError, match="not a season"):
-            clim.anomaly(_FakeCollection([]), _FakeCollection([]), "SUMMER")
+            clim.anomaly(observed, baseline, "SUMMER")
 
     def test_a_valid_season_anomaly_runs(self, fake_ee):
         """A season anomaly validates and reduces both sides."""

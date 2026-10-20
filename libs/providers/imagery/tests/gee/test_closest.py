@@ -107,13 +107,17 @@ class TestConfig:
 
     def test_a_zero_tolerance_is_refused(self):
         """A zero-width window would exclude every scene."""
+        target = dt.date(2024, 6, 1)
+        tolerance = dt.timedelta(0)
         with pytest.raises(ValidationError):
-            ClosestImage(target=dt.date(2024, 6, 1), tolerance=dt.timedelta(0))
+            ClosestImage(target=target, tolerance=tolerance)
 
     def test_a_negative_tolerance_is_refused(self):
         """A negative window is meaningless."""
+        target = dt.date(2024, 6, 1)
+        tolerance = dt.timedelta(days=-1)
         with pytest.raises(ValidationError):
-            ClosestImage(target=dt.date(2024, 6, 1), tolerance=dt.timedelta(days=-1))
+            ClosestImage(target=target, tolerance=tolerance)
 
     def test_the_target_converts_to_epoch_millis(self):
         """The target stamps on the same scale as `system:time_start`."""
@@ -121,8 +125,10 @@ class TestConfig:
 
     def test_the_config_is_frozen(self):
         """It is a value object; the target cannot be reassigned."""
+        config = ClosestImage(target=dt.date(2024, 6, 1))
+        new_target = dt.date(2024, 6, 2)
         with pytest.raises(ValidationError):
-            ClosestImage(target=dt.date(2024, 6, 1)).target = dt.date(2024, 6, 2)
+            config.target = new_target
 
 
 class TestSelect:

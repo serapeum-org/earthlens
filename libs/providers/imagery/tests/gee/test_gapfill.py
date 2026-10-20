@@ -140,18 +140,21 @@ class TestConfig:
 
     def test_a_zero_max_gap_is_refused(self):
         """A zero window would bridge nothing."""
+        max_gap = dt.timedelta(0)
         with pytest.raises(ValidationError):
-            GapFill(max_gap=dt.timedelta(0))
+            GapFill(max_gap=max_gap)
 
     def test_a_negative_max_gap_is_refused(self):
         """A negative window is meaningless."""
+        max_gap = dt.timedelta(days=-1)
         with pytest.raises(ValidationError):
-            GapFill(max_gap=dt.timedelta(days=-1))
+            GapFill(max_gap=max_gap)
 
     def test_harmonic_requires_a_band(self):
         """The harmonic model has nothing to fit without a value band."""
+        max_gap = dt.timedelta(days=60)
         with pytest.raises(ValidationError):
-            GapFill(method="harmonic", max_gap=dt.timedelta(days=60))
+            GapFill(method="harmonic", max_gap=max_gap)
 
     def test_harmonic_with_a_band_is_accepted(self):
         """A named band satisfies the harmonic requirement."""
@@ -159,8 +162,9 @@ class TestConfig:
 
     def test_the_config_is_frozen(self):
         """It is a value object; the method cannot be reassigned."""
+        config = GapFill(max_gap=dt.timedelta(days=30))
         with pytest.raises(ValidationError):
-            GapFill(max_gap=dt.timedelta(days=30)).method = "nearest"
+            config.method = "nearest"
 
     def test_the_max_gap_converts_to_milliseconds(self):
         """The join bounds its difference in the millisecond time unit."""
