@@ -843,4 +843,5 @@ def test_live_trend_is_positive_over_a_rising_stack(reducer_name):
         .get("v")
         .getInfo()
     )
-    assert value is not None and value > 0, f"expected a positive slope, got {value}"
+    assert value is not None, f"expected a slope value, got {value}"
+    assert value > 0, f"expected a positive slope, got {value}"

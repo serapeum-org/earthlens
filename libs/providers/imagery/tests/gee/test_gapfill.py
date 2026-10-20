@@ -228,7 +228,8 @@ class TestHarmonic:
         )
         names = [entry[0] for entry in log]
         assert "updateMask" in names
-        assert "sin" in names and "cos" in names
+        assert "sin" in names, "the harmonic fit must build a sin term"
+        assert "cos" in names, "the harmonic fit must build a cos term"
 
     def test_the_prediction_sums_with_the_sum_reducer(self, fake_ee):
         """The harmonic prediction reduces with `ee.Reducer.sum()`, not `"sum"`."""
