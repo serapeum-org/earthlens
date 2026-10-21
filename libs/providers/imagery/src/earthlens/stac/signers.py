@@ -50,8 +50,12 @@ class _ContractSigner:
     across every backend. The calls that mint credentials — and can therefore
     fail — are `sign_href`, `sign_item`, `sign_request` and `gdal_env` (a bearer
     signer mints its token when `gdal_env` is read); each re-raises as earthlens's
-    type. Every other attribute delegates to the wrapped signer unchanged, so the
-    wrapper still satisfies pyramids' structural `Signer` protocol.
+    type. Every other attribute delegates to the wrapped signer unchanged. The
+    protocol's `name` data member is bound as a real instance attribute at
+    construction (not delegated through `__getattr__`), because
+    `typing.runtime_checkable` resolves non-method members against the instance
+    `__dict__` / MRO and does not consult `__getattr__`; binding it is what keeps
+    `isinstance(wrapper, pyramids.stac.Signer)` true.
 
     Args:
         inner: The pyramids-eo signer to wrap.
@@ -59,6 +63,7 @@ class _ContractSigner:
 
     def __init__(self, inner: Any) -> None:
         self._inner = inner
+        self.name = inner.name
 
     def __getattr__(self, name: str) -> Any:
         """Delegate any attribute this wrapper does not define to the signer."""

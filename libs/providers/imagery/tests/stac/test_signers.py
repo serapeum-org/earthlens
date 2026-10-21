@@ -11,6 +11,7 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
+from pyramids.stac.signers import Signer
 from pyramids_eo.errors import AuthenticationError as EoAuthError
 
 from earthlens.base import AuthenticationError
@@ -80,6 +81,13 @@ class TestBuildSignerDispatch:
         """An unrecognised signer key is rejected with ValueError, not a silent fallback."""
         with pytest.raises(ValueError, match="unknown signer_type"):
             build_signer("nope")
+
+    @pytest.mark.parametrize(
+        "signer_type", ["anonymous", "aws-requester-pays", "mpc-sas"]
+    )
+    def test_wrapper_satisfies_the_signer_protocol(self, signer_type):
+        """The wrapped signer still passes isinstance against pyramids' runtime_checkable Signer."""
+        assert isinstance(build_signer(signer_type), Signer)
 
     def test_anonymous_gdal_env_is_unsigned(self):
         """The anonymous signer still opts out of request signing."""
