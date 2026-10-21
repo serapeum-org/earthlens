@@ -29114,6 +29114,17 @@ required credential is absent.</p>
               </div>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ValueError">ValueError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>When <code>signer_type</code> is not one of the known signer keys
+(propagated unchanged from <code>pyramids_eo.stac.build_signer</code>).</p>
+              </div>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -29199,7 +29210,9 @@ required credential is absent.</p>
 <span class="normal"><a href="#__codelineno-0-190">190</a></span>
 <span class="normal"><a href="#__codelineno-0-191">191</a></span>
 <span class="normal"><a href="#__codelineno-0-192">192</a></span>
-<span class="normal"><a href="#__codelineno-0-193">193</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="k">def</span><span class="w"> </span><span class="nf">build_signer</span><span class="p">(</span><span class="n">signer_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">creds</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-193">193</a></span>
+<span class="normal"><a href="#__codelineno-0-194">194</a></span>
+<span class="normal"><a href="#__codelineno-0-195">195</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="k">def</span><span class="w"> </span><span class="nf">build_signer</span><span class="p">(</span><span class="n">signer_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">creds</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a pyramids-eo signer wrapped to honour earthlens&#39;s auth contract.</span>
 <a id="__codelineno-0-141" name="__codelineno-0-141"></a>
 <a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">    Delegates to `pyramids_eo.stac.build_signer` and wraps the result so a STAC</span>
@@ -29220,40 +29233,42 @@ required credential is absent.</p>
 <a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    Raises:</span>
 <a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">        AuthenticationError: When the signer cannot be constructed because a</span>
 <a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">            required credential is absent.</span>
-<a id="__codelineno-0-160" name="__codelineno-0-160"></a>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">        - The anonymous signer opts a read out of request signing:</span>
-<a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import build_signer</span>
-<a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">            &gt;&gt;&gt; signer = build_signer(&quot;anonymous&quot;)</span>
-<a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">            &gt;&gt;&gt; signer.name</span>
-<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">            &#39;anonymous&#39;</span>
-<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">            &gt;&gt;&gt; signer.gdal_env()[&quot;AWS_NO_SIGN_REQUEST&quot;]</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">            &#39;YES&#39;</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">        - An opt-in AWS region is pinned to its region-specific endpoint:</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import build_signer</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            &gt;&gt;&gt; env = build_signer(&quot;anonymous&quot;, region=&quot;af-south-1&quot;).gdal_env()</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">            &gt;&gt;&gt; env[&quot;AWS_REGION&quot;]</span>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">            &#39;af-south-1&#39;</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">        - The CDSE S3 signer carries the eodata endpoint for `/vsis3` reads:</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import build_signer</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">            &gt;&gt;&gt; env = build_signer(&quot;cdse-s3&quot;, access_key=&quot;ak&quot;, secret_key=&quot;sk&quot;).gdal_env()</span>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">            &gt;&gt;&gt; env[&quot;AWS_S3_ENDPOINT&quot;]</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">            &#39;eodata.dataspace.copernicus.eu&#39;</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a>        <span class="n">inner</span> <span class="o">=</span> <span class="n">_eo_build_signer</span><span class="p">(</span><span class="n">signer_type</span><span class="p">,</span> <span class="o">**</span><span class="n">creds</span><span class="p">)</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="k">except</span> <span class="n">_PyramidsEoAuthError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a>        <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a>    <span class="k">return</span> <span class="n">_ContractSigner</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
+<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">        ValueError: When `signer_type` is not one of the known signer keys</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">            (propagated unchanged from `pyramids_eo.stac.build_signer`).</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a>
+<a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">        - The anonymous signer opts a read out of request signing:</span>
+<a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import build_signer</span>
+<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">            &gt;&gt;&gt; signer = build_signer(&quot;anonymous&quot;)</span>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">            &gt;&gt;&gt; signer.name</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="sd">            &#39;anonymous&#39;</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">            &gt;&gt;&gt; signer.gdal_env()[&quot;AWS_NO_SIGN_REQUEST&quot;]</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">            &#39;YES&#39;</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">        - An opt-in AWS region is pinned to its region-specific endpoint:</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import build_signer</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">            &gt;&gt;&gt; env = build_signer(&quot;anonymous&quot;, region=&quot;af-south-1&quot;).gdal_env()</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">            &gt;&gt;&gt; env[&quot;AWS_REGION&quot;]</span>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">            &#39;af-south-1&#39;</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">        - The CDSE S3 signer carries the eodata endpoint for `/vsis3` reads:</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">            &gt;&gt;&gt; from earthlens.stac import build_signer</span>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">            &gt;&gt;&gt; env = build_signer(&quot;cdse-s3&quot;, access_key=&quot;ak&quot;, secret_key=&quot;sk&quot;).gdal_env()</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">            &gt;&gt;&gt; env[&quot;AWS_S3_ENDPOINT&quot;]</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">            &#39;eodata.dataspace.copernicus.eu&#39;</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a>        <span class="n">inner</span> <span class="o">=</span> <span class="n">_eo_build_signer</span><span class="p">(</span><span class="n">signer_type</span><span class="p">,</span> <span class="o">**</span><span class="n">creds</span><span class="p">)</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a>    <span class="k">except</span> <span class="n">_PyramidsEoAuthError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a>        <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a>    <span class="k">return</span> <span class="n">_ContractSigner</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
