@@ -157,6 +157,34 @@ def build_signer(signer_type: str, **creds: Any) -> Any:
     Raises:
         AuthenticationError: When the signer cannot be constructed because a
             required credential is absent.
+
+    Examples:
+        - The anonymous signer opts a read out of request signing:
+            ```python
+            >>> from earthlens.stac import build_signer
+            >>> signer = build_signer("anonymous")
+            >>> signer.name
+            'anonymous'
+            >>> signer.gdal_env()["AWS_NO_SIGN_REQUEST"]
+            'YES'
+
+            ```
+        - An opt-in AWS region is pinned to its region-specific endpoint:
+            ```python
+            >>> from earthlens.stac import build_signer
+            >>> env = build_signer("anonymous", region="af-south-1").gdal_env()
+            >>> env["AWS_REGION"]
+            'af-south-1'
+
+            ```
+        - The CDSE S3 signer carries the eodata endpoint for `/vsis3` reads:
+            ```python
+            >>> from earthlens.stac import build_signer
+            >>> env = build_signer("cdse-s3", access_key="ak", secret_key="sk").gdal_env()
+            >>> env["AWS_S3_ENDPOINT"]
+            'eodata.dataspace.copernicus.eu'
+
+            ```
     """
     try:
         inner = _eo_build_signer(signer_type, **creds)
