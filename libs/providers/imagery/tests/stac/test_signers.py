@@ -131,23 +131,27 @@ class TestContractWrapper:
 
     def test_sign_href_is_translated(self):
         """A pyramids-eo auth error from sign_href becomes earthlens's."""
+        signer = _ContractSigner(_RaisingInner())
         with pytest.raises(AuthenticationError, match="boom-href"):
-            _ContractSigner(_RaisingInner()).sign_href("h")
+            signer.sign_href("h")
 
     def test_sign_item_is_translated(self):
         """A pyramids-eo auth error from sign_item becomes earthlens's."""
+        signer = _ContractSigner(_RaisingInner())
         with pytest.raises(AuthenticationError, match="boom-item"):
-            _ContractSigner(_RaisingInner()).sign_item(object())
+            signer.sign_item(object())
 
     def test_sign_request_is_translated(self):
         """A pyramids-eo auth error from sign_request becomes earthlens's."""
+        signer = _ContractSigner(_RaisingInner())
         with pytest.raises(AuthenticationError, match="boom-request"):
-            _ContractSigner(_RaisingInner()).sign_request(object())
+            signer.sign_request(object())
 
     def test_gdal_env_is_translated(self):
         """A pyramids-eo auth error from gdal_env becomes earthlens's."""
+        signer = _ContractSigner(_RaisingInner())
         with pytest.raises(AuthenticationError, match="boom-env"):
-            _ContractSigner(_RaisingInner()).gdal_env()
+            signer.gdal_env()
 
     def test_sign_href_passes_through_on_success(self):
         """A successful sign_href returns the wrapped signer's result unchanged."""
