@@ -2612,7 +2612,7 @@ requires-dist = [
     { name = "jaxa-earth", marker = "extra == 'jaxa'", specifier = ">=0.1.6,<0.2" },
     { name = "openeo", marker = "extra == 'openeo'", specifier = ">=0.47,<0.52" },
     { name = "pyproj", specifier = ">=3.7.0" },
-    { name = "pyramids-core", extras = ["stac"], marker = "extra == 'stac'", specifier = ">=0.70.0" },
+    { name = "pyramids-core", extras = ["stac"], marker = "extra == 'stac'", specifier = ">=0.71.0" },
     { name = "pyramids-eo", specifier = ">=0.11.0,<0.12" },
     { name = "pyramids-eo", marker = "extra == 'eedai'", specifier = ">=0.11.0,<0.12" },
     { name = "rtree", marker = "extra == 'gee'", specifier = ">=1.0.0" },
