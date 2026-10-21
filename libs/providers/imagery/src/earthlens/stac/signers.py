@@ -16,7 +16,7 @@ covers every other backend.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 from pyramids_eo.errors import AuthenticationError as _PyramidsEoAuthError
 from pyramids_eo.stac import (
@@ -83,7 +83,7 @@ class _ContractSigner:
             result = self._inner.sign_href(href)
         except _PyramidsEoAuthError as exc:
             raise AuthenticationError(str(exc)) from exc
-        return result
+        return cast("str", result)
 
     def sign_item(self, item: Any) -> None:
         """Sign a STAC item in place, re-raising auth failures as earthlens's.
@@ -133,7 +133,7 @@ class _ContractSigner:
             result = self._inner.gdal_env()
         except _PyramidsEoAuthError as exc:
             raise AuthenticationError(str(exc)) from exc
-        return result
+        return cast("dict[str, str]", result)
 
 
 def build_signer(signer_type: str, **creds: Any) -> Any:
