@@ -17,10 +17,12 @@ Public surface (re-exported from this package):
 * `Endpoint` / `Collection` / `Asset` / `Extent`
   — the frozen value objects the catalog is built from.
 * `PlanetaryComputerSigner` / `EarthdataSigner` / `CDSESigner`
-  / `CdseS3Signer` / `BdcTokenSigner` / `build_signer` — the earthlens-side
-  provider signers and the factory that selects one (the generic `Signer`
-  protocol and the `anonymous` / `aws-requester-pays` signers come from
-  `pyramids.stac`).
+  / `CdseS3Signer` / `BdcTokenSigner` / `build_signer` — the provider signers,
+  re-exported from `pyramids_eo.stac` (earthlens keeps no second copy), plus the
+  `build_signer` factory, which wraps the selected signer so a STAC auth failure
+  raises `earthlens.base.AuthenticationError` like every other backend. The
+  generic `Signer` protocol and the `anonymous` / `aws-requester-pays` signers
+  come from `pyramids.stac`.
 * `CATALOG_PATH` — absolute path to the bundled catalog directory;
   monkey-patchable to redirect the loader at a temporary directory.
 
