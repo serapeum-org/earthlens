@@ -76,6 +76,11 @@ class TestBuildSignerDispatch:
         """The returned signer is the earthlens contract wrapper, not the raw one."""
         assert isinstance(build_signer("anonymous"), _ContractSigner)
 
+    def test_unknown_signer_type_raises_value_error(self):
+        """An unrecognised signer key is rejected with ValueError, not a silent fallback."""
+        with pytest.raises(ValueError, match="unknown signer_type"):
+            build_signer("nope")
+
     def test_anonymous_gdal_env_is_unsigned(self):
         """The anonymous signer still opts out of request signing."""
         assert build_signer("anonymous").gdal_env()["AWS_NO_SIGN_REQUEST"] == "YES"
