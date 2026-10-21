@@ -36,6 +36,24 @@ class _RaisingInner:
         raise EoAuthError("boom-env")
 
 
+class _PassingInner:
+    """A fake pyramids-eo signer whose calls succeed, covering the pass-through paths."""
+
+    name = "fake-ok"
+
+    def sign_href(self, href: str) -> str:
+        return f"signed:{href}"
+
+    def sign_item(self, item: Any) -> None:
+        return None
+
+    def sign_request(self, request: Any) -> Any:
+        return request
+
+    def gdal_env(self) -> dict[str, str]:
+        return {"AWS_NO_SIGN_REQUEST": "YES"}
+
+
 @pytest.mark.stac
 class TestBuildSignerDispatch:
     """`build_signer` selects the right pyramids-eo signer and wraps it."""
@@ -118,6 +136,25 @@ class TestContractWrapper:
         with pytest.raises(AuthenticationError, match="boom-env"):
             _ContractSigner(_RaisingInner()).gdal_env()
 
+    def test_sign_href_passes_through_on_success(self):
+        """A successful sign_href returns the wrapped signer's result unchanged."""
+        assert _ContractSigner(_PassingInner()).sign_href("h") == "signed:h"
+
+    def test_sign_item_returns_none_on_success(self):
+        """A successful sign_item is a no-op returning None."""
+        assert _ContractSigner(_PassingInner()).sign_item(object()) is None
+
+    def test_sign_request_passes_through_on_success(self):
+        """A successful sign_request returns the wrapped signer's result unchanged."""
+        sentinel = object()
+        assert _ContractSigner(_PassingInner()).sign_request(sentinel) is sentinel
+
     def test_other_attributes_delegate(self):
         """Non-signing attributes pass straight through to the wrapped signer."""
-        assert _ContractSigner(_RaisingInner()).name == "fake"
+        assert _ContractSigner(_PassingInner()).name == "fake-ok"
+
+    def test_getattr_does_not_recurse_before_inner_is_set(self):
+        """Attribute access before _inner is set raises AttributeError, not recursion."""
+        bare = _ContractSigner.__new__(_ContractSigner)
+        with pytest.raises(AttributeError):
+            getattr(bare, "name")
