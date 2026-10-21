@@ -12,11 +12,15 @@ from typing import Any
 
 import pytest
 from pyramids.stac.signers import Signer
-from pyramids_eo.errors import AuthenticationError as EoAuthError
 
 from earthlens.base import AuthenticationError
 from earthlens.stac import build_signer
 from earthlens.stac.signers import _ContractSigner
+
+# pyramids-eo is a base dependency, but the distribution-boundary guard requires
+# test modules to soft-import any `_OPTIONAL_SDKS` name so a narrower environment
+# skips this one module instead of breaking collection for the whole directory.
+EoAuthError = pytest.importorskip("pyramids_eo.errors").AuthenticationError
 
 
 class _RaisingInner:
