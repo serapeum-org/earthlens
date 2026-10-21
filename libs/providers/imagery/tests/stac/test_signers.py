@@ -124,10 +124,6 @@ class TestCdseS3Signer:
         assert env["AWS_ACCESS_KEY_ID"] == "ak"
         assert env["AWS_SECRET_ACCESS_KEY"] == "sk"
         assert env["AWS_VIRTUAL_HOSTING"] == "FALSE"
-        # Single-threaded reads are a correctness stopgap for the non-AWS endpoint
-        # (earthlens#1322 / pyramids#1345); drop this once the endpoint reaches the
-        # multi-threaded warp workers upstream.
-        assert env["GDAL_NUM_THREADS"] == "1"
         assert "GDAL_HTTP_HEADERS" not in env and "Authorization" not in str(env)
 
 

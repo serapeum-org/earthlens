@@ -642,21 +642,14 @@ class CdseS3Signer:
 
         Returns:
             A mapping with the S3 endpoint, access-key/secret, virtual-hosting
-            off, HTTPS on, the standard cloud-read knob, and single-threaded
-            reads.
+            off, HTTPS on, and the standard cloud-read knob.
 
         Note:
-            `GDAL_NUM_THREADS=1` is not a tuning choice but a correctness one for
-            this non-AWS endpoint. pyramids-core 0.70.0 (serapeum-org/pyramids
-            #1339/#1340) makes a pathless `CloudConfig`'s *credentials* visible
-            to GDAL's VSICurl worker threads, but the custom `AWS_S3_ENDPOINT`
-            still does not reach GDAL's internal warp/translate worker threads
-            on a multi-threaded read, so each worker's region-discovery falls
-            back to real AWS and 403s against a bucket (`eodata`) whose name also
-            exists there. Pinning the read to the calling thread — which does
-            hold the endpoint — is the one shape that reads the asset today.
-            Tracked by earthlens#1322, to be removed once serapeum-org/pyramids
-            #1345 routes the endpoint subset to the warp workers too.
+            The custom `eodata` endpoint reaches GDAL's multi-threaded read
+            workers only on pyramids-core >=0.71.0 (serapeum-org/pyramids#1348),
+            which this distribution pins; earlier versions fell back to real AWS
+            and 403'd on a mosaic read, and needed a `GDAL_NUM_THREADS=1` stopgap
+            that is no longer required.
         """
         return {
             "AWS_S3_ENDPOINT": self._endpoint,
@@ -665,7 +658,6 @@ class CdseS3Signer:
             "AWS_VIRTUAL_HOSTING": "FALSE",
             "AWS_HTTPS": "YES",
             "GDAL_DISABLE_READDIR_ON_OPEN": "EMPTY_DIR",
-            "GDAL_NUM_THREADS": "1",
         }
 
 

@@ -150,7 +150,7 @@ dev = [
     # pyramids-core[viz] (cleopatra): the showcase notebooks render rasters and
     # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
     # runtime dep of earthlens itself.
-    "pyramids-core[viz] >=0.70.0",
+    "pyramids-core[viz] >=0.71.0",
     # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
     # animation.embed_gif, ArrayGlyph.save_animation); add_reference_map /
     # save_animation(crf=...) landed in 0.22.0, the animate() default
@@ -196,11 +196,13 @@ dev = [
     # `TasseledCap`), so `uv sync --extra all` already installs it. This explicit
     # dev pin is redundant but kept so the floor is visible here too -- the tests
     # that pin the EEDAI reader's `from_earthengine` signature run against it, so
-    # a 0.x contract change surfaces in CI rather than only on a live run. 0.9.0
-    # is the floor: it added the tasseled-cap transform (pyramids-eo#117), and it
-    # is well past 0.8.1 (whose tiled read passed no_data_value="none", rejected
-    # by pyramids >= 0.61, pyramids-eo#111).
-    "pyramids-eo >=0.9.0,<0.10",
+    # a 0.x contract change surfaces in CI rather than only on a live run. 0.11.0
+    # is the floor: it pins pyramids-core >=0.71.0 (pyramids-eo#127/#128), whose
+    # #1348 fix lets the CDSE signer read eodata with the default multi-threaded
+    # workers. It is well past 0.9.0 (the tasseled-cap transform, pyramids-eo#117)
+    # and 0.8.1 (whose tiled read passed no_data_value="none", rejected by
+    # pyramids >= 0.61, pyramids-eo#111).
+    "pyramids-eo >=0.11.0,<0.12",
 ]
 # The eclipse showcase notebooks need the geostationary-imagery pieces of
 # pyramids-eo (read_fci_l1c, the composites, the viewing geometry) plus a few small
@@ -213,12 +215,13 @@ notebooks = [
     # viewing geometry it needs. This replaces the satpy / pyresample / pyspectral
     # stack the eclipse notebook used to carry. 0.7 first carried `rayleigh_correct`,
     # `solar_zenith_azimuth`, `satellite_zenith_azimuth` and `relative_azimuth`
-    # (pyramids-eo#91-93). 0.9.0 now sets the floor (it added the tasseled-cap
-    # transform, pyramids-eo#117); it is well past 0.8, the first release built
-    # against pyramids 0.59's `from_array` / `GeoReference` constructors -- 0.7's
-    # reader still called the removed `create_from_array`.
+    # (pyramids-eo#91-93). 0.11.0 now sets the floor (it pins pyramids-core
+    # >=0.71.0, pyramids-eo#127/#128); it is well past 0.9.0 (the tasseled-cap
+    # transform, pyramids-eo#117) and 0.8 (the first release built against
+    # pyramids 0.59's `from_array` / `GeoReference` constructors -- 0.7's reader
+    # still called the removed `create_from_array`).
     # Also declared, at the same version, in `dev` and as an imagery base dep.
-    "pyramids-eo >=0.9.0,<0.10",
+    "pyramids-eo >=0.11.0,<0.12",
     # scipy: feathers the disc edge and softens the limb (ndimage.binary_erosion /
     # gaussian_filter).
     "scipy >=1.11",
@@ -245,7 +248,7 @@ docs = [
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
     # pyramids-core[viz] (cleopatra): showcase notebooks plot/animate Datasets.
-    "pyramids-core[viz] >=0.70.0",
+    "pyramids-core[viz] >=0.71.0",
     # [tiles] (pyproj, xyzservices): the satellite showcase textures its globe from
     # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
     # It arrives transitively through pyramids-core[viz], but an imported package

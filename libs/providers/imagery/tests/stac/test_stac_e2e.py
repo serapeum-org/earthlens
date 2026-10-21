@@ -83,10 +83,9 @@ class TestCdseE2E:
     Credentials come from `CDSE_S3_ACCESS_KEY` / `CDSE_S3_SECRET_KEY` in the
     environment, but the `e2e` marker — not an env-var check — decides whether
     this runs, so it executes under `-m e2e` and fails loudly (never skips
-    silently) if the live read breaks. The non-AWS `eodata` endpoint is read
-    single-threaded (`GDAL_NUM_THREADS=1`, set by `CdseS3Signer.gdal_env`)
-    because the custom endpoint does not yet reach GDAL's multi-threaded warp
-    workers; see earthlens#1322 / serapeum-org/pyramids#1345.
+    silently) if the live read breaks. The non-AWS `eodata` endpoint reads with
+    the default multi-threaded workers: pyramids-core >=0.71.0 (the pinned floor,
+    serapeum-org/pyramids#1348) routes the custom endpoint to them.
     """
 
     def test_sentinel2_writes_cog(self, tmp_path: Path):
