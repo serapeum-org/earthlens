@@ -157,6 +157,8 @@ def build_signer(signer_type: str, **creds: Any) -> Any:
     Raises:
         AuthenticationError: When the signer cannot be constructed because a
             required credential is absent.
+        ValueError: When `signer_type` is not one of the known signer keys
+            (propagated unchanged from `pyramids_eo.stac.build_signer`).
 
     Examples:
         - The anonymous signer opts a read out of request signing:
