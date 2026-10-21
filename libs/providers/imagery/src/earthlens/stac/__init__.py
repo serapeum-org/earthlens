@@ -21,8 +21,9 @@ Public surface (re-exported from this package):
   re-exported from `pyramids_eo.stac` (earthlens keeps no second copy), plus the
   `build_signer` factory, which wraps the selected signer so a STAC auth failure
   raises `earthlens.base.AuthenticationError` like every other backend. The
-  generic `Signer` protocol and the `anonymous` / `aws-requester-pays` signers
-  come from `pyramids.stac`.
+  generic `Signer` protocol and the `aws-requester-pays` signer come from
+  `pyramids.stac`; the `anonymous` signer is pyramids-eo's `_AnonymousS3Signer`
+  (which adds `AWS_NO_SIGN_REQUEST` and the opt-in-region endpoint pin).
 * `CATALOG_PATH` — absolute path to the bundled catalog directory;
   monkey-patchable to redirect the loader at a temporary directory.
 
