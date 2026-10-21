@@ -1,5 +1,17 @@
 # Change Log
 
+## 0.29.0 (2026-10-20)
+
+### Feat
+
+- **gee**: add Epic 4 temporal reduction, collections and composite refactor (#1321)
+- **gee**: add Epic 3 sampling, zonal statistics and vector interop (#1303)
+
+### Fix
+
+- **deps**: adopt the pyramids-core rename and raise the aiohttp security floor (#1318)
+- **e2e**: keep transient upstream failures from reddening the live lanes (#1285)
+
 ## 0.28.0 (2026-10-18)
 
 ### BREAKING CHANGE
