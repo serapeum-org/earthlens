@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="41 403 430 430" width="430" height="430">
+<defs>
+    <radialGradient id="ocean" cx="0.38" cy="0.32" r="0.85">
+      <stop offset="0" stop-color="#5A93BE"/>
+      <stop offset="0.5" stop-color="#234C70"/>
+      <stop offset="1" stop-color="#0A2036"/>
+    </radialGradient>
+    <radialGradient id="hi3d" cx="0.30" cy="0.26" r="0.62">
+      <stop offset="0" stop-color="#DCF2FF" stop-opacity="0.40"/>
+      <stop offset="0.55" stop-color="#DCF2FF" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#DCF2FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="sh3d" cx="0.74" cy="0.82" r="0.95">
+      <stop offset="0" stop-color="#04101E" stop-opacity="0.60"/>
+      <stop offset="0.45" stop-color="#04101E" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#04101E" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g id="globe" transform="translate(256,618) scale(1.26) translate(-256,-618)">
+  <!-- the Earth (Africa-centered) -->
+  <g>
+    <circle cx="256" cy="618" r="155" fill="url(#ocean)"/>
+    <!-- Africa -->
+    <path d="M232,548 C250,542 272,544 286,552 C296,558 296,570 292,580 C288,590 284,596 286,606
+             C288,620 282,634 272,648 C266,657 262,672 254,674 C246,676 242,664 240,654
+             C237,640 230,632 224,620 C218,606 214,592 216,578 C218,564 220,552 232,548 Z" fill="#6E97AE"/>
+    <!-- Sahara band -->
+    <path d="M228,566 C246,558 274,558 290,568 C294,573 292,580 286,583 C266,589 244,589 232,582 C226,578 224,570 228,566 Z"
+      fill="#C6B98E" opacity="0.85"/>
+    <!-- Eurasia -->
+    <path d="M240,540 C258,524 292,520 316,530 C332,537 330,549 314,553 C300,556 292,552 284,556
+             C274,561 262,558 252,556 C242,554 232,550 240,540 Z" fill="#7AA0B6"/>
+    <!-- Arabia -->
+    <path d="M300,566 C312,560 326,564 330,574 C333,584 324,592 314,590 C305,588 296,578 300,566 Z" fill="#C6B98E"/>
+    <!-- South America at the west limb -->
+    <path d="M138,596 C150,590 162,596 162,608 C162,618 156,624 154,634 C152,646 146,660 138,660
+             C132,660 130,650 132,640 C134,628 128,618 132,608 C134,601 134,600 138,596 Z" fill="#6E97AE" opacity="0.92"/>
+    <!-- Madagascar -->
+    <ellipse cx="300" cy="662" rx="7" ry="12" fill="#6E97AE" transform="rotate(20 300 662)"/>
+    <!-- natural features -->
+    <clipPath id="natclip"><circle cx="256" cy="618" r="155"/></clipPath>
+    <g clip-path="url(#natclip)">
+      <!-- extra continent SE (Australia-like) -->
+      <path d="M328,640 C346,630 376,630 392,644 C402,653 400,666 386,670 C374,673 368,668 356,670
+               C342,672 328,668 324,656 C321,648 320,644 328,640 Z" fill="#4E8C6A"/>
+      <path d="M336,644 C354,637 376,639 386,648 C377,653 362,655 350,654 C341,653 332,650 336,644 Z"
+        fill="#C6B98E" opacity="0.7"/>
+      <!-- northern continent cap -->
+      <path d="M298,510 C324,499 362,499 384,512 C396,519 392,531 375,534 C358,537 348,532 335,535
+               C322,538 307,535 298,529 C291,524 290,516 298,510 Z" fill="#5E8AA6"/>
+
+      <!-- ocean currents -->
+      <path d="M104,600 C138,586 164,610 140,632" fill="none" stroke="#7FB6D8" stroke-width="2.2" opacity="0.35" stroke-linecap="round"/>
+      <path d="M362,694 C392,684 402,704 376,716" fill="none" stroke="#7FB6D8" stroke-width="1.8" opacity="0.3" stroke-linecap="round"/>
+
+      <!-- BIG FOREST: layered canopy + tree texture across central/southern Africa -->
+      <path d="M224,614 C244,598 274,600 286,622 C296,640 288,668 262,680 C240,689 216,676 214,654
+               C213,636 212,624 224,614 Z" fill="#2F8F53"/>
+      <path d="M230,620 C248,608 270,610 280,626 C288,642 280,664 260,672 C240,679 224,668 224,650
+               C224,638 222,628 230,620 Z" fill="#3EA863" opacity="0.92"/>
+      <g fill="#1F6338" opacity="0.85">
+        <circle cx="240" cy="632" r="4.4"/><circle cx="256" cy="626" r="5"/><circle cx="270" cy="638" r="4"/>
+        <circle cx="246" cy="650" r="4.6"/><circle cx="262" cy="654" r="4.2"/><circle cx="234" cy="644" r="3.6"/>
+        <circle cx="252" cy="644" r="3.8"/><circle cx="268" cy="626" r="3.4"/><circle cx="256" cy="666" r="3.6"/>
+        <circle cx="242" cy="664" r="3"/>
+      </g>
+      <g fill="#68D28E" opacity="0.7">
+        <circle cx="243" cy="629" r="1.8"/><circle cx="258" cy="623" r="2"/><circle cx="272" cy="640" r="1.6"/>
+        <circle cx="248" cy="648" r="1.8"/><circle cx="238" cy="642" r="1.5"/><circle cx="260" cy="662" r="1.6"/>
+      </g>
+
+      <!-- lake -->
+      <ellipse cx="284" cy="600" rx="9" ry="11" fill="#2FA8E0"/>
+      <ellipse cx="281" cy="596" rx="4" ry="5" fill="#8FD8F5" opacity="0.85"/>
+
+      <!-- BIG bold river to the coast -->
+      <path d="M266,552 C255,574 282,590 264,610 C250,628 274,642 258,662 C250,675 254,688 242,700"
+        fill="none" stroke="#1487C4" stroke-width="11" opacity="0.4" stroke-linecap="round"/>
+      <path d="M266,552 C255,574 282,590 264,610 C250,628 274,642 258,662 C250,675 254,688 242,700"
+        fill="none" stroke="#29B6E6" stroke-width="6.5" stroke-linecap="round"/>
+      <path d="M266,552 C255,574 282,590 264,610 C250,628 274,642 258,662 C250,675 254,688 242,700"
+        fill="none" stroke="#A6E7F8" stroke-width="2.2" opacity="0.9" stroke-linecap="round"/>
+      <!-- tributary -->
+      <path d="M232,596 C246,610 240,628 258,640" fill="none" stroke="#29B6E6" stroke-width="4.2" stroke-linecap="round"/>
+      <path d="M232,596 C246,610 240,628 258,640" fill="none" stroke="#A6E7F8" stroke-width="1.5" opacity="0.85" stroke-linecap="round"/>
+
+      <!-- mountain ridge -->
+      <path d="M222,566 l7,-8 l6,8 l7,-7 l7,8" fill="none" stroke="#D9E2E8" stroke-width="1.6" opacity="0.5" stroke-linejoin="round"/>
+    </g>
+    <!-- graticule grid -->
+    <clipPath id="globeclip"><circle cx="256" cy="618" r="155"/></clipPath>
+    <g clip-path="url(#globeclip)">
+    <ellipse cx="256" cy="618" rx="155" ry="155" fill="none" stroke="#AEE0F0" stroke-width="1.4" opacity="0.55"/>
+    <ellipse cx="256" cy="618" rx="31" ry="155" fill="none" stroke="#AEE0F0" stroke-width="1.1" opacity="0.5"/>
+    <ellipse cx="256" cy="618" rx="62" ry="155" fill="none" stroke="#AEE0F0" stroke-width="1.1" opacity="0.5"/>
+    <ellipse cx="256" cy="618" rx="93" ry="155" fill="none" stroke="#AEE0F0" stroke-width="1.1" opacity="0.5"/>
+    <ellipse cx="256" cy="618" rx="124" ry="155" fill="none" stroke="#AEE0F0" stroke-width="1.1" opacity="0.5"/>
+    <ellipse cx="256" cy="618" rx="155" ry="31" fill="none" stroke="#AEE0F0" stroke-width="1.1" opacity="0.5"/>
+    <ellipse cx="256" cy="618" rx="155" ry="62" fill="none" stroke="#AEE0F0" stroke-width="1.1" opacity="0.5"/>
+    <ellipse cx="256" cy="618" rx="155" ry="93" fill="none" stroke="#AEE0F0" stroke-width="1.1" opacity="0.5"/>
+    <ellipse cx="256" cy="618" rx="155" ry="124" fill="none" stroke="#AEE0F0" stroke-width="1.1" opacity="0.5"/>
+    <line x1="101" y1="618" x2="411" y2="618" stroke="#AEE0F0" stroke-width="1.2" opacity="0.55"/>
+    <line x1="256" y1="463" x2="256" y2="773" stroke="#AEE0F0" stroke-width="1.2" opacity="0.55"/>
+    </g>
+    <!-- 3D spherical shading -->
+    <circle cx="256" cy="618" r="155" fill="url(#sh3d)"/>
+    <circle cx="256" cy="618" r="155" fill="url(#hi3d)"/>
+    <ellipse cx="212" cy="566" rx="42" ry="30" fill="#EAF7FF" opacity="0.16" transform="rotate(-24 212 566)"/>
+    <path d="M120,556 A155,155 0 0 1 214,470" fill="none" stroke="#EAF7FF" stroke-width="3" stroke-linecap="round" opacity="0.35"/>
+    <!-- footprint highlight where the pyramid tip focuses -->
+    <ellipse cx="256" cy="474" rx="26" ry="9" fill="#F2C879" opacity="0.4"/>
+    <ellipse cx="256" cy="474" rx="13" ry="4.5" fill="#FFF3D6" opacity="0.8"/>
+    <!-- day-side highlight -->
+    <path d="M118,556 A155,155 0 0 1 210,468" fill="none" stroke="#CFE8F5" stroke-width="7" stroke-linecap="round" opacity="0.5"/>
+    <!-- atmosphere -->
+    <circle cx="256" cy="618" r="163" fill="none" stroke="#4FA8D0" stroke-width="8" opacity="0.28"/>
+  </g>
+
+
+  </g><!-- /globe -->
+</svg>
