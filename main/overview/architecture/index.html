@@ -24497,7 +24497,7 @@ shared <code>earthlens.base.yaml_loader.load_yaml_strict</code>.</p>
 <p>When a provider needs credentials the auth surface lives in <code>auth.py</code> as a
 <code>&lt;Provider&gt;Auth</code> + <code>&lt;Provider&gt;Credentials</code> pair with env-var fallbacks, raising
 <code>AuthenticationError</code> on failure. Sanctioned exceptions: a multi-endpoint
-backend may use a signer model instead (stac: <code>signers.py</code> + <code>auth_cdse.py</code>),
+backend may use a signer model instead (stac: <code>signers.py</code>),
 and a backend whose SDK owns auth (ecmwf via <code>~/.cdsapirc</code>) may keep its
 <code>AuthenticationError</code> in <code>backend.py</code>. Public/anonymous backends (chc, gdacs,
 hdx, overture, tropycal) have no auth module.</p>
