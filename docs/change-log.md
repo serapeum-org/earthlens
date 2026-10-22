@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.30.0 (2026-10-22)
+
+### Fix
+
+- **stac**: read CDSE on pyramids-core 0.71.0, consolidate signers onto pyramids-eo, and make the live e2e honest (#1320)
+
 ## 0.29.0 (2026-10-20)
 
 ### Feat
