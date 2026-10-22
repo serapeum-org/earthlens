@@ -34,12 +34,17 @@ requires-python = ">=3.11,<4"
 # unconditionally-registered console script. No provider SDK belongs here —
 # those live in the thematic provider distributions' own dependencies.
 dependencies = [
-    "pyramids-core >=0.70.0",
+    "pyramids-core >=0.71.0",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",
     "numpy >=2.0.0",
-    "pandas >=2.0.0",
+    # Cap <3 until earthlens is pandas-3 ready (#1339): pandas 3 makes the gee
+    # geometry-only frame -> ee.Feature conversion yield properties={} instead of
+    # None. openeo's transitive pandas<3 is escaped in one branch of the wheel's
+    # universal resolve, so earthlens must assert the bound itself. Lift once #1339
+    # lands.
+    "pandas >=2.0.0,<3",
     "platformdirs >=3.0.0",
     "pydantic >=2.0",
     "pyproj >=3.7.0",
