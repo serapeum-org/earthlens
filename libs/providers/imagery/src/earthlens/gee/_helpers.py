@@ -75,6 +75,29 @@ TERMINAL_TASK_STATES: frozenset[str] = frozenset(
 )
 
 
+def checked_cdi_threshold(value: float) -> float:
+    """Refuse a CDI threshold outside the inclusive `[-1, 1]` range.
+
+    The one check `cloud_masks.Sentinel2Cdi` and the
+    `reducers.Sentinel2Composite` reducer share, so the error text cannot
+    drift between them. It lives here rather than in either of those,
+    because a check two modules share is what this module is for.
+
+    Args:
+        value: The parsed `threshold` input.
+
+    Returns:
+        The value unchanged when it is in range.
+
+    Raises:
+        ValueError: If `value` is outside `[-1, 1]` — the CDI band is a
+            `[-1, 1]` index, not a probability or a percentage.
+    """
+    if not -1 <= value <= 1:
+        raise ValueError(f"threshold must be in [-1, 1], got {value!r}")
+    return value
+
+
 def slug_asset_id(asset_id: str) -> str:
     """Turn an Earth Engine asset id into a filesystem-safe slug.
 

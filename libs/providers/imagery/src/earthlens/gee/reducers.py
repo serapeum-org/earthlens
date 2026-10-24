@@ -59,7 +59,8 @@ import ee
 import pandas as pd
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from earthlens.gee.cloud_masks import Sentinel2Cdi, _checked_cdi_threshold
+from earthlens.gee._helpers import checked_cdi_threshold
+from earthlens.gee.cloud_masks import Sentinel2Cdi
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from collections.abc import Sequence
@@ -904,7 +905,7 @@ class Sentinel2Composite(_NamedAlgorithmComposite):
         Raises:
             ValueError: If `value` is outside `[-1, 1]`.
         """
-        return _checked_cdi_threshold(value)
+        return checked_cdi_threshold(value)
 
     @field_validator("reducer", mode="before")
     @classmethod

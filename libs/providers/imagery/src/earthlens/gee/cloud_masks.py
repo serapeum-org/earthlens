@@ -129,6 +129,8 @@ import ee
 from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from earthlens.gee._helpers import checked_cdi_threshold
+
 if TYPE_CHECKING:  # pragma: no cover - import cycle / cost avoidance only
     from earthlens.gee.catalog import Dataset
 
@@ -288,27 +290,6 @@ def _with_properties(derived: ee.Image, source: ee.Image) -> ee.Image:
     """
     copied = ee.Image(derived.copyProperties(source, source.propertyNames()))
     return cast("ee.Image", copied)
-
-
-def _checked_cdi_threshold(value: float) -> float:
-    """Refuse a CDI threshold outside the inclusive `[-1, 1]` range.
-
-    The one check `Sentinel2Cdi` and the `Sentinel2Composite` reducer
-    share, so the error text cannot drift between them.
-
-    Args:
-        value: The parsed `threshold` input.
-
-    Returns:
-        The value unchanged when it is in range.
-
-    Raises:
-        ValueError: If `value` is outside `[-1, 1]` — the CDI band is a
-            `[-1, 1]` index, not a probability or a percentage.
-    """
-    if not -1 <= value <= 1:
-        raise ValueError(f"threshold must be in [-1, 1], got {value!r}")
-    return value
 
 
 def _checked_sensor(value: object) -> object:
@@ -927,7 +908,7 @@ class Sentinel2Cdi(ImageMask):
         Raises:
             ValueError: If `value` is outside `[-1, 1]`.
         """
-        return _checked_cdi_threshold(value)
+        return checked_cdi_threshold(value)
 
     def __call__(self, image: ee.Image) -> ee.Image:
         """Mask one TOA scene where its CDI falls below the threshold.
