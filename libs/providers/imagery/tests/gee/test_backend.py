@@ -4942,3 +4942,83 @@ class TestCdiThroughThePreprocessFlag:
             and catalog.datasets[asset].preprocess.mask == "sentinel2_cdi"
         ]
         assert offenders == []
+
+
+#: A static (`ee_type="image"`) catalog row that declares band scale factors,
+#: so `scaled=True` resolves a real scaler rather than an identity.
+_STATIC_SCALED = "OpenLandMap/CLM/CLM_LST_MOD11A2-DAYNIGHT_M/v01"
+
+
+class TestStaticImageWarning:
+    """L4: the warning must name what the caller actually passed."""
+
+    def _warnings(self, monkeypatch):
+        """Capture `_build_collection`'s warnings."""
+        captured: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger,
+            "warning",
+            lambda msg, *a, **k: captured.append(msg),
+        )
+        return captured
+
+    def _build(self, make_gee, **overrides):
+        """Build the one-image collection for the static scaled row."""
+        params = dict(
+            variables={_STATIC_SCALED: ["jan"]},
+            start="2010-01-01",
+            end="2010-01-31",
+            scale=1000.0,
+        )
+        params.update(overrides)
+        gee = make_gee(**params)
+        gee._build_collection(
+            gee.catalog.get_dataset(_STATIC_SCALED),
+            ["jan"],
+            dt.datetime(2010, 1, 1),
+            dt.datetime(2010, 2, 1),
+        )
+        return gee
+
+    def test_the_row_is_static_and_declares_factors(self, make_gee):
+        """The fixture row is the shape the finding needs, not an invented one."""
+        gee = make_gee(variables={_STATIC_SCALED: ["jan"]}, scale=1000.0)
+        row = gee.catalog.get_dataset(_STATIC_SCALED)
+        assert row.is_image_collection is False
+        assert row.bands["jan"].scale is not None
+
+    @pytest.mark.parametrize("flag", ["scaled"])
+    def test_a_flag_only_request_is_not_warned_about(self, make_gee, monkeypatch, flag):
+        """`scaled=True` on a static image is a valid, working request."""
+        captured = self._warnings(monkeypatch)
+        self._build(make_gee, **{flag: True})
+        assert [w for w in captured if "static single-image" in w] == []
+
+    @pytest.mark.parametrize(
+        "hooks",
+        [
+            {"filters": [lambda c: c.filter("cc")]},
+            {"cloud_mask": _identity_mask},
+            {"cloud_mask": _identity_mask, "scaled": True},
+        ],
+        ids=["filters", "cloud_mask", "cloud_mask-and-flag"],
+    )
+    def test_a_hook_is_still_warned_about(self, make_gee, monkeypatch, hooks):
+        """The arguments the message names are the ones that still trigger it."""
+        captured = self._warnings(monkeypatch)
+        self._build(make_gee, **hooks)
+        assert any("static single-image" in w for w in captured), captured
+
+    def test_the_per_image_op_is_built_once(self, make_gee, monkeypatch):
+        """The warning branch must not rebuild the MaskChain for nothing."""
+        calls: list[object] = []
+        original = backend_module.GEE._per_image_op
+
+        def _counted(self, var_info):
+            calls.append(var_info.id)
+            return original(self, var_info)
+
+        monkeypatch.setattr(backend_module.GEE, "_per_image_op", _counted)
+        self._warnings(monkeypatch)
+        self._build(make_gee, scaled=True)
+        assert calls == [_STATIC_SCALED]

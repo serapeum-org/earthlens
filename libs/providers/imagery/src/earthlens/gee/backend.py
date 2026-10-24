@@ -2242,7 +2242,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         the single wrapped image and empty the collection, while a mask
         reading a band the asset lacks fails when the graph is computed —
         either way it surfaces later as an opaque Earth Engine error at
-        download time rather than here.
+        download time rather than here. The warning names those two
+        arguments, so it fires only when one of them was given: a `scaled=`
+        / `preprocess=` op lands on the same hook, but it is resolved from
+        the row's own declarations and neither hazard reaches it.
 
         Args:
             var_info: The catalog entry.
@@ -2253,6 +2256,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         Returns:
             The `ee.ImageCollection`.
         """
+        # Resolved once and reused: the static-image branch below used to call
+        # this for the warning and then again for the `.map`, rebuilding the
+        # `MaskChain` for nothing.
+        per_image = self._per_image_op(var_info)
         if var_info.is_image_collection:
             collection = ee.ImageCollection(var_info.id).filterDate(
                 start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d")
@@ -2261,7 +2268,15 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # A static image: no temporal filtering (the asset may not
             # carry a `system:time_start` inside the request window).
             collection = ee.ImageCollection([ee.Image(var_info.id)])
-            if self.filters or self._per_image_op(var_info) is not None:
+            # Keyed on the arguments, not on the resolved op. A `scaled=` /
+            # `preprocess=` op also lands on that hook, but it is resolved
+            # from this row's own declarations: a `BandScaler` skips a band
+            # the row does not carry, and `preprocess=True` against a row
+            # with no `preprocess:` recipe is refused at construction. So
+            # neither of the two hazards below applies to it, and naming two
+            # arguments the caller never passed would cry wolf on a request
+            # that works.
+            if self.filters or self.cloud_mask is not None:
                 logger.warning(
                     f"filters / cloud_mask were set but {var_info.id!r} is a "
                     "static single-image dataset (ee_type='image'); they are "
@@ -2273,7 +2288,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
         collection = collection.filterBounds(self._ee_region())
         for image_filter in self.filters:
             collection = image_filter(collection)
-        per_image = self._per_image_op(var_info)
         if per_image is not None:
             collection = collection.map(per_image)
         return collection.select(list(bands))

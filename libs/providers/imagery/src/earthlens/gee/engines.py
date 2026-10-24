@@ -231,8 +231,9 @@ class EedaiEngine(Engine):
             raise ValueError(
                 f"engine='eedai' cannot serve {var_info.id}: the EEDAI "
                 "reader materialises pixels from an asset id, so it cannot "
-                "run server-side compute (a reduced collection, cloud_mask "
-                "or filters), and it reads only EPSG:4326 or a metre-based "
+                "run server-side compute (a reduced collection, cloud_mask, "
+                "filters, or a scaled= / preprocess= flag), and it reads "
+                "only EPSG:4326 or a metre-based "
                 f"projected CRS (got crs={backend.crs!r}).{pinned} Use "
                 "engine='auto' or engine='ee'."
             )
