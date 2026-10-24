@@ -82,6 +82,8 @@ the rendered API.
 
 ::: earthlens.gee.assets
 
+::: earthlens.gee.ml
+
 ::: earthlens.gee.io
 
 ## Client-side raster analysis

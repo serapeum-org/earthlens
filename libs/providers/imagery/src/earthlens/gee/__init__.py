@@ -243,6 +243,17 @@ engine-eligibility gate:
 * `Cluster` / `Classify`, with `TrainingExtractor` and
   `TrainingSet` — unsupervised and supervised per-pixel learning
   through scikit-learn (the `[gee]` extra).
+* `ClassifierCodec` — the bridge back to the server: encodes a fitted
+  scikit-learn tree classifier (`Classify.estimator`, or your own
+  `DecisionTreeClassifier` / `RandomForestClassifier`) into
+  `ee.Classifier.decisionTree` / `decisionTreeEnsemble` strings via
+  `to_ee`, so `image.classify(codec.to_ee(model))` runs the local model
+  server-side (a pure-Python port of geemap's tree-string bridge; geemap
+  is not a dependency). `from_ee` is the partial reverse, parsing tree
+  strings back into a `TreeEnsemble` — a lossy pure-Python majority-vote
+  predictor, not a scikit-learn estimator.
+  `ClassifierCodec.for_classify` maps a `Classify`'s training band
+  *indices* onto Earth Engine band *names*.
 * `PanSharpen` / `MatchHistogram` — operations that combine a raster
   with a companion one (a finer pan band; a reference acquisition).
 * `TasseledCap` — the sensor-specific brightness / greenness /
@@ -422,6 +433,7 @@ from earthlens.gee.joins import (
     SaveFirstJoin,
     SimpleJoin,
 )
+from earthlens.gee.ml import ClassifierCodec, TreeEnsemble
 from earthlens.gee.pixels import HIGH_VOLUME_ENDPOINT, PixelsEngine
 from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reader import EedaiReader
@@ -543,6 +555,8 @@ __all__ = [
     "WorkloadTag",
     "AssetManager",
     "AssetInfo",
+    "ClassifierCodec",
+    "TreeEnsemble",
     "Reducer",
     "Mean",
     "Median",

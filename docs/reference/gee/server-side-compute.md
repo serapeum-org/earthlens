@@ -653,6 +653,34 @@ asynchronous like the batch sinks and returns the same `TaskInfo`, so `get_task_
 `wait_for_task_id` / `cancel_task` work on it unchanged. Asset management is pure control-plane: it is
 server-side regardless of any request's `engine=`, and the EEDAI reader is never involved.
 
+### Pushing a local classifier server-side
+
+A tree model trained locally — Epic 2's client-side `Classify`, or any fitted scikit-learn
+`DecisionTreeClassifier` / `RandomForestClassifier` — can classify an arbitrarily large image server-side
+without retraining and without uploading the training data. `ClassifierCodec` encodes the fitted trees into
+the text format `ee.Classifier.decisionTree` / `decisionTreeEnsemble` accept (a pure-Python port of geemap's
+tree-string bridge; geemap is not a dependency):
+
+```python
+from earthlens.gee import ClassifierCodec
+
+codec = ClassifierCodec(feature_names=("B4", "B8"))   # band name per feature column, in order
+classifier = codec.to_ee(model)                       # ee.Classifier.decisionTreeEnsemble(...)
+labelled = image.classify(classifier)                 # server-side, over any image
+```
+
+`Classify` trains on band *indices* while Earth Engine classifies by band *name*, so
+`ClassifierCodec.for_classify(operation, {0: "B4", 1: "B8"})` builds the codec from the operation's own
+training bands, and the public `Classify.estimator` accessor hands over the fitted forest:
+`codec.to_ee(operation.estimator)`. The classify graph is server-side compute, so the request is Earth
+Engine-only (`engine="ee"`); the client-side `Classify` itself runs after a download and affects no engine
+choice.
+
+`from_ee` is the partial reverse: it parses the tree strings back into a `TreeEnsemble`, a pure-Python
+majority-vote predictor — not a scikit-learn estimator, since the fitted probabilities do not survive the
+string format. It reads the strings off a classifier built client-side; one trained *server-side* keeps its
+trees on the server, so fetch them first (`classifier.explain().getInfo()`) and pass the strings.
+
 ## Choosing an engine, in practice
 
 | Situation | Engine |

@@ -186,6 +186,9 @@ _EXPECTED_EXPORTS = {
     # Epic 6 Task 6.10 - the asset-lifecycle control plane and its rows.
     "AssetManager",
     "AssetInfo",
+    # Epic 6 Task 6.11 - the sklearn <-> ee.Classifier tree-string bridge.
+    "ClassifierCodec",
+    "TreeEnsemble",
 }
 
 

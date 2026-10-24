@@ -240,6 +240,25 @@ class Classify(RasterOperation):
             self._forest = forest
         return self._forest
 
+    @property
+    def estimator(self) -> Any:
+        """The fitted scikit-learn forest behind this operation.
+
+        Fits lazily on first access, through the same path `apply` uses, so
+        reading it before any raster has been classified is fine. The primary
+        consumer is `earthlens.gee.ml.ClassifierCodec`, which exports the
+        forest to a server-side `ee.Classifier`;
+        `ClassifierCodec.for_classify` builds the band-index-to-band-name
+        mapping from this operation's training bands.
+
+        Returns:
+            The fitted `RandomForestClassifier`.
+
+        Raises:
+            ImportError: If scikit-learn is not installed.
+        """
+        return self._fitted()
+
     def apply(self, ds: Dataset) -> Dataset:
         """Return a raster of predicted class labels.
 

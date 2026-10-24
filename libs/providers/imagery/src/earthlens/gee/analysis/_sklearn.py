@@ -17,7 +17,7 @@ import importlib
 from importlib.util import find_spec
 from types import ModuleType
 
-__all__ = ["import_cluster", "import_ensemble", "sklearn_available"]
+__all__ = ["import_cluster", "import_ensemble", "import_tree", "sklearn_available"]
 
 _INSTALL_HINT = (
     "scikit-learn is required for this operation but is not installed. Install "
@@ -67,6 +67,18 @@ def import_ensemble() -> ModuleType:
         ImportError: If scikit-learn is not installed.
     """
     return _import("sklearn.ensemble")
+
+
+def import_tree() -> ModuleType:
+    """Return `sklearn.tree`, home of `DecisionTreeClassifier`.
+
+    Returns:
+        The imported `sklearn.tree` module.
+
+    Raises:
+        ImportError: If scikit-learn is not installed.
+    """
+    return _import("sklearn.tree")
 
 
 def sklearn_available() -> bool:
