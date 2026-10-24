@@ -228,11 +228,15 @@ median composite is a facade call rather than raw `ee`:
 
 * `earthlens.gee.cloud_masks` — per-image `ee.Image -> ee.Image`
   masks: the frozen callable classes `LandsatSrMask` (Landsat C2-L2
-  QA_PIXEL Clear-bit), `Sentinel2SclMask` (Sentinel-2 L2A SCL —
-  drops cloud shadow / cloud / cirrus) and `CloudScorePlus`
-  (Google's Cloud Score+ quality score, linked per scene by
-  `system:index`) under the `ImageMask` base, plus the function
-  forms `landsat_sr(image, sensor=...)` and `sentinel2_scl(image)`.
+  QA_PIXEL Clear-bit), `LandsatQaRefinedMask` (QA_PIXEL cloud /
+  shadow confidence bit-pairs, thresholded), `Sentinel2SclMask`
+  (Sentinel-2 L2A SCL — drops cloud shadow / cloud / cirrus),
+  `Sentinel2Qa60Mask` (the pre-SCL QA60 cloud + cirrus bitmask),
+  `ModisState1kmMask` (daily MOD09GA / MYD09GA `state_1km` cloud
+  state) and `CloudScorePlus` (Google's Cloud Score+ quality score,
+  linked per scene by `system:index`) under the `ImageMask` base,
+  plus the function forms `landsat_sr(image, sensor=...)` and
+  `sentinel2_scl(image)`.
 * `earthlens.gee.filters` — collection filters: `ByYear` / `ByBounds`
   / `ByPropertyIn` / `ByCloudCoverLte` / `ByYearAndBounds` under the
   class-form `CollectionFilter` base (the top-level

@@ -9,7 +9,8 @@ through the facade instead of raw `ee`.
 Masks come in two equivalent forms:
 
 * **Callable classes** under the `ImageMask` base — `LandsatSrMask`,
-  `Sentinel2SclMask` and `CloudScorePlus` — frozen pydantic objects
+  `LandsatQaRefinedMask`, `Sentinel2SclMask`, `Sentinel2Qa60Mask`,
+  `ModisState1kmMask` and `CloudScorePlus` — frozen pydantic objects
   that carry validated config and are drop-ins for `cloud_mask=` (the
   hook only requires a callable). A typo'd keyword or an out-of-range
   value raises at construction instead of silently no-op'ing the way a
@@ -34,6 +35,26 @@ cloud medium / high probability (8 / 9) and thin cirrus (10).
 dataset (`GOOGLE/CLOUD_SCORE_PLUS/V1/S2_HARMONIZED`): it links the
 scene's `cs` / `cs_cdf` quality band by `system:index` and keeps pixels
 at or above a `[0, 1]` threshold.
+
+The expanded library (Task 6.4) broadens coverage across the catalog's
+optical datasets:
+
+* `Sentinel2Qa60Mask` — the standard pre-Scene-Classification recipe:
+  masks the `QA60` opaque-cloud bit (10) and cirrus bit (11), for TOA
+  scenes (`COPERNICUS/S2_HARMONIZED`) that carry `QA60` but no `SCL`.
+* `LandsatQaRefinedMask` — gives the `sensor` argument teeth: reads the
+  `QA_PIXEL` confidence bit-pairs (cloud at bits 8-9, cloud shadow at
+  bits 10-11) and keeps pixels at or below the configured confidence
+  ceilings, instead of trusting the single derived Clear bit.
+* `ModisState1kmMask` — the daily MODIS surface-reflectance products
+  (`MODIS/061/MOD09GA` / `MYD09GA`): keeps only pixels whose 2-bit
+  cloud-state field (bits 0-1 of `state_1km`) reads "clear" (0).
+
+Each mask reads a quality band the target dataset must carry; the
+curated catalog declares `QA60` and `state_1km` on the datasets named
+above, so a facade request against those rows has the band. On a
+dataset without it, Earth Engine fails at graph-compute time — the
+documented contract for a mask reading an absent band.
 
 Bit layout (USGS LSDS-1330):
 
@@ -65,8 +86,11 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 __all__ = [
     "CloudScorePlus",
     "ImageMask",
+    "LandsatQaRefinedMask",
     "LandsatSrMask",
+    "ModisState1kmMask",
     "Sensor",
+    "Sentinel2Qa60Mask",
     "Sentinel2SclMask",
     "landsat_sr",
     "sentinel2_scl",
@@ -88,6 +112,50 @@ _S2_SCL_MASKED_CLASSES: tuple[int, ...] = (3, 8, 9, 10)
 #: Google's Cloud Score+ collection, aligned to the harmonized Sentinel-2
 #: archive by `system:index` — the default `CloudScorePlus.cs_collection`.
 _CS_PLUS_COLLECTION: str = "GOOGLE/CLOUD_SCORE_PLUS/V1/S2_HARMONIZED"
+
+#: Bit 10 of the Sentinel-2 `QA60` bitmask: opaque clouds.
+_S2_QA60_CLOUD_BIT: int = 1 << 10
+
+#: Bit 11 of the Sentinel-2 `QA60` bitmask: cirrus clouds.
+_S2_QA60_CIRRUS_BIT: int = 1 << 11
+
+#: Right-shift bringing the `QA_PIXEL` Cloud Confidence bit-pair (bits 8-9,
+#: USGS LSDS-1330) down to the low two bits.
+_LS_CLOUD_CONF_SHIFT: int = 8
+
+#: Right-shift bringing the `QA_PIXEL` Cloud Shadow Confidence bit-pair
+#: (bits 10-11) down to the low two bits.
+_LS_SHADOW_CONF_SHIFT: int = 10
+
+#: The two-bit mask isolating one shifted `QA_PIXEL` confidence field:
+#: 0 (not set) / 1 (low) / 2 (medium) / 3 (high).
+_LS_CONF_PAIR_MASK: int = 0b11
+
+#: The two-bit cloud-state field at bits 0-1 of the MODIS `state_1km` band:
+#: 0 clear, 1 cloudy, 2 mixed, 3 not set (assumed clear by MODIS, masked here).
+_MODIS_CLOUD_STATE_MASK: int = 0b11
+
+
+def _checked_sensor(value: object) -> object:
+    """Refuse an unsupported sensor name with the long-standing message.
+
+    The one check both Landsat masks share, so the error text cannot
+    drift between them.
+
+    Args:
+        value: The raw `sensor` input, before pydantic's `Literal` check.
+
+    Returns:
+        The value unchanged when it names a supported sensor.
+
+    Raises:
+        ValueError: If `value` is not one of the supported names.
+    """
+    if not (isinstance(value, str) and value in _SUPPORTED_SENSORS):
+        raise ValueError(
+            f"sensor must be one of {sorted(_SUPPORTED_SENSORS)}, got {value!r}"
+        )
+    return value
 
 
 class ImageMask(BaseModel):
@@ -211,11 +279,7 @@ class LandsatSrMask(ImageMask):
         Raises:
             ValueError: If `value` is not one of the supported names.
         """
-        if not (isinstance(value, str) and value in _SUPPORTED_SENSORS):
-            raise ValueError(
-                f"sensor must be one of {sorted(_SUPPORTED_SENSORS)}, got {value!r}"
-            )
-        return value
+        return _checked_sensor(value)
 
     def __call__(self, image: ee.Image) -> ee.Image:
         """Mask one image to its `QA_PIXEL` Clear pixels.
@@ -415,6 +479,209 @@ class CloudScorePlus(ImageMask):
             ee.ImageCollection(self.cs_collection), [self.band]
         )
         return linked.updateMask(linked.select(self.band).gte(self.threshold))
+
+
+class Sentinel2Qa60Mask(ImageMask):
+    """Mask a Sentinel-2 image via the `QA60` cloud bitmask.
+
+    The standard pre-Scene-Classification recipe: reads the `QA60` band
+    and keeps only pixels with neither the opaque-cloud bit (10) nor
+    the cirrus bit (11) set. Use it on TOA scenes
+    (`COPERNICUS/S2_HARMONIZED`), which carry `QA60` but no `SCL` band;
+    the Level-2A products can use `Sentinel2SclMask` instead (both
+    harmonized catalog rows declare `QA60`). Like every mask here it
+    forces the request onto an Earth Engine engine.
+
+    Examples:
+        - The mask carries no config; constructing it is enough:
+            ```python
+            >>> isinstance(Sentinel2Qa60Mask(), ImageMask)
+            True
+
+            ```
+        - Hand an instance to the GEE backend as the per-image mask:
+            ```python
+            >>> from earthlens.core import EarthLens  # doctest: +SKIP
+            >>> el = EarthLens(  # doctest: +SKIP
+            ...     data_source="gee",
+            ...     dataset="COPERNICUS/S2_HARMONIZED",
+            ...     variables=["B4", "B3", "B2"],
+            ...     start="2024-05-01", end="2024-06-15",
+            ...     reducer="median", cloud_mask=Sentinel2Qa60Mask(),
+            ... )
+
+            ```
+    """
+
+    def __call__(self, image: ee.Image) -> ee.Image:
+        """Mask one image to the pixels with no `QA60` cloud or cirrus flag.
+
+        Args:
+            image: An `ee.Image` carrying the `QA60` band — the
+                harmonized Sentinel-2 TOA / SR products declare it.
+
+        Returns:
+            The input image with `updateMask(...)` applied, the mask
+            being the AND of "bit 10 clear" and "bit 11 clear" —
+            properties, `system:time_start` included, are preserved.
+        """
+        qa = image.select("QA60")
+        clear = (
+            qa.bitwiseAnd(_S2_QA60_CLOUD_BIT)
+            .eq(0)
+            .And(qa.bitwiseAnd(_S2_QA60_CIRRUS_BIT).eq(0))
+        )
+        return image.updateMask(clear)
+
+
+class LandsatQaRefinedMask(ImageMask):
+    """Mask a Landsat C2-L2 image by its `QA_PIXEL` confidence bit-pairs.
+
+    The per-sensor refinement the `LandsatSrMask.sensor` argument was
+    reserved for: instead of trusting the single derived Clear bit, it
+    reads the Cloud Confidence (bits 8-9) and Cloud Shadow Confidence
+    (bits 10-11) fields of `QA_PIXEL` (USGS LSDS-1330) and keeps only
+    pixels at or below the configured confidence ceilings — so a caller
+    can demand, say, cloud confidence `<= 1` rather than accepting
+    whatever the Clear bit folded in. Forces the request onto an Earth
+    Engine engine, like every `cloud_mask=`.
+
+    Attributes:
+        sensor: Source sensor name; one of `"LS7"`, `"LS8"`, `"LS9"`,
+            or `"auto"` (the default). The confidence bit-pairs sit at
+            the same positions across the three C2-L2 sensors, so the
+            field declares intent; an unknown name is refused at
+            construction.
+        max_cloud_confidence: Highest Cloud Confidence value kept —
+            `0` (not set) to `3` (high). Defaults to `2` (keep up to
+            medium confidence).
+        max_shadow_confidence: Highest Cloud Shadow Confidence value
+            kept, same `0`-`3` scale. Defaults to `2`.
+
+    Examples:
+        - The defaults keep up-to-medium confidence on both fields:
+            ```python
+            >>> mask = LandsatQaRefinedMask()
+            >>> mask.max_cloud_confidence, mask.max_shadow_confidence
+            (2, 2)
+
+            ```
+        - A ceiling outside the 2-bit field is refused at construction:
+            ```python
+            >>> LandsatQaRefinedMask(max_cloud_confidence=4)
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for LandsatQaRefinedMask
+            ...
+
+            ```
+        - Hand an instance to the GEE backend as the per-image mask:
+            ```python
+            >>> from earthlens.core import EarthLens  # doctest: +SKIP
+            >>> el = EarthLens(  # doctest: +SKIP
+            ...     data_source="gee",
+            ...     dataset="LANDSAT/LC08/C02/T1_L2",
+            ...     variables=["SR_B4", "SR_B3", "SR_B2"],
+            ...     start="2023-06-01", end="2023-09-01",
+            ...     reducer="median",
+            ...     cloud_mask=LandsatQaRefinedMask(max_cloud_confidence=1),
+            ... )
+
+            ```
+    """
+
+    sensor: Sensor = "auto"
+    max_cloud_confidence: int = Field(default=2, ge=0, le=3)
+    max_shadow_confidence: int = Field(default=2, ge=0, le=3)
+
+    @field_validator("sensor", mode="before")
+    @classmethod
+    def _check_sensor(cls, value: object) -> object:
+        """Refuse an unsupported sensor name with the long-standing message.
+
+        Args:
+            value: The raw `sensor` input, before pydantic's `Literal`
+                check.
+
+        Returns:
+            The value unchanged when it names a supported sensor.
+
+        Raises:
+            ValueError: If `value` is not one of the supported names.
+        """
+        return _checked_sensor(value)
+
+    def __call__(self, image: ee.Image) -> ee.Image:
+        """Mask one image by both `QA_PIXEL` confidence ceilings.
+
+        Args:
+            image: An `ee.Image` from `LANDSAT/LE07/C02/T1_L2`,
+                `LANDSAT/LC08/C02/T1_L2`, or `LANDSAT/LC09/C02/T1_L2`.
+                Must carry the `QA_PIXEL` band.
+
+        Returns:
+            The input image with `updateMask(...)` applied, the mask
+            being `cloud_conf <= max_cloud_confidence AND shadow_conf
+            <= max_shadow_confidence` — properties,
+            `system:time_start` included, are preserved.
+        """
+        qa = image.select("QA_PIXEL")
+        cloud_conf = qa.rightShift(_LS_CLOUD_CONF_SHIFT).bitwiseAnd(_LS_CONF_PAIR_MASK)
+        shadow_conf = qa.rightShift(_LS_SHADOW_CONF_SHIFT).bitwiseAnd(
+            _LS_CONF_PAIR_MASK
+        )
+        keep = cloud_conf.lte(self.max_cloud_confidence).And(
+            shadow_conf.lte(self.max_shadow_confidence)
+        )
+        return image.updateMask(keep)
+
+
+class ModisState1kmMask(ImageMask):
+    """Mask a daily MODIS surface-reflectance image via `state_1km`.
+
+    Covers the daily MODIS products (`MODIS/061/MOD09GA` /
+    `MODIS/061/MYD09GA`, both of which declare the band in the
+    catalog): the cloud state lives in the 2-bit field at bits 0-1 of
+    `state_1km`, and only the "clear" code (0) is kept — cloudy (1),
+    mixed (2) and not-set (3) pixels are all masked. Forces the request
+    onto an Earth Engine engine, like every `cloud_mask=`.
+
+    Examples:
+        - The mask carries no config; constructing it is enough:
+            ```python
+            >>> isinstance(ModisState1kmMask(), ImageMask)
+            True
+
+            ```
+        - Hand an instance to the GEE backend as the per-image mask:
+            ```python
+            >>> from earthlens.core import EarthLens  # doctest: +SKIP
+            >>> el = EarthLens(  # doctest: +SKIP
+            ...     data_source="gee",
+            ...     dataset="MODIS/061/MOD09GA",
+            ...     variables=["sur_refl_b01", "sur_refl_b04", "sur_refl_b03"],
+            ...     start="2023-06-01", end="2023-07-01",
+            ...     reducer="median", cloud_mask=ModisState1kmMask(),
+            ... )
+
+            ```
+    """
+
+    def __call__(self, image: ee.Image) -> ee.Image:
+        """Mask one image to the pixels whose cloud state reads "clear".
+
+        Args:
+            image: An `ee.Image` carrying the `state_1km` band — the
+                daily MOD09GA / MYD09GA products provide it.
+
+        Returns:
+            The input image with
+            `updateMask(state.bitwiseAnd(0b11).eq(0))` applied —
+            properties, `system:time_start` included, are preserved.
+        """
+        state = image.select("state_1km")
+        clear = state.bitwiseAnd(_MODIS_CLOUD_STATE_MASK).eq(0)
+        return image.updateMask(clear)
 
 
 def landsat_sr(image: ee.Image, sensor: Sensor = "auto") -> ee.Image:

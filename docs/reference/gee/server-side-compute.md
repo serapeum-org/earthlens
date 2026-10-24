@@ -253,6 +253,26 @@ particular — so the per-bucket date filter the composite engine applies *after
 scene. Like the function forms, an instance on `cloud_mask=` forces the request onto an Earth Engine
 engine (the EEDAI reader cannot run a graph).
 
+### The expanded mask library
+
+Three further `ImageMask` classes broaden coverage across the catalog's optical datasets. Each reads a
+quality band its target dataset declares in the curated catalog, derives its output with `updateMask`
+(properties survive), and — like every `cloud_mask=` — moves the request onto an Earth Engine engine:
+
+- `Sentinel2Qa60Mask()` — the standard pre-Scene-Classification recipe: masks the `QA60` opaque-cloud
+  bit (10) and cirrus bit (11). Use it for TOA scenes (`COPERNICUS/S2_HARMONIZED`), which carry `QA60`
+  but no `SCL` band.
+- `LandsatQaRefinedMask(sensor=..., max_cloud_confidence=2, max_shadow_confidence=2)` — the per-sensor
+  refinement the `sensor` argument was reserved for: thresholds the `QA_PIXEL` Cloud Confidence
+  (bits 8-9) and Cloud Shadow Confidence (bits 10-11) fields instead of trusting the single derived
+  Clear bit. Ceilings are `0` (not set) to `3` (high), validated at construction.
+- `ModisState1kmMask()` — the daily MODIS surface-reflectance products (`MODIS/061/MOD09GA` /
+  `MYD09GA`): keeps only pixels whose 2-bit cloud-state field (bits 0-1 of `state_1km`) reads
+  "clear" (0).
+
+On a dataset that does not carry the mask's quality band, Earth Engine fails at graph-compute time —
+the same contract as the first gotcha below; the curated rows named above all declare theirs.
+
 ### `CloudScorePlus` — the state-of-the-art Sentinel-2 mask
 
 `CloudScorePlus` masks a Sentinel-2 scene with Google's Cloud Score+ dataset
