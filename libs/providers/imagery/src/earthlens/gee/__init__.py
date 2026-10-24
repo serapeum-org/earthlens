@@ -227,12 +227,17 @@ feed the `GEE` backend's `cloud_mask=` / `filters=` constructor hooks
 median composite is a facade call rather than raw `ee`:
 
 * `earthlens.gee.cloud_masks` — per-image `ee.Image -> ee.Image`
-  masks: `landsat_sr(image, sensor=...)` (Landsat C2-L2 QA_PIXEL
-  Clear-bit) and `sentinel2_scl(image)` (Sentinel-2 L2A SCL —
-  drops cloud shadow / cloud / cirrus).
-* `earthlens.gee.filters` — `by_year` / `by_bounds` /
-  `by_property_in` / `by_cloud_cover_lte` / `by_year_and_bounds`
-  for `ee.ImageCollection.filter*` composition.
+  masks: the frozen callable classes `LandsatSrMask` (Landsat C2-L2
+  QA_PIXEL Clear-bit) and `Sentinel2SclMask` (Sentinel-2 L2A SCL —
+  drops cloud shadow / cloud / cirrus) under the `ImageMask` base,
+  plus the function forms `landsat_sr(image, sensor=...)` and
+  `sentinel2_scl(image)`.
+* `earthlens.gee.filters` — collection filters: `ByYear` / `ByBounds`
+  / `ByPropertyIn` / `ByCloudCoverLte` / `ByYearAndBounds` under the
+  class-form `CollectionFilter` base (the top-level
+  `earthlens.gee.CollectionFilter` export stays the `Callable` type
+  alias), plus the function forms `by_year` / `by_bounds` /
+  `by_property_in` / `by_cloud_cover_lte` / `by_year_and_bounds`.
 
 Job / task tracking — for asynchronous `export_via="drive"` /
 `"gcs"` / `"asset"` sinks, the `earthlens.gee.jobs` module

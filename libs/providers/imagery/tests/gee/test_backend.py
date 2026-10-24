@@ -28,7 +28,8 @@ from earthlens.gee import ExtentDiscovery
 from earthlens.gee import backend as backend_module
 from earthlens.gee.backend import GEE
 from earthlens.gee.catalog import Dataset, Extent
-from earthlens.gee.cloud_masks import sentinel2_scl
+from earthlens.gee.cloud_masks import LandsatSrMask, sentinel2_scl
+from earthlens.gee.filters import ByYear
 from earthlens.gee.reducers import temporal_reducer_for
 
 # -- fakes ------------------------------------------------------------------
@@ -4348,3 +4349,36 @@ class TestExportViaEedai:
         )
         assert not fake_reader.calls
         assert image.download_params is not None
+
+
+class TestCallableHookInstances:
+    """Task 6.1: frozen mask/filter instances are drop-ins for the hooks."""
+
+    def test_instances_flow_through_build_collection(self, make_gee):
+        """Class instances pass validation and run through `_build_collection`."""
+        mask = LandsatSrMask()
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+            cloud_mask=mask,
+            filters=[ByYear(year=2020)],
+        )
+        assert gee.cloud_mask is mask
+        assert gee.filters == (ByYear(year=2020),)
+        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        col = gee._build_collection(
+            ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
+        )
+        assert col.method_names() == [
+            "filterDate",
+            "filterBounds",
+            "filterDate",
+            "map",
+            "select",
+        ]
+        # The second filterDate is ByYear(2020) executing through the hook.
+        assert [args for name, args in col.calls if name == "filterDate"][1] == (
+            "2020-01-01",
+            "2021-01-01",
+        )
+        assert [args for name, args in col.calls if name == "map"] == [(mask,)]

@@ -192,6 +192,23 @@ el = EarthLens(
 `by_cloud_cover_lte` defaults to Landsat's `CLOUD_COVER`, so Sentinel-2 needs
 `property_name="CLOUDY_PIXEL_PERCENTAGE"` passed explicitly.
 
+Each of these also exists as a frozen callable class — `ByYear`, `ByBounds`, `ByPropertyIn`,
+`ByCloudCoverLte`, `ByYearAndBounds`, under the `earthlens.gee.filters.CollectionFilter` base — whose
+instances carry validated config and are drop-ins for a `filters=` entry, so the first lambda above can
+lose its wrapper:
+
+```python
+from earthlens.gee.filters import ByCloudCoverLte
+
+filters=[ByCloudCoverLte(max_pct=20, property_name="CLOUDY_PIXEL_PERCENTAGE")]
+```
+
+A typo'd keyword or an out-of-range `max_pct` is refused at construction (`frozen=True`,
+`extra="forbid"`), where a `functools.partial` would bind the misspelling silently. One naming note: the
+top-level `earthlens.gee.CollectionFilter` stays the `Callable` *type alias* describing the hook; the
+class of the same name in `earthlens.gee.filters` is the base that implements it. Class or function, any
+filter moves the request onto an Earth Engine engine, as above.
+
 ## Level 3 — `cloud_mask=`, per-image compute
 
 `cloud_mask` is typed `Callable[[ee.Image], ee.Image]` and is `.map`-applied to every image in the
@@ -220,6 +237,21 @@ el = EarthLens(
     path="out",
 )
 ```
+
+Both masks also ship as frozen callable classes — `LandsatSrMask(sensor=...)` and
+`Sentinel2SclMask(masked_classes=...)`, under the `earthlens.gee.cloud_masks.ImageMask` base — validated
+at construction and drop-ins for `cloud_mask=`:
+
+```python
+from earthlens.gee.cloud_masks import Sentinel2SclMask
+
+cloud_mask=Sentinel2SclMask(masked_classes=(3, 8, 9, 10, 11))   # also drop snow/ice
+```
+
+The masks derive their output with `updateMask`, which keeps image properties — `system:time_start` in
+particular — so the per-bucket date filter the composite engine applies *after* the mask still sees every
+scene. Like the function forms, an instance on `cloud_mask=` forces the request onto an Earth Engine
+engine (the EEDAI reader cannot run a graph).
 
 ### Ordering, and why it matters
 
