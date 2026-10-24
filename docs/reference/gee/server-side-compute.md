@@ -75,6 +75,9 @@ scene in the bucket and holds them in memory to reduce. It hands the bucket back
   `mode` / `sum`, and the percentile (`percentile:<q>` / `p<q>`), `trend` and `sens_slope` reducers — is
   computed client-side by pyramids' `reduce_time`, so `median` is a true per-pixel median and a percentile or
   trend no longer forces the bucket back to Earth Engine
+- the reducer is a named-algorithm composite — `LandsatComposite` / `Sentinel2Composite` wrap
+  `ee.Algorithms.Landsat.simpleComposite` / `ee.Algorithms.Sentinel2.CDI`, which exist only server-side,
+  so there is nothing client-side to approximate them with and the bucket runs on Earth Engine
 
 Narrow the window, shorten `temporal_resolution`, add a `property_filter`, or use a coarser `scale` to
 get back under the budget. These thresholds are internal constants, not public API — treat them as
@@ -151,6 +154,32 @@ paths = el.download()
 The catalog also encodes reduction advice you inherit for free. `COPERNICUS/S1_GRD` declares
 `default_reducer: median` precisely because backscatter is in dB and averaging dB is not averaging power —
 so omitting `reducer=` on Sentinel-1 gives you the defensible choice, not an arithmetic mistake.
+
+### Named-algorithm composites
+
+`reducer=` also accepts a `TemporalReducer` *instance* — `Percentile(q=90)` works — and that is how Earth
+Engine's named-algorithm composites plug in, since they carry config no string can spell:
+
+```python
+from earthlens.gee import LandsatComposite, Sentinel2Composite
+
+reducer=LandsatComposite(percentile=50, cloud_score_range=10, max_depth=40, as_float=True)
+reducer=Sentinel2Composite(threshold=-0.5, reducer="median")
+```
+
+- `LandsatComposite` runs `ee.Algorithms.Landsat.simpleComposite` over each time bucket: a cloud-screened,
+  TOA-calibrated mosaic in one server call. **It needs the raw Level-1 collection** — the curated
+  `LANDSAT/LC08/C02/T1` catalog row is the example — not the `T1_L2` surface-reflectance product, because
+  the algorithm performs its own TOA calibration.
+- `Sentinel2Composite` maps the `Sentinel2Cdi` mask (`ee.Algorithms.Sentinel2.CDI`, the parallax-based
+  cloud discriminator) over every scene, then reduces the masked stack with its inner `reducer` (median by
+  default). CDI is defined on the **TOA** product (`COPERNICUS/S2_HARMONIZED`), not L2A. The standalone
+  `Sentinel2Cdi(threshold=...)` mask is also an ordinary `cloud_mask=` drop-in.
+
+Both are validated at construction like every reducer (`GEE(reducer=...)` resolves instances through the
+same `temporal_reducer_for` seam the strings use), are deliberately *not* in the `REDUCERS` registry, and
+exist **only server-side**: the EEDAI reader declines them (see the collection routing above), so the
+request runs on an Earth Engine engine.
 
 !!! note "`property_filter` is not `filters`"
     `property_filter="CLOUDY_PIXEL_PERCENTAGE < 20"` is an **OGR attribute-filter string** consumed by the

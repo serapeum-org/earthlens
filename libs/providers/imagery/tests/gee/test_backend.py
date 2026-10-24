@@ -30,7 +30,13 @@ from earthlens.gee.backend import GEE
 from earthlens.gee.catalog import Dataset, Extent
 from earthlens.gee.cloud_masks import LandsatSrMask, sentinel2_scl
 from earthlens.gee.filters import ByYear
-from earthlens.gee.reducers import temporal_reducer_for
+from earthlens.gee.reducers import (
+    First,
+    LandsatComposite,
+    Percentile,
+    Sentinel2Composite,
+    temporal_reducer_for,
+)
 
 # -- fakes ------------------------------------------------------------------
 
@@ -620,6 +626,83 @@ class TestReducerStringWidening:
         assert len(units) == 1
         assert collection.reduced_with == ("percentile", (90.0,))
         assert units[0].image[0] == "renamed"
+
+
+class TestReducerInstanceWidening:
+    """Task 6.2: `reducer=` accepts a `TemporalReducer` instance."""
+
+    def _chirps(self, make_gee, **overrides):
+        """A GEE over a CHIRPS collection, the reducer under test applied."""
+        params = dict(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            start="2020-06-01",
+            end="2020-06-30",
+            scale=5566.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    def test_a_temporal_reducer_instance_is_accepted(self, make_gee):
+        """An already-built reducer constructs and is carried verbatim."""
+        reducer = Percentile(q=90)
+        gee = self._chirps(make_gee, reducer=reducer)
+        assert gee.reducer is reducer
+        assert temporal_reducer_for(gee.reducer) is reducer
+
+    @pytest.mark.parametrize(
+        "composite", [LandsatComposite(), Sentinel2Composite()], ids=type
+    )
+    def test_a_named_composite_instance_is_accepted(self, make_gee, composite):
+        """The named-algorithm composites pass construction-time validation."""
+        gee = self._chirps(make_gee, reducer=composite)
+        assert gee.reducer is composite
+
+    def test_a_region_only_instance_is_refused(self, make_gee):
+        """A region-only reducer instance fails fast at construction."""
+        with pytest.raises(ValueError, match="region"):
+            self._chirps(make_gee, reducer=First())
+
+    def test_a_zero_percentile_instance_is_refused(self, make_gee):
+        """`Percentile(q=0)` is a region minimum, not a temporal reducer."""
+        with pytest.raises(ValueError, match="0 < q <= 100"):
+            self._chirps(make_gee, reducer=Percentile(q=0))
+
+    def test_the_composite_engine_runs_the_named_algorithm(self, make_gee, monkeypatch):
+        """`reducer=LandsatComposite()` reaches `simpleComposite` per bucket."""
+        from earthlens.gee import reducers as reducers_module
+
+        recorded = {}
+        monkeypatch.setattr(
+            reducers_module,
+            "ee",
+            SimpleNamespace(
+                Algorithms=SimpleNamespace(
+                    Landsat=SimpleNamespace(
+                        simpleComposite=lambda **kwargs: (
+                            recorded.update(kwargs) or "landsat-composite-image"
+                        )
+                    )
+                )
+            ),
+        )
+        gee = self._chirps(
+            make_gee,
+            reducer=LandsatComposite(as_float=True),
+            temporal_resolution="raw",
+        )
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        units = list(
+            gee._composite(
+                "the-collection",
+                var_info,
+                dt.datetime(2020, 6, 1),
+                dt.datetime(2020, 7, 1),
+            )
+        )
+        assert len(units) == 1
+        assert units[0].image == "landsat-composite-image"
+        assert recorded["collection"] == "the-collection"
+        assert recorded["asFloat"] is True
 
 
 class TestInit:
@@ -2818,6 +2901,22 @@ class TestEedaiCollections:
         assert not plan.can_serve
         assert "last-wins" in plan.reason
 
+    @pytest.mark.parametrize(
+        "composite", [LandsatComposite(), Sentinel2Composite()], ids=type
+    )
+    def test_named_composites_are_declined_before_any_network_call(
+        self, make_gee, fake_reader, composite
+    ):
+        """The named algorithms exist only server-side, so the reader declines."""
+        gee = self._collection_gee(make_gee, reducer=composite)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert not plan.can_serve
+        assert "named algorithm" in plan.reason
+        assert fake_reader.cost_calls == [], (
+            "the unsupported reducer should be caught before scene discovery"
+        )
+
     def test_a_supported_reducer_still_serves(self, make_gee, fake_reader):
         """A statistical reducer is unaffected by the mosaic decline."""
         gee = self._collection_gee(make_gee, reducer="median")
@@ -3528,6 +3627,11 @@ class TestForcedEngineRemedies:
         ("reason", "expected"),
         [
             ("the reducer 'mosaic' is last-wins upstream", "statistical reducer"),
+            (
+                "reducer='landsat_composite' runs Earth Engine's named algorithm "
+                "ee.Algorithms.Landsat.simpleComposite",
+                "only on Earth Engine",
+            ),
             ("the EEDAI credential could not be built", "service key"),
             ("X has no native resolution to size the read", "spatial_resolution"),
             (

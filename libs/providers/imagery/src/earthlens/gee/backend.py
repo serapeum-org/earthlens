@@ -114,7 +114,12 @@ from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
 from earthlens.gee.pixels import PixelsEngine
 from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reader import EedaiReader
-from earthlens.gee.reducers import temporal_reducer_for
+from earthlens.gee.reducers import (
+    LandsatComposite,
+    Reducer,
+    Sentinel2Composite,
+    temporal_reducer_for,
+)
 from earthlens.gee.sinks import AssetSink, _BatchSink, resolve_sink
 from earthlens.gee.work import (
     Artifact,
@@ -203,13 +208,39 @@ _EE_URL_MAX_PIXELS: int = EE_MAX_DIMENSION * EE_MAX_DIMENSION
 #: turn the bucket-skip into a hard failure.
 _EEDAI_NO_SCENES: str = NO_SCENES
 
-#: Reducers the reader must not serve, because its client-side result would not
-#: match Earth Engine's server-side one. `mosaic` is the clear case: Earth
-#: Engine's is last-wins (later scenes paint over earlier), while the reader
-#: without a nodata value returns the *first* scene of the stack wholesale. It
-#: is also the most common `default_reducer` in the catalog, so this decline is
-#: what keeps a composite from silently becoming "the earliest scene".
-_EEDAI_UNSUPPORTED_REDUCERS: frozenset[str] = frozenset({"mosaic"})
+#: Reducers the reader must not serve, each with the reason its decline
+#: reports. `mosaic` is declined because its client-side result would not match
+#: Earth Engine's server-side one: Earth Engine's is last-wins (later scenes
+#: paint over earlier), while the reader without a nodata value returns the
+#: *first* scene of the stack wholesale — and it is the most common
+#: `default_reducer` in the catalog, so that decline is what keeps a composite
+#: from silently becoming "the earliest scene". The named-algorithm composites
+#: are declined because `ee.Algorithms.Landsat.simpleComposite` /
+#: `ee.Algorithms.Sentinel2.CDI` exist only server-side — there is nothing
+#: client-side to approximate them with.
+_EEDAI_UNSUPPORTED_REDUCER_REASONS: dict[str, str] = {
+    "mosaic": (
+        "reducer='mosaic' does not mean the same thing client-side: Earth "
+        "Engine's is last-wins, while the reader returns the first scene of "
+        "the stack, so Earth Engine composites this instead"
+    ),
+    LandsatComposite.name: (
+        f"reducer={LandsatComposite.name!r} runs Earth Engine's named "
+        "algorithm ee.Algorithms.Landsat.simpleComposite, which exists only "
+        "server-side, so Earth Engine composites this instead"
+    ),
+    Sentinel2Composite.name: (
+        f"reducer={Sentinel2Composite.name!r} runs Earth Engine's named "
+        "algorithm ee.Algorithms.Sentinel2.CDI, which exists only "
+        "server-side, so Earth Engine composites this instead"
+    ),
+}
+
+#: The reducer names the reader must not serve, derived from the reasons map
+#: so the two cannot drift.
+_EEDAI_UNSUPPORTED_REDUCERS: frozenset[str] = frozenset(
+    _EEDAI_UNSUPPORTED_REDUCER_REASONS
+)
 
 #: Most scenes a collection composite may fetch through the reader in one bucket.
 #: Each scene is a separate download the reader holds in memory to reduce, so a
@@ -408,6 +439,11 @@ def _eedai_remedy(reason: str) -> str:
             "Pass a statistical reducer (mean/median/min/max/sum), or "
             "engine='ee' to keep Earth Engine's mosaic semantics."
         )
+    if "named algorithm" in reason:
+        return (
+            "Named-algorithm composites run only on Earth Engine; use "
+            "engine='ee', or a statistical reducer for the reader."
+        )
     if "credential" in reason:
         return "Fix the service key or service account, or use engine='ee'."
     if "no native resolution" in reason:
@@ -567,14 +603,23 @@ class GEE(LazyClientMixin, AbstractDataSource):
             (`"p90"`, `"p50"`) — or `"trend"`, the per-pixel linear-fit slope.
             A percentile and `trend` are first-class here: they run on
             `engine="ee"` (via `ee.Reducer.percentile` / `linearFit`) and on
-            the client-side EEDAI path alike. `None` (the default) uses each
-            dataset's own `default_reducer`. The registry also holds the
-            region-only reducers `first` / `stdDev` / `variance` / `count`,
-            which collapse pixels inside a region rather than images in a
-            collection; naming one here is refused at construction, since there
-            is nothing for it to composite. Pass those to `sample_points`
-            instead. An out-of-range percentile (`"p150"`) or an unknown name
-            is also refused at construction.
+            the client-side EEDAI path alike. An already-built
+            `TemporalReducer` instance also works — `Percentile(q=90)`, or a
+            named-algorithm composite: `LandsatComposite()` runs
+            `ee.Algorithms.Landsat.simpleComposite` (which needs the raw L1
+            collection, e.g. the curated `LANDSAT/LC08/C02/T1` catalog row,
+            not `T1_L2`), and `Sentinel2Composite()` maps the
+            `ee.Algorithms.Sentinel2.CDI` cloud mask over the TOA
+            `COPERNICUS/S2_HARMONIZED` stack before reducing. The named
+            algorithms exist only server-side, so the EEDAI reader declines
+            them and the request runs on an Earth Engine engine. `None` (the
+            default) uses each dataset's own `default_reducer`. The registry
+            also holds the region-only reducers `first` / `stdDev` /
+            `variance` / `count`, which collapse pixels inside a region rather
+            than images in a collection; naming or passing one here is refused
+            at construction, since there is nothing for it to composite. Pass
+            those to `sample_points` instead. An out-of-range percentile
+            (`"p150"`) or an unknown name is also refused at construction.
         export_via: How to get pixels out — `"url"` (synchronous
             `getDownloadURL`, capped at 32768 px per axis; the default),
             `"drive"` (asynchronous `ee.batch.Export.image.toDrive`;
@@ -652,8 +697,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
             `ee_type="image_collection"` composited client-side per time
             bucket, in `crs="EPSG:4326"` or any metre-based projected CRS.
             A collection is additionally sized before it is served: too many
-            scenes, too large a stack, or the `mosaic` reducer (whose
-            client-side meaning differs from Earth Engine's last-wins) sends
+            scenes, too large a stack, the `mosaic` reducer (whose
+            client-side meaning differs from Earth Engine's last-wins), or a
+            named-algorithm composite (`LandsatComposite` /
+            `Sentinel2Composite`, which exist only server-side) sends
             it back to Earth Engine. One difference is worth knowing when a
             collection *is* served: the reader reduces client-side with no
             nodata value, because the EEDAI driver declares none, so a scene's
@@ -843,7 +890,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         *,
         scale: float | None = None,
         crs: str = "EPSG:4326",
-        reducer: str | None = None,
+        reducer: str | Reducer | None = None,
         export_via: Literal["url", "drive", "gcs", "asset"] = "url",
         drive_folder: str | None = None,
         gcs_bucket: str | None = None,
@@ -915,10 +962,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # percentile into a construction error like every other config mistake,
         # rather than a failure part-way through a run that has already written
         # buckets. `temporal_reducer_for` accepts the seven convenience names, a
-        # `percentile:<q>` spec or its `p<q>` shorthand, and `trend`, and refuses
-        # a region-only reducer with a message naming the collection vocabulary —
-        # the same resolver the Earth Engine and client-side composite paths use,
-        # so the accepted set is defined in exactly one place.
+        # `percentile:<q>` spec or its `p<q>` shorthand, `trend`, and an
+        # already-built `TemporalReducer` instance (e.g. `Percentile(q=90)` or
+        # a named-algorithm composite), and refuses a region-only reducer with
+        # a message naming the collection vocabulary — the same resolver the
+        # Earth Engine and client-side composite paths use, so the accepted set
+        # is defined in exactly one place.
         if reducer is not None:
             temporal_reducer_for(reducer)
         # Validated by `resolve_engine`, not re-checked here: it owns the one
@@ -2708,17 +2757,16 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # express: the composite is computed here through pyramids' `reduce_time`
         # (`_composite_collection_via_reader`), not handed to the reader's own
         # `reducer=`, so `percentile` / `trend` / `sens_slope` are admitted like
-        # `median`. The only decline is `mosaic`, whose last-wins semantics have
-        # no client-side equivalent over a scene stack.
+        # `median`. The declines are `mosaic`, whose last-wins semantics have no
+        # client-side equivalent over a scene stack, and the named-algorithm
+        # composites, which exist only server-side.
         reducer = temporal_reducer_for(self.reducer or var_info.default_reducer).name
         if reducer in _EEDAI_UNSUPPORTED_REDUCERS:
             # Checked before the network call: no point discovering scenes for a
-            # composite the reader cannot reproduce.
-            return EnginePlan.declined(
-                f"reducer={reducer!r} does not mean the same thing client-side: "
-                "Earth Engine's is last-wins, while the reader returns the first "
-                "scene of the stack, so Earth Engine composites this instead"
-            )
+            # composite the reader cannot reproduce. The reason is per-reducer,
+            # so the mosaic decline keeps explaining last-wins while a
+            # named-algorithm decline names its algorithm.
+            return EnginePlan.declined(_EEDAI_UNSUPPORTED_REDUCER_REASONS[reducer])
         # The adapter, not the raw module: it owns the lock and the identity
         # check around a reader call, which is the whole reason it exists.
         # Built outside the discovery `try`, so a credential problem is never

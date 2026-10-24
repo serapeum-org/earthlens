@@ -103,6 +103,18 @@ anything a string names:
   reducer and `SensSlope` (`"sens_slope"`) its robust Theil-Sen
   counterpart; like `Percentile` both are reachable only through the
   resolver, not the registry.
+* `LandsatComposite` / `Sentinel2Composite` — Earth Engine's
+  named-algorithm composites as `TemporalReducer`s, passed as
+  instances: `GEE(reducer=LandsatComposite())` runs
+  `ee.Algorithms.Landsat.simpleComposite` over each time bucket
+  (raw L1 input — `LANDSAT/LC08/C02/T1`, not `T1_L2`), and
+  `Sentinel2Composite` maps the `Sentinel2Cdi` cloud mask
+  (`ee.Algorithms.Sentinel2.CDI`, on the TOA
+  `COPERNICUS/S2_HARMONIZED` product) over the stack before its
+  inner reducer. Like `Percentile` they are not in `REDUCERS` —
+  reachable only as instances — and the named algorithms exist only
+  server-side, so the EEDAI reader declines them and the request
+  runs on an Earth Engine engine.
 * `CadenceBucketer` — turns a `temporal_resolution` (`"raw"` /
   `"daily"` / `"monthly"` / `"yearly"`) into a pandas frequency and the
   bucket windows that tile a request, resolving through the framework
@@ -233,9 +245,11 @@ median composite is a facade call rather than raw `ee`:
   (Sentinel-2 L2A SCL — drops cloud shadow / cloud / cirrus),
   `Sentinel2Qa60Mask` (the pre-SCL QA60 cloud + cirrus bitmask),
   `ModisState1kmMask` (daily MOD09GA / MYD09GA `state_1km` cloud
-  state) and `CloudScorePlus` (Google's Cloud Score+ quality score,
-  linked per scene by `system:index`) under the `ImageMask` base,
-  plus the function forms `landsat_sr(image, sensor=...)` and
+  state), `Sentinel2Cdi` (the `ee.Algorithms.Sentinel2.CDI`
+  parallax discriminator, thresholded — TOA scenes only) and
+  `CloudScorePlus` (Google's Cloud Score+ quality score, linked per
+  scene by `system:index`) under the `ImageMask` base, plus the
+  function forms `landsat_sr(image, sensor=...)` and
   `sentinel2_scl(image)`.
 * `earthlens.gee.filters` — collection filters: `ByYear` / `ByBounds`
   / `ByPropertyIn` / `ByCloudCoverLte` / `ByYearAndBounds`, plus the
@@ -375,6 +389,7 @@ from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reader import EedaiReader
 from earthlens.gee.reducers import (
     REDUCERS,
+    LandsatComposite,
     LinearTrend,
     Max,
     Mean,
@@ -385,6 +400,7 @@ from earthlens.gee.reducers import (
     Percentile,
     Reducer,
     SensSlope,
+    Sentinel2Composite,
     Sum,
     TemporalReducer,
     resolve_reducer,
@@ -495,6 +511,8 @@ __all__ = [
     "Percentile",
     "LinearTrend",
     "SensSlope",
+    "LandsatComposite",
+    "Sentinel2Composite",
     "TemporalReducer",
     "REDUCERS",
     "resolve_reducer",

@@ -27,6 +27,14 @@ and `ee_factory` - and the two vocabularies are *derived* from the registry by
 Deriving one set for both is what briefly let `sample_points(reducer="mosaic")`
 past the whitelist and into `AttributeError`.
 
+The named-algorithm composites (`LandsatComposite` /
+`Sentinel2Composite`) are `TemporalReducer`s too, reachable only as
+instances (`GEE(reducer=LandsatComposite())`): they wrap
+`ee.Algorithms.Landsat.simpleComposite` and an
+`ee.Algorithms.Sentinel2.CDI`-masked reduction, which exist only
+server-side, so the EEDAI reader declines them and the request runs on
+an Earth Engine engine.
+
 Resolve a name (or an already-built object) through `resolve_reducer`:
 
 ```python
@@ -49,7 +57,9 @@ from typing import TYPE_CHECKING, Any, ClassVar
 
 import ee
 import pandas as pd
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+from earthlens.gee.cloud_masks import Sentinel2Cdi, _checked_cdi_threshold
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from collections.abc import Sequence
@@ -69,6 +79,8 @@ __all__ = [
     "Percentile",
     "LinearTrend",
     "SensSlope",
+    "LandsatComposite",
+    "Sentinel2Composite",
     "First",
     "StdDev",
     "Variance",
@@ -643,6 +655,283 @@ class SensSlope(TemporalReducer):
             The `Dataset` of per-pixel Theil-Sen slopes (value-units per day).
         """
         return _reduce_whole_window(stack, times, op="sens_slope", q=None)
+
+
+class _NamedAlgorithmComposite(BaseModel, TemporalReducer):
+    """A composite backed by one of Earth Engine's named algorithms.
+
+    The shared shape of `LandsatComposite` / `Sentinel2Composite`:
+    frozen-pydantic config, a `compose` alias naming the
+    collection-to-image intent, and refusals for the two seams a named
+    algorithm cannot serve — the client-side stack reduction (the
+    algorithm exists only server-side, so the EEDAI reader declines it
+    rather than approximating) and the region reduction (there is no
+    `ee.Reducer` equivalent). Deliberately **not** in `REDUCERS`: like
+    `Percentile`, a composite is reachable only as an instance, so the
+    seven-name registry and `collection_reducers()` are unchanged.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    def compose(self, collection: Any) -> Any:
+        """Build the composite image; the explicit alias of calling it.
+
+        Args:
+            collection: An `ee.ImageCollection`.
+
+        Returns:
+            The composited `ee.Image`.
+        """
+        return self(collection)
+
+    def apply_ee(self, collection: Any) -> Any:
+        """Collapse `collection` through the named algorithm, server-side.
+
+        Args:
+            collection: An `ee.ImageCollection`.
+
+        Returns:
+            The composited `ee.Image`.
+        """
+        return self(collection)
+
+    def reduce_stack(self, stack: DatasetCollection, times: Sequence) -> Dataset:
+        """Refuse: a named algorithm exists only server-side.
+
+        Args:
+            stack: Ignored — there is no client-side reduction to run.
+            times: Ignored, for the same reason.
+
+        Raises:
+            ValueError: Always.
+        """
+        raise ValueError(
+            f"the {self.name!r} composite runs an Earth Engine named algorithm, "
+            "which has no client-side equivalent over a scene stack; composite "
+            "it on Earth Engine instead (engine='ee')"
+        )
+
+    def as_ee_reducer(self) -> Any:
+        """Refuse: a named algorithm has no `ee.Reducer` equivalent.
+
+        Raises:
+            ValueError: Always, naming the reducers that do reduce a
+                region.
+        """
+        raise ValueError(
+            f"the {self.name!r} composite wraps an Earth Engine named algorithm "
+            "with no ee.Reducer equivalent, so it cannot reduce a region; use "
+            f"one of {sorted(sampling_reducers())}"
+        )
+
+    def __str__(self) -> str:
+        """Match `__repr__`, which pydantic's own `__str__` would hide.
+
+        A `BaseModel` prints as its fields alone, so `print(reducer)` in
+        a log line would not say *which* composite it was.
+
+        Returns:
+            The same text as `__repr__`.
+        """
+        return repr(self)
+
+
+class LandsatComposite(_NamedAlgorithmComposite):
+    """A cloud-reduced Landsat TOA composite via `simpleComposite`.
+
+    Wraps `ee.Algorithms.Landsat.simpleComposite`, which assembles a
+    cloud-screened, TOA-calibrated mosaic from **raw Level-1 scenes** in
+    one server call: it computes a simple cloud score per scene and
+    takes the `percentile` of the least-cloudy pixels. Plug it into the
+    facade as an instance — `GEE(reducer=LandsatComposite())` — and the
+    composite engine applies it per time bucket.
+
+    The input must be a **raw L1 collection** — e.g. the curated
+    `LANDSAT/LC08/C02/T1` catalog row — not the `T1_L2`
+    surface-reflectance product: the algorithm performs its own TOA
+    calibration and rejects already-processed inputs. A named algorithm
+    exists only server-side, so the EEDAI reader declines this reducer
+    and the request runs on an Earth Engine engine.
+
+    Attributes:
+        percentile: The percentile of the cloud-screened stack to take
+            per pixel, `0`-`100`. Defaults to `50` (the algorithm's
+            documented default).
+        cloud_score_range: The cloud-score margin (`cloudScoreRange`)
+            above the per-pixel minimum within which scenes still
+            contribute. Defaults to `10`.
+        max_depth: The maximum number of scenes considered per pixel
+            (`maxDepth`). Defaults to `40`.
+        as_float: Return floating-point TOA reflectance (`asFloat`)
+            instead of the 8-bit scaled default. Defaults to `False`.
+
+    Examples:
+        - The defaults are the algorithm's documented ones:
+            ```python
+            >>> composite = LandsatComposite()
+            >>> composite.percentile, composite.max_depth, composite.as_float
+            (50, 40, False)
+
+            ```
+        - An out-of-range percentile is refused at construction:
+            ```python
+            >>> LandsatComposite(percentile=150)
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for LandsatComposite
+            ...
+
+            ```
+        - Hand an instance to the GEE backend as the temporal reducer:
+            ```python
+            >>> from earthlens.core import EarthLens  # doctest: +SKIP
+            >>> el = EarthLens(  # doctest: +SKIP
+            ...     data_source="gee",
+            ...     dataset="LANDSAT/LC08/C02/T1",
+            ...     variables=["B4", "B3", "B2"],
+            ...     start="2023-06-01", end="2023-09-01",
+            ...     reducer=LandsatComposite(as_float=True),
+            ... )
+
+            ```
+    """
+
+    name: ClassVar[str] = "landsat_composite"
+    ee_factory: ClassVar[str | None] = None
+
+    percentile: int = Field(default=50, ge=0, le=100)
+    cloud_score_range: float = Field(default=10.0, gt=0)
+    max_depth: int = Field(default=40, gt=0)
+    as_float: bool = False
+
+    def __call__(self, collection: Any) -> Any:
+        """Compose `collection` with `ee.Algorithms.Landsat.simpleComposite`.
+
+        Args:
+            collection: An `ee.ImageCollection` of **raw L1** Landsat
+                scenes (e.g. `LANDSAT/LC08/C02/T1`).
+
+        Returns:
+            The cloud-reduced TOA composite `ee.Image`.
+        """
+        return ee.Algorithms.Landsat.simpleComposite(
+            collection=collection,
+            percentile=self.percentile,
+            cloudScoreRange=self.cloud_score_range,
+            maxDepth=self.max_depth,
+            asFloat=self.as_float,
+        )
+
+
+class Sentinel2Composite(_NamedAlgorithmComposite):
+    """A CDI-masked Sentinel-2 TOA composite.
+
+    Maps the `earthlens.gee.cloud_masks.Sentinel2Cdi` mask —
+    `ee.Algorithms.Sentinel2.CDI`, the parallax-based cloud
+    discriminator — over every scene, then collapses the masked stack
+    with the inner `reducer` (a per-pixel median by default). Plug it
+    into the facade as an instance —
+    `GEE(reducer=Sentinel2Composite())` — and the composite engine
+    applies it per time bucket.
+
+    CDI is defined on the **TOA** product (`COPERNICUS/S2_HARMONIZED`),
+    not L2A — on surface reflectance the graph fails server-side with a
+    band-not-found error. A named algorithm exists only server-side, so
+    the EEDAI reader declines this reducer and the request runs on an
+    Earth Engine engine.
+
+    Attributes:
+        threshold: The CDI value below which a pixel is masked before
+            the reduction; a `[-1, 1]` index, validated at
+            construction. Defaults to `-0.5`.
+        reducer: The temporal reducer applied to the CDI-masked stack.
+            Defaults to the median; accepts any `temporal_reducer_for`
+            spelling or instance.
+
+    Examples:
+        - The defaults: the recommended CDI operating point, reduced by
+          the median:
+            ```python
+            >>> composite = Sentinel2Composite()
+            >>> composite.threshold, composite.reducer.name
+            (-0.5, 'median')
+
+            ```
+        - The inner reducer resolves through the one registry:
+            ```python
+            >>> Sentinel2Composite(reducer="p90").reducer.q
+            90.0
+
+            ```
+        - Hand an instance to the GEE backend as the temporal reducer:
+            ```python
+            >>> from earthlens.core import EarthLens  # doctest: +SKIP
+            >>> el = EarthLens(  # doctest: +SKIP
+            ...     data_source="gee",
+            ...     dataset="COPERNICUS/S2_HARMONIZED",
+            ...     variables=["B4", "B3", "B2"],
+            ...     start="2024-05-01", end="2024-06-15",
+            ...     reducer=Sentinel2Composite(threshold=-0.4),
+            ... )
+
+            ```
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid", arbitrary_types_allowed=True)
+
+    name: ClassVar[str] = "sentinel2_composite"
+    ee_factory: ClassVar[str | None] = None
+
+    threshold: float = -0.5
+    reducer: TemporalReducer = Field(default_factory=Median)
+
+    @field_validator("threshold")
+    @classmethod
+    def _in_cdi_range(cls, value: float) -> float:
+        """Refuse a threshold outside the inclusive `[-1, 1]` CDI range.
+
+        Args:
+            value: The parsed `threshold` input.
+
+        Returns:
+            The value unchanged when it is in range.
+
+        Raises:
+            ValueError: If `value` is outside `[-1, 1]`.
+        """
+        return _checked_cdi_threshold(value)
+
+    @field_validator("reducer", mode="before")
+    @classmethod
+    def _coerce_reducer(cls, value: TemporalReducer | str) -> TemporalReducer:
+        """Resolve the inner reducer through the one registry.
+
+        Args:
+            value: A `TemporalReducer`, a registry name (`"median"`), or
+                a percentile spec / shorthand (`"percentile:90"`,
+                `"p90"`).
+
+        Returns:
+            The resolved `TemporalReducer`.
+
+        Raises:
+            ValueError: If `value` names a region-only or unknown
+                reducer.
+        """
+        return temporal_reducer_for(value)
+
+    def __call__(self, collection: Any) -> Any:
+        """Mask every scene by its CDI, then reduce the masked stack.
+
+        Args:
+            collection: An `ee.ImageCollection` of **TOA** Sentinel-2
+                scenes (`COPERNICUS/S2_HARMONIZED`).
+
+        Returns:
+            The composited `ee.Image`.
+        """
+        masked = collection.map(Sentinel2Cdi(threshold=self.threshold))
+        return self.reducer.apply_ee(masked)
 
 
 class _RegionReducer(Reducer):

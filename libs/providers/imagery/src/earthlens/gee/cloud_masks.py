@@ -56,6 +56,13 @@ above, so a facade request against those rows has the band. On a
 dataset without it, Earth Engine fails at graph-compute time — the
 documented contract for a mask reading an absent band.
 
+`Sentinel2Cdi` masks a Sentinel-2 **TOA** scene
+(`COPERNICUS/S2_HARMONIZED`) by its Cloud Displacement Index —
+`ee.Algorithms.Sentinel2.CDI(image)`, a parallax-based cloud
+discriminator — keeping pixels whose CDI is at or above a `[-1, 1]`
+threshold (clouds push the CDI strongly negative). It is also the
+per-image half of `earthlens.gee.reducers.Sentinel2Composite`.
+
 Bit layout (USGS LSDS-1330):
 
 ```
@@ -90,6 +97,7 @@ __all__ = [
     "LandsatSrMask",
     "ModisState1kmMask",
     "Sensor",
+    "Sentinel2Cdi",
     "Sentinel2Qa60Mask",
     "Sentinel2SclMask",
     "landsat_sr",
@@ -134,6 +142,27 @@ _LS_CONF_PAIR_MASK: int = 0b11
 #: The two-bit cloud-state field at bits 0-1 of the MODIS `state_1km` band:
 #: 0 clear, 1 cloudy, 2 mixed, 3 not set (assumed clear by MODIS, masked here).
 _MODIS_CLOUD_STATE_MASK: int = 0b11
+
+
+def _checked_cdi_threshold(value: float) -> float:
+    """Refuse a CDI threshold outside the inclusive `[-1, 1]` range.
+
+    The one check `Sentinel2Cdi` and the `Sentinel2Composite` reducer
+    share, so the error text cannot drift between them.
+
+    Args:
+        value: The parsed `threshold` input.
+
+    Returns:
+        The value unchanged when it is in range.
+
+    Raises:
+        ValueError: If `value` is outside `[-1, 1]` — the CDI band is a
+            `[-1, 1]` index, not a probability or a percentage.
+    """
+    if not -1 <= value <= 1:
+        raise ValueError(f"threshold must be in [-1, 1], got {value!r}")
+    return value
 
 
 def _checked_sensor(value: object) -> object:
@@ -479,6 +508,92 @@ class CloudScorePlus(ImageMask):
             ee.ImageCollection(self.cs_collection), [self.band]
         )
         return linked.updateMask(linked.select(self.band).gte(self.threshold))
+
+
+class Sentinel2Cdi(ImageMask):
+    """Mask a Sentinel-2 TOA scene by its Cloud Displacement Index.
+
+    Wraps `ee.Algorithms.Sentinel2.CDI(image)` — Earth Engine's
+    parallax-based cloud discriminator, computed from the scene's own
+    band geometry — and keeps pixels whose CDI is at or above
+    `threshold`. Clouds push the CDI strongly negative, so the `-0.5`
+    default keeps the recommended operating point. CDI runs on the
+    **TOA** product (`COPERNICUS/S2_HARMONIZED`), not L2A — pointing it
+    at a surface-reflectance collection fails with a band-not-found
+    error server-side when the graph is computed.
+
+    A named algorithm is server-side compute, so the mask — like every
+    `cloud_mask=` — forces the request onto an Earth Engine engine. It
+    is also the per-image half of the
+    `earthlens.gee.reducers.Sentinel2Composite` temporal reducer, which
+    maps it over the collection before reducing.
+
+    Attributes:
+        threshold: Pixels whose CDI falls below this are masked out. A
+            `[-1, 1]` index value, validated at construction; defaults
+            to `-0.5`.
+
+    Examples:
+        - The default is the recommended operating point:
+            ```python
+            >>> Sentinel2Cdi().threshold
+            -0.5
+
+            ```
+        - A threshold outside the CDI range is refused at construction:
+            ```python
+            >>> Sentinel2Cdi(threshold=1.5)
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for Sentinel2Cdi
+            ...
+
+            ```
+        - Hand an instance to the GEE backend as the per-image mask:
+            ```python
+            >>> from earthlens.core import EarthLens  # doctest: +SKIP
+            >>> el = EarthLens(  # doctest: +SKIP
+            ...     data_source="gee",
+            ...     dataset="COPERNICUS/S2_HARMONIZED",
+            ...     variables=["B4", "B3", "B2"],
+            ...     start="2024-05-01", end="2024-06-15",
+            ...     reducer="median", cloud_mask=Sentinel2Cdi(),
+            ... )
+
+            ```
+    """
+
+    threshold: float = -0.5
+
+    @field_validator("threshold")
+    @classmethod
+    def _in_cdi_range(cls, value: float) -> float:
+        """Refuse a threshold outside the inclusive `[-1, 1]` CDI range.
+
+        Args:
+            value: The parsed `threshold` input.
+
+        Returns:
+            The value unchanged when it is in range.
+
+        Raises:
+            ValueError: If `value` is outside `[-1, 1]`.
+        """
+        return _checked_cdi_threshold(value)
+
+    def __call__(self, image: ee.Image) -> ee.Image:
+        """Mask one TOA scene where its CDI falls below the threshold.
+
+        Args:
+            image: An `ee.Image` from `COPERNICUS/S2_HARMONIZED` — the
+                TOA product the CDI algorithm is defined on.
+
+        Returns:
+            The input image with `updateMask(cdi >= threshold)` applied
+            — properties, `system:time_start` included, are preserved.
+        """
+        cdi = ee.Algorithms.Sentinel2.CDI(image)
+        return image.updateMask(cdi.gte(self.threshold))
 
 
 class Sentinel2Qa60Mask(ImageMask):

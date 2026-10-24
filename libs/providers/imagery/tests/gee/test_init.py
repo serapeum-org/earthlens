@@ -74,6 +74,9 @@ _EXPECTED_EXPORTS = {
     "REDUCERS",
     "resolve_reducer",
     "temporal_reducer_for",
+    # Epic 6 Task 6.2 - the named-algorithm composites, passed as instances.
+    "LandsatComposite",
+    "Sentinel2Composite",
     # Epic 4 Task 4.7 - the cadence bucketer.
     "CadenceBucketer",
     # Epic 4 Task 4.3 - the composite engine and its bucket value object.
