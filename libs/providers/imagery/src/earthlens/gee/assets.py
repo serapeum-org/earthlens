@@ -341,13 +341,27 @@ class AssetManager(BaseModel):
         `startIngestion` / `startTableIngestion` answer with the operation
         `name` (and the task `id`), not a task status, so the status is
         fetched once through the same `get_task_status` path every other
-        export rides.
+        export rides. That one extra `getOperation` is the price of handing
+        back the same normalised `TaskInfo` the image and table sinks do,
+        rather than a second, submission-only shape; `name` is already a full
+        `projects/.../operations/<id>` so no project lookup is needed.
 
         Args:
             submitted: The submission response dict.
 
         Returns:
             The normalised `TaskInfo` for the queued ingestion.
+
+        Raises:
+            ValueError: If the response carries neither `name` nor `id`, which
+                left a bare `KeyError` where the docstring implies a
+                normalised failure.
         """
-        handle = str(submitted.get("name") or submitted["id"])
-        return get_task_status(handle, project=self.project)
+        handle = submitted.get("name") or submitted.get("id")
+        if handle is None:
+            raise ValueError(
+                "the ingestion response carries neither 'name' nor 'id', so "
+                f"the queued operation cannot be tracked; got keys "
+                f"{sorted(submitted)}"
+            )
+        return get_task_status(str(handle), project=self.project)

@@ -320,3 +320,70 @@ class TestIngestion:
         )
         info = AssetManager(project="p").start_ingestion({"name": "x"}, request_id="r")
         assert info.id == "task-9"
+
+    def test_a_handleless_submission_is_named(self, fake_data, monkeypatch):
+        """Neither key present reports the keys, not a bare `KeyError`."""
+        monkeypatch.setattr(
+            fake_data,
+            "startIngestion",
+            lambda rid, params, overwrite=False: {"started": "OK"},
+        )
+        manager = AssetManager(project="p")
+        with pytest.raises(ValueError, match="neither 'name' nor 'id'"):
+            manager.start_ingestion({"name": "x"}, request_id="r")
+
+
+#: Every `ee.data` name `AssetManager` calls, with the parameter names the real
+#: SDK takes (read off `inspect.signature` on earthengine-api, not guessed —
+#: note `getAsset(asset_id)` against `deleteAsset(assetId)`, and the ingestion
+#: pair's snake_case). The fake above defines its own stand-ins, which pins the
+#: call graph but not the SDK surface: a rename or a signature change upstream
+#: would leave the rest of this module green. `TestEeDataSurface` closes that
+#: gap against the real module, the way `test_video_sink.py` /
+#: `test_table_sink.py` pin `Task.Type` and `test_workload.py` drives the real
+#: `setWorkloadTag`.
+_EE_DATA_SURFACE: dict[str, tuple[str, ...]] = {
+    "newTaskId": ("count",),
+    "createFolder": ("path",),
+    "createAsset": ("value", "path", "properties"),
+    "listAssets": ("params",),
+    "getAsset": ("asset_id",),
+    "deleteAsset": ("assetId",),
+    "copyAsset": ("sourceId", "destinationId", "allowOverwrite"),
+    "renameAsset": ("sourceId", "destinationId"),
+    "setAssetProperties": ("assetId", "properties"),
+    "getAssetAcl": ("assetId",),
+    "setAssetAcl": ("assetId", "aclUpdate"),
+    "startIngestion": ("request_id", "params", "allow_overwrite"),
+    "startTableIngestion": ("request_id", "params", "allow_overwrite"),
+}
+
+
+class TestEeDataSurface:
+    """L9: the faked `ee.data` names exist on the real SDK, with these params."""
+
+    def test_every_faked_name_exists_on_the_sdk(self):
+        """A rename upstream fails here instead of passing against the fake."""
+        import ee
+
+        missing = [name for name in _EE_DATA_SURFACE if not hasattr(ee.data, name)]
+        assert missing == []
+
+    @pytest.mark.parametrize("name", sorted(_EE_DATA_SURFACE))
+    def test_each_signature_still_takes_the_parameters_passed(self, name):
+        """The parameters `AssetManager` relies on are still on the signature."""
+        import inspect
+
+        import ee
+
+        parameters = inspect.signature(getattr(ee.data, name)).parameters
+        assert set(_EE_DATA_SURFACE[name]) <= set(parameters)
+
+    def test_the_map_covers_exactly_the_names_the_fake_stands_in_for(self):
+        """The map and the fake cannot drift apart silently."""
+        faked = {
+            name
+            for name, value in vars(_FakeEeData).items()
+            if callable(value) and not name.startswith("_")
+        }
+        assert faked == set(_EE_DATA_SURFACE)
