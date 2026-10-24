@@ -13,9 +13,20 @@ el = EarthLens(
     dataset="COPERNICUS/S2_SR_HARMONIZED",
     variables=["B4", "B3", "B2"],
     start="2024-05-01", end="2024-06-15", reducer="median",
-    cloud_mask=preprocess("COPERNICUS/S2_SR_HARMONIZED", ["B4", "B3", "B2"]),
+    preprocess=True,
 )
 ```
+
+`GEE(preprocess=True)` is the shipped entry point, and it resolves
+*through this function*: the backend holds the asset id and the requested
+bands already, so the flag passes them in rather than making the caller
+restate `dataset=` and `variables=` — a duplication nothing could
+cross-check, where a narrower band list silently left the other requested
+bands in raw DN inside the same raster. The function stays public for a
+recipe you want to inspect, extend (`preprocess(...) >> SpeckleFilter()`)
+or hand around, and when it is passed to `cloud_mask=` the backend
+cross-checks it against the request: a mismatched asset id raises, an
+uncovered scalable band warns.
 
 The recipe is **catalog data, not an `if/elif` over asset ids**: a
 `preprocess:` block on the curated dataset row names the mask and says

@@ -29,6 +29,9 @@ from earthlens.gee import backend as backend_module
 from earthlens.gee.backend import GEE
 from earthlens.gee.catalog import Dataset, Extent
 from earthlens.gee.cloud_masks import (
+    BandFactor,
+    BandScaler,
+    CloudScorePlus,
     LandsatSrMask,
     Sentinel2Cdi,
     Sentinel2Qa60Mask,
@@ -36,6 +39,7 @@ from earthlens.gee.cloud_masks import (
     sentinel2_scl,
 )
 from earthlens.gee.filters import ByYear
+from earthlens.gee.recipes import preprocess as recipe_for
 from earthlens.gee.reducers import (
     First,
     LandsatComposite,
@@ -4573,3 +4577,179 @@ class TestWorkloadTagMethod:
 
         with pytest.raises(ValidationError, match="1-63 characters"):
             make_gee().workload_tag("-bad-")
+
+
+@pytest.fixture
+def warnings_buffer():
+    """Collect loguru's WARNING output, which pytest's `caplog` never sees.
+
+    loguru writes through its own handler set, bound to the original stderr at
+    registration time, so a dedicated sink is the only way to read it back.
+    """
+    from loguru import logger
+
+    buffer: list[str] = []
+    sink_id = logger.add(buffer.append, level="WARNING")
+    yield buffer
+    logger.remove(sink_id)
+
+
+class TestServerSideFlags:
+    """Tasks 6.12 / 6.13: `scaled=` and `preprocess=` as constructor flags."""
+
+    def _gee(self, make_gee, **overrides):
+        """A GEE over one Sentinel-2 row, the flag under test applied."""
+        params = dict(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4", "B3"]},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    def _op(self, gee, asset="COPERNICUS/S2_SR_HARMONIZED"):
+        """The op `_build_collection` would `.map` for one dataset."""
+        return gee._per_image_op(gee.catalog.get_dataset(asset))
+
+    def test_the_defaults_are_off(self, make_gee):
+        """Neither flag is on by default, so no existing request changes."""
+        gee = self._gee(make_gee)
+        assert (gee.scaled, gee.preprocess) == (False, False)
+        assert self._op(gee) is None
+        assert gee._engine_config.needs_server_side_compute is False
+
+    def test_scaled_resolves_the_rows_factors_for_the_requested_bands(self, make_gee):
+        """The backend reads the asset id and the bands from `variables`."""
+        scaler = self._op(self._gee(make_gee, scaled=True))
+        assert isinstance(scaler, BandScaler)
+        assert scaler.dataset == "COPERNICUS/S2_SR_HARMONIZED"
+        assert [factor.band for factor in scaler.factors] == ["B4", "B3"]
+        assert scaler.factors[0].scale == 0.0001
+
+    def test_preprocess_resolves_the_curated_recipe(self, make_gee):
+        """`preprocess=True` is the one-argument form of the recipe chain."""
+        chain = self._op(self._gee(make_gee, preprocess=True))
+        assert chain.name == "Sentinel2SclMask >> BandScaler"
+        assert [factor.band for factor in chain.masks[1].factors] == ["B4", "B3"]
+
+    @pytest.mark.parametrize("flag", ["scaled", "preprocess"])
+    def test_a_flag_forces_server_side_compute(self, make_gee, flag):
+        """Both flags decline the EEDAI fast path, as a `cloud_mask` does."""
+        gee = self._gee(make_gee, **{flag: True})
+        assert gee._engine_config.needs_server_side_compute is True
+
+    def test_both_flags_together_are_refused(self, make_gee):
+        """The recipe already scales, so the pair would scale twice."""
+        with pytest.raises(ValueError, match="scale the pixels twice"):
+            self._gee(make_gee, scaled=True, preprocess=True)
+
+    def test_preprocess_on_an_uncovered_dataset_is_refused(self, make_gee):
+        """A dataset with no curated recipe says so, at construction."""
+        with pytest.raises(ValueError, match="no curated preprocessing recipe"):
+            self._gee(
+                make_gee,
+                variables={"USGS/SRTMGL1_003": ["elevation"]},
+                preprocess=True,
+                scale=90.0,
+            )
+
+    def test_scaled_on_a_factorless_dataset_warns(self, make_gee, warnings_buffer):
+        """`scaled=True` is never a silent no-op; it reports and stays raw."""
+        gee = self._gee(
+            make_gee,
+            variables={"USGS/SRTMGL1_003": ["elevation"]},
+            scaled=True,
+            scale=90.0,
+        )
+        assert self._op(gee, "USGS/SRTMGL1_003").factors == ()
+        assert "declares no band scale/offset" in "".join(warnings_buffer)
+
+    def test_each_dataset_gets_its_own_op(self, make_gee):
+        """A two-dataset request resolves one recipe per asset, not one shared."""
+        gee = self._gee(
+            make_gee,
+            variables={
+                "COPERNICUS/S2_SR_HARMONIZED": ["B4"],
+                "LANDSAT/LC08/C02/T1_L2": ["SR_B4"],
+            },
+            preprocess=True,
+            scale=30.0,
+        )
+        assert self._op(gee).name == "Sentinel2SclMask >> BandScaler"
+        assert (
+            self._op(gee, "LANDSAT/LC08/C02/T1_L2").name
+            == "LandsatSrMask >> BandScaler"
+        )
+
+    def test_an_explicit_mask_runs_before_the_flags_chain(self, make_gee):
+        """Composition keeps masking ahead of scaling: the caller's mask first."""
+        gee = self._gee(make_gee, preprocess=True, cloud_mask=CloudScorePlus())
+        assert self._op(gee).name == "CloudScorePlus >> Sentinel2SclMask >> BandScaler"
+
+    def test_an_explicit_mask_composes_with_scaled(self, make_gee):
+        """`scaled=True` beside a mask gives mask-then-scale, not either alone."""
+        gee = self._gee(make_gee, scaled=True, cloud_mask=Sentinel2SclMask())
+        assert self._op(gee).name == "Sentinel2SclMask >> BandScaler"
+
+    def test_an_explicit_mask_alone_is_untouched(self, make_gee):
+        """With no flag the hook reaches `.map` exactly as it was given."""
+        mask = Sentinel2SclMask()
+        assert self._op(self._gee(make_gee, cloud_mask=mask)) is mask
+
+    def test_the_explicit_one_argument_form_still_works(self, make_gee):
+        """`cloud_mask=preprocess(...)` is unchanged by the new flags."""
+        chain = recipe_for("COPERNICUS/S2_SR_HARMONIZED", ["B4", "B3"])
+        gee = self._gee(make_gee, cloud_mask=chain)
+        assert self._op(gee) is chain
+        assert gee._engine_config.needs_server_side_compute is True
+
+
+class TestExplicitScalerCrossCheck:
+    """M4: the explicit `BandScaler` / `preprocess()` forms are cross-checked."""
+
+    def _gee(self, make_gee, bands, **overrides):
+        """A Sentinel-2 L2A request over `bands`, the chain under test applied."""
+        params = dict(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": list(bands)},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    def test_a_mismatched_asset_id_is_refused(self, make_gee):
+        """Another row's recipe computes silently, so the pairing is refused."""
+        chain = recipe_for("COPERNICUS/S2_HARMONIZED", ["B4"])
+        with pytest.raises(ValueError, match="was resolved for"):
+            self._gee(make_gee, ["B4"], cloud_mask=chain)
+
+    def test_a_narrower_band_list_warns_and_names_the_raw_bands(
+        self, make_gee, warnings_buffer
+    ):
+        """The uncovered bands stay raw DN in the same raster, so say which."""
+        chain = recipe_for("COPERNICUS/S2_SR_HARMONIZED", ["B4"])
+        self._gee(make_gee, ["B4", "B3", "B2"], cloud_mask=chain)
+        logged = "".join(warnings_buffer)
+        assert "declares scale/offset for ['B2', 'B3']" in logged
+        assert "stay raw DN" in logged
+
+    def test_a_covering_band_list_is_silent(self, make_gee, warnings_buffer):
+        """A chain covering every requested scalable band warns about nothing."""
+        chain = recipe_for("COPERNICUS/S2_SR_HARMONIZED", ["B4", "B3"])
+        self._gee(make_gee, ["B4", "B3"], cloud_mask=chain)
+        assert "stay raw DN" not in "".join(warnings_buffer)
+
+    def test_an_unresolved_scaler_is_not_cross_checked(self, make_gee, warnings_buffer):
+        """A hand-built `BandScaler` names no row, so there is nothing to check."""
+        scaler = BandScaler(factors=(BandFactor(band="B4", scale=0.0001),))
+        gee = self._gee(make_gee, ["B4", "B3"], cloud_mask=scaler)
+        assert gee.cloud_mask is scaler
+        assert "stay raw DN" not in "".join(warnings_buffer)
+
+    def test_a_band_with_no_factor_is_not_reported(self, make_gee, warnings_buffer):
+        """`SCL` declares no scale, so it is not an uncovered scalable band."""
+        chain = recipe_for("COPERNICUS/S2_SR_HARMONIZED", ["B4"])
+        self._gee(make_gee, ["B4", "SCL"], cloud_mask=chain)
+        assert "stay raw DN" not in "".join(warnings_buffer)

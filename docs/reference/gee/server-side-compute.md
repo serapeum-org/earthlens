@@ -417,17 +417,42 @@ and `BandScaler` is what applies it, server-side, before the composite, so the t
 happens in physical units:
 
 ```python
-from earthlens.gee.cloud_masks import BandScaler, Sentinel2SclMask
-
-row = Catalog().get_dataset("COPERNICUS/S2_SR_HARMONIZED")
 el = EarthLens(
     data_source="gee",
     dataset="COPERNICUS/S2_SR_HARMONIZED",
     variables=["B4", "B3", "B2"],
     start="2024-05-01", end="2024-06-15", reducer="median",
-    cloud_mask=Sentinel2SclMask() >> BandScaler.for_dataset(row, ["B4", "B3", "B2"]),
+    scaled=True,
 )
 ```
+
+`scaled=True` is resolved **inside the backend**, which already knows the asset id and the requested
+bands, so neither is restated and the two cannot drift from `dataset=` / `variables=`. The default is
+`False` on purpose: switching it on would change every existing request's pixel values *and* dtype at
+once.
+
+The explicit form stays public for the cases the flag does not cover — a hand-picked factor set, or a
+row you want to scale against a catalog you loaded yourself:
+
+```python
+from earthlens.gee.catalog import Catalog
+from earthlens.gee.cloud_masks import BandScaler, Sentinel2SclMask
+
+row = Catalog().get_dataset("COPERNICUS/S2_SR_HARMONIZED")
+cloud_mask = Sentinel2SclMask() >> BandScaler.for_dataset(row, ["B4", "B3", "B2"])
+```
+
+!!! warning "The explicit form restates two arguments; keep them in step"
+    `BandScaler.for_dataset(row, bands)` duplicates `dataset=` and `variables=`, and getting either
+    wrong used to be silent. Two guards now run at `GEE(...)` construction:
+
+    - a scaler resolved for a **different asset** than the request asks for raises — both rows often
+      declare the same band names, so the wrong factors would otherwise be applied without a word;
+    - a **narrower band list** than the request logs a warning naming the bands that stay raw DN, since
+      `BandScaler` passes an unnamed band through by design and the output raster would mix 0–1
+      reflectance with 0–10000 integers.
+
+    `scaled=True` / `preprocess=True` avoid both by construction, which is the reason to prefer them.
 
 `BandScaler.for_dataset(row, bands)` reads the factors off the catalog row and skips the bands that
 declare neither — a row declaring none at all logs a warning and yields an identity, so a request never
@@ -481,21 +506,51 @@ cloud_mask = preprocess("COPERNICUS/S1_GRD") >> SpeckleFilter(radius=50)
 "Is Sentinel-2 preprocessing included?" — yes, and this is the one argument that says so:
 
 ```python
-from earthlens.gee import preprocess
-
 el = EarthLens(
     data_source="gee",
     dataset="COPERNICUS/S2_SR_HARMONIZED",
     variables=["B4", "B3", "B2"],
     start="2024-05-01", end="2024-06-15", reducer="median",
-    cloud_mask=preprocess("COPERNICUS/S2_SR_HARMONIZED", ["B4", "B3", "B2"]),
+    preprocess=True,
 )
 ```
 
-`preprocess(dataset, bands=None)` reads the dataset's curated recipe and returns the `MaskChain` it
-describes: the sensor's recommended mask, then a `BandScaler` over that row's own `scale` / `offset`
-factors. **Mask first, then scale** — the mask has to read its raw quality band before any arithmetic
-touches the pixels.
+`preprocess=True` reads the dataset's curated recipe and applies the `MaskChain` it describes: the
+sensor's recommended mask, then a `BandScaler` over that row's own `scale` / `offset` factors. **Mask
+first, then scale** — the mask has to read its raw quality band before any arithmetic touches the
+pixels. The asset id and the band list come from `dataset=` / `variables=`, so the flag restates
+nothing. A dataset with **no** curated recipe raises at construction rather than quietly doing nothing,
+and `scaled=True` beside it is refused: the recipe already scales, so the pair would scale twice.
+
+The underlying function stays public, for a recipe you want to inspect, extend or hand around:
+
+```python
+from earthlens.gee import preprocess
+
+chain = preprocess("COPERNICUS/S2_SR_HARMONIZED", ["B4", "B3", "B2"])
+chain.name                                   # 'Sentinel2SclMask >> BandScaler'
+cloud_mask = chain >> SpeckleFilter()        # extend it
+```
+
+The same two construction-time guards as `BandScaler.for_dataset` apply when such a chain is handed to
+`cloud_mask=` — a mismatched asset id raises, a narrower band list warns — because the explicit form
+restates arguments the request already carries.
+
+#### Composing a flag with your own mask
+
+The flags and `cloud_mask=` are not alternatives: both end up on the backend's one per-image hook, so
+they are chained rather than displacing each other. **The explicit mask runs first**, which keeps the
+family's ordering rule intact — every mask reads a raw quality band, and the flags' last step is the
+scaler's arithmetic, so masking stays ahead of scaling however the two were requested:
+
+```python
+EarthLens(..., preprocess=True, cloud_mask=CloudScorePlus())
+# the op mapped over the stack is:
+# CloudScorePlus >> Sentinel2SclMask >> BandScaler
+```
+
+Both screens apply and neither is dropped; with `scaled=True` the chain is simply
+`<your mask> >> BandScaler`.
 
 The recipe is **catalog data, not an `if/elif` over asset ids**. It is a `preprocess:` block on the
 curated dataset row, typed as `earthlens.gee.Preprocess`:
@@ -535,7 +590,9 @@ Two rules keep it honest:
   remaining step.
 
 Because the result is an ordinary `MaskChain`, you can extend it — `preprocess(...) >> SpeckleFilter()`
-— or ignore it and pass your own chain instead.
+— or ignore it and pass your own chain instead. `preprocess=True` enforces the same two rules: an
+uncovered dataset raises from `GEE(...)`, and a recipe with nothing to apply still resolves to the
+explicit `PassThrough`.
 
 ## Level 4 — `.client`, the full escape hatch
 
@@ -829,7 +886,7 @@ its trees on the server, so fetch them first (`classifier.explain().getInfo()`) 
 
 | Situation | Engine |
 |---|---|
-| Any `cloud_mask` / `filters` / computed graph | `ee` (forced) |
+| Any `cloud_mask` / `scaled=` / `preprocess=` / `filters` / computed graph | `ee` (forced) |
 | A computed graph *and* an AOI over 32768 px | `ee` or `pixels`, either with `auto_split=True`, or `drive` |
 | An output grid that must align with an earlier download | `ee` or `pixels` with `crs_transform=` |
 | Raw pixels from one asset, large AOI | `eedai` — no 32768-px cap, no zip round-trip |

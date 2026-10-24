@@ -1195,6 +1195,12 @@ class BandScaler(ImageMask):
             pass through untouched, and an empty tuple makes the scaler
             an identity (which is what `for_dataset` returns, with a
             warning, for a dataset declaring no factors).
+        dataset: The catalog row's asset id when `for_dataset` resolved
+            the factors, else `None`. Recorded so the `GEE` backend can
+            refuse a scaler resolved for one asset riding a request for
+            another — both rows often declare the same band names, so
+            the graph would otherwise compute and apply the wrong
+            recipe in silence.
 
     Examples:
         - Construct from the factors directly:
@@ -1236,6 +1242,7 @@ class BandScaler(ImageMask):
     """
 
     factors: tuple[BandFactor, ...] = ()
+    dataset: str | None = None
 
     @classmethod
     def for_dataset(
@@ -1254,10 +1261,11 @@ class BandScaler(ImageMask):
                 Defaults to every band on the row.
 
         Returns:
-            A `BandScaler` over the resolved factors — empty, after a
-            `logger.warning`, when the row declares none, so a request
-            asking to scale an unscalable dataset says so rather than
-            silently doing nothing.
+            A `BandScaler` over the resolved factors, carrying the row's
+            asset id as `dataset` — empty, after a `logger.warning`,
+            when the row declares none, so a request asking to scale an
+            unscalable dataset says so rather than silently doing
+            nothing.
 
         Examples:
             - A row declaring no factors warns and yields an identity:
@@ -1293,7 +1301,7 @@ class BandScaler(ImageMask):
                 "stay raw DN; drop the scaling from the request, or curate "
                 "the factors onto the catalog row."
             )
-        return cls(factors=tuple(factors))
+        return cls(factors=tuple(factors), dataset=dataset.id)
 
     def __call__(self, image: ee.Image) -> ee.Image:
         """Rescale the named bands, leaving every other band in place.

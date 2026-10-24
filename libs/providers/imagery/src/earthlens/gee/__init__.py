@@ -305,11 +305,22 @@ re-exported here. `preprocess(dataset, bands=None)` reads the curated
 `preprocess:` recipe off the catalog row (typed as `Preprocess`, so the
 loader validates it) and returns the sensor's recommended mask followed
 by a `BandScaler` over the row's own factors — mask first, so the
-quality band is read before any arithmetic. Pass the result as the
-backend's `cloud_mask=`. A
+quality band is read before any arithmetic. A
 dataset with no curated recipe raises rather than quietly doing
 nothing, and a recipe with nothing to apply (Sentinel-1, already
 corrected upstream) is an explicit `PassThrough` plus a note.
+
+The shipped entry points are the constructor flags
+`GEE(preprocess=True)` and `GEE(scaled=True)` (the latter for the
+scaling alone), which resolve through `preprocess` /
+`BandScaler.for_dataset` per requested dataset — the backend holds the
+asset id and the bands, so neither is restated and the two cannot drift
+from `variables`. Passing a chain to `cloud_mask=` still works and is
+the way to inspect or extend a recipe; the backend then cross-checks it
+against the request (a mismatched asset id raises, an uncovered
+scalable band warns). A flag and an explicit `cloud_mask=` compose
+rather than displace each other, the explicit mask running first so
+masking stays ahead of scaling.
 
 Job / task tracking — for asynchronous `export_via="drive"` /
 `"gcs"` / `"asset"` sinks, the `earthlens.gee.jobs` module

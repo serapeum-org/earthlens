@@ -95,7 +95,12 @@ from earthlens.gee._helpers import (
 )
 from earthlens.gee.auth import AuthenticationError, EarthEngineAuth, _redact
 from earthlens.gee.catalog import Catalog, Dataset
-from earthlens.gee.cloud_masks import MaskChain, Sentinel2Cdi
+from earthlens.gee.cloud_masks import (
+    BandScaler,
+    ImageMask,
+    MaskChain,
+    Sentinel2Cdi,
+)
 from earthlens.gee.configs import EngineConfig, ExportConfig
 from earthlens.gee.engines import (
     NO_SCENES,
@@ -115,6 +120,10 @@ from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
 from earthlens.gee.pixels import PixelsEngine
 from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reader import EedaiReader
+
+# Aliased: `preprocess` is also the name of the constructor flag this module
+# resolves through it, so the two must not shadow each other.
+from earthlens.gee.recipes import preprocess as recipe_for
 from earthlens.gee.reducers import (
     LandsatComposite,
     Reducer,
@@ -368,6 +377,113 @@ def _validate_cdi_product(
             "the TOA row, or use Sentinel2SclMask / Sentinel2Qa60Mask / "
             "CloudScorePlus on surface reflectance."
         )
+
+
+def _resolve_server_side_ops(
+    variables: dict[str, list[str]],
+    catalog: Catalog,
+    *,
+    scaled: bool,
+    preprocess: bool,
+) -> dict[str, ImageMask]:
+    """Resolve the `scaled=` / `preprocess=` flags into one op per dataset.
+
+    The flags are sugar over the `cloud_mask=` hook, resolved here rather
+    than by the caller: the backend already knows the asset id and the
+    requested bands, so neither has to be restated and the two cannot drift
+    from `variables`.
+
+    Args:
+        variables: The request's asset-id-to-bands mapping.
+        catalog: The catalog to read rows and recipes from.
+        scaled: Resolve a `BandScaler` from each row's declared factors.
+        preprocess: Resolve each row's curated `preprocess:` recipe.
+
+    Returns:
+        The op to `.map` per asset id, empty when neither flag is set.
+
+    Raises:
+        ValueError: If both flags are set (the recipe already scales), or
+            if `preprocess=True` meets a dataset with no curated recipe.
+    """
+    resolved: dict[str, ImageMask] = {}
+    if scaled and preprocess:
+        raise ValueError(
+            "scaled=True and preprocess=True both apply the catalog's "
+            "scale/offset, so together they would scale the pixels twice. "
+            "preprocess=True already includes the scaling — drop scaled=."
+        )
+    for asset, bands in variables.items():
+        if preprocess:
+            resolved[asset] = recipe_for(asset, bands, catalog=catalog)
+        elif scaled:
+            resolved[asset] = BandScaler.for_dataset(catalog.get_dataset(asset), bands)
+    return resolved
+
+
+def _validate_scaler_targets(
+    variables: dict[str, list[str]], catalog: Catalog, cloud_mask: Any
+) -> None:
+    """Cross-check an explicitly passed `BandScaler` against the request.
+
+    `cloud_mask=preprocess(asset, bands)` and
+    `cloud_mask=BandScaler.for_dataset(row, bands)` restate two arguments the
+    request already carries, and nothing used to compare them. The two ways
+    that goes wrong are both silent:
+
+    * a **mismatched asset id** resolves another sensor's recipe — the rows
+      often declare the same band names, so the graph computes and applies
+      the wrong factors rather than failing. Refused here.
+    * a **narrower band list** leaves the request's other scalable bands in
+      raw DN *in the same raster*, because `BandScaler.__call__` passes an
+      unnamed band through by design. Warned about here, naming them.
+
+    The `scaled=` / `preprocess=` flags avoid both by construction; this is
+    the guard for the explicit forms, which stay public.
+
+    Args:
+        variables: The request's asset-id-to-bands mapping.
+        catalog: The catalog to read each row's declared factors from.
+        cloud_mask: The per-image hook, possibly a `MaskChain`, or `None`.
+
+    Raises:
+        ValueError: If a scaler names an asset the request does not ask for.
+    """
+    scalers = [
+        op
+        for op in _flatten_image_ops(cloud_mask)
+        if isinstance(op, BandScaler) and op.dataset is not None
+    ]
+    for scaler in scalers:
+        if scaler.dataset not in variables:
+            raise ValueError(
+                f"the BandScaler on cloud_mask= was resolved for "
+                f"{scaler.dataset!r}, but this request asks for "
+                f"{sorted(variables)}. Another row's scale/offset factors "
+                "often name the same bands, so the wrong recipe would be "
+                "applied silently — pass the matching dataset, or use "
+                "preprocess=True / scaled=True and let the backend resolve "
+                "it from variables."
+            )
+        covered = {factor.band for factor in scaler.factors}
+        row = catalog.get_dataset(scaler.dataset)
+        uncovered = sorted(
+            band
+            for band in variables[scaler.dataset]
+            if band in row.bands
+            and band not in covered
+            and (
+                row.bands[band].scale is not None or row.bands[band].offset is not None
+            )
+        )
+        if uncovered:
+            logger.warning(
+                f"{scaler.dataset!r} declares scale/offset for {uncovered}, "
+                "but the BandScaler on cloud_mask= does not cover them, so "
+                "they stay raw DN in the same raster as the scaled bands. "
+                "Widen the band list, or use preprocess=True / scaled=True "
+                "so the backend resolves it from variables."
+            )
 
 
 def _validate_pure_config(
@@ -744,6 +860,32 @@ class GEE(LazyClientMixin, AbstractDataSource):
             `ee_type="image"` dataset it is applied verbatim and a warning
             is logged (see `_build_collection`). Defaults to `None`
             (no masking).
+        scaled: Convert the requested bands from raw DN to physical units
+            server-side, before the composite, using the `scale` /
+            `offset` the catalog row already declares. Resolved inside
+            the backend into a `earthlens.gee.cloud_masks.BandScaler`
+            per requested dataset over that dataset's requested bands,
+            so neither the asset id nor the band list is restated — and
+            so they cannot drift from `variables`. Bands declaring
+            neither factor pass through untouched; a dataset declaring
+            none at all logs a warning and leaves the values raw rather
+            than failing. Defaults to `False`: switching it on would
+            change every existing request's pixel values *and* dtype
+            (integer to float) at once, and `ExportConfig.dtype` is the
+            escape hatch for a narrower output. Composes with an
+            explicit `cloud_mask=`, which runs first (see
+            `_build_collection`).
+        preprocess: Apply the dataset's curated analysis-ready recipe —
+            the sensor's recommended cloud mask, then the band scaling —
+            resolved from the catalog row's `preprocess:` block. The
+            one-argument form of
+            `cloud_mask=earthlens.gee.preprocess(dataset, bands)`, with
+            the asset id and the band list taken from `variables`
+            instead of restated. A dataset with no curated recipe raises
+            at construction rather than silently doing nothing, and a
+            recipe with nothing to apply resolves to an explicit
+            `PassThrough`. Mutually exclusive with `scaled=True`, which
+            the recipe already covers. Defaults to `False`.
         filters: Optional iterable of `ee.ImageCollection ->
             ee.ImageCollection` filters applied to the stack after the
             spatial / temporal filters (`filterBounds`, and `filterDate`
@@ -969,6 +1111,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         discover_extent: bool = False,
         wait_for_export: bool = True,
         cloud_mask: CloudMask | None = None,
+        scaled: bool = False,
+        preprocess: bool = False,
         filters: Iterable[CollectionFilter] | None = None,
         engine: Literal["auto", "ee", "eedai", "pixels"] = "auto",
         cog: bool = False,
@@ -1088,6 +1232,21 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # parent constructor immediately calls `self._initialize()` (and
         # `_create_grid` / `_check_input_dates`), which read them.
         self._catalog = Catalog()
+        # Both need the catalog, so they sit after the parse rather than with
+        # the other cheap config checks above.
+        #: The `scaled=` / `preprocess=` ops, one per requested asset id,
+        #: composed onto `cloud_mask` in `_build_collection`. Resolved here so
+        #: an uncovered dataset or a factorless row reports at construction.
+        self._server_side_ops: dict[str, ImageMask] = _resolve_server_side_ops(
+            variables, self._catalog, scaled=bool(scaled), preprocess=bool(preprocess)
+        )
+        _validate_scaler_targets(variables, self._catalog, cloud_mask)
+        #: Convert raw DN to physical units server-side from the catalog's
+        #: factors, resolved per dataset (see `_server_side_ops`).
+        self.scaled = bool(scaled)
+        #: Apply each dataset's curated `preprocess:` recipe, resolved per
+        #: dataset (see `_server_side_ops`).
+        self.preprocess = bool(preprocess)
         # Credentials are resolved at authenticate()/first-client-access time
         # (explicitly or from the GEE_SERVICE_ACCOUNT / GEE_SERVICE_KEY /
         # GEE_PROJECT environment variables), not at construction.
@@ -1944,8 +2103,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         The pipeline is `filterDate` (image collections only) →
         `filterBounds` → the constructor `filters` (left to right) → the
-        per-image `cloud_mask` (`.map`) → `select(bands)`. The
-        `cloud_mask` runs *before* `select` on purpose: an optical mask
+        per-image op (`.map`) → `select(bands)`. That op is the
+        `cloud_mask` hook, whatever `scaled=` / `preprocess=` resolved
+        for this dataset, or the two chained — see `_per_image_op`. It
+        runs *before* `select` on purpose: an optical mask
         reads a quality band (`QA_PIXEL` / `SCL`) that the user's `bands`
         usually omit, so selecting the requested bands first would strip
         it.
@@ -1975,7 +2136,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # A static image: no temporal filtering (the asset may not
             # carry a `system:time_start` inside the request window).
             collection = ee.ImageCollection([ee.Image(var_info.id)])
-            if self.filters or self.cloud_mask is not None:
+            if self.filters or self._per_image_op(var_info) is not None:
                 logger.warning(
                     f"filters / cloud_mask were set but {var_info.id!r} is a "
                     "static single-image dataset (ee_type='image'); they are "
@@ -1987,9 +2148,38 @@ class GEE(LazyClientMixin, AbstractDataSource):
         collection = collection.filterBounds(self._ee_region())
         for image_filter in self.filters:
             collection = image_filter(collection)
-        if self.cloud_mask is not None:
-            collection = collection.map(self.cloud_mask)
+        per_image = self._per_image_op(var_info)
+        if per_image is not None:
+            collection = collection.map(per_image)
         return collection.select(list(bands))
+
+    def _per_image_op(self, var_info: Dataset) -> CloudMask | None:
+        """Return the op to `.map` for one dataset, flags composed onto the hook.
+
+        An explicit `cloud_mask=` and a `scaled=` / `preprocess=` flag are not
+        alternatives: both end up on the one hook, so they are chained rather
+        than one displacing the other. **The explicit mask runs first**, which
+        keeps the family's ordering rule intact — every mask reads a raw
+        quality band, and the flags' last step is the `BandScaler`'s
+        arithmetic, so masking stays ahead of scaling however the two were
+        requested. With `preprocess=True` the recipe's own mask therefore runs
+        second, after the caller's: both screens apply, and neither is dropped.
+
+        Args:
+            var_info: The catalog entry being downloaded.
+
+        Returns:
+            The per-image op, or `None` when neither a hook nor a flag was
+            given.
+        """
+        resolved = self._server_side_ops.get(var_info.id)
+        if resolved is None:
+            op: CloudMask | None = self.cloud_mask
+        elif self.cloud_mask is None:
+            op = resolved
+        else:
+            op = MaskChain.of(self.cloud_mask, resolved)
+        return op
 
     def _composite(
         self, collection, var_info: Dataset, start: dt.datetime, end: dt.datetime
@@ -2620,6 +2810,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             crs=self.crs,
             scale=self.scale,
             cloud_mask=self.cloud_mask,
+            server_side_ops=bool(self._server_side_ops),
             filters=tuple(self.filters),
             property_filter=self._property_filter_expression(),
             region=self.region,
