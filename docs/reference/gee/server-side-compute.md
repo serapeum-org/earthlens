@@ -485,12 +485,19 @@ which have a `>>` of their own. `chain.name` labels every one of those shapes. T
 `analysis.OperationChain` — that one composes client-side operations over a downloaded pyramids
 `Dataset` and cannot build an `ee.Image` graph.
 
-Every op in the family preserves the image's properties. The `updateMask` masks do it for free; the ones
-that rebuild the image (`BandScaler`, `SpeckleFilter`) copy them back with
-`copyProperties(source, source.propertyNames())` — note the explicit property list, since
-`copyProperties` skips `system:*` otherwise. That matters because the composite engine applies its
-per-bucket `filterDate` *after* the hook, and the reducers and samplers read `system:time_start`: an op
-that dropped it would empty every bucket.
+Every op in the family preserves the image's properties. That matters because the composite engine
+applies its per-bucket `filterDate` *after* the hook, and the reducers and samplers read
+`system:time_start`: an op that dropped it would empty every bucket.
+
+The `updateMask` masks do it for free. The two ops that rebuild the image (`BandScaler`,
+`SpeckleFilter`) copy them back with `copyProperties(source, source.propertyNames())` — note the
+explicit property list, since `copyProperties` skips `system:*` otherwise. Only one of the two has to:
+checked live, `focalMedian` returns an image with **no** `system:time_start`, so the copy is
+load-bearing for `SpeckleFilter`, while `addBands(..., overwrite=True)` already keeps the source's
+properties — which is why Earth Engine's own Landsat `applyScaleFactors` example never copies them — so
+for `BandScaler` the copy is belt-and-braces. One caveat either way: the copy carries
+`system:band_names` and `system:footprint` over verbatim, so an op applied after a `select()` hands on
+the pre-`select` band list.
 
 #### Radar: `SpeckleFilter`
 
@@ -558,13 +565,16 @@ The recipe is **catalog data, not an `if/elif` over asset ids**. It is a `prepro
 curated dataset row, typed as `earthlens.gee.Preprocess`:
 
 ```yaml
-COPERNICUS/S2_SR_HARMONIZED:
-  preprocess:
-    mask: sentinel2_scl
-    scale: true
-    note: >-
-      Level-2A arrives as 0-10000 scaled surface reflectance; the SCL band
-      carries the scene classification the mask reads.
+# libs/providers/imagery/src/earthlens/gee/catalog/optical-multispectral.yaml
+datasets:                                 # every row nests under this key
+  COPERNICUS/S2_SR_HARMONIZED:
+    title: "Harmonized Sentinel-2 MSI ... Level-2A (Surface Reflectance)"
+    preprocess:                           # the recipe, beside the row's other fields
+      mask: sentinel2_scl
+      scale: true
+      note: >-
+        Level-2A arrives as 0-10000 scaled surface reflectance; the SCL band
+        carries the scene classification the mask reads.
 ```
 
 Typing it as a declared field is what makes the validation real: `Dataset` is frozen but does **not**

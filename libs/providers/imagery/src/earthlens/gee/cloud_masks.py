@@ -79,12 +79,16 @@ of the recipe: a cloud mask must read its raw quality band before a
 scaler's arithmetic touches the pixels. `earthlens.gee.preprocess`
 assembles that chain per dataset from the catalog.
 
-Every op here preserves the image's properties. For the `updateMask`
-masks that is automatic; the ops that rebuild the image copy them back
-with `copyProperties(source, source.propertyNames())`, because
+Every op here preserves the image's properties, which matters because
 `CompositeEngine.composite_ee` applies its per-bucket `filterDate`
-*after* the hook and the reducers and samplers read
-`system:time_start` — dropping it would empty every bucket.
+*after* the hook and the reducers and samplers read `system:time_start`
+— dropping it would empty every bucket. For the `updateMask` masks that
+is automatic. The two ops that rebuild the image copy them back with
+`copyProperties(source, source.propertyNames())`, and only one of them
+has to: `focalMedian` drops the properties, so the copy is load-bearing
+for `SpeckleFilter`, while `addBands(..., overwrite=True)` keeps them
+already, so for `BandScaler` the copy is belt-and-braces. Both were
+checked live rather than assumed.
 
 `Sentinel2Cdi` masks a Sentinel-2 **TOA** scene
 (`COPERNICUS/S2_HARMONIZED`; L2A is refused at `GEE` construction, since
@@ -235,7 +239,6 @@ def _op_name(op: PerImageOp) -> str:
 def _with_properties(derived: ee.Image, source: ee.Image) -> ee.Image:
     """Copy every property of `source` — system ones included — onto `derived`.
 
-    Band arithmetic builds a new image that carries no metadata, and
     `copyProperties` omits the `system:*` properties unless they are named
     explicitly (its `properties` argument defaults to the *ordinary* ones), so
     the property list is passed in. `system:time_start` is the one that
@@ -243,6 +246,17 @@ def _with_properties(derived: ee.Image, source: ee.Image) -> ee.Image:
     `filterDate` *after* the `cloud_mask` hook, and the temporal reducers and
     samplers read the timestamp — an op that dropped it would empty every
     bucket.
+
+    Which ops need it differs, and only one of the two does. Verified live
+    against a Sentinel-2 scene: `ee.Image.focalMedian` returns a new image
+    with **no** `system:time_start`, so the copy is load-bearing for
+    `SpeckleFilter`; `image.addBands(scaled, overwrite=True)` **keeps** the
+    source's properties already — which is why Earth Engine's own Landsat
+    `applyScaleFactors` example never copies them — so for `BandScaler` the
+    copy is belt-and-braces, kept because it costs nothing and does not
+    depend on that behaviour holding. One caveat either way: the copy carries
+    `system:band_names` and `system:footprint` over verbatim, so an op
+    applied after a `select()` hands on the pre-`select` band list.
 
     Args:
         derived: The image computed from `source`.
@@ -1309,9 +1323,11 @@ class BandScaler(ImageMask):
         Each factor's band is recomputed as `band * scale + offset` and
         written back over the original with `addBands(..., overwrite=
         True)`, so band order and the unnamed bands survive. The
-        arithmetic itself produces a propertyless image, so the source's
-        full property set — `system:time_start` included — is copied back
-        on; see `_with_properties` for why that is load-bearing.
+        source's full property set — `system:time_start` included — is
+        copied back on afterwards. That copy is belt-and-braces here
+        rather than load-bearing: `addBands` already preserves the
+        properties (verified live), unlike `focalMedian`; see
+        `_with_properties`.
 
         Args:
             image: The `ee.Image` to rescale. Must carry every band the
@@ -1356,8 +1372,10 @@ class SpeckleFilter(ImageMask):
     the collection-level `earthlens.gee.filters`.
 
     Attributes:
-        radius: Kernel radius, in `units`. Defaults to `50` (metres),
-            roughly a 5x5 window on 10 m S1 GRD. Must be positive.
+        radius: Kernel radius, in `units`. Defaults to `50` (metres) —
+            a 5-pixel *radius* on 10 m Sentinel-1 GRD, so an 11x11
+            bounding box (`radius=20` would be the 5x5 one). Must be
+            positive.
         units: Whether `radius` is read in `"meters"` (the default) or
             `"pixels"`.
         kernel_type: The kernel shape — `"circle"` (the default),

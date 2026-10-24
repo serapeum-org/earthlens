@@ -141,6 +141,13 @@ def _tree_to_string(tree: Any, feature_names: Sequence[str], labels: Any) -> str
             "a single-leaf tree encodes no decision rule, so there is "
             "nothing to export; fit on more than one class"
         )
+    # The root's bracketed field is the total impurity across every node, not
+    # the root's own (`tree.impurity[0]`), which is what rpart's deviance
+    # column means. Deliberate, for geemap parity: its `tree_to_string` emits
+    # `tree.impurity.sum()` here, Earth Engine ignores the field entirely (the
+    # format round-trips exactly, verified live), and `_parse_tree` skips the
+    # root line. Kept as-is so a tree string earthlens emits is byte-identical
+    # to the one geemap would, which is the whole claim of this port.
     lines = [
         f"1) root {int(tree.n_node_samples[0])} 9999 9999 "
         f"({float(tree.impurity.sum())})"

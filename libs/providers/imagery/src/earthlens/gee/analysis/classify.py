@@ -251,6 +251,12 @@ class Classify(RasterOperation):
         `ClassifierCodec.for_classify` builds the band-index-to-band-name
         mapping from this operation's training bands.
 
+        **The fitted estimator is shared, not a copy**: this hands out the
+        cached object itself, so calling `.fit(...)` on it changes what
+        `apply()` predicts afterwards, even though the operation is otherwise
+        a frozen config. Read it, export it, do not re-fit it — build a second
+        `Classify` instead.
+
         Returns:
             The fitted `RandomForestClassifier`.
 

@@ -84,16 +84,21 @@ class _FakeImage:
         return _Term(("band", band))
 
     def addBands(self, src, overwrite=False):  # noqa: N802 - Earth Engine name
-        derived = _FakeImage(properties=None, bands=self.bands)
-        # A rebuilt image carries no metadata, which is the whole reason
-        # the scaler has to copy the properties back on.
-        derived.properties = {}
+        # Verified live: `addBands` KEEPS the source image's properties,
+        # `system:time_start` included — which is why Earth Engine's own
+        # Landsat `applyScaleFactors` example never copies them back. The fake
+        # models that, so `BandScaler`'s copy is belt-and-braces here rather
+        # than the thing the assertion depends on.
+        derived = _FakeImage(properties=self.properties, bands=self.bands)
         derived.added = [*self.added, src]
         derived.overwrite = overwrite
         derived.selects = self.selects
         return derived
 
     def focalMedian(self, **kwargs):  # noqa: N802 - Earth Engine name
+        # Verified live: `focalMedian` DOES drop the properties
+        # (`bare focalMedian time_start: None`), so this is the op whose
+        # `_with_properties` copy is load-bearing.
         derived = _FakeImage(properties=None, bands=self.bands)
         derived.properties = {}
         derived.focal_kwargs = kwargs
@@ -283,6 +288,12 @@ class TestBandScalerCall:
         assert out.copied_from is image
         assert out.properties["system:time_start"] == _TIME_START
         assert out.properties["CLOUD_COVER"] == 7
+
+    def test_the_fake_models_the_sdks_property_behaviour(self):
+        """`addBands` keeps the properties live; `focalMedian` drops them."""
+        image = _FakeImage()
+        assert image.addBands(_Term(("band", "B4"))).properties == image.properties
+        assert image.focalMedian(radius=1).properties == {}
 
     def test_the_system_properties_are_named_explicitly(self, ee_image_passthrough):
         """`copyProperties` is given the property list, since it skips `system:*`."""
