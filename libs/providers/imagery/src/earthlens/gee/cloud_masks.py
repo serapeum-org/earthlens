@@ -83,7 +83,9 @@ with `copyProperties(source, source.propertyNames())`, because
 `system:time_start` — dropping it would empty every bucket.
 
 `Sentinel2Cdi` masks a Sentinel-2 **TOA** scene
-(`COPERNICUS/S2_HARMONIZED`) by its Cloud Displacement Index —
+(`COPERNICUS/S2_HARMONIZED`; L2A is refused at `GEE` construction, since
+CDI computes a silently different value there rather than failing) by its
+Cloud Displacement Index —
 `ee.Algorithms.Sentinel2.CDI(image)`, a parallax-based cloud
 discriminator — keeping pixels whose CDI is at or above a `[-1, 1]`
 threshold (clouds push the CDI strongly negative). It is also the
@@ -816,10 +818,21 @@ class Sentinel2Cdi(ImageMask):
     parallax-based cloud discriminator, computed from the scene's own
     band geometry — and keeps pixels whose CDI is at or above
     `threshold`. Clouds push the CDI strongly negative, so the `-0.5`
-    default keeps the recommended operating point. CDI runs on the
-    **TOA** product (`COPERNICUS/S2_HARMONIZED`), not L2A — pointing it
-    at a surface-reflectance collection fails with a band-not-found
-    error server-side when the graph is computed.
+    default keeps the recommended operating point.
+
+    CDI is only *valid* on the **TOA** product
+    (`COPERNICUS/S2_HARMONIZED`, or the legacy `COPERNICUS/S2`): it is a
+    parallax computation over the TOA band geometry. Pointed at a
+    surface-reflectance collection it does **not** fail — verified live,
+    `ee.Algorithms.Sentinel2.CDI` computes a value on an L2A scene and
+    the masked band resolves to a pixel — so there is no server-side
+    error to rely on, only a silently different mask. The `GEE` backend
+    therefore refuses the pairing itself: a `Sentinel2Cdi` on
+    `cloud_mask=` (directly or inside a chain) with
+    `COPERNICUS/S2_SR_HARMONIZED` / `COPERNICUS/S2_SR` raises at
+    construction, where the asset id is known. On surface reflectance
+    use `Sentinel2SclMask`, `Sentinel2Qa60Mask` or `CloudScorePlus`
+    instead.
 
     A named algorithm is server-side compute, so the mask — like every
     `cloud_mask=` — forces the request onto an Earth Engine engine. It

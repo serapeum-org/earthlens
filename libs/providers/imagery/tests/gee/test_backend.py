@@ -28,7 +28,13 @@ from earthlens.gee import ExtentDiscovery
 from earthlens.gee import backend as backend_module
 from earthlens.gee.backend import GEE
 from earthlens.gee.catalog import Dataset, Extent
-from earthlens.gee.cloud_masks import LandsatSrMask, sentinel2_scl
+from earthlens.gee.cloud_masks import (
+    LandsatSrMask,
+    Sentinel2Cdi,
+    Sentinel2Qa60Mask,
+    Sentinel2SclMask,
+    sentinel2_scl,
+)
 from earthlens.gee.filters import ByYear
 from earthlens.gee.reducers import (
     First,
@@ -703,6 +709,68 @@ class TestReducerInstanceWidening:
         assert units[0].image == "landsat-composite-image"
         assert recorded["collection"] == "the-collection"
         assert recorded["asFloat"] is True
+
+
+class TestCdiNeedsTheToaProduct:
+    """M1: CDI computes on L2A rather than failing, so the request is refused."""
+
+    def _s2(self, make_gee, asset, **overrides):
+        """A GEE over one Sentinel-2 row, the CDI op under test applied."""
+        params = dict(
+            variables={asset: ["B4"]},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    @pytest.mark.parametrize(
+        "asset", ["COPERNICUS/S2_SR_HARMONIZED", "COPERNICUS/S2_SR"]
+    )
+    def test_the_mask_is_refused_on_a_surface_reflectance_row(self, make_gee, asset):
+        """`cloud_mask=Sentinel2Cdi()` on L2A raises instead of masking wrongly."""
+        with pytest.raises(ValueError, match="only valid on the Sentinel-2 TOA"):
+            self._s2(make_gee, asset, cloud_mask=Sentinel2Cdi())
+
+    def test_the_composite_is_refused_on_a_surface_reflectance_row(self, make_gee):
+        """`reducer=Sentinel2Composite()` maps the CDI mask, so it is refused too."""
+        with pytest.raises(ValueError, match="sentinel2_composite"):
+            self._s2(
+                make_gee,
+                "COPERNICUS/S2_SR_HARMONIZED",
+                reducer=Sentinel2Composite(),
+            )
+
+    def test_a_chained_cdi_mask_is_found(self, make_gee):
+        """The walk reaches a CDI op nested inside a mask chain."""
+        chain = Sentinel2Qa60Mask() >> Sentinel2Cdi()
+        with pytest.raises(ValueError, match="Sentinel2Cdi"):
+            self._s2(make_gee, "COPERNICUS/S2_SR_HARMONIZED", cloud_mask=chain)
+
+    def test_the_toa_row_is_accepted(self, make_gee):
+        """The TOA product is what CDI is defined on, so it constructs."""
+        gee = self._s2(make_gee, "COPERNICUS/S2_HARMONIZED", cloud_mask=Sentinel2Cdi())
+        assert isinstance(gee.cloud_mask, Sentinel2Cdi)
+
+    def test_the_legacy_toa_row_is_accepted(self, make_gee):
+        """`COPERNICUS/S2` is the pre-harmonization TOA archive."""
+        gee = self._s2(make_gee, "COPERNICUS/S2", reducer=Sentinel2Composite())
+        assert isinstance(gee.reducer, Sentinel2Composite)
+
+    def test_a_non_sentinel2_row_is_left_to_earth_engine(self, make_gee):
+        """Only the detectable L2A case is refused; anything else is EE's call."""
+        gee = self._s2(
+            make_gee, "UCSB-CHG/CHIRPS/DAILY", cloud_mask=Sentinel2Cdi(), scale=5566.0
+        )
+        assert isinstance(gee.cloud_mask, Sentinel2Cdi)
+
+    def test_a_mask_without_cdi_is_unaffected(self, make_gee):
+        """An L2A request with an ordinary mask still constructs."""
+        gee = self._s2(
+            make_gee, "COPERNICUS/S2_SR_HARMONIZED", cloud_mask=Sentinel2SclMask()
+        )
+        assert isinstance(gee.cloud_mask, Sentinel2SclMask)
 
 
 class TestInit:

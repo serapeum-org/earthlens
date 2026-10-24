@@ -95,6 +95,7 @@ from earthlens.gee._helpers import (
 )
 from earthlens.gee.auth import AuthenticationError, EarthEngineAuth, _redact
 from earthlens.gee.catalog import Catalog, Dataset
+from earthlens.gee.cloud_masks import MaskChain, Sentinel2Cdi
 from earthlens.gee.configs import EngineConfig, ExportConfig
 from earthlens.gee.engines import (
     NO_SCENES,
@@ -301,6 +302,72 @@ CloudMask = Callable[[ee.Image], ee.Image]
 #: An `ee.ImageCollection` filter — collection in, filtered collection out —
 #: applied after `filterDate` / `filterBounds` (see `earthlens.gee.filters`).
 CollectionFilter = Callable[[ee.ImageCollection], ee.ImageCollection]
+
+#: The Sentinel-2 surface-reflectance (Level-2A) rows `ee.Algorithms.Sentinel2
+#: .CDI` must not be pointed at. CDI is a parallax computation over the TOA
+#: band geometry; on L2A it does **not** fail — verified live, it returns a
+#: value — so a mistaken request would get a silently different mask. The
+#: asset id is known at construction, which is why this is a refusal rather
+#: than a caveat.
+_CDI_FORBIDDEN_ASSETS: frozenset[str] = frozenset(
+    {"COPERNICUS/S2_SR_HARMONIZED", "COPERNICUS/S2_SR"}
+)
+
+
+def _flatten_image_ops(op: Any) -> tuple[Any, ...]:
+    """Expand a `MaskChain` into its leaf ops, however deeply nested.
+
+    `MaskChain.of` and `>>` both flatten, but `MaskChain(masks=(chain, ...))`
+    can still nest, so the walk recurses rather than assuming one level.
+
+    Args:
+        op: A per-image op, a `MaskChain`, or `None`.
+
+    Returns:
+        The leaf ops, in run order; empty for `None`.
+    """
+    result: tuple[Any, ...]
+    if op is None:
+        result = ()
+    elif isinstance(op, MaskChain):
+        result = tuple(leaf for inner in op.masks for leaf in _flatten_image_ops(inner))
+    else:
+        result = (op,)
+    return result
+
+
+def _validate_cdi_product(
+    variables: dict[str, list[str]], cloud_mask: Any, reducer: Any
+) -> None:
+    """Refuse a Cloud Displacement Index op aimed at a Level-2A row.
+
+    Args:
+        variables: The request's asset-id-to-bands mapping.
+        cloud_mask: The per-image hook, possibly a `MaskChain`, or `None`.
+        reducer: The temporal reducer, possibly a named composite, or `None`.
+
+    Raises:
+        ValueError: If a `Sentinel2Cdi` mask or a `Sentinel2Composite` reducer
+            is paired with a Sentinel-2 surface-reflectance asset.
+    """
+    candidates = (*_flatten_image_ops(cloud_mask), reducer)
+    named = tuple(
+        getattr(op, "name", type(op).__name__)
+        for op in candidates
+        if isinstance(op, (Sentinel2Cdi, Sentinel2Composite))
+    )
+    forbidden = sorted(set(variables) & _CDI_FORBIDDEN_ASSETS)
+    if named and forbidden:
+        raise ValueError(
+            f"{', '.join(named)} runs ee.Algorithms.Sentinel2.CDI, which is "
+            "only valid on the Sentinel-2 TOA product "
+            "('COPERNICUS/S2_HARMONIZED', or the legacy 'COPERNICUS/S2'): it "
+            "is a parallax computation over the TOA band geometry. On "
+            f"{', '.join(forbidden)} it does not fail — it computes a "
+            "different value — so the mask would be silently wrong. Request "
+            "the TOA row, or use Sentinel2SclMask / Sentinel2Qa60Mask / "
+            "CloudScorePlus on surface reflectance."
+        )
 
 
 def _validate_pure_config(
@@ -955,6 +1022,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 "cloud_mask must be a callable ee.Image -> ee.Image (or None), "
                 f"got {type(cloud_mask).__name__}"
             )
+        # The asset id and the ops are both in hand here, so the one
+        # CDI/product mismatch that is detectable client-side is refused now
+        # rather than returning a plausible-looking but wrong mask.
+        _validate_cdi_product(variables, cloud_mask, reducer)
         collection_filters = _validate_filters(filters)
         pinned_transform = validate_crs_transform(crs_transform)
         # Resolved up front, not only at composite time: validating `reducer=`

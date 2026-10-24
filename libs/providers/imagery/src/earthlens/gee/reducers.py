@@ -834,11 +834,16 @@ class Sentinel2Composite(_NamedAlgorithmComposite):
     `GEE(reducer=Sentinel2Composite())` — and the composite engine
     applies it per time bucket.
 
-    CDI is defined on the **TOA** product (`COPERNICUS/S2_HARMONIZED`),
-    not L2A — on surface reflectance the graph fails server-side with a
-    band-not-found error. A named algorithm exists only server-side, so
-    the EEDAI reader declines this reducer and the request runs on an
-    Earth Engine engine.
+    CDI is only *valid* on the **TOA** product
+    (`COPERNICUS/S2_HARMONIZED`, or the legacy `COPERNICUS/S2`), not L2A:
+    it is a parallax computation over the TOA band geometry. On surface
+    reflectance the graph does **not** fail — verified live, CDI computes
+    a value there — so the hazard is a silently different mask rather
+    than an error, and the `GEE` backend refuses
+    `reducer=Sentinel2Composite()` against
+    `COPERNICUS/S2_SR_HARMONIZED` / `COPERNICUS/S2_SR` at construction.
+    A named algorithm exists only server-side, so the EEDAI reader
+    declines this reducer and the request runs on an Earth Engine engine.
 
     Attributes:
         threshold: The CDI value below which a pixel is masked before

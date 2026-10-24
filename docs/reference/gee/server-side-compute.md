@@ -173,8 +173,20 @@ reducer=Sentinel2Composite(threshold=-0.5, reducer="median")
   the algorithm performs its own TOA calibration.
 - `Sentinel2Composite` maps the `Sentinel2Cdi` mask (`ee.Algorithms.Sentinel2.CDI`, the parallax-based
   cloud discriminator) over every scene, then reduces the masked stack with its inner `reducer` (median by
-  default). CDI is defined on the **TOA** product (`COPERNICUS/S2_HARMONIZED`), not L2A. The standalone
-  `Sentinel2Cdi(threshold=...)` mask is also an ordinary `cloud_mask=` drop-in.
+  default). The standalone `Sentinel2Cdi(threshold=...)` mask is also an ordinary `cloud_mask=` drop-in.
+
+!!! warning "CDI needs the TOA product, and L2A fails *silently*"
+    `ee.Algorithms.Sentinel2.CDI` is a parallax computation over the TOA band geometry, so it is only
+    *valid* on `COPERNICUS/S2_HARMONIZED` (or the legacy `COPERNICUS/S2`). Pointed at surface reflectance
+    it does **not** raise: checked live against earthengine-api 1.7.35 with evaluation forced, CDI returns
+    a value on an L2A scene (`-0.083`) just as it does on the matching TOA scene (`-0.075`), and the masked
+    band resolves to a pixel. There is therefore no server-side error to rely on — only a mask that is
+    quietly wrong.
+
+    Because the asset id is known at construction, earthlens refuses the pairing itself: a `Sentinel2Cdi`
+    on `cloud_mask=` (directly or inside a `MaskChain`) or a `reducer=Sentinel2Composite()` against
+    `COPERNICUS/S2_SR_HARMONIZED` / `COPERNICUS/S2_SR` raises a `ValueError` from `GEE(...)`. On surface
+    reflectance use `Sentinel2SclMask`, `Sentinel2Qa60Mask` or `CloudScorePlus`.
 
 Both are validated at construction like every reducer (`GEE(reducer=...)` resolves instances through the
 same `temporal_reducer_for` seam the strings use), are deliberately *not* in the `REDUCERS` registry, and
