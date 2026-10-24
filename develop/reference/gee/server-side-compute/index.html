@@ -3373,6 +3373,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#the-expanded-mask-library" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The expanded mask library
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#cloudscoreplus-the-state-of-the-art-sentinel-2-mask" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24002,6 +24013,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#the-expanded-mask-library" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The expanded mask library
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#cloudscoreplus-the-state-of-the-art-sentinel-2-mask" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24470,6 +24492,24 @@ at construction and drop-ins for <code>cloud_mask=</code>:</p>
 particular — so the per-bucket date filter the composite engine applies <em>after</em> the mask still sees every
 scene. Like the function forms, an instance on <code>cloud_mask=</code> forces the request onto an Earth Engine
 engine (the EEDAI reader cannot run a graph).</p>
+<h3 id="the-expanded-mask-library"><a class="toclink" href="#the-expanded-mask-library">The expanded mask library</a><a class="headerlink" href="#the-expanded-mask-library" title="Permanent link">#</a></h3>
+<p>Three further <code>ImageMask</code> classes broaden coverage across the catalog's optical datasets. Each reads a
+quality band its target dataset declares in the curated catalog, derives its output with <code>updateMask</code>
+(properties survive), and — like every <code>cloud_mask=</code> — moves the request onto an Earth Engine engine:</p>
+<ul>
+<li><code>Sentinel2Qa60Mask()</code> — the standard pre-Scene-Classification recipe: masks the <code>QA60</code> opaque-cloud
+  bit (10) and cirrus bit (11). Use it for TOA scenes (<code>COPERNICUS/S2_HARMONIZED</code>), which carry <code>QA60</code>
+  but no <code>SCL</code> band.</li>
+<li><code>LandsatQaRefinedMask(sensor=..., max_cloud_confidence=2, max_shadow_confidence=2)</code> — the per-sensor
+  refinement the <code>sensor</code> argument was reserved for: thresholds the <code>QA_PIXEL</code> Cloud Confidence
+  (bits 8-9) and Cloud Shadow Confidence (bits 10-11) fields instead of trusting the single derived
+  Clear bit. Ceilings are <code>0</code> (not set) to <code>3</code> (high), validated at construction.</li>
+<li><code>ModisState1kmMask()</code> — the daily MODIS surface-reflectance products (<code>MODIS/061/MOD09GA</code> /
+  <code>MYD09GA</code>): keeps only pixels whose 2-bit cloud-state field (bits 0-1 of <code>state_1km</code>) reads
+  "clear" (0).</li>
+</ul>
+<p>On a dataset that does not carry the mask's quality band, Earth Engine fails at graph-compute time —
+the same contract as the first gotcha below; the curated rows named above all declare theirs.</p>
 <h3 id="cloudscoreplus-the-state-of-the-art-sentinel-2-mask"><a class="toclink" href="#cloudscoreplus-the-state-of-the-art-sentinel-2-mask"><code>CloudScorePlus</code> — the state-of-the-art Sentinel-2 mask</a><a class="headerlink" href="#cloudscoreplus-the-state-of-the-art-sentinel-2-mask" title="Permanent link">#</a></h3>
 <p><code>CloudScorePlus</code> masks a Sentinel-2 scene with Google's Cloud Score+ dataset
 (<code>GOOGLE/CLOUD_SCORE_PLUS/V1/S2_HARMONIZED</code>). The scores live in a <em>separate</em> collection aligned to the
