@@ -496,6 +496,37 @@ info.task_type   # "EXPORT_VIDEO" — track it with get_task_status / wait_for_t
 Like every `ee.batch` export this is Earth Engine-only; the EEDAI reader never applies to an
 asynchronous export.
 
+### Table exports: BigQuery and FeatureView options
+
+`TableSink` exports an `ee.FeatureCollection` to any of its five targets (`drive` / `gcs` / `asset` /
+`bigquery` / `featureview`), and the two server-side targets carry their options:
+
+```python
+from earthlens.gee import TableSink
+
+TableSink(destination="bigquery", table="proj.ds.tbl", overwrite=True).write(fc, description="stations")
+TableSink(
+    destination="featureview",
+    asset_id="projects/my-proj/assets/stations_fv",
+    ingestion_time_parameters={"maxFeaturesPerTile": 1500, "thinningStrategy": "HIGHER_DENSITY"},
+).write(fc, description="stations")
+```
+
+- **BigQuery write disposition** — `overwrite` replaces an existing table, `append` adds to one with a
+  compatible schema. Earth Engine refuses both at once, so the sink refuses both at construction; with
+  neither set, the export fails if the table already exists (EE's default).
+- **FeatureView serving options** — `toFeatureView` takes a single `ingestionTimeParameters` dict, and
+  `maxFeaturesPerTile`, the thinning strategy and friends all go *inside* it, not as separate kwargs.
+- **Address validation** — each destination's required address (`bucket` for `gcs`, `asset_id` for
+  `asset` / `featureview`, `table` for `bigquery`) is checked at construction, so a misconfigured sink
+  fails at the call that built it instead of as a late server error. `drive` with no `folder` is valid:
+  Earth Engine exports to the Drive root.
+
+Whatever the destination, the queued task's wire type — what `TaskInfo.task_type` carries and what
+`list_recent_tasks(task_type=...)` filters on — is `EXPORT_FEATURES`: BigQuery and FeatureView create the
+same `ee.batch.Task.Type.EXPORT_TABLE` tasks the file targets do (the enum *name* differs from its wire
+value). Videos are `EXPORT_VIDEO`, images `EXPORT_IMAGE`.
+
 ### Temporal helpers over a collection
 
 Four frozen, validated config objects build a server-side graph over an `ee.ImageCollection` you hold — the

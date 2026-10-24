@@ -124,8 +124,12 @@ class TaskInfo(BaseModel):
             submitted (e.g. the `description=` kwarg of
             `ee.batch.Export.image.toDrive`).
         state: One of `_VALID_TASK_STATES`.
-        task_type: `EXPORT_IMAGE` / `EXPORT_TABLE` / `EXPORT_MAP` /
-            `EXPORT_VIDEO` / `EXPORT_CLASSIFIER`.
+        task_type: The wire value of `ee.batch.Task.Type` —
+            `EXPORT_IMAGE`, `EXPORT_FEATURES` (every table destination,
+            BigQuery and FeatureView included), `EXPORT_VIDEO`,
+            `EXPORT_TILES` (map tiles) or `EXPORT_CLASSIFIER`. Note the
+            enum *names* `EXPORT_TABLE` / `EXPORT_MAP` differ from the
+            wire values carried here.
         create_time: Submission time as a naive UTC datetime.
         update_time: Last status-update time as a naive UTC datetime.
         start_time: When the task moved out of `READY` into `RUNNING`,
@@ -364,7 +368,8 @@ def list_recent_tasks(
         max_age_min: Drop tasks older than this many minutes (clock
             difference uses the EE-reported `createTime`). `None`
             keeps every task EE still has on file.
-        task_type: Filter by `Task.Type` (e.g. `"EXPORT_IMAGE"`).
+        task_type: Filter by `Task.Type` wire value (e.g.
+            `"EXPORT_IMAGE"`, or `"EXPORT_FEATURES"` for table exports).
         description_prefix: Substring match against the task
             `description` — works well with earthlens's
             `<asset-slug>_<bands>_<YYYYMMDD>` naming.

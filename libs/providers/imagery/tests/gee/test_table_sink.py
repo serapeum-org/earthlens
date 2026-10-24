@@ -5,8 +5,11 @@ from __future__ import annotations
 import datetime as dt
 
 import pytest
+from pydantic import ValidationError
 
+from earthlens.gee import jobs as jobs_module
 from earthlens.gee import table_sink as table_sink_module
+from earthlens.gee.jobs import get_task_status
 from earthlens.gee.table_sink import TableSink
 from earthlens.gee.work import FeatureWorkUnit
 
@@ -87,6 +90,54 @@ class TestTableSinkConfig:
             sink.bucket = "other"
 
 
+class TestTableSinkValidation:
+    """Option/destination consistency, checked at construction."""
+
+    def test_overwrite_and_append_are_mutually_exclusive(self):
+        """Earth Engine refuses both flags, so the sink refuses them first."""
+        with pytest.raises(ValidationError, match="mutually exclusive"):
+            TableSink(
+                destination="bigquery", table="p.d.t", overwrite=True, append=True
+            )
+
+    def test_overwrite_is_bigquery_only(self):
+        """The overwrite flag has no meaning on a file destination."""
+        with pytest.raises(ValidationError, match="BigQuery"):
+            TableSink(destination="drive", folder="f", overwrite=True)
+
+    def test_append_is_bigquery_only(self):
+        """The append flag has no meaning on a file destination."""
+        with pytest.raises(ValidationError, match="BigQuery"):
+            TableSink(destination="gcs", bucket="b", append=True)
+
+    def test_ingestion_time_parameters_is_featureview_only(self):
+        """The serving options belong to FeatureView alone."""
+        with pytest.raises(ValidationError, match="FeatureView"):
+            TableSink(
+                destination="bigquery",
+                table="p.d.t",
+                ingestion_time_parameters={"maxFeaturesPerTile": 1000},
+            )
+
+    @pytest.mark.parametrize(
+        ("destination", "missing"),
+        [
+            ("gcs", "bucket"),
+            ("asset", "asset_id"),
+            ("bigquery", "table"),
+            ("featureview", "asset_id"),
+        ],
+    )
+    def test_each_destination_requires_its_address(self, destination, missing):
+        """A sink without the address its destination writes to is refused."""
+        with pytest.raises(ValidationError, match=missing):
+            TableSink(destination=destination)
+
+    def test_drive_needs_no_folder(self):
+        """Earth Engine exports to the Drive root when no folder is given."""
+        assert TableSink(destination="drive").folder is None
+
+
 class TestTableSinkWrite:
     """Each destination dispatches to its Export.table factory."""
 
@@ -119,22 +170,54 @@ class TestTableSinkWrite:
         assert kwargs["assetId"] == "users/me/pts"
 
     def test_bigquery(self, fake_export):
-        """BigQuery passes the table."""
+        """BigQuery passes the table and the write-disposition defaults."""
         TableSink(destination="bigquery", table="proj.ds.tbl").write(
             "fc", description="d"
         )
         name, kwargs = fake_export.calls[0]
         assert name == "toBigQuery"
         assert kwargs["table"] == "proj.ds.tbl"
+        assert (kwargs["overwrite"], kwargs["append"]) == (False, False)
+
+    def test_bigquery_passes_overwrite(self, fake_export):
+        """The overwrite flag reaches ee."""
+        TableSink(destination="bigquery", table="proj.ds.tbl", overwrite=True).write(
+            "fc", description="d"
+        )
+        _, kwargs = fake_export.calls[0]
+        assert (kwargs["overwrite"], kwargs["append"]) == (True, False)
+
+    def test_bigquery_passes_append(self, fake_export):
+        """The append flag reaches ee."""
+        TableSink(destination="bigquery", table="proj.ds.tbl", append=True).write(
+            "fc", description="d"
+        )
+        _, kwargs = fake_export.calls[0]
+        assert (kwargs["overwrite"], kwargs["append"]) == (False, True)
 
     def test_featureview(self, fake_export):
-        """FeatureView passes the asset id."""
+        """FeatureView passes the asset id, with no serving options by default."""
         TableSink(destination="featureview", asset_id="users/me/fv").write(
             "fc", description="d"
         )
         name, kwargs = fake_export.calls[0]
         assert name == "toFeatureView"
         assert kwargs["assetId"] == "users/me/fv"
+        assert kwargs["ingestionTimeParameters"] is None
+
+    def test_featureview_passes_ingestion_time_parameters(self, fake_export):
+        """The serving options travel inside the single ee dict."""
+        parameters = {
+            "maxFeaturesPerTile": 1500,
+            "thinningStrategy": "HIGHER_DENSITY",
+        }
+        TableSink(
+            destination="featureview",
+            asset_id="users/me/fv",
+            ingestion_time_parameters=parameters,
+        ).write("fc", description="d")
+        _, kwargs = fake_export.calls[0]
+        assert kwargs["ingestionTimeParameters"] == parameters
 
     def test_wait_for_export_blocks(self, fake_export):
         """With wait_for_export the task is waited on before the TaskInfo."""
@@ -165,3 +248,67 @@ class TestTableSinkWrite:
         TableSink(destination="drive", folder="f").export(unit)
         _, kwargs = fake_export.calls[0]
         assert kwargs["description"] == repr(unit)
+
+
+class _FakeFeaturesTask:
+    """A task whose status carries the table-export wire type."""
+
+    def start(self) -> None:
+        """Accept the submission."""
+
+    def status(self) -> dict[str, object]:
+        return {
+            "state": "READY",
+            "id": "task-1",
+            "task_type": "EXPORT_FEATURES",
+            "description": "d",
+            "creation_timestamp_ms": 1_704_067_200_000,
+            "update_timestamp_ms": 1_704_067_200_000,
+        }
+
+
+class TestTaskTracking:
+    """A queued table export rides the unchanged jobs machinery."""
+
+    def test_the_table_wire_type_is_export_features(self):
+        """Every table target — BigQuery and FeatureView included — is EXPORT_FEATURES."""
+        import ee.batch
+
+        assert ee.batch.Task.Type.EXPORT_TABLE.value == "EXPORT_FEATURES"
+
+    def test_bigquery_write_returns_a_taskinfo_with_the_table_wire_type(
+        self, monkeypatch
+    ):
+        """The submitted status normalises to a TaskInfo typed EXPORT_FEATURES."""
+        export = _FakeTableExport()
+        export.task = _FakeFeaturesTask()
+        monkeypatch.setattr("ee.batch.Export.table", export, raising=False)
+        info = TableSink(destination="bigquery", table="proj.ds.tbl").write(
+            "fc", description="d"
+        )
+        assert (info.id, info.state, info.task_type) == (
+            "task-1",
+            "READY",
+            "EXPORT_FEATURES",
+        )
+
+    def test_the_queued_task_round_trips_through_get_task_status(self, monkeypatch):
+        """The TaskInfo id resolves through jobs.get_task_status."""
+        operation = {
+            "name": "projects/p/operations/task-1",
+            "metadata": {
+                "state": "RUNNING",
+                "type": "EXPORT_FEATURES",
+                "createTime": "2024-01-01T00:00:00Z",
+                "updateTime": "2024-01-01T00:01:00Z",
+                "description": "d",
+            },
+            "done": False,
+        }
+        monkeypatch.setattr(jobs_module.ee.data, "getOperation", lambda name: operation)
+        info = get_task_status("task-1", project="p")
+        assert (info.id, info.state, info.task_type) == (
+            "task-1",
+            "RUNNING",
+            "EXPORT_FEATURES",
+        )
