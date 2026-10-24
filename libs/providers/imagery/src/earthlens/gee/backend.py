@@ -327,8 +327,10 @@ _CDI_FORBIDDEN_ASSETS: frozenset[str] = frozenset(
 def _flatten_image_ops(op: Any) -> tuple[Any, ...]:
     """Expand a `MaskChain` into its leaf ops, however deeply nested.
 
-    `MaskChain.of` and `>>` both flatten, but `MaskChain(masks=(chain, ...))`
-    can still nest, so the walk recurses rather than assuming one level.
+    `MaskChain.of` and `>>` both flatten recursively, so a chain built
+    through either carries no nesting — but `MaskChain(masks=(chain, ...))`
+    constructs one directly and still can, so the walk recurses rather than
+    assuming one level.
 
     Args:
         op: A per-image op, a `MaskChain`, or `None`.

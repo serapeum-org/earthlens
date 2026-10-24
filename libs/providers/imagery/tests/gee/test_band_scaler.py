@@ -480,6 +480,32 @@ class TestChainNaming:
         assert len(chain.masks) == 3
         assert chain.name == "Sentinel2SclMask >> Sentinel2Qa60Mask >> BandScaler"
 
+    def test_of_flattens_a_chain_nested_more_than_one_level(self):
+        """Grouping never changes the chain, however deep the grouping went."""
+        inner = Sentinel2SclMask() >> Sentinel2Qa60Mask()
+        nested = MaskChain(masks=(inner, sentinel2_scl))
+        chain = MaskChain.of(nested, BandScaler())
+        assert not any(isinstance(mask, MaskChain) for mask in chain.masks)
+        assert len(chain.masks) == 4
+        assert chain.name == (
+            "Sentinel2SclMask >> Sentinel2Qa60Mask >> sentinel2_scl >> BandScaler"
+        )
+
+    def test_rshift_flattens_a_chain_nested_more_than_one_level(self):
+        """`>>` flattens as deeply as `of` does, so the two cannot disagree."""
+        inner = Sentinel2SclMask() >> Sentinel2Qa60Mask()
+        nested = MaskChain(masks=(inner, BandScaler()))
+        chain = nested >> Sentinel2Qa60Mask()
+        assert not any(isinstance(mask, MaskChain) for mask in chain.masks)
+        assert len(chain.masks) == 4
+
+    def test_rshift_flattens_a_nested_right_hand_side(self):
+        """The right operand is unpacked as deeply as the left one."""
+        inner = Sentinel2SclMask() >> Sentinel2Qa60Mask()
+        chain = BandScaler() >> MaskChain(masks=(inner, sentinel2_scl))
+        assert not any(isinstance(mask, MaskChain) for mask in chain.masks)
+        assert len(chain.masks) == 4
+
     def test_of_keeps_a_plain_callable_unflattened(self):
         """Flattening only unpacks chains; other callables stay as given."""
         chain = MaskChain.of(functools.partial(landsat_sr, sensor="LS8"), BandScaler())

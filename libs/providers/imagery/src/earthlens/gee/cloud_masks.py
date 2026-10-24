@@ -122,7 +122,7 @@ Ported from `gee_utils.raster.cloud_mask_ls7_sr`.
 from __future__ import annotations
 
 import functools
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from typing import TYPE_CHECKING, Literal, cast
 
 import ee
@@ -130,8 +130,6 @@ from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 if TYPE_CHECKING:  # pragma: no cover - import cycle / cost avoidance only
-    from collections.abc import Iterable
-
     from earthlens.gee.catalog import Dataset
 
 __all__ = [
@@ -196,6 +194,29 @@ _LS_CONF_PAIR_MASK: int = 0b11
 #: The two-bit cloud-state field at bits 0-1 of the MODIS `state_1km` band:
 #: 0 clear, 1 cloudy, 2 mixed, 3 not set (assumed clear by MODIS, masked here).
 _MODIS_CLOUD_STATE_MASK: int = 0b11
+
+
+def _flatten_ops(ops: Iterable[PerImageOp]) -> tuple[PerImageOp, ...]:
+    """Expand any `MaskChain` among `ops` into its leaves, however deep.
+
+    The recursion is what makes "grouping never changes the chain" true: a
+    `MaskChain` built directly — `MaskChain(masks=(chain, f))` — nests, and
+    unpacking only its immediate elements would leave that nesting in place.
+    Any other callable, a `functools.partial` included, is kept as given.
+
+    Args:
+        ops: The ops to expand, in run order.
+
+    Returns:
+        The leaf ops, in run order, with no `MaskChain` among them.
+    """
+    flattened: list[PerImageOp] = []
+    for op in ops:
+        if isinstance(op, MaskChain):
+            flattened.extend(_flatten_ops(op.masks))
+        else:
+            flattened.append(op)
+    return tuple(flattened)
 
 
 def _op_name(op: PerImageOp) -> str:
@@ -392,7 +413,9 @@ class ImageMask(BaseModel):
 
         Chains flatten rather than nest — `a >> b >> c` is one chain of
         three — so `name` and iteration stay readable however the
-        expression was grouped. This mirrors
+        expression was grouped. Either side may itself hold nested chains
+        and the result still has none, since the unpacking recurses. This
+        mirrors
         `analysis.RasterOperation.__rshift__`, one level down: there the
         elements run client-side over a pyramids `Dataset`, here they run
         server-side over an `ee.Image`.
@@ -414,9 +437,7 @@ class ImageMask(BaseModel):
                 ">> needs an ImageMask on both sides (use MaskChain.of(...) "
                 "for a plain callable)"
             )
-        left = self.masks if isinstance(self, MaskChain) else (self,)
-        right = other.masks if isinstance(other, MaskChain) else (other,)
-        return MaskChain(masks=(*left, *right))
+        return MaskChain(masks=_flatten_ops((self, other)))
 
 
 class PassThrough(ImageMask):
@@ -510,8 +531,11 @@ class MaskChain(ImageMask):
 
         Flattens for the same reason `>>` does: an element that is itself a
         `MaskChain` contributes its own elements, so `name` and iteration read
-        the same however the expression was grouped. Any other callable —
-        including a `functools.partial` — is kept as given.
+        the same however the expression was grouped. The unpacking recurses,
+        so a chain that was itself built by nesting
+        (`MaskChain(masks=(chain, f))`) leaves no `MaskChain` behind either.
+        Any other callable — including a `functools.partial` — is kept as
+        given.
 
         Args:
             *masks: The ops to run, in order. At least one.
@@ -534,13 +558,7 @@ class MaskChain(ImageMask):
 
                 ```
         """
-        flattened: list[PerImageOp] = []
-        for mask in masks:
-            if isinstance(mask, MaskChain):
-                flattened.extend(mask.masks)
-            else:
-                flattened.append(mask)
-        return cls(masks=tuple(flattened))
+        return cls(masks=_flatten_ops(masks))
 
     @property
     def name(self) -> str:
