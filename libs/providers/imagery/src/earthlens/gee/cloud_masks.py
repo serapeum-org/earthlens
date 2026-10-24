@@ -111,6 +111,7 @@ Ported from `gee_utils.raster.cloud_mask_ls7_sr`.
 
 from __future__ import annotations
 
+import functools
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Literal, cast
 
@@ -188,23 +189,41 @@ _MODIS_CLOUD_STATE_MASK: int = 0b11
 
 
 def _op_name(op: PerImageOp) -> str:
-    """Name one chain element, whether it is a mask object or a function.
+    """Name one chain element, whatever kind of callable it is.
+
+    Total over every shape the hook accepts, because `MaskChain.masks` is
+    typed as any `ee.Image -> ee.Image` callable and pydantic validates it
+    with `callable`: an `ImageMask`, a module function, a
+    `functools.partial`, a lambda, a callable instance, a bound method or a
+    builtin. An `ImageMask` is asked for its own `name`, so a nested
+    `MaskChain` prints its elements rather than the bare class name; a
+    `functools.partial` reports the function it wraps, which is the name the
+    caller wrote; anything else answers with its `__name__` when it has one
+    and its class name otherwise.
 
     Args:
-        op: An `ImageMask` instance or a plain `ee.Image -> ee.Image`
-            callable.
+        op: Any per-image callable the chain may hold.
 
     Returns:
-        The class name for an object, the function name for a function.
+        A short label for the op.
 
     Examples:
         ```python
+        >>> import functools
         >>> _op_name(Sentinel2Qa60Mask()), _op_name(sentinel2_scl)
         ('Sentinel2Qa60Mask', 'sentinel2_scl')
+        >>> _op_name(functools.partial(landsat_sr, sensor="LS8"))
+        'landsat_sr'
 
         ```
     """
-    return type(op).__name__ if isinstance(op, ImageMask) else op.__name__
+    if isinstance(op, ImageMask):
+        label = op.name
+    elif isinstance(op, functools.partial):
+        label = _op_name(op.func)
+    else:
+        label = str(getattr(op, "__name__", None) or type(op).__name__)
+    return label
 
 
 def _with_properties(derived: ee.Image, source: ee.Image) -> ee.Image:
@@ -467,7 +486,12 @@ class MaskChain(ImageMask):
 
     @classmethod
     def of(cls, *masks: PerImageOp) -> MaskChain:
-        """Build a chain from ops given positionally.
+        """Build a chain from ops given positionally, flattening nested chains.
+
+        Flattens for the same reason `>>` does: an element that is itself a
+        `MaskChain` contributes its own elements, so `name` and iteration read
+        the same however the expression was grouped. Any other callable —
+        including a `functools.partial` — is kept as given.
 
         Args:
             *masks: The ops to run, in order. At least one.
@@ -476,13 +500,27 @@ class MaskChain(ImageMask):
             The chain running them left to right.
 
         Examples:
-            ```python
-            >>> len(MaskChain.of(Sentinel2Qa60Mask(), sentinel2_scl).masks)
-            2
+            - Two ops make a two-element chain:
+                ```python
+                >>> len(MaskChain.of(Sentinel2Qa60Mask(), sentinel2_scl).masks)
+                2
 
-            ```
+                ```
+            - A chain handed to `of` is unpacked rather than nested:
+                ```python
+                >>> inner = Sentinel2SclMask() >> Sentinel2Qa60Mask()
+                >>> MaskChain.of(inner, sentinel2_scl).name
+                'Sentinel2SclMask >> Sentinel2Qa60Mask >> sentinel2_scl'
+
+                ```
         """
-        return cls(masks=masks)
+        flattened: list[PerImageOp] = []
+        for mask in masks:
+            if isinstance(mask, MaskChain):
+                flattened.extend(mask.masks)
+            else:
+                flattened.append(mask)
+        return cls(masks=tuple(flattened))
 
     @property
     def name(self) -> str:

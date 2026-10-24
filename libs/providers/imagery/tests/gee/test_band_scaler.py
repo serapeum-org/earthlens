@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import functools
+
 import pytest
 
 pytest.importorskip("ee")
@@ -17,6 +19,7 @@ from earthlens.gee.cloud_masks import (  # noqa: E402
     Sentinel2Qa60Mask,
     Sentinel2SclMask,
     SpeckleFilter,
+    landsat_sr,
     sentinel2_scl,
 )
 from earthlens.gee.configs import EngineConfig  # noqa: E402
@@ -426,3 +429,59 @@ class TestMaskChain:
         chain = MaskChain.of(BandScaler())
         with pytest.raises(ValidationError):
             chain.masks = ()
+
+
+class TestChainNaming:
+    """`name` is total over every callable shape the chain accepts."""
+
+    @pytest.mark.parametrize(
+        ("op", "expected"),
+        [
+            (Sentinel2SclMask(), "Sentinel2SclMask"),
+            (sentinel2_scl, "sentinel2_scl"),
+            (functools.partial(landsat_sr, sensor="LS8"), "landsat_sr"),
+            (lambda image: image, "<lambda>"),
+            (_Recorder("rec", []), "_Recorder"),
+            (abs, "abs"),
+        ],
+        ids=["mask", "function", "partial", "lambda", "instance", "builtin"],
+    )
+    def test_every_accepted_callable_shape_is_named(self, op, expected):
+        """A partial, a lambda, an instance and a builtin all name themselves."""
+        assert MaskChain.of(op).name == expected
+
+    def test_a_bound_method_is_named(self):
+        """A bound method carries its function name, not its owner's."""
+        assert MaskChain.of(_Recorder("rec", []).__call__).name == "__call__"
+
+    def test_a_nested_chain_prints_its_elements(self):
+        """An inner chain delegates to its own name instead of just `MaskChain`."""
+        inner = Sentinel2SclMask() >> Sentinel2Qa60Mask()
+        assert (
+            MaskChain(masks=(inner, BandScaler())).name
+            == "Sentinel2SclMask >> Sentinel2Qa60Mask >> BandScaler"
+        )
+
+    def test_of_flattens_a_nested_chain(self):
+        """`of` flattens like `>>`, so grouping never changes the chain."""
+        inner = Sentinel2SclMask() >> Sentinel2Qa60Mask()
+        chain = MaskChain.of(inner, BandScaler())
+        assert len(chain.masks) == 3
+        assert chain.name == "Sentinel2SclMask >> Sentinel2Qa60Mask >> BandScaler"
+
+    def test_of_keeps_a_plain_callable_unflattened(self):
+        """Flattening only unpacks chains; other callables stay as given."""
+        chain = MaskChain.of(functools.partial(landsat_sr, sensor="LS8"), BandScaler())
+        assert len(chain.masks) == 2
+
+    def test_composing_a_partial_chain_with_a_non_mask_reports(self):
+        """The `>>` diagnostic names the chain instead of crashing on it."""
+        chain = MaskChain.of(functools.partial(landsat_sr, sensor="LS8"))
+        with pytest.raises(TypeError, match="cannot compose landsat_sr with str"):
+            chain >> "not a mask"
+
+    def test_composing_an_instance_chain_with_a_non_mask_reports(self):
+        """A callable instance in the chain is named in the same diagnostic."""
+        chain = MaskChain.of(_Recorder("rec", []))
+        with pytest.raises(TypeError, match="cannot compose _Recorder with int"):
+            chain >> 3

@@ -439,8 +439,10 @@ chain.name                                                  # 'Sentinel2SclMask 
 
 A chain is itself an `ImageMask`, flattens (`a >> b >> c` is one chain of three), and runs left to
 right. Order is part of the recipe: the mask must read its raw quality band **before** the scaler's
-arithmetic touches the pixels. `MaskChain.of(...)` takes the elements positionally and also accepts the
-plain-function forms (`landsat_sr`, `sentinel2_scl`), which have no `>>` of their own. This is *not*
+arithmetic touches the pixels. `MaskChain.of(...)` takes the elements positionally, flattens an inner
+chain the same way `>>` does, and accepts any `ee.Image -> ee.Image` callable — the plain-function forms
+(`landsat_sr`, `sentinel2_scl`), a `functools.partial` of one, a lambda or a callable instance, none of
+which have a `>>` of their own. `chain.name` labels every one of those shapes. This is *not*
 `analysis.OperationChain` — that one composes client-side operations over a downloaded pyramids
 `Dataset` and cannot build an `ee.Image` graph.
 
