@@ -548,9 +548,8 @@ restates arguments the request already carries.
 #### Composing a flag with your own mask
 
 The flags and `cloud_mask=` are not alternatives: both end up on the backend's one per-image hook, so
-they are chained rather than displacing each other. **The explicit mask runs first**, which keeps the
-family's ordering rule intact — every mask reads a raw quality band, and the flags' last step is the
-scaler's arithmetic, so masking stays ahead of scaling however the two were requested:
+they are chained rather than displacing each other. **The explicit op runs first, verbatim**, and the
+flag's op follows it:
 
 ```python
 EarthLens(..., preprocess=True, cloud_mask=CloudScorePlus())
@@ -560,6 +559,22 @@ EarthLens(..., preprocess=True, cloud_mask=CloudScorePlus())
 
 Both screens apply and neither is dropped; with `scaled=True` the chain is simply
 `<your mask> >> BandScaler`.
+
+What is guaranteed is the ordering *inside* the flag's own op — the recipe's mask reads its raw quality
+band before the recipe's `BandScaler` touches the pixels. The composition does not extend that across
+the two: your op is run as given, so arithmetic inside it runs before the flag's mask. The one pairing
+where that would corrupt pixels is refused at construction:
+
+```python
+EarthLens(..., scaled=True, cloud_mask=BandScaler.for_dataset(row, ["B4"]))
+# ValueError: cloud_mask= already carries a BandScaler, and scaled=True resolves
+# another one for ['COPERNICUS/S2_SR_HARMONIZED']. ... they would scale the
+# pixels twice. Drop scaled=, or drop the BandScaler from cloud_mask=.
+```
+
+The same refusal covers `preprocess=True` beside `cloud_mask=preprocess(...)`, and finds the scaler
+however the explicit chain was grouped. A scaler that resolved to an *identity* (a row declaring no
+`scale` / `offset`) is exempt on either side: it has no arithmetic to duplicate.
 
 The recipe is **catalog data, not an `if/elif` over asset ids**. It is a `preprocess:` block on the
 curated dataset row, typed as `earthlens.gee.Preprocess`:

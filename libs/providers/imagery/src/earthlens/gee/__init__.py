@@ -319,9 +319,11 @@ asset id and the bands, so neither is restated and the two cannot drift
 from `variables`. Passing a chain to `cloud_mask=` still works and is
 the way to inspect or extend a recipe; the backend then cross-checks it
 against the request (a mismatched asset id raises, an uncovered
-scalable band warns). A flag and an explicit `cloud_mask=` compose
-rather than displace each other, the explicit mask running first so
-masking stays ahead of scaling.
+scalable band warns, and a `BandScaler` on both sides raises — the
+hook and the flag's op are chained, so two scalers would apply the
+row's factors twice). A flag and an explicit `cloud_mask=` compose
+rather than displace each other: the explicit op runs first, verbatim,
+and the flag's op — mask then scaler — follows it.
 
 Job / task tracking — for asynchronous `export_via="drive"` /
 `"gcs"` / `"asset"` sinks, the `earthlens.gee.jobs` module

@@ -421,41 +421,76 @@ def _resolve_server_side_ops(
     return resolved
 
 
+def _scaling_assets(server_side_ops: dict[str, ImageMask]) -> list[str]:
+    """Return the asset ids whose flag-resolved op actually rescales pixels.
+
+    A `BandScaler` with no factors is an identity — `BandScaler.for_dataset`
+    returns one, after a warning, for a row that declares no `scale` /
+    `offset` — so it is not counted: there is no arithmetic to duplicate.
+
+    Args:
+        server_side_ops: The ops `scaled=` / `preprocess=` resolved, keyed by
+            asset id.
+
+    Returns:
+        The asset ids, sorted, whose op carries a non-empty `BandScaler`.
+    """
+    return sorted(
+        asset
+        for asset, op in server_side_ops.items()
+        if any(
+            isinstance(leaf, BandScaler) and leaf.factors
+            for leaf in _flatten_image_ops(op)
+        )
+    )
+
+
 def _validate_scaler_targets(
-    variables: dict[str, list[str]], catalog: Catalog, cloud_mask: Any
+    variables: dict[str, list[str]],
+    catalog: Catalog,
+    cloud_mask: Any,
+    server_side_ops: dict[str, ImageMask],
+    *,
+    scaled: bool,
+    preprocess: bool,
 ) -> None:
     """Cross-check an explicitly passed `BandScaler` against the request.
 
     `cloud_mask=preprocess(asset, bands)` and
     `cloud_mask=BandScaler.for_dataset(row, bands)` restate two arguments the
-    request already carries, and nothing used to compare them. The two ways
-    that goes wrong are both silent:
+    request already carries, and nothing used to compare them. The three ways
+    that goes wrong are all silent:
 
     * a **mismatched asset id** resolves another sensor's recipe — the rows
       often declare the same band names, so the graph computes and applies
       the wrong factors rather than failing. Refused here.
+    * a **second scaler**, when `scaled=` / `preprocess=` has resolved one
+      too: the hook and the flag's op are chained onto the same image
+      (`_per_image_op`), so the row's scale/offset lands twice. Refused here,
+      for the same reason the two flags refuse each other. An *identity*
+      scaler on either side is exempt — it has no arithmetic to duplicate.
     * a **narrower band list** leaves the request's other scalable bands in
       raw DN *in the same raster*, because `BandScaler.__call__` passes an
       unnamed band through by design. Warned about here, naming them.
-
-    The `scaled=` / `preprocess=` flags avoid both by construction; this is
-    the guard for the explicit forms, which stay public.
 
     Args:
         variables: The request's asset-id-to-bands mapping.
         catalog: The catalog to read each row's declared factors from.
         cloud_mask: The per-image hook, possibly a `MaskChain`, or `None`.
+        server_side_ops: The ops `scaled=` / `preprocess=` resolved, keyed by
+            asset id.
+        scaled: Whether `scaled=True` was passed, so the remedy names it.
+        preprocess: Whether `preprocess=True` was passed, likewise.
 
     Raises:
-        ValueError: If a scaler names an asset the request does not ask for.
+        ValueError: If a scaler names an asset the request does not ask for,
+            or if the hook and a flag would each rescale the same image.
     """
-    scalers = [
-        op
-        for op in _flatten_image_ops(cloud_mask)
-        if isinstance(op, BandScaler) and op.dataset is not None
+    explicit = [
+        op for op in _flatten_image_ops(cloud_mask) if isinstance(op, BandScaler)
     ]
-    for scaler in scalers:
-        if scaler.dataset not in variables:
+    for scaler in explicit:
+        if scaler.dataset is not None and scaler.dataset not in variables:
             raise ValueError(
                 f"the BandScaler on cloud_mask= was resolved for "
                 f"{scaler.dataset!r}, but this request asks for "
@@ -465,6 +500,19 @@ def _validate_scaler_targets(
                 "preprocess=True / scaled=True and let the backend resolve "
                 "it from variables."
             )
+    doubled = _scaling_assets(server_side_ops)
+    if doubled and any(scaler.factors for scaler in explicit):
+        flag = "preprocess" if preprocess else "scaled"
+        raise ValueError(
+            f"cloud_mask= already carries a BandScaler, and {flag}=True "
+            f"resolves another one for {doubled}. The hook and the flag's op "
+            "are chained onto the same image, and both apply the catalog's "
+            "scale/offset, so together they would scale the pixels twice. "
+            f"Drop {flag}=, or drop the BandScaler from cloud_mask=."
+        )
+    for scaler in explicit:
+        if scaler.dataset is None:
+            continue
         covered = {factor.band for factor in scaler.factors}
         row = catalog.get_dataset(scaler.dataset)
         uncovered = sorted(
@@ -1287,7 +1335,14 @@ class GEE(LazyClientMixin, AbstractDataSource):
         self._server_side_ops: dict[str, ImageMask] = _resolve_server_side_ops(
             variables, self._catalog, scaled=bool(scaled), preprocess=bool(preprocess)
         )
-        _validate_scaler_targets(variables, self._catalog, cloud_mask)
+        _validate_scaler_targets(
+            variables,
+            self._catalog,
+            cloud_mask,
+            self._server_side_ops,
+            scaled=bool(scaled),
+            preprocess=bool(preprocess),
+        )
         #: Convert raw DN to physical units server-side from the catalog's
         #: factors, resolved per dataset (see `_server_side_ops`).
         self.scaled = bool(scaled)
@@ -2215,12 +2270,17 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         An explicit `cloud_mask=` and a `scaled=` / `preprocess=` flag are not
         alternatives: both end up on the one hook, so they are chained rather
-        than one displacing the other. **The explicit mask runs first**, which
-        keeps the family's ordering rule intact — every mask reads a raw
-        quality band, and the flags' last step is the `BandScaler`'s
-        arithmetic, so masking stays ahead of scaling however the two were
-        requested. With `preprocess=True` the recipe's own mask therefore runs
-        second, after the caller's: both screens apply, and neither is dropped.
+        than one displacing the other. **The explicit op runs first, verbatim**,
+        and the flag's op follows. With `preprocess=True` the recipe's own mask
+        therefore runs second, after the caller's: both screens apply, and
+        neither is dropped.
+
+        Within the *flag's* op, masking precedes scaling — that is the order
+        `recipes.preprocess` builds. The composition does not extend that
+        guarantee across the two: an explicit op is run as given, so arithmetic
+        inside it runs before the flag's mask. The one case where that would
+        corrupt pixels — a `BandScaler` on both sides — is refused at
+        construction by `_validate_scaler_targets`.
 
         Args:
             var_info: The catalog entry being downloaded.

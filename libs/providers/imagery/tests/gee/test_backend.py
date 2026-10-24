@@ -4753,3 +4753,70 @@ class TestExplicitScalerCrossCheck:
         chain = recipe_for("COPERNICUS/S2_SR_HARMONIZED", ["B4"])
         self._gee(make_gee, ["B4", "SCL"], cloud_mask=chain)
         assert "stay raw DN" not in "".join(warnings_buffer)
+
+
+class TestDoubleScalerRefusal:
+    """H1: a flag beside an explicit `BandScaler` would scale twice."""
+
+    def _gee(self, make_gee, bands, **overrides):
+        """A Sentinel-2 L2A request over `bands`, the pairing under test applied."""
+        params = dict(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": list(bands)},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    def _row(self, make_gee):
+        """The Sentinel-2 L2A catalog row the scalers are resolved from."""
+        return self._gee(make_gee, ["B4"]).catalog.get_dataset(
+            "COPERNICUS/S2_SR_HARMONIZED"
+        )
+
+    def test_scaled_beside_an_explicit_scaler_is_refused(self, make_gee):
+        """Two scalers on one image apply the row's factors twice."""
+        scaler = BandScaler.for_dataset(self._row(make_gee), ["B4"])
+        with pytest.raises(ValueError, match="scale the pixels twice"):
+            self._gee(make_gee, ["B4"], scaled=True, cloud_mask=scaler)
+
+    def test_preprocess_beside_an_explicit_recipe_is_refused(self, make_gee):
+        """`cloud_mask=preprocess(...)` already ends in a `BandScaler`."""
+        chain = recipe_for("COPERNICUS/S2_SR_HARMONIZED", ["B4"])
+        with pytest.raises(ValueError, match="scale the pixels twice"):
+            self._gee(make_gee, ["B4"], preprocess=True, cloud_mask=chain)
+
+    def test_a_nested_explicit_chain_is_seen(self, make_gee):
+        """The scaler is found however the explicit chain was grouped."""
+        chain = recipe_for("COPERNICUS/S2_SR_HARMONIZED", ["B4"]) >> Sentinel2Qa60Mask()
+        with pytest.raises(ValueError, match="scale the pixels twice"):
+            self._gee(make_gee, ["B4"], scaled=True, cloud_mask=chain)
+
+    def test_the_refusal_names_the_remedy(self, make_gee):
+        """The message says which of the two to drop."""
+        scaler = BandScaler.for_dataset(self._row(make_gee), ["B4"])
+        with pytest.raises(ValueError) as caught:
+            self._gee(make_gee, ["B4"], scaled=True, cloud_mask=scaler)
+        assert "Drop scaled=, or drop the BandScaler" in str(caught.value)
+        assert "COPERNICUS/S2_SR_HARMONIZED" in str(caught.value)
+
+    def test_an_identity_explicit_scaler_is_allowed(self, make_gee):
+        """An empty-factor scaler scales nothing, so there is nothing to double."""
+        gee = self._gee(
+            make_gee, ["B4"], scaled=True, cloud_mask=BandScaler(factors=())
+        )
+        op = gee._per_image_op(gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED"))
+        assert op.name == "BandScaler >> BandScaler"
+
+    def test_a_non_scaling_mask_beside_a_flag_still_composes(self, make_gee):
+        """The refusal is about scalers only; a mask plus a flag is the point."""
+        gee = self._gee(make_gee, ["B4"], scaled=True, cloud_mask=Sentinel2SclMask())
+        op = gee._per_image_op(gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED"))
+        assert op.name == "Sentinel2SclMask >> BandScaler"
+
+    def test_another_rows_scaler_still_reports_the_mismatch_first(self, make_gee):
+        """A scaler for a row the request does not ask for is the older refusal."""
+        chain = recipe_for("COPERNICUS/S2_HARMONIZED", ["B4"])
+        with pytest.raises(ValueError, match="was resolved for"):
+            self._gee(make_gee, ["B4"], scaled=True, cloud_mask=chain)
