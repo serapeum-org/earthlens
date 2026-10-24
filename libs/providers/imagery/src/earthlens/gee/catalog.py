@@ -432,7 +432,7 @@ class Extent(SummarisedLeaf):
 #: The per-image masks a `preprocess:` recipe may name, as
 #: `earthlens.gee.preprocess` resolves them. A `Literal` rather than a free
 #: string so a typo in the YAML fails at load time; `earthlens.gee.preprocess`
-#: holds the name-to-class map and a test pins the two together.
+#: holds the matching name-to-class map.
 MaskRecipe = Literal[
     "landsat_sr",
     "landsat_qa_refined",

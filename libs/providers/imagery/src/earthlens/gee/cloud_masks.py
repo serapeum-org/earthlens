@@ -869,10 +869,16 @@ class Sentinel2Qa60Mask(ImageMask):
     forces the request onto an Earth Engine engine.
 
     Examples:
-        - The mask carries no config; constructing it is enough:
+        - The mask carries no config, so its name is all there is to read:
             ```python
-            >>> isinstance(Sentinel2Qa60Mask(), ImageMask)
-            True
+            >>> Sentinel2Qa60Mask().name
+            'Sentinel2Qa60Mask'
+
+            ```
+        - Pair it with the CDI mask for a stricter TOA screen:
+            ```python
+            >>> (Sentinel2Qa60Mask() >> Sentinel2Cdi()).name
+            'Sentinel2Qa60Mask >> Sentinel2Cdi'
 
             ```
         - Hand an instance to the GEE backend as the per-image mask:
@@ -1023,10 +1029,17 @@ class ModisState1kmMask(ImageMask):
     onto an Earth Engine engine, like every `cloud_mask=`.
 
     Examples:
-        - The mask carries no config; constructing it is enough:
+        - The mask carries no config, so its name is all there is to read:
             ```python
-            >>> isinstance(ModisState1kmMask(), ImageMask)
-            True
+            >>> ModisState1kmMask().name
+            'ModisState1kmMask'
+
+            ```
+        - Compose it with the reflectance scaler the MODIS rows declare:
+            ```python
+            >>> factors = (BandFactor(band="sur_refl_b01", scale=0.0001),)
+            >>> (ModisState1kmMask() >> BandScaler(factors=factors)).name
+            'ModisState1kmMask >> BandScaler'
 
             ```
         - Hand an instance to the GEE backend as the per-image mask:

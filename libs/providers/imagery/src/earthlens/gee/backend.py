@@ -1645,14 +1645,18 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         Args:
             tag: The workload tag — 1-63 characters, starting and ending
-                alphanumeric, with `-`, `_` or `.` allowed between.
+                with a **lowercase** alphanumeric character, with `-` or `_`
+                allowed between. That is the rule the SDK's own validator
+                enforces, which is stricter than the one
+                `ee.data.setWorkloadTag`'s docstring describes (it also
+                claims case and dots); see `earthlens.gee.workload`.
 
         Returns:
             The `WorkloadTag` context manager, validated and ready to enter.
 
         Raises:
-            pydantic.ValidationError: If `tag` does not match Earth Engine's
-                documented format.
+            pydantic.ValidationError: If `tag` does not match the format the
+                Earth Engine SDK's validator enforces.
 
         Examples:
             - Tag a download run (needs credentials to download):
@@ -1661,6 +1665,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 >>> gee = GEE(...)  # doctest: +SKIP
                 >>> with gee.workload_tag("run-42"):  # doctest: +SKIP
                 ...     paths = gee.download()
+
                 ```
         """
         return WorkloadTag(tag=tag)

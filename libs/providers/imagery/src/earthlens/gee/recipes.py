@@ -71,8 +71,7 @@ __all__ = ["preprocess"]
 
 #: Recipe name → the mask it builds. The keys are exactly the members of
 #: `earthlens.gee.catalog.MaskRecipe`, which is what the catalog YAML is
-#: validated against; `test_preprocess.py` pins the two together so a name
-#: can never be added to one side alone.
+#: validated against, so a name can never be added to one side alone.
 _MASK_RECIPES: dict[str, type[ImageMask]] = {
     "landsat_sr": LandsatSrMask,
     "landsat_qa_refined": LandsatQaRefinedMask,
