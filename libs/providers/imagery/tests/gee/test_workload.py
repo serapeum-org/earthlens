@@ -6,6 +6,7 @@ import pytest
 
 pytest.importorskip("ee")
 
+import ee  # noqa: E402
 from pydantic import ValidationError  # noqa: E402
 
 from earthlens.gee import workload as workload_module  # noqa: E402
@@ -45,14 +46,16 @@ class TestWorkloadTagValidation:
         [
             "a",  # 1 char, the lower boundary
             "a" * 63,  # 63 chars, the upper boundary
+            "a1",
             "run-42",
-            "a.b_c-d",  # every separator EE documents, between alphanumerics
-            "A1-b.C",  # case is allowed
+            "a-b",
+            "a_b",
+            "a_b-c",  # both separators EE accepts, between alphanumerics
             "0" + "-" * 61 + "9",
         ],
     )
     def test_a_well_formed_tag_is_kept(self, tag):
-        """Tags matching EE's documented rule construct and keep their string."""
+        """Tags the SDK accepts construct and keep their string."""
         assert WorkloadTag(tag=tag).tag == tag
 
     @pytest.mark.parametrize(
@@ -61,17 +64,46 @@ class TestWorkloadTagValidation:
             "",  # below the 1-char floor
             "a" * 64,  # above the 63-char cap
             "-a",  # leading separator
-            "a.",  # trailing separator
+            "a-",  # trailing separator
             "_a",
-            "a-",
-            "a b",  # whitespace is not a documented separator
+            "a_",
+            "a b",  # whitespace is not a separator
             "a$b",
+            "A1",  # uppercase: the docstring allows it, the SDK does not
+            "a.b",  # a dot: likewise documented but refused
+            "A1-b.C",
         ],
     )
     def test_an_illegal_tag_is_refused_at_construction(self, tag):
         """A tag Earth Engine would reject raises before any request is made."""
         with pytest.raises(ValidationError, match="1-63 characters"):
             WorkloadTag(tag=tag)
+
+    @pytest.mark.parametrize("tag", ["A1", "a.b", "a" * 64, "-a", "a-", "a b"])
+    def test_the_rule_matches_the_sdk(self, tag):
+        """Each tag refused at construction is one `ee.data` also refuses.
+
+        The SDK's docstring documents a looser rule than its enforcement
+        (`ee/_state.py` requires lowercase and forbids dots), so the validator
+        is pinned against the enforcement rather than against the prose.
+        """
+        with pytest.raises(ValueError):
+            ee.data.setWorkloadTag(tag)
+
+    @pytest.mark.parametrize("tag", ["a", "a1", "a-b", "a_b", "a" * 63])
+    def test_every_accepted_tag_is_one_the_sdk_takes(self, tag):
+        """A tag that constructs is one `ee.data.setWorkloadTag` accepts."""
+        WorkloadTag(tag=tag)
+        ee.data.setWorkloadTag(tag)
+        assert ee.data.getWorkloadTag() == tag
+        ee.data.resetWorkloadTag()
+
+    def test_the_empty_tag_is_the_sdks_no_tag_sentinel(self):
+        """`''` means "no tag" to the SDK, so a scope over it is refused here."""
+        ee.data.setWorkloadTag("")
+        assert ee.data.getWorkloadTag() == ""
+        with pytest.raises(ValidationError, match="1-63 characters"):
+            WorkloadTag(tag="")
 
     def test_it_is_frozen(self):
         """The tag cannot drift after construction."""

@@ -618,8 +618,12 @@ with gee.workload_tag("drought-monitor-2024"):
     paths = gee.download()   # every EE-served request in here carries the tag
 ```
 
-The tag is validated at construction (1-63 characters, alphanumeric at start and end, `-` `_` `.` allowed
-between), so a typo raises immediately rather than mid-download. Unlike the SDK's own
+The tag is validated at construction (1-63 characters, **lowercase** alphanumeric at start and end, `-` and
+`_` allowed between), so a typo raises immediately rather than mid-download. That is the rule the SDK's
+validator enforces (`ee/_state.py`, `_WorkloadTag.validate`), which is stricter than the one
+`ee.data.setWorkloadTag`'s own docstring states: the docstring allows mixed case and dots, the validator
+refuses both — `setWorkloadTag("A1")` and `setWorkloadTag("a.b")` each raise `ValueError`. earthlens follows
+the validator, so `WorkloadTag(tag="A1")` fails at construction instead of on entry. Unlike the SDK's own
 `ee.data.workloadTagContext` — whose exit calls `resetWorkloadTag()` and so resets to the *default* tag —
 `WorkloadTag` saves the tag it found on entry and restores exactly that on exit, exception or not, which is
 what makes nesting work: an inner scope hands back to the enclosing tag instead of wiping it.

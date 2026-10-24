@@ -18,13 +18,17 @@ The EEDAI reader path (`engine="eedai"`) fetches stored pixels through GDAL's
 EEDAI driver, not through `ee`, so those reads are never attributed: a run
 that only uses the reader gains nothing from a tag.
 
-Earth Engine constrains the string (1-63 characters, starting and ending
-alphanumeric, with `-` `_` `.` allowed between — the rule `setWorkloadTag`
-documents), and `WorkloadTag` enforces it at construction, so a typo'd tag
-raises immediately instead of mid-download. Some SDK releases validate more
-strictly than their own documentation (lowercase-only, no dots), in which
-case Earth Engine itself still raises on entry; stick to lowercase tags for
-portability.
+Earth Engine constrains the string, and `WorkloadTag` enforces the
+constraint at construction, so a typo'd tag raises immediately instead of
+mid-download. The rule is **the SDK's enforced one, not its documented
+one**: `ee/_state.py`'s `_WorkloadTag.validate` requires 1-63 characters
+beginning and ending with a *lowercase* alphanumeric character, with `-`
+and `_` allowed between, while `ee.data.setWorkloadTag`'s docstring
+describes a looser rule that also allows case and dots. The two disagree,
+and the validator is what runs — `setWorkloadTag("A1")` and `("a.b")` both
+raise `ValueError` on earthengine-api 1.7.35 — so `WorkloadTag` matches the
+validator. The empty string is the SDK's "no tag" sentinel rather than a
+tag, so it is refused too.
 
 Examples:
     - Nesting restores the *enclosing* tag, not the default (the workload-tag
@@ -42,10 +46,15 @@ Examples:
         ''
 
         ```
-    - An illegal tag is refused at construction:
+    - An illegal tag is refused at construction — including the uppercase
+      and dotted forms the SDK's docstring claims to allow:
         ```python
         >>> from earthlens.gee import WorkloadTag
         >>> WorkloadTag(tag="-starts-wrong")
+        Traceback (most recent call last):
+            ...
+        pydantic_core._pydantic_core.ValidationError: ...
+        >>> WorkloadTag(tag="Run-42")
         Traceback (most recent call last):
             ...
         pydantic_core._pydantic_core.ValidationError: ...
@@ -63,10 +72,13 @@ from pydantic import BaseModel, ConfigDict, PrivateAttr, field_validator
 
 __all__ = ["WorkloadTag"]
 
-#: Earth Engine's documented workload-tag rule (`ee.data.setWorkloadTag`):
-#: 1-63 characters, beginning and ending with an alphanumeric character,
-#: with dashes, underscores and dots allowed between.
-_TAG_RE = re.compile(r"^[a-zA-Z0-9](?:[a-zA-Z0-9._-]{0,61}[a-zA-Z0-9])?$")
+#: Earth Engine's *enforced* workload-tag rule, copied from the SDK's own
+#: validator (`ee/_state.py`, `_WorkloadTag.validate`): 1-63 characters,
+#: beginning and ending with a **lowercase** alphanumeric character, with
+#: dashes and underscores allowed between. `ee.data.setWorkloadTag`'s
+#: docstring describes a looser rule (case, and dots, allowed) that the
+#: validator refuses — this is the one that decides whether a request flies.
+_TAG_RE = re.compile(r"^[a-z0-9](?:[-_a-z0-9]{0,61}[a-z0-9])?$")
 
 
 class WorkloadTag(BaseModel):
@@ -83,6 +95,11 @@ class WorkloadTag(BaseModel):
     `with gee.workload_tag("run-42"): gee.download()` tags every Earth
     Engine-served request the download makes. The EEDAI reader path is
     separate and stays unattributed.
+
+    The `tag` must satisfy the rule the SDK's validator enforces — 1-63
+    characters, lowercase alphanumeric at both ends, `-` and `_` between —
+    which is stricter than the rule `ee.data.setWorkloadTag`'s docstring
+    states; see the module docstring.
 
     Examples:
         - A scope is a frozen value object, constructed without Earth Engine:
@@ -122,7 +139,7 @@ class WorkloadTag(BaseModel):
     @field_validator("tag")
     @classmethod
     def _well_formed(cls, value: str) -> str:
-        """Refuse a tag Earth Engine's documented rule would reject.
+        """Refuse a tag the Earth Engine SDK's own validator would reject.
 
         Args:
             value: The parsed `tag` input.
@@ -132,12 +149,13 @@ class WorkloadTag(BaseModel):
 
         Raises:
             ValueError: If `value` is not 1-63 characters beginning and ending
-                alphanumeric, with only `-`, `_` or `.` between.
+                with a lowercase alphanumeric character, with only `-` or `_`
+                between.
         """
         if _TAG_RE.match(value) is None:
             raise ValueError(
                 "workload tag must be 1-63 characters, starting and ending "
-                "with an alphanumeric character, with '-', '_' or '.' "
+                "with a lowercase alphanumeric character, with '-' or '_' "
                 f"allowed between, got {value!r}"
             )
         return value
