@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -3560,6 +3560,17 @@
     <span class="md-ellipsis">
       
         Managing assets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pushing-a-local-classifier-server-side" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pushing a local classifier server-side
       
     </span>
   </a>
@@ -24295,6 +24306,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#pushing-a-local-classifier-server-side" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pushing a local classifier server-side
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -25014,6 +25036,28 @@ line each. Ingestion (<code>start_ingestion</code> / <code>start_table_ingestion
 asynchronous like the batch sinks and returns the same <code>TaskInfo</code>, so <code>get_task_status</code> /
 <code>wait_for_task_id</code> / <code>cancel_task</code> work on it unchanged. Asset management is pure control-plane: it is
 server-side regardless of any request's <code>engine=</code>, and the EEDAI reader is never involved.</p>
+<h3 id="pushing-a-local-classifier-server-side"><a class="toclink" href="#pushing-a-local-classifier-server-side">Pushing a local classifier server-side</a><a class="headerlink" href="#pushing-a-local-classifier-server-side" title="Permanent link">#</a></h3>
+<p>A tree model trained locally — Epic 2's client-side <code>Classify</code>, or any fitted scikit-learn
+<code>DecisionTreeClassifier</code> / <code>RandomForestClassifier</code> — can classify an arbitrarily large image server-side
+without retraining and without uploading the training data. <code>ClassifierCodec</code> encodes the fitted trees into
+the text format <code>ee.Classifier.decisionTree</code> / <code>decisionTreeEnsemble</code> accept (a pure-Python port of geemap's
+tree-string bridge; geemap is not a dependency):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassifierCodec</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="n">codec</span> <span class="o">=</span> <span class="n">ClassifierCodec</span><span class="p">(</span><span class="n">feature_names</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;B4&quot;</span><span class="p">,</span> <span class="s2">&quot;B8&quot;</span><span class="p">))</span>   <span class="c1"># band name per feature column, in order</span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="n">classifier</span> <span class="o">=</span> <span class="n">codec</span><span class="o">.</span><span class="n">to_ee</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>                       <span class="c1"># ee.Classifier.decisionTreeEnsemble(...)</span>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="n">labelled</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">classifier</span><span class="p">)</span>                 <span class="c1"># server-side, over any image</span>
+</code></pre></div>
+<p><code>Classify</code> trains on band <em>indices</em> while Earth Engine classifies by band <em>name</em>, so
+<code>ClassifierCodec.for_classify(operation, {0: "B4", 1: "B8"})</code> builds the codec from the operation's own
+training bands, and the public <code>Classify.estimator</code> accessor hands over the fitted forest:
+<code>codec.to_ee(operation.estimator)</code>. The classify graph is server-side compute, so the request is Earth
+Engine-only (<code>engine="ee"</code>); the client-side <code>Classify</code> itself runs after a download and affects no engine
+choice.</p>
+<p><code>from_ee</code> is the partial reverse: it parses the tree strings back into a <code>TreeEnsemble</code>, a pure-Python
+majority-vote predictor — not a scikit-learn estimator, since the fitted probabilities do not survive the
+string format. It reads the strings off a classifier built client-side; one trained <em>server-side</em> keeps its
+trees on the server, so fetch them first (<code>classifier.explain().getInfo()</code>) and pass the strings.</p>
 <h2 id="choosing-an-engine-in-practice"><a class="toclink" href="#choosing-an-engine-in-practice">Choosing an engine, in practice</a><a class="headerlink" href="#choosing-an-engine-in-practice" title="Permanent link">#</a></h2>
 <table>
 <thead>
