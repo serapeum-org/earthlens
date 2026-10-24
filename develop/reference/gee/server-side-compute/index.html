@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -3494,6 +3494,28 @@
     <span class="md-ellipsis">
       
         Exporting a graph you built yourself
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exporting-a-video" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exporting a video
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-exports-bigquery-and-featureview-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table exports: BigQuery and FeatureView options
       
     </span>
   </a>
@@ -24186,6 +24208,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#exporting-a-video" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exporting a video
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-exports-bigquery-and-featureview-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table exports: BigQuery and FeatureView options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#temporal-helpers-over-a-collection" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24783,6 +24827,53 @@ re-do authentication; <code>client</code> is a lazy property that returns the in
 <code>wait_for_export=False</code> and <code>download()</code> returns <code>TaskInfo</code> objects at submission time instead of
 blocking; <code>list_recent_tasks</code>, <code>get_task_status</code>, <code>wait_for_task_id</code>, <code>cancel_task</code> and
 <code>resolve_destination</code> track them. The batch sinks are Earth Engine-only, so <code>engine=</code> is ignored there.</p>
+<h3 id="exporting-a-video"><a class="toclink" href="#exporting-a-video">Exporting a video</a><a class="headerlink" href="#exporting-a-video" title="Permanent link">#</a></h3>
+<p>A collection you built through <code>.client</code> can also leave as a <strong>video</strong>: <code>VideoSink</code> queues an
+<code>ee.ImageCollection</code> of frames through <code>ee.batch.Export.video.toDrive</code> / <code>toCloudStorage</code> — the only two
+video targets Earth Engine offers — and returns the same <code>TaskInfo</code> the other batch exports do, with wire
+task type <code>EXPORT_VIDEO</code>. It is a standalone frozen model like <code>TableSink</code> (the image-shaped <code>Sink</code> ABC
+does not fit a frames export), validated at construction: a <code>gcs</code> sink without its <code>bucket</code> is refused up
+front, <code>fps</code> must be in Earth Engine's <code>[0.1, 120]</code>, and <code>dimensions</code> is a positive max dimension or
+<code>"WIDTHxHEIGHT"</code>. A Drive export with no <code>folder</code> lands in the Drive root. Every frame must be an 8-bit
+RGB image — visualise first — and the caller provides the collection (nothing in the download pipeline
+produces frames):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">VideoSink</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">frames</span> <span class="o">=</span> <span class="n">s2_monthly</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">img</span><span class="p">:</span> <span class="n">img</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">bands</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;B4&quot;</span><span class="p">,</span> <span class="s2">&quot;B3&quot;</span><span class="p">,</span> <span class="s2">&quot;B2&quot;</span><span class="p">],</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">3000</span><span class="p">))</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">info</span> <span class="o">=</span> <span class="n">VideoSink</span><span class="p">(</span><span class="n">destination</span><span class="o">=</span><span class="s2">&quot;drive&quot;</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="s2">&quot;videos&quot;</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">720</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="n">frames</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;nile_delta_2024&quot;</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="n">aoi</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="p">)</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="n">info</span><span class="o">.</span><span class="n">task_type</span>   <span class="c1"># &quot;EXPORT_VIDEO&quot; — track it with get_task_status / wait_for_task_id</span>
+</code></pre></div>
+<p>Like every <code>ee.batch</code> export this is Earth Engine-only; the EEDAI reader never applies to an
+asynchronous export.</p>
+<h3 id="table-exports-bigquery-and-featureview-options"><a class="toclink" href="#table-exports-bigquery-and-featureview-options">Table exports: BigQuery and FeatureView options</a><a class="headerlink" href="#table-exports-bigquery-and-featureview-options" title="Permanent link">#</a></h3>
+<p><code>TableSink</code> exports an <code>ee.FeatureCollection</code> to any of its five targets (<code>drive</code> / <code>gcs</code> / <code>asset</code> /
+<code>bigquery</code> / <code>featureview</code>), and the two server-side targets carry their options:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">TableSink</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="n">TableSink</span><span class="p">(</span><span class="n">destination</span><span class="o">=</span><span class="s2">&quot;bigquery&quot;</span><span class="p">,</span> <span class="n">table</span><span class="o">=</span><span class="s2">&quot;proj.ds.tbl&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;stations&quot;</span><span class="p">)</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="n">TableSink</span><span class="p">(</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="n">destination</span><span class="o">=</span><span class="s2">&quot;featureview&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>    <span class="n">asset_id</span><span class="o">=</span><span class="s2">&quot;projects/my-proj/assets/stations_fv&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="n">ingestion_time_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;maxFeaturesPerTile&quot;</span><span class="p">:</span> <span class="mi">1500</span><span class="p">,</span> <span class="s2">&quot;thinningStrategy&quot;</span><span class="p">:</span> <span class="s2">&quot;HIGHER_DENSITY&quot;</span><span class="p">},</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;stations&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ul>
+<li><strong>BigQuery write disposition</strong> — <code>overwrite</code> replaces an existing table, <code>append</code> adds to one with a
+  compatible schema. Earth Engine refuses both at once, so the sink refuses both at construction; with
+  neither set, the export fails if the table already exists (EE's default).</li>
+<li><strong>FeatureView serving options</strong> — <code>toFeatureView</code> takes a single <code>ingestionTimeParameters</code> dict, and
+  <code>maxFeaturesPerTile</code>, the thinning strategy and friends all go <em>inside</em> it, not as separate kwargs.</li>
+<li><strong>Address validation</strong> — each destination's required address (<code>bucket</code> for <code>gcs</code>, <code>asset_id</code> for
+  <code>asset</code> / <code>featureview</code>, <code>table</code> for <code>bigquery</code>) is checked at construction, so a misconfigured sink
+  fails at the call that built it instead of as a late server error. <code>drive</code> with no <code>folder</code> is valid:
+  Earth Engine exports to the Drive root.</li>
+</ul>
+<p>Whatever the destination, the queued task's wire type — what <code>TaskInfo.task_type</code> carries and what
+<code>list_recent_tasks(task_type=...)</code> filters on — is <code>EXPORT_FEATURES</code>: BigQuery and FeatureView create the
+same <code>ee.batch.Task.Type.EXPORT_TABLE</code> tasks the file targets do (the enum <em>name</em> differs from its wire
+value). Videos are <code>EXPORT_VIDEO</code>, images <code>EXPORT_IMAGE</code>.</p>
 <h3 id="temporal-helpers-over-a-collection"><a class="toclink" href="#temporal-helpers-over-a-collection">Temporal helpers over a collection</a><a class="headerlink" href="#temporal-helpers-over-a-collection" title="Permanent link">#</a></h3>
 <p>Four frozen, validated config objects build a server-side graph over an <code>ee.ImageCollection</code> you hold — the
 <code>.client</code> collection above, or one you built yourself. They answer the questions a single reducer cannot:
@@ -24791,36 +24882,36 @@ holes before reducing</em>. Each is imported from <code>earthlens.gee</code>.</p
 <p><code>TemporalSegmentation</code> (<code>LandTrendr</code> / <code>Ccdc</code>) finds breakpoints in a per-pixel trajectory — disturbance and
 recovery — and returns a <code>SegmentationResult</code> wrapping the algorithm's array-valued <code>ee.Image</code>, never a
 plottable raster. Mask clouds first; the algorithms assume a clean series:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">LandTrendr</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">nbr</span> <span class="o">=</span> <span class="n">masked_collection</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">img</span><span class="p">:</span> <span class="n">img</span><span class="o">.</span><span class="n">normalizedDifference</span><span class="p">([</span><span class="s2">&quot;B5&quot;</span><span class="p">,</span> <span class="s2">&quot;B7&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;NBR&quot;</span><span class="p">))</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">result</span> <span class="o">=</span> <span class="n">LandTrendr</span><span class="p">(</span><span class="n">maxSegments</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span><span class="n">nbr</span><span class="p">)</span>   <span class="c1"># invert=True by default for a vegetation index</span>
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="n">vertices</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">array</span>                            <span class="c1"># the ee.Array image, for your own getInfo/export</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">LandTrendr</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">nbr</span> <span class="o">=</span> <span class="n">masked_collection</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">img</span><span class="p">:</span> <span class="n">img</span><span class="o">.</span><span class="n">normalizedDifference</span><span class="p">([</span><span class="s2">&quot;B5&quot;</span><span class="p">,</span> <span class="s2">&quot;B7&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;NBR&quot;</span><span class="p">))</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">result</span> <span class="o">=</span> <span class="n">LandTrendr</span><span class="p">(</span><span class="n">maxSegments</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span><span class="n">nbr</span><span class="p">)</span>   <span class="c1"># invert=True by default for a vegetation index</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">vertices</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">array</span>                            <span class="c1"># the ee.Array image, for your own getInfo/export</span>
 </code></pre></div>
 <p><code>Climatology</code> reduces a collection <em>per calendar period across a baseline</em> (<code>dayofyear</code> / <code>month</code> / <code>season</code>),
 and <code>anomaly()</code> is the observed-minus-baseline companion:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">Climatology</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="n">clim</span> <span class="o">=</span> <span class="n">Climatology</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;month&quot;</span><span class="p">,</span> <span class="n">baseline</span><span class="o">=</span><span class="p">(</span><span class="mi">1991</span><span class="p">,</span> <span class="mi">2020</span><span class="p">),</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="n">monthly</span> <span class="o">=</span> <span class="n">clim</span><span class="o">.</span><span class="n">climatology</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>                       <span class="c1"># one image per month</span>
-<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="n">june_2024</span> <span class="o">=</span> <span class="n">clim</span><span class="o">.</span><span class="n">anomaly</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">collection_2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>     <span class="c1"># this June vs the 1991-2020 June mean</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">Climatology</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">clim</span> <span class="o">=</span> <span class="n">Climatology</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;month&quot;</span><span class="p">,</span> <span class="n">baseline</span><span class="o">=</span><span class="p">(</span><span class="mi">1991</span><span class="p">,</span> <span class="mi">2020</span><span class="p">),</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="n">monthly</span> <span class="o">=</span> <span class="n">clim</span><span class="o">.</span><span class="n">climatology</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>                       <span class="c1"># one image per month</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="n">june_2024</span> <span class="o">=</span> <span class="n">clim</span><span class="o">.</span><span class="n">anomaly</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">collection_2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>     <span class="c1"># this June vs the 1991-2020 June mean</span>
 </code></pre></div>
 <p><code>ClosestImage</code> selects the scene nearest a target date, within an optional tolerance (an out-of-range target
 with a tolerance set yields an empty selection rather than a distant scene):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClosestImage</span>
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>
-<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">nearest</span> <span class="o">=</span> <span class="n">ClosestImage</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">tolerance</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">15</span><span class="p">))</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClosestImage</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="n">nearest</span> <span class="o">=</span> <span class="n">ClosestImage</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">tolerance</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">15</span><span class="p">))</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
 </code></pre></div>
 <p><code>GapFill</code> fills temporal holes <em>before</em> a reduction or sampling, by <code>linear</code> / <code>nearest</code> / <code>harmonic</code>
 interpolation over a within-<code>max_gap</code> neighbour join — <code>max_gap</code> is a refusal, not a hint, so a pixel with no
 valid neighbour in the window stays masked:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
-<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">GapFill</span>
-<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
-<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="n">filled</span> <span class="o">=</span> <span class="n">GapFill</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">max_gap</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">30</span><span class="p">))</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">GapFill</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="n">filled</span> <span class="o">=</span> <span class="n">GapFill</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">max_gap</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">30</span><span class="p">))</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="joining-two-collections"><a class="toclink" href="#joining-two-collections">Joining two collections</a><a class="headerlink" href="#joining-two-collections" title="Permanent link">#</a></h3>
 <p>Earth Engine's five join strategies ship as frozen config objects — <code>InnerJoin</code>, <code>SaveAllJoin</code>,
@@ -24830,15 +24921,15 @@ valid neighbour in the window stays masked:</p>
 would bind a typo'd keyword silently; the <em>condition</em> stays an ordinary <code>ee.Filter</code>, exactly as raw Earth
 Engine spells it. A join is inherently a two-collection operation, so these are standalone composables for
 <code>.client</code>-level graphs — never drop-ins for the single-collection <code>filters=</code> hook:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">ee</span>
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
-<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">SaveAllJoin</span>
-<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
-<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="c1"># Hang each Sentinel-2 scene&#39;s cloud-probability image on it, by scene id.</span>
-<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="n">condition</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">leftField</span><span class="o">=</span><span class="s2">&quot;system:index&quot;</span><span class="p">,</span> <span class="n">rightField</span><span class="o">=</span><span class="s2">&quot;system:index&quot;</span><span class="p">)</span>
-<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="n">joined</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">ImageCollection</span><span class="p">(</span>
-<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>    <span class="n">SaveAllJoin</span><span class="p">(</span><span class="n">matches_key</span><span class="o">=</span><span class="s2">&quot;probability&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="n">s2_cloud_prob</span><span class="p">,</span> <span class="n">condition</span><span class="p">)</span>
-<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">ee</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">SaveAllJoin</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="c1"># Hang each Sentinel-2 scene&#39;s cloud-probability image on it, by scene id.</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="n">condition</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">leftField</span><span class="o">=</span><span class="s2">&quot;system:index&quot;</span><span class="p">,</span> <span class="n">rightField</span><span class="o">=</span><span class="s2">&quot;system:index&quot;</span><span class="p">)</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="n">joined</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">ImageCollection</span><span class="p">(</span>
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a>    <span class="n">SaveAllJoin</span><span class="p">(</span><span class="n">matches_key</span><span class="o">=</span><span class="s2">&quot;probability&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="n">s2_cloud_prob</span><span class="p">,</span> <span class="n">condition</span><span class="p">)</span>
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="p">)</span>
 </code></pre></div>
 <p><code>GapFill</code> builds its within-<code>max_gap</code> <code>before</code> / <code>after</code> neighbour lists through <code>SaveAllJoin</code> with an
 <code>ee.Filter.And(maxDifference, ...)</code> condition — the same pattern to copy for any temporal-neighbour join.
