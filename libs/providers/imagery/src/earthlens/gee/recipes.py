@@ -95,9 +95,9 @@ _MASK_RECIPES: dict[str, type[ImageMask]] = {
 
 #: Recipe name → the bands its mask reads off the scene by name. Curating a
 #: recipe onto a row that does not declare these would surface only as an
-#: opaque server-side graph failure on a live request, so the invariant is
-#: asserted over the whole curated catalog. Keyed by the same names as
-#: `_MASK_RECIPES`, which a test pins, so neither map can gain a name alone.
+#: opaque server-side graph failure on a live request, so the requirement is
+#: recorded here and checked against the whole curated catalog. Keyed by the
+#: same names as `_MASK_RECIPES`, so neither map can gain a name alone.
 #:
 #: `cloud_score_plus` is empty on purpose: its `cs` / `cs_cdf` band comes from
 #: the linked Cloud Score+ collection, not from the row. `sentinel2_cdi` names
@@ -124,7 +124,17 @@ def preprocess(
     Resolves the `preprocess:` recipe on the catalog row into a
     `MaskChain` of the sensor's recommended mask followed, when the
     recipe asks for it, by a `BandScaler` over the row's own `scale` /
-    `offset` factors. Hand the result to `GEE(cloud_mask=...)`.
+    `offset` factors.
+
+    `GEE(preprocess=True)` is the shipped entry point and resolves
+    *through this function*, passing the asset id and the requested bands
+    it already holds. This function stays public for a recipe you want to
+    read, extend (`preprocess(...) >> SpeckleFilter()`) or hand around;
+    pass that chain to `GEE(cloud_mask=...)` and the backend cross-checks
+    it against the request — a `BandScaler` resolved for an asset
+    `variables` does not ask for raises, and a band list narrower than the
+    request's warns, naming the scalable bands that would stay raw DN in
+    the same raster.
 
     The chain forces the request onto an Earth Engine engine, as any
     `cloud_mask` does, so the EEDAI reader declines it automatically.

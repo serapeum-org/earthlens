@@ -1030,7 +1030,15 @@ class GEE(LazyClientMixin, AbstractDataSource):
             `"asset"` without `asset_id`), a `crs_transform` that is not six
             finite terms with non-zero, unsheared pixel sizes, or a `reducer`
             that reduces a region rather than a collection, is an unknown name,
-            or is a malformed / out-of-range percentile; from the parent on
+            or is a malformed / out-of-range percentile; at construction for
+            `scaled=True` together with `preprocess=True` (the recipe already
+            scales, so both would scale twice), for `preprocess=True` against a
+            dataset whose catalog row carries no `preprocess:` recipe, for a
+            `Sentinel2Cdi` mask (on its own or inside a chain) or a
+            `Sentinel2Composite` reducer paired with a Sentinel-2
+            surface-reflectance asset, and for a `BandScaler` on `cloud_mask=`
+            that was resolved for an asset `variables` does not ask for; from
+            the parent on
             a bad date range; from `_check_input_dates` on an unknown
             `temporal_resolution`; from `_api` on a missing scale or an
             oversized `"url"` request on either pull API (unless
@@ -1075,6 +1083,38 @@ class GEE(LazyClientMixin, AbstractDataSource):
             >>> paths = gee.authenticate().download()  # doctest: +SKIP
             >>> paths[0].name  # doctest: +SKIP
             'USGS_SRTMGL1_003_elevation_20000211.tif'
+
+            ```
+        - Ask for the dataset's curated analysis-ready recipe instead of
+          assembling one. The flag reads the asset id and the bands off
+          `variables`, so neither is restated, and it resolves at construction
+          — no authentication involved:
+            ```python
+            >>> from earthlens.gee import GEE
+            >>> request = {
+            ...     "start": "2024-05-01", "end": "2024-06-01",
+            ...     "variables": {"COPERNICUS/S2_SR_HARMONIZED": ["B4", "B3"]},
+            ...     "lat_lim": [29.9, 30.0], "lon_lim": [31.2, 31.3],
+            ...     "path": "data/gee",
+            ... }
+            >>> gee = GEE(preprocess=True, **request)
+            >>> gee.preprocess, gee.scaled
+            (True, False)
+
+            ```
+        - The two flags are mutually exclusive, because the recipe already
+          carries the scaling:
+            ```python
+            >>> from earthlens.gee import GEE
+            >>> GEE(
+            ...     start="2024-05-01", end="2024-06-01",
+            ...     variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4", "B3"]},
+            ...     lat_lim=[29.9, 30.0], lon_lim=[31.2, 31.3],
+            ...     path="data/gee", scaled=True, preprocess=True,
+            ... )
+            Traceback (most recent call last):
+                ...
+            ValueError: scaled=True and preprocess=True both apply the catalog's scale/offset...
 
             ```
     """

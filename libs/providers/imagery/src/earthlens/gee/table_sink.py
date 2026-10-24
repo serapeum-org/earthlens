@@ -127,6 +127,30 @@ class TableSink(BaseModel):
             pydantic_core._pydantic_core.ValidationError: ...
 
             ```
+        - A BigQuery `table` must be fully qualified, not just
+          `dataset.table`:
+            ```python
+            >>> from earthlens.gee.table_sink import TableSink
+            >>> TableSink(destination="bigquery", table="dataset.table")
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: ...
+
+            ```
+        - And a `file_format` is refused by the destinations that write a
+          table rather than a file, instead of being silently dropped:
+            ```python
+            >>> from earthlens.gee.table_sink import TableSink
+            >>> TableSink(
+            ...     destination="asset",
+            ...     asset_id="projects/p/assets/t",
+            ...     file_format="GeoJSON",
+            ... )
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: ...
+
+            ```
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")

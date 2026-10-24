@@ -304,6 +304,11 @@ class AssetManager(BaseModel):
             The queued task, normalised exactly like the batch export sinks'
             — poll it with `earthlens.gee.jobs.get_task_status` /
             `wait_for_task_id`.
+
+        Raises:
+            ValueError: If the submission response carries neither an operation
+                `name` nor a task `id`, so there is no handle to track the
+                queued ingestion by.
         """
         submitted = ee.data.startIngestion(
             _request_id(request_id), params, allow_overwrite
@@ -329,6 +334,11 @@ class AssetManager(BaseModel):
 
         Returns:
             The queued task, normalised exactly like the batch export sinks'.
+
+        Raises:
+            ValueError: If the submission response carries neither an operation
+                `name` nor a task `id`, so there is no handle to track the
+                queued ingestion by.
         """
         submitted = ee.data.startTableIngestion(
             _request_id(request_id), params, allow_overwrite
