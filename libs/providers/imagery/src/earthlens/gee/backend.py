@@ -1871,7 +1871,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         The returned object is a plain `earthlens.gee.workload.WorkloadTag`;
         nothing on the backend changes, and the tag applies process-wide while
-        the scope is open.
+        the scope is open. Being process-wide is also its limit: the scope
+        nests safely within one thread but is **not thread-safe**, since two
+        threads entering scopes concurrently interleave their saves and can
+        restore each other's tags.
 
         Args:
             tag: The workload tag — 1-63 characters, starting and ending

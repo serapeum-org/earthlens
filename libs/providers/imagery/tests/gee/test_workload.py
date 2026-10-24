@@ -176,3 +176,25 @@ class TestWorkloadTagScope:
         with WorkloadTag(tag="run-42"):
             assert fake_data.tag == "run-42"
         assert fake_data.tag == 1234
+
+    def test_an_unbalanced_exit_is_named(self, fake_data):
+        """`__exit__` without a matching `__enter__` says so, not `IndexError`."""
+        scope = WorkloadTag(tag="run-42")
+        with pytest.raises(RuntimeError, match="was not entered"):
+            scope.__exit__(None, None, None)
+
+    def test_an_unbalanced_exit_leaves_the_tag_alone(self, fake_data):
+        """The refusal happens before any `setWorkloadTag`, so state is intact."""
+        fake_data.tag = "pre-existing"
+        with pytest.raises(RuntimeError):
+            WorkloadTag(tag="run-42").__exit__(None, None, None)
+        assert fake_data.tag == "pre-existing"
+        assert fake_data.calls == []
+
+    def test_a_double_exit_is_named(self, fake_data):
+        """One extra exit after a balanced scope is the same mistake."""
+        scope = WorkloadTag(tag="run-42")
+        with scope:
+            pass
+        with pytest.raises(RuntimeError, match="was not entered"):
+            scope.__exit__(None, None, None)

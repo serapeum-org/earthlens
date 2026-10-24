@@ -18,6 +18,13 @@ The EEDAI reader path (`engine="eedai"`) fetches stored pixels through GDAL's
 EEDAI driver, not through `ee`, so those reads are never attributed: a run
 that only uses the reader gains nothing from a tag.
 
+**The scope is per-process and not thread-safe.** The tag it sets is
+process-wide SDK state (`ee/_state.py`), and the save stack is a plain list,
+so two threads entering scopes concurrently interleave their saves and can
+restore each other's tags. Nesting within *one* thread is what the stack
+makes safe. Tag a run from the thread that drives it, or give each worker its
+own process.
+
 Earth Engine constrains the string, and `WorkloadTag` enforces the
 constraint at construction, so a typo'd tag raises immediately instead of
 mid-download. The rule is **the SDK's enforced one, not its documented
@@ -95,6 +102,12 @@ class WorkloadTag(BaseModel):
     `with gee.workload_tag("run-42"): gee.download()` tags every Earth
     Engine-served request the download makes. The EEDAI reader path is
     separate and stays unattributed.
+
+    The tag is **process-wide** SDK state and the save stack is a plain list,
+    so the scope is nest-safe within one thread but **not thread-safe**: two
+    threads entering scopes concurrently interleave their saves and can
+    restore each other's tags. Exiting a scope that was never entered raises
+    `RuntimeError` rather than popping an empty stack.
 
     The `tag` must satisfy the rule the SDK's validator enforces — 1-63
     characters, lowercase alphanumeric at both ends, `-` and `_` between —
@@ -185,5 +198,19 @@ class WorkloadTag(BaseModel):
 
         Returns:
             `None`, so an in-flight exception always propagates.
+
+        Raises:
+            RuntimeError: If the scope was never entered (or has already been
+                exited) — a bare `IndexError: pop from empty list` named
+                neither the object nor the mistake. Checked before the
+                `setWorkloadTag` call, so the process-wide tag is left as it
+                was.
         """
+        if not self._saved:
+            raise RuntimeError(
+                f"WorkloadTag(tag={self.tag!r}) was not entered, so there is "
+                "no saved tag to restore; use it as a context manager "
+                "(`with gee.workload_tag(...):`) rather than calling "
+                "__exit__ directly"
+            )
         ee.data.setWorkloadTag(self._saved.pop())

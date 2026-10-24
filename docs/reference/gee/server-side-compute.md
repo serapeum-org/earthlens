@@ -820,6 +820,13 @@ The tag covers the Earth Engine-served calls (`getDownloadURL`, `computePixels`,
 is where billing accrues. The EEDAI reader fetches stored pixels through GDAL, not `ee`, so an
 `engine="eedai"` read is never attributed; tagging an EEDAI-only run buys nothing.
 
+!!! note "Per-process, and not thread-safe"
+    The tag is process-wide SDK state and the save stack is a plain list, so the scope nests safely
+    within **one** thread but two threads entering scopes concurrently interleave their saves and can
+    restore each other's tags. Tag a run from the thread that drives it, or give each worker its own
+    process. Exiting a scope that was never entered raises `RuntimeError` naming the tag, rather than
+    popping an empty stack.
+
 ### Managing assets
 
 `export_via="asset"` creates assets; `AssetManager` is what manages them afterwards — a dedicated
