@@ -608,6 +608,26 @@ joined = ee.ImageCollection(
 join plumbing.) Joins are server-side compute: a pipeline using one runs on an Earth Engine engine, never
 the EEDAI reader.
 
+### Tagging traffic for billing
+
+Earth Engine attaches a *workload tag* to every request it serves, and Cloud billing breaks cost out by it.
+`WorkloadTag` is the earthlens scope for one — `GEE.workload_tag` is the backend convenience that returns it:
+
+```python
+with gee.workload_tag("drought-monitor-2024"):
+    paths = gee.download()   # every EE-served request in here carries the tag
+```
+
+The tag is validated at construction (1-63 characters, alphanumeric at start and end, `-` `_` `.` allowed
+between), so a typo raises immediately rather than mid-download. Unlike the SDK's own
+`ee.data.workloadTagContext` — whose exit calls `resetWorkloadTag()` and so resets to the *default* tag —
+`WorkloadTag` saves the tag it found on entry and restores exactly that on exit, exception or not, which is
+what makes nesting work: an inner scope hands back to the enclosing tag instead of wiping it.
+
+The tag covers the Earth Engine-served calls (`getDownloadURL`, `computePixels`, `ee.batch` exports) — which
+is where billing accrues. The EEDAI reader fetches stored pixels through GDAL, not `ee`, so an
+`engine="eedai"` read is never attributed; tagging an EEDAI-only run buys nothing.
+
 ## Choosing an engine, in practice
 
 | Situation | Engine |

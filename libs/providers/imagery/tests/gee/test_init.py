@@ -181,6 +181,8 @@ _EXPECTED_EXPORTS = {
     "cancel_task",
     "wait_for_task_id",
     "resolve_destination",
+    # Epic 6 Task 6.9 - the nest-safe workload-tag billing scope.
+    "WorkloadTag",
 }
 
 

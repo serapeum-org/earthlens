@@ -126,6 +126,7 @@ from earthlens.gee.work import (
     DownloadResult,
     FeatureWorkUnit,
 )
+from earthlens.gee.workload import WorkloadTag
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from geopandas import GeoDataFrame
@@ -1625,6 +1626,44 @@ class GEE(LazyClientMixin, AbstractDataSource):
             self.download(progress_bar=progress_bar, materialize=True),
         )
         return analysis.run_on_result(result, write_to=write_to, overwrite=overwrite)
+
+    def workload_tag(self, tag: str) -> WorkloadTag:
+        """Return a nest-safe scope tagging this backend's Earth Engine traffic.
+
+        `with gee.workload_tag("run-42"): gee.download()` labels every Earth
+        Engine-served request in the scope — `getDownloadURL`, `computePixels`,
+        `ee.batch` exports — for cost attribution in Cloud billing. The scope
+        is a save-and-restore over `ee.data.getWorkloadTag` /
+        `setWorkloadTag`, so nested scopes hand back to the enclosing tag
+        (unlike `ee.data.workloadTagContext`, whose exit resets to the
+        default). The EEDAI reader path fetches pixels through GDAL rather
+        than `ee`, so an `engine="eedai"` read stays unattributed.
+
+        The returned object is a plain `earthlens.gee.workload.WorkloadTag`;
+        nothing on the backend changes, and the tag applies process-wide while
+        the scope is open.
+
+        Args:
+            tag: The workload tag — 1-63 characters, starting and ending
+                alphanumeric, with `-`, `_` or `.` allowed between.
+
+        Returns:
+            The `WorkloadTag` context manager, validated and ready to enter.
+
+        Raises:
+            pydantic.ValidationError: If `tag` does not match Earth Engine's
+                documented format.
+
+        Examples:
+            - Tag a download run (needs credentials to download):
+                ```python
+                >>> from earthlens.gee import GEE  # doctest: +SKIP
+                >>> gee = GEE(...)  # doctest: +SKIP
+                >>> with gee.workload_tag("run-42"):  # doctest: +SKIP
+                ...     paths = gee.download()
+                ```
+        """
+        return WorkloadTag(tag=tag)
 
     def _materialise(self, written: list[Any]) -> DownloadResult:
         """Read each written raster back as an in-memory pyramids object.

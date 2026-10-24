@@ -4486,3 +4486,22 @@ class TestCallableHookInstances:
             "2021-01-01",
         )
         assert [args for name, args in col.calls if name == "map"] == [(mask,)]
+
+
+class TestWorkloadTagMethod:
+    """Task 6.9: `GEE.workload_tag` hands out the nest-safe billing scope."""
+
+    def test_it_returns_a_validated_workload_tag(self, make_gee):
+        """The method wraps the tag in a `WorkloadTag` value object."""
+        from earthlens.gee.workload import WorkloadTag
+
+        scope = make_gee().workload_tag("run-42")
+        assert isinstance(scope, WorkloadTag)
+        assert scope.tag == "run-42"
+
+    def test_an_illegal_tag_is_refused(self, make_gee):
+        """Validation happens here, not mid-download inside the SDK."""
+        from pydantic import ValidationError
+
+        with pytest.raises(ValidationError, match="1-63 characters"):
+            make_gee().workload_tag("-bad-")

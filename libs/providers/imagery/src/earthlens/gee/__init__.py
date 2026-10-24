@@ -296,6 +296,12 @@ exposes a small set of helpers re-exported from this package:
 * `resolve_destination` surfaces a completed task's
   destination URIs (Drive / GCS / asset paths) for follow-up
   pulls.
+* `WorkloadTag` — a nest-safe billing scope: `GEE.workload_tag("run-42")`
+  returns one, and entering it labels every Earth Engine-served request
+  (`getDownloadURL`, `computePixels`, `ee.batch`) for cost attribution,
+  saving and restoring the *enclosing* tag on exit — the SDK's own
+  `ee.data.workloadTagContext` resets to the default instead, wiping an
+  outer scope. The EEDAI reader path is separate and stays unattributed.
 
 Mirrors `earthlens.ecmwf.jobs` — see also the "Tracking asynchronous
 Earth Engine exports" notebook, `docs/examples/gee/track-batch-exports.ipynb`.
@@ -476,6 +482,7 @@ from earthlens.gee.work import (
     RasterWorkUnit,
     WorkUnit,
 )
+from earthlens.gee.workload import WorkloadTag
 
 __all__ = [
     "MatchHistogram",
@@ -525,6 +532,7 @@ __all__ = [
     "cancel_task",
     "wait_for_task_id",
     "resolve_destination",
+    "WorkloadTag",
     "Reducer",
     "Mean",
     "Median",
