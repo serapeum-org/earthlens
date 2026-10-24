@@ -23,7 +23,13 @@ parameter, not a framing: `overwrite` is for `bigquery` **and** `asset`
 (`toAsset` declares and forwards it, so a table asset can be re-exported in
 place), `append` is BigQuery's alone, `ingestion_time_parameters` is
 FeatureView's alone, and `file_format` belongs to the two destinations that
-write a file (`_FILE_DESTINATIONS`), the rest ignoring it. `overwrite` and
+write a file (`_FILE_DESTINATIONS`), the rest ignoring it. Each of those
+refusals keys off *whether the option was set*, not off its value: that is
+why `file_format` defaults to `None` rather than to `"CSV"` — with a value
+for a default, an explicit `file_format="CSV"` is indistinguishable from an
+unset one and slips past the refusal it was meant to trip.
+`effective_file_format` answers the format Earth Engine will use, so nothing
+is lost by the `None`. `overwrite` and
 `append` stay mutually exclusive, which is BigQuery's own rule. The BigQuery
 `table` is checked for *shape* as well as presence, mirroring the SDK's own
 `project.dataset.table` rule (`_BIGQUERY_TABLE_RE`), so that mistake lands
@@ -65,6 +71,11 @@ _REQUIRED_ADDRESS: dict[str, str] = {
 #: `file_format` set for one of them is refused rather than dropped.
 _FILE_DESTINATIONS: frozenset[str] = frozenset({"drive", "gcs"})
 
+#: The format Earth Engine writes when a file destination is given none, read
+#: off `ee.batch.Export.table.toDrive`'s own docstring (`fileFormat: The
+#: output format: "CSV" (default), ...`); its parameter default is `None`.
+_DEFAULT_FILE_FORMAT: str = "CSV"
+
 #: The destinations whose factory takes `overwrite`. Not BigQuery alone:
 #: `ee.batch.Export.table.toAsset(..., overwrite=False)` is a declared,
 #: forwarded parameter too ("If an existing asset can be overwritten by this
@@ -103,7 +114,10 @@ class TableSink(BaseModel):
     default), `overwrite` / `append` are mutually exclusive, `overwrite` is
     for `bigquery` / `asset` and `append` for `bigquery`,
     `ingestion_time_parameters` is FeatureView-only, and `file_format` is for
-    the `drive` / `gcs` destinations that pass it on.
+    the `drive` / `gcs` destinations that pass it on — set at all, not merely
+    set to something other than the default. `effective_file_format` reports
+    what Earth Engine will write, including when `file_format` was left
+    unset.
 
     Examples:
         - A sink is a frozen value object, constructed without Earth Engine:
@@ -155,17 +169,32 @@ class TableSink(BaseModel):
 
             ```
         - And a `file_format` is refused by the destinations that write a
-          table rather than a file, instead of being silently dropped:
+          table rather than a file, instead of being silently dropped —
+          whatever the format, the default included:
             ```python
             >>> from earthlens.gee.table_sink import TableSink
             >>> TableSink(
             ...     destination="asset",
             ...     asset_id="projects/p/assets/t",
-            ...     file_format="GeoJSON",
+            ...     file_format="CSV",
             ... )
             Traceback (most recent call last):
                 ...
             pydantic_core._pydantic_core.ValidationError: ...
+
+            ```
+        - A file destination that sets none still reports what Earth Engine
+          will write, while a table destination has no format at all:
+            ```python
+            >>> from earthlens.gee.table_sink import TableSink
+            >>> TableSink(destination="drive").effective_file_format
+            'CSV'
+            >>> print(
+            ...     TableSink(
+            ...         destination="asset", asset_id="projects/p/assets/t"
+            ...     ).effective_file_format
+            ... )
+            None
 
             ```
     """
@@ -187,12 +216,31 @@ class TableSink(BaseModel):
     # Scoped and validated like the sibling options: a free `str` constructed
     # happily and was then never passed to `toAsset` / `toBigQuery` /
     # `toFeatureView`, i.e. silently ignored where `overwrite` would have
-    # raised. The default is kept rather than made `None`, so the attribute
-    # still reads back as the format Earth Engine would use.
-    file_format: Literal["CSV", "GeoJSON", "KML", "KMZ", "SHP", "TFRecord"] = (
-        "CSV"  # file destinations only (see `_FILE_DESTINATIONS`)
+    # raised. `None` rather than `"CSV"` is the default, so the scoping guard
+    # keys off *was it set* instead of *is it the default value* — with a
+    # `"CSV"` default the two are indistinguishable and an explicit
+    # `file_format="CSV"` slips past the refusal. The format Earth Engine
+    # will actually use is still readable, through `effective_file_format`.
+    file_format: Literal["CSV", "GeoJSON", "KML", "KMZ", "SHP", "TFRecord"] | None = (
+        None  # file destinations only (see `_FILE_DESTINATIONS`)
     )
     wait_for_export: bool = False  # block until the task finishes
+
+    @property
+    def effective_file_format(self) -> str | None:
+        """The format this sink writes, or `None` where none applies.
+
+        Returns:
+            `file_format` when set; Earth Engine's own default
+            (`_DEFAULT_FILE_FORMAT`) for a file destination that left it
+            unset; `None` for a destination that writes a table rather than a
+            file, which has no format at all.
+        """
+        return (
+            (self.file_format or _DEFAULT_FILE_FORMAT)
+            if self.destination in _FILE_DESTINATIONS
+            else None
+        )
 
     @model_validator(mode="after")
     def _consistent(self) -> TableSink:
@@ -210,7 +258,7 @@ class TableSink(BaseModel):
                 not `project.dataset.table`-shaped, or the destination's
                 required address field is `None`.
         """
-        if self.file_format != "CSV" and self.destination not in _FILE_DESTINATIONS:
+        if self.file_format is not None and self.destination not in _FILE_DESTINATIONS:
             raise ValueError(
                 f"file_format={self.file_format!r} is only passed on by the "
                 f"file destinations {sorted(_FILE_DESTINATIONS)}; the "
@@ -288,14 +336,14 @@ class TableSink(BaseModel):
                 collection=features,
                 description=description,
                 folder=self.folder,
-                fileFormat=self.file_format,
+                fileFormat=self.effective_file_format,
             )
         elif self.destination == "gcs":
             task = factory.toCloudStorage(
                 collection=features,
                 description=description,
                 bucket=self.bucket,
-                fileFormat=self.file_format,
+                fileFormat=self.effective_file_format,
             )
         elif self.destination == "asset":
             task = factory.toAsset(

@@ -2193,12 +2193,15 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
             # `asset` writes a table rather than a file, so Earth Engine's
             # `toAsset` takes no `fileFormat` and `TableSink` refuses one it
-            # would only ignore. The default stands in for "not applicable".
-            file_format: Literal["CSV", "GeoJSON"] = (
-                "GeoJSON"
-                if self.OUTPUT_KIND == "vector" and self.export_via != "asset"
-                else "CSV"
-            )
+            # would only ignore — including the format that used to be its
+            # default. `None` is how the sink spells "not applicable".
+            file_format: Literal["CSV", "GeoJSON"] | None
+            if self.export_via == "asset":
+                file_format = None
+            elif self.OUTPUT_KIND == "vector":
+                file_format = "GeoJSON"
+            else:
+                file_format = "CSV"
             result: GeoDataFrame | TaskInfo = TableSink(
                 destination=cast('Literal["drive", "gcs", "asset"]', self.export_via),
                 folder=self.drive_folder,

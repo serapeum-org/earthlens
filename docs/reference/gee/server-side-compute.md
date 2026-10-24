@@ -746,7 +746,11 @@ TableSink(
 - **`file_format` is scoped like the rest** — only `drive` and `gcs` pass it on to their
   `Export.table.to*` factory, so setting it on `asset` / `bigquery` / `featureview` is refused instead
   of silently ignored, and the value itself is a fixed vocabulary (`CSV`, `GeoJSON`, `KML`, `KMZ`,
-  `SHP`, `TFRecord`) rather than a free string Earth Engine may reject later.
+  `SHP`, `TFRecord`) rather than a free string Earth Engine may reject later. The refusal keys off
+  *whether it was set*, which is why the field defaults to `None` and not to `"CSV"`: an explicit
+  `file_format="CSV"` on a table destination is the same mistake as any other format and is refused
+  too. `sink.effective_file_format` answers what Earth Engine will write — `"CSV"` for a file
+  destination that set none (its own default), `None` for a destination that writes no file.
 
 Whatever the destination, the queued task's wire type — what `TaskInfo.task_type` carries and what
 `list_recent_tasks(task_type=...)` filters on — is `EXPORT_FEATURES`: BigQuery and FeatureView create the

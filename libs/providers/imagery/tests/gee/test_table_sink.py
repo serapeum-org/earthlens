@@ -75,13 +75,14 @@ class TestTableSinkConfig:
     """The frozen export configuration."""
 
     def test_defaults(self):
-        """A bare sink targets Drive, CSV, non-blocking."""
+        """A bare sink targets Drive, non-blocking, with no format of its own."""
         sink = TableSink()
         assert (sink.destination, sink.file_format, sink.wait_for_export) == (
             "drive",
-            "CSV",
+            None,
             False,
         )
+        assert sink.effective_file_format == "CSV"
 
     def test_it_is_frozen(self):
         """The configuration cannot drift after construction."""
@@ -151,6 +152,51 @@ class TestTableSinkValidation:
         """A format the destination never passes on is a mistake, not a no-op."""
         with pytest.raises(ValidationError, match="file_format"):
             TableSink(file_format="GeoJSON", **kwargs)
+
+    @pytest.mark.parametrize(
+        "kwargs",
+        [
+            {"destination": "asset", "asset_id": "a/b"},
+            {"destination": "bigquery", "table": "p.d.t"},
+            {"destination": "featureview", "asset_id": "a/b"},
+        ],
+        ids=["asset", "bigquery", "featureview"],
+    )
+    def test_the_default_format_is_refused_too_when_set_explicitly(self, kwargs):
+        """The guard keys off "was set", not off a value, so `CSV` is refused."""
+        with pytest.raises(ValidationError, match="file_format"):
+            TableSink(file_format="CSV", **kwargs)
+
+    @pytest.mark.parametrize(
+        "kwargs",
+        [
+            {"destination": "asset", "asset_id": "a/b"},
+            {"destination": "bigquery", "table": "p.d.t"},
+            {"destination": "featureview", "asset_id": "a/b"},
+        ],
+        ids=["asset", "bigquery", "featureview"],
+    )
+    def test_a_table_destination_reads_back_no_format(self, kwargs):
+        """A destination that writes no file must not claim one."""
+        sink = TableSink(**kwargs)
+        assert sink.file_format is None
+        assert sink.effective_file_format is None
+
+    @pytest.mark.parametrize(
+        ("kwargs", "expected"),
+        [
+            ({"destination": "drive", "folder": "f"}, "CSV"),
+            ({"destination": "gcs", "bucket": "b"}, "CSV"),
+            (
+                {"destination": "drive", "folder": "f", "file_format": "KML"},
+                "KML",
+            ),
+        ],
+        ids=["drive-default", "gcs-default", "drive-explicit"],
+    )
+    def test_a_file_destination_reports_the_format_ee_will_use(self, kwargs, expected):
+        """Unset still answers Earth Engine's own default, via the property."""
+        assert TableSink(**kwargs).effective_file_format == expected
 
     @pytest.mark.parametrize(
         "kwargs",
