@@ -25247,8 +25247,10 @@ asynchronous export.</p>
 </code></pre></div>
 <ul>
 <li><strong><code>overwrite</code> / <code>append</code></strong> — <code>overwrite</code> replaces what is already there, <code>append</code> adds to a table with
-  a compatible schema. Earth Engine refuses both at once, so the sink refuses both at construction; with
-  neither set, the export fails if the destination already exists (EE's default). Their scopes differ,
+  a compatible schema. Earth Engine refuses both at once, so the sink refuses both at construction. For a
+  BigQuery table the SDK states the consequence of setting neither — "the export fails if the table already
+  exists and both <code>overwrite</code> and <code>append</code> are <code>false</code>" — while for an asset it documents only that
+  <code>overwrite</code> permits replacing one, without stating what happens when it is left off. Their scopes differ,
   and each is the set of factories whose signature declares the parameter: <code>append</code> is BigQuery's alone,
   while <code>overwrite</code> is also taken — and forwarded — by <code>asset</code>, since
   <code>ee.batch.Export.table.toAsset(..., overwrite=…)</code> is a declared option. So re-exporting a table asset
