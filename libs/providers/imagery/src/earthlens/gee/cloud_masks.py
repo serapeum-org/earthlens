@@ -54,7 +54,11 @@ Each mask reads a quality band the target dataset must carry; the
 curated catalog declares `QA60` and `state_1km` on the datasets named
 above, so a facade request against those rows has the band. On a
 dataset without it, Earth Engine fails at graph-compute time — the
-documented contract for a mask reading an absent band.
+documented contract for a mask reading an absent band. For the rows a
+`preprocess:` recipe names, that is an enforced invariant rather than a
+claim: `earthlens.gee.recipes._MASK_REQUIRED_BANDS` records which bands
+each recipe's mask reads, and the suite asserts every curated recipe row
+declares them.
 
 Two members of the family are not masks at all, but the same shape —
 per-image `ee.Image -> ee.Image` ops, and so drop-ins for the same hook:

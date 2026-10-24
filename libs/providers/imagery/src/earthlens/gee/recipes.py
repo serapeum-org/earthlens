@@ -82,6 +82,26 @@ _MASK_RECIPES: dict[str, type[ImageMask]] = {
     "modis_state_1km": ModisState1kmMask,
 }
 
+#: Recipe name → the bands its mask reads off the scene by name. Curating a
+#: recipe onto a row that does not declare these would surface only as an
+#: opaque server-side graph failure on a live request, so the invariant is
+#: asserted over the whole curated catalog. Keyed by the same names as
+#: `_MASK_RECIPES`, which a test pins, so neither map can gain a name alone.
+#:
+#: `cloud_score_plus` is empty on purpose: its `cs` / `cs_cdf` band comes from
+#: the linked Cloud Score+ collection, not from the row. `sentinel2_cdi` names
+#: the three bands `ee.Algorithms.Sentinel2.CDI` reads for its parallax
+#: computation rather than a quality band.
+_MASK_REQUIRED_BANDS: dict[str, frozenset[str]] = {
+    "landsat_sr": frozenset({"QA_PIXEL"}),
+    "landsat_qa_refined": frozenset({"QA_PIXEL"}),
+    "sentinel2_scl": frozenset({"SCL"}),
+    "sentinel2_qa60": frozenset({"QA60"}),
+    "sentinel2_cdi": frozenset({"B7", "B8", "B8A"}),
+    "cloud_score_plus": frozenset(),
+    "modis_state_1km": frozenset({"state_1km"}),
+}
+
 
 def preprocess(
     dataset: str,

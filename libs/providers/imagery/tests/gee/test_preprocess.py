@@ -26,7 +26,11 @@ from earthlens.gee.cloud_masks import (  # noqa: E402
     SpeckleFilter,
 )
 from earthlens.gee.configs import EngineConfig  # noqa: E402
-from earthlens.gee.recipes import _MASK_RECIPES, preprocess  # noqa: E402
+from earthlens.gee.recipes import (  # noqa: E402
+    _MASK_RECIPES,
+    _MASK_REQUIRED_BANDS,
+    preprocess,
+)
 
 
 @pytest.fixture
@@ -230,3 +234,84 @@ class TestShippedRecipes:
             if row.preprocess is not None and row.preprocess.mask is not None
         }
         assert named <= set(_MASK_RECIPES)
+
+
+def _recipe_rows(catalog):
+    """Every curated row carrying a `preprocess:` block, keyed by asset id."""
+    return {
+        asset: row
+        for asset, row in catalog.datasets.items()
+        if row.preprocess is not None
+    }
+
+
+def _missing_quality_bands(row):
+    """Name the bands the row's recipe mask reads but the row does not declare."""
+    recipe = row.preprocess
+    required = (
+        frozenset()
+        if recipe is None or recipe.mask is None
+        else _MASK_REQUIRED_BANDS[recipe.mask]
+    )
+    return sorted(required - set(row.bands))
+
+
+class TestRecipeInvariants:
+    """M5: the docstring's promises about curated recipes, locked by tests."""
+
+    def test_the_required_band_map_covers_every_recipe_name(self):
+        """Neither map can gain a recipe name without the other."""
+        assert set(_MASK_REQUIRED_BANDS) == set(_MASK_RECIPES)
+
+    def test_every_recipe_row_declares_its_masks_quality_band(self, catalog):
+        """A recipe's mask reads a band the row must carry, or EE fails live."""
+        offenders = {
+            asset: _missing_quality_bands(row)
+            for asset, row in _recipe_rows(catalog).items()
+            if _missing_quality_bands(row)
+        }
+        assert offenders == {}
+
+    def test_a_mis_curated_recipe_is_caught(self):
+        """The check bites: a row without `SCL` is reported, not passed over."""
+        row = Dataset(
+            id="X/Y",
+            title="no SCL here",
+            extent=Extent(start_date="2020-01-01"),
+            bands={"B4": Band(id="B4")},
+            preprocess=Preprocess(mask="sentinel2_scl"),
+        )
+        assert _missing_quality_bands(row) == ["SCL"]
+
+    def test_every_scaling_recipe_resolves_to_at_least_one_factor(self, catalog):
+        """`scale: true` must not degrade to a warning-only identity scaler."""
+        empty = [
+            asset
+            for asset, row in _recipe_rows(catalog).items()
+            if row.preprocess.scale and not BandScaler.for_dataset(row).factors
+        ]
+        assert empty == []
+
+    def test_a_scaling_recipe_on_a_factorless_row_is_caught(self):
+        """The factor check bites too: no `scale`/`offset` means no factors."""
+        row = Dataset(
+            id="X/Y",
+            title="no factors here",
+            extent=Extent(start_date="2020-01-01"),
+            bands={"B4": Band(id="B4")},
+            preprocess=Preprocess(scale=True),
+        )
+        assert BandScaler.for_dataset(row).factors == ()
+
+    def test_no_quality_band_declares_a_scale_or_offset(self, catalog):
+        """Scaling a quality band would corrupt the very flags a mask reads."""
+        corrupted = [
+            f"{asset}:{band}"
+            for asset, row in _recipe_rows(catalog).items()
+            for band in _MASK_REQUIRED_BANDS.get(row.preprocess.mask or "", frozenset())
+            if band in row.bands
+            and (
+                row.bands[band].scale is not None or row.bands[band].offset is not None
+            )
+        ]
+        assert corrupted == []
