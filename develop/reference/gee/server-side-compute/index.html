@@ -3544,6 +3544,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#tagging-traffic-for-billing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tagging traffic for billing
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -24251,6 +24262,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#tagging-traffic-for-billing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tagging traffic for billing
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -24936,6 +24958,20 @@ Engine spells it. A join is inherently a two-collection operation, so these are 
 (<code>CloudScorePlus</code> deliberately stays on <code>linkCollection</code>, a per-image <code>system:index</code> link that needs no
 join plumbing.) Joins are server-side compute: a pipeline using one runs on an Earth Engine engine, never
 the EEDAI reader.</p>
+<h3 id="tagging-traffic-for-billing"><a class="toclink" href="#tagging-traffic-for-billing">Tagging traffic for billing</a><a class="headerlink" href="#tagging-traffic-for-billing" title="Permanent link">#</a></h3>
+<p>Earth Engine attaches a <em>workload tag</em> to every request it serves, and Cloud billing breaks cost out by it.
+<code>WorkloadTag</code> is the earthlens scope for one — <code>GEE.workload_tag</code> is the backend convenience that returns it:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">with</span> <span class="n">gee</span><span class="o">.</span><span class="n">workload_tag</span><span class="p">(</span><span class="s2">&quot;drought-monitor-2024&quot;</span><span class="p">):</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="n">gee</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>   <span class="c1"># every EE-served request in here carries the tag</span>
+</code></pre></div>
+<p>The tag is validated at construction (1-63 characters, alphanumeric at start and end, <code>-</code> <code>_</code> <code>.</code> allowed
+between), so a typo raises immediately rather than mid-download. Unlike the SDK's own
+<code>ee.data.workloadTagContext</code> — whose exit calls <code>resetWorkloadTag()</code> and so resets to the <em>default</em> tag —
+<code>WorkloadTag</code> saves the tag it found on entry and restores exactly that on exit, exception or not, which is
+what makes nesting work: an inner scope hands back to the enclosing tag instead of wiping it.</p>
+<p>The tag covers the Earth Engine-served calls (<code>getDownloadURL</code>, <code>computePixels</code>, <code>ee.batch</code> exports) — which
+is where billing accrues. The EEDAI reader fetches stored pixels through GDAL, not <code>ee</code>, so an
+<code>engine="eedai"</code> read is never attributed; tagging an EEDAI-only run buys nothing.</p>
 <h2 id="choosing-an-engine-in-practice"><a class="toclink" href="#choosing-an-engine-in-practice">Choosing an engine, in practice</a><a class="headerlink" href="#choosing-an-engine-in-practice" title="Permanent link">#</a></h2>
 <table>
 <thead>
