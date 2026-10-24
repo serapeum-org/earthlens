@@ -328,10 +328,12 @@ class TestListRecentTasks:
         fake_list(
             [
                 _op(task_type="EXPORT_IMAGE", task_id="I1"),
-                _op(task_type="EXPORT_TABLE", task_id="T1"),
+                # Tables carry the EXPORT_FEATURES wire value, not the
+                # ee.batch.Task.Type.EXPORT_TABLE enum *name*.
+                _op(task_type="EXPORT_FEATURES", task_id="T1"),
             ]
         )
-        ids = [t.id for t in list_recent_tasks(task_type="EXPORT_TABLE")]
+        ids = [t.id for t in list_recent_tasks(task_type="EXPORT_FEATURES")]
         assert ids == ["T1"]
 
     def test_description_prefix_filter(self, fake_list):

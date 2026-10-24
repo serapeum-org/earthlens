@@ -74,6 +74,9 @@ _EXPECTED_EXPORTS = {
     "REDUCERS",
     "resolve_reducer",
     "temporal_reducer_for",
+    # Epic 6 Task 6.2 - the named-algorithm composites, passed as instances.
+    "LandsatComposite",
+    "Sentinel2Composite",
     # Epic 4 Task 4.7 - the cadence bucketer.
     "CadenceBucketer",
     # Epic 4 Task 4.3 - the composite engine and its bucket value object.
@@ -88,6 +91,13 @@ _EXPECTED_EXPORTS = {
     "Climatology",
     "ClosestImage",
     "GapFill",
+    # Epic 6 Task 6.6 - the composable ee.Join wrappers.
+    "Join",
+    "InnerJoin",
+    "SaveAllJoin",
+    "SaveBestJoin",
+    "SaveFirstJoin",
+    "SimpleJoin",
     # Epic 1 Task 1.6 - the promoted routing verdict.
     "EnginePlan",
     "EedaiPlan",
@@ -112,6 +122,8 @@ _EXPECTED_EXPORTS = {
     "TableSink",
     "SINKS",
     "resolve_sink",
+    # Epic 6 Task 6.7 - the frames-collection video export.
+    "VideoSink",
     # Epic 1 Task 1.5 - the EEDAI reader adapter.
     "EedaiReader",
     # Epic 4 Task 4.8 - the validated property-filter value object.
@@ -131,11 +143,15 @@ _EXPECTED_EXPORTS = {
     "AuthenticationError",
     "CloudMask",
     "CollectionFilter",
+    # Epic 6 Task 6.13 - the one-call analysis-ready recipe, plus the catalog
+    # model its `preprocess:` block is validated against.
+    "preprocess",
     "Catalog",
     "Dataset",
     "Band",
     "Cadence",
     "Extent",
+    "Preprocess",
     "Provider",
     "CATALOG_PATH",
     "PROVIDERS_PATH",
@@ -169,6 +185,14 @@ _EXPECTED_EXPORTS = {
     "cancel_task",
     "wait_for_task_id",
     "resolve_destination",
+    # Epic 6 Task 6.9 - the nest-safe workload-tag billing scope.
+    "WorkloadTag",
+    # Epic 6 Task 6.10 - the asset-lifecycle control plane and its rows.
+    "AssetManager",
+    "AssetInfo",
+    # Epic 6 Task 6.11 - the sklearn <-> ee.Classifier tree-string bridge.
+    "ClassifierCodec",
+    "TreeEnsemble",
 }
 
 
