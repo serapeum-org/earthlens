@@ -282,6 +282,40 @@ def _majority(votes: Any) -> float:
     return float(values[int(np.argmax(counts))])
 
 
+def _numeric_labels(estimator: Any) -> np.ndarray:
+    """Return a fitted classifier's `classes_`, refusing non-numeric labels.
+
+    The tree format is space-delimited and carries each leaf's class as a
+    bare number, so a string-labelled classifier — the normal shape for
+    land-cover work — cannot be encoded. Checked here rather than left to
+    the walk, where it surfaced as `invalid literal for int() with base 10`
+    with nothing naming the label dtype as the cause. Booleans pass: they
+    encode as `0` / `1` without loss.
+
+    Args:
+        estimator: The fitted classifier whose `classes_` to read.
+
+    Returns:
+        The class labels as an array.
+
+    Raises:
+        ValueError: If the labels are neither numeric nor boolean.
+    """
+    labels = np.asarray(estimator.classes_)
+    usable = np.issubdtype(labels.dtype, np.number) or np.issubdtype(
+        labels.dtype, np.bool_
+    )
+    if not usable:
+        raise ValueError(
+            "Earth Engine's tree format carries numeric class labels, but "
+            f"{type(estimator).__name__} was fitted on {labels.dtype} labels "
+            f"({list(labels)[:4]}...); encode your classes as integers first "
+            "(e.g. sklearn.preprocessing.LabelEncoder) and map the codes back "
+            "after classifying"
+        )
+    return labels
+
+
 def _tree_strings_of(value: Any) -> tuple[str, ...]:
     """Pull client-side tree strings out of what `to_ee` built.
 
@@ -568,8 +602,11 @@ class ClassifierCodec(BaseModel):
         Raises:
             ImportError: If scikit-learn is not installed (it ships on the
                 `[gee]` extra).
-            ValueError: If the estimator is not a fitted tree classifier, or
-                its feature count does not match `feature_names`.
+            ValueError: If the estimator is not a fitted tree classifier, its
+                feature count does not match `feature_names`, or its
+                `classes_` are not numeric — the tree format carries class
+                labels as bare numbers, so encode string classes as integers
+                first (e.g. `sklearn.preprocessing.LabelEncoder`).
         """
         tree_mod = import_tree()
         strings = self._rf_to_strings(estimator)
@@ -628,8 +665,10 @@ class ClassifierCodec(BaseModel):
         Raises:
             ImportError: If scikit-learn is not installed.
             ValueError: If the estimator is not a fitted classifier, an
-                ensemble member is not a decision-tree classifier, or the
-                fitted feature count does not match `feature_names`.
+                ensemble member is not a decision-tree classifier, the fitted
+                feature count does not match `feature_names`, or its
+                `classes_` are not numeric (the format carries class labels as
+                bare numbers).
         """
         tree_mod = import_tree()
         if not hasattr(estimator, "classes_"):
@@ -668,7 +707,7 @@ class ClassifierCodec(BaseModel):
                 f"codec names {len(self.feature_names)} ({self.feature_names}); "
                 "the bands would not line up"
             )
-        labels = np.asarray(estimator.classes_)
+        labels = _numeric_labels(estimator)
         return tuple(
             _tree_to_string(member.tree_, self.feature_names, labels)
             for member in members

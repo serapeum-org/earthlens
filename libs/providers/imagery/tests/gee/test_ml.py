@@ -164,6 +164,41 @@ class TestTreeStrings:
                 RandomForestClassifier()
             )
 
+    def test_a_string_labelled_forest_is_refused(self):
+        """Land-cover names cannot ride the space-delimited numeric format."""
+        rng = np.random.default_rng(0)
+        x = rng.uniform(0, 1, size=(60, 2))
+        y = np.where(x[:, 0] > 0.5, "water", "land")
+        model = RandomForestClassifier(n_estimators=2, max_depth=3, random_state=0).fit(
+            x, y
+        )
+        with pytest.raises(ValueError, match="numeric class labels"):
+            ClassifierCodec(feature_names=("B4", "B8"))._rf_to_strings(model)
+
+    def test_the_refusal_names_the_remedy(self):
+        """The message points at integer encoding rather than the int() error."""
+        model = DecisionTreeClassifier(random_state=0).fit(
+            [[0.0], [1.0]], ["land", "water"]
+        )
+        with pytest.raises(ValueError, match="LabelEncoder"):
+            ClassifierCodec(feature_names=("B4",))._rf_to_strings(model)
+
+    def test_boolean_labels_are_accepted(self):
+        """A two-class boolean target encodes as 0 / 1."""
+        model = DecisionTreeClassifier(random_state=0).fit(
+            [[0.0], [1.0]], [False, True]
+        )
+        (string,) = ClassifierCodec(feature_names=("B4",))._rf_to_strings(model)
+        branches = ml_module._parse_tree(string)
+        assert (branches[2].value, branches[3].value) == (0.0, 1.0)
+
+    def test_integral_float_labels_are_accepted(self):
+        """Float labels that are whole numbers encode without loss."""
+        model = DecisionTreeClassifier(random_state=0).fit([[0.0], [1.0]], [7.0, 9.0])
+        (string,) = ClassifierCodec(feature_names=("B4",))._rf_to_strings(model)
+        branches = ml_module._parse_tree(string)
+        assert (branches[2].value, branches[3].value) == (7.0, 9.0)
+
     def test_a_feature_count_mismatch_is_refused(self):
         """The codec's names must line up with the fitted feature count."""
         x, y = _separable_training()
