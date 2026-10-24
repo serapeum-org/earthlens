@@ -68,8 +68,10 @@ class TestImageMask:
 
     def test_base_call_is_abstract(self):
         """Calling the base class directly raises `NotImplementedError`."""
+        base = ImageMask()
+        image = _FakeImage()
         with pytest.raises(NotImplementedError, match="ImageMask"):
-            ImageMask()(_FakeImage())
+            base(image)
 
     def test_is_frozen(self):
         """A constructed mask is immutable."""
@@ -88,8 +90,14 @@ class TestImageMask:
 
     def test_equality_is_by_value(self):
         """Two masks with the same config compare equal."""
-        assert LandsatSrMask(sensor="LS8") == LandsatSrMask(sensor="LS8")
-        assert LandsatSrMask(sensor="LS8") != LandsatSrMask(sensor="LS9")
+        # Bound to locals so the comparison reads as two distinct instances,
+        # which is the point: a frozen pydantic model compares by value.
+        first = LandsatSrMask(sensor="LS8")
+        same = LandsatSrMask(sensor="LS8")
+        other = LandsatSrMask(sensor="LS9")
+        assert first is not same
+        assert first == same
+        assert first != other
 
 
 class TestLandsatSrMask:
@@ -136,8 +144,9 @@ class TestLandsatSrMask:
 
     def test_wrapper_preserves_the_value_error(self):
         """`landsat_sr` still raises `ValueError` naming the valid sensors."""
+        image = _FakeImage()
         with pytest.raises(ValueError, match="sensor must be one of"):
-            landsat_sr(_FakeImage(), sensor="S2")
+            landsat_sr(image, sensor="S2")
 
 
 class TestSentinel2SclMask:

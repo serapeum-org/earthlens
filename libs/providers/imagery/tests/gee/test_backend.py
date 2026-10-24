@@ -670,13 +670,15 @@ class TestReducerInstanceWidening:
 
     def test_a_region_only_instance_is_refused(self, make_gee):
         """A region-only reducer instance fails fast at construction."""
+        reducer = First()
         with pytest.raises(ValueError, match="region"):
-            self._chirps(make_gee, reducer=First())
+            self._chirps(make_gee, reducer=reducer)
 
     def test_a_zero_percentile_instance_is_refused(self, make_gee):
         """`Percentile(q=0)` is a region minimum, not a temporal reducer."""
+        reducer = Percentile(q=0)
         with pytest.raises(ValueError, match="0 < q <= 100"):
-            self._chirps(make_gee, reducer=Percentile(q=0))
+            self._chirps(make_gee, reducer=reducer)
 
     def test_the_composite_engine_runs_the_named_algorithm(self, make_gee, monkeypatch):
         """`reducer=LandsatComposite()` reaches `simpleComposite` per bucket."""
@@ -735,17 +737,15 @@ class TestCdiNeedsTheToaProduct:
     )
     def test_the_mask_is_refused_on_a_surface_reflectance_row(self, make_gee, asset):
         """`cloud_mask=Sentinel2Cdi()` on L2A raises instead of masking wrongly."""
+        mask = Sentinel2Cdi()
         with pytest.raises(ValueError, match="only valid on the Sentinel-2 TOA"):
-            self._s2(make_gee, asset, cloud_mask=Sentinel2Cdi())
+            self._s2(make_gee, asset, cloud_mask=mask)
 
     def test_the_composite_is_refused_on_a_surface_reflectance_row(self, make_gee):
         """`reducer=Sentinel2Composite()` maps the CDI mask, so it is refused too."""
+        reducer = Sentinel2Composite()
         with pytest.raises(ValueError, match="sentinel2_composite"):
-            self._s2(
-                make_gee,
-                "COPERNICUS/S2_SR_HARMONIZED",
-                reducer=Sentinel2Composite(),
-            )
+            self._s2(make_gee, "COPERNICUS/S2_SR_HARMONIZED", reducer=reducer)
 
     def test_a_chained_cdi_mask_is_found(self, make_gee):
         """The walk reaches a CDI op nested inside a mask chain."""
@@ -4576,8 +4576,9 @@ class TestWorkloadTagMethod:
         """Validation happens here, not mid-download inside the SDK."""
         from pydantic import ValidationError
 
+        gee = make_gee()
         with pytest.raises(ValidationError, match="1-63 characters"):
-            make_gee().workload_tag("-bad-")
+            gee.workload_tag("-bad-")
 
 
 @pytest.fixture
@@ -4924,12 +4925,9 @@ class TestCdiThroughThePreprocessFlag:
 
     def test_the_explicit_route_is_still_refused(self, make_gee):
         """The pre-catalog check on `cloud_mask=` is unchanged."""
+        mask = Sentinel2Cdi()
         with pytest.raises(ValueError, match="only valid on the Sentinel-2 TOA"):
-            self._gee(
-                make_gee,
-                "COPERNICUS/S2_SR_HARMONIZED",
-                cloud_mask=Sentinel2Cdi(),
-            )
+            self._gee(make_gee, "COPERNICUS/S2_SR_HARMONIZED", cloud_mask=mask)
 
     def test_no_shipped_row_names_a_cdi_recipe_on_a_forbidden_asset(self):
         """Belt and braces: the data must not need the guard in the first place."""

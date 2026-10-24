@@ -156,9 +156,9 @@ class TestWorkloadTagScope:
     def test_an_exception_still_restores(self, fake_data):
         """The saved tag comes back even when the body raises."""
         fake_data.tag = "pre-existing"
-        with pytest.raises(RuntimeError, match="boom"):
-            with WorkloadTag(tag="run-42"):
-                raise RuntimeError("boom")
+        scope = WorkloadTag(tag="run-42")
+        with pytest.raises(RuntimeError, match="boom"), scope:
+            raise RuntimeError("boom")
         assert fake_data.tag == "pre-existing"
 
     def test_the_exception_is_not_swallowed(self, fake_data):
@@ -193,8 +193,9 @@ class TestWorkloadTagScope:
     def test_an_unbalanced_exit_leaves_the_tag_alone(self, fake_data):
         """The refusal happens before any `setWorkloadTag`, so state is intact."""
         fake_data.tag = "pre-existing"
+        scope = WorkloadTag(tag="run-42")
         with pytest.raises(RuntimeError):
-            WorkloadTag(tag="run-42").__exit__(None, None, None)
+            scope.__exit__(None, None, None)
         assert fake_data.tag == "pre-existing"
         assert fake_data.calls == []
 

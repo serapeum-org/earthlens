@@ -70,8 +70,9 @@ class TestBase:
 
     def test_the_base_refuses_to_apply(self):
         """The base class names the contract; applying it raises."""
+        base = Join()
         with pytest.raises(NotImplementedError, match="_join"):
-            Join().apply("primary", "secondary", "condition")
+            base.apply("primary", "secondary", "condition")
 
     def test_it_is_frozen(self):
         """A wrapper's configuration cannot drift after construction."""

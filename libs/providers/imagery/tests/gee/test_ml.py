@@ -142,8 +142,10 @@ class TestTreeStrings:
         model = DecisionTreeClassifier(random_state=0).fit([[0.0], [1.0]], [7, 9])
         (string,) = ClassifierCodec(feature_names=("B4",))._rf_to_strings(model)
         branches = ml_module._parse_tree(string)
-        assert branches[2].value == 7.0 and branches[2].is_leaf
-        assert branches[3].value == 9.0 and branches[3].is_leaf
+        assert branches[2].value == 7.0
+        assert branches[2].is_leaf
+        assert branches[3].value == 9.0
+        assert branches[3].is_leaf
         assert branches[2].threshold == pytest.approx(0.5)
 
     def test_every_forest_member_parses(self):
@@ -159,21 +161,23 @@ class TestTreeStrings:
     def test_a_single_leaf_tree_is_refused(self):
         """A stump with no split encodes no decision rule."""
         model = DecisionTreeClassifier(random_state=0).fit([[0.0], [1.0]], [1, 1])
+        codec = ClassifierCodec(feature_names=("B4",))
         with pytest.raises(ValueError, match="single-leaf"):
-            ClassifierCodec(feature_names=("B4",))._rf_to_strings(model)
+            codec._rf_to_strings(model)
 
     def test_a_regressor_is_refused(self):
         """Only classifiers translate; regression output mode is out of scope."""
         model = DecisionTreeRegressor(random_state=0).fit([[0.0], [1.0]], [0.1, 0.9])
+        codec = ClassifierCodec(feature_names=("B4",))
         with pytest.raises(ValueError, match="classifier"):
-            ClassifierCodec(feature_names=("B4",))._rf_to_strings(model)
+            codec._rf_to_strings(model)
 
     def test_an_unfitted_estimator_is_refused(self):
         """An unfitted forest has no trees to encode."""
+        codec = ClassifierCodec(feature_names=("B4",))
+        unfitted = RandomForestClassifier()
         with pytest.raises(ValueError, match="classifier"):
-            ClassifierCodec(feature_names=("B4",))._rf_to_strings(
-                RandomForestClassifier()
-            )
+            codec._rf_to_strings(unfitted)
 
     def test_a_string_labelled_forest_is_refused(self):
         """Land-cover names cannot ride the space-delimited numeric format."""
@@ -183,16 +187,18 @@ class TestTreeStrings:
         model = RandomForestClassifier(n_estimators=2, max_depth=3, random_state=0).fit(
             x, y
         )
+        codec = ClassifierCodec(feature_names=("B4", "B8"))
         with pytest.raises(ValueError, match="numeric class labels"):
-            ClassifierCodec(feature_names=("B4", "B8"))._rf_to_strings(model)
+            codec._rf_to_strings(model)
 
     def test_the_refusal_names_the_remedy(self):
         """The message points at integer encoding rather than the int() error."""
         model = DecisionTreeClassifier(random_state=0).fit(
             [[0.0], [1.0]], ["land", "water"]
         )
+        codec = ClassifierCodec(feature_names=("B4",))
         with pytest.raises(ValueError, match="LabelEncoder"):
-            ClassifierCodec(feature_names=("B4",))._rf_to_strings(model)
+            codec._rf_to_strings(model)
 
     def test_boolean_labels_are_accepted(self):
         """A two-class boolean target encodes as 0 / 1."""
@@ -214,14 +220,16 @@ class TestTreeStrings:
         """The codec's names must line up with the fitted feature count."""
         x, y = _separable_training()
         model = RandomForestClassifier(n_estimators=2, random_state=0).fit(x, y)
+        codec = ClassifierCodec(feature_names=("B4",))
         with pytest.raises(ValueError, match="would not line up"):
-            ClassifierCodec(feature_names=("B4",))._rf_to_strings(model)
+            codec._rf_to_strings(model)
 
     def test_an_ensemble_without_members_is_refused(self):
         """A classifier whose estimators_ is empty has nothing to encode."""
         forest = SimpleNamespace(classes_=np.array([0, 1]), estimators_=[])
+        codec = ClassifierCodec(feature_names=("B4",))
         with pytest.raises(ValueError, match="no fitted trees"):
-            ClassifierCodec(feature_names=("B4",))._rf_to_strings(forest)
+            codec._rf_to_strings(forest)
 
     def test_a_foreign_ensemble_member_is_refused(self):
         """An ensemble of non-classification trees is named and rejected."""
@@ -230,8 +238,9 @@ class TestTreeStrings:
             estimators_=[DecisionTreeRegressor()],
             n_features_in_=1,
         )
+        codec = ClassifierCodec(feature_names=("B4",))
         with pytest.raises(ValueError, match="member type"):
-            ClassifierCodec(feature_names=("B4",))._rf_to_strings(forest)
+            codec._rf_to_strings(forest)
 
 
 class TestToEe:
@@ -244,7 +253,8 @@ class TestToEe:
         ClassifierCodec(feature_names=("B4", "B8")).to_ee(model)
         name, strings = fake_classifier.calls[0]
         assert name == "decisionTreeEnsemble"
-        assert isinstance(strings, list) and len(strings) == 3
+        assert isinstance(strings, list)
+        assert len(strings) == 3
         assert all(s.startswith("1) root ") for s in strings)
 
     def test_a_single_tree_becomes_a_decision_tree(self, fake_classifier):
@@ -326,8 +336,9 @@ class TestFromEe:
     def test_an_args_object_without_trees_is_refused(self):
         """A computed object whose args carry no tree strings is named."""
         codec = ClassifierCodec(feature_names=("B4",))
+        treeless = SimpleNamespace(args={"numberOfTrees": 3})
         with pytest.raises(TypeError, match="tree strings"):
-            codec.from_ee(SimpleNamespace(args={"numberOfTrees": 3}))
+            codec.from_ee(treeless)
 
     def test_a_malformed_line_is_refused(self):
         """An unparseable line raises instead of silently dropping nodes."""
@@ -432,8 +443,9 @@ class TestClassifyBridge:
             labels=np.array([7, 9]),
             bands=(2, 5),
         )
+        step = Classify(training=training)
         with pytest.raises(ValueError, match=r"\[5\]"):
-            ClassifierCodec.for_classify(Classify(training=training), {2: "B4"})
+            ClassifierCodec.for_classify(step, {2: "B4"})
 
     def test_a_classify_trained_forest_exports(self, fake_classifier):
         """End to end: Classify -> estimator -> to_ee -> ensemble strings."""
@@ -443,7 +455,8 @@ class TestClassifyBridge:
         codec = ClassifierCodec.for_classify(operation, {0: "B4", 1: "B8"})
         codec.to_ee(operation.estimator)
         name, strings = fake_classifier.calls[0]
-        assert name == "decisionTreeEnsemble" and len(strings) == 2
+        assert name == "decisionTreeEnsemble"
+        assert len(strings) == 2
 
 
 class TestSklearnSeam:

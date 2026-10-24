@@ -147,8 +147,9 @@ class TestPreprocessComposition:
 
     def test_a_dataset_with_no_recipe_raises(self):
         """`preprocess` reports rather than silently returning an identity."""
+        catalog = _FakeCatalog(_row(None))
         with pytest.raises(ValueError, match="no curated preprocessing recipe"):
-            preprocess("X/Y", catalog=_FakeCatalog(_row(None)))
+            preprocess("X/Y", catalog=catalog)
 
     def test_the_note_is_logged(self, notes_buffer):
         """The recipe's note reaches the user instead of sitting in the YAML."""

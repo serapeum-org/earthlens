@@ -61,7 +61,7 @@ class _FakeS2Image:
         return _FakeLinkedImage(self)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def fake_ee(monkeypatch):
     """Replace the module's `ee.ImageCollection` with a recording stand-in."""
     fake = SimpleNamespace(ImageCollection=lambda asset_id: ("ic", asset_id))

@@ -148,13 +148,15 @@ class TestLandsatComposite:
 
     def test_reduce_stack_has_no_client_side_form(self):
         """The named algorithm exists only server-side."""
+        composite = LandsatComposite()
         with pytest.raises(ValueError, match="named algorithm"):
-            LandsatComposite().reduce_stack("stack", ["2020-01-01"])
+            composite.reduce_stack("stack", ["2020-01-01"])
 
     def test_cannot_reduce_a_region(self):
         """There is no `ee.Reducer` equivalent to sample with."""
+        composite = LandsatComposite()
         with pytest.raises(ValueError, match="region"):
-            LandsatComposite().as_ee_reducer()
+            composite.as_ee_reducer()
 
     def test_not_in_the_registry(self):
         """The composites resolve as instances, never by registry name."""
@@ -294,13 +296,15 @@ class TestSentinel2Composite:
 
     def test_reduce_stack_has_no_client_side_form(self):
         """The CDI algorithm exists only server-side."""
+        composite = Sentinel2Composite()
         with pytest.raises(ValueError, match="named algorithm"):
-            Sentinel2Composite().reduce_stack("stack", ["2020-01-01"])
+            composite.reduce_stack("stack", ["2020-01-01"])
 
     def test_cannot_reduce_a_region(self):
         """There is no `ee.Reducer` equivalent to sample with."""
+        composite = Sentinel2Composite()
         with pytest.raises(ValueError, match="region"):
-            Sentinel2Composite().as_ee_reducer()
+            composite.as_ee_reducer()
 
     def test_instance_passes_the_temporal_resolver(self):
         """`temporal_reducer_for` returns the instance unchanged."""
@@ -321,5 +325,6 @@ class TestNamedCompositesStayOffTheClientPath:
     )
     def test_reduce_stack_refusal_names_the_remedy(self, composite):
         """The refusal points at Earth Engine rather than approximating."""
+        stack = np.empty(0)
         with pytest.raises(ValueError, match="engine='ee'"):
-            composite.reduce_stack(np.empty(0), [])
+            composite.reduce_stack(stack, [])

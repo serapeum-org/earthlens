@@ -43,7 +43,7 @@ class _FakeCollection:
         return self._chain("filter", filt)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def fake_ee(monkeypatch):
     """Replace the module's `ee.Filter` with recording stand-ins."""
     fake = SimpleNamespace(
@@ -61,8 +61,10 @@ class TestCollectionFilterBase:
 
     def test_base_call_is_abstract(self):
         """Calling the base class directly raises `NotImplementedError`."""
+        base = CollectionFilter()
+        collection = _FakeCollection()
         with pytest.raises(NotImplementedError, match="CollectionFilter"):
-            CollectionFilter()(_FakeCollection())
+            base(collection)
 
     def test_is_frozen(self):
         """A constructed filter is immutable."""
@@ -81,8 +83,14 @@ class TestCollectionFilterBase:
 
     def test_equality_is_by_value(self):
         """Two filters with the same config compare equal."""
-        assert ByYear(year=2020) == ByYear(year=2020)
-        assert ByYear(year=2020) != ByYear(year=2021)
+        # Bound to locals so the comparison reads as two distinct instances,
+        # which is the point: a frozen pydantic model compares by value.
+        first = ByYear(year=2020)
+        same = ByYear(year=2020)
+        other = ByYear(year=2021)
+        assert first is not same
+        assert first == same
+        assert first != other
 
 
 class TestByYear:
@@ -165,8 +173,9 @@ class TestByCloudCoverLte:
 
     def test_wrapper_preserves_the_value_error(self, fake_ee):
         """`by_cloud_cover_lte` still raises `ValueError` for a bad percentage."""
+        collection = _FakeCollection()
         with pytest.raises(ValueError, match=r"max_pct must be in \[0, 100\]"):
-            by_cloud_cover_lte(_FakeCollection(), 150)
+            by_cloud_cover_lte(collection, 150)
 
     def test_wrapper_delegates_to_the_class(self, fake_ee):
         """`by_cloud_cover_lte` records the same call graph as a class instance."""
