@@ -31,9 +31,11 @@ unset one and slips past the refusal it was meant to trip.
 `effective_file_format` answers the format Earth Engine will use, so nothing
 is lost by the `None`. `overwrite` and
 `append` stay mutually exclusive, which is BigQuery's own rule. The BigQuery
-`table` is checked for *shape* as well as presence, mirroring the SDK's own
-`project.dataset.table` rule (`_BIGQUERY_TABLE_RE`), so that mistake lands
-here rather than as an `EEException` from `write()`. Whatever the destination,
+`table` is checked for *shape* as well as presence against the
+`project.dataset.table` rule (`_BIGQUERY_TABLE_RE`, which is deliberately a
+little stricter than the SDK's own regex — see its comment), so that mistake
+lands here rather than as an `EEException` from `write()`. Whatever the
+destination,
 the queued task's wire type — what
 `TaskInfo.task_type` carries — is `EXPORT_FEATURES`: BigQuery and FeatureView
 create the same `ee.batch.Task.Type.EXPORT_TABLE` tasks the file targets do.
@@ -88,11 +90,22 @@ _OVERWRITE_DESTINATIONS: frozenset[str] = frozenset({"bigquery", "asset"})
 #: alone: no other `Export.table.to*` has the parameter.
 _APPEND_DESTINATIONS: frozenset[str] = frozenset({"bigquery"})
 
-#: Earth Engine's own shape check for a BigQuery destination, mirrored so the
-#: mistake lands at construction instead of as an `EEException` from
-#: `ee.batch.Export.table.toBigQuery` at `write()` time. Verified against
-#: earthengine-api's `re.fullmatch(r'.+\..+\..+', table)`.
-_BIGQUERY_TABLE_RE = re.compile(r".+\..+\..+")
+#: The shape check for a BigQuery destination, so the mistake lands at
+#: construction instead of as an `EEException` from
+#: `ee.batch.Export.table.toBigQuery` at `write()` time.
+#:
+#: **Deliberately at least as strict as the SDK's own check, not identical
+#: to it.** earthengine-api uses `re.fullmatch(r'.+\..+\..+', table)`, whose
+#: `.+` runs are ambiguous across the dots and backtrack super-linearly.
+#: Spelling each segment as "one or more non-dot, non-newline characters"
+#: removes the ambiguity, and the result accepts a strict subset: compared
+#: exhaustively over every string of length 1-6 from `a . \n \r space -`,
+#: nothing is accepted here that the SDK rejects, and the 918 strings the
+#: SDK accepts and this does not **all carry four or more dotted
+#: components**. Refusing those is right for BigQuery, where an identifier
+#: cannot contain a dot, so `project.dataset.table.extra` is not a table
+#: name the SDK could have meant.
+_BIGQUERY_TABLE_RE = re.compile(r"[^.\n]+\.[^.\n]+\.[^.\n]+")
 
 
 class TableSink(BaseModel):

@@ -216,20 +216,45 @@ class TestTableSinkValidation:
         with pytest.raises(ValidationError, match="project.dataset.table"):
             TableSink(destination="bigquery", table=table)
 
-    def test_the_bigquery_shape_matches_the_sdk(self):
-        """The accepted/refused split is the SDK's regex, not a guess."""
+    @pytest.mark.parametrize("table", ["p.d.t.extra", "a.b.c.d", "p.d.t.", "p.d.t.e.f"])
+    def test_a_fourth_dotted_component_is_refused(self, table):
+        """A BigQuery identifier holds no dot, so a fourth part is not a name."""
+        with pytest.raises(ValidationError, match="project.dataset.table"):
+            TableSink(destination="bigquery", table=table)
+
+    def test_the_bigquery_shape_is_at_least_as_strict_as_the_sdk(self):
+        """Nothing is accepted here that the SDK's own regex would reject.
+
+        Compared exhaustively over the strings the two patterns can disagree
+        on, so the "at least as strict" claim is measured rather than stated.
+        """
+        import itertools
         import re
 
-        import ee.batch  # noqa: F401 - the SDK whose rule is mirrored
+        import ee.batch  # noqa: F401 - the SDK whose rule is the baseline
 
         sdk = re.compile(r".+\..+\..+")
-        for table in ("p.d.t", "proj-1.data_set.tbl"):
-            assert sdk.fullmatch(table) is not None
+        looser = []
+        stricter = []
+        for length in range(1, 7):
+            for combination in itertools.product("a.\n\r -", repeat=length):
+                sample = "".join(combination)
+                by_sdk = sdk.fullmatch(sample) is not None
+                by_sink = (
+                    table_sink_module._BIGQUERY_TABLE_RE.fullmatch(sample) is not None
+                )
+                if by_sink and not by_sdk:
+                    looser.append(sample)
+                elif by_sdk and not by_sink:
+                    stricter.append(sample)
+        assert looser == []
+        assert stricter, "the two patterns must differ, or this proves nothing"
+        assert all(sample.count(".") >= 3 for sample in stricter)
+
+    def test_the_valid_shapes_still_construct(self):
+        """The fully qualified forms the SDK accepts are accepted here too."""
+        for table in ("p.d.t", "proj-1.data_set.tbl", "my-project.my_set.my_table"):
             assert TableSink(destination="bigquery", table=table).table == table
-        for table in ("nodots", "p.d"):
-            assert sdk.fullmatch(table) is None
-            with pytest.raises(ValidationError):
-                TableSink(destination="bigquery", table=table)
 
     def test_drive_needs_no_folder(self):
         """Earth Engine exports to the Drive root when no folder is given."""
