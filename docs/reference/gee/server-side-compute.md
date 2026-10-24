@@ -184,8 +184,11 @@ reducer=Sentinel2Composite(threshold=-0.5, reducer="median")
     quietly wrong.
 
     Because the asset id is known at construction, earthlens refuses the pairing itself: a `Sentinel2Cdi`
-    on `cloud_mask=` (directly or inside a `MaskChain`) or a `reducer=Sentinel2Composite()` against
-    `COPERNICUS/S2_SR_HARMONIZED` / `COPERNICUS/S2_SR` raises a `ValueError` from `GEE(...)`. On surface
+    on `cloud_mask=` (directly or inside a `MaskChain`), a `reducer=Sentinel2Composite()`, **or** a
+    `preprocess:` recipe resolving `sentinel2_cdi` under `preprocess=True`, against
+    `COPERNICUS/S2_SR_HARMONIZED` / `COPERNICUS/S2_SR`, raises a `ValueError` from `GEE(...)`. The check
+    runs twice — on the arguments before the catalog parse, and again on the ops the flags resolve — so
+    the catalog-driven route is covered by the same refusal, not only the user-driven one. On surface
     reflectance use `Sentinel2SclMask`, `Sentinel2Qa60Mask` or `CloudScorePlus`.
 
 Both are validated at construction like every reducer (`GEE(reducer=...)` resolves instances through the

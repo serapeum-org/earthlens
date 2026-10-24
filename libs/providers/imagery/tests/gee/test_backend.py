@@ -27,7 +27,7 @@ from earthlens.base import SpatialExtent, TemporalExtent
 from earthlens.gee import ExtentDiscovery
 from earthlens.gee import backend as backend_module
 from earthlens.gee.backend import GEE
-from earthlens.gee.catalog import Dataset, Extent
+from earthlens.gee.catalog import Dataset, Extent, Preprocess
 from earthlens.gee.cloud_masks import (
     BandFactor,
     BandScaler,
@@ -4867,3 +4867,78 @@ class TestFlagCompositionOrdering:
             self._op(make_gee, preprocess=True, cloud_mask=SpeckleFilter())
         )
         assert names == ["SpeckleFilter", "Sentinel2SclMask", "BandScaler"]
+
+
+class TestCdiThroughThePreprocessFlag:
+    """L2: the CDI guard must also see what `preprocess=` resolves."""
+
+    def _patch_recipe(self, monkeypatch, asset, recipe):
+        """Give one catalog row a `preprocess:` recipe the shipped YAML lacks."""
+        from earthlens.gee.catalog import Catalog as RealCatalog
+
+        original = RealCatalog.get_dataset
+
+        def _patched(self, dataset_id, *args, **kwargs):
+            row = original(self, dataset_id, *args, **kwargs)
+            return (
+                row.model_copy(update={"preprocess": recipe})
+                if dataset_id == asset
+                else row
+            )
+
+        monkeypatch.setattr(RealCatalog, "get_dataset", _patched)
+
+    def _gee(self, make_gee, asset, **overrides):
+        """A request over one asset, the flag under test applied."""
+        params = dict(
+            variables={asset: ["B4"]},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    @pytest.mark.parametrize("asset", sorted(backend_module._CDI_FORBIDDEN_ASSETS))
+    def test_a_cdi_recipe_on_a_forbidden_row_is_refused(
+        self, make_gee, monkeypatch, asset
+    ):
+        """The catalog-driven route reaches the same refusal as `cloud_mask=`."""
+        self._patch_recipe(
+            monkeypatch, asset, Preprocess(mask="sentinel2_cdi", scale=True)
+        )
+        with pytest.raises(ValueError, match="only valid on the Sentinel-2 TOA"):
+            self._gee(make_gee, asset, preprocess=True)
+
+    def test_a_cdi_recipe_on_the_toa_row_still_constructs(self, make_gee, monkeypatch):
+        """The guard is about the product, not about CDI, so TOA is fine."""
+        asset = "COPERNICUS/S2_HARMONIZED"
+        self._patch_recipe(
+            monkeypatch, asset, Preprocess(mask="sentinel2_cdi", scale=True)
+        )
+        gee = self._gee(make_gee, asset, preprocess=True)
+        op = gee._per_image_op(gee.catalog.get_dataset(asset))
+        assert op.name == "Sentinel2Cdi >> BandScaler"
+
+    def test_the_explicit_route_is_still_refused(self, make_gee):
+        """The pre-catalog check on `cloud_mask=` is unchanged."""
+        with pytest.raises(ValueError, match="only valid on the Sentinel-2 TOA"):
+            self._gee(
+                make_gee,
+                "COPERNICUS/S2_SR_HARMONIZED",
+                cloud_mask=Sentinel2Cdi(),
+            )
+
+    def test_no_shipped_row_names_a_cdi_recipe_on_a_forbidden_asset(self):
+        """Belt and braces: the data must not need the guard in the first place."""
+        from earthlens.gee.catalog import Catalog as RealCatalog
+
+        catalog = RealCatalog()
+        offenders = [
+            asset
+            for asset in backend_module._CDI_FORBIDDEN_ASSETS
+            if asset in catalog.datasets
+            and catalog.datasets[asset].preprocess is not None
+            and catalog.datasets[asset].preprocess.mask == "sentinel2_cdi"
+        ]
+        assert offenders == []

@@ -345,21 +345,25 @@ def _flatten_image_ops(op: Any) -> tuple[Any, ...]:
     return result
 
 
-def _validate_cdi_product(
-    variables: dict[str, list[str]], cloud_mask: Any, reducer: Any
-) -> None:
+def _validate_cdi_product(variables: dict[str, list[str]], *ops: Any) -> None:
     """Refuse a Cloud Displacement Index op aimed at a Level-2A row.
+
+    Called twice: once on the arguments, before the catalog parse, so a
+    user-supplied `cloud_mask=` / `reducer=` mistake reports without paying
+    for it; and once on the ops `scaled=` / `preprocess=` resolved, which can
+    only be known after it. A catalog `preprocess:` recipe naming
+    `sentinel2_cdi` is the route the first call cannot see.
 
     Args:
         variables: The request's asset-id-to-bands mapping.
-        cloud_mask: The per-image hook, possibly a `MaskChain`, or `None`.
-        reducer: The temporal reducer, possibly a named composite, or `None`.
+        *ops: Candidate ops — a per-image hook, a `MaskChain`, a temporal
+            reducer, or `None`. A chain is expanded to its leaves.
 
     Raises:
         ValueError: If a `Sentinel2Cdi` mask or a `Sentinel2Composite` reducer
             is paired with a Sentinel-2 surface-reflectance asset.
     """
-    candidates = (*_flatten_image_ops(cloud_mask), reducer)
+    candidates = tuple(leaf for op in ops for leaf in _flatten_image_ops(op))
     named = tuple(
         getattr(op, "name", type(op).__name__)
         for op in candidates
@@ -1082,10 +1086,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
             `scaled=True` together with `preprocess=True` (the recipe already
             scales, so both would scale twice), for `preprocess=True` against a
             dataset whose catalog row carries no `preprocess:` recipe, for a
-            `Sentinel2Cdi` mask (on its own or inside a chain) or a
-            `Sentinel2Composite` reducer paired with a Sentinel-2
-            surface-reflectance asset, and for a `BandScaler` on `cloud_mask=`
-            that was resolved for an asset `variables` does not ask for; from
+            `Sentinel2Cdi` mask (on its own, inside a chain, or resolved from
+            a `preprocess:` recipe) or a `Sentinel2Composite` reducer paired
+            with a Sentinel-2 surface-reflectance asset, for a `BandScaler` on
+            `cloud_mask=` that was resolved for an asset `variables` does not
+            ask for, and for a `BandScaler` on `cloud_mask=` beside a flag
+            that resolves another one (both would scale the pixels); from
             the parent on
             a bad date range; from `_check_input_dates` on an unknown
             `temporal_resolution`; from `_api` on a missing scale or an
@@ -1335,6 +1341,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         self._server_side_ops: dict[str, ImageMask] = _resolve_server_side_ops(
             variables, self._catalog, scaled=bool(scaled), preprocess=bool(preprocess)
         )
+        # Re-run on the resolved ops: the pre-catalog call above sees only the
+        # arguments, so a `preprocess:` recipe naming `sentinel2_cdi` on a
+        # Level-2A row would otherwise reach the graph unchecked.
+        _validate_cdi_product(variables, *self._server_side_ops.values())
         _validate_scaler_targets(
             variables,
             self._catalog,
