@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -25008,8 +25008,12 @@ the EEDAI reader.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">with</span> <span class="n">gee</span><span class="o">.</span><span class="n">workload_tag</span><span class="p">(</span><span class="s2">&quot;drought-monitor-2024&quot;</span><span class="p">):</span>
 <a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="n">gee</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>   <span class="c1"># every EE-served request in here carries the tag</span>
 </code></pre></div>
-<p>The tag is validated at construction (1-63 characters, alphanumeric at start and end, <code>-</code> <code>_</code> <code>.</code> allowed
-between), so a typo raises immediately rather than mid-download. Unlike the SDK's own
+<p>The tag is validated at construction (1-63 characters, <strong>lowercase</strong> alphanumeric at start and end, <code>-</code> and
+<code>_</code> allowed between), so a typo raises immediately rather than mid-download. That is the rule the SDK's
+validator enforces (<code>ee/_state.py</code>, <code>_WorkloadTag.validate</code>), which is stricter than the one
+<code>ee.data.setWorkloadTag</code>'s own docstring states: the docstring allows mixed case and dots, the validator
+refuses both — <code>setWorkloadTag("A1")</code> and <code>setWorkloadTag("a.b")</code> each raise <code>ValueError</code>. earthlens follows
+the validator, so <code>WorkloadTag(tag="A1")</code> fails at construction instead of on entry. Unlike the SDK's own
 <code>ee.data.workloadTagContext</code> — whose exit calls <code>resetWorkloadTag()</code> and so resets to the <em>default</em> tag —
 <code>WorkloadTag</code> saves the tag it found on entry and restores exactly that on exit, exception or not, which is
 what makes nesting work: an inner scope hands back to the enclosing tag instead of wiping it.</p>
