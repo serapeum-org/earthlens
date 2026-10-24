@@ -116,6 +116,12 @@ class TestVideoSinkConfig:
         """The documented 0.1 and 120 endpoints are both accepted."""
         assert VideoSink(fps=fps).fps == fps
 
+    @pytest.mark.parametrize("dimensions", ["640x480\n", "640x480 ", " 640x480"])
+    def test_a_dimensions_with_trailing_junk_is_refused(self, dimensions):
+        """`$` matches before a trailing newline; the validator must not."""
+        with pytest.raises(ValidationError, match="WIDTHxHEIGHT"):
+            VideoSink(dimensions=dimensions)
+
     @pytest.mark.parametrize("dimensions", [0, -640, "640x", "x480", "wide"])
     def test_a_malformed_dimensions_is_refused(self, dimensions):
         """dimensions is a positive max dimension or WIDTHxHEIGHT."""

@@ -71,6 +71,11 @@ class TestWorkloadTagValidation:
             "A1",  # uppercase: the docstring allows it, the SDK does not
             "a.b",  # a dot: likewise documented but refused
             "A1-b.C",
+            # `$` also matches just before a trailing newline, while the SDK's
+            # own `fullmatch` does not, so neither may this validator.
+            "ab\n",
+            "ab\n\n",
+            "a\nb",
         ],
     )
     def test_an_illegal_tag_is_refused_at_construction(self, tag):
@@ -78,7 +83,9 @@ class TestWorkloadTagValidation:
         with pytest.raises(ValidationError, match="1-63 characters"):
             WorkloadTag(tag=tag)
 
-    @pytest.mark.parametrize("tag", ["A1", "a.b", "a" * 64, "-a", "a-", "a b"])
+    @pytest.mark.parametrize(
+        "tag", ["A1", "a.b", "a" * 64, "-a", "a-", "a b", "ab\n", "ab\n\n"]
+    )
     def test_the_rule_matches_the_sdk(self, tag):
         """Each tag refused at construction is one `ee.data` also refuses.
 

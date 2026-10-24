@@ -507,6 +507,12 @@ class TestTemporalReducerFor:
         reducer = Percentile(q=42)
         assert temporal_reducer_for(reducer) is reducer
 
+    @pytest.mark.parametrize("spec", ["p90\n", "p90 ", " p90", "p90x"])
+    def test_rejects_a_shorthand_with_trailing_junk(self, spec):
+        """`$` matches before a trailing newline; the resolver must not."""
+        with pytest.raises(ValueError):
+            temporal_reducer_for(spec)
+
     @pytest.mark.parametrize("spec", ["p0", "p150"])
     def test_rejects_out_of_range_shorthand(self, spec):
         """The shorthand needs `0 < q <= 100`."""

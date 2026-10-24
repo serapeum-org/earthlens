@@ -41,7 +41,9 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
 __all__ = ["VideoSink"]
 
 #: The `"WIDTHxHEIGHT"` form Earth Engine accepts for `dimensions`, e.g.
-#: `"640x480"` — two positive integers joined by a literal `x`.
+#: `"640x480"` — two positive integers joined by a literal `x`. Applied with
+#: `fullmatch`: under `match`, the `$` also matches just before a trailing
+#: newline, so `"640x480\n"` would pass and reach the wire.
 _DIMENSIONS_RE = re.compile(r"^[1-9]\d*x[1-9]\d*$")
 
 
@@ -137,7 +139,7 @@ class VideoSink(BaseModel):
                 the `"WIDTHxHEIGHT"` form.
         """
         bad = (isinstance(value, int) and value <= 0) or (
-            isinstance(value, str) and _DIMENSIONS_RE.match(value) is None
+            isinstance(value, str) and _DIMENSIONS_RE.fullmatch(value) is None
         )
         if bad:
             raise ValueError(

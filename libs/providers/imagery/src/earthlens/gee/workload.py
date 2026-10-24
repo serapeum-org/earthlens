@@ -85,6 +85,9 @@ __all__ = ["WorkloadTag"]
 #: dashes and underscores allowed between. `ee.data.setWorkloadTag`'s
 #: docstring describes a looser rule (case, and dots, allowed) that the
 #: validator refuses — this is the one that decides whether a request flies.
+#: Applied with `fullmatch`, as the SDK applies it: under `match`, the `$`
+#: also matches just before a trailing newline, so `"ab\n"` would pass here
+#: and then be rejected by `ee.data.setWorkloadTag`.
 _TAG_RE = re.compile(r"^[a-z0-9](?:[-_a-z0-9]{0,61}[a-z0-9])?$")
 
 
@@ -165,7 +168,7 @@ class WorkloadTag(BaseModel):
                 with a lowercase alphanumeric character, with only `-` or `_`
                 between.
         """
-        if _TAG_RE.match(value) is None:
+        if _TAG_RE.fullmatch(value) is None:
             raise ValueError(
                 "workload tag must be 1-63 characters, starting and ending "
                 "with a lowercase alphanumeric character, with '-' or '_' "

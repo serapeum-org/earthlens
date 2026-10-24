@@ -1183,7 +1183,9 @@ def _reduce_whole_window(
 
 
 #: A percentile shorthand like `p90`: the registry-friendly spelling of
-#: `percentile:90` that `temporal_reducer_for` also accepts.
+#: `percentile:90` that `temporal_reducer_for` also accepts. Applied with
+#: `fullmatch`: under `match`, the `$` also matches just before a trailing
+#: newline, so `"p90\n"` would resolve rather than being reported as unknown.
 _PERCENTILE_SHORTHAND = re.compile(r"^p(\d{1,3})$")
 
 #: The message both region-only refusals share, since the suggestion is the same
@@ -1233,7 +1235,7 @@ def _temporal_reducer_from_str(spec: str) -> TemporalReducer:
         ValueError: If the shorthand is out of range, or the name resolves to a
             region-only reducer or an unknown one.
     """
-    match = _PERCENTILE_SHORTHAND.match(spec)
+    match = _PERCENTILE_SHORTHAND.fullmatch(spec)
     if match is not None:
         q = float(match.group(1))
         if not 0 < q <= 100:
