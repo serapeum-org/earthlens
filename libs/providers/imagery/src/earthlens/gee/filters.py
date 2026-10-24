@@ -19,6 +19,17 @@ Filters come in two equivalent forms:
   surface, kept as thin behaviour-identical wrappers that construct
   the class and call it.
 
+Two details of that wrapping are worth knowing, because the *text* of a
+rejection moved even though its type did not. A wrapper builds its class
+first, so the validation now runs inside pydantic: the raised error is a
+`ValidationError`, which subclasses `ValueError`, so `except ValueError`
+and a `match=` on the message prefix both still work, but the message
+arrives wrapped and the offending value is printed after coercion —
+`by_cloud_cover_lte(collection, 150)` reports `got 150.0`, not
+`got 150`. One thing improved in passing: the old
+`sensor not in frozenset(...)` membership test raised `TypeError` on an
+unhashable argument, where the validators now answer `ValueError`.
+
 Ported (and renamed for the in-`filters` namespace) from
 `gee_utils.raster.filter_*`. The `filter_` prefix is dropped: under
 `earthlens.gee.filters` the call sites read `filters.by_year(...)`,

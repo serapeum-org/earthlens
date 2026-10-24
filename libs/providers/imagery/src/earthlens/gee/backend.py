@@ -612,6 +612,13 @@ def _eedai_remedy(reason: str) -> str:
     credential. Matched most specific first, since the reasons overlap in
     wording (a stack over the pixel budget also names its scene count).
 
+    The one-`return` house rule is deliberately not applied here, and the
+    decision is recorded rather than left implicit: this is a dispatch table
+    written as guard clauses, where each arm's condition and its answer belong
+    on adjacent lines. Accumulating into a single `result` would put the
+    conditions and the strings a screen apart and add an `elif` ladder that
+    says nothing. New helpers in this family still take the rule.
+
     Args:
         reason: The declined plan's reason.
 
