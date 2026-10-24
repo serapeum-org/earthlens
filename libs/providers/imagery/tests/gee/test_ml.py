@@ -64,6 +64,28 @@ def _separable_training():
     return x, y
 
 
+#: Probe points on which the depth-limited forest below splits the two voting
+#: rules: sklearn averages probabilities, Earth Engine hard-votes.
+_DIVERGING_SAMPLES = [(0.2, 0.2), (0.2, 0.8), (0.8, 0.2), (0.9, 0.9)]
+
+
+def _divergent_forest():
+    """A depth-4 forest whose trees disagree, so the voting rules differ."""
+    rng = np.random.default_rng(0)
+    x = rng.uniform(0, 1, size=(300, 2))
+    y = np.where(x[:, 0] > 0.5, 9, np.where(x[:, 1] > 0.5, 7, 3))
+    return RandomForestClassifier(n_estimators=3, max_depth=4, random_state=0).fit(x, y)
+
+
+def _hard_vote(forest, samples):
+    """Majority-vote the forest's members by label, ties to the smallest."""
+    labels = np.asarray(forest.classes_)
+    per_tree = np.column_stack(
+        [labels[member.predict(samples).astype(int)] for member in forest.estimators_]
+    )
+    return np.asarray([ml_module._majority(row) for row in per_tree])
+
+
 class TestCodecValidation:
     """The codec's band-name mapping is validated at construction."""
 
@@ -191,13 +213,33 @@ class TestToEe:
 class TestFromEe:
     """`from_ee` rebuilds a pure-Python predictor from the tree strings."""
 
-    def test_round_trip_predictions_match_sklearn(self, fake_classifier):
-        """to_ee then from_ee predicts exactly what the forest predicts."""
-        x, y = _separable_training()
-        model = RandomForestClassifier(n_estimators=3, random_state=0).fit(x, y)
+    def test_round_trip_predictions_hard_vote_the_exported_trees(self, fake_classifier):
+        """The rebuilt ensemble majority-votes its members, as Earth Engine does."""
+        model = _divergent_forest()
         codec = ClassifierCodec(feature_names=("B4", "B8"))
         predictor = codec.from_ee(codec.to_ee(model))
         assert isinstance(predictor, TreeEnsemble)
+        assert np.array_equal(
+            predictor.predict(_DIVERGING_SAMPLES),
+            _hard_vote(model, _DIVERGING_SAMPLES),
+        )
+
+    def test_the_hard_vote_can_differ_from_the_forests_probability_average(
+        self, fake_classifier
+    ):
+        """A non-unanimous forest predicts differently from the exported trees."""
+        model = _divergent_forest()
+        codec = ClassifierCodec(feature_names=("B4", "B8"))
+        predictor = codec.from_ee(codec.to_ee(model))
+        assert predictor.predict(_DIVERGING_SAMPLES).tolist() == [9.0, 7.0, 9.0, 9.0]
+        assert model.predict(_DIVERGING_SAMPLES).tolist() == [3, 7, 9, 9]
+
+    def test_a_single_tree_round_trips_with_exact_parity(self, fake_classifier):
+        """One DecisionTreeClassifier has no vote to take, so parity is exact."""
+        x, y = _separable_training()
+        model = DecisionTreeClassifier(max_depth=4, random_state=0).fit(x, y)
+        codec = ClassifierCodec(feature_names=("B4", "B8"))
+        predictor = codec.from_ee(codec.to_ee(model))
         axes = np.linspace(0.05, 0.95, 10)
         grid = np.column_stack([g.ravel() for g in np.meshgrid(axes, axes)])
         assert np.array_equal(predictor.predict(grid), model.predict(grid))

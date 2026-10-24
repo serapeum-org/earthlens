@@ -5,7 +5,19 @@ plain-text tree format (the R/rpart-style node listing), which means a
 decision-tree model fitted *locally* — on samples that never left the machine
 — can classify an arbitrarily large image *server-side* with
 `image.classify(codec.to_ee(model))`: no retraining, no upload of the
-training data, no feature-collection round trip. The bridge is a pure-Python
+training data, no feature-collection round trip.
+
+**The exported ensemble votes differently from a `RandomForestClassifier`.**
+Earth Engine's `decisionTreeEnsemble` takes a hard majority vote over the
+member trees, where `RandomForestClassifier.predict` takes the argmax of the
+*averaged* `predict_proba`. The encoding is exact — every tree's splits and
+leaf labels survive the round trip — but the aggregation is not the same
+rule, so server-side labels can differ from the local model's wherever the
+trees are not unanimous. A single `DecisionTreeClassifier` has no vote to
+take and agrees exactly. Expect the difference rather than reading it as a
+broken export; `TreeEnsemble` documents it in full.
+
+The bridge is a pure-Python
 **port** of geemap's `ml` module (`rf_to_strings` / `tree_to_string` /
 `strings_to_classifier`); geemap itself is not a dependency and must not
 become one — the walk over the fitted `tree_` arrays is implemented fresh
@@ -324,9 +336,19 @@ class TreeEnsemble(BaseModel):
 
     What `ClassifierCodec.from_ee` returns: each tree descends its parsed
     branches to a leaf, and the ensemble takes the majority vote (ties break
-    to the smallest label). It is *not* a scikit-learn estimator — the fitted
-    probabilities did not survive the string format — but on the same inputs
-    it reproduces the hard-class predictions of the forest that was exported.
+    to the smallest label). That is Earth Engine's own rule, so on the same
+    inputs it reproduces what `ee.Classifier.decisionTreeEnsemble` predicts
+    from the exported trees.
+
+    It is *not* a scikit-learn estimator — the fitted probabilities did not
+    survive the string format — and **that is a prediction difference, not
+    only a missing API**: `RandomForestClassifier.predict` takes the argmax
+    of the *averaged* `predict_proba` across its trees, while this (and Earth
+    Engine) take a **hard majority vote**. The two agree whenever the trees
+    are unanimous — exactly, for a single `DecisionTreeClassifier`, where
+    there is no vote to take — and can disagree as soon as they are not. A
+    pixel whose members vote `[3, 9, 9]` comes back `9` here while a forest
+    whose averaged probabilities favour `3` returns `3`.
 
     Examples:
         - Predict from hand-written branches (columns follow `feature_names`):
@@ -526,6 +548,15 @@ class ClassifierCodec(BaseModel):
         the model server-side over any image — Earth Engine-only compute, so
         the request takes `engine="ee"`, never the EEDAI reader.
 
+        The splits and leaf labels are encoded exactly, but an **ensemble's
+        aggregation rule changes**: `decisionTreeEnsemble` hard-majority-votes
+        its member trees, while `RandomForestClassifier.predict` argmaxes the
+        averaged `predict_proba`. Server-side labels therefore differ from the
+        local model's wherever the trees are not unanimous; a single
+        `DecisionTreeClassifier` has no vote to take and matches exactly.
+        Spot-checking a forest against the local model will show mismatches,
+        and they are this rule rather than a faulty export.
+
         Args:
             estimator: A fitted `DecisionTreeClassifier`, or an ensemble of
                 them (`RandomForestClassifier` / `ExtraTreesClassifier`).
@@ -552,8 +583,12 @@ class ClassifierCodec(BaseModel):
         """Rebuild a pure-Python predictor from a classifier's tree strings.
 
         The partial, lossy direction: the result is a `TreeEnsemble`
-        (per-tree descent, majority vote), not a scikit-learn estimator — the
-        fitted probabilities did not survive the string format. Accepts the
+        (per-tree descent, hard majority vote — Earth Engine's rule, not
+        `RandomForestClassifier`'s probability averaging), not a scikit-learn
+        estimator, because the fitted probabilities did not survive the string
+        format. It is therefore the right predictor to compare *server-side*
+        output against, and the wrong one to compare the local forest against.
+        Accepts the
         classifier `to_ee` built (whose client-side arguments still carry the
         strings), an iterable of tree strings, or one string; a classifier
         trained *server-side* keeps its trees on the server, so fetch them

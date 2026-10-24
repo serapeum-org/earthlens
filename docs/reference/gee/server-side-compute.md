@@ -791,10 +791,25 @@ training bands, and the public `Classify.estimator` accessor hands over the fitt
 Engine-only (`engine="ee"`); the client-side `Classify` itself runs after a download and affects no engine
 choice.
 
+!!! warning "An ensemble votes differently server-side"
+    The *encoding* is exact — every split threshold and leaf label survives the round trip — but the
+    *aggregation* is not the same rule. `ee.Classifier.decisionTreeEnsemble` takes a **hard majority
+    vote** over the member trees; `RandomForestClassifier.predict` takes the **argmax of the averaged
+    `predict_proba`**. The two agree whenever the trees are unanimous, and exactly for a single
+    `DecisionTreeClassifier` (there is no vote to take), but they can disagree the moment the members
+    split. A pixel whose three trees vote `[3, 9, 9]` is labelled `9` server-side even when the forest's
+    averaged probabilities favour `3`.
+
+    So spot-checking a few pixels of the server-side result against `model.predict` will show mismatches
+    on a non-unanimous forest, and they are this rule rather than a faulty export. To compare
+    like-for-like, run `codec.from_ee(classifier)` — the `TreeEnsemble` it returns applies Earth Engine's
+    vote. If you need the forest's exact labels, classify locally after a download with Epic 2's
+    `Classify`.
+
 `from_ee` is the partial reverse: it parses the tree strings back into a `TreeEnsemble`, a pure-Python
-majority-vote predictor — not a scikit-learn estimator, since the fitted probabilities do not survive the
-string format. It reads the strings off a classifier built client-side; one trained *server-side* keeps its
-trees on the server, so fetch them first (`classifier.explain().getInfo()`) and pass the strings.
+hard-majority-vote predictor — not a scikit-learn estimator, since the fitted probabilities do not survive
+the string format. It reads the strings off a classifier built client-side; one trained *server-side* keeps
+its trees on the server, so fetch them first (`classifier.explain().getInfo()`) and pass the strings.
 
 ## Choosing an engine, in practice
 

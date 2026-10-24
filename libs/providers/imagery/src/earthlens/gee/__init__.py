@@ -251,7 +251,11 @@ engine-eligibility gate:
   server-side (a pure-Python port of geemap's tree-string bridge; geemap
   is not a dependency). `from_ee` is the partial reverse, parsing tree
   strings back into a `TreeEnsemble` — a lossy pure-Python majority-vote
-  predictor, not a scikit-learn estimator.
+  predictor, not a scikit-learn estimator. The vote is the difference that
+  matters: Earth Engine hard-majority-votes the exported trees where
+  `RandomForestClassifier.predict` averages their probabilities, so a
+  forest's server-side labels can differ from the local model's (a single
+  `DecisionTreeClassifier` matches exactly).
   `ClassifierCodec.for_classify` maps a `Classify`'s training band
   *indices* onto Earth Engine band *names*.
 * `PanSharpen` / `MatchHistogram` — operations that combine a raster
