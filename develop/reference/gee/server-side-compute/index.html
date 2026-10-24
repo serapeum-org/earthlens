@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24923,8 +24923,10 @@ rather than displacing each other:</p>
 </code></pre></div>
 <p>A chain is itself an <code>ImageMask</code>, flattens (<code>a &gt;&gt; b &gt;&gt; c</code> is one chain of three), and runs left to
 right. Order is part of the recipe: the mask must read its raw quality band <strong>before</strong> the scaler's
-arithmetic touches the pixels. <code>MaskChain.of(...)</code> takes the elements positionally and also accepts the
-plain-function forms (<code>landsat_sr</code>, <code>sentinel2_scl</code>), which have no <code>&gt;&gt;</code> of their own. This is <em>not</em>
+arithmetic touches the pixels. <code>MaskChain.of(...)</code> takes the elements positionally, flattens an inner
+chain the same way <code>&gt;&gt;</code> does, and accepts any <code>ee.Image -&gt; ee.Image</code> callable — the plain-function forms
+(<code>landsat_sr</code>, <code>sentinel2_scl</code>), a <code>functools.partial</code> of one, a lambda or a callable instance, none of
+which have a <code>&gt;&gt;</code> of their own. <code>chain.name</code> labels every one of those shapes. This is <em>not</em>
 <code>analysis.OperationChain</code> — that one composes client-side operations over a downloaded pyramids
 <code>Dataset</code> and cannot build an <code>ee.Image</code> graph.</p>
 <p>Every op in the family preserves the image's properties. The <code>updateMask</code> masks do it for free; the ones
@@ -25253,10 +25255,25 @@ training bands, and the public <code>Classify.estimator</code> accessor hands ov
 <code>codec.to_ee(operation.estimator)</code>. The classify graph is server-side compute, so the request is Earth
 Engine-only (<code>engine="ee"</code>); the client-side <code>Classify</code> itself runs after a download and affects no engine
 choice.</p>
+<div class="admonition warning">
+<p class="admonition-title">An ensemble votes differently server-side</p>
+<p>The <em>encoding</em> is exact — every split threshold and leaf label survives the round trip — but the
+<em>aggregation</em> is not the same rule. <code>ee.Classifier.decisionTreeEnsemble</code> takes a <strong>hard majority
+vote</strong> over the member trees; <code>RandomForestClassifier.predict</code> takes the <strong>argmax of the averaged
+<code>predict_proba</code></strong>. The two agree whenever the trees are unanimous, and exactly for a single
+<code>DecisionTreeClassifier</code> (there is no vote to take), but they can disagree the moment the members
+split. A pixel whose three trees vote <code>[3, 9, 9]</code> is labelled <code>9</code> server-side even when the forest's
+averaged probabilities favour <code>3</code>.</p>
+<p>So spot-checking a few pixels of the server-side result against <code>model.predict</code> will show mismatches
+on a non-unanimous forest, and they are this rule rather than a faulty export. To compare
+like-for-like, run <code>codec.from_ee(classifier)</code> — the <code>TreeEnsemble</code> it returns applies Earth Engine's
+vote. If you need the forest's exact labels, classify locally after a download with Epic 2's
+<code>Classify</code>.</p>
+</div>
 <p><code>from_ee</code> is the partial reverse: it parses the tree strings back into a <code>TreeEnsemble</code>, a pure-Python
-majority-vote predictor — not a scikit-learn estimator, since the fitted probabilities do not survive the
-string format. It reads the strings off a classifier built client-side; one trained <em>server-side</em> keeps its
-trees on the server, so fetch them first (<code>classifier.explain().getInfo()</code>) and pass the strings.</p>
+hard-majority-vote predictor — not a scikit-learn estimator, since the fitted probabilities do not survive
+the string format. It reads the strings off a classifier built client-side; one trained <em>server-side</em> keeps
+its trees on the server, so fetch them first (<code>classifier.explain().getInfo()</code>) and pass the strings.</p>
 <h2 id="choosing-an-engine-in-practice"><a class="toclink" href="#choosing-an-engine-in-practice">Choosing an engine, in practice</a><a class="headerlink" href="#choosing-an-engine-in-practice" title="Permanent link">#</a></h2>
 <table>
 <thead>
