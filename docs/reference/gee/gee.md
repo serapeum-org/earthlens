@@ -34,6 +34,8 @@ the rendered API.
 
 ::: earthlens.gee.gapfill
 
+::: earthlens.gee.joins
+
 ::: earthlens.gee.engines
 
 ::: earthlens.gee.pixels

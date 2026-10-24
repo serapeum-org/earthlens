@@ -524,6 +524,34 @@ from earthlens.gee import GapFill
 filled = GapFill(method="linear", max_gap=dt.timedelta(days=30)).fill(collection)
 ```
 
+### Joining two collections
+
+Earth Engine's five join strategies ship as frozen config objects — `InnerJoin`, `SaveAllJoin`,
+`SaveBestJoin`, `SaveFirstJoin`, `SimpleJoin`, all under the `Join` base — each exposing the SDK's own
+`apply(primary, secondary, condition)` seam. The wrapper names the intent (`matches_key`, `ordering`,
+`measure_key`) and validates it at construction (`frozen=True`, `extra="forbid"`), where the raw factory
+would bind a typo'd keyword silently; the *condition* stays an ordinary `ee.Filter`, exactly as raw Earth
+Engine spells it. A join is inherently a two-collection operation, so these are standalone composables for
+`.client`-level graphs — never drop-ins for the single-collection `filters=` hook:
+
+```python
+import ee
+
+from earthlens.gee import SaveAllJoin
+
+# Hang each Sentinel-2 scene's cloud-probability image on it, by scene id.
+condition = ee.Filter.equals(leftField="system:index", rightField="system:index")
+joined = ee.ImageCollection(
+    SaveAllJoin(matches_key="probability").apply(s2, s2_cloud_prob, condition)
+)
+```
+
+`GapFill` builds its within-`max_gap` `before` / `after` neighbour lists through `SaveAllJoin` with an
+`ee.Filter.And(maxDifference, ...)` condition — the same pattern to copy for any temporal-neighbour join.
+(`CloudScorePlus` deliberately stays on `linkCollection`, a per-image `system:index` link that needs no
+join plumbing.) Joins are server-side compute: a pipeline using one runs on an Earth Engine engine, never
+the EEDAI reader.
+
 ## Choosing an engine, in practice
 
 | Situation | Engine |

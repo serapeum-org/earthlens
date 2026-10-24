@@ -91,6 +91,13 @@ _EXPECTED_EXPORTS = {
     "Climatology",
     "ClosestImage",
     "GapFill",
+    # Epic 6 Task 6.6 - the composable ee.Join wrappers.
+    "Join",
+    "InnerJoin",
+    "SaveAllJoin",
+    "SaveBestJoin",
+    "SaveFirstJoin",
+    "SimpleJoin",
     # Epic 1 Task 1.6 - the promoted routing verdict.
     "EnginePlan",
     "EedaiPlan",

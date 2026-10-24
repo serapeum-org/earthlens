@@ -153,6 +153,15 @@ anything a string names:
   a within-`max_gap` neighbour join. `max_gap` is a refusal, not a
   hint: a pixel with no valid neighbour inside the window stays masked
   rather than being extrapolated across a wider gap.
+* `Join`, with `InnerJoin` / `SaveAllJoin` / `SaveBestJoin` /
+  `SaveFirstJoin` / `SimpleJoin` — Earth Engine's five join
+  strategies as frozen config objects exposing the SDK's own
+  `apply(primary, secondary, condition)` seam. A join links two
+  collections on an `ee.Filter` condition, so these are standalone
+  composables — never `filters=` / `cloud_mask=` drop-ins — and
+  `GapFill` pairs each scene with its within-`max_gap` neighbours
+  through `SaveAllJoin`. Joins are server-side compute, so a
+  pipeline using one runs on an Earth Engine engine.
 * `Engine`, with `ENGINES` and `resolve_engine` —
   what materialises the pixels. `engine="auto"` routes between
   `EedaiEngine` (the pyramids-eo reader) and `EeEngine`
@@ -384,6 +393,14 @@ from earthlens.gee.jobs import (
     resolve_destination,
     wait_for_task_id,
 )
+from earthlens.gee.joins import (
+    InnerJoin,
+    Join,
+    SaveAllJoin,
+    SaveBestJoin,
+    SaveFirstJoin,
+    SimpleJoin,
+)
 from earthlens.gee.pixels import HIGH_VOLUME_ENDPOINT, PixelsEngine
 from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reader import EedaiReader
@@ -527,6 +544,12 @@ __all__ = [
     "Climatology",
     "ClosestImage",
     "GapFill",
+    "Join",
+    "InnerJoin",
+    "SaveAllJoin",
+    "SaveBestJoin",
+    "SaveFirstJoin",
+    "SimpleJoin",
     "EnginePlan",
     "EedaiPlan",
     "OutputGrid",
