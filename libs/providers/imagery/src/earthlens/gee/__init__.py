@@ -238,8 +238,13 @@ median composite is a facade call rather than raw `ee`:
   plus the function forms `landsat_sr(image, sensor=...)` and
   `sentinel2_scl(image)`.
 * `earthlens.gee.filters` — collection filters: `ByYear` / `ByBounds`
-  / `ByPropertyIn` / `ByCloudCoverLte` / `ByYearAndBounds` under the
-  class-form `CollectionFilter` base (the top-level
+  / `ByPropertyIn` / `ByCloudCoverLte` / `ByYearAndBounds`, plus the
+  expanded scene selectors `ByOrbit` (Sentinel-1 pass direction /
+  relative orbit), `BySensor` (platform list), `ByQuality` (generic
+  metadata threshold) and `BySeason` / `ByMonth` / `ByDayOfYear`
+  (calendar periods across every year, via
+  `ee.Filter.calendarRange`), all under the class-form
+  `CollectionFilter` base (the top-level
   `earthlens.gee.CollectionFilter` export stays the `Callable` type
   alias), plus the function forms `by_year` / `by_bounds` /
   `by_property_in` / `by_cloud_cover_lte` / `by_year_and_bounds`.

@@ -7,11 +7,13 @@ Filters come in two equivalent forms:
 
 * **Callable classes** under the class-form `CollectionFilter` base —
   `ByYear`, `ByBounds`, `ByPropertyIn`, `ByCloudCoverLte`,
-  `ByYearAndBounds` — frozen pydantic objects that carry validated
-  config and are drop-ins for a `GEE(filters=[...])` entry (the hook
-  only requires a callable). A typo'd keyword or an out-of-range value
-  raises at construction instead of silently no-op'ing the way a
-  misspelled `functools.partial` keyword would.
+  `ByYearAndBounds`, plus the expanded scene selectors `ByOrbit`,
+  `BySensor`, `ByQuality`, `BySeason`, `ByMonth` and `ByDayOfYear` —
+  frozen pydantic objects that carry validated config and are drop-ins
+  for a `GEE(filters=[...])` entry (the hook only requires a
+  callable). A typo'd keyword or an out-of-range value raises at
+  construction instead of silently no-op'ing the way a misspelled
+  `functools.partial` keyword would.
 * **Module functions** — `by_year`, `by_bounds`, `by_property_in`,
   `by_cloud_cover_lte`, `by_year_and_bounds` — the original public
   surface, kept as thin behaviour-identical wrappers that construct
@@ -22,20 +24,40 @@ Ported (and renamed for the in-`filters` namespace) from
 `earthlens.gee.filters` the call sites read `filters.by_year(...)`,
 `filters.by_bounds(...)`, etc., which is clearer than
 `filters.filter_year(...)`.
+
+The expanded selectors (Task 6.5) cover what SAR, multi-sensor and
+seasonal work need: `ByOrbit` pins a Sentinel-1 pass direction and/or
+relative orbit (mixing look geometries in a composite is almost always
+wrong), `BySensor` selects platforms by metadata list, `ByQuality` is
+the generic metadata-threshold escape hatch, and `BySeason` / `ByMonth`
+/ `ByDayOfYear` select calendar periods *across every year* in the date
+window via `ee.Filter.calendarRange` — what a plain `filterDate` cannot
+express. `BySeason` expands a named season to an `Or` over its months,
+the same idiom `earthlens.gee.climatology` uses, so DJF wraps the year
+boundary correctly. These are new, class-only selectors; no function
+wrappers exist for them.
 """
 
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 import ee
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+from earthlens.gee.climatology import _SEASONS
 
 __all__ = [
     "ByBounds",
     "ByCloudCoverLte",
+    "ByDayOfYear",
+    "ByMonth",
+    "ByOrbit",
     "ByPropertyIn",
+    "ByQuality",
+    "BySeason",
+    "BySensor",
     "ByYear",
     "ByYearAndBounds",
     "CollectionFilter",
@@ -329,6 +351,314 @@ class ByYearAndBounds(CollectionFilter):
         if self.region is not None:
             out = ByBounds(region=self.region)(out)
         return out
+
+
+class ByOrbit(CollectionFilter):
+    """Filter a SAR collection to one orbit pass and/or relative orbit.
+
+    The selector that unlocks coherent Sentinel-1 analysis: ascending
+    and descending passes have different look geometries, so mixing
+    them in a composite is almost always wrong. Pins
+    `orbitProperties_pass` and/or `relativeOrbitNumber_start` with
+    `ee.Filter.eq`; at least one must be set, since with neither the
+    filter would select everything.
+
+    Attributes:
+        pass_direction: The orbit pass to keep — `"ASCENDING"` or
+            `"DESCENDING"` — or `None` to accept both. Defaults to
+            `None`.
+        relative_orbit: The relative orbit number to keep (Sentinel-1
+            numbers them from 1), or `None` to accept all. Defaults to
+            `None`.
+
+    Examples:
+        - Pin the ascending pass:
+            ```python
+            >>> ByOrbit(pass_direction="ASCENDING").pass_direction
+            'ASCENDING'
+
+            ```
+        - With neither constraint the filter is refused at construction:
+            ```python
+            >>> ByOrbit()
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for ByOrbit
+            ...
+
+            ```
+    """
+
+    pass_direction: Literal["ASCENDING", "DESCENDING"] | None = None
+    relative_orbit: int | None = Field(default=None, ge=1)
+
+    @model_validator(mode="after")
+    def _at_least_one_constraint(self) -> ByOrbit:
+        """Refuse a constraint-free orbit filter.
+
+        Returns:
+            The model unchanged when at least one constraint is set.
+
+        Raises:
+            ValueError: If both `pass_direction` and `relative_orbit`
+                are `None` — the filter would select every scene.
+        """
+        if self.pass_direction is None and self.relative_orbit is None:
+            raise ValueError(
+                "ByOrbit needs pass_direction and/or relative_orbit; with "
+                "neither it would filter nothing"
+            )
+        return self
+
+    def __call__(self, collection: ee.ImageCollection) -> ee.ImageCollection:
+        """Apply the configured orbit constraints, pass first.
+
+        Args:
+            collection: The Earth Engine `ImageCollection`.
+
+        Returns:
+            A new `ImageCollection` keeping only the configured pass
+            direction and/or relative orbit.
+        """
+        out = collection
+        if self.pass_direction is not None:
+            out = out.filter(ee.Filter.eq("orbitProperties_pass", self.pass_direction))
+        if self.relative_orbit is not None:
+            out = out.filter(
+                ee.Filter.eq("relativeOrbitNumber_start", self.relative_orbit)
+            )
+        return out
+
+
+class BySensor(CollectionFilter):
+    """Filter a multi-sensor collection to the named platforms.
+
+    Wraps `ee.Filter.inList` over a platform metadata property, so a
+    merged or multi-sensor collection can be narrowed to specific
+    spacecraft. The default property matches Landsat C2
+    (`SPACECRAFT_ID`, e.g. `"LANDSAT_8"`); Sentinel-2 callers pass
+    `property_name="SPACECRAFT_NAME"` (`"Sentinel-2A"` / `"-2B"`).
+
+    Attributes:
+        values: The acceptable platform names; at least one, stored as
+            a tuple on the frozen model.
+        property_name: The metadata property carrying the platform
+            name. Defaults to `"SPACECRAFT_ID"`.
+
+    Examples:
+        - Keep only Landsat 8 and 9 scenes:
+            ```python
+            >>> BySensor(values=("LANDSAT_8", "LANDSAT_9")).values
+            ('LANDSAT_8', 'LANDSAT_9')
+
+            ```
+    """
+
+    values: tuple[str, ...] = Field(min_length=1)
+    property_name: str = "SPACECRAFT_ID"
+
+    def __call__(self, collection: ee.ImageCollection) -> ee.ImageCollection:
+        """Apply the platform-membership filter.
+
+        Args:
+            collection: The Earth Engine `ImageCollection`.
+
+        Returns:
+            A new `ImageCollection` keeping only the named platforms.
+        """
+        return collection.filter(
+            ee.Filter.inList(self.property_name, list(self.values))
+        )
+
+
+class ByQuality(CollectionFilter):
+    """Filter by a generic metadata threshold — the escape hatch.
+
+    One `property_name` / `op` / `value` triple dispatched to the
+    matching `ee.Filter.{lte,gte,lt,gt,eq}` factory, so a new metadata
+    threshold does not need a bespoke filter class. For the common
+    cloud-cover case prefer `ByCloudCoverLte`, which names the intent.
+
+    Attributes:
+        property_name: The metadata property to threshold.
+        op: The comparison — one of `"lte"`, `"gte"`, `"lt"`, `"gt"`,
+            `"eq"`; anything else is refused at construction.
+        value: The threshold value.
+
+    Examples:
+        - Keep scenes with a low mean solar zenith angle:
+            ```python
+            >>> f = ByQuality(property_name="MEAN_SOLAR_ZENITH_ANGLE", op="lte", value=70)
+            >>> f.op, f.value
+            ('lte', 70.0)
+
+            ```
+    """
+
+    property_name: str
+    op: Literal["lte", "gte", "lt", "gt", "eq"]
+    value: float
+
+    def __call__(self, collection: ee.ImageCollection) -> ee.ImageCollection:
+        """Apply the metadata-threshold filter.
+
+        Args:
+            collection: The Earth Engine `ImageCollection`.
+
+        Returns:
+            A new `ImageCollection` with the threshold filter applied.
+        """
+        return collection.filter(
+            getattr(ee.Filter, self.op)(self.property_name, self.value)
+        )
+
+
+class BySeason(CollectionFilter):
+    """Filter to one meteorological season across every year in the window.
+
+    Selects a named three-month season — `DJF` / `MAM` / `JJA` / `SON`
+    — as an `ee.Filter.Or` over its months, each a
+    `calendarRange(month, month, "month")`. This is the same
+    season-to-months expansion `earthlens.gee.climatology` uses, so DJF
+    wraps the year boundary correctly, and it selects the season in
+    *every* year of the date window — what seasonal cloud-free
+    compositing needs and a plain `filterDate` cannot express.
+
+    Attributes:
+        season: The season to keep — `"DJF"`, `"MAM"`, `"JJA"`, or
+            `"SON"`.
+
+    Examples:
+        - Summer-only scenes across all years:
+            ```python
+            >>> BySeason(season="JJA").season
+            'JJA'
+
+            ```
+        - An unknown season name is refused at construction:
+            ```python
+            >>> BySeason(season="WINTER")
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for BySeason
+            ...
+
+            ```
+    """
+
+    season: Literal["DJF", "MAM", "JJA", "SON"]
+
+    def __call__(self, collection: ee.ImageCollection) -> ee.ImageCollection:
+        """Apply the season filter, an `Or` over the season's months.
+
+        Args:
+            collection: The Earth Engine `ImageCollection`.
+
+        Returns:
+            A new `ImageCollection` keeping only scenes whose
+            `system:time_start` falls in the season, in any year.
+        """
+        selected = ee.Filter.Or(
+            *[
+                ee.Filter.calendarRange(month, month, "month")
+                for month in _SEASONS[self.season]
+            ]
+        )
+        return collection.filter(selected)
+
+
+class ByMonth(CollectionFilter):
+    """Filter to a calendar-month window across every year in the window.
+
+    Wraps `ee.Filter.calendarRange(start_month, end_month, "month")`:
+    one month when `end_month` is omitted, an inclusive window
+    otherwise. A start after the end wraps across the year boundary
+    (Earth Engine's `calendarRange` semantics), so `ByMonth(11, 2)`
+    selects November through February. For the four named seasons
+    prefer `BySeason`.
+
+    Attributes:
+        start_month: First month kept, `1`-`12`.
+        end_month: Last month kept (inclusive), `1`-`12`, or `None`
+            (the default) to keep exactly `start_month`.
+
+    Examples:
+        - A single month:
+            ```python
+            >>> ByMonth(start_month=6).end_month is None
+            True
+
+            ```
+        - An out-of-range month is refused at construction:
+            ```python
+            >>> ByMonth(start_month=13)
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for ByMonth
+            ...
+
+            ```
+    """
+
+    start_month: int = Field(ge=1, le=12)
+    end_month: int | None = Field(default=None, ge=1, le=12)
+
+    def __call__(self, collection: ee.ImageCollection) -> ee.ImageCollection:
+        """Apply the month calendar filter.
+
+        Args:
+            collection: The Earth Engine `ImageCollection`.
+
+        Returns:
+            A new `ImageCollection` keeping only scenes inside the
+            month window, in any year.
+        """
+        end = self.end_month if self.end_month is not None else self.start_month
+        return collection.filter(
+            ee.Filter.calendarRange(self.start_month, end, "month")
+        )
+
+
+class ByDayOfYear(CollectionFilter):
+    """Filter to a day-of-year window across every year in the window.
+
+    Wraps `ee.Filter.calendarRange(start_day, end_day, "day_of_year")`:
+    one day when `end_day` is omitted, an inclusive window otherwise —
+    the finer-grained counterpart to `ByMonth` for phenology-style
+    selections.
+
+    Attributes:
+        start_day: First day of year kept, `1`-`366`.
+        end_day: Last day kept (inclusive), `1`-`366`, or `None` (the
+            default) to keep exactly `start_day`.
+
+    Examples:
+        - The meteorological summer, in days of year:
+            ```python
+            >>> f = ByDayOfYear(start_day=152, end_day=243)
+            >>> f.start_day, f.end_day
+            (152, 243)
+
+            ```
+    """
+
+    start_day: int = Field(ge=1, le=366)
+    end_day: int | None = Field(default=None, ge=1, le=366)
+
+    def __call__(self, collection: ee.ImageCollection) -> ee.ImageCollection:
+        """Apply the day-of-year calendar filter.
+
+        Args:
+            collection: The Earth Engine `ImageCollection`.
+
+        Returns:
+            A new `ImageCollection` keeping only scenes inside the
+            day-of-year window, in any year.
+        """
+        end = self.end_day if self.end_day is not None else self.start_day
+        return collection.filter(
+            ee.Filter.calendarRange(self.start_day, end, "day_of_year")
+        )
 
 
 def by_year(collection: ee.ImageCollection, year: int) -> ee.ImageCollection:

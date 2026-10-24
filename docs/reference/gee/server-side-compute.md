@@ -209,6 +209,34 @@ top-level `earthlens.gee.CollectionFilter` stays the `Callable` *type alias* des
 class of the same name in `earthlens.gee.filters` is the base that implements it. Class or function, any
 filter moves the request onto an Earth Engine engine, as above.
 
+### The expanded filter library
+
+Six further class-only selectors cover what SAR, multi-sensor and seasonal work needs — each a frozen,
+construction-validated `CollectionFilter` drop-in for a `filters=` entry (and, like every filter, an
+Earth Engine-engine request):
+
+- `ByOrbit(pass_direction=..., relative_orbit=...)` — pins a Sentinel-1 pass direction
+  (`orbitProperties_pass`) and/or relative orbit (`relativeOrbitNumber_start`). Ascending and
+  descending passes have different look geometries, so mixing them in a composite is almost always
+  wrong; at least one constraint is required.
+- `BySensor(values=("LANDSAT_8", "LANDSAT_9"))` — platform selection via `ee.Filter.inList`; the
+  default property matches Landsat C2 (`SPACECRAFT_ID`), Sentinel-2 passes
+  `property_name="SPACECRAFT_NAME"`.
+- `ByQuality(property_name=..., op="lte", value=...)` — the generic metadata-threshold escape hatch,
+  dispatching to `ee.Filter.{lte,gte,lt,gt,eq}`, so a new threshold needs no bespoke class.
+- `BySeason(season="JJA")` — one meteorological season (`DJF` / `MAM` / `JJA` / `SON`) *across every
+  year* in the date window, expanded to an `ee.Filter.Or` over its months — the same idiom
+  `Climatology` uses, so `DJF` wraps the year boundary correctly.
+- `ByMonth(start_month=6, end_month=8)` / `ByDayOfYear(start_day=152, end_day=243)` — calendar windows
+  across every year via `ee.Filter.calendarRange`; a start after the end wraps (Earth Engine
+  semantics), and omitting the end selects the single period.
+
+```python
+from earthlens.gee.filters import ByOrbit, BySeason
+
+filters=[ByOrbit(pass_direction="ASCENDING", relative_orbit=87), BySeason(season="JJA")]
+```
+
 ## Level 3 — `cloud_mask=`, per-image compute
 
 `cloud_mask` is typed `Callable[[ee.Image], ee.Image]` and is `.map`-applied to every image in the
