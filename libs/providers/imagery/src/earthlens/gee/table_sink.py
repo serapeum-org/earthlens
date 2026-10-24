@@ -17,13 +17,21 @@ and friends all travel *inside* that one dict, as
 `ee.batch.Export.table.toFeatureView` takes them). Every destination's
 required address is validated at construction (see `_REQUIRED_ADDRESS`), so a
 misconfigured sink fails at the call that built it rather than as a late
-server error. Whatever the destination, the queued task's wire type — what
+server error — and so is every option that is scoped to one destination:
+`overwrite` / `append` are BigQuery-only, `ingestion_time_parameters` is
+FeatureView-only, and `file_format` belongs to the two destinations that
+write a file (`_FILE_DESTINATIONS`), the rest ignoring it. The BigQuery
+`table` is checked for *shape* as well as presence, mirroring the SDK's own
+`project.dataset.table` rule (`_BIGQUERY_TABLE_RE`), so that mistake lands
+here rather than as an `EEException` from `write()`. Whatever the destination,
+the queued task's wire type — what
 `TaskInfo.task_type` carries — is `EXPORT_FEATURES`: BigQuery and FeatureView
 create the same `ee.batch.Task.Type.EXPORT_TABLE` tasks the file targets do.
 """
 
 from __future__ import annotations
 
+import re
 from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, model_validator
@@ -48,6 +56,17 @@ _REQUIRED_ADDRESS: dict[str, str] = {
     "featureview": "asset_id",
 }
 
+#: The destinations that forward `fileFormat` to their `Export.table.to*`
+#: factory. The others write a table, not a file, and would ignore it — so a
+#: `file_format` set for one of them is refused rather than dropped.
+_FILE_DESTINATIONS: frozenset[str] = frozenset({"drive", "gcs"})
+
+#: Earth Engine's own shape check for a BigQuery destination, mirrored so the
+#: mistake lands at construction instead of as an `EEException` from
+#: `ee.batch.Export.table.toBigQuery` at `write()` time. Verified against
+#: earthengine-api's `re.fullmatch(r'.+\..+\..+', table)`.
+_BIGQUERY_TABLE_RE = re.compile(r".+\..+\..+")
+
 
 class TableSink(BaseModel):
     """Queue an `ee.FeatureCollection` export and track it as a `TaskInfo`.
@@ -63,10 +82,11 @@ class TableSink(BaseModel):
 
     Construction refuses an inconsistent sink: each destination must carry
     its address (`bucket` for `gcs`, `asset_id` for `asset` / `featureview`,
-    `table` for `bigquery` — `drive` without a `folder` lands in the Drive
-    root, Earth Engine's own default), `overwrite` / `append` are mutually
-    exclusive and BigQuery-only, and `ingestion_time_parameters` is
-    FeatureView-only.
+    `table` for `bigquery` in Earth Engine's `project.dataset.table` shape —
+    `drive` without a `folder` lands in the Drive root, Earth Engine's own
+    default), `overwrite` / `append` are mutually exclusive and BigQuery-only,
+    `ingestion_time_parameters` is FeatureView-only, and `file_format` is for
+    the `drive` / `gcs` destinations that pass it on.
 
     Examples:
         - A sink is a frozen value object, constructed without Earth Engine:
@@ -123,7 +143,14 @@ class TableSink(BaseModel):
     ingestion_time_parameters: dict[str, Any] | None = (
         None  # FeatureView serving options, passed as one ee dict
     )
-    file_format: str = "CSV"  # export file format for the file destinations
+    # Scoped and validated like the sibling options: a free `str` constructed
+    # happily and was then never passed to `toAsset` / `toBigQuery` /
+    # `toFeatureView`, i.e. silently ignored where `overwrite` would have
+    # raised. The default is kept rather than made `None`, so the attribute
+    # still reads back as the format Earth Engine would use.
+    file_format: Literal["CSV", "GeoJSON", "KML", "KMZ", "SHP", "TFRecord"] = (
+        "CSV"  # file destinations only (see `_FILE_DESTINATIONS`)
+    )
     wait_for_export: bool = False  # block until the task finishes
 
     @model_validator(mode="after")
@@ -136,9 +163,28 @@ class TableSink(BaseModel):
         Raises:
             ValueError: If `overwrite` and `append` are both set, either is
                 set for a non-BigQuery destination, `ingestion_time_parameters`
-                is set for a non-FeatureView destination, or the destination's
+                is set for a non-FeatureView destination, `file_format` is set
+                for a destination that writes no file, the BigQuery `table` is
+                not `project.dataset.table`-shaped, or the destination's
                 required address field is `None`.
         """
+        if self.file_format != "CSV" and self.destination not in _FILE_DESTINATIONS:
+            raise ValueError(
+                f"file_format={self.file_format!r} is only passed on by the "
+                f"file destinations {sorted(_FILE_DESTINATIONS)}; the "
+                f"destination is {self.destination!r}, which writes a table "
+                "rather than a file and would ignore it"
+            )
+        if (
+            self.destination == "bigquery"
+            and self.table is not None
+            and _BIGQUERY_TABLE_RE.fullmatch(self.table) is None
+        ):
+            raise ValueError(
+                f"table={self.table!r} is not a BigQuery destination; Earth "
+                "Engine needs the fully qualified "
+                "'project.dataset.table' form"
+            )
         if self.overwrite and self.append:
             raise ValueError("overwrite and append are mutually exclusive")
         if (self.overwrite or self.append) and self.destination != "bigquery":

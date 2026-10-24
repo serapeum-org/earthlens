@@ -702,7 +702,13 @@ TableSink(
 - **Address validation** — each destination's required address (`bucket` for `gcs`, `asset_id` for
   `asset` / `featureview`, `table` for `bigquery`) is checked at construction, so a misconfigured sink
   fails at the call that built it instead of as a late server error. `drive` with no `folder` is valid:
-  Earth Engine exports to the Drive root.
+  Earth Engine exports to the Drive root. The BigQuery `table` is checked for *shape* too — the sink
+  mirrors Earth Engine's own `project.dataset.table` rule, so `table="nodots"` raises here rather than
+  as an `EEException` at `write()`.
+- **`file_format` is scoped like the rest** — only `drive` and `gcs` pass it on to their
+  `Export.table.to*` factory, so setting it on `asset` / `bigquery` / `featureview` is refused instead
+  of silently ignored, and the value itself is a fixed vocabulary (`CSV`, `GeoJSON`, `KML`, `KMZ`,
+  `SHP`, `TFRecord`) rather than a free string Earth Engine may reject later.
 
 Whatever the destination, the queued task's wire type — what `TaskInfo.task_type` carries and what
 `list_recent_tasks(task_type=...)` filters on — is `EXPORT_FEATURES`: BigQuery and FeatureView create the

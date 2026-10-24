@@ -133,6 +133,58 @@ class TestTableSinkValidation:
         with pytest.raises(ValidationError, match=missing):
             TableSink(destination=destination)
 
+    def test_an_unknown_file_format_is_refused(self):
+        """The format is a fixed vocabulary, not a free string EE may reject."""
+        with pytest.raises(ValidationError, match="file_format"):
+            TableSink(destination="drive", folder="f", file_format="Parquet")
+
+    @pytest.mark.parametrize(
+        "kwargs",
+        [
+            {"destination": "asset", "asset_id": "a/b"},
+            {"destination": "bigquery", "table": "p.d.t"},
+            {"destination": "featureview", "asset_id": "a/b"},
+        ],
+        ids=["asset", "bigquery", "featureview"],
+    )
+    def test_a_file_format_is_refused_where_it_is_ignored(self, kwargs):
+        """A format the destination never passes on is a mistake, not a no-op."""
+        with pytest.raises(ValidationError, match="file_format"):
+            TableSink(file_format="GeoJSON", **kwargs)
+
+    @pytest.mark.parametrize(
+        "kwargs",
+        [
+            {"destination": "drive", "folder": "f"},
+            {"destination": "gcs", "bucket": "b"},
+        ],
+        ids=["drive", "gcs"],
+    )
+    def test_the_file_destinations_take_a_format(self, kwargs):
+        """The two destinations that forward `fileFormat` still accept it."""
+        assert TableSink(file_format="GeoJSON", **kwargs).file_format == "GeoJSON"
+
+    @pytest.mark.parametrize("table", ["nodots", "p.d", "p.d.", ".d.t"])
+    def test_a_malformed_bigquery_table_is_refused(self, table):
+        """The sink mirrors EE's own `project.dataset.table` check."""
+        with pytest.raises(ValidationError, match="project.dataset.table"):
+            TableSink(destination="bigquery", table=table)
+
+    def test_the_bigquery_shape_matches_the_sdk(self):
+        """The accepted/refused split is the SDK's regex, not a guess."""
+        import re
+
+        import ee.batch  # noqa: F401 - the SDK whose rule is mirrored
+
+        sdk = re.compile(r".+\..+\..+")
+        for table in ("p.d.t", "proj-1.data_set.tbl"):
+            assert sdk.fullmatch(table) is not None
+            assert TableSink(destination="bigquery", table=table).table == table
+        for table in ("nodots", "p.d"):
+            assert sdk.fullmatch(table) is None
+            with pytest.raises(ValidationError):
+                TableSink(destination="bigquery", table=table)
+
     def test_drive_needs_no_folder(self):
         """Earth Engine exports to the Drive root when no folder is given."""
         assert TableSink(destination="drive").folder is None
