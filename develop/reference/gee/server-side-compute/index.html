@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -25260,7 +25260,11 @@ asynchronous export.</p>
 - <strong><code>file_format</code> is scoped like the rest</strong> — only <code>drive</code> and <code>gcs</code> pass it on to their
   <code>Export.table.to*</code> factory, so setting it on <code>asset</code> / <code>bigquery</code> / <code>featureview</code> is refused instead
   of silently ignored, and the value itself is a fixed vocabulary (<code>CSV</code>, <code>GeoJSON</code>, <code>KML</code>, <code>KMZ</code>,
-  <code>SHP</code>, <code>TFRecord</code>) rather than a free string Earth Engine may reject later.</p>
+  <code>SHP</code>, <code>TFRecord</code>) rather than a free string Earth Engine may reject later. The refusal keys off
+  <em>whether it was set</em>, which is why the field defaults to <code>None</code> and not to <code>"CSV"</code>: an explicit
+  <code>file_format="CSV"</code> on a table destination is the same mistake as any other format and is refused
+  too. <code>sink.effective_file_format</code> answers what Earth Engine will write — <code>"CSV"</code> for a file
+  destination that set none (its own default), <code>None</code> for a destination that writes no file.</p>
 <p>Whatever the destination, the queued task's wire type — what <code>TaskInfo.task_type</code> carries and what
 <code>list_recent_tasks(task_type=...)</code> filters on — is <code>EXPORT_FEATURES</code>: BigQuery and FeatureView create the
 same <code>ee.batch.Task.Type.EXPORT_TABLE</code> tasks the file targets do (the enum <em>name</em> differs from its wire
