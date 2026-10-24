@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24818,7 +24818,9 @@ Earth Engine-engine request):</p>
   default property matches Landsat C2 (<code>SPACECRAFT_ID</code>), Sentinel-2 passes
   <code>property_name="SPACECRAFT_NAME"</code>.</li>
 <li><code>ByQuality(property_name=..., op="lte", value=...)</code> — the generic metadata-threshold escape hatch,
-  dispatching to <code>ee.Filter.{lte,gte,lt,gt,eq}</code>, so a new threshold needs no bespoke class.</li>
+  dispatching to <code>ee.Filter.{lte,gte,lt,gt,eq}</code>, so a new threshold needs no bespoke class. <code>value</code>
+  takes a number, or a <strong>string</strong> with <code>op="eq"</code> (<code>property_name="SPACECRAFT_ID", value="LANDSAT_8"</code>) —
+  a string with an ordering comparison is refused at construction, since Earth Engine orders numbers.</li>
 <li><code>BySeason(season="JJA")</code> — one meteorological season (<code>DJF</code> / <code>MAM</code> / <code>JJA</code> / <code>SON</code>) <em>across every
   year</em> in the date window, expanded to an <code>ee.Filter.Or</code> over its months — the same idiom
   <code>Climatology</code> uses, so <code>DJF</code> wraps the year boundary correctly.</li>
@@ -24997,12 +24999,18 @@ chain the same way <code>&gt;&gt;</code> does, and accepts any <code>ee.Image -&
 which have a <code>&gt;&gt;</code> of their own. <code>chain.name</code> labels every one of those shapes. This is <em>not</em>
 <code>analysis.OperationChain</code> — that one composes client-side operations over a downloaded pyramids
 <code>Dataset</code> and cannot build an <code>ee.Image</code> graph.</p>
-<p>Every op in the family preserves the image's properties. The <code>updateMask</code> masks do it for free; the ones
-that rebuild the image (<code>BandScaler</code>, <code>SpeckleFilter</code>) copy them back with
-<code>copyProperties(source, source.propertyNames())</code> — note the explicit property list, since
-<code>copyProperties</code> skips <code>system:*</code> otherwise. That matters because the composite engine applies its
-per-bucket <code>filterDate</code> <em>after</em> the hook, and the reducers and samplers read <code>system:time_start</code>: an op
-that dropped it would empty every bucket.</p>
+<p>Every op in the family preserves the image's properties. That matters because the composite engine
+applies its per-bucket <code>filterDate</code> <em>after</em> the hook, and the reducers and samplers read
+<code>system:time_start</code>: an op that dropped it would empty every bucket.</p>
+<p>The <code>updateMask</code> masks do it for free. The two ops that rebuild the image (<code>BandScaler</code>,
+<code>SpeckleFilter</code>) copy them back with <code>copyProperties(source, source.propertyNames())</code> — note the
+explicit property list, since <code>copyProperties</code> skips <code>system:*</code> otherwise. Only one of the two has to:
+checked live, <code>focalMedian</code> returns an image with <strong>no</strong> <code>system:time_start</code>, so the copy is
+load-bearing for <code>SpeckleFilter</code>, while <code>addBands(..., overwrite=True)</code> already keeps the source's
+properties — which is why Earth Engine's own Landsat <code>applyScaleFactors</code> example never copies them — so
+for <code>BandScaler</code> the copy is belt-and-braces. One caveat either way: the copy carries
+<code>system:band_names</code> and <code>system:footprint</code> over verbatim, so an op applied after a <code>select()</code> hands on
+the pre-<code>select</code> band list.</p>
 <h4 id="radar-specklefilter"><a class="toclink" href="#radar-specklefilter">Radar: <code>SpeckleFilter</code></a><a class="headerlink" href="#radar-specklefilter" title="Permanent link">#</a></h4>
 <p><code>SpeckleFilter</code> runs <code>ee.Image.focalMedian</code> on the graph — the server-side counterpart of the
 client-side <code>analysis.FocalMedian</code>, which can only work on an already-downloaded raster. It is the one
@@ -25049,13 +25057,16 @@ scaler's arithmetic, so masking stays ahead of scaling however the two were requ
 <code>&lt;your mask&gt; &gt;&gt; BandScaler</code>.</p>
 <p>The recipe is <strong>catalog data, not an <code>if/elif</code> over asset ids</strong>. It is a <code>preprocess:</code> block on the
 curated dataset row, typed as <code>earthlens.gee.Preprocess</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nt">COPERNICUS/S2_SR_HARMONIZED</span><span class="p">:</span>
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="nt">preprocess</span><span class="p">:</span>
-<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">    </span><span class="nt">mask</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sentinel2_scl</span>
-<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">    </span><span class="nt">scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">    </span><span class="nt">note</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
-<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">      </span><span class="no">Level-2A arrives as 0-10000 scaled surface reflectance; the SCL band</span>
-<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">      </span><span class="no">carries the scene classification the mask reads.</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># libs/providers/imagery/src/earthlens/gee/catalog/optical-multispectral.yaml</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="nt">datasets</span><span class="p">:</span><span class="w">                                 </span><span class="c1"># every row nests under this key</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span><span class="nt">COPERNICUS/S2_SR_HARMONIZED</span><span class="p">:</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">    </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Harmonized</span><span class="nv"> </span><span class="s">Sentinel-2</span><span class="nv"> </span><span class="s">MSI</span><span class="nv"> </span><span class="s">...</span><span class="nv"> </span><span class="s">Level-2A</span><span class="nv"> </span><span class="s">(Surface</span><span class="nv"> </span><span class="s">Reflectance)&quot;</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">    </span><span class="nt">preprocess</span><span class="p">:</span><span class="w">                           </span><span class="c1"># the recipe, beside the row&#39;s other fields</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">      </span><span class="nt">mask</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sentinel2_scl</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">      </span><span class="nt">scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">      </span><span class="nt">note</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;-</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">        </span><span class="no">Level-2A arrives as 0-10000 scaled surface reflectance; the SCL band</span>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">        </span><span class="no">carries the scene classification the mask reads.</span>
 </code></pre></div>
 <p>Typing it as a declared field is what makes the validation real: <code>Dataset</code> is frozen but does <strong>not</strong>
 forbid extra keys, so an undeclared <code>preprocess:</code> block would have been dropped in silence and a typo'd
