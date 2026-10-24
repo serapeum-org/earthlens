@@ -465,6 +465,12 @@ quietly returns raw DN when you asked for reflectance. `BandScaler(factors=(Band
 scale=0.0001),))` is the explicit form. Scaling **raises the dtype** from integer to float; use
 `ExportConfig.dtype` if you need a narrower output.
 
+An identity op costs nothing but the warning. `scaled=True` on a row with no factors, and
+`preprocess=True` on a recipe that is only a `PassThrough` (Sentinel-1's, which Earth Engine has
+already corrected), both resolve to something that cannot change a pixel — so the backend drops the op
+instead of mapping it, and the request keeps the EEDAI fast path rather than being pushed onto Earth
+Engine for a no-op. An explicit `cloud_mask=` is never dropped: it is run as given.
+
 Opt-in is deliberate: switching it on by default would change every existing request's pixel values and
 dtype at once. `preprocess()` is the one-argument way to get the mask and the scaler together — see
 ["Analysis-ready pixels in one call"](#analysis-ready-pixels-in-one-call).

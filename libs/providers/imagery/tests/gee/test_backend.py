@@ -4663,7 +4663,9 @@ class TestServerSideFlags:
             scaled=True,
             scale=90.0,
         )
-        assert self._op(gee, "USGS/SRTMGL1_003").factors == ()
+        # The identity scaler is dropped rather than mapped, so nothing
+        # reaches `.map` and the EEDAI reader is still available.
+        assert self._op(gee, "USGS/SRTMGL1_003") is None
         assert "declares no band scale/offset" in "".join(warnings_buffer)
 
     def test_each_dataset_gets_its_own_op(self, make_gee):
@@ -5022,3 +5024,73 @@ class TestStaticImageWarning:
         self._warnings(monkeypatch)
         self._build(make_gee, scaled=True)
         assert calls == [_STATIC_SCALED]
+
+
+class TestIdentityOpsDoNotForceServerSide:
+    """L5: an op that provably does nothing must not cost the EEDAI reader."""
+
+    def _gee(self, make_gee, **overrides):
+        """A GEE over one dataset, the flag under test applied."""
+        params = dict(start="2024-05-01", end="2024-05-10", scale=90.0)
+        params.update(overrides)
+        return make_gee(**params)
+
+    def test_scaled_on_a_factorless_row_keeps_the_reader(
+        self, make_gee, warnings_buffer
+    ):
+        """An identity `BandScaler` changes nothing, so it changes no routing."""
+        gee = self._gee(
+            make_gee, variables={"USGS/SRTMGL1_003": ["elevation"]}, scaled=True
+        )
+        assert gee._server_side_ops == {}
+        assert gee._per_image_op(gee.catalog.get_dataset("USGS/SRTMGL1_003")) is None
+        assert gee._engine_config.needs_server_side_compute is False
+        assert "declares no band scale/offset" in "".join(warnings_buffer)
+
+    def test_preprocess_on_a_pass_through_recipe_keeps_the_reader(self, make_gee):
+        """Sentinel-1's recipe is a documented `PassThrough`: nothing to apply."""
+        gee = self._gee(
+            make_gee,
+            variables={"COPERNICUS/S1_GRD": ["VV"]},
+            preprocess=True,
+            scale=10.0,
+        )
+        assert gee._server_side_ops == {}
+        assert gee._engine_config.needs_server_side_compute is False
+
+    def test_a_real_scaler_still_declines_the_reader(self, make_gee):
+        """The routing change is only for identities, not for the flags."""
+        gee = self._gee(
+            make_gee,
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+            scaled=True,
+            scale=10.0,
+        )
+        assert set(gee._server_side_ops) == {"COPERNICUS/S2_SR_HARMONIZED"}
+        assert gee._engine_config.needs_server_side_compute is True
+
+    def test_only_the_identity_dataset_is_dropped(self, make_gee):
+        """A mixed request keeps the op for the row that has factors."""
+        gee = self._gee(
+            make_gee,
+            variables={
+                "COPERNICUS/S2_SR_HARMONIZED": ["B4"],
+                "USGS/SRTMGL1_003": ["elevation"],
+            },
+            scaled=True,
+            scale=10.0,
+        )
+        assert set(gee._server_side_ops) == {"COPERNICUS/S2_SR_HARMONIZED"}
+        assert gee._engine_config.needs_server_side_compute is True
+
+    def test_a_masking_recipe_is_never_an_identity(self, make_gee):
+        """A recipe whose mask is real is kept even if its scaler is empty."""
+        gee = self._gee(
+            make_gee,
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["SCL"]},
+            preprocess=True,
+            scale=10.0,
+        )
+        op = gee._per_image_op(gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED"))
+        assert op.name == "Sentinel2SclMask >> BandScaler"
+        assert gee._engine_config.needs_server_side_compute is True

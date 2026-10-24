@@ -225,7 +225,11 @@ class EngineConfig(SummarisedLeaf):
 
         Returns:
             `True` when a `cloud_mask`, any `filters`, or a `scaled=` /
-            `preprocess=` flag (`server_side_ops`) were given.
+            `preprocess=` flag that resolved a real op (`server_side_ops`)
+            were given. A flag whose op is an identity — a factorless
+            `BandScaler`, or a recipe that is only a `PassThrough` — does
+            not count: the backend drops it, because it cannot change a
+            pixel and so is no reason to decline the reader.
 
         Examples:
             - A plain request needs nothing computed, so the reader may serve

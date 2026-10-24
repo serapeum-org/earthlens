@@ -99,6 +99,7 @@ from earthlens.gee.cloud_masks import (
     BandScaler,
     ImageMask,
     MaskChain,
+    PassThrough,
     Sentinel2Cdi,
 )
 from earthlens.gee.configs import EngineConfig, ExportConfig
@@ -397,6 +398,13 @@ def _resolve_server_side_ops(
     requested bands, so neither has to be restated and the two cannot drift
     from `variables`.
 
+    An op that resolves to an *identity* is dropped rather than recorded:
+    `bool(self._server_side_ops)` is what sets `EngineConfig.server_side_ops`
+    and so declines the EEDAI reader, and declining it — the 32768-px cap,
+    the zip round trip, the per-scene limits — for an op that cannot change
+    a pixel is a cost with no effect. `BandScaler.for_dataset` has already
+    warned when it returns one, so nothing goes unreported.
+
     Args:
         variables: The request's asset-id-to-bands mapping.
         catalog: The catalog to read rows and recipes from.
@@ -404,7 +412,8 @@ def _resolve_server_side_ops(
         preprocess: Resolve each row's curated `preprocess:` recipe.
 
     Returns:
-        The op to `.map` per asset id, empty when neither flag is set.
+        The op to `.map` per asset id, empty when neither flag is set and
+        for any dataset whose op is an identity.
 
     Raises:
         ValueError: If both flags are set (the recipe already scales), or
@@ -418,11 +427,37 @@ def _resolve_server_side_ops(
             "preprocess=True already includes the scaling — drop scaled=."
         )
     for asset, bands in variables.items():
+        op: ImageMask | None = None
         if preprocess:
-            resolved[asset] = recipe_for(asset, bands, catalog=catalog)
+            op = recipe_for(asset, bands, catalog=catalog)
         elif scaled:
-            resolved[asset] = BandScaler.for_dataset(catalog.get_dataset(asset), bands)
+            op = BandScaler.for_dataset(catalog.get_dataset(asset), bands)
+        if op is not None and not _is_identity_op(op):
+            resolved[asset] = op
     return resolved
+
+
+def _is_identity_op(op: ImageMask) -> bool:
+    """Say whether an op provably leaves every pixel and mask untouched.
+
+    Two shapes resolve to one: a `BandScaler` carrying no factors (what
+    `BandScaler.for_dataset` returns, after a warning, for a row declaring
+    no `scale` / `offset`), and a `PassThrough` (what a recipe with nothing
+    to apply yields — Sentinel-1's, which Earth Engine already corrects
+    upstream). An op is an identity when every one of its leaves is.
+
+    Args:
+        op: A resolved per-image op, possibly a `MaskChain`.
+
+    Returns:
+        `True` when the op cannot change the image.
+    """
+    leaves = _flatten_image_ops(op)
+    return all(
+        isinstance(leaf, PassThrough)
+        or (isinstance(leaf, BandScaler) and not leaf.factors)
+        for leaf in leaves
+    )
 
 
 def _scaling_assets(server_side_ops: dict[str, ImageMask]) -> list[str]:
@@ -928,7 +963,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
             so they cannot drift from `variables`. Bands declaring
             neither factor pass through untouched; a dataset declaring
             none at all logs a warning and leaves the values raw rather
-            than failing. Defaults to `False`: switching it on would
+            than failing — and, since that scaler is an identity, it is
+            dropped instead of being mapped, so the request keeps the
+            EEDAI reader it would otherwise have paid for. Defaults to
+            `False`: switching it on would
             change every existing request's pixel values *and* dtype
             (integer to float) at once, and `ExportConfig.dtype` is the
             escape hatch for a narrower output. Composes with an
@@ -943,8 +981,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
             instead of restated. A dataset with no curated recipe raises
             at construction rather than silently doing nothing, and a
             recipe with nothing to apply resolves to an explicit
-            `PassThrough`. Mutually exclusive with `scaled=True`, which
-            the recipe already covers. Defaults to `False`.
+            `PassThrough` — which, being an identity, is dropped rather
+            than mapped, so the request keeps the EEDAI reader. Mutually
+            exclusive with `scaled=True`, which the recipe already
+            covers. Defaults to `False`.
         filters: Optional iterable of `ee.ImageCollection ->
             ee.ImageCollection` filters applied to the stack after the
             spatial / temporal filters (`filterBounds`, and `filterDate`
