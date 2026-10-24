@@ -100,9 +100,9 @@ class TestTableSinkValidation:
                 destination="bigquery", table="p.d.t", overwrite=True, append=True
             )
 
-    def test_overwrite_is_bigquery_only(self):
-        """The overwrite flag has no meaning on a file destination."""
-        with pytest.raises(ValidationError, match="BigQuery"):
+    def test_overwrite_is_refused_where_the_factory_lacks_it(self):
+        """`toDrive` has no overwrite parameter, so the flag is refused."""
+        with pytest.raises(ValidationError, match="no overwrite parameter"):
             TableSink(destination="drive", folder="f", overwrite=True)
 
     def test_append_is_bigquery_only(self):
@@ -364,3 +364,107 @@ class TestTaskTracking:
             "RUNNING",
             "EXPORT_FEATURES",
         )
+
+
+class TestAssetOverwrite:
+    """M1: `Export.table.toAsset` takes a real, forwarded `overwrite`."""
+
+    def test_the_sdk_scopes_overwrite_to_asset_and_bigquery(self):
+        """The scoping is read off the installed SDK, not restated."""
+        import inspect
+
+        import ee.batch  # noqa: F401 - the SDK whose scoping is mirrored
+
+        takes = {
+            name: "overwrite"
+            in inspect.signature(getattr(ee.batch.Export.table, name)).parameters
+            for name in (
+                "toDrive",
+                "toCloudStorage",
+                "toAsset",
+                "toBigQuery",
+                "toFeatureView",
+            )
+        }
+        assert takes == {
+            "toDrive": False,
+            "toCloudStorage": False,
+            "toAsset": True,
+            "toBigQuery": True,
+            "toFeatureView": False,
+        }
+
+    def test_the_sdk_scopes_append_to_bigquery_alone(self):
+        """`append` really is BigQuery-only, so that half of the rule stands."""
+        import inspect
+
+        import ee.batch  # noqa: F401 - the SDK whose scoping is mirrored
+
+        takes = {
+            name: "append"
+            in inspect.signature(getattr(ee.batch.Export.table, name)).parameters
+            for name in (
+                "toDrive",
+                "toCloudStorage",
+                "toAsset",
+                "toBigQuery",
+                "toFeatureView",
+            )
+        }
+        assert takes == {
+            "toDrive": False,
+            "toCloudStorage": False,
+            "toAsset": False,
+            "toBigQuery": True,
+            "toFeatureView": False,
+        }
+
+    def test_an_asset_sink_accepts_overwrite(self):
+        """Re-exporting a table asset in place is expressible."""
+        sink = TableSink(
+            destination="asset", asset_id="projects/p/assets/t", overwrite=True
+        )
+        assert sink.overwrite is True
+
+    def test_an_asset_sink_forwards_overwrite(self, fake_export):
+        """The flag reaches `toAsset`, or the asset export fails server-side."""
+        TableSink(
+            destination="asset", asset_id="projects/p/assets/t", overwrite=True
+        ).write("fc", description="d")
+        name, kwargs = fake_export.calls[0]
+        assert name == "toAsset"
+        assert kwargs["overwrite"] is True
+
+    def test_an_asset_sink_forwards_the_default(self, fake_export):
+        """The default is `False`, the same value the SDK defaults to."""
+        TableSink(destination="asset", asset_id="projects/p/assets/t").write(
+            "fc", description="d"
+        )
+        _, kwargs = fake_export.calls[0]
+        assert kwargs["overwrite"] is False
+
+    def test_an_asset_sink_still_refuses_append(self):
+        """`append` has no `toAsset` parameter, so it stays BigQuery-only."""
+        with pytest.raises(ValidationError, match="append"):
+            TableSink(destination="asset", asset_id="projects/p/assets/t", append=True)
+
+    @pytest.mark.parametrize(
+        "kwargs",
+        [
+            {"destination": "drive", "folder": "f"},
+            {"destination": "gcs", "bucket": "b"},
+            {"destination": "featureview", "asset_id": "a/b"},
+        ],
+        ids=["drive", "gcs", "featureview"],
+    )
+    def test_overwrite_is_still_refused_where_the_sdk_has_no_parameter(self, kwargs):
+        """The three factories without an `overwrite` parameter still refuse it."""
+        with pytest.raises(ValidationError, match="overwrite"):
+            TableSink(overwrite=True, **kwargs)
+
+    def test_overwrite_and_append_stay_mutually_exclusive_on_bigquery(self):
+        """Scoping `overwrite` wider does not relax BigQuery's own rule."""
+        with pytest.raises(ValidationError, match="mutually exclusive"):
+            TableSink(
+                destination="bigquery", table="p.d.t", overwrite=True, append=True
+            )

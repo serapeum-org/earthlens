@@ -721,9 +721,17 @@ TableSink(
 ).write(fc, description="stations")
 ```
 
-- **BigQuery write disposition** — `overwrite` replaces an existing table, `append` adds to one with a
-  compatible schema. Earth Engine refuses both at once, so the sink refuses both at construction; with
-  neither set, the export fails if the table already exists (EE's default).
+- **`overwrite` / `append`** — `overwrite` replaces what is already there, `append` adds to a table with
+  a compatible schema. Earth Engine refuses both at once, so the sink refuses both at construction; with
+  neither set, the export fails if the destination already exists (EE's default). Their scopes differ,
+  and each is the set of factories whose signature declares the parameter: `append` is BigQuery's alone,
+  while `overwrite` is also taken — and forwarded — by `asset`, since
+  `ee.batch.Export.table.toAsset(..., overwrite=…)` is a declared option. So re-exporting a table asset
+  in place is expressible:
+
+  ```python
+  TableSink(destination="asset", asset_id="projects/p/assets/stations", overwrite=True)
+  ```
 - **FeatureView serving options** — `toFeatureView` takes a single `ingestionTimeParameters` dict, and
   `maxFeaturesPerTile`, the thinning strategy and friends all go *inside* it, not as separate kwargs.
 - **Address validation** — each destination's required address (`bucket` for `gcs`, `asset_id` for

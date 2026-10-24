@@ -10,17 +10,21 @@ table-shaped counterpart: it dispatches a `FeatureCollection` to the matching
 exactly like an image one.
 
 The `drive` / `gcs` / `asset` trio is the core; `bigquery` / `featureview`
-carry their server-side options too — BigQuery's mutually exclusive
-`overwrite` / `append` write disposition, and FeatureView's
+carry their server-side options too — `overwrite` (replace what is already
+there) and `append` (add to it), and FeatureView's
 `ingestion_time_parameters` dict (`maxFeaturesPerTile`, the thinning strategy
 and friends all travel *inside* that one dict, as
 `ee.batch.Export.table.toFeatureView` takes them). Every destination's
 required address is validated at construction (see `_REQUIRED_ADDRESS`), so a
 misconfigured sink fails at the call that built it rather than as a late
-server error — and so is every option that is scoped to one destination:
-`overwrite` / `append` are BigQuery-only, `ingestion_time_parameters` is
-FeatureView-only, and `file_format` belongs to the two destinations that
-write a file (`_FILE_DESTINATIONS`), the rest ignoring it. The BigQuery
+server error — and so is every option that is scoped to a subset of the
+destinations. Each scope is the set of factories whose signature declares the
+parameter, not a framing: `overwrite` is for `bigquery` **and** `asset`
+(`toAsset` declares and forwards it, so a table asset can be re-exported in
+place), `append` is BigQuery's alone, `ingestion_time_parameters` is
+FeatureView's alone, and `file_format` belongs to the two destinations that
+write a file (`_FILE_DESTINATIONS`), the rest ignoring it. `overwrite` and
+`append` stay mutually exclusive, which is BigQuery's own rule. The BigQuery
 `table` is checked for *shape* as well as presence, mirroring the SDK's own
 `project.dataset.table` rule (`_BIGQUERY_TABLE_RE`), so that mistake lands
 here rather than as an `EEException` from `write()`. Whatever the destination,
@@ -61,6 +65,18 @@ _REQUIRED_ADDRESS: dict[str, str] = {
 #: `file_format` set for one of them is refused rather than dropped.
 _FILE_DESTINATIONS: frozenset[str] = frozenset({"drive", "gcs"})
 
+#: The destinations whose factory takes `overwrite`. Not BigQuery alone:
+#: `ee.batch.Export.table.toAsset(..., overwrite=False)` is a declared,
+#: forwarded parameter too ("If an existing asset can be overwritten by this
+#: export"), which is what makes re-exporting a table asset in place
+#: expressible. Scoped from the installed SDK's signatures rather than from
+#: the "write disposition" framing, which is BigQuery's alone.
+_OVERWRITE_DESTINATIONS: frozenset[str] = frozenset({"bigquery", "asset"})
+
+#: The destinations whose factory takes `append`. Here BigQuery really is
+#: alone: no other `Export.table.to*` has the parameter.
+_APPEND_DESTINATIONS: frozenset[str] = frozenset({"bigquery"})
+
 #: Earth Engine's own shape check for a BigQuery destination, mirrored so the
 #: mistake lands at construction instead of as an `EEException` from
 #: `ee.batch.Export.table.toBigQuery` at `write()` time. Verified against
@@ -84,7 +100,8 @@ class TableSink(BaseModel):
     its address (`bucket` for `gcs`, `asset_id` for `asset` / `featureview`,
     `table` for `bigquery` in Earth Engine's `project.dataset.table` shape —
     `drive` without a `folder` lands in the Drive root, Earth Engine's own
-    default), `overwrite` / `append` are mutually exclusive and BigQuery-only,
+    default), `overwrite` / `append` are mutually exclusive, `overwrite` is
+    for `bigquery` / `asset` and `append` for `bigquery`,
     `ingestion_time_parameters` is FeatureView-only, and `file_format` is for
     the `drive` / `gcs` destinations that pass it on.
 
@@ -162,7 +179,7 @@ class TableSink(BaseModel):
     bucket: str | None = None  # Cloud Storage bucket (gcs)
     asset_id: str | None = None  # asset path (asset / featureview)
     table: str | None = None  # BigQuery "project.dataset.table" (bigquery)
-    overwrite: bool = False  # BigQuery: replace an existing table
+    overwrite: bool = False  # replace what is there (bigquery / asset)
     append: bool = False  # BigQuery: add to an existing table
     ingestion_time_parameters: dict[str, Any] | None = (
         None  # FeatureView serving options, passed as one ee dict
@@ -185,8 +202,9 @@ class TableSink(BaseModel):
             The config unchanged once it is consistent.
 
         Raises:
-            ValueError: If `overwrite` and `append` are both set, either is
-                set for a non-BigQuery destination, `ingestion_time_parameters`
+            ValueError: If `overwrite` and `append` are both set, `overwrite`
+                is set outside `_OVERWRITE_DESTINATIONS`, `append` outside
+                `_APPEND_DESTINATIONS`, `ingestion_time_parameters`
                 is set for a non-FeatureView destination, `file_format` is set
                 for a destination that writes no file, the BigQuery `table` is
                 not `project.dataset.table`-shaped, or the destination's
@@ -211,10 +229,17 @@ class TableSink(BaseModel):
             )
         if self.overwrite and self.append:
             raise ValueError("overwrite and append are mutually exclusive")
-        if (self.overwrite or self.append) and self.destination != "bigquery":
+        if self.overwrite and self.destination not in _OVERWRITE_DESTINATIONS:
             raise ValueError(
-                "overwrite/append are BigQuery write dispositions; the "
-                f"destination is {self.destination!r}"
+                "overwrite is taken by the "
+                f"{sorted(_OVERWRITE_DESTINATIONS)} destinations; the "
+                f"destination is {self.destination!r}, whose "
+                "Export.table factory has no overwrite parameter"
+            )
+        if self.append and self.destination not in _APPEND_DESTINATIONS:
+            raise ValueError(
+                "append is a BigQuery write disposition; the destination is "
+                f"{self.destination!r}"
             )
         if (
             self.ingestion_time_parameters is not None
@@ -274,7 +299,10 @@ class TableSink(BaseModel):
             )
         elif self.destination == "asset":
             task = factory.toAsset(
-                collection=features, description=description, assetId=self.asset_id
+                collection=features,
+                description=description,
+                assetId=self.asset_id,
+                overwrite=self.overwrite,
             )
         elif self.destination == "bigquery":
             task = factory.toBigQuery(
