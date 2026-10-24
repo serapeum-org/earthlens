@@ -733,8 +733,10 @@ TableSink(
 ```
 
 - **`overwrite` / `append`** — `overwrite` replaces what is already there, `append` adds to a table with
-  a compatible schema. Earth Engine refuses both at once, so the sink refuses both at construction; with
-  neither set, the export fails if the destination already exists (EE's default). Their scopes differ,
+  a compatible schema. Earth Engine refuses both at once, so the sink refuses both at construction. For a
+  BigQuery table the SDK states the consequence of setting neither — "the export fails if the table already
+  exists and both `overwrite` and `append` are `false`" — while for an asset it documents only that
+  `overwrite` permits replacing one, without stating what happens when it is left off. Their scopes differ,
   and each is the set of factories whose signature declares the parameter: `append` is BigQuery's alone,
   while `overwrite` is also taken — and forwarded — by `asset`, since
   `ee.batch.Export.table.toAsset(..., overwrite=…)` is a declared option. So re-exporting a table asset
