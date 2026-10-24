@@ -80,6 +80,8 @@ the rendered API.
 
 ::: earthlens.gee.workload
 
+::: earthlens.gee.assets
+
 ::: earthlens.gee.io
 
 ## Client-side raster analysis

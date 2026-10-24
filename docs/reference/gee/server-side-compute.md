@@ -628,6 +628,31 @@ The tag covers the Earth Engine-served calls (`getDownloadURL`, `computePixels`,
 is where billing accrues. The EEDAI reader fetches stored pixels through GDAL, not `ee`, so an
 `engine="eedai"` read is never attributed; tagging an EEDAI-only run buys nothing.
 
+### Managing assets
+
+`export_via="asset"` creates assets; `AssetManager` is what manages them afterwards — a dedicated
+control-plane object over the `ee.data` asset family, deliberately *not* methods on `GEE`, so the
+read-focused backend never grows destructive verbs and the intent is explicit at the call site:
+
+```python
+from earthlens.gee import AssetManager
+
+manager = AssetManager(project="my-project")
+manager.create_folder("projects/my-project/assets/runs")
+for row in manager.list_assets("projects/my-project/assets/runs"):
+    print(row)                      # AssetInfo(projects/my-project/assets/runs/x, IMAGE, 1024)
+manager.copy_asset(src, dst)        # overwrite=True to replace
+manager.rename(src, dst)
+manager.set_acl(dst, {"all_users_can_read": True})
+manager.delete(src)                 # destructive, immediate, no undo
+```
+
+Reads (`get_asset`, `list_assets`, the create calls) come back as frozen `AssetInfo` rows that print as one
+line each. Ingestion (`start_ingestion` / `start_table_ingestion`, a `gs://` manifest in, an asset out) is
+asynchronous like the batch sinks and returns the same `TaskInfo`, so `get_task_status` /
+`wait_for_task_id` / `cancel_task` work on it unchanged. Asset management is pure control-plane: it is
+server-side regardless of any request's `engine=`, and the EEDAI reader is never involved.
+
 ## Choosing an engine, in practice
 
 | Situation | Engine |

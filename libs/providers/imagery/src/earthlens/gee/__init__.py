@@ -302,6 +302,13 @@ exposes a small set of helpers re-exported from this package:
   saving and restoring the *enclosing* tag on exit — the SDK's own
   `ee.data.workloadTagContext` resets to the default instead, wiping an
   outer scope. The EEDAI reader path is separate and stays unattributed.
+* `AssetManager`, with the frozen `AssetInfo` rows its reads return —
+  the asset lifecycle as its own control-plane object over `ee.data`:
+  create folder / collection, list, get, delete, copy, rename, property
+  and ACL updates, plus image / table ingestion submissions tracked as
+  `TaskInfo` exactly like the batch sinks. Deliberately **not** methods
+  on `GEE`: the read-focused backend stays free of destructive verbs,
+  and the manager is server-side control-plane regardless of `engine=`.
 
 Mirrors `earthlens.ecmwf.jobs` — see also the "Tracking asynchronous
 Earth Engine exports" notebook, `docs/examples/gee/track-batch-exports.ipynb`.
@@ -367,6 +374,7 @@ from earthlens.gee.analysis import (
     TrainingSet,
     supported_conversions,
 )
+from earthlens.gee.assets import AssetInfo, AssetManager
 from earthlens.gee.auth import AuthenticationError, EarthEngineAuth
 from earthlens.gee.backend import GEE, CloudMask, CollectionFilter
 from earthlens.gee.catalog import (
@@ -533,6 +541,8 @@ __all__ = [
     "wait_for_task_id",
     "resolve_destination",
     "WorkloadTag",
+    "AssetManager",
+    "AssetInfo",
     "Reducer",
     "Mean",
     "Median",

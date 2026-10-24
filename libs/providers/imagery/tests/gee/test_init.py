@@ -183,6 +183,9 @@ _EXPECTED_EXPORTS = {
     "resolve_destination",
     # Epic 6 Task 6.9 - the nest-safe workload-tag billing scope.
     "WorkloadTag",
+    # Epic 6 Task 6.10 - the asset-lifecycle control plane and its rows.
+    "AssetManager",
+    "AssetInfo",
 }
 
 
