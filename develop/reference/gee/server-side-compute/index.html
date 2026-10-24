@@ -24704,9 +24704,21 @@ Engine's named-algorithm composites plug in, since they carry config no string c
   the algorithm performs its own TOA calibration.</li>
 <li><code>Sentinel2Composite</code> maps the <code>Sentinel2Cdi</code> mask (<code>ee.Algorithms.Sentinel2.CDI</code>, the parallax-based
   cloud discriminator) over every scene, then reduces the masked stack with its inner <code>reducer</code> (median by
-  default). CDI is defined on the <strong>TOA</strong> product (<code>COPERNICUS/S2_HARMONIZED</code>), not L2A. The standalone
-  <code>Sentinel2Cdi(threshold=...)</code> mask is also an ordinary <code>cloud_mask=</code> drop-in.</li>
+  default). The standalone <code>Sentinel2Cdi(threshold=...)</code> mask is also an ordinary <code>cloud_mask=</code> drop-in.</li>
 </ul>
+<div class="admonition warning">
+<p class="admonition-title">CDI needs the TOA product, and L2A fails <em>silently</em></p>
+<p><code>ee.Algorithms.Sentinel2.CDI</code> is a parallax computation over the TOA band geometry, so it is only
+<em>valid</em> on <code>COPERNICUS/S2_HARMONIZED</code> (or the legacy <code>COPERNICUS/S2</code>). Pointed at surface reflectance
+it does <strong>not</strong> raise: checked live against earthengine-api 1.7.35 with evaluation forced, CDI returns
+a value on an L2A scene (<code>-0.083</code>) just as it does on the matching TOA scene (<code>-0.075</code>), and the masked
+band resolves to a pixel. There is therefore no server-side error to rely on — only a mask that is
+quietly wrong.</p>
+<p>Because the asset id is known at construction, earthlens refuses the pairing itself: a <code>Sentinel2Cdi</code>
+on <code>cloud_mask=</code> (directly or inside a <code>MaskChain</code>) or a <code>reducer=Sentinel2Composite()</code> against
+<code>COPERNICUS/S2_SR_HARMONIZED</code> / <code>COPERNICUS/S2_SR</code> raises a <code>ValueError</code> from <code>GEE(...)</code>. On surface
+reflectance use <code>Sentinel2SclMask</code>, <code>Sentinel2Qa60Mask</code> or <code>CloudScorePlus</code>.</p>
+</div>
 <p>Both are validated at construction like every reducer (<code>GEE(reducer=...)</code> resolves instances through the
 same <code>temporal_reducer_for</code> seam the strings use), are deliberately <em>not</em> in the <code>REDUCERS</code> registry, and
 exist <strong>only server-side</strong>: the EEDAI reader declines them (see the collection routing above), so the
