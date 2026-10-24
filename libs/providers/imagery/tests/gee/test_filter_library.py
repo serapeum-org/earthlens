@@ -133,6 +133,34 @@ class TestByQuality:
         )
         assert out.applied == [(op, "MEAN_SOLAR_ZENITH_ANGLE", 70.0)]
 
+    def test_a_string_equality_is_expressible(self):
+        """`eq` against a string property is the escape hatch's common case."""
+        f = ByQuality(property_name="SPACECRAFT_ID", op="eq", value="LANDSAT_8")
+        assert f.value == "LANDSAT_8"
+
+    def test_a_string_value_reaches_the_ee_factory_verbatim(self, fake_ee):
+        """The value is handed to `ee.Filter.eq` as a string, not coerced."""
+        out = ByQuality(property_name="SPACECRAFT_ID", op="eq", value="LANDSAT_8")(
+            _FakeCollection()
+        )
+        assert out.applied == [("eq", "SPACECRAFT_ID", "LANDSAT_8")]
+
+    def test_a_numeric_value_is_still_a_float(self):
+        """The numeric path is unchanged: an int is coerced as before."""
+        f = ByQuality(property_name="MEAN_SOLAR_ZENITH_ANGLE", op="lte", value=70)
+        assert f.value == 70.0
+
+    @pytest.mark.parametrize("op", ["lte", "gte", "lt", "gt"])
+    def test_a_string_value_is_refused_for_an_ordering_op(self, op):
+        """Earth Engine's ordering comparisons are numeric; say so at construction."""
+        with pytest.raises(ValidationError, match="numeric"):
+            ByQuality(property_name="SPACECRAFT_ID", op=op, value="LANDSAT_8")
+
+    def test_a_digit_string_stays_a_string(self):
+        """A numeric-looking string is not coerced, so `eq` matches the type."""
+        f = ByQuality(property_name="WRS_PATH", op="eq", value="42")
+        assert f.value == "42"
+
     def test_unknown_op_is_refused(self):
         """An operator outside the allowed set is refused at construction."""
         with pytest.raises(ValidationError):

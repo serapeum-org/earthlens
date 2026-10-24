@@ -264,7 +264,9 @@ Earth Engine-engine request):
   default property matches Landsat C2 (`SPACECRAFT_ID`), Sentinel-2 passes
   `property_name="SPACECRAFT_NAME"`.
 - `ByQuality(property_name=..., op="lte", value=...)` — the generic metadata-threshold escape hatch,
-  dispatching to `ee.Filter.{lte,gte,lt,gt,eq}`, so a new threshold needs no bespoke class.
+  dispatching to `ee.Filter.{lte,gte,lt,gt,eq}`, so a new threshold needs no bespoke class. `value`
+  takes a number, or a **string** with `op="eq"` (`property_name="SPACECRAFT_ID", value="LANDSAT_8"`) —
+  a string with an ordering comparison is refused at construction, since Earth Engine orders numbers.
 - `BySeason(season="JJA")` — one meteorological season (`DJF` / `MAM` / `JJA` / `SON`) *across every
   year* in the date window, expanded to an `ee.Filter.Or` over its months — the same idiom
   `Climatology` uses, so `DJF` wraps the year boundary correctly.

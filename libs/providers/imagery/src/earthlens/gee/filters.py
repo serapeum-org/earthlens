@@ -479,11 +479,22 @@ class ByQuality(CollectionFilter):
     threshold does not need a bespoke filter class. For the common
     cloud-cover case prefer `ByCloudCoverLte`, which names the intent.
 
+    `value` is a number for the four ordering comparisons and either a
+    number or a string for `eq` — a string metadata property is the
+    common case for equality (`SPACECRAFT_ID == "LANDSAT_8"`), and the
+    escape hatch would not be one if it could not express it. A string
+    with an ordering op is refused at construction: Earth Engine's
+    `lte` / `gte` / `lt` / `gt` compare numbers. For equality against
+    *several* values use `ByPropertyIn`, and for the Landsat/Sentinel
+    platform names `BySensor`.
+
     Attributes:
         property_name: The metadata property to threshold.
         op: The comparison — one of `"lte"`, `"gte"`, `"lt"`, `"gt"`,
             `"eq"`; anything else is refused at construction.
-        value: The threshold value.
+        value: The threshold value — a number, or a string with
+            `op="eq"`. A numeric-looking string stays a string, so the
+            comparison matches the property's own type.
 
     Examples:
         - Keep scenes with a low mean solar zenith angle:
@@ -493,11 +504,49 @@ class ByQuality(CollectionFilter):
             ('lte', 70.0)
 
             ```
+        - Keep one platform by its string property:
+            ```python
+            >>> ByQuality(property_name="SPACECRAFT_ID", op="eq", value="LANDSAT_8").value
+            'LANDSAT_8'
+
+            ```
+        - A string with an ordering comparison is refused:
+            ```python
+            >>> ByQuality(property_name="SPACECRAFT_ID", op="lte", value="LANDSAT_8")
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for ByQuality
+            ...
+
+            ```
     """
 
     property_name: str
     op: Literal["lte", "gte", "lt", "gt", "eq"]
-    value: float
+    # `float | str` in that order, so a number stays a number; pydantic's
+    # smart union leaves a `str` input as a `str` rather than parsing it, which
+    # is what keeps `eq` matching the property's own type.
+    value: float | str
+
+    @model_validator(mode="after")
+    def _comparable(self) -> ByQuality:
+        """Refuse a string value for a comparison Earth Engine runs on numbers.
+
+        Returns:
+            The filter unchanged when the value suits the operator.
+
+        Raises:
+            ValueError: If `value` is a string and `op` is an ordering
+                comparison rather than `"eq"`.
+        """
+        if isinstance(self.value, str) and self.op != "eq":
+            raise ValueError(
+                f"op={self.op!r} is an ordering comparison, which Earth "
+                f"Engine runs on numeric properties; value={self.value!r} is "
+                "a string, so only op='eq' can express it (or use "
+                "ByPropertyIn / BySensor for a set of names)"
+            )
+        return self
 
     def __call__(self, collection: ee.ImageCollection) -> ee.ImageCollection:
         """Apply the metadata-threshold filter.
@@ -573,8 +622,11 @@ class ByMonth(CollectionFilter):
     Wraps `ee.Filter.calendarRange(start_month, end_month, "month")`:
     one month when `end_month` is omitted, an inclusive window
     otherwise. A start after the end wraps across the year boundary
-    (Earth Engine's `calendarRange` semantics), so `ByMonth(11, 2)`
-    selects November through February. For the four named seasons
+    (Earth Engine's `calendarRange` semantics), so
+    `ByMonth(start_month=11, end_month=2)` selects November through
+    February — verified live: `calendarRange(11, 2, "month")` keeps
+    months {1, 2, 11, 12}. The keywords are not optional: a pydantic
+    model takes no positional arguments. For the four named seasons
     prefer `BySeason`.
 
     Attributes:

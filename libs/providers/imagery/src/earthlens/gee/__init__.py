@@ -292,7 +292,8 @@ median composite is a facade call rather than raw `ee`:
   / `ByPropertyIn` / `ByCloudCoverLte` / `ByYearAndBounds`, plus the
   expanded scene selectors `ByOrbit` (Sentinel-1 pass direction /
   relative orbit), `BySensor` (platform list), `ByQuality` (generic
-  metadata threshold) and `BySeason` / `ByMonth` / `ByDayOfYear`
+  metadata threshold, numeric or — with `op="eq"` — a string
+  property) and `BySeason` / `ByMonth` / `ByDayOfYear`
   (calendar periods across every year, via
   `ee.Filter.calendarRange`), all under the class-form
   `CollectionFilter` base (the top-level
