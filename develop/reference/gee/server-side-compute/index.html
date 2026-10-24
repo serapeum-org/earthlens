@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -3357,6 +3357,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Level 2 — filters=, collection-level compute">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-expanded-filter-library" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The expanded filter library
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -23998,6 +24015,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Level 2 — filters=, collection-level compute">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-expanded-filter-library" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The expanded filter library
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -24456,6 +24490,31 @@ lose its wrapper:</p>
 top-level <code>earthlens.gee.CollectionFilter</code> stays the <code>Callable</code> <em>type alias</em> describing the hook; the
 class of the same name in <code>earthlens.gee.filters</code> is the base that implements it. Class or function, any
 filter moves the request onto an Earth Engine engine, as above.</p>
+<h3 id="the-expanded-filter-library"><a class="toclink" href="#the-expanded-filter-library">The expanded filter library</a><a class="headerlink" href="#the-expanded-filter-library" title="Permanent link">#</a></h3>
+<p>Six further class-only selectors cover what SAR, multi-sensor and seasonal work needs — each a frozen,
+construction-validated <code>CollectionFilter</code> drop-in for a <code>filters=</code> entry (and, like every filter, an
+Earth Engine-engine request):</p>
+<ul>
+<li><code>ByOrbit(pass_direction=..., relative_orbit=...)</code> — pins a Sentinel-1 pass direction
+  (<code>orbitProperties_pass</code>) and/or relative orbit (<code>relativeOrbitNumber_start</code>). Ascending and
+  descending passes have different look geometries, so mixing them in a composite is almost always
+  wrong; at least one constraint is required.</li>
+<li><code>BySensor(values=("LANDSAT_8", "LANDSAT_9"))</code> — platform selection via <code>ee.Filter.inList</code>; the
+  default property matches Landsat C2 (<code>SPACECRAFT_ID</code>), Sentinel-2 passes
+  <code>property_name="SPACECRAFT_NAME"</code>.</li>
+<li><code>ByQuality(property_name=..., op="lte", value=...)</code> — the generic metadata-threshold escape hatch,
+  dispatching to <code>ee.Filter.{lte,gte,lt,gt,eq}</code>, so a new threshold needs no bespoke class.</li>
+<li><code>BySeason(season="JJA")</code> — one meteorological season (<code>DJF</code> / <code>MAM</code> / <code>JJA</code> / <code>SON</code>) <em>across every
+  year</em> in the date window, expanded to an <code>ee.Filter.Or</code> over its months — the same idiom
+  <code>Climatology</code> uses, so <code>DJF</code> wraps the year boundary correctly.</li>
+<li><code>ByMonth(start_month=6, end_month=8)</code> / <code>ByDayOfYear(start_day=152, end_day=243)</code> — calendar windows
+  across every year via <code>ee.Filter.calendarRange</code>; a start after the end wraps (Earth Engine
+  semantics), and omitting the end selects the single period.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.filters</span><span class="w"> </span><span class="kn">import</span> <span class="n">ByOrbit</span><span class="p">,</span> <span class="n">BySeason</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">filters</span><span class="o">=</span><span class="p">[</span><span class="n">ByOrbit</span><span class="p">(</span><span class="n">pass_direction</span><span class="o">=</span><span class="s2">&quot;ASCENDING&quot;</span><span class="p">,</span> <span class="n">relative_orbit</span><span class="o">=</span><span class="mi">87</span><span class="p">),</span> <span class="n">BySeason</span><span class="p">(</span><span class="n">season</span><span class="o">=</span><span class="s2">&quot;JJA&quot;</span><span class="p">)]</span>
+</code></pre></div>
 <h2 id="level-3-cloud_mask-per-image-compute"><a class="toclink" href="#level-3-cloud_mask-per-image-compute">Level 3 — <code>cloud_mask=</code>, per-image compute</a><a class="headerlink" href="#level-3-cloud_mask-per-image-compute" title="Permanent link">#</a></h2>
 <p><code>cloud_mask</code> is typed <code>Callable[[ee.Image], ee.Image]</code> and is <code>.map</code>-applied to every image in the
 collection. <strong>Despite the name it is a general per-image hook</strong>, not only a mask — any <code>ee.Image</code>
@@ -24466,27 +24525,27 @@ expression is fair game.</p>
   (8 / 9) and thin cirrus (10). It deliberately <strong>keeps</strong> saturated/defective (1) and snow/ice (11).</li>
 <li><code>landsat_sr(image, sensor=...)</code> — Landsat C2-L2, keeping the <code>QA_PIXEL</code> Clear bit (bit 6).</li>
 </ul>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.cloud_masks</span><span class="w"> </span><span class="kn">import</span> <span class="n">sentinel2_scl</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gee&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;COPERNICUS/S2_SR_HARMONIZED&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;B4&quot;</span><span class="p">,</span> <span class="s2">&quot;B3&quot;</span><span class="p">,</span> <span class="s2">&quot;B2&quot;</span><span class="p">],</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-05-01&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-06-15&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">29.9</span><span class="p">,</span> <span class="mf">30.1</span><span class="p">],</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">31.2</span><span class="p">,</span> <span class="mf">31.4</span><span class="p">],</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="n">reducer</span><span class="o">=</span><span class="s2">&quot;median&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="n">cloud_mask</span><span class="o">=</span><span class="n">sentinel2_scl</span><span class="p">,</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.cloud_masks</span><span class="w"> </span><span class="kn">import</span> <span class="n">sentinel2_scl</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gee&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;COPERNICUS/S2_SR_HARMONIZED&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;B4&quot;</span><span class="p">,</span> <span class="s2">&quot;B3&quot;</span><span class="p">,</span> <span class="s2">&quot;B2&quot;</span><span class="p">],</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-05-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-06-15&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">29.9</span><span class="p">,</span> <span class="mf">30.1</span><span class="p">],</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">31.2</span><span class="p">,</span> <span class="mf">31.4</span><span class="p">],</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    <span class="n">reducer</span><span class="o">=</span><span class="s2">&quot;median&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>    <span class="n">cloud_mask</span><span class="o">=</span><span class="n">sentinel2_scl</span><span class="p">,</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="p">)</span>
 </code></pre></div>
 <p>Both masks also ship as frozen callable classes — <code>LandsatSrMask(sensor=...)</code> and
 <code>Sentinel2SclMask(masked_classes=...)</code>, under the <code>earthlens.gee.cloud_masks.ImageMask</code> base — validated
 at construction and drop-ins for <code>cloud_mask=</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.cloud_masks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sentinel2SclMask</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">cloud_mask</span><span class="o">=</span><span class="n">Sentinel2SclMask</span><span class="p">(</span><span class="n">masked_classes</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">))</span>   <span class="c1"># also drop snow/ice</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.cloud_masks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sentinel2SclMask</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">cloud_mask</span><span class="o">=</span><span class="n">Sentinel2SclMask</span><span class="p">(</span><span class="n">masked_classes</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">))</span>   <span class="c1"># also drop snow/ice</span>
 </code></pre></div>
 <p>The masks derive their output with <code>updateMask</code>, which keeps image properties — <code>system:time_start</code> in
 particular — so the per-bucket date filter the composite engine applies <em>after</em> the mask still sees every
@@ -24516,10 +24575,10 @@ the same contract as the first gotcha below; the curated rows named above all de
 harmonized S2 archive, so the mask links each scene to its score image with <code>linkCollection</code> — a
 per-image match on <code>system:index</code> — then keeps pixels scoring at or above <code>threshold</code>. Because the link
 is per image, it works unchanged under <code>collection.map(...)</code> and is an ordinary <code>cloud_mask=</code> drop-in:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.cloud_masks</span><span class="w"> </span><span class="kn">import</span> <span class="n">CloudScorePlus</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">cloud_mask</span><span class="o">=</span><span class="n">CloudScorePlus</span><span class="p">()</span>                          <span class="c1"># band=&quot;cs&quot;, threshold=0.6 — Google&#39;s recipe</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">cloud_mask</span><span class="o">=</span><span class="n">CloudScorePlus</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="s2">&quot;cs_cdf&quot;</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.cloud_masks</span><span class="w"> </span><span class="kn">import</span> <span class="n">CloudScorePlus</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">cloud_mask</span><span class="o">=</span><span class="n">CloudScorePlus</span><span class="p">()</span>                          <span class="c1"># band=&quot;cs&quot;, threshold=0.6 — Google&#39;s recipe</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">cloud_mask</span><span class="o">=</span><span class="n">CloudScorePlus</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="s2">&quot;cs_cdf&quot;</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 </code></pre></div>
 <p>The two score bands differ: <code>cs</code> scores each pixel on its own; <code>cs_cdf</code> integrates a cumulative
 distribution and tends to be more conservative over bright surfaces. The threshold is a <code>[0, 1]</code> quality
@@ -24528,18 +24587,18 @@ bands, so no separate shadow projection is applied. Reading the second collectio
 so this mask — like every <code>cloud_mask=</code> — runs on an Earth Engine engine, never the EEDAI reader.</p>
 <h3 id="ordering-and-why-it-matters"><a class="toclink" href="#ordering-and-why-it-matters">Ordering, and why it matters</a><a class="headerlink" href="#ordering-and-why-it-matters" title="Permanent link">#</a></h3>
 <p>The chain is:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>filterDate → filterBounds → filters (left to right) → cloud_mask (.map) → select(bands)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>filterDate → filterBounds → filters (left to right) → cloud_mask (.map) → select(bands)
 </code></pre></div>
 <p><code>cloud_mask</code> runs <strong>before</strong> <code>select</code> on purpose: an optical mask reads a quality band (<code>QA_PIXEL</code>, <code>SCL</code>)
 that your <code>variables</code> usually omit, so selecting first would strip the band the mask needs.</p>
 <h3 id="the-one-real-constraint-band-names-must-be-in-the-catalog"><a class="toclink" href="#the-one-real-constraint-band-names-must-be-in-the-catalog">The one real constraint: band names must be in the catalog</a><a class="headerlink" href="#the-one-real-constraint-band-names-must-be-in-the-catalog" title="Permanent link">#</a></h3>
 <p>Every requested band is validated against the catalog before the graph is built, so <strong>a band your hook
 creates cannot be requested</strong>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s2">&quot;COPERNICUS/S2_SR_HARMONIZED&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_band</span><span class="p">(</span><span class="s2">&quot;NDVI&quot;</span><span class="p">)</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="o">...</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="ne">ValueError</span><span class="p">:</span> <span class="s1">&#39;NDVI&#39;</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">a</span> <span class="n">band</span> <span class="n">of</span> <span class="s1">&#39;COPERNICUS/S2_SR_HARMONIZED&#39;</span><span class="o">.</span> <span class="n">Known</span> <span class="n">bands</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="s2">&quot;COPERNICUS/S2_SR_HARMONIZED&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_band</span><span class="p">(</span><span class="s2">&quot;NDVI&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="o">...</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="ne">ValueError</span><span class="p">:</span> <span class="s1">&#39;NDVI&#39;</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">a</span> <span class="n">band</span> <span class="n">of</span> <span class="s1">&#39;COPERNICUS/S2_SR_HARMONIZED&#39;</span><span class="o">.</span> <span class="n">Known</span> <span class="n">bands</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
 </code></pre></div>
 <p>So <code>cloud_mask</code> is the right seam for <strong>transforming</strong> bands that already exist — masking, rescaling to
 physical units, dB conversion, a per-image correction — and the wrong seam for adding a new named output.</p>
@@ -24547,9 +24606,9 @@ physical units, dB conversion, a per-image correction — and the wrong seam for
 <ol>
 <li>
 <p><strong>Overwrite a declared band.</strong> Works today, at the cost of an honest name:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">ndvi_into_b8</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="n">nd</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">normalizedDifference</span><span class="p">([</span><span class="s2">&quot;B8&quot;</span><span class="p">,</span> <span class="s2">&quot;B4&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;B8&quot;</span><span class="p">)</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="k">return</span> <span class="n">image</span><span class="o">.</span><span class="n">addBands</span><span class="p">(</span><span class="n">nd</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">ndvi_into_b8</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="n">nd</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">normalizedDifference</span><span class="p">([</span><span class="s2">&quot;B8&quot;</span><span class="p">,</span> <span class="s2">&quot;B4&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;B8&quot;</span><span class="p">)</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="k">return</span> <span class="n">image</span><span class="o">.</span><span class="n">addBands</span><span class="p">(</span><span class="n">nd</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 <p>Request <code>variables=["B8"]</code> and the file carries NDVI under the name <code>B8</code>. The catalog's <code>min</code> / <code>max</code> /
 <code>scale</code> metadata for <code>B8</code> no longer describes the contents, so this is a deliberate trade, not a
@@ -24568,37 +24627,37 @@ recommendation.</p>
 "multiply the raw DN by this to get physical units" — but <strong>nothing applies it</strong>. Sentinel-2 surface
 reflectance arrives as 0–10000 integers, not 0–1 reflectance. Scale it yourself, in a <code>cloud_mask</code> hook
 if you want it done server-side before the composite:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">to_reflectance</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="k">return</span> <span class="n">image</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="mf">0.0001</span><span class="p">)</span><span class="o">.</span><span class="n">copyProperties</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">propertyNames</span><span class="p">())</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">to_reflectance</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="k">return</span> <span class="n">image</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="mf">0.0001</span><span class="p">)</span><span class="o">.</span><span class="n">copyProperties</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">propertyNames</span><span class="p">())</span>
 </code></pre></div>
 <p>Note the <code>copyProperties</code>: <code>multiply</code> drops image metadata, which any metadata-dependent <code>filters</code> running
 after it would then miss.</p>
 <h2 id="level-4-client-the-full-escape-hatch"><a class="toclink" href="#level-4-client-the-full-escape-hatch">Level 4 — <code>.client</code>, the full escape hatch</a><a class="headerlink" href="#level-4-client-the-full-escape-hatch" title="Permanent link">#</a></h2>
 <p>When the knobs run out, take the authenticated <code>ee</code> module and do whatever Earth Engine does. You do not
 re-do authentication; <code>client</code> is a lazy property that returns the initialized module.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gee&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;COPERNICUS/S1_GRD&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;VV&quot;</span><span class="p">],</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-03-01&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">29.9</span><span class="p">,</span> <span class="mf">30.1</span><span class="p">],</span>
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">31.2</span><span class="p">,</span> <span class="mf">31.4</span><span class="p">],</span>
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
-<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
-<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="n">gee</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">datasource</span>          <span class="c1"># the GEE backend instance</span>
-<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="n">ee</span> <span class="o">=</span> <span class="n">gee</span><span class="o">.</span><span class="n">client</span>              <span class="c1"># the initialized `ee` module</span>
-<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="nb">print</span><span class="p">(</span><span class="n">gee</span><span class="o">.</span><span class="n">project</span><span class="p">)</span>           <span class="c1"># the resolved Cloud project</span>
-<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>
-<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="n">s1</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>    <span class="n">ee</span><span class="o">.</span><span class="n">ImageCollection</span><span class="p">(</span><span class="s2">&quot;COPERNICUS/S1_GRD&quot;</span><span class="p">)</span>
-<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>    <span class="o">.</span><span class="n">filterBounds</span><span class="p">(</span><span class="n">ee</span><span class="o">.</span><span class="n">Geometry</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">([</span><span class="mf">31.2</span><span class="p">,</span> <span class="mf">29.9</span><span class="p">,</span> <span class="mf">31.4</span><span class="p">,</span> <span class="mf">30.1</span><span class="p">]))</span>
-<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a>    <span class="o">.</span><span class="n">filterDate</span><span class="p">(</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span> <span class="s2">&quot;2024-03-01&quot;</span><span class="p">)</span>
-<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>    <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">ee</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="s2">&quot;instrumentMode&quot;</span><span class="p">,</span> <span class="s2">&quot;IW&quot;</span><span class="p">))</span>
-<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="p">)</span>
-<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="n">speckle_filtered</span> <span class="o">=</span> <span class="n">s1</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">img</span><span class="p">:</span> <span class="n">img</span><span class="o">.</span><span class="n">focal_median</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="s2">&quot;circle&quot;</span><span class="p">,</span> <span class="s2">&quot;meters&quot;</span><span class="p">))</span>
-<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a><span class="n">composite</span> <span class="o">=</span> <span class="n">speckle_filtered</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;VV&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">median</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gee&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    <span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;COPERNICUS/S1_GRD&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;VV&quot;</span><span class="p">],</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2024-03-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">29.9</span><span class="p">,</span> <span class="mf">30.1</span><span class="p">],</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">31.2</span><span class="p">,</span> <span class="mf">31.4</span><span class="p">],</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="n">gee</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">datasource</span>          <span class="c1"># the GEE backend instance</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="n">ee</span> <span class="o">=</span> <span class="n">gee</span><span class="o">.</span><span class="n">client</span>              <span class="c1"># the initialized `ee` module</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="nb">print</span><span class="p">(</span><span class="n">gee</span><span class="o">.</span><span class="n">project</span><span class="p">)</span>           <span class="c1"># the resolved Cloud project</span>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="n">s1</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>    <span class="n">ee</span><span class="o">.</span><span class="n">ImageCollection</span><span class="p">(</span><span class="s2">&quot;COPERNICUS/S1_GRD&quot;</span><span class="p">)</span>
+<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>    <span class="o">.</span><span class="n">filterBounds</span><span class="p">(</span><span class="n">ee</span><span class="o">.</span><span class="n">Geometry</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">([</span><span class="mf">31.2</span><span class="p">,</span> <span class="mf">29.9</span><span class="p">,</span> <span class="mf">31.4</span><span class="p">,</span> <span class="mf">30.1</span><span class="p">]))</span>
+<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a>    <span class="o">.</span><span class="n">filterDate</span><span class="p">(</span><span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span> <span class="s2">&quot;2024-03-01&quot;</span><span class="p">)</span>
+<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a>    <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">ee</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="s2">&quot;instrumentMode&quot;</span><span class="p">,</span> <span class="s2">&quot;IW&quot;</span><span class="p">))</span>
+<a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a><span class="p">)</span>
+<a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a><span class="n">speckle_filtered</span> <span class="o">=</span> <span class="n">s1</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">img</span><span class="p">:</span> <span class="n">img</span><span class="o">.</span><span class="n">focal_median</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="s2">&quot;circle&quot;</span><span class="p">,</span> <span class="s2">&quot;meters&quot;</span><span class="p">))</span>
+<a id="__codelineno-11-23" name="__codelineno-11-23" href="#__codelineno-11-23"></a><span class="n">composite</span> <span class="o">=</span> <span class="n">speckle_filtered</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;VV&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">median</span><span class="p">()</span>
 </code></pre></div>
 <p>From here you have full parity with the Code Editor: <code>ee.Algorithms</code>, <code>reduceRegion(s)</code>, <code>ee.Join</code>,
 <code>ee.Classifier</code>, <code>ee.Reducer</code> combinations, <code>ee.Image.expression</code>, arbitrary <code>.map</code>.</p>
@@ -24634,9 +24693,9 @@ re-do authentication; <code>client</code> is a lazy property that returns the in
 </tr>
 </tbody>
 </table>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">sample_points_to_gdf</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">sampled</span> <span class="o">=</span> <span class="n">sample_points_to_gdf</span><span class="p">(</span><span class="n">composite</span><span class="p">,</span> <span class="n">stations_gdf</span><span class="p">,</span> <span class="n">scale_m</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">sample_points_to_gdf</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">sampled</span> <span class="o">=</span> <span class="n">sample_points_to_gdf</span><span class="p">(</span><span class="n">composite</span><span class="p">,</span> <span class="n">stations_gdf</span><span class="p">,</span> <span class="n">scale_m</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="exporting-a-graph-you-built-yourself"><a class="toclink" href="#exporting-a-graph-you-built-yourself">Exporting a graph you built yourself</a><a class="headerlink" href="#exporting-a-graph-you-built-yourself" title="Permanent link">#</a></h3>
 <p>For a computed image too large for <code>getDownloadURL</code>, use the asynchronous sinks. Set
@@ -24651,36 +24710,36 @@ holes before reducing</em>. Each is imported from <code>earthlens.gee</code>.</p
 <p><code>TemporalSegmentation</code> (<code>LandTrendr</code> / <code>Ccdc</code>) finds breakpoints in a per-pixel trajectory — disturbance and
 recovery — and returns a <code>SegmentationResult</code> wrapping the algorithm's array-valued <code>ee.Image</code>, never a
 plottable raster. Mask clouds first; the algorithms assume a clean series:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">LandTrendr</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">nbr</span> <span class="o">=</span> <span class="n">masked_collection</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">img</span><span class="p">:</span> <span class="n">img</span><span class="o">.</span><span class="n">normalizedDifference</span><span class="p">([</span><span class="s2">&quot;B5&quot;</span><span class="p">,</span> <span class="s2">&quot;B7&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;NBR&quot;</span><span class="p">))</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="n">result</span> <span class="o">=</span> <span class="n">LandTrendr</span><span class="p">(</span><span class="n">maxSegments</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span><span class="n">nbr</span><span class="p">)</span>   <span class="c1"># invert=True by default for a vegetation index</span>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="n">vertices</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">array</span>                            <span class="c1"># the ee.Array image, for your own getInfo/export</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">LandTrendr</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">nbr</span> <span class="o">=</span> <span class="n">masked_collection</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">img</span><span class="p">:</span> <span class="n">img</span><span class="o">.</span><span class="n">normalizedDifference</span><span class="p">([</span><span class="s2">&quot;B5&quot;</span><span class="p">,</span> <span class="s2">&quot;B7&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;NBR&quot;</span><span class="p">))</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="n">result</span> <span class="o">=</span> <span class="n">LandTrendr</span><span class="p">(</span><span class="n">maxSegments</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span><span class="n">nbr</span><span class="p">)</span>   <span class="c1"># invert=True by default for a vegetation index</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="n">vertices</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">array</span>                            <span class="c1"># the ee.Array image, for your own getInfo/export</span>
 </code></pre></div>
 <p><code>Climatology</code> reduces a collection <em>per calendar period across a baseline</em> (<code>dayofyear</code> / <code>month</code> / <code>season</code>),
 and <code>anomaly()</code> is the observed-minus-baseline companion:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">Climatology</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">clim</span> <span class="o">=</span> <span class="n">Climatology</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;month&quot;</span><span class="p">,</span> <span class="n">baseline</span><span class="o">=</span><span class="p">(</span><span class="mi">1991</span><span class="p">,</span> <span class="mi">2020</span><span class="p">),</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="n">monthly</span> <span class="o">=</span> <span class="n">clim</span><span class="o">.</span><span class="n">climatology</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>                       <span class="c1"># one image per month</span>
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="n">june_2024</span> <span class="o">=</span> <span class="n">clim</span><span class="o">.</span><span class="n">anomaly</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">collection_2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>     <span class="c1"># this June vs the 1991-2020 June mean</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">Climatology</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">clim</span> <span class="o">=</span> <span class="n">Climatology</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;month&quot;</span><span class="p">,</span> <span class="n">baseline</span><span class="o">=</span><span class="p">(</span><span class="mi">1991</span><span class="p">,</span> <span class="mi">2020</span><span class="p">),</span> <span class="n">reducer</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">monthly</span> <span class="o">=</span> <span class="n">clim</span><span class="o">.</span><span class="n">climatology</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>                       <span class="c1"># one image per month</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="n">june_2024</span> <span class="o">=</span> <span class="n">clim</span><span class="o">.</span><span class="n">anomaly</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">collection_2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>     <span class="c1"># this June vs the 1991-2020 June mean</span>
 </code></pre></div>
 <p><code>ClosestImage</code> selects the scene nearest a target date, within an optional tolerance (an out-of-range target
 with a tolerance set yields an empty selection rather than a distant scene):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClosestImage</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="n">nearest</span> <span class="o">=</span> <span class="n">ClosestImage</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">tolerance</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">15</span><span class="p">))</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClosestImage</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="n">nearest</span> <span class="o">=</span> <span class="n">ClosestImage</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">tolerance</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">15</span><span class="p">))</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
 </code></pre></div>
 <p><code>GapFill</code> fills temporal holes <em>before</em> a reduction or sampling, by <code>linear</code> / <code>nearest</code> / <code>harmonic</code>
 interpolation over a within-<code>max_gap</code> neighbour join — <code>max_gap</code> is a refusal, not a hint, so a pixel with no
 valid neighbour in the window stays masked:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">GapFill</span>
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
-<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="n">filled</span> <span class="o">=</span> <span class="n">GapFill</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">max_gap</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">30</span><span class="p">))</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">GapFill</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">filled</span> <span class="o">=</span> <span class="n">GapFill</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">max_gap</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">30</span><span class="p">))</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="choosing-an-engine-in-practice"><a class="toclink" href="#choosing-an-engine-in-practice">Choosing an engine, in practice</a><a class="headerlink" href="#choosing-an-engine-in-practice" title="Permanent link">#</a></h2>
 <table>
