@@ -935,8 +935,13 @@ choice.
     So spot-checking a few pixels of the server-side result against `model.predict` will show mismatches
     on a non-unanimous forest, and they are this rule rather than a faulty export. To compare
     like-for-like, run `codec.from_ee(classifier)` — the `TreeEnsemble` it returns applies Earth Engine's
-    vote. If you need the forest's exact labels, classify locally after a download with Epic 2's
-    `Classify`.
+    vote, **tie-break included**. Earth Engine documents the majority vote but not how it settles a tie,
+    which an even number of members produces routinely, so that half was checked live against
+    `ee.Classifier.decisionTreeEnsemble` (earthengine-api 1.7.35): it returns the **smallest** tied
+    label — `[1, 2]` → `1`, `[3, 9]` → `3`, `[0, 4]` → `0`, `[5, 5, 8, 8]` → `5` — regardless of the
+    order the trees are given in, which is what `TreeEnsemble` does. `test_ml_e2e.py` (marker `e2e`)
+    re-runs that comparison against the live service. If you need the forest's exact labels, classify
+    locally after a download with Epic 2's `Classify`.
 
 `from_ee` is the partial reverse: it parses the tree strings back into a `TreeEnsemble`, a pure-Python
 hard-majority-vote predictor — not a scikit-learn estimator, since the fitted probabilities do not survive

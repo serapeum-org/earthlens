@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import Counter
 from types import SimpleNamespace
 
 import numpy as np
@@ -78,12 +79,22 @@ def _divergent_forest():
 
 
 def _hard_vote(forest, samples):
-    """Majority-vote the forest's members by label, ties to the smallest."""
+    """Majority-vote the forest's members by label, ties to the smallest.
+
+    Written out with `Counter` rather than calling `ml_module._majority`, so
+    the parity assertion compares the implementation against an independent
+    statement of the rule instead of against itself.
+    """
     labels = np.asarray(forest.classes_)
     per_tree = np.column_stack(
         [labels[member.predict(samples).astype(int)] for member in forest.estimators_]
     )
-    return np.asarray([ml_module._majority(row) for row in per_tree])
+    voted = []
+    for row in per_tree:
+        counts = Counter(float(vote) for vote in row)
+        best = max(counts.values())
+        voted.append(min(label for label, seen in counts.items() if seen == best))
+    return np.asarray(voted)
 
 
 class TestCodecValidation:

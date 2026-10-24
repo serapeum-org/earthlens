@@ -279,6 +279,14 @@ def _predict_tree(
 def _majority(votes: Any) -> float:
     """Return the most common vote, breaking ties on the smallest label.
 
+    `np.unique` returns the labels sorted and `np.argmax` takes the first
+    maximum, so a tie resolves to the smallest tied label. That is Earth
+    Engine's rule too — verified live against
+    `ee.Classifier.decisionTreeEnsemble` on earthengine-api 1.7.35: a
+    two-tree ensemble voting `[1, 2]` returns `1`, `[3, 9]` returns `3`,
+    `[0, 4]` returns `0`, and `[5, 5, 8, 8]` returns `5`, whichever order
+    the members are given in.
+
     Args:
         votes: One row of per-tree class votes.
 
@@ -377,9 +385,14 @@ class TreeEnsemble(BaseModel):
 
     What `ClassifierCodec.from_ee` returns: each tree descends its parsed
     branches to a leaf, and the ensemble takes the majority vote (ties break
-    to the smallest label). That is Earth Engine's own rule, so on the same
-    inputs it reproduces what `ee.Classifier.decisionTreeEnsemble` predicts
-    from the exported trees.
+    to the smallest label). That is Earth Engine's own rule — Earth Engine
+    documents the vote but not the tie-break, so it was checked live against
+    `ee.Classifier.decisionTreeEnsemble` on earthengine-api 1.7.35: tied
+    two-tree ensembles voting `[1, 2]`, `[3, 9]` and `[0, 4]` come back `1`,
+    `3` and `0`, a four-tree `[5, 5, 8, 8]` comes back `5`, and swapping the
+    members changes nothing, so the break is by label and not by tree order.
+    On the same inputs this therefore reproduces what
+    `ee.Classifier.decisionTreeEnsemble` predicts from the exported trees.
 
     It is *not* a scikit-learn estimator — the fitted probabilities did not
     survive the string format — and **that is a prediction difference, not
