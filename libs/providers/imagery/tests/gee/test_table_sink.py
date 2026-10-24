@@ -210,7 +210,21 @@ class TestTableSinkValidation:
         """The two destinations that forward `fileFormat` still accept it."""
         assert TableSink(file_format="GeoJSON", **kwargs).file_format == "GeoJSON"
 
-    @pytest.mark.parametrize("table", ["nodots", "p.d", "p.d.", ".d.t"])
+    @pytest.mark.parametrize(
+        "table",
+        [
+            "nodots",
+            "p.d",
+            "p.d.",
+            ".d.t",
+            # A newline is not part of any identifier, and each segment is
+            # spelled `[^.\n]+` so none of the three can absorb one.
+            "p.d.t\n",
+            "\np.d.t",
+            "p.d\n.t",
+            "p.d.t\nq.r.s",
+        ],
+    )
     def test_a_malformed_bigquery_table_is_refused(self, table):
         """The sink mirrors EE's own `project.dataset.table` check."""
         with pytest.raises(ValidationError, match="project.dataset.table"):

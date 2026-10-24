@@ -9,6 +9,7 @@ import numpy as np
 import pytest
 from pydantic import ValidationError
 
+from earthlens.gee import _helpers as helpers_module
 from earthlens.gee import cloud_masks as cloud_masks_module
 from earthlens.gee import reducers as reducers_module
 from earthlens.gee.cloud_masks import ImageMask, Sentinel2Cdi
@@ -22,6 +23,11 @@ from earthlens.gee.reducers import (
     TemporalReducer,
     temporal_reducer_for,
 )
+
+
+def _refuse_every_threshold(value: float) -> float:
+    """Stand in for the shared CDI check, refusing whatever it is given."""
+    raise ValueError(f"patched check refuses {value!r}")
 
 
 class _FakeCdiBand:
@@ -328,3 +334,44 @@ class TestNamedCompositesStayOffTheClientPath:
         stack = np.empty(0)
         with pytest.raises(ValueError, match="engine='ee'"):
             composite.reduce_stack(stack, [])
+
+
+class TestSharedCdiThresholdCheck:
+    """`Sentinel2Cdi` and `Sentinel2Composite` share one range check."""
+
+    @pytest.mark.parametrize("value", [-1.5, 1.5, 2])
+    def test_the_two_models_refuse_with_the_identical_message(self, value):
+        """A shared helper is only worth moving if the text cannot drift."""
+        with pytest.raises(ValidationError) as mask_error:
+            Sentinel2Cdi(threshold=value)
+        with pytest.raises(ValidationError) as composite_error:
+            Sentinel2Composite(threshold=value)
+        expected = f"threshold must be in [-1, 1], got {float(value)!r}"
+        for error in (mask_error, composite_error):
+            assert expected in str(error.value), (
+                f"expected the shared text {expected!r}, got: {error.value}"
+            )
+
+    @pytest.mark.parametrize("value", [-1, 0.0, 1])
+    def test_the_inclusive_bounds_are_accepted_by_both(self, value):
+        """The range is inclusive, so both endpoints construct on either side."""
+        assert Sentinel2Cdi(threshold=value).threshold == float(value)
+        assert Sentinel2Composite(threshold=value).threshold == float(value)
+
+    def test_both_models_route_through_the_one_helper(self, monkeypatch):
+        """Patching the shared helper changes both, so neither kept a copy."""
+        assert (
+            cloud_masks_module.checked_cdi_threshold
+            is helpers_module.checked_cdi_threshold
+            is reducers_module.checked_cdi_threshold
+        ), "both modules must hold the one `_helpers` function, not a copy"
+        monkeypatch.setattr(
+            cloud_masks_module, "checked_cdi_threshold", _refuse_every_threshold
+        )
+        monkeypatch.setattr(
+            reducers_module, "checked_cdi_threshold", _refuse_every_threshold
+        )
+        with pytest.raises(ValidationError, match="patched"):
+            Sentinel2Cdi(threshold=0.0)
+        with pytest.raises(ValidationError, match="patched"):
+            Sentinel2Composite(threshold=0.0)

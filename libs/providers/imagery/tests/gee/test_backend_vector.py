@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 from types import SimpleNamespace
+from typing import Any, ClassVar
 
 import geopandas as gpd
 import pytest
@@ -14,6 +15,7 @@ from earthlens.gee.backend import GEE
 from earthlens.gee.sampling.histogram import ZonalHistogram
 from earthlens.gee.sampling.region import RegionSampler, ZonalStrategy
 from earthlens.gee.sampling.timeseries import TimeSeriesSampler
+from earthlens.gee.table_sink import TableSink
 from earthlens.gee.work import RasterWorkUnit
 
 _WHEN = dt.datetime(2024, 1, 1)
@@ -41,6 +43,17 @@ class _FakeSampler:
 
     def _ensure_backend_compatible(self) -> None:
         return None
+
+
+class _SpyTableSink(TableSink):
+    """A real `TableSink` whose `export` records the sink instead of calling EE."""
+
+    seen: ClassVar[list[TableSink]] = []
+
+    def export(self, work_unit: Any, *, description: str) -> str:
+        """Record the constructed sink and return a stand-in `TaskInfo`."""
+        type(self).seen.append(self)
+        return "fake-taskinfo"
 
 
 class _StampImage:
@@ -198,6 +211,32 @@ class TestSamplePayload:
             ["imgA"], _WHEN, _WHEN, _WHEN, SimpleNamespace(id="X"), ["b"]
         )
         assert built["file_format"] == "CSV"
+
+    def test_an_asset_batch_passes_no_file_format(self, tmp_path, monkeypatch):
+        """An asset export sends `file_format=None`, which the real sink accepts."""
+        _SpyTableSink.seen.clear()
+        monkeypatch.setattr(
+            "earthlens.gee.table_sink.TableSink", _SpyTableSink, raising=True
+        )
+        gee = _make_gee(
+            tmp_path,
+            export_via="asset",
+            asset_id="projects/p/assets/out",
+            sampler=_FakeSampler(),
+            geometry=_POLYS,
+        )
+        result = gee._sample_payload(
+            "img", _WHEN, _WHEN, _WHEN, SimpleNamespace(id="X"), ["b"]
+        )
+        assert result == "fake-taskinfo", f"unexpected payload result: {result!r}"
+        sink = _SpyTableSink.seen[-1]
+        assert sink.destination == "asset", f"wrong destination: {sink.destination!r}"
+        assert sink.asset_id == "projects/p/assets/out", f"wrong id: {sink.asset_id!r}"
+        assert sink.file_format is None, f"expected no format, got {sink.file_format!r}"
+        assert sink.effective_file_format is None, (
+            f"an asset writes a table, so no format applies: "
+            f"{sink.effective_file_format!r}"
+        )
 
     def test_zonal_histogram_through_backend_widens(self, tmp_path, monkeypatch):
         """The sync path applies the sampler's `_reshape`, so a histogram widens."""
