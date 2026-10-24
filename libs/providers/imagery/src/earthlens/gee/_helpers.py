@@ -93,6 +93,35 @@ def refuse_bool(value: Any) -> Any:
 
     Raises:
         ValueError: If `value` is `True` or `False`.
+
+    Examples:
+        - A number passes through untouched, whatever its type:
+            ```python
+            >>> from earthlens.gee._helpers import refuse_bool
+            >>> (refuse_bool(1), refuse_bool(0.5), refuse_bool(None))
+            (1, 0.5, None)
+
+            ```
+        - A boolean is refused, and the message names the integer it would
+          have become:
+            ```python
+            >>> from earthlens.gee._helpers import refuse_bool
+            >>> refuse_bool(True)
+            Traceback (most recent call last):
+                ...
+            ValueError: expected a number, got the boolean True; bool is a ...
+
+            ```
+        - Annotated onto a field, it refuses before the field's own
+          constraints run:
+            ```python
+            >>> from earthlens.gee.video_sink import VideoSink
+            >>> VideoSink(max_frames=True)
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: ...
+
+            ```
     """
     if isinstance(value, bool):
         raise ValueError(
@@ -126,6 +155,39 @@ def checked_cdi_threshold(value: float) -> float:
     Raises:
         ValueError: If `value` is outside `[-1, 1]` — the CDI band is a
             `[-1, 1]` index, not a probability or a percentage.
+
+    Examples:
+        - A threshold inside the range comes back unchanged, the bounds
+          included:
+            ```python
+            >>> from earthlens.gee._helpers import checked_cdi_threshold
+            >>> (checked_cdi_threshold(-0.5), checked_cdi_threshold(-1.0),
+            ...  checked_cdi_threshold(1.0))
+            (-0.5, -1.0, 1.0)
+
+            ```
+        - A probability-shaped mistake is refused, naming the value:
+            ```python
+            >>> from earthlens.gee._helpers import checked_cdi_threshold
+            >>> checked_cdi_threshold(1.5)
+            Traceback (most recent call last):
+                ...
+            ValueError: threshold must be in [-1, 1], got 1.5
+
+            ```
+        - Both users of the check report the same way, the mask and the
+          composite:
+            ```python
+            >>> from earthlens.gee.cloud_masks import Sentinel2Cdi
+            >>> from earthlens.gee.reducers import Sentinel2Composite
+            >>> (Sentinel2Cdi().threshold, Sentinel2Composite().threshold)
+            (-0.5, -0.5)
+            >>> Sentinel2Composite(threshold=42)
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: ...
+
+            ```
     """
     if not -1 <= value <= 1:
         raise ValueError(f"threshold must be in [-1, 1], got {value!r}")

@@ -1133,8 +1133,13 @@ class GEE(LazyClientMixin, AbstractDataSource):
             with a Sentinel-2 surface-reflectance asset, for a `BandScaler` on
             `cloud_mask=` that was resolved for an asset `variables` does not
             ask for, and for a `BandScaler` on `cloud_mask=` beside a flag
-            that resolves another one (both would scale the pixels); from
-            the parent on
+            that resolves another one for the same asset (both would scale
+            the pixels) — with a deliberate carve-out for an *identity*
+            scaler on either side, which has no arithmetic to duplicate:
+            `cloud_mask=BandScaler(factors=())` beside `scaled=True`
+            composes, and so does an explicit scaler beside a flag whose
+            own scaler came back factorless because the row declares none;
+            from the parent on
             a bad date range; from `_check_input_dates` on an unknown
             `temporal_resolution`; from `_api` on a missing scale or an
             oversized `"url"` request on either pull API (unless

@@ -62,6 +62,14 @@ class VideoSink(BaseModel):
     own default); a `gcs` export is refused at construction without its
     `bucket`.
 
+    The encoding knobs are validated here rather than on the wire. A string
+    `dimensions` must be exactly `"WIDTHxHEIGHT"` — the pattern is applied to
+    the whole value, so `"640x480\\n"` is refused instead of travelling to
+    Earth Engine with the newline attached — and `fps`, `dimensions` and
+    `max_frames` refuse a `bool`: `bool` is a subclass of `int`, so
+    `dimensions=True` would otherwise coerce to `1` and queue a one-pixel
+    video.
+
     Examples:
         - A sink is a frozen value object, constructed without Earth Engine:
             ```python
@@ -85,6 +93,29 @@ class VideoSink(BaseModel):
             ```python
             >>> from earthlens.gee.video_sink import VideoSink
             >>> VideoSink(destination="gcs")
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: ...
+
+            ```
+        - `dimensions` takes a positive maximum or the exact
+          `"WIDTHxHEIGHT"` form, trailing whitespace included in the
+          judgement:
+            ```python
+            >>> from earthlens.gee.video_sink import VideoSink
+            >>> VideoSink(dimensions="640x480").dimensions
+            '640x480'
+            >>> VideoSink(dimensions="640x480\\n")
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: ...
+
+            ```
+        - A `bool` is refused where a number is wanted, rather than becoming
+          a one-pixel video:
+            ```python
+            >>> from earthlens.gee.video_sink import VideoSink
+            >>> VideoSink(dimensions=True)
             Traceback (most recent call last):
                 ...
             pydantic_core._pydantic_core.ValidationError: ...

@@ -115,7 +115,10 @@ class WorkloadTag(BaseModel):
     The `tag` must satisfy the rule the SDK's validator enforces — 1-63
     characters, lowercase alphanumeric at both ends, `-` and `_` between —
     which is stricter than the rule `ee.data.setWorkloadTag`'s docstring
-    states; see the module docstring.
+    states; see the module docstring. The rule is applied to the whole
+    string, so a tag carrying a stray trailing newline (`"run-42\\n"`, the
+    shape a tag read from a file arrives in) is refused here rather than
+    inside the SDK on the first request of the scope.
 
     Examples:
         - A scope is a frozen value object, constructed without Earth Engine:
@@ -125,6 +128,16 @@ class WorkloadTag(BaseModel):
             >>> scope.tag
             'run-42'
             >>> scope.tag = "other"
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: ...
+
+            ```
+        - A malformed tag is refused at construction, a trailing newline
+          included:
+            ```python
+            >>> from earthlens.gee import WorkloadTag
+            >>> WorkloadTag(tag="run-42\\n")
             Traceback (most recent call last):
                 ...
             pydantic_core._pydantic_core.ValidationError: ...

@@ -35,6 +35,13 @@ instances (`GEE(reducer=LandsatComposite())`): they wrap
 server-side, so the EEDAI reader declines them and the request runs on
 an Earth Engine engine.
 
+A parameterised reducer validates its parameter at construction, and that
+includes refusing a `bool` where a number is wanted: `Percentile(q=True)`
+raises rather than becoming the 1st percentile, which `bool` being a
+subclass of `int` would otherwise make it. The `p<q>` shorthand is matched
+against the whole spec, so `"p90\\n"` is reported as an unknown reducer
+instead of resolving to the 90th percentile.
+
 Resolve a name (or an already-built object) through `resolve_reducer`:
 
 ```python

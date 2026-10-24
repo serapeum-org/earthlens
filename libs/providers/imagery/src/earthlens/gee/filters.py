@@ -13,7 +13,10 @@ Filters come in two equivalent forms:
   for a `GEE(filters=[...])` entry (the hook only requires a
   callable). A typo'd keyword or an out-of-range value raises at
   construction instead of silently no-op'ing the way a misspelled
-  `functools.partial` keyword would.
+  `functools.partial` keyword would — and so does a `bool` passed to a
+  numeric field (`ByYear(year=True)`, `ByQuality(value=True)`), which
+  `bool` being a subclass of `int` would otherwise coerce to the number
+  `1` and filter on.
 * **Module functions** — `by_year`, `by_bounds`, `by_property_in`,
   `by_cloud_cover_lte`, `by_year_and_bounds` — the original public
   surface, kept as thin behaviour-identical wrappers that construct

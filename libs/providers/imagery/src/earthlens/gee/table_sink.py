@@ -95,16 +95,24 @@ _APPEND_DESTINATIONS: frozenset[str] = frozenset({"bigquery"})
 #: `ee.batch.Export.table.toBigQuery` at `write()` time.
 #:
 #: **Deliberately at least as strict as the SDK's own check, not identical
-#: to it.** earthengine-api uses `re.fullmatch(r'.+\..+\..+', table)`, whose
-#: `.+` runs are ambiguous across the dots and backtrack super-linearly.
-#: Spelling each segment as "one or more non-dot, non-newline characters"
-#: removes the ambiguity, and the result accepts a strict subset: compared
-#: exhaustively over every string of length 1-6 from `a . \n \r space -`,
-#: nothing is accepted here that the SDK rejects, and the 918 strings the
-#: SDK accepts and this does not **all carry four or more dotted
-#: components**. Refusing those is right for BigQuery, where an identifier
-#: cannot contain a dot, so `project.dataset.table.extra` is not a table
-#: name the SDK could have meant.
+#: to it.** earthengine-api 1.7.35 uses `re.fullmatch(r'.+\..+\..+',
+#: table)`, whose three `.+` runs each match a dot as happily as any other
+#: character, so where the two literal dots land is ambiguous — which is how
+#: that pattern accepts `p.d.t.extra` (reading `d.t` as the middle segment)
+#: and `p...t` (reading a bare `.` as it). Spelling each segment as "one or
+#: more non-dot, non-newline characters" removes the ambiguity, and what it
+#: refuses in exchange was measured rather than reasoned about: compared
+#: exhaustively over every string of length 1-7 from `a . \n \r space -`,
+#: nothing is accepted here that the SDK rejects, and all 8899 strings the
+#: SDK accepts and this does not **carry four or more dotted components**.
+#: Refusing those is right for BigQuery, where an identifier cannot contain
+#: a dot, so `project.dataset.table.extra` is not a table name the SDK could
+#: have meant.
+#:
+#: The `\n` in each segment is load-bearing, and is why `[^.]` alone is not
+#: used: `.` does not match a newline but `[^.]` does, so that spelling
+#: *accepts* `"p.d.t\n"` where the SDK rejects it — looser, not stricter,
+#: and the subset property gone.
 _BIGQUERY_TABLE_RE = re.compile(r"[^.\n]+\.[^.\n]+\.[^.\n]+")
 
 
@@ -248,6 +256,40 @@ class TableSink(BaseModel):
             (`_DEFAULT_FILE_FORMAT`) for a file destination that left it
             unset; `None` for a destination that writes a table rather than a
             file, which has no format at all.
+
+        Examples:
+            - An explicit format is reported as given, whichever file
+              destination it was set on:
+                ```python
+                >>> from earthlens.gee.table_sink import TableSink
+                >>> TableSink(
+                ...     destination="gcs", bucket="my-bucket", file_format="SHP"
+                ... ).effective_file_format
+                'SHP'
+
+                ```
+            - A file destination that set none reports what Earth Engine will
+              write anyway, so the `None` default loses nothing:
+                ```python
+                >>> from earthlens.gee.table_sink import TableSink
+                >>> sink = TableSink(destination="drive", folder="exports")
+                >>> print(sink.file_format)
+                None
+                >>> sink.effective_file_format
+                'CSV'
+
+                ```
+            - A destination that writes a table has no format at all:
+                ```python
+                >>> from earthlens.gee.table_sink import TableSink
+                >>> print(
+                ...     TableSink(
+                ...         destination="bigquery", table="p.d.t"
+                ...     ).effective_file_format
+                ... )
+                None
+
+                ```
         """
         return (
             (self.file_format or _DEFAULT_FILE_FORMAT)
