@@ -143,11 +143,15 @@ _EXPECTED_EXPORTS = {
     "AuthenticationError",
     "CloudMask",
     "CollectionFilter",
+    # Epic 6 Task 6.13 - the one-call analysis-ready recipe, plus the catalog
+    # model its `preprocess:` block is validated against.
+    "preprocess",
     "Catalog",
     "Dataset",
     "Band",
     "Cadence",
     "Extent",
+    "Preprocess",
     "Provider",
     "CATALOG_PATH",
     "PROVIDERS_PATH",

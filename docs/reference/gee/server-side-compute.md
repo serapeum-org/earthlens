@@ -424,8 +424,8 @@ scale=0.0001),))` is the explicit form. Scaling **raises the dtype** from intege
 `ExportConfig.dtype` if you need a narrower output.
 
 Opt-in is deliberate: switching it on by default would change every existing request's pixel values and
-dtype at once. `preprocess()` is the one-argument way to get the mask and the scaler together, and is
-covered below.
+dtype at once. `preprocess()` is the one-argument way to get the mask and the scaler together — see
+["Analysis-ready pixels in one call"](#analysis-ready-pixels-in-one-call).
 
 #### Composing: masks chain with `>>`
 
@@ -461,6 +461,67 @@ thermal-noise-removed, radiometrically calibrated and terrain-corrected to dB.
 ```python
 cloud_mask = preprocess("COPERNICUS/S1_GRD") >> SpeckleFilter(radius=50)
 ```
+
+### Analysis-ready pixels in one call
+
+"Is Sentinel-2 preprocessing included?" — yes, and this is the one argument that says so:
+
+```python
+from earthlens.gee import preprocess
+
+el = EarthLens(
+    data_source="gee",
+    dataset="COPERNICUS/S2_SR_HARMONIZED",
+    variables=["B4", "B3", "B2"],
+    start="2024-05-01", end="2024-06-15", reducer="median",
+    cloud_mask=preprocess("COPERNICUS/S2_SR_HARMONIZED", ["B4", "B3", "B2"]),
+)
+```
+
+`preprocess(dataset, bands=None)` reads the dataset's curated recipe and returns the `MaskChain` it
+describes: the sensor's recommended mask, then a `BandScaler` over that row's own `scale` / `offset`
+factors. **Mask first, then scale** — the mask has to read its raw quality band before any arithmetic
+touches the pixels.
+
+The recipe is **catalog data, not an `if/elif` over asset ids**. It is a `preprocess:` block on the
+curated dataset row, typed as `earthlens.gee.Preprocess`:
+
+```yaml
+COPERNICUS/S2_SR_HARMONIZED:
+  preprocess:
+    mask: sentinel2_scl
+    scale: true
+    note: >-
+      Level-2A arrives as 0-10000 scaled surface reflectance; the SCL band
+      carries the scene classification the mask reads.
+```
+
+Typing it as a declared field is what makes the validation real: `Dataset` is frozen but does **not**
+forbid extra keys, so an undeclared `preprocess:` block would have been dropped in silence and a typo'd
+recipe would have read as "this dataset has no recipe". With the field declared, an unknown `mask:` name
+or a misspelled key inside the block fails at catalog-load time.
+
+Shipped recipes:
+
+| Dataset | Mask | Scale |
+|---|---|---|
+| `COPERNICUS/S2_SR_HARMONIZED` | `sentinel2_scl` | yes |
+| `COPERNICUS/S2_HARMONIZED` (TOA) | `sentinel2_qa60` | yes |
+| `LANDSAT/LC08/C02/T1_L2`, `LC09`, `LE07` | `landsat_sr` | yes |
+| `MODIS/061/MOD09GA`, `MYD09GA` | `modis_state_1km` | yes |
+| `COPERNICUS/S1_GRD` | — (`PassThrough`) | no |
+
+Two rules keep it honest:
+
+- **A dataset with no recipe raises.** `preprocess` is never a silent no-op; compose your own chain from
+  the `cloud_masks` library, or curate a recipe onto the row.
+- **A recipe with nothing to apply says so.** Sentinel-1 is that case — `COPERNICUS/S1_GRD` already
+  arrives thermal-noise-removed, calibrated and terrain-corrected to dB, so its recipe is an explicit
+  `PassThrough` and its `note` (logged when the recipe resolves) names speckle filtering as the one
+  remaining step.
+
+Because the result is an ordinary `MaskChain`, you can extend it — `preprocess(...) >> SpeckleFilter()`
+— or ignore it and pass your own chain instead.
 
 ## Level 4 — `.client`, the full escape hatch
 

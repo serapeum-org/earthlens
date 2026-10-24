@@ -132,6 +132,7 @@ __all__ = [
     "LandsatSrMask",
     "MaskChain",
     "ModisState1kmMask",
+    "PassThrough",
     "Sensor",
     "Sentinel2Cdi",
     "Sentinel2Qa60Mask",
@@ -377,6 +378,47 @@ class ImageMask(BaseModel):
         left = self.masks if isinstance(self, MaskChain) else (self,)
         right = other.masks if isinstance(other, MaskChain) else (other,)
         return MaskChain(masks=(*left, *right))
+
+
+class PassThrough(ImageMask):
+    """The identity op — returns the image untouched.
+
+    The honest step of a recipe that has nothing to apply. Sentinel-1 is
+    the case: Earth Engine's `COPERNICUS/S1_GRD` already arrives
+    thermal-noise-removed, radiometrically calibrated and
+    terrain-corrected to dB, so its catalog recipe names no mask and
+    nothing to scale — yet `earthlens.gee.preprocess` must still hand
+    back a usable `MaskChain` the caller can extend
+    (`>> SpeckleFilter()`). The recipe's `note` carries the explanation;
+    this carries the no-op, so "nothing to do here" is a documented
+    object rather than a missing one.
+
+    Examples:
+        - It hands the image straight back, properties and all:
+            ```python
+            >>> PassThrough()("an image")
+            'an image'
+
+            ```
+        - And it composes like any other op:
+            ```python
+            >>> (PassThrough() >> SpeckleFilter()).name
+            'PassThrough >> SpeckleFilter'
+
+            ```
+    """
+
+    def __call__(self, image: ee.Image) -> ee.Image:
+        """Return the image unchanged.
+
+        Args:
+            image: The `ee.Image` the chain was handed.
+
+        Returns:
+            That same image — nothing is rebuilt, so its properties are
+            trivially preserved.
+        """
+        return image
 
 
 class MaskChain(ImageMask):

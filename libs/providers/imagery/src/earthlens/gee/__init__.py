@@ -277,7 +277,13 @@ median composite is a facade call rather than raw `ee`:
   `CloudScorePlus` (Google's Cloud Score+ quality score, linked per
   scene by `system:index`) under the `ImageMask` base, plus the
   function forms `landsat_sr(image, sensor=...)` and
-  `sentinel2_scl(image)`.
+  `sentinel2_scl(image)`. Two family members are not masks but the
+  same shape: `BandScaler` (with `BandFactor`), which converts raw DN
+  to physical units from the `scale` / `offset` the catalog declares
+  per band, and `SpeckleFilter`, the server-side `ee.Image.focalMedian`
+  counterpart of the client-side `FocalMedian`. Because the backend has
+  one `cloud_mask` slot, the ops compose with `>>` into a `MaskChain`
+  (itself an `ImageMask`), with `PassThrough` as the documented no-op.
 * `earthlens.gee.filters` — collection filters: `ByYear` / `ByBounds`
   / `ByPropertyIn` / `ByCloudCoverLte` / `ByYearAndBounds`, plus the
   expanded scene selectors `ByOrbit` (Sentinel-1 pass direction /
@@ -289,6 +295,17 @@ median composite is a facade call rather than raw `ee`:
   `earthlens.gee.CollectionFilter` export stays the `Callable` type
   alias), plus the function forms `by_year` / `by_bounds` /
   `by_property_in` / `by_cloud_cover_lte` / `by_year_and_bounds`.
+
+`preprocess` is the one call that assembles those pieces, and *is*
+re-exported here. `preprocess(dataset, bands=None)` reads the curated
+`preprocess:` recipe off the catalog row (typed as `Preprocess`, so the
+loader validates it) and returns the sensor's recommended mask followed
+by a `BandScaler` over the row's own factors — mask first, so the
+quality band is read before any arithmetic. Pass the result as the
+backend's `cloud_mask=`. A
+dataset with no curated recipe raises rather than quietly doing
+nothing, and a recipe with nothing to apply (Sentinel-1, already
+corrected upstream) is an explicit `PassThrough` plus a note.
 
 Job / task tracking — for asynchronous `export_via="drive"` /
 `"gcs"` / `"asset"` sinks, the `earthlens.gee.jobs` module
@@ -396,6 +413,7 @@ from earthlens.gee.catalog import (
     Catalog,
     Dataset,
     Extent,
+    Preprocess,
     Provider,
 )
 from earthlens.gee.climatology import Climatology
@@ -437,6 +455,7 @@ from earthlens.gee.ml import ClassifierCodec, TreeEnsemble
 from earthlens.gee.pixels import HIGH_VOLUME_ENDPOINT, PixelsEngine
 from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reader import EedaiReader
+from earthlens.gee.recipes import preprocess
 from earthlens.gee.reducers import (
     REDUCERS,
     LandsatComposite,
@@ -514,11 +533,13 @@ __all__ = [
     "AuthenticationError",
     "CloudMask",
     "CollectionFilter",
+    "preprocess",
     "Catalog",
     "Dataset",
     "Band",
     "Cadence",
     "Extent",
+    "Preprocess",
     "Provider",
     "CATALOG_PATH",
     "PROVIDERS_PATH",

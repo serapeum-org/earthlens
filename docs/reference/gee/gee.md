@@ -60,6 +60,8 @@ the rendered API.
 
 ::: earthlens.gee.filters
 
+::: earthlens.gee.recipes
+
 ::: earthlens.gee.sampling
 
 ::: earthlens.gee.sampling.base
