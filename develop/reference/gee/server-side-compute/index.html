@@ -25002,7 +25002,9 @@ rather than displacing each other:</p>
 <p>A chain is itself an <code>ImageMask</code>, flattens (<code>a &gt;&gt; b &gt;&gt; c</code> is one chain of three), and runs left to
 right. Order is part of the recipe: the mask must read its raw quality band <strong>before</strong> the scaler's
 arithmetic touches the pixels. <code>MaskChain.of(...)</code> takes the elements positionally, flattens an inner
-chain the same way <code>&gt;&gt;</code> does, and accepts any <code>ee.Image -&gt; ee.Image</code> callable — the plain-function forms
+chain the same way <code>&gt;&gt;</code> does — both recurse, so a chain built by nesting
+(<code>MaskChain(masks=(chain, f))</code>) unpacks fully too and <code>len(chain.masks)</code> always counts leaves — and
+accepts any <code>ee.Image -&gt; ee.Image</code> callable — the plain-function forms
 (<code>landsat_sr</code>, <code>sentinel2_scl</code>), a <code>functools.partial</code> of one, a lambda or a callable instance, none of
 which have a <code>&gt;&gt;</code> of their own. <code>chain.name</code> labels every one of those shapes. This is <em>not</em>
 <code>analysis.OperationChain</code> — that one composes client-side operations over a downloaded pyramids
@@ -25412,8 +25414,13 @@ averaged probabilities favour <code>3</code>.</p>
 <p>So spot-checking a few pixels of the server-side result against <code>model.predict</code> will show mismatches
 on a non-unanimous forest, and they are this rule rather than a faulty export. To compare
 like-for-like, run <code>codec.from_ee(classifier)</code> — the <code>TreeEnsemble</code> it returns applies Earth Engine's
-vote. If you need the forest's exact labels, classify locally after a download with Epic 2's
-<code>Classify</code>.</p>
+vote, <strong>tie-break included</strong>. Earth Engine documents the majority vote but not how it settles a tie,
+which an even number of members produces routinely, so that half was checked live against
+<code>ee.Classifier.decisionTreeEnsemble</code> (earthengine-api 1.7.35): it returns the <strong>smallest</strong> tied
+label — <code>[1, 2]</code> → <code>1</code>, <code>[3, 9]</code> → <code>3</code>, <code>[0, 4]</code> → <code>0</code>, <code>[5, 5, 8, 8]</code> → <code>5</code> — regardless of the
+order the trees are given in, which is what <code>TreeEnsemble</code> does. <code>test_ml_e2e.py</code> (marker <code>e2e</code>)
+re-runs that comparison against the live service. If you need the forest's exact labels, classify
+locally after a download with Epic 2's <code>Classify</code>.</p>
 </div>
 <p><code>from_ee</code> is the partial reverse: it parses the tree strings back into a <code>TreeEnsemble</code>, a pure-Python
 hard-majority-vote predictor — not a scikit-learn estimator, since the fitted probabilities do not survive
