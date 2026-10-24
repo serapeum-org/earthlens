@@ -3555,6 +3555,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#managing-assets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Managing assets
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -24273,6 +24284,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#managing-assets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Managing assets
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -24972,6 +24994,26 @@ what makes nesting work: an inner scope hands back to the enclosing tag instead 
 <p>The tag covers the Earth Engine-served calls (<code>getDownloadURL</code>, <code>computePixels</code>, <code>ee.batch</code> exports) — which
 is where billing accrues. The EEDAI reader fetches stored pixels through GDAL, not <code>ee</code>, so an
 <code>engine="eedai"</code> read is never attributed; tagging an EEDAI-only run buys nothing.</p>
+<h3 id="managing-assets"><a class="toclink" href="#managing-assets">Managing assets</a><a class="headerlink" href="#managing-assets" title="Permanent link">#</a></h3>
+<p><code>export_via="asset"</code> creates assets; <code>AssetManager</code> is what manages them afterwards — a dedicated
+control-plane object over the <code>ee.data</code> asset family, deliberately <em>not</em> methods on <code>GEE</code>, so the
+read-focused backend never grows destructive verbs and the intent is explicit at the call site:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">AssetManager</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="n">manager</span> <span class="o">=</span> <span class="n">AssetManager</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s2">&quot;my-project&quot;</span><span class="p">)</span>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="n">manager</span><span class="o">.</span><span class="n">create_folder</span><span class="p">(</span><span class="s2">&quot;projects/my-project/assets/runs&quot;</span><span class="p">)</span>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">manager</span><span class="o">.</span><span class="n">list_assets</span><span class="p">(</span><span class="s2">&quot;projects/my-project/assets/runs&quot;</span><span class="p">):</span>
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>                      <span class="c1"># AssetInfo(projects/my-project/assets/runs/x, IMAGE, 1024)</span>
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="n">manager</span><span class="o">.</span><span class="n">copy_asset</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>        <span class="c1"># overwrite=True to replace</span>
+<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="n">manager</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
+<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="n">manager</span><span class="o">.</span><span class="n">set_acl</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;all_users_can_read&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="n">manager</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>                 <span class="c1"># destructive, immediate, no undo</span>
+</code></pre></div>
+<p>Reads (<code>get_asset</code>, <code>list_assets</code>, the create calls) come back as frozen <code>AssetInfo</code> rows that print as one
+line each. Ingestion (<code>start_ingestion</code> / <code>start_table_ingestion</code>, a <code>gs://</code> manifest in, an asset out) is
+asynchronous like the batch sinks and returns the same <code>TaskInfo</code>, so <code>get_task_status</code> /
+<code>wait_for_task_id</code> / <code>cancel_task</code> work on it unchanged. Asset management is pure control-plane: it is
+server-side regardless of any request's <code>engine=</code>, and the EEDAI reader is never involved.</p>
 <h2 id="choosing-an-engine-in-practice"><a class="toclink" href="#choosing-an-engine-in-practice">Choosing an engine, in practice</a><a class="headerlink" href="#choosing-an-engine-in-practice" title="Permanent link">#</a></h2>
 <table>
 <thead>
