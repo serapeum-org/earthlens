@@ -24985,6 +24985,11 @@ declare neither — a row declaring none at all logs a warning and yields an ide
 quietly returns raw DN when you asked for reflectance. <code>BandScaler(factors=(BandFactor(band="B4",
 scale=0.0001),))</code> is the explicit form. Scaling <strong>raises the dtype</strong> from integer to float; use
 <code>ExportConfig.dtype</code> if you need a narrower output.</p>
+<p>An identity op costs nothing but the warning. <code>scaled=True</code> on a row with no factors, and
+<code>preprocess=True</code> on a recipe that is only a <code>PassThrough</code> (Sentinel-1's, which Earth Engine has
+already corrected), both resolve to something that cannot change a pixel — so the backend drops the op
+instead of mapping it, and the request keeps the EEDAI fast path rather than being pushed onto Earth
+Engine for a no-op. An explicit <code>cloud_mask=</code> is never dropped: it is run as given.</p>
 <p>Opt-in is deliberate: switching it on by default would change every existing request's pixel values and
 dtype at once. <code>preprocess()</code> is the one-argument way to get the mask and the scaler together — see
 <a href="#analysis-ready-pixels-in-one-call">"Analysis-ready pixels in one call"</a>.</p>
