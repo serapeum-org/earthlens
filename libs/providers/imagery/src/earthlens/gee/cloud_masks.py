@@ -8,12 +8,12 @@ through the facade instead of raw `ee`.
 
 Masks come in two equivalent forms:
 
-* **Callable classes** under the `ImageMask` base — `LandsatSrMask` and
-  `Sentinel2SclMask` — frozen pydantic objects that carry validated
-  config and are drop-ins for `cloud_mask=` (the hook only requires a
-  callable). A typo'd keyword or an out-of-range value raises at
-  construction instead of silently no-op'ing the way a misspelled
-  `functools.partial` keyword would.
+* **Callable classes** under the `ImageMask` base — `LandsatSrMask`,
+  `Sentinel2SclMask` and `CloudScorePlus` — frozen pydantic objects
+  that carry validated config and are drop-ins for `cloud_mask=` (the
+  hook only requires a callable). A typo'd keyword or an out-of-range
+  value raises at construction instead of silently no-op'ing the way a
+  misspelled `functools.partial` keyword would.
 * **Module functions** — `landsat_sr(image, sensor="auto")` and
   `sentinel2_scl(image)` — the original public surface, kept as thin
   behaviour-identical wrappers that construct the class and call it.
@@ -29,6 +29,11 @@ public API.
 `sentinel2_scl` / `Sentinel2SclMask` mask a Sentinel-2 L2A image via its
 Scene Classification (`SCL`) band, dropping cloud shadow (class 3),
 cloud medium / high probability (8 / 9) and thin cirrus (10).
+
+`CloudScorePlus` masks a Sentinel-2 scene with Google's Cloud Score+
+dataset (`GOOGLE/CLOUD_SCORE_PLUS/V1/S2_HARMONIZED`): it links the
+scene's `cs` / `cs_cdf` quality band by `system:index` and keeps pixels
+at or above a `[0, 1]` threshold.
 
 Bit layout (USGS LSDS-1330):
 
@@ -58,6 +63,7 @@ import ee
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 __all__ = [
+    "CloudScorePlus",
     "ImageMask",
     "LandsatSrMask",
     "Sensor",
@@ -78,6 +84,10 @@ _SUPPORTED_SENSORS: frozenset[str] = frozenset({"LS7", "LS8", "LS9", "auto"})
 #: cloud high probability (9) and thin cirrus (10). Every other class
 #: (vegetation, bare soil, water, snow/ice, ...) is kept.
 _S2_SCL_MASKED_CLASSES: tuple[int, ...] = (3, 8, 9, 10)
+
+#: Google's Cloud Score+ collection, aligned to the harmonized Sentinel-2
+#: archive by `system:index` — the default `CloudScorePlus.cs_collection`.
+_CS_PLUS_COLLECTION: str = "GOOGLE/CLOUD_SCORE_PLUS/V1/S2_HARMONIZED"
 
 
 class ImageMask(BaseModel):
@@ -293,6 +303,118 @@ class Sentinel2SclMask(ImageMask):
         for masked_class in self.masked_classes[1:]:
             keep = keep.And(scl.neq(masked_class))
         return image.updateMask(keep)
+
+
+class CloudScorePlus(ImageMask):
+    """Mask a Sentinel-2 scene with Google's Cloud Score+ quality score.
+
+    Cloud Score+ is the current state-of-the-art Sentinel-2 cloud /
+    shadow mask. Its scores live in a *separate* collection
+    (`GOOGLE/CLOUD_SCORE_PLUS/V1/S2_HARMONIZED`) aligned to the
+    harmonized S2 archive, so the mask links each scene to its score
+    image with `ee.Image.linkCollection` — a per-image match on
+    `system:index` — and keeps pixels whose score is at or above
+    `threshold`. Because the link is per image, the mask works
+    unchanged under `collection.map(...)` and therefore slots straight
+    into the `cloud_mask=` hook (which forces the request onto an Earth
+    Engine engine — reading a second collection is server-side compute
+    the EEDAI reader cannot run).
+
+    The two score bands differ: `cs` scores each pixel on its own,
+    while `cs_cdf` integrates a cumulative distribution and tends to be
+    more conservative over bright surfaces. `cs` with a `0.6` threshold
+    is Google's documented default. Cloud Score+ folds shadow signal
+    into both bands, so no separate shadow projection is applied here.
+
+    Attributes:
+        band: The score band to threshold — `"cs"` (the default) or
+            `"cs_cdf"`.
+        threshold: Pixels scoring below this are masked out. A `[0, 1]`
+            quality score, not a percentage; validated at construction.
+            Defaults to `0.6`.
+        cs_collection: The Cloud Score+ collection to link. Defaults to
+            `GOOGLE/CLOUD_SCORE_PLUS/V1/S2_HARMONIZED`.
+
+    Examples:
+        - The defaults are Google's documented recipe:
+            ```python
+            >>> mask = CloudScorePlus()
+            >>> mask.band, mask.threshold
+            ('cs', 0.6)
+
+            ```
+        - Pick the conservative CDF band with a looser threshold:
+            ```python
+            >>> CloudScorePlus(band="cs_cdf", threshold=0.5).band
+            'cs_cdf'
+
+            ```
+        - A threshold outside the unit interval is refused at construction:
+            ```python
+            >>> CloudScorePlus(threshold=1.5)
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for CloudScorePlus
+            ...
+
+            ```
+        - Hand an instance to the GEE backend as the per-image mask:
+            ```python
+            >>> from earthlens.core import EarthLens  # doctest: +SKIP
+            >>> el = EarthLens(  # doctest: +SKIP
+            ...     data_source="gee",
+            ...     dataset="COPERNICUS/S2_SR_HARMONIZED",
+            ...     variables=["B4", "B3", "B2"],
+            ...     start="2024-05-01", end="2024-06-15",
+            ...     reducer="median", cloud_mask=CloudScorePlus(),
+            ... )
+
+            ```
+    """
+
+    band: Literal["cs", "cs_cdf"] = "cs"
+    threshold: float = 0.6
+    cs_collection: str = _CS_PLUS_COLLECTION
+
+    @field_validator("threshold")
+    @classmethod
+    def _in_unit_interval(cls, value: float) -> float:
+        """Refuse a threshold outside the inclusive `[0, 1]` range.
+
+        Args:
+            value: The parsed `threshold` input.
+
+        Returns:
+            The value unchanged when it is in range.
+
+        Raises:
+            ValueError: If `value` is outside `[0, 1]` — the score bands
+                are unit-interval qualities, not percentages.
+        """
+        if not 0 <= value <= 1:
+            raise ValueError(f"threshold must be in [0, 1], got {value!r}")
+        return value
+
+    def __call__(self, image: ee.Image) -> ee.Image:
+        """Link the score band onto one scene and mask by the threshold.
+
+        Args:
+            image: An `ee.Image` from the harmonized Sentinel-2 archive
+                (`COPERNICUS/S2_SR_HARMONIZED` / `S2_HARMONIZED`) — the
+                collections Cloud Score+ shares `system:index` with.
+
+        Returns:
+            The scene, with the score band added by `linkCollection`
+            and `updateMask(score >= threshold)` applied — properties,
+            `system:time_start` included, are preserved. A scene with
+            no Cloud Score+ match gets a fully masked score band
+            (Earth Engine's `linkCollection` contract), so it drops out
+            of a composite rather than passing unmasked.
+        """
+        linked = image.linkCollection(
+            ee.ImageCollection(self.cs_collection), [self.band]
+        )
+        return linked.updateMask(linked.select(self.band).gte(self.threshold))
 
 
 def landsat_sr(image: ee.Image, sensor: Sensor = "auto") -> ee.Image:

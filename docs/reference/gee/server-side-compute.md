@@ -253,6 +253,27 @@ particular — so the per-bucket date filter the composite engine applies *after
 scene. Like the function forms, an instance on `cloud_mask=` forces the request onto an Earth Engine
 engine (the EEDAI reader cannot run a graph).
 
+### `CloudScorePlus` — the state-of-the-art Sentinel-2 mask
+
+`CloudScorePlus` masks a Sentinel-2 scene with Google's Cloud Score+ dataset
+(`GOOGLE/CLOUD_SCORE_PLUS/V1/S2_HARMONIZED`). The scores live in a *separate* collection aligned to the
+harmonized S2 archive, so the mask links each scene to its score image with `linkCollection` — a
+per-image match on `system:index` — then keeps pixels scoring at or above `threshold`. Because the link
+is per image, it works unchanged under `collection.map(...)` and is an ordinary `cloud_mask=` drop-in:
+
+```python
+from earthlens.gee.cloud_masks import CloudScorePlus
+
+cloud_mask=CloudScorePlus()                          # band="cs", threshold=0.6 — Google's recipe
+cloud_mask=CloudScorePlus(band="cs_cdf", threshold=0.5)
+```
+
+The two score bands differ: `cs` scores each pixel on its own; `cs_cdf` integrates a cumulative
+distribution and tends to be more conservative over bright surfaces. The threshold is a `[0, 1]` quality
+score (not a percentage) and is validated at construction. Cloud Score+ folds shadow signal into both
+bands, so no separate shadow projection is applied. Reading the second collection is server-side compute,
+so this mask — like every `cloud_mask=` — runs on an Earth Engine engine, never the EEDAI reader.
+
 ### Ordering, and why it matters
 
 The chain is:
