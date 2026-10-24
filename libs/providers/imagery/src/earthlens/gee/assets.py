@@ -46,12 +46,13 @@ Examples:
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Annotated, Any
 
 import ee
 from pydantic import BaseModel, ConfigDict
 
 from earthlens.base import SummarisedLeaf
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.jobs import TaskInfo, _resolve_project, get_task_status
 
 __all__ = ["AssetInfo", "AssetManager"]
@@ -81,7 +82,9 @@ class AssetInfo(SummarisedLeaf):
 
     id: str  # the asset id, e.g. `projects/<p>/assets/<path>`
     type: str | None = None  # `IMAGE` / `IMAGE_COLLECTION` / `TABLE` / `FOLDER`
-    size_bytes: int | None = None  # storage size, when the endpoint reports one
+    size_bytes: Annotated[int | None, NoBool] = (
+        None  # storage size, when the endpoint reports one
+    )
 
 
 def _to_asset_info(payload: dict[str, Any]) -> AssetInfo:

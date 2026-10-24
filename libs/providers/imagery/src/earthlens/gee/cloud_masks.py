@@ -123,13 +123,13 @@ from __future__ import annotations
 
 import functools
 from collections.abc import Callable, Iterable
-from typing import TYPE_CHECKING, Literal, cast
+from typing import TYPE_CHECKING, Annotated, Literal, cast
 
 import ee
 from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from earthlens.gee._helpers import checked_cdi_threshold
+from earthlens.gee._helpers import NoBool, checked_cdi_threshold
 
 if TYPE_CHECKING:  # pragma: no cover - import cycle / cost avoidance only
     from earthlens.gee.catalog import Dataset
@@ -784,7 +784,7 @@ class CloudScorePlus(ImageMask):
     """
 
     band: Literal["cs", "cs_cdf"] = "cs"
-    threshold: float = 0.6
+    threshold: Annotated[float, NoBool] = 0.6
     cs_collection: str = _CS_PLUS_COLLECTION
 
     @field_validator("threshold")
@@ -892,7 +892,7 @@ class Sentinel2Cdi(ImageMask):
             ```
     """
 
-    threshold: float = -0.5
+    threshold: Annotated[float, NoBool] = -0.5
 
     @field_validator("threshold")
     @classmethod
@@ -1041,8 +1041,8 @@ class LandsatQaRefinedMask(ImageMask):
     """
 
     sensor: Sensor = "auto"
-    max_cloud_confidence: int = Field(default=2, ge=0, le=3)
-    max_shadow_confidence: int = Field(default=2, ge=0, le=3)
+    max_cloud_confidence: Annotated[int, NoBool] = Field(default=2, ge=0, le=3)
+    max_shadow_confidence: Annotated[int, NoBool] = Field(default=2, ge=0, le=3)
 
     @field_validator("sensor", mode="before")
     @classmethod
@@ -1174,8 +1174,8 @@ class BandFactor(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     band: str = Field(min_length=1)
-    scale: float = 1.0
-    offset: float = 0.0
+    scale: Annotated[float, NoBool] = 1.0
+    offset: Annotated[float, NoBool] = 0.0
 
 
 class BandScaler(ImageMask):
@@ -1406,12 +1406,12 @@ class SpeckleFilter(ImageMask):
             ```
     """
 
-    radius: float = Field(default=50.0, gt=0)
+    radius: Annotated[float, NoBool] = Field(default=50.0, gt=0)
     units: Literal["meters", "pixels"] = "meters"
     kernel_type: Literal["circle", "square", "cross", "plus", "octagon", "diamond"] = (
         "circle"
     )
-    iterations: int = Field(default=1, ge=1)
+    iterations: Annotated[int, NoBool] = Field(default=1, ge=1)
 
     def __call__(self, image: ee.Image) -> ee.Image:
         """Replace every pixel with the median of its neighbourhood.

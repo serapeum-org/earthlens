@@ -52,11 +52,12 @@ wrappers exist for them.
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import Any, Literal, cast
+from typing import Annotated, Any, Literal, cast
 
 import ee
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.climatology import _SEASONS
 
 __all__ = [
@@ -167,7 +168,7 @@ class ByYear(CollectionFilter):
             ```
     """
 
-    year: int
+    year: Annotated[int, NoBool]
 
     def __call__(self, collection: ee.ImageCollection) -> ee.ImageCollection:
         """Apply the calendar-year date filter.
@@ -291,7 +292,7 @@ class ByCloudCoverLte(CollectionFilter):
             ```
     """
 
-    max_pct: float
+    max_pct: Annotated[float, NoBool]
     property_name: str = "CLOUD_COVER"
 
     @field_validator("max_pct")
@@ -345,7 +346,7 @@ class ByYearAndBounds(CollectionFilter):
             ```
     """
 
-    year: int
+    year: Annotated[int, NoBool]
     region: Any = None
 
     def __call__(self, collection: ee.ImageCollection) -> ee.ImageCollection:
@@ -401,7 +402,7 @@ class ByOrbit(CollectionFilter):
     """
 
     pass_direction: Literal["ASCENDING", "DESCENDING"] | None = None
-    relative_orbit: int | None = Field(default=None, ge=1)
+    relative_orbit: Annotated[int | None, NoBool] = Field(default=None, ge=1)
 
     @model_validator(mode="after")
     def _at_least_one_constraint(self) -> ByOrbit:
@@ -537,7 +538,7 @@ class ByQuality(CollectionFilter):
     # `float | str` in that order, so a number stays a number; pydantic's
     # smart union leaves a `str` input as a `str` rather than parsing it, which
     # is what keeps `eq` matching the property's own type.
-    value: float | str
+    value: Annotated[float | str, NoBool]
 
     @model_validator(mode="after")
     def _comparable(self) -> ByQuality:
@@ -663,8 +664,8 @@ class ByMonth(CollectionFilter):
             ```
     """
 
-    start_month: int = Field(ge=1, le=12)
-    end_month: int | None = Field(default=None, ge=1, le=12)
+    start_month: Annotated[int, NoBool] = Field(ge=1, le=12)
+    end_month: Annotated[int | None, NoBool] = Field(default=None, ge=1, le=12)
 
     def __call__(self, collection: ee.ImageCollection) -> ee.ImageCollection:
         """Apply the month calendar filter.
@@ -705,8 +706,8 @@ class ByDayOfYear(CollectionFilter):
             ```
     """
 
-    start_day: int = Field(ge=1, le=366)
-    end_day: int | None = Field(default=None, ge=1, le=366)
+    start_day: Annotated[int, NoBool] = Field(ge=1, le=366)
+    end_day: Annotated[int | None, NoBool] = Field(default=None, ge=1, le=366)
 
     def __call__(self, collection: ee.ImageCollection) -> ee.ImageCollection:
         """Apply the day-of-year calendar filter.

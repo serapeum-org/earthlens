@@ -53,13 +53,13 @@ from __future__ import annotations
 import functools
 import re
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar
 
 import ee
 import pandas as pd
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from earthlens.gee._helpers import checked_cdi_threshold
+from earthlens.gee._helpers import NoBool, checked_cdi_threshold
 from earthlens.gee.cloud_masks import Sentinel2Cdi
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -374,7 +374,7 @@ class Percentile(BaseModel, TemporalReducer):
     name: ClassVar[str] = "percentile"
     ee_factory: ClassVar[str | None] = "percentile"
 
-    q: float = Field(ge=0, le=100)
+    q: Annotated[float, NoBool] = Field(ge=0, le=100)
 
     def __call__(self, collection: Any) -> Any:
         """Reduce `collection` to its per-pixel `q`-th percentile.
@@ -800,9 +800,9 @@ class LandsatComposite(_NamedAlgorithmComposite):
     name: ClassVar[str] = "landsat_composite"
     ee_factory: ClassVar[str | None] = None
 
-    percentile: int = Field(default=50, ge=0, le=100)
-    cloud_score_range: float = Field(default=10.0, gt=0)
-    max_depth: int = Field(default=40, gt=0)
+    percentile: Annotated[int, NoBool] = Field(default=50, ge=0, le=100)
+    cloud_score_range: Annotated[float, NoBool] = Field(default=10.0, gt=0)
+    max_depth: Annotated[int, NoBool] = Field(default=40, gt=0)
     as_float: bool = False
 
     def __call__(self, collection: Any) -> Any:
@@ -888,7 +888,7 @@ class Sentinel2Composite(_NamedAlgorithmComposite):
     name: ClassVar[str] = "sentinel2_composite"
     ee_factory: ClassVar[str | None] = None
 
-    threshold: float = -0.5
+    threshold: Annotated[float, NoBool] = -0.5
     reducer: TemporalReducer = Field(default_factory=Median)
 
     @field_validator("threshold")

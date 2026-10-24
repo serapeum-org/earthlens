@@ -26,11 +26,11 @@ is no engine choice here and nothing for the reader to decline.
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from earthlens.gee._helpers import wait_for_task
+from earthlens.gee._helpers import NoBool, wait_for_task
 from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -97,9 +97,13 @@ class VideoSink(BaseModel):
     destination: Literal["drive", "gcs"] = "drive"  # Export.video.to* factory
     folder: str | None = None  # Drive folder (drive); None is the Drive root
     bucket: str | None = None  # Cloud Storage bucket (gcs)
-    fps: float = 1.0  # framesPerSecond; EE accepts 0.1-120
-    dimensions: int | str | None = None  # max dimension, or "WIDTHxHEIGHT"
-    max_frames: int | None = Field(default=None, gt=0)  # maxFrames cap
+    fps: Annotated[float, NoBool] = 1.0  # framesPerSecond; EE accepts 0.1-120
+    dimensions: Annotated[int | str | None, NoBool] = (
+        None  # max dimension, or "WIDTHxHEIGHT"
+    )
+    max_frames: Annotated[int | None, NoBool] = Field(
+        default=None, gt=0
+    )  # maxFrames cap
     crs: str = "EPSG:4326"  # projection of the exported video
     wait_for_export: bool = False  # block until the task finishes
 

@@ -16,6 +16,7 @@ import time
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
+from pydantic import BeforeValidator
 from tqdm import tqdm
 
 from earthlens.base import safe_filename
@@ -73,6 +74,39 @@ def __getattr__(name: str) -> frozenset[str]:
 TERMINAL_TASK_STATES: frozenset[str] = frozenset(
     {"COMPLETED", "FAILED", "CANCELLED", "CANCEL_REQUESTED"}
 )
+
+
+def refuse_bool(value: Any) -> Any:
+    """Refuse a `bool` where a number is wanted, before pydantic coerces it.
+
+    `bool` is a subclass of `int`, so an `int` / `float` field takes `True`
+    and silently stores `1` — `VideoSink(dimensions=True)` became a one-pixel
+    video, `ByQuality(value=True)` a comparison against `1.0`. A
+    `BeforeValidator` sees the raw input, so it can tell `True` from `1`,
+    which the field's own type no longer can once coercion has run.
+
+    Args:
+        value: The raw field input.
+
+    Returns:
+        The value unchanged when it is not a `bool`.
+
+    Raises:
+        ValueError: If `value` is `True` or `False`.
+    """
+    if isinstance(value, bool):
+        raise ValueError(
+            f"expected a number, got the boolean {value!r}; bool is a subclass "
+            "of int, so this would silently become "
+            f"{int(value)} — pass the number you mean"
+        )
+    return value
+
+
+#: Annotate a numeric field with this to refuse `True` / `False`:
+#: `Annotated[float, NoBool]`. Shared so every such field refuses with the
+#: same message rather than each model re-stating the `bool`-is-an-`int` trap.
+NoBool = BeforeValidator(refuse_bool)
 
 
 def checked_cdi_threshold(value: float) -> float:
