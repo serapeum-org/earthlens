@@ -44,6 +44,8 @@ the rendered API.
 
 ::: earthlens.gee.table_sink
 
+::: earthlens.gee.video_sink
+
 ::: earthlens.gee.plans
 
 ::: earthlens.gee.work

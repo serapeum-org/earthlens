@@ -181,6 +181,13 @@ anything a string names:
   `GEE(export_via=...)` takes the **name** only; pass an instance and
   `ExportConfig` rejects it. Call `resolve_sink` yourself
   when you want the object.
+* `VideoSink` — the frames counterpart: a standalone frozen model
+  (like `TableSink`, not a `Sink` subclass — the `Sink` ABC's
+  `write` is image-shaped) exporting an `ee.ImageCollection` of RGB
+  frames via `ee.batch.Export.video.toDrive` / `toCloudStorage`,
+  tracked through the same jobs machinery with wire task type
+  `EXPORT_VIDEO`. The caller provides the frames (nothing in the
+  pipeline produces a frames collection yet).
 * `WorkUnit` / `RasterWorkUnit` — one time bucket's
   payload. `FeatureWorkUnit` is the vector/tabular seam for the
   later epics; nothing produces one yet.
@@ -461,6 +468,7 @@ from earthlens.gee.vector import (
     to_netcdf,
     to_numpy,
 )
+from earthlens.gee.video_sink import VideoSink
 from earthlens.gee.work import (
     Artifact,
     DownloadResult,
@@ -567,6 +575,7 @@ __all__ = [
     "GcsSink",
     "AssetSink",
     "TableSink",
+    "VideoSink",
     "SINKS",
     "resolve_sink",
     "EedaiReader",

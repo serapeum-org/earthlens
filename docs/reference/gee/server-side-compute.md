@@ -471,6 +471,31 @@ For a computed image too large for `getDownloadURL`, use the asynchronous sinks.
 blocking; `list_recent_tasks`, `get_task_status`, `wait_for_task_id`, `cancel_task` and
 `resolve_destination` track them. The batch sinks are Earth Engine-only, so `engine=` is ignored there.
 
+### Exporting a video
+
+A collection you built through `.client` can also leave as a **video**: `VideoSink` queues an
+`ee.ImageCollection` of frames through `ee.batch.Export.video.toDrive` / `toCloudStorage` — the only two
+video targets Earth Engine offers — and returns the same `TaskInfo` the other batch exports do, with wire
+task type `EXPORT_VIDEO`. It is a standalone frozen model like `TableSink` (the image-shaped `Sink` ABC
+does not fit a frames export), validated at construction: a `gcs` sink without its `bucket` is refused up
+front, `fps` must be in Earth Engine's `[0.1, 120]`, and `dimensions` is a positive max dimension or
+`"WIDTHxHEIGHT"`. A Drive export with no `folder` lands in the Drive root. Every frame must be an 8-bit
+RGB image — visualise first — and the caller provides the collection (nothing in the download pipeline
+produces frames):
+
+```python
+from earthlens.gee import VideoSink
+
+frames = s2_monthly.map(lambda img: img.visualize(bands=["B4", "B3", "B2"], min=0, max=3000))
+info = VideoSink(destination="drive", folder="videos", fps=6, dimensions=720).write(
+    frames, prefix="nile_delta_2024", region=aoi
+)
+info.task_type   # "EXPORT_VIDEO" — track it with get_task_status / wait_for_task_id
+```
+
+Like every `ee.batch` export this is Earth Engine-only; the EEDAI reader never applies to an
+asynchronous export.
+
 ### Temporal helpers over a collection
 
 Four frozen, validated config objects build a server-side graph over an `ee.ImageCollection` you hold — the

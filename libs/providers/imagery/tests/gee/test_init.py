@@ -122,6 +122,8 @@ _EXPECTED_EXPORTS = {
     "TableSink",
     "SINKS",
     "resolve_sink",
+    # Epic 6 Task 6.7 - the frames-collection video export.
+    "VideoSink",
     # Epic 1 Task 1.5 - the EEDAI reader adapter.
     "EedaiReader",
     # Epic 4 Task 4.8 - the validated property-filter value object.
