@@ -5094,3 +5094,32 @@ class TestIdentityOpsDoNotForceServerSide:
         op = gee._per_image_op(gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED"))
         assert op.name == "Sentinel2SclMask >> BandScaler"
         assert gee._engine_config.needs_server_side_compute is True
+
+
+class TestUnknownBandOnTheFlagPath:
+    """N2: the band check runs at download, not before the flags resolve."""
+
+    def _gee(self, make_gee, bands, **overrides):
+        """A Sentinel-2 L2A request over `bands`."""
+        params = dict(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": list(bands)},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    def test_the_flag_resolves_before_the_band_is_refused(self, make_gee):
+        """Construction succeeds, so the scaler cannot rely on a prior check."""
+        gee = self._gee(make_gee, ["B4", "B8A"], scaled=True)
+        scaler = gee._per_image_op(
+            gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED")
+        )
+        assert [factor.band for factor in scaler.factors] == ["B4"]
+
+    def test_the_band_is_refused_at_download(self, make_gee):
+        """The refusal the docstring points at happens in `_download_dataset`."""
+        gee = self._gee(make_gee, ["B4", "B8A"], scaled=True)
+        with pytest.raises(ValueError, match="is not a band of"):
+            gee._download_dataset("COPERNICUS/S2_SR_HARMONIZED", ["B4", "B8A"])

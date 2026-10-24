@@ -1284,8 +1284,13 @@ class BandScaler(ImageMask):
 
         A band is included only when its row declares `scale` or
         `offset`; the missing half falls back to its identity. A band
-        named in `bands` that the row does not carry is skipped — the
-        backend already refuses an unknown band id before this point.
+        named in `bands` that the row does not carry is skipped rather
+        than reported: the backend refuses an unknown band id at
+        download time, which is *after* this runs on the `scaled=` /
+        `preprocess=` path (the flags resolve inside `GEE.__init__`), so
+        such a scaler can exist briefly for a request that will not
+        survive `download()`. Skipping keeps this resolver about factors
+        and leaves the band vocabulary to the one check that owns it.
 
         Args:
             dataset: The catalog row to read the factors from.
