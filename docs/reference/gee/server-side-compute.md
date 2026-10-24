@@ -397,20 +397,70 @@ If you want a computed index written to disk, pick one of:
 3. **Compute it downstream** from the downloaded bands with pyramids/NumPy, which keeps the archive
    request and the derived product separate.
 
-### Values are raw DN, not physical units
+### Raw DN to physical units: `BandScaler`
 
-The catalog records each band's `scale` (and `offset`) as metadata — `Band.scale` is documented as
-"multiply the raw DN by this to get physical units" — but **nothing applies it**. Sentinel-2 surface
-reflectance arrives as 0–10000 integers, not 0–1 reflectance. Scale it yourself, in a `cloud_mask` hook
-if you want it done server-side before the composite:
+Values arrive as raw digital numbers by default. The catalog records each band's `scale` (and `offset`)
+as metadata — `Band.scale` is documented as "multiply the raw DN by this to get physical units" —
+and `BandScaler` is what applies it, server-side, before the composite, so the temporal reduction
+happens in physical units:
 
 ```python
-def to_reflectance(image):
-    return image.multiply(0.0001).copyProperties(image, image.propertyNames())
+from earthlens.gee.cloud_masks import BandScaler, Sentinel2SclMask
+
+row = Catalog().get_dataset("COPERNICUS/S2_SR_HARMONIZED")
+el = EarthLens(
+    data_source="gee",
+    dataset="COPERNICUS/S2_SR_HARMONIZED",
+    variables=["B4", "B3", "B2"],
+    start="2024-05-01", end="2024-06-15", reducer="median",
+    cloud_mask=Sentinel2SclMask() >> BandScaler.for_dataset(row, ["B4", "B3", "B2"]),
+)
 ```
 
-Note the `copyProperties`: `multiply` drops image metadata, which any metadata-dependent `filters` running
-after it would then miss.
+`BandScaler.for_dataset(row, bands)` reads the factors off the catalog row and skips the bands that
+declare neither — a row declaring none at all logs a warning and yields an identity, so a request never
+quietly returns raw DN when you asked for reflectance. `BandScaler(factors=(BandFactor(band="B4",
+scale=0.0001),))` is the explicit form. Scaling **raises the dtype** from integer to float; use
+`ExportConfig.dtype` if you need a narrower output.
+
+Opt-in is deliberate: switching it on by default would change every existing request's pixel values and
+dtype at once. `preprocess()` is the one-argument way to get the mask and the scaler together, and is
+covered below.
+
+#### Composing: masks chain with `>>`
+
+The backend has a **single** `cloud_mask` slot, so a mask and a scaler compose into one `MaskChain`
+rather than displacing each other:
+
+```python
+chain = Sentinel2SclMask() >> BandScaler.for_dataset(row)   # mask first, then scale
+chain.name                                                  # 'Sentinel2SclMask >> BandScaler'
+```
+
+A chain is itself an `ImageMask`, flattens (`a >> b >> c` is one chain of three), and runs left to
+right. Order is part of the recipe: the mask must read its raw quality band **before** the scaler's
+arithmetic touches the pixels. `MaskChain.of(...)` takes the elements positionally and also accepts the
+plain-function forms (`landsat_sr`, `sentinel2_scl`), which have no `>>` of their own. This is *not*
+`analysis.OperationChain` — that one composes client-side operations over a downloaded pyramids
+`Dataset` and cannot build an `ee.Image` graph.
+
+Every op in the family preserves the image's properties. The `updateMask` masks do it for free; the ones
+that rebuild the image (`BandScaler`, `SpeckleFilter`) copy them back with
+`copyProperties(source, source.propertyNames())` — note the explicit property list, since
+`copyProperties` skips `system:*` otherwise. That matters because the composite engine applies its
+per-bucket `filterDate` *after* the hook, and the reducers and samplers read `system:time_start`: an op
+that dropped it would empty every bucket.
+
+#### Radar: `SpeckleFilter`
+
+`SpeckleFilter` runs `ee.Image.focalMedian` on the graph — the server-side counterpart of the
+client-side `analysis.FocalMedian`, which can only work on an already-downloaded raster. It is the one
+genuine Sentinel-1 preprocessing gap: Earth Engine's `COPERNICUS/S1_GRD` already arrives
+thermal-noise-removed, radiometrically calibrated and terrain-corrected to dB.
+
+```python
+cloud_mask = preprocess("COPERNICUS/S1_GRD") >> SpeckleFilter(radius=50)
+```
 
 ## Level 4 — `.client`, the full escape hatch
 

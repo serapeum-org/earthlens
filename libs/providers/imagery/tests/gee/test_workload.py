@@ -6,7 +6,6 @@ import pytest
 
 pytest.importorskip("ee")
 
-import ee  # noqa: E402
 from pydantic import ValidationError  # noqa: E402
 
 from earthlens.gee import workload as workload_module  # noqa: E402
@@ -88,20 +87,20 @@ class TestWorkloadTagValidation:
         is pinned against the enforcement rather than against the prose.
         """
         with pytest.raises(ValueError):
-            ee.data.setWorkloadTag(tag)
+            workload_module.ee.data.setWorkloadTag(tag)
 
     @pytest.mark.parametrize("tag", ["a", "a1", "a-b", "a_b", "a" * 63])
     def test_every_accepted_tag_is_one_the_sdk_takes(self, tag):
         """A tag that constructs is one `ee.data.setWorkloadTag` accepts."""
         WorkloadTag(tag=tag)
-        ee.data.setWorkloadTag(tag)
-        assert ee.data.getWorkloadTag() == tag
-        ee.data.resetWorkloadTag()
+        workload_module.ee.data.setWorkloadTag(tag)
+        assert workload_module.ee.data.getWorkloadTag() == tag
+        workload_module.ee.data.resetWorkloadTag()
 
     def test_the_empty_tag_is_the_sdks_no_tag_sentinel(self):
         """`''` means "no tag" to the SDK, so a scope over it is refused here."""
-        ee.data.setWorkloadTag("")
-        assert ee.data.getWorkloadTag() == ""
+        workload_module.ee.data.setWorkloadTag("")
+        assert workload_module.ee.data.getWorkloadTag() == ""
         with pytest.raises(ValidationError, match="1-63 characters"):
             WorkloadTag(tag="")
 

@@ -56,6 +56,32 @@ above, so a facade request against those rows has the band. On a
 dataset without it, Earth Engine fails at graph-compute time — the
 documented contract for a mask reading an absent band.
 
+Two members of the family are not masks at all, but the same shape —
+per-image `ee.Image -> ee.Image` ops, and so drop-ins for the same hook:
+
+* `BandScaler` (with `BandFactor`) converts raw DN to physical units
+  using the `scale` / `offset` the catalog already declares per band,
+  server-side and before the composite. `BandScaler.for_dataset(row)`
+  resolves the factors from a catalog row.
+* `SpeckleFilter` runs `ee.Image.focalMedian` on the graph — the
+  server-side counterpart of the client-side `analysis.FocalMedian`,
+  and the remaining Sentinel-1 preprocessing step.
+
+Because the backend has a **single** `cloud_mask` slot, the ops compose
+into a `MaskChain` — itself an `ImageMask` — either with `>>`
+(`Sentinel2SclMask() >> BandScaler(...)`) or via `MaskChain.of(...)`,
+which also accepts the plain-function forms. Order matters and is part
+of the recipe: a cloud mask must read its raw quality band before a
+scaler's arithmetic touches the pixels. `earthlens.gee.preprocess`
+assembles that chain per dataset from the catalog.
+
+Every op here preserves the image's properties. For the `updateMask`
+masks that is automatic; the ops that rebuild the image copy them back
+with `copyProperties(source, source.propertyNames())`, because
+`CompositeEngine.composite_ee` applies its per-bucket `filterDate`
+*after* the hook and the reducers and samplers read
+`system:time_start` — dropping it would empty every bucket.
+
 `Sentinel2Cdi` masks a Sentinel-2 **TOA** scene
 (`COPERNICUS/S2_HARMONIZED`) by its Cloud Displacement Index —
 `ee.Algorithms.Sentinel2.CDI(image)`, a parallax-based cloud
@@ -85,24 +111,40 @@ Ported from `gee_utils.raster.cloud_mask_ls7_sr`.
 
 from __future__ import annotations
 
-from typing import Literal
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Literal, cast
 
 import ee
+from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+if TYPE_CHECKING:  # pragma: no cover - import cycle / cost avoidance only
+    from collections.abc import Iterable
+
+    from earthlens.gee.catalog import Dataset
+
 __all__ = [
+    "BandFactor",
+    "BandScaler",
     "CloudScorePlus",
     "ImageMask",
     "LandsatQaRefinedMask",
     "LandsatSrMask",
+    "MaskChain",
     "ModisState1kmMask",
     "Sensor",
     "Sentinel2Cdi",
     "Sentinel2Qa60Mask",
     "Sentinel2SclMask",
+    "SpeckleFilter",
     "landsat_sr",
     "sentinel2_scl",
 ]
+
+#: A per-image Earth Engine op: what the `cloud_mask=` hook accepts, and so
+#: what a `MaskChain` links together — every `ImageMask` is one, and so are
+#: the module-function forms (`landsat_sr` / `sentinel2_scl`).
+PerImageOp = Callable[[ee.Image], ee.Image]
 
 # Bit 6 of QA_PIXEL: the "Clear" bit. Set when the pixel is neither
 # Dilated Cloud (bit 1), Cloud (bit 3), nor Cloud Shadow (bit 4).
@@ -142,6 +184,49 @@ _LS_CONF_PAIR_MASK: int = 0b11
 #: The two-bit cloud-state field at bits 0-1 of the MODIS `state_1km` band:
 #: 0 clear, 1 cloudy, 2 mixed, 3 not set (assumed clear by MODIS, masked here).
 _MODIS_CLOUD_STATE_MASK: int = 0b11
+
+
+def _op_name(op: PerImageOp) -> str:
+    """Name one chain element, whether it is a mask object or a function.
+
+    Args:
+        op: An `ImageMask` instance or a plain `ee.Image -> ee.Image`
+            callable.
+
+    Returns:
+        The class name for an object, the function name for a function.
+
+    Examples:
+        ```python
+        >>> _op_name(Sentinel2Qa60Mask()), _op_name(sentinel2_scl)
+        ('Sentinel2Qa60Mask', 'sentinel2_scl')
+
+        ```
+    """
+    return type(op).__name__ if isinstance(op, ImageMask) else op.__name__
+
+
+def _with_properties(derived: ee.Image, source: ee.Image) -> ee.Image:
+    """Copy every property of `source` — system ones included — onto `derived`.
+
+    Band arithmetic builds a new image that carries no metadata, and
+    `copyProperties` omits the `system:*` properties unless they are named
+    explicitly (its `properties` argument defaults to the *ordinary* ones), so
+    the property list is passed in. `system:time_start` is the one that
+    matters: `CompositeEngine.composite_ee` applies its per-bucket
+    `filterDate` *after* the `cloud_mask` hook, and the temporal reducers and
+    samplers read the timestamp — an op that dropped it would empty every
+    bucket.
+
+    Args:
+        derived: The image computed from `source`.
+        source: The image whose properties should survive.
+
+    Returns:
+        `derived` with `source`'s full property set, as an `ee.Image`.
+    """
+    copied = ee.Image(derived.copyProperties(source, source.propertyNames()))
+    return cast("ee.Image", copied)
 
 
 def _checked_cdi_threshold(value: float) -> float:
@@ -207,6 +292,13 @@ class ImageMask(BaseModel):
     has been applied. A mask that rebuilt the image without its
     properties would silently empty every bucket.
 
+    Because the backend has a *single* `cloud_mask` slot, masks compose
+    with `>>` into a `MaskChain` — itself an `ImageMask` — so a cloud
+    mask and a `BandScaler` can both apply to one request. The
+    client-side `analysis.OperationChain` cannot do this: it composes
+    `RasterOperation`s over a downloaded pyramids `Dataset`, not
+    `ee.Image` graphs.
+
     Examples:
         - A concrete mask carries its config as readable fields:
             ```python
@@ -220,6 +312,13 @@ class ImageMask(BaseModel):
             Traceback (most recent call last):
                 ...
             NotImplementedError: ImageMask must implement __call__(image)
+
+            ```
+        - `>>` composes two ops into one chain, left to right:
+            ```python
+            >>> chain = Sentinel2SclMask() >> Sentinel2Qa60Mask()
+            >>> chain.name
+            'Sentinel2SclMask >> Sentinel2Qa60Mask'
 
             ```
     """
@@ -242,6 +341,126 @@ class ImageMask(BaseModel):
         raise NotImplementedError(
             f"{type(self).__name__} must implement __call__(image)"
         )
+
+    @property
+    def name(self) -> str:
+        """A short label for this op, used in chain names and errors."""
+        return type(self).__name__
+
+    def __rshift__(self, other: ImageMask) -> MaskChain:
+        """Compose with `other`, returning a chain that runs self first.
+
+        Chains flatten rather than nest — `a >> b >> c` is one chain of
+        three — so `name` and iteration stay readable however the
+        expression was grouped. This mirrors
+        `analysis.RasterOperation.__rshift__`, one level down: there the
+        elements run client-side over a pyramids `Dataset`, here they run
+        server-side over an `ee.Image`.
+
+        Args:
+            other: The mask to run on this one's output.
+
+        Returns:
+            A `MaskChain` of both, left to right.
+
+        Raises:
+            TypeError: If `other` is not an `ImageMask`. A plain
+                callable has no `>>`, so compose it with
+                `MaskChain.of(...)` instead.
+        """
+        if not isinstance(other, ImageMask):
+            raise TypeError(
+                f"cannot compose {self.name} with {type(other).__name__}: "
+                ">> needs an ImageMask on both sides (use MaskChain.of(...) "
+                "for a plain callable)"
+            )
+        left = self.masks if isinstance(self, MaskChain) else (self,)
+        right = other.masks if isinstance(other, MaskChain) else (other,)
+        return MaskChain(masks=(*left, *right))
+
+
+class MaskChain(ImageMask):
+    """An ordered run of per-image ops, itself an `ImageMask`.
+
+    Being an `ImageMask` is the point: the backend's one `cloud_mask`
+    slot accepts a chain wherever it accepts a mask, so "mask *and*
+    scale" needs no second hook. Elements run left to right, each on the
+    previous one's output, which is why order is part of the recipe — a
+    cloud mask reads a raw quality band, so it must run *before* a
+    `BandScaler` touches the pixels with arithmetic.
+
+    Attributes:
+        masks: The ops to run, in order. Each is an `ImageMask` or any
+            `ee.Image -> ee.Image` callable (so the module-function forms
+            `landsat_sr` / `sentinel2_scl` compose too). At least one.
+
+    Examples:
+        - Build a chain with `>>` and read its name:
+            ```python
+            >>> chain = Sentinel2SclMask() >> BandScaler(
+            ...     factors=(BandFactor(band="B4", scale=0.0001),)
+            ... )
+            >>> chain.name
+            'Sentinel2SclMask >> BandScaler'
+            >>> len(chain.masks)
+            2
+
+            ```
+        - Composition flattens, so grouping does not change the result:
+            ```python
+            >>> a, b, c = Sentinel2SclMask(), Sentinel2Qa60Mask(), Sentinel2Cdi()
+            >>> len(((a >> b) >> c).masks), len((a >> (b >> c)).masks)
+            (3, 3)
+
+            ```
+        - `of` takes the ops positionally, and accepts the function forms:
+            ```python
+            >>> MaskChain.of(sentinel2_scl, Sentinel2Qa60Mask()).name
+            'sentinel2_scl >> Sentinel2Qa60Mask'
+
+            ```
+    """
+
+    masks: tuple[PerImageOp, ...] = Field(min_length=1)
+
+    @classmethod
+    def of(cls, *masks: PerImageOp) -> MaskChain:
+        """Build a chain from ops given positionally.
+
+        Args:
+            *masks: The ops to run, in order. At least one.
+
+        Returns:
+            The chain running them left to right.
+
+        Examples:
+            ```python
+            >>> len(MaskChain.of(Sentinel2Qa60Mask(), sentinel2_scl).masks)
+            2
+
+            ```
+        """
+        return cls(masks=masks)
+
+    @property
+    def name(self) -> str:
+        """The element names joined by `>>`, in run order."""
+        return " >> ".join(_op_name(mask) for mask in self.masks)
+
+    def __call__(self, image: ee.Image) -> ee.Image:
+        """Run every op in order, threading each one's output into the next.
+
+        Args:
+            image: The `ee.Image` the first op receives.
+
+        Returns:
+            The last op's output. Each element preserves the image's
+            properties, so `system:time_start` survives the whole chain.
+        """
+        result = image
+        for mask in self.masks:
+            result = mask(result)
+        return result
 
 
 class LandsatSrMask(ImageMask):
@@ -797,6 +1016,281 @@ class ModisState1kmMask(ImageMask):
         state = image.select("state_1km")
         clear = state.bitwiseAnd(_MODIS_CLOUD_STATE_MASK).eq(0)
         return image.updateMask(clear)
+
+
+class BandFactor(BaseModel):
+    """One band's linear conversion from raw DN to physical units.
+
+    The pair the catalog declares per band: `physical = raw * scale +
+    offset`. Either half may be left at its identity, so a band that
+    declares only a multiplier needs only `scale`.
+
+    Attributes:
+        band: The band id the factor applies to, as the catalog spells
+            it (e.g. `"B4"`, `"SR_B4"`). Must be non-empty.
+        scale: The multiplier. Defaults to `1.0` (no scaling).
+        offset: The additive term, applied after the multiplier.
+            Defaults to `0.0` (no offset).
+
+    Examples:
+        - Sentinel-2 surface reflectance is a pure multiplier:
+            ```python
+            >>> f = BandFactor(band="B4", scale=0.0001)
+            >>> f.band, f.scale, f.offset
+            ('B4', 0.0001, 0.0)
+
+            ```
+        - Landsat C2-L2 reflectance carries both halves:
+            ```python
+            >>> BandFactor(band="SR_B4", scale=2.75e-05, offset=-0.2).offset
+            -0.2
+
+            ```
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    band: str = Field(min_length=1)
+    scale: float = 1.0
+    offset: float = 0.0
+
+
+class BandScaler(ImageMask):
+    """Convert raw DN to physical units with the catalog's own factors.
+
+    The catalog records `Band.scale` ("multiply the raw DN by this to get
+    physical units") and `Band.offset` on the rows that need them —
+    `COPERNICUS/S2_SR_HARMONIZED` declares `scale: 0.0001` on every
+    reflectance band, Landsat C2-L2 declares `2.75e-05` / `-0.2` — and
+    until now nothing consumed either field, so a surface-reflectance
+    request returned 0-10000 integers with nothing saying a conversion
+    was outstanding. `BandScaler` applies them **server-side**, before
+    the composite, so the temporal reduction happens in physical units.
+
+    It is an `ImageMask` so it rides the backend's existing `cloud_mask=`
+    hook — which also means it forces the request onto an Earth Engine
+    engine (`EngineConfig.needs_server_side_compute`), the EEDAI reader
+    declining automatically, since stored pixels cannot carry the
+    arithmetic. Scaling raises the dtype from integer to float;
+    `ExportConfig.dtype` is the escape hatch if a narrower output is
+    wanted.
+
+    Compose it *after* a cloud mask — `Sentinel2SclMask() >>
+    BandScaler(...)` — so the mask reads its quality band before any
+    arithmetic touches the image. `earthlens.gee.preprocess` builds that
+    chain from the catalog for you.
+
+    Attributes:
+        factors: The per-band conversions to apply. Bands not named here
+            pass through untouched, and an empty tuple makes the scaler
+            an identity (which is what `for_dataset` returns, with a
+            warning, for a dataset declaring no factors).
+
+    Examples:
+        - Construct from the factors directly:
+            ```python
+            >>> scaler = BandScaler(factors=(BandFactor(band="B4", scale=0.0001),))
+            >>> scaler.name
+            'BandScaler'
+
+            ```
+        - Or resolve them from a catalog row, which skips the bands that
+          declare neither:
+            ```python
+            >>> from earthlens.gee.catalog import Band, Dataset, Extent
+            >>> row = Dataset(
+            ...     id="COPERNICUS/S2_SR_HARMONIZED",
+            ...     title="S2 L2A",
+            ...     extent=Extent(start_date="2017-03-28"),
+            ...     bands={
+            ...         "B4": Band(id="B4", scale=0.0001),
+            ...         "SCL": Band(id="SCL"),
+            ...     },
+            ... )
+            >>> [f.band for f in BandScaler.for_dataset(row).factors]
+            ['B4']
+
+            ```
+        - Hand the composed chain to the GEE backend:
+            ```python
+            >>> from earthlens.core import EarthLens  # doctest: +SKIP
+            >>> el = EarthLens(  # doctest: +SKIP
+            ...     data_source="gee",
+            ...     dataset="COPERNICUS/S2_SR_HARMONIZED",
+            ...     variables=["B4", "B3", "B2"],
+            ...     start="2024-05-01", end="2024-06-15", reducer="median",
+            ...     cloud_mask=Sentinel2SclMask() >> BandScaler.for_dataset(row),
+            ... )
+
+            ```
+    """
+
+    factors: tuple[BandFactor, ...] = ()
+
+    @classmethod
+    def for_dataset(
+        cls, dataset: Dataset, bands: Iterable[str] | None = None
+    ) -> BandScaler:
+        """Resolve the factors a catalog row declares into a scaler.
+
+        A band is included only when its row declares `scale` or
+        `offset`; the missing half falls back to its identity. A band
+        named in `bands` that the row does not carry is skipped — the
+        backend already refuses an unknown band id before this point.
+
+        Args:
+            dataset: The catalog row to read the factors from.
+            bands: The band ids to consider, usually the requested ones.
+                Defaults to every band on the row.
+
+        Returns:
+            A `BandScaler` over the resolved factors — empty, after a
+            `logger.warning`, when the row declares none, so a request
+            asking to scale an unscalable dataset says so rather than
+            silently doing nothing.
+
+        Examples:
+            - A row declaring no factors warns and yields an identity:
+                ```python
+                >>> from earthlens.gee.catalog import Band, Dataset, Extent
+                >>> row = Dataset(
+                ...     id="USGS/SRTMGL1_003", title="SRTM v3",
+                ...     extent=Extent(start_date="2000-02-11"),
+                ...     bands={"elevation": Band(id="elevation")},
+                ... )
+                >>> BandScaler.for_dataset(row).factors
+                ()
+
+                ```
+        """
+        wanted = tuple(bands) if bands is not None else tuple(dataset.bands)
+        factors = []
+        for band in wanted:
+            row = dataset.bands.get(band)
+            if row is None or (row.scale is None and row.offset is None):
+                continue
+            factors.append(
+                BandFactor(
+                    band=band,
+                    scale=1.0 if row.scale is None else row.scale,
+                    offset=0.0 if row.offset is None else row.offset,
+                )
+            )
+        if not factors:
+            logger.warning(
+                f"{dataset.id!r} declares no band scale/offset for "
+                f"{list(wanted)} — the scaler is an identity and the values "
+                "stay raw DN; drop the scaling from the request, or curate "
+                "the factors onto the catalog row."
+            )
+        return cls(factors=tuple(factors))
+
+    def __call__(self, image: ee.Image) -> ee.Image:
+        """Rescale the named bands, leaving every other band in place.
+
+        Each factor's band is recomputed as `band * scale + offset` and
+        written back over the original with `addBands(..., overwrite=
+        True)`, so band order and the unnamed bands survive. The
+        arithmetic itself produces a propertyless image, so the source's
+        full property set — `system:time_start` included — is copied back
+        on; see `_with_properties` for why that is load-bearing.
+
+        Args:
+            image: The `ee.Image` to rescale. Must carry every band the
+                factors name, which holds on the backend path because
+                the `cloud_mask` hook runs *before* `select(bands)`.
+
+        Returns:
+            The image with the named bands in physical units (as
+            floats), carrying the input's properties.
+        """
+        scaled = image
+        for factor in self.factors:
+            converted = (
+                image.select(factor.band)
+                .multiply(factor.scale)
+                .add(factor.offset)
+                .rename(factor.band)
+            )
+            scaled = scaled.addBands(converted, overwrite=True)
+        return _with_properties(scaled, image)
+
+
+class SpeckleFilter(ImageMask):
+    """Smooth speckle out of a radar scene with a focal median.
+
+    The server-side counterpart of the client-side
+    `analysis.FocalMedian`: it runs `ee.Image.focalMedian` on the Earth
+    Engine graph instead of on a downloaded pyramids raster, so it can
+    sit in a `cloud_mask=` chain and apply *before* a composite rather
+    than after the download.
+
+    It exists for the Sentinel-1 recipe. Earth Engine's
+    `COPERNICUS/S1_GRD` already arrives thermal-noise-removed,
+    radiometrically calibrated and terrain-corrected to dB, so speckle
+    filtering is the one genuine preprocessing gap — which is why the
+    catalog's S1 recipe is a documented no-op that points here rather
+    than pretending the absence is an oversight. Appending it is the
+    "extend the default recipe" case:
+    `preprocess("COPERNICUS/S1_GRD") >> SpeckleFilter()`.
+
+    Despite the name it is an `ImageMask`-family per-image op, not one of
+    the collection-level `earthlens.gee.filters`.
+
+    Attributes:
+        radius: Kernel radius, in `units`. Defaults to `50` (metres),
+            roughly a 5x5 window on 10 m S1 GRD. Must be positive.
+        units: Whether `radius` is read in `"meters"` (the default) or
+            `"pixels"`.
+        kernel_type: The kernel shape — `"circle"` (the default),
+            `"square"`, `"cross"`, `"plus"`, `"octagon"` or
+            `"diamond"`.
+        iterations: How many times to apply the kernel. Defaults to `1`.
+
+    Examples:
+        - The defaults are a 50 m circular median:
+            ```python
+            >>> f = SpeckleFilter()
+            >>> f.radius, f.units, f.kernel_type, f.iterations
+            (50.0, 'meters', 'circle', 1)
+
+            ```
+        - A non-positive radius is refused at construction:
+            ```python
+            >>> SpeckleFilter(radius=0)
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for SpeckleFilter
+            ...
+
+            ```
+    """
+
+    radius: float = Field(default=50.0, gt=0)
+    units: Literal["meters", "pixels"] = "meters"
+    kernel_type: Literal["circle", "square", "cross", "plus", "octagon", "diamond"] = (
+        "circle"
+    )
+    iterations: int = Field(default=1, ge=1)
+
+    def __call__(self, image: ee.Image) -> ee.Image:
+        """Replace every pixel with the median of its neighbourhood.
+
+        Args:
+            image: The `ee.Image` to smooth — every band is filtered.
+
+        Returns:
+            The focal-median image, carrying the input's properties
+            (`focalMedian` builds a new image, so they are copied back
+            on).
+        """
+        smoothed = image.focalMedian(
+            radius=self.radius,
+            kernelType=self.kernel_type,
+            units=self.units,
+            iterations=self.iterations,
+        )
+        return _with_properties(smoothed, image)
 
 
 def landsat_sr(image: ee.Image, sensor: Sensor = "auto") -> ee.Image:
