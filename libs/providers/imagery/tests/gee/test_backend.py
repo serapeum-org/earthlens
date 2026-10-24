@@ -36,6 +36,7 @@ from earthlens.gee.cloud_masks import (
     Sentinel2Cdi,
     Sentinel2Qa60Mask,
     Sentinel2SclMask,
+    SpeckleFilter,
     sentinel2_scl,
 )
 from earthlens.gee.filters import ByYear
@@ -4683,7 +4684,7 @@ class TestServerSideFlags:
         )
 
     def test_an_explicit_mask_runs_before_the_flags_chain(self, make_gee):
-        """Composition keeps masking ahead of scaling: the caller's mask first."""
+        """The explicit op is run first, verbatim; the flag's op follows."""
         gee = self._gee(make_gee, preprocess=True, cloud_mask=CloudScorePlus())
         assert self._op(gee).name == "CloudScorePlus >> Sentinel2SclMask >> BandScaler"
 
@@ -4820,3 +4821,49 @@ class TestDoubleScalerRefusal:
         chain = recipe_for("COPERNICUS/S2_HARMONIZED", ["B4"])
         with pytest.raises(ValueError, match="was resolved for"):
             self._gee(make_gee, ["B4"], scaled=True, cloud_mask=chain)
+
+
+class TestFlagCompositionOrdering:
+    """M2: what the explicit-op-first composition does and does not guarantee."""
+
+    def _op(self, make_gee, **overrides):
+        """The composed op for one Sentinel-2 L2A request."""
+        params = dict(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        gee = make_gee(**params)
+        return gee._per_image_op(gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED"))
+
+    def _names(self, op):
+        """The composed op's leaf names, in run order."""
+        return [type(leaf).__name__ for leaf in backend_module._flatten_image_ops(op)]
+
+    def test_the_explicit_op_leads_the_chain_verbatim(self, make_gee):
+        """Every leaf of the hook comes first, in the order it was given."""
+        chain = CloudScorePlus() >> Sentinel2Qa60Mask()
+        names = self._names(self._op(make_gee, preprocess=True, cloud_mask=chain))
+        assert names[:2] == ["CloudScorePlus", "Sentinel2Qa60Mask"]
+        assert names == [
+            "CloudScorePlus",
+            "Sentinel2Qa60Mask",
+            "Sentinel2SclMask",
+            "BandScaler",
+        ]
+
+    def test_the_flags_own_mask_precedes_its_own_scaler(self, make_gee):
+        """The guarantee that does hold: inside the flag's op, mask then scale."""
+        names = self._names(
+            self._op(make_gee, preprocess=True, cloud_mask=CloudScorePlus())
+        )
+        assert names.index("Sentinel2SclMask") < names.index("BandScaler")
+
+    def test_explicit_arithmetic_is_not_hoisted_behind_the_flags_mask(self, make_gee):
+        """The claim that does NOT hold, pinned so it is not re-asserted."""
+        names = self._names(
+            self._op(make_gee, preprocess=True, cloud_mask=SpeckleFilter())
+        )
+        assert names == ["SpeckleFilter", "Sentinel2SclMask", "BandScaler"]

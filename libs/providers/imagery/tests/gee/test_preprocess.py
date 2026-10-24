@@ -315,3 +315,41 @@ class TestRecipeInvariants:
             )
         ]
         assert corrupted == []
+
+
+def _leaf_names(op):
+    """The op's leaf names in run order, however the chain was grouped."""
+    return [
+        leaf if isinstance(leaf, str) else type(leaf).__name__ for leaf in _leaves(op)
+    ]
+
+
+def _leaves(op):
+    """Flatten a `MaskChain` into its leaf ops, recursing through nesting."""
+    return (
+        [leaf for inner in op.masks for leaf in _leaves(inner)]
+        if isinstance(op, MaskChain)
+        else [op]
+    )
+
+
+class TestRecipeOrdering:
+    """M2: the ordering the recipe guarantees, and the one it does not."""
+
+    def test_no_scaler_precedes_a_mask_inside_any_curated_recipe(self, catalog):
+        """Within a recipe, the mask reads raw flags before any arithmetic."""
+        offenders = {}
+        for asset in _recipe_rows(catalog):
+            names = _leaf_names(preprocess(asset, catalog=catalog))
+            scaler = names.index("BandScaler") if "BandScaler" in names else len(names)
+            after = [name for name in names[scaler + 1 :] if name.endswith("Mask")]
+            if after:
+                offenders[asset] = names
+        assert offenders == {}
+
+    def test_a_recipe_puts_its_scaler_last(self, catalog):
+        """The scaler is the recipe's final step, so nothing reads scaled flags."""
+        for asset, row in _recipe_rows(catalog).items():
+            names = _leaf_names(preprocess(asset, catalog=catalog))
+            if row.preprocess.scale:
+                assert names[-1] == "BandScaler", asset
