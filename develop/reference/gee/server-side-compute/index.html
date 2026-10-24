@@ -3511,6 +3511,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#joining-two-collections" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Joining two collections
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -24185,6 +24196,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#joining-two-collections" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Joining two collections
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -24800,6 +24822,29 @@ valid neighbour in the window stays masked:</p>
 <a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
 <a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="n">filled</span> <span class="o">=</span> <span class="n">GapFill</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">max_gap</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">30</span><span class="p">))</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
 </code></pre></div>
+<h3 id="joining-two-collections"><a class="toclink" href="#joining-two-collections">Joining two collections</a><a class="headerlink" href="#joining-two-collections" title="Permanent link">#</a></h3>
+<p>Earth Engine's five join strategies ship as frozen config objects — <code>InnerJoin</code>, <code>SaveAllJoin</code>,
+<code>SaveBestJoin</code>, <code>SaveFirstJoin</code>, <code>SimpleJoin</code>, all under the <code>Join</code> base — each exposing the SDK's own
+<code>apply(primary, secondary, condition)</code> seam. The wrapper names the intent (<code>matches_key</code>, <code>ordering</code>,
+<code>measure_key</code>) and validates it at construction (<code>frozen=True</code>, <code>extra="forbid"</code>), where the raw factory
+would bind a typo'd keyword silently; the <em>condition</em> stays an ordinary <code>ee.Filter</code>, exactly as raw Earth
+Engine spells it. A join is inherently a two-collection operation, so these are standalone composables for
+<code>.client</code>-level graphs — never drop-ins for the single-collection <code>filters=</code> hook:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">ee</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">SaveAllJoin</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="c1"># Hang each Sentinel-2 scene&#39;s cloud-probability image on it, by scene id.</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="n">condition</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">leftField</span><span class="o">=</span><span class="s2">&quot;system:index&quot;</span><span class="p">,</span> <span class="n">rightField</span><span class="o">=</span><span class="s2">&quot;system:index&quot;</span><span class="p">)</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="n">joined</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">ImageCollection</span><span class="p">(</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>    <span class="n">SaveAllJoin</span><span class="p">(</span><span class="n">matches_key</span><span class="o">=</span><span class="s2">&quot;probability&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="n">s2_cloud_prob</span><span class="p">,</span> <span class="n">condition</span><span class="p">)</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="p">)</span>
+</code></pre></div>
+<p><code>GapFill</code> builds its within-<code>max_gap</code> <code>before</code> / <code>after</code> neighbour lists through <code>SaveAllJoin</code> with an
+<code>ee.Filter.And(maxDifference, ...)</code> condition — the same pattern to copy for any temporal-neighbour join.
+(<code>CloudScorePlus</code> deliberately stays on <code>linkCollection</code>, a per-image <code>system:index</code> link that needs no
+join plumbing.) Joins are server-side compute: a pipeline using one runs on an Earth Engine engine, never
+the EEDAI reader.</p>
 <h2 id="choosing-an-engine-in-practice"><a class="toclink" href="#choosing-an-engine-in-practice">Choosing an engine, in practice</a><a class="headerlink" href="#choosing-an-engine-in-practice" title="Permanent link">#</a></h2>
 <table>
 <thead>
