@@ -152,6 +152,28 @@ class TestAssetInfo:
         row = AssetInfo(id="projects/p/assets/x", type="FOLDER")
         assert str(row) == "AssetInfo(projects/p/assets/x, FOLDER)"
 
+    def test_a_payload_with_no_handle_is_reported(self):
+        """Neither `id` nor `name` leaves nothing to address, so it raises."""
+        with pytest.raises(ValueError, match="neither 'id' nor 'name'"):
+            assets_module._to_asset_info({"type": "FOLDER"})
+
+    def test_the_refusal_names_the_keys_it_got(self):
+        """The message carries the payload's keys, as `_submitted_task`'s does."""
+        with pytest.raises(ValueError, match=r"\['size[Bb]ytes', 'type'\]"):
+            assets_module._to_asset_info({"type": "FOLDER", "sizeBytes": "1"})
+
+    @pytest.mark.parametrize("key", ["id", "name"])
+    def test_either_handle_is_enough(self, key):
+        """Both spellings normalise onto `id`, as before."""
+        assert assets_module._to_asset_info({key: "projects/p/assets/x"}).id == (
+            "projects/p/assets/x"
+        )
+
+    def test_an_empty_handle_is_reported_too(self):
+        """An empty string is not an asset id either."""
+        with pytest.raises(ValueError, match="neither 'id' nor 'name'"):
+            assets_module._to_asset_info({"id": "", "type": "FOLDER"})
+
     def test_it_is_frozen(self):
         """A listing row cannot be edited in place."""
         row = AssetInfo(id="projects/p/assets/x")

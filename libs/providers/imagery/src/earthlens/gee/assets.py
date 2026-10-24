@@ -93,10 +93,23 @@ def _to_asset_info(payload: dict[str, Any]) -> AssetInfo:
 
     Returns:
         The parsed row, with `sizeBytes` (a string on the wire) as an int.
+
+    Raises:
+        ValueError: If the payload carries neither `id` nor `name`, so there
+            is no asset id to address the row by. Reported rather than
+            manufactured as `""`, which printed as `AssetInfo(, FOLDER)` —
+            the same choice `_submitted_task` makes for a missing operation
+            handle.
     """
+    handle = payload.get("id") or payload.get("name")
+    if not handle:
+        raise ValueError(
+            "the asset payload carries neither 'id' nor 'name', so the row "
+            f"has no asset id to address it by; got keys {sorted(payload)}"
+        )
     size = payload.get("sizeBytes")
     return AssetInfo(
-        id=str(payload.get("id") or payload.get("name") or ""),
+        id=str(handle),
         type=payload.get("type"),
         size_bytes=int(size) if size is not None else None,
     )
@@ -167,6 +180,10 @@ class AssetManager(BaseModel):
 
         Returns:
             The created folder, parsed from `ee.data.createFolder`'s answer.
+
+        Raises:
+            ValueError: If the answer carries neither `id` nor `name`, so
+                the row has no asset id (see `_to_asset_info`).
         """
         return _to_asset_info(ee.data.createFolder(path))
 
@@ -186,6 +203,10 @@ class AssetManager(BaseModel):
 
         Returns:
             The created asset, parsed from `ee.data.createAsset`'s answer.
+
+        Raises:
+            ValueError: If the answer carries neither `id` nor `name`, so
+                the row has no asset id (see `_to_asset_info`).
         """
         return _to_asset_info(
             ee.data.createAsset({"type": asset_type}, path, properties)
@@ -200,6 +221,10 @@ class AssetManager(BaseModel):
 
         Returns:
             One parsed `AssetInfo` per child, empty when the container is.
+
+        Raises:
+            ValueError: If a listed row carries neither `id` nor `name`, so
+                it has no asset id (see `_to_asset_info`).
         """
         target = parent if parent is not None else self.root
         response = ee.data.listAssets({"parent": target})
@@ -213,6 +238,10 @@ class AssetManager(BaseModel):
 
         Returns:
             The parsed `AssetInfo` row.
+
+        Raises:
+            ValueError: If the answer carries neither `id` nor `name`, so
+                the row has no asset id (see `_to_asset_info`).
         """
         return _to_asset_info(ee.data.getAsset(asset_id))
 
