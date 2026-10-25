@@ -284,6 +284,13 @@ with `ee.Reducer.linearFit` / `sensSlope`, so the slope is per-pixel *over time*
 both paths yield the same per-pixel result. The `reducer=` string is validated at construction, so a bad percentile (`"p150"`) or
 an unknown name fails before any bucket exports rather than part-way through.
 
+**Compositing.** `CompositeEngine` is the object that pairs a reducer with a cadence: it holds a `TemporalReducer`
+and a `Cadence` bucketer, splits the request window into buckets, and reduces each one to a single image. It is what
+`temporal_resolution=` resolves to, and the two special cases live in it rather than in the backend —
+`temporal_resolution="raw"` and a static (non-collection) dataset are both one whole-window bucket reducing the
+collection once. Reach for it directly when you want a bucketing the string cannot express; otherwise the string is
+the same thing.
+
 **Engines.** `engine=` resolves to an `Engine`, and there are four:
 
 | `engine=` | Transport | Runs a computation graph? | Per-axis cap |
@@ -512,6 +519,96 @@ The units matter: pyramids' `slope` understands `degrees` and `radians` and
 falls through to radians for anything else, so `percent` is computed here as
 `tan(radians) * 100` rather than passed down. A 45° slope therefore reads 45.0,
 π/4 and 100.0 in the three units.
+
+### Windowed texture
+
+`Texture` reports a grey-level co-occurrence measure per window, which is how a
+smooth surface is told from a rough one when both have the same mean value —
+urban against bare soil, say, or calm water against wind-roughened water:
+
+```python
+from earthlens.gee import Texture
+
+contrast = gee.analyze(Texture(measure="contrast", radius=2, levels=16))
+```
+
+`radius` is the window half-width in cells and `levels` the number of grey
+levels the band is quantised into before the co-occurrence matrix is built —
+fewer levels means a coarser, cheaper measure. A constant field has no texture
+at all, which is the useful sanity check: `contrast` reads 0.0 and
+`homogeneity` reads 1.0 everywhere on it.
+
+### Distance to a target
+
+`Proximity` replaces each cell with its distance to the nearest target cell.
+With `target_values` left unset every non-zero cell is a target, which is GDAL's
+own default and the right one for a mask raster:
+
+```python
+from earthlens.gee import Proximity
+
+# Distance from every cell to the nearest water pixel.
+distance = gee.analyze(Proximity(band=0))
+
+# Only classes 3 and 4 count as targets, and cap the search.
+to_roads = gee.analyze(Proximity(target_values=(3, 4), max_distance=5000))
+```
+
+Distances come out in the **CRS's own units**, so a geographic raster reports
+degrees, not metres — worth knowing before comparing a result against a
+distance in metres. Pass `distance_units="PIXEL"` to count cells instead.
+
+### Unit conversion
+
+`ConvertUnits` applies the affine conversion between two physical units, reading
+the band's current unit from the raster's own `band_units` and declaring the
+target on the result:
+
+```python
+from earthlens.gee import ConvertUnits
+
+celsius = gee.analyze(ConvertUnits(target="celsius"))
+```
+
+Converting to the unit a band already carries is a no-op rather than an error.
+No-data stays no-data: a sentinel is a number, and `-9999 K` would otherwise
+become a plausible-looking `-10272.15 °C`.
+
+This operation owns its arithmetic deliberately. pyramids has the same table
+behind `Dataset.convert_units` but deprecated it for removal, on the grounds
+that physical unit conversion is domain logic rather than a GIS primitive — to
+be done in the downstream science-domain consumer, which is this package.
+
+### Patches: labelling and sieving
+
+Two operations treat contiguous runs of cells as objects rather than as pixels.
+`ConnectedComponents` labels each patch with its own number, so counting patches
+is reading the maximum and selecting one is comparing against its label:
+
+```python
+from earthlens.gee import ConnectedComponents, Sieve
+
+labels = gee.analyze(ConnectedComponents(lower_bound=1.0, upper_bound=1.0))
+```
+
+Cells outside `[lower_bound, upper_bound]` become 0. A no-data cell is outside
+any finite range, so a void becomes background too — which is the right default,
+since a void is not a patch, but it means the label raster cannot tell "not in a
+patch" from "no data here". Read that back from the source raster if it matters.
+
+`Sieve` drops patches smaller than `min_patch_cells`, which is the clean-up step
+a classification needs before anything downstream treats its patches as real:
+
+```python
+# Classify, then drop the salt-and-pepper, then vectorise what survived.
+cleaned = gee.analyze(Reclassify(bins=((0.3, 1.0, 1),)) >> Sieve(min_patch_cells=25))
+```
+
+`Sieve` takes a `connectedness` of 4 or 8, deciding whether diagonal neighbours
+join a patch; `ConnectedComponents` labels with its own fixed rule and exposes
+`dtype` instead, for when the label count outgrows `int32`. Pairing `Sieve` with
+`Vectorize` is the intended route from a classification to polygons — see
+[Sampling and vector interop](sampling-and-vector.md#rasters-to-polygons).
 
 ### No-data, once
 
