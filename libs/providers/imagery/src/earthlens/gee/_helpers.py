@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import math
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from typing import TYPE_CHECKING, Any
 
 from pydantic import BeforeValidator
@@ -192,6 +192,77 @@ def checked_cdi_threshold(value: float) -> float:
     if not -1 <= value <= 1:
         raise ValueError(f"threshold must be in [-1, 1], got {value!r}")
     return value
+
+
+def checked_handle(
+    handle: Any,
+    subject: str,
+    keys: tuple[str, ...],
+    payload: Mapping[str, Any],
+) -> str:
+    """Refuse a raw payload that carries no handle to address its row by.
+
+    `assets._to_asset_info` and `jobs._op_to_taskinfo` both turn a raw Earth
+    Engine dict into a typed row, and both need the same thing out of it: an
+    id the row can be addressed by afterwards. Where one was missing they
+    used to manufacture `""`, which printed as `AssetInfo(, FOLDER)` on one
+    side and handed back a `TaskInfo` whose `cancel_task(info.id)` aimed at
+    the empty string on the other. The check lives here so the two cannot
+    disagree about it again.
+
+    Args:
+        handle: The candidate id the caller resolved out of `payload`, already
+            reduced to its final form — an operation `name` cut down to its
+            last path segment, say. Anything falsy means nothing usable was
+            found, including the empty segment a trailing `/` leaves behind.
+        subject: What the row describes, named in the message: `asset` or
+            `task`.
+        keys: The payload keys the caller looked in, in order, named in the
+            message.
+        payload: The raw dict. Its keys go into the message, so a schema
+            surprise is diagnosable from the error alone.
+
+    Returns:
+        `handle` as a `str`.
+
+    Raises:
+        ValueError: If `handle` is falsy.
+
+    Examples:
+        - A handle passes through, stringified:
+            ```python
+            >>> from earthlens.gee._helpers import checked_handle
+            >>> checked_handle("ID0001", "task", ("id",), {"id": "ID0001"})
+            'ID0001'
+
+            ```
+        - One key, with nothing usable in it:
+            ```python
+            >>> from earthlens.gee._helpers import checked_handle
+            >>> checked_handle("", "task", ("name",), {})
+            Traceback (most recent call last):
+                ...
+            ValueError: the task payload carries no usable 'name', so there is no task id to address the row by; got keys []
+
+            ```
+        - Two keys, and neither carries one:
+            ```python
+            >>> from earthlens.gee._helpers import checked_handle
+            >>> checked_handle(None, "asset", ("id", "name"), {"type": "FOLDER"})
+            Traceback (most recent call last):
+                ...
+            ValueError: the asset payload carries neither 'id' nor 'name', so there is no asset id to address the row by; got keys ['type']
+
+            ```
+    """
+    if not handle:
+        named = " nor ".join(repr(k) for k in keys)
+        quantifier = "no usable" if len(keys) == 1 else "neither"
+        raise ValueError(
+            f"the {subject} payload carries {quantifier} {named}, so there is "
+            f"no {subject} id to address the row by; got keys {sorted(payload)}"
+        )
+    return str(handle)
 
 
 def slug_asset_id(asset_id: str) -> str:

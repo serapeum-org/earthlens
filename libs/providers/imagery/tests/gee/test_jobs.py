@@ -239,6 +239,54 @@ class TestOpAdapter:
         with pytest.raises(ValueError, match="unknown EE task state 'GARGLE'"):
             _op_to_taskinfo(_op(state="GARGLE"))
 
+    def test_list_operations_shape_without_a_name_is_refused(self):
+        """An LRO envelope with no `name` has no task id, so it is refused."""
+        op = _op()
+        del op["name"]
+        with pytest.raises(ValueError, match="carries no usable 'name'"):
+            _op_to_taskinfo(op)
+
+    def test_list_operations_shape_with_a_trailing_slash_name_is_refused(self):
+        """A `name` ending in `/` leaves an empty last segment, also refused."""
+        op = _op()
+        op["name"] = "projects/earth-engine-415620/operations/"
+        with pytest.raises(ValueError, match="carries no usable 'name'"):
+            _op_to_taskinfo(op)
+
+    def test_flat_status_shape_without_id_or_name_is_refused(self):
+        """A flat status carrying neither `id` nor `name` is refused."""
+        status = _flat_status()
+        del status["id"]
+        del status["name"]
+        with pytest.raises(ValueError, match="neither 'id' nor 'name'"):
+            _op_to_taskinfo(status)
+
+    def test_flat_status_shape_falls_back_to_the_name_segment(self):
+        """With `id` gone, the flat shape still resolves the id from `name`."""
+        status = _flat_status(task_id="ID0042")
+        del status["id"]
+        assert _op_to_taskinfo(status).id == "ID0042"
+
+    @pytest.mark.parametrize("spelling", ["UNSUBMITTED", "State.UNSUBMITTED"])
+    def test_an_unsubmitted_status_legitimately_has_no_handle(self, spelling):
+        """A never-started task has no id, so the empty one is kept, not refused.
+
+        `ee.batch.Task.status()` answers `{'state': State.UNSUBMITTED}` and
+        nothing else for a task with no operation name, so both the bare name
+        and the enum's `str()` have to land on the same row.
+        """
+        info = _op_to_taskinfo({"state": spelling})
+        assert info.id == ""
+        assert info.operation_name == ""
+        assert info.state == "UNSUBMITTED"
+
+    def test_the_refusal_names_the_keys_the_payload_did_carry(self):
+        """The message lists the payload's keys so a schema change is visible."""
+        op = _op()
+        del op["name"]
+        with pytest.raises(ValueError, match=r"got keys \['metadata'\]"):
+            _op_to_taskinfo(op)
+
     @pytest.mark.parametrize(
         "lro, normalised",
         [

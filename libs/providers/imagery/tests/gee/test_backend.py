@@ -158,6 +158,8 @@ class _FakeTask:
         self._error = error
         self.started = False
         self.poll_count = 0
+        self.task_id = "FAKETASK000000000000001"
+        self.operation_name = f"projects/earth-engine-415620/operations/{self.task_id}"
 
     def start(self):
         self.started = True
@@ -165,7 +167,11 @@ class _FakeTask:
     def status(self) -> dict:
         self.poll_count += 1
         state = self._states[min(self.poll_count - 1, len(self._states) - 1)]
-        out = {"state": state}
+        # `_cloud_api_utils.convert_operation_to_task` sets `id` and `name` on
+        # every submitted task, so a status carrying neither is not a shape the
+        # SDK produces — bar `{"state": "UNSUBMITTED"}`, which it answers for a
+        # task that was never started.
+        out = {"state": state, "id": self.task_id, "name": self.operation_name}
         if state == "FAILED" and self._error:
             out["error_message"] = self._error
         return out

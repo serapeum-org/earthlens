@@ -52,7 +52,7 @@ import ee
 from pydantic import BaseModel, ConfigDict
 
 from earthlens.base import SummarisedLeaf
-from earthlens.gee._helpers import NoBool
+from earthlens.gee._helpers import NoBool, checked_handle
 from earthlens.gee.jobs import TaskInfo, _resolve_project, get_task_status
 
 __all__ = ["AssetInfo", "AssetManager"]
@@ -102,17 +102,15 @@ def _to_asset_info(payload: dict[str, Any]) -> AssetInfo:
             is no asset id to address the row by. Reported rather than
             manufactured as `""`, which printed as `AssetInfo(, FOLDER)` —
             the same choice `_submitted_task` makes for a missing operation
-            handle.
+            handle, and the same `_helpers.checked_handle` that
+            `jobs._op_to_taskinfo` applies to an operation payload.
     """
-    handle = payload.get("id") or payload.get("name")
-    if not handle:
-        raise ValueError(
-            "the asset payload carries neither 'id' nor 'name', so the row "
-            f"has no asset id to address it by; got keys {sorted(payload)}"
-        )
+    handle = checked_handle(
+        payload.get("id") or payload.get("name"), "asset", ("id", "name"), payload
+    )
     size = payload.get("sizeBytes")
     return AssetInfo(
-        id=str(handle),
+        id=handle,
         type=payload.get("type"),
         size_bytes=int(size) if size is not None else None,
     )
