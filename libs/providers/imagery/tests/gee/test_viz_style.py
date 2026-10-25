@@ -94,9 +94,7 @@ class TestStyleHints:
         """Each draw takes gamma in its own shape."""
         single = StyleHints(bands=("b1",), gamma=(1.5,), source="catalog")
         assert single.field_kwargs()["gamma"] == 1.5
-        rgb = StyleHints(
-            bands=("a", "b", "c"), gamma=(1.5, 1.5, 1.5), source="catalog"
-        )
+        rgb = StyleHints(bands=("a", "b", "c"), gamma=(1.5, 1.5, 1.5), source="catalog")
         assert rgb.rgb_kwargs()["gamma"] == [1.5, 1.5, 1.5]
 
     @pytest.mark.parametrize("field", ["gamma", "gain"])
@@ -296,7 +294,9 @@ class TestAgainstTheRealCatalog:
                 for asset_id, row in catalog.datasets.items()
                 if not row.visualizations
                 and row.bands
-                and any(b.min is not None and b.max is not None for b in row.bands.values())
+                and any(
+                    b.min is not None and b.max is not None for b in row.bands.values()
+                )
             ),
             None,
         )

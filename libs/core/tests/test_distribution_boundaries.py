@@ -3117,9 +3117,9 @@ class TestRenderingStaysOptional:
 
     def test_the_viz_extra_is_declared(self):
         """The dependency the lazy import needs must be a declared extra."""
-        text = (
-            _ROOT / "libs" / "providers" / "imagery" / "pyproject.toml"
-        ).read_text(encoding="utf-8")
+        text = (_ROOT / "libs" / "providers" / "imagery" / "pyproject.toml").read_text(
+            encoding="utf-8"
+        )
         assert "\nviz = [" in text, (
             "earthlens-imagery must declare a `viz` extra; a package the code "
             "imports is never allowed to arrive transitively"
@@ -3149,7 +3149,9 @@ class TestRenderingStaysOptional:
                 names: list[str] = []
                 if isinstance(node, ast.Import):
                     names = [alias.name for alias in node.names]
-                elif isinstance(node, ast.ImportFrom) and node.module and not node.level:
+                elif (
+                    isinstance(node, ast.ImportFrom) and node.module and not node.level
+                ):
                     names = [node.module]
                 for name in names:
                     root = name.split(".")[0]

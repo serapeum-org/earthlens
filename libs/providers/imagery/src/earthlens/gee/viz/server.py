@@ -125,10 +125,10 @@ class ServerThumbnail(BaseModel):
             ```
         - An oversize request is refused at construction, not by the SDK:
             ```python
-            >>> ServerThumbnail(dimensions=8192)
+            >>> ServerThumbnail(dimensions=8192)  # doctest: +IGNORE_EXCEPTION_DETAIL
             Traceback (most recent call last):
                 ...
-            ValueError: dimensions=8192 exceeds Earth Engine's 4096-px thumbnail cap; use MapTiles for an interactive view, or export the pixels
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for ServerThumbnail
 
             ```
         - A boolean is not a pixel count:

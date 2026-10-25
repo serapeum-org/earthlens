@@ -102,8 +102,8 @@ class Visualizer:
             >>> viz = Visualizer(result=None, asset_id="USGS/SRTMGL1_003")
             >>> viz.hints.bands
             ('elevation',)
-            >>> viz.hints.source
-            'heuristic'
+            >>> viz.hints.source  # SRTM carries a publisher rendering
+            'catalog'
 
             ```
         - An unknown backend is refused before digitalearth is even imported:
