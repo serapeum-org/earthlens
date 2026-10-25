@@ -169,6 +169,11 @@ class EngineConfig(SummarisedLeaf):
             asset's native resolution.
         cloud_mask: Optional per-image hook, `.map`-applied before the reducer.
             Despite the name it is a general `ee.Image -> ee.Image` operation.
+        server_side_ops: Whether `GEE(scaled=...)` / `GEE(preprocess=...)`
+            resolved a per-image op. Those flags are resolved per *dataset*
+            (the backend reads the asset id and the requested bands from
+            `variables`), so they do not arrive on `cloud_mask` and have to be
+            reported here for the reader's eligibility question to see them.
         filters: Collection-level hooks, applied left to right.
         property_filter: An OGR attribute-filter string narrowing collection
             scenes on the EEDAI path; Earth Engine ignores it.
@@ -195,6 +200,7 @@ class EngineConfig(SummarisedLeaf):
     crs: str = "EPSG:4326"
     scale: float | None = None
     cloud_mask: Any = None
+    server_side_ops: bool = False
     filters: tuple[Any, ...] = ()
     property_filter: str | None = None
     region: Any = None
@@ -218,7 +224,12 @@ class EngineConfig(SummarisedLeaf):
         request that needs one belongs on an Earth Engine engine.
 
         Returns:
-            `True` when a `cloud_mask` or any `filters` were given.
+            `True` when a `cloud_mask`, any `filters`, or a `scaled=` /
+            `preprocess=` flag that resolved a real op (`server_side_ops`)
+            were given. A flag whose op is an identity — a factorless
+            `BandScaler`, or a recipe that is only a `PassThrough` — does
+            not count: the backend drops it, because it cannot change a
+            pixel and so is no reason to decline the reader.
 
         Examples:
             - A plain request needs nothing computed, so the reader may serve
@@ -235,8 +246,19 @@ class EngineConfig(SummarisedLeaf):
                 True
 
                 ```
+            - So is a `scaled=True` / `preprocess=True` request, whose op the
+              backend resolves per dataset rather than onto `cloud_mask`:
+                ```python
+                >>> EngineConfig(server_side_ops=True).needs_server_side_compute
+                True
+
+                ```
         """
-        return self.cloud_mask is not None or bool(self.filters)
+        return (
+            self.cloud_mask is not None
+            or bool(self.filters)
+            or bool(self.server_side_ops)
+        )
 
     @property
     def grid_inputs(self) -> tuple[str, float | None]:

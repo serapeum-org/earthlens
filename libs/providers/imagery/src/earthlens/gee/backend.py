@@ -95,6 +95,13 @@ from earthlens.gee._helpers import (
 )
 from earthlens.gee.auth import AuthenticationError, EarthEngineAuth, _redact
 from earthlens.gee.catalog import Catalog, Dataset
+from earthlens.gee.cloud_masks import (
+    BandScaler,
+    ImageMask,
+    MaskChain,
+    PassThrough,
+    Sentinel2Cdi,
+)
 from earthlens.gee.configs import EngineConfig, ExportConfig
 from earthlens.gee.engines import (
     NO_SCENES,
@@ -114,13 +121,23 @@ from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
 from earthlens.gee.pixels import PixelsEngine
 from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reader import EedaiReader
-from earthlens.gee.reducers import temporal_reducer_for
+
+# Aliased: `preprocess` is also the name of the constructor flag this module
+# resolves through it, so the two must not shadow each other.
+from earthlens.gee.recipes import preprocess as recipe_for
+from earthlens.gee.reducers import (
+    LandsatComposite,
+    Reducer,
+    Sentinel2Composite,
+    temporal_reducer_for,
+)
 from earthlens.gee.sinks import AssetSink, _BatchSink, resolve_sink
 from earthlens.gee.work import (
     Artifact,
     DownloadResult,
     FeatureWorkUnit,
 )
+from earthlens.gee.workload import WorkloadTag
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from geopandas import GeoDataFrame
@@ -203,13 +220,39 @@ _EE_URL_MAX_PIXELS: int = EE_MAX_DIMENSION * EE_MAX_DIMENSION
 #: turn the bucket-skip into a hard failure.
 _EEDAI_NO_SCENES: str = NO_SCENES
 
-#: Reducers the reader must not serve, because its client-side result would not
-#: match Earth Engine's server-side one. `mosaic` is the clear case: Earth
-#: Engine's is last-wins (later scenes paint over earlier), while the reader
-#: without a nodata value returns the *first* scene of the stack wholesale. It
-#: is also the most common `default_reducer` in the catalog, so this decline is
-#: what keeps a composite from silently becoming "the earliest scene".
-_EEDAI_UNSUPPORTED_REDUCERS: frozenset[str] = frozenset({"mosaic"})
+#: Reducers the reader must not serve, each with the reason its decline
+#: reports. `mosaic` is declined because its client-side result would not match
+#: Earth Engine's server-side one: Earth Engine's is last-wins (later scenes
+#: paint over earlier), while the reader without a nodata value returns the
+#: *first* scene of the stack wholesale — and it is the most common
+#: `default_reducer` in the catalog, so that decline is what keeps a composite
+#: from silently becoming "the earliest scene". The named-algorithm composites
+#: are declined because `ee.Algorithms.Landsat.simpleComposite` /
+#: `ee.Algorithms.Sentinel2.CDI` exist only server-side — there is nothing
+#: client-side to approximate them with.
+_EEDAI_UNSUPPORTED_REDUCER_REASONS: dict[str, str] = {
+    "mosaic": (
+        "reducer='mosaic' does not mean the same thing client-side: Earth "
+        "Engine's is last-wins, while the reader returns the first scene of "
+        "the stack, so Earth Engine composites this instead"
+    ),
+    LandsatComposite.name: (
+        f"reducer={LandsatComposite.name!r} runs Earth Engine's named "
+        "algorithm ee.Algorithms.Landsat.simpleComposite, which exists only "
+        "server-side, so Earth Engine composites this instead"
+    ),
+    Sentinel2Composite.name: (
+        f"reducer={Sentinel2Composite.name!r} runs Earth Engine's named "
+        "algorithm ee.Algorithms.Sentinel2.CDI, which exists only "
+        "server-side, so Earth Engine composites this instead"
+    ),
+}
+
+#: The reducer names the reader must not serve, derived from the reasons map
+#: so the two cannot drift.
+_EEDAI_UNSUPPORTED_REDUCERS: frozenset[str] = frozenset(
+    _EEDAI_UNSUPPORTED_REDUCER_REASONS
+)
 
 #: Most scenes a collection composite may fetch through the reader in one bucket.
 #: Each scene is a separate download the reader holds in memory to reduce, so a
@@ -269,6 +312,267 @@ CloudMask = Callable[[ee.Image], ee.Image]
 #: An `ee.ImageCollection` filter — collection in, filtered collection out —
 #: applied after `filterDate` / `filterBounds` (see `earthlens.gee.filters`).
 CollectionFilter = Callable[[ee.ImageCollection], ee.ImageCollection]
+
+#: The Sentinel-2 surface-reflectance (Level-2A) rows `ee.Algorithms.Sentinel2
+#: .CDI` must not be pointed at. CDI is a parallax computation over the TOA
+#: band geometry; on L2A it does **not** fail — verified live, it returns a
+#: value — so a mistaken request would get a silently different mask. The
+#: asset id is known at construction, which is why this is a refusal rather
+#: than a caveat.
+_CDI_FORBIDDEN_ASSETS: frozenset[str] = frozenset(
+    {"COPERNICUS/S2_SR_HARMONIZED", "COPERNICUS/S2_SR"}
+)
+
+
+def _flatten_image_ops(op: Any) -> tuple[Any, ...]:
+    """Expand a `MaskChain` into its leaf ops, however deeply nested.
+
+    `MaskChain.of` and `>>` both flatten recursively, so a chain built
+    through either carries no nesting — but `MaskChain(masks=(chain, ...))`
+    constructs one directly and still can, so the walk recurses rather than
+    assuming one level.
+
+    Args:
+        op: A per-image op, a `MaskChain`, or `None`.
+
+    Returns:
+        The leaf ops, in run order; empty for `None`.
+    """
+    result: tuple[Any, ...]
+    if op is None:
+        result = ()
+    elif isinstance(op, MaskChain):
+        result = tuple(leaf for inner in op.masks for leaf in _flatten_image_ops(inner))
+    else:
+        result = (op,)
+    return result
+
+
+def _validate_cdi_product(variables: dict[str, list[str]], *ops: Any) -> None:
+    """Refuse a Cloud Displacement Index op aimed at a Level-2A row.
+
+    Called twice: once on the arguments, before the catalog parse, so a
+    user-supplied `cloud_mask=` / `reducer=` mistake reports without paying
+    for it; and once on the ops `scaled=` / `preprocess=` resolved, which can
+    only be known after it. A catalog `preprocess:` recipe naming
+    `sentinel2_cdi` is the route the first call cannot see.
+
+    Args:
+        variables: The request's asset-id-to-bands mapping.
+        *ops: Candidate ops — a per-image hook, a `MaskChain`, a temporal
+            reducer, or `None`. A chain is expanded to its leaves.
+
+    Raises:
+        ValueError: If a `Sentinel2Cdi` mask or a `Sentinel2Composite` reducer
+            is paired with a Sentinel-2 surface-reflectance asset.
+    """
+    candidates = tuple(leaf for op in ops for leaf in _flatten_image_ops(op))
+    named = tuple(
+        getattr(op, "name", type(op).__name__)
+        for op in candidates
+        if isinstance(op, (Sentinel2Cdi, Sentinel2Composite))
+    )
+    forbidden = sorted(set(variables) & _CDI_FORBIDDEN_ASSETS)
+    if named and forbidden:
+        raise ValueError(
+            f"{', '.join(named)} runs ee.Algorithms.Sentinel2.CDI, which is "
+            "only valid on the Sentinel-2 TOA product "
+            "('COPERNICUS/S2_HARMONIZED', or the legacy 'COPERNICUS/S2'): it "
+            "is a parallax computation over the TOA band geometry. On "
+            f"{', '.join(forbidden)} it does not fail — it computes a "
+            "different value — so the mask would be silently wrong. Request "
+            "the TOA row, or use Sentinel2SclMask / Sentinel2Qa60Mask / "
+            "CloudScorePlus on surface reflectance."
+        )
+
+
+def _resolve_server_side_ops(
+    variables: dict[str, list[str]],
+    catalog: Catalog,
+    *,
+    scaled: bool,
+    preprocess: bool,
+) -> dict[str, ImageMask]:
+    """Resolve the `scaled=` / `preprocess=` flags into one op per dataset.
+
+    The flags are sugar over the `cloud_mask=` hook, resolved here rather
+    than by the caller: the backend already knows the asset id and the
+    requested bands, so neither has to be restated and the two cannot drift
+    from `variables`.
+
+    An op that resolves to an *identity* is dropped rather than recorded:
+    `bool(self._server_side_ops)` is what sets `EngineConfig.server_side_ops`
+    and so declines the EEDAI reader, and declining it — the 32768-px cap,
+    the zip round trip, the per-scene limits — for an op that cannot change
+    a pixel is a cost with no effect. `BandScaler.for_dataset` has already
+    warned when it returns one, so nothing goes unreported.
+
+    Args:
+        variables: The request's asset-id-to-bands mapping.
+        catalog: The catalog to read rows and recipes from.
+        scaled: Resolve a `BandScaler` from each row's declared factors.
+        preprocess: Resolve each row's curated `preprocess:` recipe.
+
+    Returns:
+        The op to `.map` per asset id, empty when neither flag is set and
+        for any dataset whose op is an identity.
+
+    Raises:
+        ValueError: If both flags are set (the recipe already scales), or
+            if `preprocess=True` meets a dataset with no curated recipe.
+    """
+    resolved: dict[str, ImageMask] = {}
+    if scaled and preprocess:
+        raise ValueError(
+            "scaled=True and preprocess=True both apply the catalog's "
+            "scale/offset, so together they would scale the pixels twice. "
+            "preprocess=True already includes the scaling — drop scaled=."
+        )
+    for asset, bands in variables.items():
+        op: ImageMask | None = None
+        if preprocess:
+            op = recipe_for(asset, bands, catalog=catalog)
+        elif scaled:
+            op = BandScaler.for_dataset(catalog.get_dataset(asset), bands)
+        if op is not None and not _is_identity_op(op):
+            resolved[asset] = op
+    return resolved
+
+
+def _is_identity_op(op: ImageMask) -> bool:
+    """Say whether an op provably leaves every pixel and mask untouched.
+
+    Two shapes resolve to one: a `BandScaler` carrying no factors (what
+    `BandScaler.for_dataset` returns, after a warning, for a row declaring
+    no `scale` / `offset`), and a `PassThrough` (what a recipe with nothing
+    to apply yields — Sentinel-1's, which Earth Engine already corrects
+    upstream). An op is an identity when every one of its leaves is.
+
+    Args:
+        op: A resolved per-image op, possibly a `MaskChain`.
+
+    Returns:
+        `True` when the op cannot change the image.
+    """
+    leaves = _flatten_image_ops(op)
+    return all(
+        isinstance(leaf, PassThrough)
+        or (isinstance(leaf, BandScaler) and not leaf.factors)
+        for leaf in leaves
+    )
+
+
+def _scaling_assets(server_side_ops: dict[str, ImageMask]) -> list[str]:
+    """Return the asset ids whose flag-resolved op actually rescales pixels.
+
+    A `BandScaler` with no factors is an identity — `BandScaler.for_dataset`
+    returns one, after a warning, for a row that declares no `scale` /
+    `offset` — so it is not counted: there is no arithmetic to duplicate.
+
+    Args:
+        server_side_ops: The ops `scaled=` / `preprocess=` resolved, keyed by
+            asset id.
+
+    Returns:
+        The asset ids, sorted, whose op carries a non-empty `BandScaler`.
+    """
+    return sorted(
+        asset
+        for asset, op in server_side_ops.items()
+        if any(
+            isinstance(leaf, BandScaler) and leaf.factors
+            for leaf in _flatten_image_ops(op)
+        )
+    )
+
+
+def _validate_scaler_targets(
+    variables: dict[str, list[str]],
+    catalog: Catalog,
+    cloud_mask: Any,
+    server_side_ops: dict[str, ImageMask],
+    *,
+    scaled: bool,
+    preprocess: bool,
+) -> None:
+    """Cross-check an explicitly passed `BandScaler` against the request.
+
+    `cloud_mask=preprocess(asset, bands)` and
+    `cloud_mask=BandScaler.for_dataset(row, bands)` restate two arguments the
+    request already carries, and nothing used to compare them. The three ways
+    that goes wrong are all silent:
+
+    * a **mismatched asset id** resolves another sensor's recipe — the rows
+      often declare the same band names, so the graph computes and applies
+      the wrong factors rather than failing. Refused here.
+    * a **second scaler**, when `scaled=` / `preprocess=` has resolved one
+      too: the hook and the flag's op are chained onto the same image
+      (`_per_image_op`), so the row's scale/offset lands twice. Refused here,
+      for the same reason the two flags refuse each other. An *identity*
+      scaler on either side is exempt — it has no arithmetic to duplicate.
+    * a **narrower band list** leaves the request's other scalable bands in
+      raw DN *in the same raster*, because `BandScaler.__call__` passes an
+      unnamed band through by design. Warned about here, naming them.
+
+    Args:
+        variables: The request's asset-id-to-bands mapping.
+        catalog: The catalog to read each row's declared factors from.
+        cloud_mask: The per-image hook, possibly a `MaskChain`, or `None`.
+        server_side_ops: The ops `scaled=` / `preprocess=` resolved, keyed by
+            asset id.
+        scaled: Whether `scaled=True` was passed, so the remedy names it.
+        preprocess: Whether `preprocess=True` was passed, likewise.
+
+    Raises:
+        ValueError: If a scaler names an asset the request does not ask for,
+            or if the hook and a flag would each rescale the same image.
+    """
+    explicit = [
+        op for op in _flatten_image_ops(cloud_mask) if isinstance(op, BandScaler)
+    ]
+    for scaler in explicit:
+        if scaler.dataset is not None and scaler.dataset not in variables:
+            raise ValueError(
+                f"the BandScaler on cloud_mask= was resolved for "
+                f"{scaler.dataset!r}, but this request asks for "
+                f"{sorted(variables)}. Another row's scale/offset factors "
+                "often name the same bands, so the wrong recipe would be "
+                "applied silently — pass the matching dataset, or use "
+                "preprocess=True / scaled=True and let the backend resolve "
+                "it from variables."
+            )
+    doubled = _scaling_assets(server_side_ops)
+    if doubled and any(scaler.factors for scaler in explicit):
+        flag = "preprocess" if preprocess else "scaled"
+        raise ValueError(
+            f"cloud_mask= already carries a BandScaler, and {flag}=True "
+            f"resolves another one for {doubled}. The hook and the flag's op "
+            "are chained onto the same image, and both apply the catalog's "
+            "scale/offset, so together they would scale the pixels twice. "
+            f"Drop {flag}=, or drop the BandScaler from cloud_mask=."
+        )
+    for scaler in explicit:
+        if scaler.dataset is None:
+            continue
+        covered = {factor.band for factor in scaler.factors}
+        row = catalog.get_dataset(scaler.dataset)
+        uncovered = sorted(
+            band
+            for band in variables[scaler.dataset]
+            if band in row.bands
+            and band not in covered
+            and (
+                row.bands[band].scale is not None or row.bands[band].offset is not None
+            )
+        )
+        if uncovered:
+            logger.warning(
+                f"{scaler.dataset!r} declares scale/offset for {uncovered}, "
+                "but the BandScaler on cloud_mask= does not cover them, so "
+                "they stay raw DN in the same raster as the scaled bands. "
+                "Widen the band list, or use preprocess=True / scaled=True "
+                "so the backend resolves it from variables."
+            )
 
 
 def _validate_pure_config(
@@ -397,6 +701,13 @@ def _eedai_remedy(reason: str) -> str:
     credential. Matched most specific first, since the reasons overlap in
     wording (a stack over the pixel budget also names its scene count).
 
+    The one-`return` house rule is deliberately not applied here, and the
+    decision is recorded rather than left implicit: this is a dispatch table
+    written as guard clauses, where each arm's condition and its answer belong
+    on adjacent lines. Accumulating into a single `result` would put the
+    conditions and the strings a screen apart and add an `elif` ladder that
+    says nothing. New helpers in this family still take the rule.
+
     Args:
         reason: The declined plan's reason.
 
@@ -407,6 +718,11 @@ def _eedai_remedy(reason: str) -> str:
         return (
             "Pass a statistical reducer (mean/median/min/max/sum), or "
             "engine='ee' to keep Earth Engine's mosaic semantics."
+        )
+    if "named algorithm" in reason:
+        return (
+            "Named-algorithm composites run only on Earth Engine; use "
+            "engine='ee', or a statistical reducer for the reader."
         )
     if "credential" in reason:
         return "Fix the service key or service account, or use engine='ee'."
@@ -567,14 +883,23 @@ class GEE(LazyClientMixin, AbstractDataSource):
             (`"p90"`, `"p50"`) — or `"trend"`, the per-pixel linear-fit slope.
             A percentile and `trend` are first-class here: they run on
             `engine="ee"` (via `ee.Reducer.percentile` / `linearFit`) and on
-            the client-side EEDAI path alike. `None` (the default) uses each
-            dataset's own `default_reducer`. The registry also holds the
-            region-only reducers `first` / `stdDev` / `variance` / `count`,
-            which collapse pixels inside a region rather than images in a
-            collection; naming one here is refused at construction, since there
-            is nothing for it to composite. Pass those to `sample_points`
-            instead. An out-of-range percentile (`"p150"`) or an unknown name
-            is also refused at construction.
+            the client-side EEDAI path alike. An already-built
+            `TemporalReducer` instance also works — `Percentile(q=90)`, or a
+            named-algorithm composite: `LandsatComposite()` runs
+            `ee.Algorithms.Landsat.simpleComposite` (which needs the raw L1
+            collection, e.g. the curated `LANDSAT/LC08/C02/T1` catalog row,
+            not `T1_L2`), and `Sentinel2Composite()` maps the
+            `ee.Algorithms.Sentinel2.CDI` cloud mask over the TOA
+            `COPERNICUS/S2_HARMONIZED` stack before reducing. The named
+            algorithms exist only server-side, so the EEDAI reader declines
+            them and the request runs on an Earth Engine engine. `None` (the
+            default) uses each dataset's own `default_reducer`. The registry
+            also holds the region-only reducers `first` / `stdDev` /
+            `variance` / `count`, which collapse pixels inside a region rather
+            than images in a collection; naming or passing one here is refused
+            at construction, since there is nothing for it to composite. Pass
+            those to `sample_points` instead. An out-of-range percentile
+            (`"p150"`) or an unknown name is also refused at construction.
         export_via: How to get pixels out — `"url"` (synchronous
             `getDownloadURL`, capped at 32768 px per axis; the default),
             `"drive"` (asynchronous `ee.batch.Export.image.toDrive`;
@@ -631,6 +956,37 @@ class GEE(LazyClientMixin, AbstractDataSource):
             `ee_type="image"` dataset it is applied verbatim and a warning
             is logged (see `_build_collection`). Defaults to `None`
             (no masking).
+        scaled: Convert the requested bands from raw DN to physical units
+            server-side, before the composite, using the `scale` /
+            `offset` the catalog row already declares. Resolved inside
+            the backend into a `earthlens.gee.cloud_masks.BandScaler`
+            per requested dataset over that dataset's requested bands,
+            so neither the asset id nor the band list is restated — and
+            so they cannot drift from `variables`. Bands declaring
+            neither factor pass through untouched; a dataset declaring
+            none at all logs a warning and leaves the values raw rather
+            than failing — and, since that scaler is an identity, it is
+            dropped instead of being mapped, so the request keeps the
+            EEDAI reader it would otherwise have paid for. Defaults to
+            `False`: switching it on would
+            change every existing request's pixel values *and* dtype
+            (integer to float) at once, and `ExportConfig.dtype` is the
+            escape hatch for a narrower output. Composes with an
+            explicit `cloud_mask=`, which runs first (see
+            `_build_collection`).
+        preprocess: Apply the dataset's curated analysis-ready recipe —
+            the sensor's recommended cloud mask, then the band scaling —
+            resolved from the catalog row's `preprocess:` block. The
+            one-argument form of
+            `cloud_mask=earthlens.gee.preprocess(dataset, bands)`, with
+            the asset id and the band list taken from `variables`
+            instead of restated. A dataset with no curated recipe raises
+            at construction rather than silently doing nothing, and a
+            recipe with nothing to apply resolves to an explicit
+            `PassThrough` — which, being an identity, is dropped rather
+            than mapped, so the request keeps the EEDAI reader. Mutually
+            exclusive with `scaled=True`, which the recipe already
+            covers. Defaults to `False`.
         filters: Optional iterable of `ee.ImageCollection ->
             ee.ImageCollection` filters applied to the stack after the
             spatial / temporal filters (`filterBounds`, and `filterDate`
@@ -652,8 +1008,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
             `ee_type="image_collection"` composited client-side per time
             bucket, in `crs="EPSG:4326"` or any metre-based projected CRS.
             A collection is additionally sized before it is served: too many
-            scenes, too large a stack, or the `mosaic` reducer (whose
-            client-side meaning differs from Earth Engine's last-wins) sends
+            scenes, too large a stack, the `mosaic` reducer (whose
+            client-side meaning differs from Earth Engine's last-wins), or a
+            named-algorithm composite (`LandsatComposite` /
+            `Sentinel2Composite`, which exist only server-side) sends
             it back to Earth Engine. One difference is worth knowing when a
             collection *is* served: the reader reduces client-side with no
             nodata value, because the EEDAI driver declares none, so a scene's
@@ -766,7 +1124,22 @@ class GEE(LazyClientMixin, AbstractDataSource):
             `"asset"` without `asset_id`), a `crs_transform` that is not six
             finite terms with non-zero, unsheared pixel sizes, or a `reducer`
             that reduces a region rather than a collection, is an unknown name,
-            or is a malformed / out-of-range percentile; from the parent on
+            or is a malformed / out-of-range percentile; at construction for
+            `scaled=True` together with `preprocess=True` (the recipe already
+            scales, so both would scale twice), for `preprocess=True` against a
+            dataset whose catalog row carries no `preprocess:` recipe, for a
+            `Sentinel2Cdi` mask (on its own, inside a chain, or resolved from
+            a `preprocess:` recipe) or a `Sentinel2Composite` reducer paired
+            with a Sentinel-2 surface-reflectance asset, for a `BandScaler` on
+            `cloud_mask=` that was resolved for an asset `variables` does not
+            ask for, and for a `BandScaler` on `cloud_mask=` beside a flag
+            that resolves another one for the same asset (both would scale
+            the pixels) — with a deliberate carve-out for an *identity*
+            scaler on either side, which has no arithmetic to duplicate:
+            `cloud_mask=BandScaler(factors=())` beside `scaled=True`
+            composes, and so does an explicit scaler beside a flag whose
+            own scaler came back factorless because the row declares none;
+            from the parent on
             a bad date range; from `_check_input_dates` on an unknown
             `temporal_resolution`; from `_api` on a missing scale or an
             oversized `"url"` request on either pull API (unless
@@ -813,6 +1186,38 @@ class GEE(LazyClientMixin, AbstractDataSource):
             'USGS_SRTMGL1_003_elevation_20000211.tif'
 
             ```
+        - Ask for the dataset's curated analysis-ready recipe instead of
+          assembling one. The flag reads the asset id and the bands off
+          `variables`, so neither is restated, and it resolves at construction
+          — no authentication involved:
+            ```python
+            >>> from earthlens.gee import GEE
+            >>> request = {
+            ...     "start": "2024-05-01", "end": "2024-06-01",
+            ...     "variables": {"COPERNICUS/S2_SR_HARMONIZED": ["B4", "B3"]},
+            ...     "lat_lim": [29.9, 30.0], "lon_lim": [31.2, 31.3],
+            ...     "path": "data/gee",
+            ... }
+            >>> gee = GEE(preprocess=True, **request)
+            >>> gee.preprocess, gee.scaled
+            (True, False)
+
+            ```
+        - The two flags are mutually exclusive, because the recipe already
+          carries the scaling:
+            ```python
+            >>> from earthlens.gee import GEE
+            >>> GEE(
+            ...     start="2024-05-01", end="2024-06-01",
+            ...     variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4", "B3"]},
+            ...     lat_lim=[29.9, 30.0], lon_lim=[31.2, 31.3],
+            ...     path="data/gee", scaled=True, preprocess=True,
+            ... )
+            Traceback (most recent call last):
+                ...
+            ValueError: scaled=True and preprocess=True both apply the catalog's scale/offset...
+
+            ```
     """
 
     OUTPUT_KIND: OutputKind = "raster"
@@ -843,7 +1248,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         *,
         scale: float | None = None,
         crs: str = "EPSG:4326",
-        reducer: str | None = None,
+        reducer: str | Reducer | None = None,
         export_via: Literal["url", "drive", "gcs", "asset"] = "url",
         drive_folder: str | None = None,
         gcs_bucket: str | None = None,
@@ -854,6 +1259,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         discover_extent: bool = False,
         wait_for_export: bool = True,
         cloud_mask: CloudMask | None = None,
+        scaled: bool = False,
+        preprocess: bool = False,
         filters: Iterable[CollectionFilter] | None = None,
         engine: Literal["auto", "ee", "eedai", "pixels"] = "auto",
         cog: bool = False,
@@ -907,6 +1314,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 "cloud_mask must be a callable ee.Image -> ee.Image (or None), "
                 f"got {type(cloud_mask).__name__}"
             )
+        # The asset id and the ops are both in hand here, so the one
+        # CDI/product mismatch that is detectable client-side is refused now
+        # rather than returning a plausible-looking but wrong mask.
+        _validate_cdi_product(variables, cloud_mask, reducer)
         collection_filters = _validate_filters(filters)
         pinned_transform = validate_crs_transform(crs_transform)
         # Resolved up front, not only at composite time: validating `reducer=`
@@ -915,10 +1326,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # percentile into a construction error like every other config mistake,
         # rather than a failure part-way through a run that has already written
         # buckets. `temporal_reducer_for` accepts the seven convenience names, a
-        # `percentile:<q>` spec or its `p<q>` shorthand, and `trend`, and refuses
-        # a region-only reducer with a message naming the collection vocabulary —
-        # the same resolver the Earth Engine and client-side composite paths use,
-        # so the accepted set is defined in exactly one place.
+        # `percentile:<q>` spec or its `p<q>` shorthand, `trend`, and an
+        # already-built `TemporalReducer` instance (e.g. `Percentile(q=90)` or
+        # a named-algorithm composite), and refuses a region-only reducer with
+        # a message naming the collection vocabulary — the same resolver the
+        # Earth Engine and client-side composite paths use, so the accepted set
+        # is defined in exactly one place.
         if reducer is not None:
             temporal_reducer_for(reducer)
         # Validated by `resolve_engine`, not re-checked here: it owns the one
@@ -967,6 +1380,32 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # parent constructor immediately calls `self._initialize()` (and
         # `_create_grid` / `_check_input_dates`), which read them.
         self._catalog = Catalog()
+        # Both need the catalog, so they sit after the parse rather than with
+        # the other cheap config checks above.
+        #: The `scaled=` / `preprocess=` ops, one per requested asset id,
+        #: composed onto `cloud_mask` in `_build_collection`. Resolved here so
+        #: an uncovered dataset or a factorless row reports at construction.
+        self._server_side_ops: dict[str, ImageMask] = _resolve_server_side_ops(
+            variables, self._catalog, scaled=bool(scaled), preprocess=bool(preprocess)
+        )
+        # Re-run on the resolved ops: the pre-catalog call above sees only the
+        # arguments, so a `preprocess:` recipe naming `sentinel2_cdi` on a
+        # Level-2A row would otherwise reach the graph unchecked.
+        _validate_cdi_product(variables, *self._server_side_ops.values())
+        _validate_scaler_targets(
+            variables,
+            self._catalog,
+            cloud_mask,
+            self._server_side_ops,
+            scaled=bool(scaled),
+            preprocess=bool(preprocess),
+        )
+        #: Convert raw DN to physical units server-side from the catalog's
+        #: factors, resolved per dataset (see `_server_side_ops`).
+        self.scaled = bool(scaled)
+        #: Apply each dataset's curated `preprocess:` recipe, resolved per
+        #: dataset (see `_server_side_ops`).
+        self.preprocess = bool(preprocess)
         # Credentials are resolved at authenticate()/first-client-access time
         # (explicitly or from the GEE_SERVICE_ACCOUNT / GEE_SERVICE_KEY /
         # GEE_PROJECT environment variables), not at construction.
@@ -1577,6 +2016,52 @@ class GEE(LazyClientMixin, AbstractDataSource):
         )
         return analysis.run_on_result(result, write_to=write_to, overwrite=overwrite)
 
+    def workload_tag(self, tag: str) -> WorkloadTag:
+        """Return a nest-safe scope tagging this backend's Earth Engine traffic.
+
+        `with gee.workload_tag("run-42"): gee.download()` labels every Earth
+        Engine-served request in the scope — `getDownloadURL`, `computePixels`,
+        `ee.batch` exports — for cost attribution in Cloud billing. The scope
+        is a save-and-restore over `ee.data.getWorkloadTag` /
+        `setWorkloadTag`, so nested scopes hand back to the enclosing tag
+        (unlike `ee.data.workloadTagContext`, whose exit resets to the
+        default). The EEDAI reader path fetches pixels through GDAL rather
+        than `ee`, so an `engine="eedai"` read stays unattributed.
+
+        The returned object is a plain `earthlens.gee.workload.WorkloadTag`;
+        nothing on the backend changes, and the tag applies process-wide while
+        the scope is open. Being process-wide is also its limit: the scope
+        nests safely within one thread but is **not thread-safe**, since two
+        threads entering scopes concurrently interleave their saves and can
+        restore each other's tags.
+
+        Args:
+            tag: The workload tag — 1-63 characters, starting and ending
+                with a **lowercase** alphanumeric character, with `-` or `_`
+                allowed between. That is the rule the SDK's own validator
+                enforces, which is stricter than the one
+                `ee.data.setWorkloadTag`'s docstring describes (it also
+                claims case and dots); see `earthlens.gee.workload`.
+
+        Returns:
+            The `WorkloadTag` context manager, validated and ready to enter.
+
+        Raises:
+            pydantic.ValidationError: If `tag` does not match the format the
+                Earth Engine SDK's validator enforces.
+
+        Examples:
+            - Tag a download run (needs credentials to download):
+                ```python
+                >>> from earthlens.gee import GEE  # doctest: +SKIP
+                >>> gee = GEE(...)  # doctest: +SKIP
+                >>> with gee.workload_tag("run-42"):  # doctest: +SKIP
+                ...     paths = gee.download()
+
+                ```
+        """
+        return WorkloadTag(tag=tag)
+
     def _materialise(self, written: list[Any]) -> DownloadResult:
         """Read each written raster back as an in-memory pyramids object.
 
@@ -1753,7 +2238,17 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 bucket_start,
                 bucket_end,
             )
-            file_format = "GeoJSON" if self.OUTPUT_KIND == "vector" else "CSV"
+            # `asset` writes a table rather than a file, so Earth Engine's
+            # `toAsset` takes no `fileFormat` and `TableSink` refuses one it
+            # would only ignore — including the format that used to be its
+            # default. `None` is how the sink spells "not applicable".
+            file_format: Literal["CSV", "GeoJSON"] | None
+            if self.export_via == "asset":
+                file_format = None
+            elif self.OUTPUT_KIND == "vector":
+                file_format = "GeoJSON"
+            else:
+                file_format = "CSV"
             result: GeoDataFrame | TaskInfo = TableSink(
                 destination=cast('Literal["drive", "gcs", "asset"]', self.export_via),
                 folder=self.drive_folder,
@@ -1780,8 +2275,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         The pipeline is `filterDate` (image collections only) →
         `filterBounds` → the constructor `filters` (left to right) → the
-        per-image `cloud_mask` (`.map`) → `select(bands)`. The
-        `cloud_mask` runs *before* `select` on purpose: an optical mask
+        per-image op (`.map`) → `select(bands)`. That op is the
+        `cloud_mask` hook, whatever `scaled=` / `preprocess=` resolved
+        for this dataset, or the two chained — see `_per_image_op`. It
+        runs *before* `select` on purpose: an optical mask
         reads a quality band (`QA_PIXEL` / `SCL`) that the user's `bands`
         usually omit, so selecting the requested bands first would strip
         it.
@@ -1792,7 +2289,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         the single wrapped image and empty the collection, while a mask
         reading a band the asset lacks fails when the graph is computed —
         either way it surfaces later as an opaque Earth Engine error at
-        download time rather than here.
+        download time rather than here. The warning names those two
+        arguments, so it fires only when one of them was given: a `scaled=`
+        / `preprocess=` op lands on the same hook, but it is resolved from
+        the row's own declarations and neither hazard reaches it.
 
         Args:
             var_info: The catalog entry.
@@ -1803,6 +2303,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         Returns:
             The `ee.ImageCollection`.
         """
+        # Resolved once and reused: the static-image branch below used to call
+        # this for the warning and then again for the `.map`, rebuilding the
+        # `MaskChain` for nothing.
+        per_image = self._per_image_op(var_info)
         if var_info.is_image_collection:
             collection = ee.ImageCollection(var_info.id).filterDate(
                 start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d")
@@ -1811,6 +2315,14 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # A static image: no temporal filtering (the asset may not
             # carry a `system:time_start` inside the request window).
             collection = ee.ImageCollection([ee.Image(var_info.id)])
+            # Keyed on the arguments, not on the resolved op. A `scaled=` /
+            # `preprocess=` op also lands on that hook, but it is resolved
+            # from this row's own declarations: a `BandScaler` skips a band
+            # the row does not carry, and `preprocess=True` against a row
+            # with no `preprocess:` recipe is refused at construction. So
+            # neither of the two hazards below applies to it, and naming two
+            # arguments the caller never passed would cry wolf on a request
+            # that works.
             if self.filters or self.cloud_mask is not None:
                 logger.warning(
                     f"filters / cloud_mask were set but {var_info.id!r} is a "
@@ -1823,9 +2335,42 @@ class GEE(LazyClientMixin, AbstractDataSource):
         collection = collection.filterBounds(self._ee_region())
         for image_filter in self.filters:
             collection = image_filter(collection)
-        if self.cloud_mask is not None:
-            collection = collection.map(self.cloud_mask)
+        if per_image is not None:
+            collection = collection.map(per_image)
         return collection.select(list(bands))
+
+    def _per_image_op(self, var_info: Dataset) -> CloudMask | None:
+        """Return the op to `.map` for one dataset, flags composed onto the hook.
+
+        An explicit `cloud_mask=` and a `scaled=` / `preprocess=` flag are not
+        alternatives: both end up on the one hook, so they are chained rather
+        than one displacing the other. **The explicit op runs first, verbatim**,
+        and the flag's op follows. With `preprocess=True` the recipe's own mask
+        therefore runs second, after the caller's: both screens apply, and
+        neither is dropped.
+
+        Within the *flag's* op, masking precedes scaling — that is the order
+        `recipes.preprocess` builds. The composition does not extend that
+        guarantee across the two: an explicit op is run as given, so arithmetic
+        inside it runs before the flag's mask. The one case where that would
+        corrupt pixels — a `BandScaler` on both sides — is refused at
+        construction by `_validate_scaler_targets`.
+
+        Args:
+            var_info: The catalog entry being downloaded.
+
+        Returns:
+            The per-image op, or `None` when neither a hook nor a flag was
+            given.
+        """
+        resolved = self._server_side_ops.get(var_info.id)
+        if resolved is None:
+            op: CloudMask | None = self.cloud_mask
+        elif self.cloud_mask is None:
+            op = resolved
+        else:
+            op = MaskChain.of(self.cloud_mask, resolved)
+        return op
 
     def _composite(
         self, collection, var_info: Dataset, start: dt.datetime, end: dt.datetime
@@ -2456,6 +3001,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             crs=self.crs,
             scale=self.scale,
             cloud_mask=self.cloud_mask,
+            server_side_ops=bool(self._server_side_ops),
             filters=tuple(self.filters),
             property_filter=self._property_filter_expression(),
             region=self.region,
@@ -2708,17 +3254,16 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # express: the composite is computed here through pyramids' `reduce_time`
         # (`_composite_collection_via_reader`), not handed to the reader's own
         # `reducer=`, so `percentile` / `trend` / `sens_slope` are admitted like
-        # `median`. The only decline is `mosaic`, whose last-wins semantics have
-        # no client-side equivalent over a scene stack.
+        # `median`. The declines are `mosaic`, whose last-wins semantics have no
+        # client-side equivalent over a scene stack, and the named-algorithm
+        # composites, which exist only server-side.
         reducer = temporal_reducer_for(self.reducer or var_info.default_reducer).name
         if reducer in _EEDAI_UNSUPPORTED_REDUCERS:
             # Checked before the network call: no point discovering scenes for a
-            # composite the reader cannot reproduce.
-            return EnginePlan.declined(
-                f"reducer={reducer!r} does not mean the same thing client-side: "
-                "Earth Engine's is last-wins, while the reader returns the first "
-                "scene of the stack, so Earth Engine composites this instead"
-            )
+            # composite the reader cannot reproduce. The reason is per-reducer,
+            # so the mosaic decline keeps explaining last-wins while a
+            # named-algorithm decline names its algorithm.
+            return EnginePlan.declined(_EEDAI_UNSUPPORTED_REDUCER_REASONS[reducer])
         # The adapter, not the raw module: it owns the lock and the identity
         # check around a reader call, which is the whole reason it exists.
         # Built outside the discovery `try`, so a credential problem is never

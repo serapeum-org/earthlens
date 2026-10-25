@@ -188,6 +188,88 @@ class TestNeighbourJoin:
         assert set(fake_filter.max_differences) == {10 * 86_400_000}
 
 
+class _ParityJoinInstance:
+    """A join whose `apply` records its full keyword arguments."""
+
+    def __init__(self, applies: list) -> None:
+        self.applies = applies
+
+    def apply(self, **kwargs: object) -> tuple:
+        self.applies.append(kwargs)
+        return ("joined", len(self.applies))
+
+
+class _ParityJoin:
+    """Records every `saveAll` factory call with its full kwargs."""
+
+    def __init__(self) -> None:
+        self.factories: list[dict] = []
+        self.applies: list[dict] = []
+
+    def saveAll(self, **kwargs: object) -> _ParityJoinInstance:  # noqa: N802
+        self.factories.append(kwargs)
+        return _ParityJoinInstance(self.applies)
+
+
+class _ParityFilter:
+    """Returns inspectable tuples for the join-condition filters."""
+
+    @staticmethod
+    def And(*parts):  # noqa: N802 - mirrors the ee API
+        return ("And", parts)
+
+    @staticmethod
+    def greaterThanOrEquals(**kwargs):  # noqa: N802 - mirrors the ee API
+        return ("gte", kwargs)
+
+    @staticmethod
+    def lessThanOrEquals(**kwargs):  # noqa: N802 - mirrors the ee API
+        return ("lte", kwargs)
+
+    @staticmethod
+    def maxDifference(**kwargs):  # noqa: N802 - mirrors the ee API
+        return ("maxDiff", kwargs)
+
+
+class TestJoinGraphParity:
+    """The join/filter graph the neighbour pairing records, pinned exactly.
+
+    This is the call-graph the inline `ee.Join.saveAll` code produced before
+    the `SaveAllJoin` refactor; the refactored `_join_neighbours` must record
+    the identical factory kwargs, apply kwargs, and condition structure.
+    """
+
+    def test_the_neighbour_join_graph_is_unchanged(self, monkeypatch):
+        """saveAll kwargs, apply kwargs and conditions match the inline form."""
+        fake_join = _ParityJoin()
+        monkeypatch.setattr(gapfill_module.ee, "Join", fake_join)
+        monkeypatch.setattr(gapfill_module.ee, "Filter", _ParityFilter())
+        monkeypatch.setattr(gapfill_module.ee, "ImageCollection", lambda joined: joined)
+
+        result = GapFill(max_gap=dt.timedelta(days=10))._join_neighbours("source")
+
+        time_field = {
+            "leftField": "system:time_start",
+            "rightField": "system:time_start",
+        }
+        max_diff = ("maxDiff", {"difference": 10 * 86_400_000, **time_field})
+        after_cond = ("And", (("gte", time_field), max_diff))
+        before_cond = ("And", (("lte", time_field), max_diff))
+        assert fake_join.factories == [
+            {"matchesKey": "after", "ordering": "system:time_start", "ascending": True},
+            {
+                "matchesKey": "before",
+                "ordering": "system:time_start",
+                "ascending": False,
+            },
+        ]
+        assert fake_join.applies == [
+            {"primary": "source", "secondary": "source", "condition": after_cond},
+            {"primary": ("joined", 1), "secondary": "source", "condition": before_cond},
+        ]
+        assert result == ("joined", 2)
+
+
 class TestLinear:
     """Linear interpolation between the nearest earlier and later pixels."""
 

@@ -5,8 +5,11 @@ from __future__ import annotations
 import datetime as dt
 
 import pytest
+from pydantic import ValidationError
 
+from earthlens.gee import jobs as jobs_module
 from earthlens.gee import table_sink as table_sink_module
+from earthlens.gee.jobs import get_task_status
 from earthlens.gee.table_sink import TableSink
 from earthlens.gee.work import FeatureWorkUnit
 
@@ -72,19 +75,204 @@ class TestTableSinkConfig:
     """The frozen export configuration."""
 
     def test_defaults(self):
-        """A bare sink targets Drive, CSV, non-blocking."""
+        """A bare sink targets Drive, non-blocking, with no format of its own."""
         sink = TableSink()
         assert (sink.destination, sink.file_format, sink.wait_for_export) == (
             "drive",
-            "CSV",
+            None,
             False,
         )
+        assert sink.effective_file_format == "CSV"
 
     def test_it_is_frozen(self):
         """The configuration cannot drift after construction."""
         sink = TableSink(destination="gcs", bucket="b")
         with pytest.raises(Exception, match="frozen"):
             sink.bucket = "other"
+
+
+class TestTableSinkValidation:
+    """Option/destination consistency, checked at construction."""
+
+    def test_overwrite_and_append_are_mutually_exclusive(self):
+        """Earth Engine refuses both flags, so the sink refuses them first."""
+        with pytest.raises(ValidationError, match="mutually exclusive"):
+            TableSink(
+                destination="bigquery", table="p.d.t", overwrite=True, append=True
+            )
+
+    def test_overwrite_is_refused_where_the_factory_lacks_it(self):
+        """`toDrive` has no overwrite parameter, so the flag is refused."""
+        with pytest.raises(ValidationError, match="no overwrite parameter"):
+            TableSink(destination="drive", folder="f", overwrite=True)
+
+    def test_append_is_bigquery_only(self):
+        """The append flag has no meaning on a file destination."""
+        with pytest.raises(ValidationError, match="BigQuery"):
+            TableSink(destination="gcs", bucket="b", append=True)
+
+    def test_ingestion_time_parameters_is_featureview_only(self):
+        """The serving options belong to FeatureView alone."""
+        with pytest.raises(ValidationError, match="FeatureView"):
+            TableSink(
+                destination="bigquery",
+                table="p.d.t",
+                ingestion_time_parameters={"maxFeaturesPerTile": 1000},
+            )
+
+    @pytest.mark.parametrize(
+        ("destination", "missing"),
+        [
+            ("gcs", "bucket"),
+            ("asset", "asset_id"),
+            ("bigquery", "table"),
+            ("featureview", "asset_id"),
+        ],
+    )
+    def test_each_destination_requires_its_address(self, destination, missing):
+        """A sink without the address its destination writes to is refused."""
+        with pytest.raises(ValidationError, match=missing):
+            TableSink(destination=destination)
+
+    def test_an_unknown_file_format_is_refused(self):
+        """The format is a fixed vocabulary, not a free string EE may reject."""
+        with pytest.raises(ValidationError, match="file_format"):
+            TableSink(destination="drive", folder="f", file_format="Parquet")
+
+    @pytest.mark.parametrize(
+        "kwargs",
+        [
+            {"destination": "asset", "asset_id": "a/b"},
+            {"destination": "bigquery", "table": "p.d.t"},
+            {"destination": "featureview", "asset_id": "a/b"},
+        ],
+        ids=["asset", "bigquery", "featureview"],
+    )
+    def test_a_file_format_is_refused_where_it_is_ignored(self, kwargs):
+        """A format the destination never passes on is a mistake, not a no-op."""
+        with pytest.raises(ValidationError, match="file_format"):
+            TableSink(file_format="GeoJSON", **kwargs)
+
+    @pytest.mark.parametrize(
+        "kwargs",
+        [
+            {"destination": "asset", "asset_id": "a/b"},
+            {"destination": "bigquery", "table": "p.d.t"},
+            {"destination": "featureview", "asset_id": "a/b"},
+        ],
+        ids=["asset", "bigquery", "featureview"],
+    )
+    def test_the_default_format_is_refused_too_when_set_explicitly(self, kwargs):
+        """The guard keys off "was set", not off a value, so `CSV` is refused."""
+        with pytest.raises(ValidationError, match="file_format"):
+            TableSink(file_format="CSV", **kwargs)
+
+    @pytest.mark.parametrize(
+        "kwargs",
+        [
+            {"destination": "asset", "asset_id": "a/b"},
+            {"destination": "bigquery", "table": "p.d.t"},
+            {"destination": "featureview", "asset_id": "a/b"},
+        ],
+        ids=["asset", "bigquery", "featureview"],
+    )
+    def test_a_table_destination_reads_back_no_format(self, kwargs):
+        """A destination that writes no file must not claim one."""
+        sink = TableSink(**kwargs)
+        assert sink.file_format is None
+        assert sink.effective_file_format is None
+
+    @pytest.mark.parametrize(
+        ("kwargs", "expected"),
+        [
+            ({"destination": "drive", "folder": "f"}, "CSV"),
+            ({"destination": "gcs", "bucket": "b"}, "CSV"),
+            (
+                {"destination": "drive", "folder": "f", "file_format": "KML"},
+                "KML",
+            ),
+        ],
+        ids=["drive-default", "gcs-default", "drive-explicit"],
+    )
+    def test_a_file_destination_reports_the_format_ee_will_use(self, kwargs, expected):
+        """Unset still answers Earth Engine's own default, via the property."""
+        assert TableSink(**kwargs).effective_file_format == expected
+
+    @pytest.mark.parametrize(
+        "kwargs",
+        [
+            {"destination": "drive", "folder": "f"},
+            {"destination": "gcs", "bucket": "b"},
+        ],
+        ids=["drive", "gcs"],
+    )
+    def test_the_file_destinations_take_a_format(self, kwargs):
+        """The two destinations that forward `fileFormat` still accept it."""
+        assert TableSink(file_format="GeoJSON", **kwargs).file_format == "GeoJSON"
+
+    @pytest.mark.parametrize(
+        "table",
+        [
+            "nodots",
+            "p.d",
+            "p.d.",
+            ".d.t",
+            # A newline is not part of any identifier, and each segment is
+            # spelled `[^.\n]+` so none of the three can absorb one.
+            "p.d.t\n",
+            "\np.d.t",
+            "p.d\n.t",
+            "p.d.t\nq.r.s",
+        ],
+    )
+    def test_a_malformed_bigquery_table_is_refused(self, table):
+        """The sink mirrors EE's own `project.dataset.table` check."""
+        with pytest.raises(ValidationError, match="project.dataset.table"):
+            TableSink(destination="bigquery", table=table)
+
+    @pytest.mark.parametrize("table", ["p.d.t.extra", "a.b.c.d", "p.d.t.", "p.d.t.e.f"])
+    def test_a_fourth_dotted_component_is_refused(self, table):
+        """A BigQuery identifier holds no dot, so a fourth part is not a name."""
+        with pytest.raises(ValidationError, match="project.dataset.table"):
+            TableSink(destination="bigquery", table=table)
+
+    def test_the_bigquery_shape_is_at_least_as_strict_as_the_sdk(self):
+        """Nothing is accepted here that the SDK's own regex would reject.
+
+        Compared exhaustively over the strings the two patterns can disagree
+        on, so the "at least as strict" claim is measured rather than stated.
+        """
+        import itertools
+        import re
+
+        import ee.batch  # noqa: F401 - the SDK whose rule is the baseline
+
+        sdk = re.compile(r".+\..+\..+")
+        looser = []
+        stricter = []
+        for length in range(1, 7):
+            for combination in itertools.product("a.\n\r -", repeat=length):
+                sample = "".join(combination)
+                by_sdk = sdk.fullmatch(sample) is not None
+                by_sink = (
+                    table_sink_module._BIGQUERY_TABLE_RE.fullmatch(sample) is not None
+                )
+                if by_sink and not by_sdk:
+                    looser.append(sample)
+                elif by_sdk and not by_sink:
+                    stricter.append(sample)
+        assert looser == []
+        assert stricter, "the two patterns must differ, or this proves nothing"
+        assert all(sample.count(".") >= 3 for sample in stricter)
+
+    def test_the_valid_shapes_still_construct(self):
+        """The fully qualified forms the SDK accepts are accepted here too."""
+        for table in ("p.d.t", "proj-1.data_set.tbl", "my-project.my_set.my_table"):
+            assert TableSink(destination="bigquery", table=table).table == table
+
+    def test_drive_needs_no_folder(self):
+        """Earth Engine exports to the Drive root when no folder is given."""
+        assert TableSink(destination="drive").folder is None
 
 
 class TestTableSinkWrite:
@@ -119,22 +307,54 @@ class TestTableSinkWrite:
         assert kwargs["assetId"] == "users/me/pts"
 
     def test_bigquery(self, fake_export):
-        """BigQuery passes the table."""
+        """BigQuery passes the table and the write-disposition defaults."""
         TableSink(destination="bigquery", table="proj.ds.tbl").write(
             "fc", description="d"
         )
         name, kwargs = fake_export.calls[0]
         assert name == "toBigQuery"
         assert kwargs["table"] == "proj.ds.tbl"
+        assert (kwargs["overwrite"], kwargs["append"]) == (False, False)
+
+    def test_bigquery_passes_overwrite(self, fake_export):
+        """The overwrite flag reaches ee."""
+        TableSink(destination="bigquery", table="proj.ds.tbl", overwrite=True).write(
+            "fc", description="d"
+        )
+        _, kwargs = fake_export.calls[0]
+        assert (kwargs["overwrite"], kwargs["append"]) == (True, False)
+
+    def test_bigquery_passes_append(self, fake_export):
+        """The append flag reaches ee."""
+        TableSink(destination="bigquery", table="proj.ds.tbl", append=True).write(
+            "fc", description="d"
+        )
+        _, kwargs = fake_export.calls[0]
+        assert (kwargs["overwrite"], kwargs["append"]) == (False, True)
 
     def test_featureview(self, fake_export):
-        """FeatureView passes the asset id."""
+        """FeatureView passes the asset id, with no serving options by default."""
         TableSink(destination="featureview", asset_id="users/me/fv").write(
             "fc", description="d"
         )
         name, kwargs = fake_export.calls[0]
         assert name == "toFeatureView"
         assert kwargs["assetId"] == "users/me/fv"
+        assert kwargs["ingestionTimeParameters"] is None
+
+    def test_featureview_passes_ingestion_time_parameters(self, fake_export):
+        """The serving options travel inside the single ee dict."""
+        parameters = {
+            "maxFeaturesPerTile": 1500,
+            "thinningStrategy": "HIGHER_DENSITY",
+        }
+        TableSink(
+            destination="featureview",
+            asset_id="users/me/fv",
+            ingestion_time_parameters=parameters,
+        ).write("fc", description="d")
+        _, kwargs = fake_export.calls[0]
+        assert kwargs["ingestionTimeParameters"] == parameters
 
     def test_wait_for_export_blocks(self, fake_export):
         """With wait_for_export the task is waited on before the TaskInfo."""
@@ -165,3 +385,171 @@ class TestTableSinkWrite:
         TableSink(destination="drive", folder="f").export(unit)
         _, kwargs = fake_export.calls[0]
         assert kwargs["description"] == repr(unit)
+
+
+class _FakeFeaturesTask:
+    """A task whose status carries the table-export wire type."""
+
+    def start(self) -> None:
+        """Accept the submission."""
+
+    def status(self) -> dict[str, object]:
+        return {
+            "state": "READY",
+            "id": "task-1",
+            "task_type": "EXPORT_FEATURES",
+            "description": "d",
+            "creation_timestamp_ms": 1_704_067_200_000,
+            "update_timestamp_ms": 1_704_067_200_000,
+        }
+
+
+class TestTaskTracking:
+    """A queued table export rides the unchanged jobs machinery."""
+
+    def test_the_table_wire_type_is_export_features(self):
+        """Every table target — BigQuery and FeatureView included — is EXPORT_FEATURES."""
+        import ee.batch
+
+        assert ee.batch.Task.Type.EXPORT_TABLE.value == "EXPORT_FEATURES"
+
+    def test_bigquery_write_returns_a_taskinfo_with_the_table_wire_type(
+        self, monkeypatch
+    ):
+        """The submitted status normalises to a TaskInfo typed EXPORT_FEATURES."""
+        export = _FakeTableExport()
+        export.task = _FakeFeaturesTask()
+        monkeypatch.setattr("ee.batch.Export.table", export, raising=False)
+        info = TableSink(destination="bigquery", table="proj.ds.tbl").write(
+            "fc", description="d"
+        )
+        assert (info.id, info.state, info.task_type) == (
+            "task-1",
+            "READY",
+            "EXPORT_FEATURES",
+        )
+
+    def test_the_queued_task_round_trips_through_get_task_status(self, monkeypatch):
+        """The TaskInfo id resolves through jobs.get_task_status."""
+        operation = {
+            "name": "projects/p/operations/task-1",
+            "metadata": {
+                "state": "RUNNING",
+                "type": "EXPORT_FEATURES",
+                "createTime": "2024-01-01T00:00:00Z",
+                "updateTime": "2024-01-01T00:01:00Z",
+                "description": "d",
+            },
+            "done": False,
+        }
+        monkeypatch.setattr(jobs_module.ee.data, "getOperation", lambda name: operation)
+        info = get_task_status("task-1", project="p")
+        assert (info.id, info.state, info.task_type) == (
+            "task-1",
+            "RUNNING",
+            "EXPORT_FEATURES",
+        )
+
+
+class TestAssetOverwrite:
+    """M1: `Export.table.toAsset` takes a real, forwarded `overwrite`."""
+
+    def test_the_sdk_scopes_overwrite_to_asset_and_bigquery(self):
+        """The scoping is read off the installed SDK, not restated."""
+        import inspect
+
+        import ee.batch  # noqa: F401 - the SDK whose scoping is mirrored
+
+        takes = {
+            name: "overwrite"
+            in inspect.signature(getattr(ee.batch.Export.table, name)).parameters
+            for name in (
+                "toDrive",
+                "toCloudStorage",
+                "toAsset",
+                "toBigQuery",
+                "toFeatureView",
+            )
+        }
+        assert takes == {
+            "toDrive": False,
+            "toCloudStorage": False,
+            "toAsset": True,
+            "toBigQuery": True,
+            "toFeatureView": False,
+        }
+
+    def test_the_sdk_scopes_append_to_bigquery_alone(self):
+        """`append` really is BigQuery-only, so that half of the rule stands."""
+        import inspect
+
+        import ee.batch  # noqa: F401 - the SDK whose scoping is mirrored
+
+        takes = {
+            name: "append"
+            in inspect.signature(getattr(ee.batch.Export.table, name)).parameters
+            for name in (
+                "toDrive",
+                "toCloudStorage",
+                "toAsset",
+                "toBigQuery",
+                "toFeatureView",
+            )
+        }
+        assert takes == {
+            "toDrive": False,
+            "toCloudStorage": False,
+            "toAsset": False,
+            "toBigQuery": True,
+            "toFeatureView": False,
+        }
+
+    def test_an_asset_sink_accepts_overwrite(self):
+        """Re-exporting a table asset in place is expressible."""
+        sink = TableSink(
+            destination="asset", asset_id="projects/p/assets/t", overwrite=True
+        )
+        assert sink.overwrite is True
+
+    def test_an_asset_sink_forwards_overwrite(self, fake_export):
+        """The flag reaches `toAsset`, or the asset export fails server-side."""
+        TableSink(
+            destination="asset", asset_id="projects/p/assets/t", overwrite=True
+        ).write("fc", description="d")
+        name, kwargs = fake_export.calls[0]
+        assert name == "toAsset"
+        assert kwargs["overwrite"] is True
+
+    def test_an_asset_sink_forwards_the_default(self, fake_export):
+        """The default is `False`, the same value the SDK defaults to."""
+        TableSink(destination="asset", asset_id="projects/p/assets/t").write(
+            "fc", description="d"
+        )
+        _, kwargs = fake_export.calls[0]
+        assert kwargs["overwrite"] is False
+
+    def test_an_asset_sink_still_refuses_append(self):
+        """`append` has no `toAsset` parameter, so it stays BigQuery-only."""
+        with pytest.raises(ValidationError, match="append"):
+            TableSink(destination="asset", asset_id="projects/p/assets/t", append=True)
+
+    @pytest.mark.parametrize(
+        "kwargs",
+        [
+            {"destination": "drive", "folder": "f"},
+            {"destination": "gcs", "bucket": "b"},
+            {"destination": "featureview", "asset_id": "a/b"},
+        ],
+        ids=["drive", "gcs", "featureview"],
+    )
+    def test_overwrite_is_still_refused_where_the_sdk_has_no_parameter(self, kwargs):
+        """The three factories without an `overwrite` parameter still refuse it."""
+        with pytest.raises(ValidationError, match="overwrite"):
+            TableSink(overwrite=True, **kwargs)
+
+    def test_overwrite_and_append_stay_mutually_exclusive_on_bigquery(self):
+        """Scoping `overwrite` wider does not relax BigQuery's own rule."""
+        with pytest.raises(ValidationError, match="mutually exclusive"):
+            TableSink(
+                destination="bigquery", table="p.d.t", overwrite=True, append=True
+            )

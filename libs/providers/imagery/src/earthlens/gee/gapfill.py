@@ -32,6 +32,8 @@ from typing import Any, Literal
 import ee
 from pydantic import BaseModel, ConfigDict, model_validator
 
+from earthlens.gee.joins import SaveAllJoin
+
 __all__ = ["GapFill"]
 
 #: Milliseconds in an average year, for scaling `system:time_start` to the years
@@ -137,9 +139,10 @@ class GapFill(BaseModel):
     def _join_neighbours(self, source: Any) -> Any:
         """Attach each scene's within-gap earlier and later neighbours.
 
-        Two `saveAll` joins hang a `before` list (nearest earlier scenes first)
-        and an `after` list (nearest later scenes first) on every image, both
-        bounded by `max_gap` through `ee.Filter.maxDifference`.
+        Two `SaveAllJoin`s (`earthlens.gee.joins`) hang a `before` list
+        (nearest earlier scenes first) and an `after` list (nearest later
+        scenes first) on every image, both bounded by `max_gap` through
+        `ee.Filter.maxDifference`.
 
         Args:
             source: The time-banded `ee.ImageCollection`.
@@ -162,19 +165,17 @@ class GapFill(BaseModel):
                 difference=max_diff, leftField=_TIME_FIELD, rightField=_TIME_FIELD
             ),
         )
-        join_after = ee.Join.saveAll(
-            matchesKey="after", ordering=_TIME_FIELD, ascending=True
+        join_after = SaveAllJoin(
+            matches_key="after", ordering=_TIME_FIELD, ascending=True
         )
-        join_before = ee.Join.saveAll(
-            matchesKey="before", ordering=_TIME_FIELD, ascending=False
+        join_before = SaveAllJoin(
+            matches_key="before", ordering=_TIME_FIELD, ascending=False
         )
         after_joined = ee.ImageCollection(
-            join_after.apply(primary=source, secondary=source, condition=after_filter)
+            join_after.apply(source, source, after_filter)
         )
         both_joined = ee.ImageCollection(
-            join_before.apply(
-                primary=after_joined, secondary=source, condition=before_filter
-            )
+            join_before.apply(after_joined, source, before_filter)
         )
         return both_joined
 

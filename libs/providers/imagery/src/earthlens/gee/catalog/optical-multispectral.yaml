@@ -268,6 +268,12 @@ datasets:
     default_reducer: median
     license: proprietary
     terms_note: 'Free for use under the Copernicus Sentinel data terms.'
+    preprocess:
+      mask: sentinel2_qa60
+      scale: true
+      note: >-
+        Top-of-atmosphere, so there is no SCL band - QA60 is the standard
+        pre-Scene-Classification cloud bitmask for this product.
     bands:
       B2:
         description: Blue
@@ -384,6 +390,12 @@ datasets:
     default_reducer: median
     license: proprietary
     terms_note: 'Copernicus Sentinel Data Terms and Conditions.'
+    preprocess:
+      mask: sentinel2_scl
+      scale: true
+      note: >-
+        Level-2A arrives as 0-10000 scaled surface reflectance; the SCL band
+        carries the scene classification the mask reads.
     bands:
       B2:
         description: Blue
@@ -2143,6 +2155,12 @@ datasets:
       end_date: null
     default_reducer: median
     license: public-domain
+    preprocess:
+      mask: landsat_sr
+      scale: true
+      note: >-
+        Collection-2 Level-2 surface reflectance; bit 6 of QA_PIXEL is USGS's
+        derived Clear flag. LandsatQaRefinedMask is the stricter alternative.
     bands:
       SR_B2:
         description: Band 2 (blue) surface reflectance
@@ -2606,6 +2624,12 @@ datasets:
       end_date: null
     default_reducer: median
     license: public-domain
+    preprocess:
+      mask: landsat_sr
+      scale: true
+      note: >-
+        Collection-2 Level-2 surface reflectance; bit 6 of QA_PIXEL is USGS's
+        derived Clear flag. LandsatQaRefinedMask is the stricter alternative.
     bands:
       SR_B2:
         description: Band 2 (blue) surface reflectance
@@ -2934,6 +2958,13 @@ datasets:
       end_date: "2024-04-06"
     default_reducer: median
     license: public-domain
+    preprocess:
+      mask: landsat_sr
+      scale: true
+      note: >-
+        Collection-2 Level-2 surface reflectance; bit 6 of QA_PIXEL is USGS's
+        derived Clear flag. SLC-off after 2003-05-31 leaves unfilled scan gaps
+        that no cloud mask can recover.
     bands:
       SR_B1:
         description: Band 1 (blue) surface reflectance
@@ -5327,6 +5358,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    preprocess:
+      mask: modis_state_1km
+      scale: true
+      note: >-
+        Daily surface reflectance; bits 0-1 of state_1km carry the cloud state,
+        of which only 0 (clear) is kept.
     bands:
       sur_refl_b01:
         description: Band 1 (red) surface reflectance
@@ -5961,6 +5998,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    preprocess:
+      mask: modis_state_1km
+      scale: true
+      note: >-
+        Daily surface reflectance; bits 0-1 of state_1km carry the cloud state,
+        of which only 0 (clear) is kept.
     bands:
       sur_refl_b01:
         description: Band 1 (red) surface reflectance

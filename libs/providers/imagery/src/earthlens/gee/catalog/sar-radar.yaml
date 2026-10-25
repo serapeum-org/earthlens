@@ -16,6 +16,13 @@ datasets:
     default_reducer: median
     license: proprietary
     terms_note: 'Copernicus Sentinel Data Terms and Conditions.'
+    preprocess:
+      scale: false
+      note: >-
+        Earth Engine already applies thermal-noise removal, radiometric
+        calibration and terrain correction to dB, so there is nothing to mask
+        and nothing to scale. Speckle filtering is the one remaining step:
+        append SpeckleFilter() to the chain.
     bands:
       VV:
         description: Single co-polarization, vertical transmit / vertical receive

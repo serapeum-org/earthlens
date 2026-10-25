@@ -7,6 +7,7 @@ import pytest
 from earthlens.base import SpatialExtent
 from earthlens.gee._helpers import (
     EE_MAX_DIMENSION,
+    checked_handle,
     reduce_collection,
     slug_asset_id,
     split_aoi_for_url,
@@ -241,3 +242,50 @@ class TestSplitAoiForUrl:
         space = SpatialExtent.from_pairs([0.0, 40.0], [0.0, 40.0], resolution=0.5)
         tiles = split_aoi_for_url(space, scale_m=30)
         assert {t.resolution for t in tiles} == {0.5}
+
+
+class TestCheckedHandle:
+    """Tests for the shared no-handle refusal."""
+
+    @pytest.mark.parametrize(
+        "handle, expected",
+        [
+            ("ID0001", "ID0001"),
+            (42, "42"),
+            ("projects/p/assets/x", "projects/p/assets/x"),
+        ],
+    )
+    def test_a_handle_passes_through_stringified(self, handle, expected):
+        """Any truthy handle comes back unchanged, as a string."""
+        got = checked_handle(handle, "task", ("id",), {"id": handle})
+        assert got == expected, f"expected {expected!r}, got {got!r}"
+
+    @pytest.mark.parametrize("handle", ["", None, 0])
+    def test_a_falsy_handle_is_refused(self, handle):
+        """Empty, missing and zero handles are all unusable."""
+        with pytest.raises(ValueError, match="no usable 'name'"):
+            checked_handle(handle, "task", ("name",), {"metadata": {}})
+
+    def test_one_key_reads_as_no_usable(self):
+        """A single searched key is phrased in the singular."""
+        with pytest.raises(
+            ValueError, match=r"the task payload carries no usable 'name'"
+        ):
+            checked_handle("", "task", ("name",), {})
+
+    def test_two_keys_read_as_neither_nor(self):
+        """Two searched keys are phrased as neither/nor, naming both."""
+        with pytest.raises(
+            ValueError, match=r"the asset payload carries neither 'id' nor 'name'"
+        ):
+            checked_handle(None, "asset", ("id", "name"), {"type": "FOLDER"})
+
+    def test_the_subject_names_the_row_in_the_message(self):
+        """The subject appears twice: the payload, and the id it lacks."""
+        with pytest.raises(ValueError, match="no asset id to address the row by"):
+            checked_handle("", "asset", ("name",), {})
+
+    def test_the_payload_keys_are_listed_sorted(self):
+        """The message lists the payload's keys, sorted, for diagnosis."""
+        with pytest.raises(ValueError, match=r"got keys \['alpha', 'zulu'\]"):
+            checked_handle("", "task", ("name",), {"zulu": 1, "alpha": 2})

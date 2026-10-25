@@ -34,6 +34,8 @@ the rendered API.
 
 ::: earthlens.gee.gapfill
 
+::: earthlens.gee.joins
+
 ::: earthlens.gee.engines
 
 ::: earthlens.gee.pixels
@@ -41,6 +43,8 @@ the rendered API.
 ::: earthlens.gee.sinks
 
 ::: earthlens.gee.table_sink
+
+::: earthlens.gee.video_sink
 
 ::: earthlens.gee.plans
 
@@ -55,6 +59,8 @@ the rendered API.
 ::: earthlens.gee.cloud_masks
 
 ::: earthlens.gee.filters
+
+::: earthlens.gee.recipes
 
 ::: earthlens.gee.sampling
 
@@ -73,6 +79,12 @@ the rendered API.
 ::: earthlens.gee.sampling.histogram
 
 ::: earthlens.gee.jobs
+
+::: earthlens.gee.workload
+
+::: earthlens.gee.assets
+
+::: earthlens.gee.ml
 
 ::: earthlens.gee.io
 

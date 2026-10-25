@@ -54,6 +54,8 @@ from loguru import logger
 from pydantic import BaseModel, ConfigDict
 from tqdm import tqdm
 
+from earthlens.gee._helpers import checked_handle
+
 #: Terminal task states — `wait_for_task_id` returns / raises when one is reached.
 #:
 #: `CANCEL_REQUESTED` is intentionally **not** terminal: it's a
@@ -124,8 +126,12 @@ class TaskInfo(BaseModel):
             submitted (e.g. the `description=` kwarg of
             `ee.batch.Export.image.toDrive`).
         state: One of `_VALID_TASK_STATES`.
-        task_type: `EXPORT_IMAGE` / `EXPORT_TABLE` / `EXPORT_MAP` /
-            `EXPORT_VIDEO` / `EXPORT_CLASSIFIER`.
+        task_type: The wire value of `ee.batch.Task.Type` —
+            `EXPORT_IMAGE`, `EXPORT_FEATURES` (every table destination,
+            BigQuery and FeatureView included), `EXPORT_VIDEO`,
+            `EXPORT_TILES` (map tiles) or `EXPORT_CLASSIFIER`. Note the
+            enum *names* `EXPORT_TABLE` / `EXPORT_MAP` differ from the
+            wire values carried here.
         create_time: Submission time as a naive UTC datetime.
         update_time: Last status-update time as a naive UTC datetime.
         start_time: When the task moved out of `READY` into `RUNNING`,
@@ -257,13 +263,25 @@ def _op_to_taskinfo(payload: dict[str, Any]) -> TaskInfo:
         A `TaskInfo` with normalised fields.
 
     Raises:
-        ValueError: If `payload` is neither shape, or carries a `state`
-            outside `_VALID_TASK_STATES`.
+        ValueError: If the payload carries no usable operation handle, so the
+            row would have no task id to cancel or poll it by. Reported
+            rather than manufactured as `""`, which handed back a `TaskInfo`
+            whose `cancel_task(info.id)` aimed at the empty string — the same
+            choice `assets._to_asset_info` makes for an asset payload. The
+            single exception is an `UNSUBMITTED` flat status, which has no id
+            because the task does not exist server-side yet; it keeps `""`
+            for both `id` and `operation_name`. Also raised if the payload
+            carries a `state` outside `_VALID_TASK_STATES`.
     """
     if "metadata" in payload:
         meta = payload.get("metadata") or {}
         op_name = payload.get("name", "")
-        task_id = op_name.rsplit("/", 1)[-1] if op_name else ""
+        task_id = checked_handle(
+            op_name.rsplit("/", 1)[-1] if op_name else "",
+            "task",
+            ("name",),
+            payload,
+        )
         state = str(meta.get("state", ""))
         task_type = str(meta.get("type", ""))
         create_time = _parse_iso(meta.get("createTime"))
@@ -280,10 +298,21 @@ def _op_to_taskinfo(payload: dict[str, Any]) -> TaskInfo:
     else:
         # `task.status()` flat shape.
         op_name = payload.get("name", "")
-        task_id = str(
-            payload.get("id") or (op_name.rsplit("/", 1)[-1] if op_name else "")
-        )
         state = str(payload.get("state", "")).rsplit(".", 1)[-1].upper()
+        raw_id = payload.get("id") or (op_name.rsplit("/", 1)[-1] if op_name else "")
+        # A task that was never started is the one shape that legitimately
+        # carries no handle: `Task.status()` answers
+        # `{'state': 'UNSUBMITTED'}` and nothing else for it, while every
+        # submitted task comes back through
+        # `_cloud_api_utils.convert_operation_to_task`, which always sets both
+        # `id` and `name`. There is no id to report for a task that does not
+        # exist server-side yet, so `""` is the truthful answer there rather
+        # than a manufactured one.
+        task_id = (
+            ""
+            if not raw_id and state == "UNSUBMITTED"
+            else checked_handle(raw_id, "task", ("id", "name"), payload)
+        )
         task_type = str(payload.get("task_type", ""))
         create_time = _parse_ms(payload.get("creation_timestamp_ms"))
         update_time = _parse_ms(payload.get("update_timestamp_ms")) or create_time
@@ -311,7 +340,7 @@ def _op_to_taskinfo(payload: dict[str, Any]) -> TaskInfo:
 
     return TaskInfo(
         id=task_id,
-        operation_name=op_name or _operation_name(task_id),
+        operation_name=op_name or (_operation_name(task_id) if task_id else ""),
         description=description,
         state=state,  # type: ignore[arg-type]
         task_type=task_type,
@@ -364,7 +393,8 @@ def list_recent_tasks(
         max_age_min: Drop tasks older than this many minutes (clock
             difference uses the EE-reported `createTime`). `None`
             keeps every task EE still has on file.
-        task_type: Filter by `Task.Type` (e.g. `"EXPORT_IMAGE"`).
+        task_type: Filter by `Task.Type` wire value (e.g.
+            `"EXPORT_IMAGE"`, or `"EXPORT_FEATURES"` for table exports).
         description_prefix: Substring match against the task
             `description` — works well with earthlens's
             `<asset-slug>_<bands>_<YYYYMMDD>` naming.

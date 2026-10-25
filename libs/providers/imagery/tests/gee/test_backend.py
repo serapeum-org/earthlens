@@ -27,9 +27,27 @@ from earthlens.base import SpatialExtent, TemporalExtent
 from earthlens.gee import ExtentDiscovery
 from earthlens.gee import backend as backend_module
 from earthlens.gee.backend import GEE
-from earthlens.gee.catalog import Dataset, Extent
-from earthlens.gee.cloud_masks import sentinel2_scl
-from earthlens.gee.reducers import temporal_reducer_for
+from earthlens.gee.catalog import Dataset, Extent, Preprocess
+from earthlens.gee.cloud_masks import (
+    BandFactor,
+    BandScaler,
+    CloudScorePlus,
+    LandsatSrMask,
+    Sentinel2Cdi,
+    Sentinel2Qa60Mask,
+    Sentinel2SclMask,
+    SpeckleFilter,
+    sentinel2_scl,
+)
+from earthlens.gee.filters import ByYear
+from earthlens.gee.recipes import preprocess as recipe_for
+from earthlens.gee.reducers import (
+    First,
+    LandsatComposite,
+    Percentile,
+    Sentinel2Composite,
+    temporal_reducer_for,
+)
 
 # -- fakes ------------------------------------------------------------------
 
@@ -140,6 +158,8 @@ class _FakeTask:
         self._error = error
         self.started = False
         self.poll_count = 0
+        self.task_id = "FAKETASK000000000000001"
+        self.operation_name = f"projects/earth-engine-415620/operations/{self.task_id}"
 
     def start(self):
         self.started = True
@@ -147,7 +167,11 @@ class _FakeTask:
     def status(self) -> dict:
         self.poll_count += 1
         state = self._states[min(self.poll_count - 1, len(self._states) - 1)]
-        out = {"state": state}
+        # `_cloud_api_utils.convert_operation_to_task` sets `id` and `name` on
+        # every submitted task, so a status carrying neither is not a shape the
+        # SDK produces — bar `{"state": "UNSUBMITTED"}`, which it answers for a
+        # task that was never started.
+        out = {"state": state, "id": self.task_id, "name": self.operation_name}
         if state == "FAILED" and self._error:
             out["error_message"] = self._error
         return out
@@ -619,6 +643,145 @@ class TestReducerStringWidening:
         assert len(units) == 1
         assert collection.reduced_with == ("percentile", (90.0,))
         assert units[0].image[0] == "renamed"
+
+
+class TestReducerInstanceWidening:
+    """Task 6.2: `reducer=` accepts a `TemporalReducer` instance."""
+
+    def _chirps(self, make_gee, **overrides):
+        """A GEE over a CHIRPS collection, the reducer under test applied."""
+        params = dict(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            start="2020-06-01",
+            end="2020-06-30",
+            scale=5566.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    def test_a_temporal_reducer_instance_is_accepted(self, make_gee):
+        """An already-built reducer constructs and is carried verbatim."""
+        reducer = Percentile(q=90)
+        gee = self._chirps(make_gee, reducer=reducer)
+        assert gee.reducer is reducer
+        assert temporal_reducer_for(gee.reducer) is reducer
+
+    @pytest.mark.parametrize(
+        "composite", [LandsatComposite(), Sentinel2Composite()], ids=type
+    )
+    def test_a_named_composite_instance_is_accepted(self, make_gee, composite):
+        """The named-algorithm composites pass construction-time validation."""
+        gee = self._chirps(make_gee, reducer=composite)
+        assert gee.reducer is composite
+
+    def test_a_region_only_instance_is_refused(self, make_gee):
+        """A region-only reducer instance fails fast at construction."""
+        reducer = First()
+        with pytest.raises(ValueError, match="region"):
+            self._chirps(make_gee, reducer=reducer)
+
+    def test_a_zero_percentile_instance_is_refused(self, make_gee):
+        """`Percentile(q=0)` is a region minimum, not a temporal reducer."""
+        reducer = Percentile(q=0)
+        with pytest.raises(ValueError, match="0 < q <= 100"):
+            self._chirps(make_gee, reducer=reducer)
+
+    def test_the_composite_engine_runs_the_named_algorithm(self, make_gee, monkeypatch):
+        """`reducer=LandsatComposite()` reaches `simpleComposite` per bucket."""
+        from earthlens.gee import reducers as reducers_module
+
+        recorded = {}
+        monkeypatch.setattr(
+            reducers_module,
+            "ee",
+            SimpleNamespace(
+                Algorithms=SimpleNamespace(
+                    Landsat=SimpleNamespace(
+                        simpleComposite=lambda **kwargs: (
+                            recorded.update(kwargs) or "landsat-composite-image"
+                        )
+                    )
+                )
+            ),
+        )
+        gee = self._chirps(
+            make_gee,
+            reducer=LandsatComposite(as_float=True),
+            temporal_resolution="raw",
+        )
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        units = list(
+            gee._composite(
+                "the-collection",
+                var_info,
+                dt.datetime(2020, 6, 1),
+                dt.datetime(2020, 7, 1),
+            )
+        )
+        assert len(units) == 1
+        assert units[0].image == "landsat-composite-image"
+        assert recorded["collection"] == "the-collection"
+        assert recorded["asFloat"] is True
+
+
+class TestCdiNeedsTheToaProduct:
+    """M1: CDI computes on L2A rather than failing, so the request is refused."""
+
+    def _s2(self, make_gee, asset, **overrides):
+        """A GEE over one Sentinel-2 row, the CDI op under test applied."""
+        params = dict(
+            variables={asset: ["B4"]},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    @pytest.mark.parametrize(
+        "asset", ["COPERNICUS/S2_SR_HARMONIZED", "COPERNICUS/S2_SR"]
+    )
+    def test_the_mask_is_refused_on_a_surface_reflectance_row(self, make_gee, asset):
+        """`cloud_mask=Sentinel2Cdi()` on L2A raises instead of masking wrongly."""
+        mask = Sentinel2Cdi()
+        with pytest.raises(ValueError, match="only valid on the Sentinel-2 TOA"):
+            self._s2(make_gee, asset, cloud_mask=mask)
+
+    def test_the_composite_is_refused_on_a_surface_reflectance_row(self, make_gee):
+        """`reducer=Sentinel2Composite()` maps the CDI mask, so it is refused too."""
+        reducer = Sentinel2Composite()
+        with pytest.raises(ValueError, match="sentinel2_composite"):
+            self._s2(make_gee, "COPERNICUS/S2_SR_HARMONIZED", reducer=reducer)
+
+    def test_a_chained_cdi_mask_is_found(self, make_gee):
+        """The walk reaches a CDI op nested inside a mask chain."""
+        chain = Sentinel2Qa60Mask() >> Sentinel2Cdi()
+        with pytest.raises(ValueError, match="Sentinel2Cdi"):
+            self._s2(make_gee, "COPERNICUS/S2_SR_HARMONIZED", cloud_mask=chain)
+
+    def test_the_toa_row_is_accepted(self, make_gee):
+        """The TOA product is what CDI is defined on, so it constructs."""
+        gee = self._s2(make_gee, "COPERNICUS/S2_HARMONIZED", cloud_mask=Sentinel2Cdi())
+        assert isinstance(gee.cloud_mask, Sentinel2Cdi)
+
+    def test_the_legacy_toa_row_is_accepted(self, make_gee):
+        """`COPERNICUS/S2` is the pre-harmonization TOA archive."""
+        gee = self._s2(make_gee, "COPERNICUS/S2", reducer=Sentinel2Composite())
+        assert isinstance(gee.reducer, Sentinel2Composite)
+
+    def test_a_non_sentinel2_row_is_left_to_earth_engine(self, make_gee):
+        """Only the detectable L2A case is refused; anything else is EE's call."""
+        gee = self._s2(
+            make_gee, "UCSB-CHG/CHIRPS/DAILY", cloud_mask=Sentinel2Cdi(), scale=5566.0
+        )
+        assert isinstance(gee.cloud_mask, Sentinel2Cdi)
+
+    def test_a_mask_without_cdi_is_unaffected(self, make_gee):
+        """An L2A request with an ordinary mask still constructs."""
+        gee = self._s2(
+            make_gee, "COPERNICUS/S2_SR_HARMONIZED", cloud_mask=Sentinel2SclMask()
+        )
+        assert isinstance(gee.cloud_mask, Sentinel2SclMask)
 
 
 class TestInit:
@@ -2817,6 +2980,22 @@ class TestEedaiCollections:
         assert not plan.can_serve
         assert "last-wins" in plan.reason
 
+    @pytest.mark.parametrize(
+        "composite", [LandsatComposite(), Sentinel2Composite()], ids=type
+    )
+    def test_named_composites_are_declined_before_any_network_call(
+        self, make_gee, fake_reader, composite
+    ):
+        """The named algorithms exist only server-side, so the reader declines."""
+        gee = self._collection_gee(make_gee, reducer=composite)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert not plan.can_serve
+        assert "named algorithm" in plan.reason
+        assert fake_reader.cost_calls == [], (
+            "the unsupported reducer should be caught before scene discovery"
+        )
+
     def test_a_supported_reducer_still_serves(self, make_gee, fake_reader):
         """A statistical reducer is unaffected by the mosaic decline."""
         gee = self._collection_gee(make_gee, reducer="median")
@@ -3527,6 +3706,11 @@ class TestForcedEngineRemedies:
         ("reason", "expected"),
         [
             ("the reducer 'mosaic' is last-wins upstream", "statistical reducer"),
+            (
+                "reducer='landsat_composite' runs Earth Engine's named algorithm "
+                "ee.Algorithms.Landsat.simpleComposite",
+                "only on Earth Engine",
+            ),
             ("the EEDAI credential could not be built", "service key"),
             ("X has no native resolution to size the read", "spatial_resolution"),
             (
@@ -4348,3 +4532,598 @@ class TestExportViaEedai:
         )
         assert not fake_reader.calls
         assert image.download_params is not None
+
+
+class TestCallableHookInstances:
+    """Task 6.1: frozen mask/filter instances are drop-ins for the hooks."""
+
+    def test_instances_flow_through_build_collection(self, make_gee):
+        """Class instances pass validation and run through `_build_collection`."""
+        mask = LandsatSrMask()
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+            cloud_mask=mask,
+            filters=[ByYear(year=2020)],
+        )
+        assert gee.cloud_mask is mask
+        assert gee.filters == (ByYear(year=2020),)
+        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        col = gee._build_collection(
+            ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
+        )
+        assert col.method_names() == [
+            "filterDate",
+            "filterBounds",
+            "filterDate",
+            "map",
+            "select",
+        ]
+        # The second filterDate is ByYear(2020) executing through the hook.
+        assert [args for name, args in col.calls if name == "filterDate"][1] == (
+            "2020-01-01",
+            "2021-01-01",
+        )
+        assert [args for name, args in col.calls if name == "map"] == [(mask,)]
+
+
+class TestWorkloadTagMethod:
+    """Task 6.9: `GEE.workload_tag` hands out the nest-safe billing scope."""
+
+    def test_it_returns_a_validated_workload_tag(self, make_gee):
+        """The method wraps the tag in a `WorkloadTag` value object."""
+        from earthlens.gee.workload import WorkloadTag
+
+        scope = make_gee().workload_tag("run-42")
+        assert isinstance(scope, WorkloadTag)
+        assert scope.tag == "run-42"
+
+    def test_an_illegal_tag_is_refused(self, make_gee):
+        """Validation happens here, not mid-download inside the SDK."""
+        from pydantic import ValidationError
+
+        gee = make_gee()
+        with pytest.raises(ValidationError, match="1-63 characters"):
+            gee.workload_tag("-bad-")
+
+
+@pytest.fixture
+def warnings_buffer():
+    """Collect loguru's WARNING output, which pytest's `caplog` never sees.
+
+    loguru writes through its own handler set, bound to the original stderr at
+    registration time, so a dedicated sink is the only way to read it back.
+    """
+    from loguru import logger
+
+    buffer: list[str] = []
+    sink_id = logger.add(buffer.append, level="WARNING")
+    yield buffer
+    logger.remove(sink_id)
+
+
+class TestServerSideFlags:
+    """Tasks 6.12 / 6.13: `scaled=` and `preprocess=` as constructor flags."""
+
+    def _gee(self, make_gee, **overrides):
+        """A GEE over one Sentinel-2 row, the flag under test applied."""
+        params = dict(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4", "B3"]},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    def _op(self, gee, asset="COPERNICUS/S2_SR_HARMONIZED"):
+        """The op `_build_collection` would `.map` for one dataset."""
+        return gee._per_image_op(gee.catalog.get_dataset(asset))
+
+    def test_the_defaults_are_off(self, make_gee):
+        """Neither flag is on by default, so no existing request changes."""
+        gee = self._gee(make_gee)
+        assert (gee.scaled, gee.preprocess) == (False, False)
+        assert self._op(gee) is None
+        assert gee._engine_config.needs_server_side_compute is False
+
+    def test_scaled_resolves_the_rows_factors_for_the_requested_bands(self, make_gee):
+        """The backend reads the asset id and the bands from `variables`."""
+        scaler = self._op(self._gee(make_gee, scaled=True))
+        assert isinstance(scaler, BandScaler)
+        assert scaler.dataset == "COPERNICUS/S2_SR_HARMONIZED"
+        assert [factor.band for factor in scaler.factors] == ["B4", "B3"]
+        assert scaler.factors[0].scale == 0.0001
+
+    def test_preprocess_resolves_the_curated_recipe(self, make_gee):
+        """`preprocess=True` is the one-argument form of the recipe chain."""
+        chain = self._op(self._gee(make_gee, preprocess=True))
+        assert chain.name == "Sentinel2SclMask >> BandScaler"
+        assert [factor.band for factor in chain.masks[1].factors] == ["B4", "B3"]
+
+    @pytest.mark.parametrize("flag", ["scaled", "preprocess"])
+    def test_a_flag_forces_server_side_compute(self, make_gee, flag):
+        """Both flags decline the EEDAI fast path, as a `cloud_mask` does."""
+        gee = self._gee(make_gee, **{flag: True})
+        assert gee._engine_config.needs_server_side_compute is True
+
+    def test_both_flags_together_are_refused(self, make_gee):
+        """The recipe already scales, so the pair would scale twice."""
+        with pytest.raises(ValueError, match="scale the pixels twice"):
+            self._gee(make_gee, scaled=True, preprocess=True)
+
+    def test_preprocess_on_an_uncovered_dataset_is_refused(self, make_gee):
+        """A dataset with no curated recipe says so, at construction."""
+        with pytest.raises(ValueError, match="no curated preprocessing recipe"):
+            self._gee(
+                make_gee,
+                variables={"USGS/SRTMGL1_003": ["elevation"]},
+                preprocess=True,
+                scale=90.0,
+            )
+
+    def test_scaled_on_a_factorless_dataset_warns(self, make_gee, warnings_buffer):
+        """`scaled=True` is never a silent no-op; it reports and stays raw."""
+        gee = self._gee(
+            make_gee,
+            variables={"USGS/SRTMGL1_003": ["elevation"]},
+            scaled=True,
+            scale=90.0,
+        )
+        # The identity scaler is dropped rather than mapped, so nothing
+        # reaches `.map` and the EEDAI reader is still available.
+        assert self._op(gee, "USGS/SRTMGL1_003") is None
+        assert "declares no band scale/offset" in "".join(warnings_buffer)
+
+    def test_each_dataset_gets_its_own_op(self, make_gee):
+        """A two-dataset request resolves one recipe per asset, not one shared."""
+        gee = self._gee(
+            make_gee,
+            variables={
+                "COPERNICUS/S2_SR_HARMONIZED": ["B4"],
+                "LANDSAT/LC08/C02/T1_L2": ["SR_B4"],
+            },
+            preprocess=True,
+            scale=30.0,
+        )
+        assert self._op(gee).name == "Sentinel2SclMask >> BandScaler"
+        assert (
+            self._op(gee, "LANDSAT/LC08/C02/T1_L2").name
+            == "LandsatSrMask >> BandScaler"
+        )
+
+    def test_an_explicit_mask_runs_before_the_flags_chain(self, make_gee):
+        """The explicit op is run first, verbatim; the flag's op follows."""
+        gee = self._gee(make_gee, preprocess=True, cloud_mask=CloudScorePlus())
+        assert self._op(gee).name == "CloudScorePlus >> Sentinel2SclMask >> BandScaler"
+
+    def test_an_explicit_mask_composes_with_scaled(self, make_gee):
+        """`scaled=True` beside a mask gives mask-then-scale, not either alone."""
+        gee = self._gee(make_gee, scaled=True, cloud_mask=Sentinel2SclMask())
+        assert self._op(gee).name == "Sentinel2SclMask >> BandScaler"
+
+    def test_an_explicit_mask_alone_is_untouched(self, make_gee):
+        """With no flag the hook reaches `.map` exactly as it was given."""
+        mask = Sentinel2SclMask()
+        assert self._op(self._gee(make_gee, cloud_mask=mask)) is mask
+
+    def test_the_explicit_one_argument_form_still_works(self, make_gee):
+        """`cloud_mask=preprocess(...)` is unchanged by the new flags."""
+        chain = recipe_for("COPERNICUS/S2_SR_HARMONIZED", ["B4", "B3"])
+        gee = self._gee(make_gee, cloud_mask=chain)
+        assert self._op(gee) is chain
+        assert gee._engine_config.needs_server_side_compute is True
+
+
+class TestExplicitScalerCrossCheck:
+    """M4: the explicit `BandScaler` / `preprocess()` forms are cross-checked."""
+
+    def _gee(self, make_gee, bands, **overrides):
+        """A Sentinel-2 L2A request over `bands`, the chain under test applied."""
+        params = dict(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": list(bands)},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    def test_a_mismatched_asset_id_is_refused(self, make_gee):
+        """Another row's recipe computes silently, so the pairing is refused."""
+        chain = recipe_for("COPERNICUS/S2_HARMONIZED", ["B4"])
+        with pytest.raises(ValueError, match="was resolved for"):
+            self._gee(make_gee, ["B4"], cloud_mask=chain)
+
+    def test_a_narrower_band_list_warns_and_names_the_raw_bands(
+        self, make_gee, warnings_buffer
+    ):
+        """The uncovered bands stay raw DN in the same raster, so say which."""
+        chain = recipe_for("COPERNICUS/S2_SR_HARMONIZED", ["B4"])
+        self._gee(make_gee, ["B4", "B3", "B2"], cloud_mask=chain)
+        logged = "".join(warnings_buffer)
+        assert "declares scale/offset for ['B2', 'B3']" in logged
+        assert "stay raw DN" in logged
+
+    def test_a_covering_band_list_is_silent(self, make_gee, warnings_buffer):
+        """A chain covering every requested scalable band warns about nothing."""
+        chain = recipe_for("COPERNICUS/S2_SR_HARMONIZED", ["B4", "B3"])
+        self._gee(make_gee, ["B4", "B3"], cloud_mask=chain)
+        assert "stay raw DN" not in "".join(warnings_buffer)
+
+    def test_an_unresolved_scaler_is_not_cross_checked(self, make_gee, warnings_buffer):
+        """A hand-built `BandScaler` names no row, so there is nothing to check."""
+        scaler = BandScaler(factors=(BandFactor(band="B4", scale=0.0001),))
+        gee = self._gee(make_gee, ["B4", "B3"], cloud_mask=scaler)
+        assert gee.cloud_mask is scaler
+        assert "stay raw DN" not in "".join(warnings_buffer)
+
+    def test_a_band_with_no_factor_is_not_reported(self, make_gee, warnings_buffer):
+        """`SCL` declares no scale, so it is not an uncovered scalable band."""
+        chain = recipe_for("COPERNICUS/S2_SR_HARMONIZED", ["B4"])
+        self._gee(make_gee, ["B4", "SCL"], cloud_mask=chain)
+        assert "stay raw DN" not in "".join(warnings_buffer)
+
+
+class TestDoubleScalerRefusal:
+    """H1: a flag beside an explicit `BandScaler` would scale twice."""
+
+    def _gee(self, make_gee, bands, **overrides):
+        """A Sentinel-2 L2A request over `bands`, the pairing under test applied."""
+        params = dict(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": list(bands)},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    def _row(self, make_gee):
+        """The Sentinel-2 L2A catalog row the scalers are resolved from."""
+        return self._gee(make_gee, ["B4"]).catalog.get_dataset(
+            "COPERNICUS/S2_SR_HARMONIZED"
+        )
+
+    def test_scaled_beside_an_explicit_scaler_is_refused(self, make_gee):
+        """Two scalers on one image apply the row's factors twice."""
+        scaler = BandScaler.for_dataset(self._row(make_gee), ["B4"])
+        with pytest.raises(ValueError, match="scale the pixels twice"):
+            self._gee(make_gee, ["B4"], scaled=True, cloud_mask=scaler)
+
+    def test_preprocess_beside_an_explicit_recipe_is_refused(self, make_gee):
+        """`cloud_mask=preprocess(...)` already ends in a `BandScaler`."""
+        chain = recipe_for("COPERNICUS/S2_SR_HARMONIZED", ["B4"])
+        with pytest.raises(ValueError, match="scale the pixels twice"):
+            self._gee(make_gee, ["B4"], preprocess=True, cloud_mask=chain)
+
+    def test_a_nested_explicit_chain_is_seen(self, make_gee):
+        """The scaler is found however the explicit chain was grouped."""
+        chain = recipe_for("COPERNICUS/S2_SR_HARMONIZED", ["B4"]) >> Sentinel2Qa60Mask()
+        with pytest.raises(ValueError, match="scale the pixels twice"):
+            self._gee(make_gee, ["B4"], scaled=True, cloud_mask=chain)
+
+    def test_the_refusal_names_the_remedy(self, make_gee):
+        """The message says which of the two to drop."""
+        scaler = BandScaler.for_dataset(self._row(make_gee), ["B4"])
+        with pytest.raises(ValueError) as caught:
+            self._gee(make_gee, ["B4"], scaled=True, cloud_mask=scaler)
+        assert "Drop scaled=, or drop the BandScaler" in str(caught.value)
+        assert "COPERNICUS/S2_SR_HARMONIZED" in str(caught.value)
+
+    def test_an_identity_explicit_scaler_is_allowed(self, make_gee):
+        """An empty-factor scaler scales nothing, so there is nothing to double."""
+        gee = self._gee(
+            make_gee, ["B4"], scaled=True, cloud_mask=BandScaler(factors=())
+        )
+        op = gee._per_image_op(gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED"))
+        assert op.name == "BandScaler >> BandScaler"
+
+    def test_a_non_scaling_mask_beside_a_flag_still_composes(self, make_gee):
+        """The refusal is about scalers only; a mask plus a flag is the point."""
+        gee = self._gee(make_gee, ["B4"], scaled=True, cloud_mask=Sentinel2SclMask())
+        op = gee._per_image_op(gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED"))
+        assert op.name == "Sentinel2SclMask >> BandScaler"
+
+    def test_another_rows_scaler_still_reports_the_mismatch_first(self, make_gee):
+        """A scaler for a row the request does not ask for is the older refusal."""
+        chain = recipe_for("COPERNICUS/S2_HARMONIZED", ["B4"])
+        with pytest.raises(ValueError, match="was resolved for"):
+            self._gee(make_gee, ["B4"], scaled=True, cloud_mask=chain)
+
+
+class TestFlagCompositionOrdering:
+    """M2: what the explicit-op-first composition does and does not guarantee."""
+
+    def _op(self, make_gee, **overrides):
+        """The composed op for one Sentinel-2 L2A request."""
+        params = dict(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        gee = make_gee(**params)
+        return gee._per_image_op(gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED"))
+
+    def _names(self, op):
+        """The composed op's leaf names, in run order."""
+        return [type(leaf).__name__ for leaf in backend_module._flatten_image_ops(op)]
+
+    def test_the_explicit_op_leads_the_chain_verbatim(self, make_gee):
+        """Every leaf of the hook comes first, in the order it was given."""
+        chain = CloudScorePlus() >> Sentinel2Qa60Mask()
+        names = self._names(self._op(make_gee, preprocess=True, cloud_mask=chain))
+        assert names[:2] == ["CloudScorePlus", "Sentinel2Qa60Mask"]
+        assert names == [
+            "CloudScorePlus",
+            "Sentinel2Qa60Mask",
+            "Sentinel2SclMask",
+            "BandScaler",
+        ]
+
+    def test_the_flags_own_mask_precedes_its_own_scaler(self, make_gee):
+        """The guarantee that does hold: inside the flag's op, mask then scale."""
+        names = self._names(
+            self._op(make_gee, preprocess=True, cloud_mask=CloudScorePlus())
+        )
+        assert names.index("Sentinel2SclMask") < names.index("BandScaler")
+
+    def test_explicit_arithmetic_is_not_hoisted_behind_the_flags_mask(self, make_gee):
+        """The claim that does NOT hold, pinned so it is not re-asserted."""
+        names = self._names(
+            self._op(make_gee, preprocess=True, cloud_mask=SpeckleFilter())
+        )
+        assert names == ["SpeckleFilter", "Sentinel2SclMask", "BandScaler"]
+
+
+class TestCdiThroughThePreprocessFlag:
+    """L2: the CDI guard must also see what `preprocess=` resolves."""
+
+    def _patch_recipe(self, monkeypatch, asset, recipe):
+        """Give one catalog row a `preprocess:` recipe the shipped YAML lacks."""
+        from earthlens.gee.catalog import Catalog as RealCatalog
+
+        original = RealCatalog.get_dataset
+
+        def _patched(self, dataset_id, *args, **kwargs):
+            row = original(self, dataset_id, *args, **kwargs)
+            return (
+                row.model_copy(update={"preprocess": recipe})
+                if dataset_id == asset
+                else row
+            )
+
+        monkeypatch.setattr(RealCatalog, "get_dataset", _patched)
+
+    def _gee(self, make_gee, asset, **overrides):
+        """A request over one asset, the flag under test applied."""
+        params = dict(
+            variables={asset: ["B4"]},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    @pytest.mark.parametrize("asset", sorted(backend_module._CDI_FORBIDDEN_ASSETS))
+    def test_a_cdi_recipe_on_a_forbidden_row_is_refused(
+        self, make_gee, monkeypatch, asset
+    ):
+        """The catalog-driven route reaches the same refusal as `cloud_mask=`."""
+        self._patch_recipe(
+            monkeypatch, asset, Preprocess(mask="sentinel2_cdi", scale=True)
+        )
+        with pytest.raises(ValueError, match="only valid on the Sentinel-2 TOA"):
+            self._gee(make_gee, asset, preprocess=True)
+
+    def test_a_cdi_recipe_on_the_toa_row_still_constructs(self, make_gee, monkeypatch):
+        """The guard is about the product, not about CDI, so TOA is fine."""
+        asset = "COPERNICUS/S2_HARMONIZED"
+        self._patch_recipe(
+            monkeypatch, asset, Preprocess(mask="sentinel2_cdi", scale=True)
+        )
+        gee = self._gee(make_gee, asset, preprocess=True)
+        op = gee._per_image_op(gee.catalog.get_dataset(asset))
+        assert op.name == "Sentinel2Cdi >> BandScaler"
+
+    def test_the_explicit_route_is_still_refused(self, make_gee):
+        """The pre-catalog check on `cloud_mask=` is unchanged."""
+        mask = Sentinel2Cdi()
+        with pytest.raises(ValueError, match="only valid on the Sentinel-2 TOA"):
+            self._gee(make_gee, "COPERNICUS/S2_SR_HARMONIZED", cloud_mask=mask)
+
+    def test_no_shipped_row_names_a_cdi_recipe_on_a_forbidden_asset(self):
+        """Belt and braces: the data must not need the guard in the first place."""
+        from earthlens.gee.catalog import Catalog as RealCatalog
+
+        catalog = RealCatalog()
+        offenders = [
+            asset
+            for asset in backend_module._CDI_FORBIDDEN_ASSETS
+            if asset in catalog.datasets
+            and catalog.datasets[asset].preprocess is not None
+            and catalog.datasets[asset].preprocess.mask == "sentinel2_cdi"
+        ]
+        assert offenders == []
+
+
+#: A static (`ee_type="image"`) catalog row that declares band scale factors,
+#: so `scaled=True` resolves a real scaler rather than an identity.
+_STATIC_SCALED = "OpenLandMap/CLM/CLM_LST_MOD11A2-DAYNIGHT_M/v01"
+
+
+class TestStaticImageWarning:
+    """L4: the warning must name what the caller actually passed."""
+
+    def _warnings(self, monkeypatch):
+        """Capture `_build_collection`'s warnings."""
+        captured: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger,
+            "warning",
+            lambda msg, *a, **k: captured.append(msg),
+        )
+        return captured
+
+    def _build(self, make_gee, **overrides):
+        """Build the one-image collection for the static scaled row."""
+        params = dict(
+            variables={_STATIC_SCALED: ["jan"]},
+            start="2010-01-01",
+            end="2010-01-31",
+            scale=1000.0,
+        )
+        params.update(overrides)
+        gee = make_gee(**params)
+        gee._build_collection(
+            gee.catalog.get_dataset(_STATIC_SCALED),
+            ["jan"],
+            dt.datetime(2010, 1, 1),
+            dt.datetime(2010, 2, 1),
+        )
+        return gee
+
+    def test_the_row_is_static_and_declares_factors(self, make_gee):
+        """The fixture row is the shape the finding needs, not an invented one."""
+        gee = make_gee(variables={_STATIC_SCALED: ["jan"]}, scale=1000.0)
+        row = gee.catalog.get_dataset(_STATIC_SCALED)
+        assert row.is_image_collection is False
+        assert row.bands["jan"].scale is not None
+
+    @pytest.mark.parametrize("flag", ["scaled"])
+    def test_a_flag_only_request_is_not_warned_about(self, make_gee, monkeypatch, flag):
+        """`scaled=True` on a static image is a valid, working request."""
+        captured = self._warnings(monkeypatch)
+        self._build(make_gee, **{flag: True})
+        assert [w for w in captured if "static single-image" in w] == []
+
+    @pytest.mark.parametrize(
+        "hooks",
+        [
+            {"filters": [lambda c: c.filter("cc")]},
+            {"cloud_mask": _identity_mask},
+            {"cloud_mask": _identity_mask, "scaled": True},
+        ],
+        ids=["filters", "cloud_mask", "cloud_mask-and-flag"],
+    )
+    def test_a_hook_is_still_warned_about(self, make_gee, monkeypatch, hooks):
+        """The arguments the message names are the ones that still trigger it."""
+        captured = self._warnings(monkeypatch)
+        self._build(make_gee, **hooks)
+        assert any("static single-image" in w for w in captured), captured
+
+    def test_the_per_image_op_is_built_once(self, make_gee, monkeypatch):
+        """The warning branch must not rebuild the MaskChain for nothing."""
+        calls: list[object] = []
+        original = backend_module.GEE._per_image_op
+
+        def _counted(self, var_info):
+            calls.append(var_info.id)
+            return original(self, var_info)
+
+        monkeypatch.setattr(backend_module.GEE, "_per_image_op", _counted)
+        self._warnings(monkeypatch)
+        self._build(make_gee, scaled=True)
+        assert calls == [_STATIC_SCALED]
+
+
+class TestIdentityOpsDoNotForceServerSide:
+    """L5: an op that provably does nothing must not cost the EEDAI reader."""
+
+    def _gee(self, make_gee, **overrides):
+        """A GEE over one dataset, the flag under test applied."""
+        params = dict(start="2024-05-01", end="2024-05-10", scale=90.0)
+        params.update(overrides)
+        return make_gee(**params)
+
+    def test_scaled_on_a_factorless_row_keeps_the_reader(
+        self, make_gee, warnings_buffer
+    ):
+        """An identity `BandScaler` changes nothing, so it changes no routing."""
+        gee = self._gee(
+            make_gee, variables={"USGS/SRTMGL1_003": ["elevation"]}, scaled=True
+        )
+        assert gee._server_side_ops == {}
+        assert gee._per_image_op(gee.catalog.get_dataset("USGS/SRTMGL1_003")) is None
+        assert gee._engine_config.needs_server_side_compute is False
+        assert "declares no band scale/offset" in "".join(warnings_buffer)
+
+    def test_preprocess_on_a_pass_through_recipe_keeps_the_reader(self, make_gee):
+        """Sentinel-1's recipe is a documented `PassThrough`: nothing to apply."""
+        gee = self._gee(
+            make_gee,
+            variables={"COPERNICUS/S1_GRD": ["VV"]},
+            preprocess=True,
+            scale=10.0,
+        )
+        assert gee._server_side_ops == {}
+        assert gee._engine_config.needs_server_side_compute is False
+
+    def test_a_real_scaler_still_declines_the_reader(self, make_gee):
+        """The routing change is only for identities, not for the flags."""
+        gee = self._gee(
+            make_gee,
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+            scaled=True,
+            scale=10.0,
+        )
+        assert set(gee._server_side_ops) == {"COPERNICUS/S2_SR_HARMONIZED"}
+        assert gee._engine_config.needs_server_side_compute is True
+
+    def test_only_the_identity_dataset_is_dropped(self, make_gee):
+        """A mixed request keeps the op for the row that has factors."""
+        gee = self._gee(
+            make_gee,
+            variables={
+                "COPERNICUS/S2_SR_HARMONIZED": ["B4"],
+                "USGS/SRTMGL1_003": ["elevation"],
+            },
+            scaled=True,
+            scale=10.0,
+        )
+        assert set(gee._server_side_ops) == {"COPERNICUS/S2_SR_HARMONIZED"}
+        assert gee._engine_config.needs_server_side_compute is True
+
+    def test_a_masking_recipe_is_never_an_identity(self, make_gee):
+        """A recipe whose mask is real is kept even if its scaler is empty."""
+        gee = self._gee(
+            make_gee,
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["SCL"]},
+            preprocess=True,
+            scale=10.0,
+        )
+        op = gee._per_image_op(gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED"))
+        assert op.name == "Sentinel2SclMask >> BandScaler"
+        assert gee._engine_config.needs_server_side_compute is True
+
+
+class TestUnknownBandOnTheFlagPath:
+    """N2: the band check runs at download, not before the flags resolve."""
+
+    def _gee(self, make_gee, bands, **overrides):
+        """A Sentinel-2 L2A request over `bands`."""
+        params = dict(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": list(bands)},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    def test_the_flag_resolves_before_the_band_is_refused(self, make_gee):
+        """Construction succeeds, so the scaler cannot rely on a prior check."""
+        gee = self._gee(make_gee, ["B4", "B8A"], scaled=True)
+        scaler = gee._per_image_op(
+            gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED")
+        )
+        assert [factor.band for factor in scaler.factors] == ["B4"]
+
+    def test_the_band_is_refused_at_download(self, make_gee):
+        """The refusal the docstring points at happens in `_download_dataset`."""
+        gee = self._gee(make_gee, ["B4", "B8A"], scaled=True)
+        with pytest.raises(ValueError, match="is not a band of"):
+            gee._download_dataset("COPERNICUS/S2_SR_HARMONIZED", ["B4", "B8A"])

@@ -103,6 +103,18 @@ anything a string names:
   reducer and `SensSlope` (`"sens_slope"`) its robust Theil-Sen
   counterpart; like `Percentile` both are reachable only through the
   resolver, not the registry.
+* `LandsatComposite` / `Sentinel2Composite` — Earth Engine's
+  named-algorithm composites as `TemporalReducer`s, passed as
+  instances: `GEE(reducer=LandsatComposite())` runs
+  `ee.Algorithms.Landsat.simpleComposite` over each time bucket
+  (raw L1 input — `LANDSAT/LC08/C02/T1`, not `T1_L2`), and
+  `Sentinel2Composite` maps the `Sentinel2Cdi` cloud mask
+  (`ee.Algorithms.Sentinel2.CDI`, on the TOA
+  `COPERNICUS/S2_HARMONIZED` product) over the stack before its
+  inner reducer. Like `Percentile` they are not in `REDUCERS` —
+  reachable only as instances — and the named algorithms exist only
+  server-side, so the EEDAI reader declines them and the request
+  runs on an Earth Engine engine.
 * `CadenceBucketer` — turns a `temporal_resolution` (`"raw"` /
   `"daily"` / `"monthly"` / `"yearly"`) into a pandas frequency and the
   bucket windows that tile a request, resolving through the framework
@@ -141,6 +153,15 @@ anything a string names:
   a within-`max_gap` neighbour join. `max_gap` is a refusal, not a
   hint: a pixel with no valid neighbour inside the window stays masked
   rather than being extrapolated across a wider gap.
+* `Join`, with `InnerJoin` / `SaveAllJoin` / `SaveBestJoin` /
+  `SaveFirstJoin` / `SimpleJoin` — Earth Engine's five join
+  strategies as frozen config objects exposing the SDK's own
+  `apply(primary, secondary, condition)` seam. A join links two
+  collections on an `ee.Filter` condition, so these are standalone
+  composables — never `filters=` / `cloud_mask=` drop-ins — and
+  `GapFill` pairs each scene with its within-`max_gap` neighbours
+  through `SaveAllJoin`. Joins are server-side compute, so a
+  pipeline using one runs on an Earth Engine engine.
 * `Engine`, with `ENGINES` and `resolve_engine` —
   what materialises the pixels. `engine="auto"` routes between
   `EedaiEngine` (the pyramids-eo reader) and `EeEngine`
@@ -160,6 +181,13 @@ anything a string names:
   `GEE(export_via=...)` takes the **name** only; pass an instance and
   `ExportConfig` rejects it. Call `resolve_sink` yourself
   when you want the object.
+* `VideoSink` — the frames counterpart: a standalone frozen model
+  (like `TableSink`, not a `Sink` subclass — the `Sink` ABC's
+  `write` is image-shaped) exporting an `ee.ImageCollection` of RGB
+  frames via `ee.batch.Export.video.toDrive` / `toCloudStorage`,
+  tracked through the same jobs machinery with wire task type
+  `EXPORT_VIDEO`. The caller provides the frames (nothing in the
+  pipeline produces a frames collection yet).
 * `WorkUnit` / `RasterWorkUnit` — one time bucket's
   payload. `FeatureWorkUnit` is the vector/tabular seam for the
   later epics; nothing produces one yet.
@@ -215,6 +243,21 @@ engine-eligibility gate:
 * `Cluster` / `Classify`, with `TrainingExtractor` and
   `TrainingSet` — unsupervised and supervised per-pixel learning
   through scikit-learn (the `[gee]` extra).
+* `ClassifierCodec` — the bridge back to the server: encodes a fitted
+  scikit-learn tree classifier (`Classify.estimator`, or your own
+  `DecisionTreeClassifier` / `RandomForestClassifier`) into
+  `ee.Classifier.decisionTree` / `decisionTreeEnsemble` strings via
+  `to_ee`, so `image.classify(codec.to_ee(model))` runs the local model
+  server-side (a pure-Python port of geemap's tree-string bridge; geemap
+  is not a dependency). `from_ee` is the partial reverse, parsing tree
+  strings back into a `TreeEnsemble` — a lossy pure-Python majority-vote
+  predictor, not a scikit-learn estimator. The vote is the difference that
+  matters: Earth Engine hard-majority-votes the exported trees where
+  `RandomForestClassifier.predict` averages their probabilities, so a
+  forest's server-side labels can differ from the local model's (a single
+  `DecisionTreeClassifier` matches exactly).
+  `ClassifierCodec.for_classify` maps a `Classify`'s training band
+  *indices* onto Earth Engine band *names*.
 * `PanSharpen` / `MatchHistogram` — operations that combine a raster
   with a companion one (a finer pan band; a reference acquisition).
 * `TasseledCap` — the sensor-specific brightness / greenness /
@@ -227,12 +270,61 @@ feed the `GEE` backend's `cloud_mask=` / `filters=` constructor hooks
 median composite is a facade call rather than raw `ee`:
 
 * `earthlens.gee.cloud_masks` — per-image `ee.Image -> ee.Image`
-  masks: `landsat_sr(image, sensor=...)` (Landsat C2-L2 QA_PIXEL
-  Clear-bit) and `sentinel2_scl(image)` (Sentinel-2 L2A SCL —
-  drops cloud shadow / cloud / cirrus).
-* `earthlens.gee.filters` — `by_year` / `by_bounds` /
-  `by_property_in` / `by_cloud_cover_lte` / `by_year_and_bounds`
-  for `ee.ImageCollection.filter*` composition.
+  masks: the frozen callable classes `LandsatSrMask` (Landsat C2-L2
+  QA_PIXEL Clear-bit), `LandsatQaRefinedMask` (QA_PIXEL cloud /
+  shadow confidence bit-pairs, thresholded), `Sentinel2SclMask`
+  (Sentinel-2 L2A SCL — drops cloud shadow / cloud / cirrus),
+  `Sentinel2Qa60Mask` (the pre-SCL QA60 cloud + cirrus bitmask),
+  `ModisState1kmMask` (daily MOD09GA / MYD09GA `state_1km` cloud
+  state), `Sentinel2Cdi` (the `ee.Algorithms.Sentinel2.CDI`
+  parallax discriminator, thresholded — TOA scenes only) and
+  `CloudScorePlus` (Google's Cloud Score+ quality score, linked per
+  scene by `system:index`) under the `ImageMask` base, plus the
+  function forms `landsat_sr(image, sensor=...)` and
+  `sentinel2_scl(image)`. Two family members are not masks but the
+  same shape: `BandScaler` (with `BandFactor`), which converts raw DN
+  to physical units from the `scale` / `offset` the catalog declares
+  per band, and `SpeckleFilter`, the server-side `ee.Image.focalMedian`
+  counterpart of the client-side `FocalMedian`. Because the backend has
+  one `cloud_mask` slot, the ops compose with `>>` into a `MaskChain`
+  (itself an `ImageMask`), with `PassThrough` as the documented no-op.
+* `earthlens.gee.filters` — collection filters: `ByYear` / `ByBounds`
+  / `ByPropertyIn` / `ByCloudCoverLte` / `ByYearAndBounds`, plus the
+  expanded scene selectors `ByOrbit` (Sentinel-1 pass direction /
+  relative orbit), `BySensor` (platform list), `ByQuality` (generic
+  metadata threshold, numeric or — with `op="eq"` — a string
+  property) and `BySeason` / `ByMonth` / `ByDayOfYear`
+  (calendar periods across every year, via
+  `ee.Filter.calendarRange`), all under the class-form
+  `CollectionFilter` base (the top-level
+  `earthlens.gee.CollectionFilter` export stays the `Callable` type
+  alias), plus the function forms `by_year` / `by_bounds` /
+  `by_property_in` / `by_cloud_cover_lte` / `by_year_and_bounds`.
+
+`preprocess` is the one call that assembles those pieces, and *is*
+re-exported here. `preprocess(dataset, bands=None)` reads the curated
+`preprocess:` recipe off the catalog row (typed as `Preprocess`, so the
+loader validates it) and returns the sensor's recommended mask followed
+by a `BandScaler` over the row's own factors — mask first, so the
+quality band is read before any arithmetic. A
+dataset with no curated recipe raises rather than quietly doing
+nothing, and a recipe with nothing to apply (Sentinel-1, already
+corrected upstream) is an explicit `PassThrough` plus a note.
+
+The shipped entry points are the constructor flags
+`GEE(preprocess=True)` and `GEE(scaled=True)` (the latter for the
+scaling alone), which resolve through `preprocess` /
+`BandScaler.for_dataset` per requested dataset — the backend holds the
+asset id and the bands, so neither is restated and the two cannot drift
+from `variables`. Passing a chain to `cloud_mask=` still works and is
+the way to inspect or extend a recipe; the backend then cross-checks it
+against the request (a mismatched asset id raises, an uncovered
+scalable band warns, and a `BandScaler` on both sides raises — the
+hook and the flag's op are chained, so two scalers would apply the
+row's factors twice, unless one of them is an identity with no factors
+to apply). A flag and an explicit `cloud_mask=` compose
+rather than displace each other: the explicit op runs first, verbatim,
+and the flag's op — mask then scaler — follows it.
 
 Job / task tracking — for asynchronous `export_via="drive"` /
 `"gcs"` / `"asset"` sinks, the `earthlens.gee.jobs` module
@@ -251,6 +343,19 @@ exposes a small set of helpers re-exported from this package:
 * `resolve_destination` surfaces a completed task's
   destination URIs (Drive / GCS / asset paths) for follow-up
   pulls.
+* `WorkloadTag` — a nest-safe billing scope: `GEE.workload_tag("run-42")`
+  returns one, and entering it labels every Earth Engine-served request
+  (`getDownloadURL`, `computePixels`, `ee.batch`) for cost attribution,
+  saving and restoring the *enclosing* tag on exit — the SDK's own
+  `ee.data.workloadTagContext` resets to the default instead, wiping an
+  outer scope. The EEDAI reader path is separate and stays unattributed.
+* `AssetManager`, with the frozen `AssetInfo` rows its reads return —
+  the asset lifecycle as its own control-plane object over `ee.data`:
+  create folder / collection, list, get, delete, copy, rename, property
+  and ACL updates, plus image / table ingestion submissions tracked as
+  `TaskInfo` exactly like the batch sinks. Deliberately **not** methods
+  on `GEE`: the read-focused backend stays free of destructive verbs,
+  and the manager is server-side control-plane regardless of `engine=`.
 
 Mirrors `earthlens.ecmwf.jobs` — see also the "Tracking asynchronous
 Earth Engine exports" notebook, `docs/examples/gee/track-batch-exports.ipynb`.
@@ -316,6 +421,7 @@ from earthlens.gee.analysis import (
     TrainingSet,
     supported_conversions,
 )
+from earthlens.gee.assets import AssetInfo, AssetManager
 from earthlens.gee.auth import AuthenticationError, EarthEngineAuth
 from earthlens.gee.backend import GEE, CloudMask, CollectionFilter
 from earthlens.gee.catalog import (
@@ -326,6 +432,7 @@ from earthlens.gee.catalog import (
     Catalog,
     Dataset,
     Extent,
+    Preprocess,
     Provider,
 )
 from earthlens.gee.climatology import Climatology
@@ -355,11 +462,22 @@ from earthlens.gee.jobs import (
     resolve_destination,
     wait_for_task_id,
 )
+from earthlens.gee.joins import (
+    InnerJoin,
+    Join,
+    SaveAllJoin,
+    SaveBestJoin,
+    SaveFirstJoin,
+    SimpleJoin,
+)
+from earthlens.gee.ml import ClassifierCodec, TreeEnsemble
 from earthlens.gee.pixels import HIGH_VOLUME_ENDPOINT, PixelsEngine
 from earthlens.gee.plans import EedaiPlan, EnginePlan
 from earthlens.gee.reader import EedaiReader
+from earthlens.gee.recipes import preprocess
 from earthlens.gee.reducers import (
     REDUCERS,
+    LandsatComposite,
     LinearTrend,
     Max,
     Mean,
@@ -370,6 +488,7 @@ from earthlens.gee.reducers import (
     Percentile,
     Reducer,
     SensSlope,
+    Sentinel2Composite,
     Sum,
     TemporalReducer,
     resolve_reducer,
@@ -413,6 +532,7 @@ from earthlens.gee.vector import (
     to_netcdf,
     to_numpy,
 )
+from earthlens.gee.video_sink import VideoSink
 from earthlens.gee.work import (
     Artifact,
     DownloadResult,
@@ -420,6 +540,7 @@ from earthlens.gee.work import (
     RasterWorkUnit,
     WorkUnit,
 )
+from earthlens.gee.workload import WorkloadTag
 
 __all__ = [
     "MatchHistogram",
@@ -431,11 +552,13 @@ __all__ = [
     "AuthenticationError",
     "CloudMask",
     "CollectionFilter",
+    "preprocess",
     "Catalog",
     "Dataset",
     "Band",
     "Cadence",
     "Extent",
+    "Preprocess",
     "Provider",
     "CATALOG_PATH",
     "PROVIDERS_PATH",
@@ -469,6 +592,11 @@ __all__ = [
     "cancel_task",
     "wait_for_task_id",
     "resolve_destination",
+    "WorkloadTag",
+    "AssetManager",
+    "AssetInfo",
+    "ClassifierCodec",
+    "TreeEnsemble",
     "Reducer",
     "Mean",
     "Median",
@@ -480,6 +608,8 @@ __all__ = [
     "Percentile",
     "LinearTrend",
     "SensSlope",
+    "LandsatComposite",
+    "Sentinel2Composite",
     "TemporalReducer",
     "REDUCERS",
     "resolve_reducer",
@@ -494,6 +624,12 @@ __all__ = [
     "Climatology",
     "ClosestImage",
     "GapFill",
+    "Join",
+    "InnerJoin",
+    "SaveAllJoin",
+    "SaveBestJoin",
+    "SaveFirstJoin",
+    "SimpleJoin",
     "EnginePlan",
     "EedaiPlan",
     "OutputGrid",
@@ -511,6 +647,7 @@ __all__ = [
     "GcsSink",
     "AssetSink",
     "TableSink",
+    "VideoSink",
     "SINKS",
     "resolve_sink",
     "EedaiReader",

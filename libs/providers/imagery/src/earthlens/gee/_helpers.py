@@ -13,9 +13,10 @@ from __future__ import annotations
 
 import math
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from typing import TYPE_CHECKING, Any
 
+from pydantic import BeforeValidator
 from tqdm import tqdm
 
 from earthlens.base import safe_filename
@@ -73,6 +74,195 @@ def __getattr__(name: str) -> frozenset[str]:
 TERMINAL_TASK_STATES: frozenset[str] = frozenset(
     {"COMPLETED", "FAILED", "CANCELLED", "CANCEL_REQUESTED"}
 )
+
+
+def refuse_bool(value: Any) -> Any:
+    """Refuse a `bool` where a number is wanted, before pydantic coerces it.
+
+    `bool` is a subclass of `int`, so an `int` / `float` field takes `True`
+    and silently stores `1` — `VideoSink(dimensions=True)` became a one-pixel
+    video, `ByQuality(value=True)` a comparison against `1.0`. A
+    `BeforeValidator` sees the raw input, so it can tell `True` from `1`,
+    which the field's own type no longer can once coercion has run.
+
+    Args:
+        value: The raw field input.
+
+    Returns:
+        The value unchanged when it is not a `bool`.
+
+    Raises:
+        ValueError: If `value` is `True` or `False`.
+
+    Examples:
+        - A number passes through untouched, whatever its type:
+            ```python
+            >>> from earthlens.gee._helpers import refuse_bool
+            >>> (refuse_bool(1), refuse_bool(0.5), refuse_bool(None))
+            (1, 0.5, None)
+
+            ```
+        - A boolean is refused, and the message names the integer it would
+          have become:
+            ```python
+            >>> from earthlens.gee._helpers import refuse_bool
+            >>> refuse_bool(True)
+            Traceback (most recent call last):
+                ...
+            ValueError: expected a number, got the boolean True; bool is a ...
+
+            ```
+        - Annotated onto a field, it refuses before the field's own
+          constraints run:
+            ```python
+            >>> from earthlens.gee.video_sink import VideoSink
+            >>> VideoSink(max_frames=True)
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: ...
+
+            ```
+    """
+    if isinstance(value, bool):
+        raise ValueError(
+            f"expected a number, got the boolean {value!r}; bool is a subclass "
+            "of int, so this would silently become "
+            f"{int(value)} — pass the number you mean"
+        )
+    return value
+
+
+#: Annotate a numeric field with this to refuse `True` / `False`:
+#: `Annotated[float, NoBool]`. Shared so every such field refuses with the
+#: same message rather than each model re-stating the `bool`-is-an-`int` trap.
+NoBool = BeforeValidator(refuse_bool)
+
+
+def checked_cdi_threshold(value: float) -> float:
+    """Refuse a CDI threshold outside the inclusive `[-1, 1]` range.
+
+    The one check `cloud_masks.Sentinel2Cdi` and the
+    `reducers.Sentinel2Composite` reducer share, so the error text cannot
+    drift between them. It lives here rather than in either of those,
+    because a check two modules share is what this module is for.
+
+    Args:
+        value: The parsed `threshold` input.
+
+    Returns:
+        The value unchanged when it is in range.
+
+    Raises:
+        ValueError: If `value` is outside `[-1, 1]` — the CDI band is a
+            `[-1, 1]` index, not a probability or a percentage.
+
+    Examples:
+        - A threshold inside the range comes back unchanged, the bounds
+          included:
+            ```python
+            >>> from earthlens.gee._helpers import checked_cdi_threshold
+            >>> (checked_cdi_threshold(-0.5), checked_cdi_threshold(-1.0),
+            ...  checked_cdi_threshold(1.0))
+            (-0.5, -1.0, 1.0)
+
+            ```
+        - A probability-shaped mistake is refused, naming the value:
+            ```python
+            >>> from earthlens.gee._helpers import checked_cdi_threshold
+            >>> checked_cdi_threshold(1.5)
+            Traceback (most recent call last):
+                ...
+            ValueError: threshold must be in [-1, 1], got 1.5
+
+            ```
+        - Both users of the check report the same way, the mask and the
+          composite:
+            ```python
+            >>> from earthlens.gee.cloud_masks import Sentinel2Cdi
+            >>> from earthlens.gee.reducers import Sentinel2Composite
+            >>> (Sentinel2Cdi().threshold, Sentinel2Composite().threshold)
+            (-0.5, -0.5)
+            >>> Sentinel2Composite(threshold=42)
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: ...
+
+            ```
+    """
+    if not -1 <= value <= 1:
+        raise ValueError(f"threshold must be in [-1, 1], got {value!r}")
+    return value
+
+
+def checked_handle(
+    handle: Any,
+    subject: str,
+    keys: tuple[str, ...],
+    payload: Mapping[str, Any],
+) -> str:
+    """Refuse a raw payload that carries no handle to address its row by.
+
+    `assets._to_asset_info` and `jobs._op_to_taskinfo` both turn a raw Earth
+    Engine dict into a typed row, and both need the same thing out of it: an
+    id the row can be addressed by afterwards. Where one was missing they
+    used to manufacture `""`, which printed as `AssetInfo(, FOLDER)` on one
+    side and handed back a `TaskInfo` whose `cancel_task(info.id)` aimed at
+    the empty string on the other. The check lives here so the two cannot
+    disagree about it again.
+
+    Args:
+        handle: The candidate id the caller resolved out of `payload`, already
+            reduced to its final form — an operation `name` cut down to its
+            last path segment, say. Anything falsy means nothing usable was
+            found, including the empty segment a trailing `/` leaves behind.
+        subject: What the row describes, named in the message: `asset` or
+            `task`.
+        keys: The payload keys the caller looked in, in order, named in the
+            message.
+        payload: The raw dict. Its keys go into the message, so a schema
+            surprise is diagnosable from the error alone.
+
+    Returns:
+        `handle` as a `str`.
+
+    Raises:
+        ValueError: If `handle` is falsy.
+
+    Examples:
+        - A handle passes through, stringified:
+            ```python
+            >>> from earthlens.gee._helpers import checked_handle
+            >>> checked_handle("ID0001", "task", ("id",), {"id": "ID0001"})
+            'ID0001'
+
+            ```
+        - One key, with nothing usable in it:
+            ```python
+            >>> from earthlens.gee._helpers import checked_handle
+            >>> checked_handle("", "task", ("name",), {})
+            Traceback (most recent call last):
+                ...
+            ValueError: the task payload carries no usable 'name', so there is no task id to address the row by; got keys []
+
+            ```
+        - Two keys, and neither carries one:
+            ```python
+            >>> from earthlens.gee._helpers import checked_handle
+            >>> checked_handle(None, "asset", ("id", "name"), {"type": "FOLDER"})
+            Traceback (most recent call last):
+                ...
+            ValueError: the asset payload carries neither 'id' nor 'name', so there is no asset id to address the row by; got keys ['type']
+
+            ```
+    """
+    if not handle:
+        named = " nor ".join(repr(k) for k in keys)
+        quantifier = "no usable" if len(keys) == 1 else "neither"
+        raise ValueError(
+            f"the {subject} payload carries {quantifier} {named}, so there is "
+            f"no {subject} id to address the row by; got keys {sorted(payload)}"
+        )
+    return str(handle)
 
 
 def slug_asset_id(asset_id: str) -> str:

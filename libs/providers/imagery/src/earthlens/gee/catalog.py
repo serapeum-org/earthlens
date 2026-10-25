@@ -429,6 +429,83 @@ class Extent(SummarisedLeaf):
         return [f"{self.start_date}..{self.end_date or 'present'}"]
 
 
+#: The per-image masks a `preprocess:` recipe may name, as
+#: `earthlens.gee.preprocess` resolves them. A `Literal` rather than a free
+#: string so a typo in the YAML fails at load time; `earthlens.gee.preprocess`
+#: holds the matching name-to-class map.
+MaskRecipe = Literal[
+    "landsat_sr",
+    "landsat_qa_refined",
+    "sentinel2_scl",
+    "sentinel2_qa60",
+    "sentinel2_cdi",
+    "cloud_score_plus",
+    "modis_state_1km",
+]
+
+
+class Preprocess(SummarisedLeaf):
+    """A dataset's curated "analysis-ready pixels" recipe.
+
+    The data behind `earthlens.gee.preprocess(asset_id)`: which per-image
+    mask the sensor wants, whether the band `scale` / `offset` should be
+    applied, and a note for whatever the recipe cannot express. Keeping
+    it on the catalog row is the point — the alternative is an
+    `if/elif` over asset ids in Python, which drifts from the catalog the
+    moment a dataset is added.
+
+    It is declared as an explicit typed field because `Dataset` sets
+    `frozen=True` but **not** `extra="forbid"`: an unknown `preprocess:`
+    key would otherwise be dropped in silence, so a typo'd recipe would
+    read as "this dataset has none". With the field declared, the
+    loader validates it, and `extra="forbid"` here rejects a typo
+    *inside* the recipe too.
+
+    Attributes:
+        mask: The per-image mask to apply, by recipe name, or `None`
+            when the dataset needs none (the Sentinel-1 case: Earth
+            Engine's GRD product is already corrected, so the recipe is
+            an honest no-op plus a `note`).
+        scale: Whether to apply the row's band `scale` / `offset` after
+            the mask, via `BandScaler.for_dataset`. Defaults to `False`.
+        note: What the recipe cannot express — preprocessing the
+            provider already applied, or a step earthlens cannot do
+            server-side. Surfaced by `preprocess` so the user reads it.
+
+    Examples:
+        - The Sentinel-2 L2A recipe: mask on the scene classification,
+          then scale to reflectance:
+            ```python
+            >>> recipe = Preprocess(mask="sentinel2_scl", scale=True)
+            >>> print(recipe)
+            Preprocess(sentinel2_scl, scale)
+
+            ```
+        - A documented no-op carries only the note:
+            ```python
+            >>> Preprocess(note="already terrain-corrected").mask is None
+            True
+
+            ```
+        - An unknown mask name is refused at load time:
+            ```python
+            >>> Preprocess(mask="sentinel2_scll")  # doctest: +IGNORE_EXCEPTION_DETAIL
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for Preprocess
+
+            ```
+    """
+
+    _summary_fields = ("mask", "scale", "note")
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    mask: MaskRecipe | None = None
+    scale: bool = False
+    note: str | None = None
+
+
 class Dataset(SummarisedLeaf):
     """One Earth Engine collection/image with curated metadata.
 
@@ -481,6 +558,10 @@ class Dataset(SummarisedLeaf):
 
             Replaces the older ambiguous `user_uploaded: bool` flag.
         bands: Band id → `Band`.
+        preprocess: The curated "analysis-ready pixels" recipe — which
+            per-image mask the sensor wants and whether to apply the
+            band `scale` / `offset` — or `None` for a dataset with no
+            curated recipe. Read by `earthlens.gee.preprocess`.
     """
 
     model_config = ConfigDict(frozen=True)
@@ -501,6 +582,7 @@ class Dataset(SummarisedLeaf):
     terms_note: str | None = None
     source: Literal["ee_native", "republished", "community"] = "ee_native"
     bands: dict[str, Band] = Field(default_factory=dict)
+    preprocess: Preprocess | None = None
 
     def summary_parts(self) -> list[str]:
         """Return id, title, provider, resolution, period and band count.
