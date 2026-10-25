@@ -28,8 +28,10 @@ Public surface (re-exported from this package):
   `available_datasets`, `datasets`, `providers`, and
   `get_dataset` / `get_band` / `get_variable` / `get_provider`.
 * `Dataset` / `Band` / `Cadence` / `Extent`
-  / `Provider` — the frozen value objects the catalog is built
-  from.
+  / `Provider` / `Visualization` — the frozen value objects the
+  catalog is built from; `Visualization` carries the publisher's own
+  default rendering, captured from the asset's STAC `gee:visualizations`
+  and consumed by `earthlens.gee.viz.style_for`.
 * `CATALOG_PATH` / `PROVIDERS_PATH` — absolute paths to
   the bundled catalog directory and `providers.yaml`; monkey-patchable
   to redirect the loader at a temp directory.
@@ -434,6 +436,7 @@ from earthlens.gee.catalog import (
     Extent,
     Preprocess,
     Provider,
+    Visualization,
 )
 from earthlens.gee.climatology import Climatology
 from earthlens.gee.closest import ClosestImage
@@ -560,6 +563,7 @@ __all__ = [
     "Extent",
     "Preprocess",
     "Provider",
+    "Visualization",
     "CATALOG_PATH",
     "PROVIDERS_PATH",
     "EarthEngineAuth",

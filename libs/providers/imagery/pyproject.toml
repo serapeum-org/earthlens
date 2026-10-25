@@ -74,6 +74,19 @@ jaxa = ["jaxa.earth >=0.1.6,<0.2", "gportal >=0.4,<0.5"]
 openeo = ["openeo >=0.47,<0.52"]
 sentinel-hub = ["sentinelhub >=3.11.5"]
 stac = ["pyramids-core[stac] >=0.71.0"]
+# digitalearth is the visualization ORCHESTRATOR for the whole stack: it reads
+# pyramids objects and composes the render across its four backend tiers
+# (matplotlib / HoloViz / PyVista / MapLibre), delegating the drawing itself to
+# cleopatra. earthlens deliberately owns NO plotting layer -- `earthlens.gee.viz`
+# only resolves style hints from the catalog and the two Earth-Engine-side
+# preview URLs, then calls a digitalearth verb. The import is lazy (inside the
+# `Visualizer` method that needs it), so a bare install pulls no plotting stack
+# at all and `import earthlens.gee` never reaches digitalearth -- a boundary
+# test in `libs/core/tests/test_distribution_boundaries.py` holds that line.
+# The floor is 0.13.0: that release has `quickmap(backend=)`, the
+# `DatasetCollection`-aware `Map.animate`, and `tiles(url=)` on both WebMap and
+# InteractiveMap, which are the three verbs this package calls.
+viz = ["digitalearth >=0.13.0"]
 
 # This distribution's slice of the facade's data-source table.
 [project.entry-points."earthlens.backends"]

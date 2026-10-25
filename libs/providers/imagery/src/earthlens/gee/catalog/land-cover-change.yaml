@@ -15,6 +15,12 @@ datasets:
       bbox: [-135.17, 36.83, -51.24, 62.25]
     default_reducer: mosaic
     license: OGL-Canada-2.0
+    visualizations:
+      - name: "Crop Landcover"
+        bands: ["landcover"]
+        vmin: [10]
+        vmax: [230]
+        palette: ["000000", "3333ff", "996666", "cc6699", "e1e1e1", "ffff00", "666666", "993399", "501b50", "cccc00", "cc6600", "ff9933", "ffcc33", "7899f6", "ff9900", "660000", "dae31d", "99cc00", "d2db25", "d1d52b", "cacd32", "c3c63a", "b9bc44", "a7b34d", "b9c64e", "999900", "e9e2b1", "809769", "92a55b", "ffff99", "98887c", "799b93", "5ea263", "52ae77", "41bf7a", "d6ff70", "8c8cff", "d6cc00", "ff7f00", "315491", "cc9933", "5ea296", "896e43", "996633", "8f6c3d", "b6a472", "82654a", "a39069", "b85900", "b74b15", "ff8a8a", "ffcccc", "6f55ca", "ffccff", "dc5424", "d05a30", "d20000", "cc0000", "dc3200", "ff6666", "c5453b", "7442bd", "ffcc99", "b5fb05", "ccff05", "07f98c", "00ffcc", "cc33cc", "8e7672", "b1954f", "749a66", "009900", "006600", "00cc00", "cc9900"]
     bands:
       landcover:
         description: Crop-specific land-cover classification
@@ -109,6 +115,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Benthic Map"
+        bands: ["benthic"]
+        vmin: [11]
+        vmax: [16]
+        palette: ["ffffbe", "e0d05e", "b19c3a", "668438", "ff6161", "9bcc4f"]
     bands:
       geomorphic:
         description: Classification of geomorphic zonation.
@@ -129,6 +141,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Benthic Map"
+        bands: ["benthic"]
+        vmin: [11]
+        vmax: [16]
+        palette: ["ffffbe", "e0d05e", "b19c3a", "668438", "ff6161", "9bcc4f"]
     bands:
       geomorphic:
         description: Geomorphic zonation class
@@ -149,6 +167,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "classificationVis"
+        bands: ["classification"]
+        vmin: [1]
+        vmax: [3]
+        palette: ["ff0000", "ef00ff", "808080"]
     bands:
       classification:
         description: Oil-palm plantation class
@@ -176,6 +200,9 @@ datasets:
       bbox: [-8.602, 4.36, -2.493, 10.74]
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Cote d'Ivoire Land Cover Map 2020"
+        bands: ["classification"]
     bands:
       classification:
         description: Land-cover class
@@ -195,6 +222,9 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Nighttime Lights"
+        bands: ["b1"]
     bands:
       b1:
         description: Inter-calibrated nighttime light digital number
@@ -210,6 +240,12 @@ datasets:
       end_date: "2019-12-31"
     default_reducer: mosaic
     license: public-domain
+    visualizations:
+      - name: "Forest age"
+        bands: ["forest"]
+        vmin: [0]
+        vmax: [1000]
+        palette: ["ff0000"]
     bands:
       forest:
         description: Forest stand age
@@ -228,6 +264,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free with attribution (Copernicus).'
+    visualizations:
+      - name: "Land Cover"
+        bands: ["landcover"]
+        vmin: [1]
+        vmax: [44]
+        palette: ["e6004d", "ff0000", "cc4df2", "cc0000", "e6cccc", "e6cce6", "a600cc", "a64dcc", "ff4dff", "ffa6ff", "ffe6ff", "ffffa8", "ffff00", "e6e600", "e68000", "f2a64d", "e6a600", "e6e64d", "ffe6a6", "ffe64d", "e6cc4d", "f2cca6", "80ff00", "00a600", "4dff00", "ccf24d", "a6ff80", "a6e64d", "a6f200", "e6e6e6", "cccccc", "ccffcc", "000000", "a6e6cc", "a6a6ff", "4d4dff", "ccccff", "e6e6ff", "a6a6e6", "00ccf2", "80f2e6", "00ffa6", "a6ffe6", "e6f2ff"]
     bands:
       landcover:
         description: CORINE land-cover class
@@ -290,6 +332,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free with attribution (Copernicus).'
+    visualizations:
+      - name: "Land Cover"
+        bands: ["landcover"]
+        vmin: [111]
+        vmax: [523]
+        palette: ["e6004d", "ff0000", "cc4df2", "cc0000", "e6cccc", "e6cce6", "a600cc", "a64dcc", "ff4dff", "ffa6ff", "ffe6ff", "ffffa8", "ffff00", "e6e600", "e68000", "f2a64d", "e6a600", "e6e64d", "ffe6a6", "ffe64d", "e6cc4d", "f2cca6", "80ff00", "00a600", "4dff00", "ccf24d", "a6ff80", "a6e64d", "a6f200", "e6e6e6", "cccccc", "ccffcc", "000000", "a6e6cc", "a6a6ff", "4d4dff", "ccccff", "e6e6ff", "a6a6e6", "00ccf2", "80f2e6", "00ffa6", "a6ffe6", "e6f2ff"]
     bands:
       landcover:
         description: CORINE land-cover class
@@ -352,6 +400,9 @@ datasets:
     license: proprietary
     terms_note: 'Free with attribution (Copernicus).'
     source: republished
+    visualizations:
+      - name: "Land Cover"
+        bands: ["discrete_classification"]
     bands:
       discrete_classification:
         description: Land-cover class (discrete)
@@ -400,6 +451,9 @@ datasets:
     license: proprietary
     terms_note: 'Free with attribution (Copernicus).'
     source: republished
+    visualizations:
+      - name: "Land Cover"
+        bands: ["discrete_classification"]
     bands:
       discrete_classification:
         description: Land-cover class (discrete)
@@ -447,6 +501,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-NC-SA-4.0
     source: republished
+    visualizations:
+      - name: "Human modification"
+        bands: ["gHM"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["0c0c0c", "071aff", "ff0000", "ffbd03", "fbff05", "fffdfd"]
     bands:
       gHM:
         description: Cumulative Human Modification index (0 = none, 1 = full)
@@ -464,6 +524,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "A human settlement area"
+        bands: ["settlement"]
+        vmin: [255]
+        vmax: [255]
     bands:
       settlement:
         description: Binary settlement / built-up classification (255 = settlement)
@@ -480,6 +545,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free for use under ESA CCI data terms.'
+    visualizations:
+      - name: "Above Ground Biomass"
+        bands: ["agb"]
+        vmin: [0]
+        vmax: [500]
+        palette: ["white", "green"]
     bands:
       agb:
         description: Above-ground biomass density
@@ -501,6 +572,12 @@ datasets:
     license: proprietary
     terms_note: 'Free for any use with attribution.'
     source: republished
+    visualizations:
+      - name: "Burn Date"
+        bands: ["BurnDate"]
+        vmin: [0]
+        vmax: [366]
+        palette: ["ff0000", "fd4100", "fb8200", "f9c400", "f2ff00", "b6ff05", "7aff0a", "3eff0f", "02ff15", "00ff55", "00ff99", "00ffdd", "00ddff", "0098ff", "0052ff", "0210ff", "3a0dfb", "7209f6", "a905f1", "e102ed", "ff00cc", "ff0089", "ff0047", "ff0004"]
     bands:
       BurnDate:
         description: Day of year of first burn detection
@@ -527,6 +604,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'The GlobCover products have been processed by ESA and by the Université'
+    visualizations:
+      - name: "Landcover"
+        bands: ["landcover"]
+        vmin: [11]
+        vmax: [230]
+        palette: ["aaefef", "ffff63", "dcef63", "cdcd64", "006300", "009f00", "aac700", "003b00", "286300", "788300", "8d9f00", "bd9500", "956300", "ffb431", "ffebae", "00785a", "009578", "00dc83", "c31300", "fff5d6", "0046c7", "ffffff", "743411"]
     bands:
       landcover:
         description: The land cover map is derived by an automatic and
@@ -545,6 +628,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "WorldCereal active cropland marker"
+        bands: ["classification"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["eb0000", "37e622"]
     bands:
       classification:
         description: Active-cropland marker (0=absent, 100=present)
@@ -563,6 +652,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Classification confidence"
+        bands: ["confidence"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["be0000", "fff816", "069711"]
     bands:
       classification:
         description: Cropland / crop-type classification (0 = absent, 100 = present)
@@ -597,6 +692,9 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Landcover"
+        bands: ["Map"]
     bands:
       Map:
         description: Land-cover class (ESA WorldCover legend, 10-100)
@@ -627,6 +725,9 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Landcover"
+        bands: ["Map"]
     bands:
       Map:
         description: Land-cover class (ESA WorldCover legend)
@@ -658,6 +759,12 @@ datasets:
     license: proprietary
     terms_note: 'The Food and Agriculture Organization of the United Nations (FAO) is'
     source: republished
+    visualizations:
+      - name: "Cropland area drained (Annual)"
+        bands: ["cropland"]
+        vmin: [1]
+        vmax: [60]
+        palette: ["white", "red"]
     bands:
       cropland:
         description: Area of cropland organic soils (histosols)
@@ -679,6 +786,12 @@ datasets:
     license: proprietary
     terms_note: 'The Food and Agriculture Organization of the United Nations (FAO) is'
     source: republished
+    visualizations:
+      - name: "Cropland C emissions (Annual)"
+        bands: ["croplandc"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["yellow", "red"]
     bands:
       croplandc:
         description: C emissions from cropland organic soils
@@ -705,6 +818,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Forest proximate people - 1km cutoff distance"
+        bands: ["FPP_1km"]
+        vmin: [0]
+        vmax: [12]
+        palette: ["blue", "yellow", "red"]
     bands:
       FPP_1km:
         description: Number of people living in or within 1 kilometer of forests.
@@ -725,6 +844,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Tree proximate people - 1km cutoff distance"
+        bands: ["TPP_1km"]
+        vmin: [0]
+        vmax: [12]
+        palette: ["blue", "yellow", "red"]
     bands:
       TPP_1km:
         description: Number of people living in or within 1 km from agricultural lands
@@ -751,6 +876,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA promotes the full and open sharing of all data with the research and'
+    visualizations:
+      - name: "Fires"
+        bands: ["T21"]
+        vmin: [325]
+        vmax: [400]
+        palette: ["red", "orange", "yellow"]
     bands:
       T21:
         description: The brightness temperature of a fire pixel using MODIS channels 21/22.
@@ -778,6 +909,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'The FORMA datasets are available without restriction on use or distribution.'
+    visualizations:
+      - name: "Alert Areas"
+        bands: ["constant"]
+        vmin: [1134979200]
+        vmax: [1433919600]
+        palette: ["ff8800", "ff0000"]
     bands:
       constant:
         description: '[Seconds since Jan 1, 1970](https://en.wikipedia.org/wiki/Unix_time)'
@@ -798,6 +935,11 @@ datasets:
     license: CC-BY-SA-4.0
     terms_note: 'This work is licensed under a Creative Commons Attribution-ShareAlike 4.0'
     source: republished
+    visualizations:
+      - name: "Trawlers"
+        bands: ["trawlers"]
+        vmin: [0]
+        vmax: [5]
     bands:
       drifting_longlines:
         description: Hours per sq. km of fishing with drifting longlines.
@@ -831,6 +973,11 @@ datasets:
     license: CC-BY-SA-4.0
     terms_note: 'This work is licensed under a Creative Commons Attribution-ShareAlike 4.0'
     source: republished
+    visualizations:
+      - name: "Trawlers"
+        bands: ["trawlers"]
+        vmin: [0]
+        vmax: [5]
     bands:
       drifting_longlines:
         description: Hours per sq. km of fishing vessel presence with drifting longlines.
@@ -863,6 +1010,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Intellectual property rights to this dataset belong to'
+    visualizations:
+      - name: "Tree Canopy Cover"
+        bands: ["tree_canopy_cover"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffffff", "afce56", "5f9c00", "0e6a00", "003800"]
     bands:
       tree_canopy_cover:
         description: The percentage of pixel area covered by trees.
@@ -886,6 +1039,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Use of this dataset is subject to the [Brazil Forest Imagery Dataset 2008 license'
+    visualizations:
+      - name: "Analytic Basemap NIR/R/G"
+        bands: ["N", "R", "G"]
+        vmin: [0]
+        vmax: [10000]
     bands:
       G:
         description: Green reflectance (top-of-atmosphere)
@@ -928,6 +1086,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Use of this dataset is subject to the [Brazil Forest Imagery Dataset 2008 license'
+    visualizations:
+      - name: "Visual Basemap RGB"
+        bands: ["R", "G", "B"]
+        vmin: [0]
+        vmax: [255]
     bands:
       R:
         description: Red reflectance
@@ -965,6 +1128,12 @@ datasets:
       end_date: null
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Dynamic World V1 - label"
+        bands: ["label"]
+        vmin: [0]
+        vmax: [8]
+        palette: ["419bdf", "397d49", "88b053", "7a87c6", "e49635", "dfc35a", "c4281b", "a59b8f", "b39fe1"]
     bands:
       water:
         description: Estimated probability of complete coverage by water
@@ -1029,6 +1198,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Global CCDC"
+        bands: ["RED_coefs", "GREEN_coefs", "BLUE_coefs"]
+        vmin: [0]
+        vmax: [1]
     bands:
       tStart:
         description: 1-D Array containing the date of the start of each segment (fractional year).
@@ -1132,6 +1306,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Classification"
+        bands: ["classification"]
+        vmin: [211]
+        vmax: [500]
     bands:
       classification:
         description: Crop-specific land-cover classification
@@ -1149,6 +1328,12 @@ datasets:
     license: public-domain
     terms_note: 'The data may be used by anyone, anywhere, anytime without permission,'
     source: republished
+    visualizations:
+      - name: "GFC"
+        bands: ["Map"]
+        vmin: [1]
+        vmax: [1]
+        palette: ["4d9221"]
     bands:
       Map:
         description: Global forest cover 2020
@@ -1166,6 +1351,12 @@ datasets:
     license: proprietary
     terms_note: 'Free for any use (JRC).'
     source: republished
+    visualizations:
+      - name: "GFC"
+        bands: ["Map"]
+        vmin: [1]
+        vmax: [1]
+        palette: ["4d9221"]
     bands:
       Map:
         description: Global forest cover for 2020 (binary)
@@ -1181,6 +1372,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'The data may be used by anyone, anywhere, anytime without permission,'
+    visualizations:
+      - name: "GFC"
+        bands: ["Map"]
+        vmin: [1]
+        vmax: [1]
+        palette: ["4d9221"]
     bands:
       Map:
         description: Global forest cover 2020
@@ -1198,6 +1395,12 @@ datasets:
     license: public-domain
     terms_note: 'The data may be used by anyone, anywhere, anytime without permission,'
     source: republished
+    visualizations:
+      - name: "GFT"
+        bands: ["Map"]
+        vmin: [1]
+        vmax: [20]
+        palette: ["78c679", "000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000", "006837", "000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000", "cc6600"]
     bands:
       Map:
         description: Global forest types 2020
@@ -1214,6 +1417,12 @@ datasets:
     license: public-domain
     terms_note: 'The data may be used by anyone, anywhere, anytime without permission,'
     source: republished
+    visualizations:
+      - name: "GFT"
+        bands: ["Map"]
+        vmin: [1]
+        vmax: [20]
+        palette: ["78c679", "000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000", "006837", "000000", "000000", "000000", "000000", "000000", "000000", "000000", "000000", "cc6600"]
     bands:
       Map:
         description: Global forest types 2020
@@ -1230,6 +1439,12 @@ datasets:
     license: proprietary
     terms_note: 'Free for use (JRC).'
     source: republished
+    visualizations:
+      - name: "Built-Up Multitemporal"
+        bands: ["built"]
+        vmin: [1]
+        vmax: [6]
+        palette: ["0c1d60", "000000", "448564", "70daa4", "83ffbf", "ffffff"]
     bands:
       built:
         description: Multitemporal built-up presence (epoch encoded)
@@ -1251,6 +1466,12 @@ datasets:
     license: proprietary
     terms_note: 'Free for use (JRC).'
     source: republished
+    visualizations:
+      - name: "Population Count"
+        bands: ["population_count"]
+        vmin: [0]
+        vmax: [200]
+        palette: ["060606", "337663", "337663", "ffffff"]
     bands:
       population_count:
         description: Number of people per 250m cell
@@ -1268,6 +1489,12 @@ datasets:
     license: proprietary
     terms_note: 'Free for use (JRC).'
     source: republished
+    visualizations:
+      - name: "Degree of Urbanization"
+        bands: ["smod_code"]
+        vmin: [0]
+        vmax: [3]
+        palette: ["000000", "448564", "70daa4", "ffffff"]
     bands:
       smod_code:
         description: Degree-of-urbanisation class
@@ -1282,6 +1509,9 @@ datasets:
       end_date: "2018-12-31"
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Multitemporal Built-up Characteristics"
+        bands: ["built_characteristics"]
     bands:
       built_characteristics:
         description: Settlement characteristic class (residential / non-residential / open-low-veg / etc.)
@@ -1296,6 +1526,12 @@ datasets:
       end_date: "2018-12-31"
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Average building height per grid cell in meters"
+        bands: ["built_height"]
+        vmin: [0]
+        vmax: [0.5]
+        palette: ["000000", "400000", "a00000", "00ffff"]
     bands:
       built_height:
         description: Average building height per 100m grid cell
@@ -1312,6 +1548,12 @@ datasets:
       end_date: "2030-01-01"
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Built-up surface per grid cell in square metres"
+        bands: ["built_surface"]
+        vmin: [0]
+        vmax: [8000]
+        palette: ["000000", "ffffff"]
     bands:
       built_surface:
         description: Built-up surface area per 100m grid cell
@@ -1330,6 +1572,12 @@ datasets:
       end_date: "2018-12-31"
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Built-up surface per grid cell in square metres"
+        bands: ["built_surface"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["000000", "ffffff"]
     bands:
       built_surface:
         description: Built-up surface area per 10 m grid cell
@@ -1349,6 +1597,12 @@ datasets:
       end_date: "2030-01-01"
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Total building volume per grid cell in cubic meters"
+        bands: ["built_volume_total"]
+        vmin: [0]
+        vmax: [80000]
+        palette: ["000000", "400000", "a00000", "00ffff"]
     bands:
       built_volume_total:
         description: Total building volume per 100m grid cell
@@ -1368,6 +1622,12 @@ datasets:
       end_date: "2030-01-01"
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Population Count"
+        bands: ["population_count"]
+        vmin: [0]
+        vmax: [200]
+        palette: ["060606", "337663", "337663", "ffffff"]
     bands:
       population_count:
         description: Population count per 100m grid cell
@@ -1383,6 +1643,12 @@ datasets:
       end_date: "2030-01-01"
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Degree of Urbanization"
+        bands: ["smod_code"]
+        vmin: [0]
+        vmax: [3]
+        palette: ["000000", "448564", "70daa4", "ffffff"]
     bands:
       smod_code:
         description: Degree-of-urbanisation class (rural/town/city granularity)
@@ -1398,6 +1664,12 @@ datasets:
       end_date: "2030-01-01"
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Degree of Urbanization"
+        bands: ["smod_code"]
+        vmin: [0]
+        vmax: [3]
+        palette: ["000000", "448564", "70daa4", "ffffff"]
     bands:
       smod_code:
         description: Degree-of-urbanisation class (rural/town/city granularity, v2-0)
@@ -1439,6 +1711,9 @@ datasets:
     license: proprietary
     terms_note: 'This work "Iran Land Cover Map'
     source: republished
+    visualizations:
+      - name: "Classification"
+        bands: ["classification"]
     bands:
       classification:
         description: Classification
@@ -1456,6 +1731,9 @@ datasets:
     license: public-domain
     terms_note: 'LANDFIRE data are public domain data with no use restrictions, though if modifications'
     source: republished
+    visualizations:
+      - name: "FRG"
+        bands: ["FRG"]
     bands:
       FRG:
         description: Fire Regime Groups
@@ -1473,6 +1751,9 @@ datasets:
     license: public-domain
     terms_note: 'LANDFIRE data are public domain data with no use restrictions, though if modifications'
     source: republished
+    visualizations:
+      - name: "MFRI"
+        bands: ["MFRI"]
     bands:
       MFRI:
         description: Mean Fire Return Interval
@@ -1490,6 +1771,9 @@ datasets:
     license: public-domain
     terms_note: 'LANDFIRE data are public domain data with no use restrictions, though if modifications'
     source: republished
+    visualizations:
+      - name: "PLS"
+        bands: ["PLS"]
     bands:
       PLS:
         description: Percent Low-severity Fire
@@ -1507,6 +1791,9 @@ datasets:
     license: public-domain
     terms_note: 'LANDFIRE data are public domain data with no use restrictions, though if modifications'
     source: republished
+    visualizations:
+      - name: "PMS"
+        bands: ["PMS"]
     bands:
       PMS:
         description: Percent of Mixed-severity Fire
@@ -1524,6 +1811,9 @@ datasets:
     license: public-domain
     terms_note: 'LANDFIRE data are public domain data with no use restrictions, though if modifications'
     source: republished
+    visualizations:
+      - name: "PRS"
+        bands: ["PRS"]
     bands:
       PRS:
         description: Percent of Replacement-severity Fire
@@ -1541,6 +1831,9 @@ datasets:
     license: public-domain
     terms_note: 'LANDFIRE data are public domain data with no use restrictions, though if modifications'
     source: republished
+    visualizations:
+      - name: "SClass"
+        bands: ["SClass"]
     bands:
       SClass:
         description: Succession Classes
@@ -1558,6 +1851,9 @@ datasets:
     license: public-domain
     terms_note: 'LANDFIRE data are public domain data with no use restrictions, though if modifications'
     source: republished
+    visualizations:
+      - name: "VCC"
+        bands: ["VCC"]
     bands:
       VCC:
         description: Vegetation Condition Class
@@ -1575,6 +1871,9 @@ datasets:
     license: public-domain
     terms_note: 'LANDFIRE data are public domain data with no use restrictions, though if modifications'
     source: republished
+    visualizations:
+      - name: "VDep"
+        bands: ["VDep"]
     bands:
       VDep:
         description: Vegetation Departure
@@ -1592,6 +1891,9 @@ datasets:
     license: public-domain
     terms_note: 'LANDFIRE data are public domain data with no use restrictions, though if modifications'
     source: republished
+    visualizations:
+      - name: "BPS"
+        bands: ["BPS"]
     bands:
       BPS:
         description: Biophysical Settings
@@ -1609,6 +1911,9 @@ datasets:
     license: public-domain
     terms_note: 'LANDFIRE data are public domain data with no use restrictions, though if modifications'
     source: republished
+    visualizations:
+      - name: "ESP"
+        bands: ["ESP"]
     bands:
       ESP:
         description: Environmental Site Potential
@@ -1626,6 +1931,9 @@ datasets:
     license: public-domain
     terms_note: 'LANDFIRE data are public domain data with no use restrictions, though if modifications'
     source: republished
+    visualizations:
+      - name: "ESP"
+        bands: ["ESP"]
     bands:
       ESP:
         description: Environmental Site Potential
@@ -1643,6 +1951,9 @@ datasets:
     license: public-domain
     terms_note: 'LANDFIRE data are public domain data with no use restrictions, though if modifications'
     source: republished
+    visualizations:
+      - name: "ESP"
+        bands: ["ESP"]
     bands:
       ESP:
         description: Environmental Site Potential
@@ -1660,6 +1971,9 @@ datasets:
     license: public-domain
     terms_note: 'LANDFIRE data are public domain data with no use restrictions, though if modifications'
     source: republished
+    visualizations:
+      - name: "EVC"
+        bands: ["EVC"]
     bands:
       EVC:
         description: Existing Vegetation Cover
@@ -1677,6 +1991,9 @@ datasets:
     license: public-domain
     terms_note: 'LANDFIRE data are public domain data with no use restrictions, though if modifications'
     source: republished
+    visualizations:
+      - name: "EVH"
+        bands: ["EVH"]
     bands:
       EVH:
         description: Existing Vegetation Height
@@ -1694,6 +2011,9 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     source: republished
+    visualizations:
+      - name: "EVT"
+        bands: ["EVT"]
     bands:
       EVT:
         description: Existing vegetation-type class
@@ -1710,6 +2030,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Colorized"
+        bands: ["EVI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       EVI:
         description: Enhanced Vegetation Index
@@ -1726,6 +2052,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index
@@ -1744,6 +2076,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Colorized"
+        bands: ["EVI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       EVI:
         description: Enhanced Vegetation Index
@@ -1760,6 +2098,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index
@@ -1778,6 +2122,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Colorized"
+        bands: ["EVI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       EVI:
         description: Enhanced Vegetation Index
@@ -1794,6 +2144,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index
@@ -1811,6 +2167,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Mangroves"
+        bands: ["1"]
+        vmin: [1]
+        vmax: [1]
+        palette: ["d40115"]
     bands:
       "1":
         description: Mangroves
@@ -1827,6 +2189,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "IGBP Land Cover"
+        bands: ["LC_Type1"]
+        vmin: [1]
+        vmax: [17]
+        palette: ["05450a", "086a10", "54a708", "78d203", "009900", "c6b044", "dcd159", "dade48", "fbff13", "b6ff05", "27ff87", "c24f44", "a5a5a5", "ff6d4c", "69fff8", "f9ffa4", "1c0dff"]
     bands:
       LC_Type1:
         description: Annual IGBP land cover classification
@@ -1853,6 +2221,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Vegetation Peak Date"
+        bands: ["Peak_1"]
+        vmin: [11400]
+        vmax: [11868]
+        palette: ["0f17ff", "b11406", "f1ff23"]
     bands:
       NumCycles:
         description: Number of valid vegetation cycles peaking in this year (0-7)
@@ -1884,6 +2258,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Default visualization"
+        bands: ["Fpar"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["e1e4b4", "999d60", "2ec409", "0a4b06"]
     bands:
       Lai:
         description: Leaf area index
@@ -1918,6 +2298,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Default visualization"
+        bands: ["BRDF_Albedo_Parameters_Band1_iso", "BRDF_Albedo_Parameters_Band4_iso", "BRDF_Albedo_Parameters_Band3_iso"]
+        vmin: [0]
+        vmax: [1400]
+        gamma: [2]
     bands:
       BRDF_Albedo_Parameters_Band1_iso:
         description: Isotropic BRDF parameter, MODIS band 1 (red)
@@ -1956,6 +2342,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Default visualization"
+        bands: ["Snow_BRDF_Albedo"]
+        vmin: [0]
+        vmax: [1]
     bands:
       Snow_BRDF_Albedo:
         description: Snow-free or snow BRDF/albedo retrieved
@@ -2014,6 +2405,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Black-Sky Albedo"
+        bands: ["Albedo_BSA_Band1"]
+        vmin: [0]
+        vmax: [400]
     bands:
       Albedo_BSA_Band1:
         description: Black-sky albedo for band 1
@@ -2164,6 +2560,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "True Color"
+        bands: ["Nadir_Reflectance_Band1", "Nadir_Reflectance_Band4", "Nadir_Reflectance_Band3"]
+        vmin: [0]
+        vmax: [4000]
+        gamma: [1.5]
     bands:
       Nadir_Reflectance_Band1:
         description: NBAR at local solar noon, MODIS band 1 (red)
@@ -2202,6 +2604,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Black-Sky Albedo"
+        bands: ["Albedo_BSA_Band1"]
+        vmin: [0]
+        vmax: [400]
     bands:
       Albedo_BSA_Band1:
         description: Black-sky albedo for band 1
@@ -2354,6 +2761,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Burned Area"
+        bands: ["BurnDate"]
+        vmin: [30]
+        vmax: [341]
+        palette: ["4e0400", "951003", "c61503", "ff1901"]
     bands:
       BurnDate:
         description: "Burn day of year (0 = unburned, 1-366 = ordinal day)"
@@ -2378,6 +2791,13 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [9000]
+        gain: [0.0001]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index
@@ -2412,6 +2832,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [9000]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: 16-day NDVI average
@@ -2442,6 +2868,13 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [8000]
+        gain: [0.0001]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: 16-day NDVI average
@@ -2472,6 +2905,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Fire Mask"
+        bands: ["MaxFRP", "FireMask", "FireMask"]
+        vmin: [0]
+        vmax: [6000]
     bands:
       FireMask:
         description: Confidence of fire
@@ -2500,6 +2938,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Fire Mask"
+        bands: ["FireMask"]
+        vmin: [3]
+        vmax: [8]
     bands:
       FireMask:
         description: Confidence of fire
@@ -2518,6 +2961,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Fpar"
+        bands: ["Fpar_500m"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       Lai_500m:
         description: Leaf area index
@@ -2548,6 +2997,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "GPP"
+        bands: ["Gpp"]
+        vmin: [0]
+        vmax: [600]
+        palette: ["bbe029", "0a9501", "074b03"]
     bands:
       Gpp:
         description: Gross primary production over 8 days
@@ -2572,6 +3027,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "NPP"
+        bands: ["Npp"]
+        vmin: [0]
+        vmax: [19000]
+        palette: ["bbe029", "0a9501", "074b03"]
     bands:
       Npp:
         description: Annual net primary productivity
@@ -2592,6 +3053,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "NPP"
+        bands: ["Npp"]
+        vmin: [0]
+        vmax: [19000]
+        palette: ["bbe029", "0a9501", "074b03"]
     bands:
       Gpp:
         description: Annual gross primary productivity
@@ -2619,6 +3086,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Percent Tree Cover"
+        bands: ["Percent_Tree_Cover"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["bbe029", "0a9501", "074b03"]
     bands:
       Percent_Tree_Cover:
         description: Percent of a pixel which is covered by tree canopy
@@ -2664,6 +3137,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Water Mask"
+        bands: ["water_mask"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["bcba99", "2d0491"]
     bands:
       water_mask:
         description: Land-water mask
@@ -2682,6 +3161,13 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [9000]
+        gain: [0.0001]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index
@@ -2756,6 +3242,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [9000]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: 16-day NDVI average
@@ -2831,6 +3323,13 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [8000]
+        gain: [0.0001]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index
@@ -2905,6 +3404,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Fire Mask"
+        bands: ["MaxFRP", "FireMask", "FireMask"]
+        vmin: [0]
+        vmax: [6000]
     bands:
       FireMask:
         description: Confidence of fire
@@ -2933,6 +3437,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Fire Mask"
+        bands: ["FireMask"]
+        vmin: [3]
+        vmax: [8]
     bands:
       FireMask:
         description: Confidence of fire
@@ -2951,6 +3460,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Fpar"
+        bands: ["Fpar_500m"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       Fpar_500m:
         description: Fraction of Photosynthetically Active Radiation
@@ -2997,6 +3512,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "IGBP Land Cover"
+        bands: ["Majority_Land_Cover_Type_1"]
+        vmin: [0]
+        vmax: [16]
+        palette: ["1c0dff", "05450a", "086a10", "54a708", "78d203", "009900", "c6b044", "dcd159", "dade48", "fbff13", "b6ff05", "27ff87", "c24f44", "a5a5a5", "ff6d4c", "69fff8", "f9ffa4"]
     bands:
       Majority_Land_Cover_Type_1:
         description: Majority IGBP land-cover class per 0.05° pixel
@@ -3020,6 +3541,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "IGBP Land Cover"
+        bands: ["LC_Type1"]
+        vmin: [1]
+        vmax: [17]
+        palette: ["05450a", "086a10", "54a708", "78d203", "009900", "c6b044", "dcd159", "dade48", "fbff13", "b6ff05", "27ff87", "c24f44", "a5a5a5", "ff6d4c", "69fff8", "f9ffa4", "1c0dff"]
     bands:
       LC_Type1:
         description: Land cover type 1 — Annual IGBP classification
@@ -3098,6 +3625,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Vegetation Peak Date"
+        bands: ["Peak_1"]
+        vmin: [11400]
+        vmax: [11868]
+        palette: ["0f17ff", "b11406", "f1ff23"]
     bands:
       NumCycles:
         description: Number of valid vegetation cycles peaking in this year (0-7)
@@ -3134,6 +3667,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Default visualization"
+        bands: ["Fpar"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["e1e4b4", "999d60", "2ec409", "0a4b06"]
     bands:
       Fpar:
         description: FPAR absorbed by the green elements of a vegetation canopy
@@ -3173,6 +3712,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Default visualization"
+        bands: ["BRDF_Albedo_Parameters_Band1_iso", "BRDF_Albedo_Parameters_Band4_iso", "BRDF_Albedo_Parameters_Band3_iso"]
+        vmin: [0]
+        vmax: [1400]
+        gamma: [2]
     bands:
       BRDF_Albedo_Parameters_Band1_iso:
         description: Isotropic BRDF parameter, MODIS band 1 (red)
@@ -3215,6 +3760,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Default visualization"
+        bands: ["Snow_BRDF_Albedo"]
+        vmin: [0]
+        vmax: [1]
     bands:
       Snow_BRDF_Albedo:
         description: Snow-free vs snow BRDF/albedo retrieval flag
@@ -3242,6 +3792,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Black-Sky Albedo"
+        bands: ["Albedo_BSA_Band1"]
+        vmin: [0]
+        vmax: [400]
     bands:
       Albedo_BSA_Band1:
         description: Black-sky albedo, MODIS band 1 (red)
@@ -3278,6 +3833,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "True Color"
+        bands: ["Nadir_Reflectance_Band1", "Nadir_Reflectance_Band4", "Nadir_Reflectance_Band3"]
+        vmin: [0]
+        vmax: [4000]
+        gamma: [1.5]
     bands:
       Nadir_Reflectance_Band1:
         description: NBAR at local solar noon, MODIS band 1 (red)
@@ -3328,6 +3889,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Black-Sky Albedo"
+        bands: ["Albedo_BSA_Band1"]
+        vmin: [0]
+        vmax: [400]
     bands:
       Albedo_BSA_Band1:
         description: Black-sky albedo for band 1
@@ -3480,6 +4046,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Burned Area"
+        bands: ["BurnDate"]
+        vmin: [30]
+        vmax: [341]
+        palette: ["4e0400", "951003", "c61503", "ff1901"]
     bands:
       BurnDate:
         description: "Burn day of year (0 = unburned, 1-366 = ordinal day)"
@@ -3504,6 +4076,13 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [9000]
+        gain: [0.0001]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index
@@ -3548,6 +4127,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [9000]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: 16-day NDVI average
@@ -3582,6 +4167,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [9000]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: Monthly NDVI average
@@ -3612,6 +4203,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [0.9]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: 16-day NDVI average
@@ -3642,6 +4239,13 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [8000]
+        gain: [0.0001]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index
@@ -3678,6 +4282,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Fire Mask"
+        bands: ["MaxFRP", "FireMask", "FireMask"]
+        vmin: [0]
+        vmax: [6000]
     bands:
       FireMask:
         description: Per-pixel fire/no-fire confidence class
@@ -3702,6 +4311,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Fire Mask"
+        bands: ["FireMask"]
+        vmin: [3]
+        vmax: [8]
     bands:
       FireMask:
         description: Per-pixel 8-day fire confidence class
@@ -3720,6 +4334,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Fpar"
+        bands: ["Fpar_500m"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       Lai_500m:
         description: Leaf Area Index (one-sided green leaf area per unit ground area)
@@ -3756,6 +4376,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "GPP"
+        bands: ["Gpp"]
+        vmin: [0]
+        vmax: [600]
+        palette: ["bbe029", "0a9501", "074b03"]
     bands:
       Gpp:
         description: Gross primary production over 8 days
@@ -3784,6 +4410,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "GPP"
+        bands: ["Gpp"]
+        vmin: [0]
+        vmax: [600]
+        palette: ["bbe029", "0a9501", "074b03"]
     bands:
       Gpp:
         description: Gross primary production
@@ -3812,6 +4444,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "NPP"
+        bands: ["Npp"]
+        vmin: [0]
+        vmax: [19000]
+        palette: ["bbe029", "0a9501", "074b03"]
     bands:
       Gpp:
         description: Annual gross primary productivity
@@ -3839,6 +4477,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Percent Tree Cover"
+        bands: ["Percent_Tree_Cover"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["bbe029", "0a9501", "074b03"]
     bands:
       Percent_Tree_Cover:
         description: Per-pixel tree-canopy cover
@@ -3870,6 +4514,13 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [9000]
+        gain: [0.0001]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index
@@ -3914,6 +4565,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [9000]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: 16-day NDVI average
@@ -3948,6 +4605,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [9000]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: Monthly NDVI average
@@ -3978,6 +4641,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [0.9]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: 16-day NDVI average
@@ -4008,6 +4677,13 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [8000]
+        gain: [0.0001]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index
@@ -4044,6 +4720,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Fire Mask"
+        bands: ["MaxFRP", "FireMask", "FireMask"]
+        vmin: [0]
+        vmax: [6000]
     bands:
       FireMask:
         description: Per-pixel daily fire confidence class
@@ -4068,6 +4749,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Fire Mask"
+        bands: ["FireMask"]
+        vmin: [3]
+        vmax: [8]
     bands:
       FireMask:
         description: Per-pixel 8-day fire confidence class
@@ -4086,6 +4772,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Fpar"
+        bands: ["Fpar_500m"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       Lai_500m:
         description: Leaf area index (one-sided green leaf area / unit ground area)
@@ -4115,6 +4807,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "BRDF Albedo Parameters"
+        bands: ["BRDF_Albedo_Parameters_Band1_iso", "BRDF_Albedo_Parameters_Band4_iso", "BRDF_Albedo_Parameters_Band3_iso"]
+        vmin: [0]
+        vmax: [255]
     bands:
       BRDF_Albedo_Parameters_Band1_iso:
       BRDF_Albedo_Parameters_Band1_vol:
@@ -4161,6 +4858,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "BRDF Albedo Quality"
+        bands: ["Snow_BRDF_Albedo", "Snow_BRDF_Albedo", "BRDF_Albedo_Quality"]
+        vmin: [0]
+        vmax: [1]
     bands:
       BRDF_Albedo_Quality:
       Snow_BRDF_Albedo:
@@ -4178,6 +4880,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index
@@ -4196,6 +4904,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["EVI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       EVI:
         description: Enhanced Vegetation Index
@@ -4212,6 +4926,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index
@@ -4230,6 +4950,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index
@@ -4248,6 +4974,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["EVI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       EVI:
         description: Enhanced Vegetation Index
@@ -4264,6 +4996,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index
@@ -4281,6 +5019,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        gain: [0.0001]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
       EVI:
@@ -4305,6 +5048,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        gain: [0.0001]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
       EVI:
@@ -4330,6 +5078,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index
@@ -4348,6 +5102,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["EVI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       EVI:
         description: Enhanced Vegetation Index
@@ -4364,6 +5124,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDVI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index
@@ -4381,6 +5147,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        gain: [0.0001]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
       EVI:
@@ -4405,6 +5176,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        gain: [0.0001]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       NDVI:
       EVI:
@@ -4429,6 +5205,12 @@ datasets:
       end_date: "2015-12-31"
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "NDVI"
+        bands: ["ndvi"]
+        vmin: [-1]
+        vmax: [1]
+        palette: ["000000", "f5f5f5", "119701"]
     bands:
       ndvi:
         description: Normalized Difference Vegetation Index
@@ -4450,6 +5232,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     source: republished
+    visualizations:
+      - name: "Aboveground biomass carbon"
+        bands: ["agb"]
+        vmin: [-50]
+        vmax: [80]
+        palette: ["d9f0a3", "addd8e", "78c679", "41ab5d", "238443", "005a32"]
     bands:
       agb:
         description: Above-ground living biomass carbon density (woody + herbaceous)
@@ -4475,6 +5263,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'This dataset is in the public domain and is available'
+    visualizations:
+      - name: "Forest Type"
+        bands: ["classification"]
+        vmin: [1]
+        vmax: [3]
+        palette: ["00ff00", "ff0000", "6666ff"]
     bands:
       classification:
         description: Forest Type
@@ -4491,6 +5285,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "Default visualization"
+        bands: ["EVI"]
+        vmin: [0]
+        vmax: [10000]
+        palette: ["000000", "004400", "008800", "00bb00", "00ff00"]
     bands:
       EVI:
         description: 3 band Enhanced Vegetation Index
@@ -4548,6 +5348,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "Maximum Fire Radiative Power"
+        bands: ["MaxFRP"]
+        vmin: [1]
+        vmax: [10000]
+        palette: ["000000", "004400", "008800", "00bb00", "00ff00"]
     bands:
       FireMask:
         description: Confidence of fire.
@@ -4571,6 +5377,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "Leaf Area Index (LAI)"
+        bands: ["Lai"]
+        vmin: [0]
+        vmax: [4]
+        palette: ["a50026", "d73027", "f46d43", "fdae61", "fee08b", "ffffbf", "d9ef8b", "a6d96a", "66bd63", "1a9850", "006837"]
     bands:
       Fpar:
         description: Fraction of Photosynthetically Active Radiation.
@@ -4599,6 +5411,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "BRDF/Albedo mandatory quality for band I1"
+        bands: ["BRDF_Albedo_Band_Mandatory_Quality_I1"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["000080", "0000d9", "4000ff", "8000ff", "0080ff", "00ffff", "00ff80", "80ff00", "daff00", "ffff00", "fff500", "ffda00", "ffb000", "ffa400", "ff4f00", "ff2500", "ff0a00", "ff00ff"]
     bands:
       BRDF_Albedo_Band_Mandatory_Quality_I1:
         description: BRDF/Albedo mandatory quality for band I1
@@ -4625,6 +5443,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "brdf"
+        bands: ["DNB_BRDF_Corrected_NTL"]
+        vmin: [0]
+        vmax: [100]
     bands:
       DNB_BRDF_Corrected_NTL:
         description: BRDF corrected DNB NTL
@@ -4665,6 +5488,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "Burn Date"
+        bands: ["Burn_Date"]
+        vmin: [1]
+        vmax: [366]
+        palette: ["000080", "0000d9", "4000ff", "8000ff", "0080ff", "00ffff", "00ff80", "80ff00", "daff00", "ffff00", "fff500", "ffda00", "ffb000", "ffa400", "ff4f00", "ff2500", "ff0a00", "ff00ff"]
     bands:
       Burn_Date:
         description: Ordinal day of burn (1-366) for each 500-m grid cell.
@@ -4689,6 +5518,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Leaf Area Index"
+        bands: ["LAI"]
+        vmin: [0]
+        vmax: [4000]
+        palette: ["3b0200", "977705", "ca9f06", "ffca09", "006a03", "003b02"]
     bands:
       LAI:
         description: Leaf area index
@@ -4710,6 +5545,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Leaf Area Index"
+        bands: ["LAI"]
+        vmin: [0]
+        vmax: [4000]
+        palette: ["3b0200", "977705", "ca9f06", "ffca09", "006a03", "003b02"]
     bands:
       LAI:
         description: Leaf area index
@@ -4731,6 +5572,12 @@ datasets:
       end_date: null
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [-1000]
+        vmax: [5000]
+        palette: ["ffffff", "ce7e45", "fcd163", "c6ca02", "22cc04", "99b718", "207401", "012e01"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index (legacy v4)
@@ -4753,6 +5600,12 @@ datasets:
       end_date: null
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [-1000]
+        vmax: [5000]
+        palette: ["ffffff", "ce7e45", "fcd163", "c6ca02", "22cc04", "99b718", "207401", "012e01"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index
@@ -4778,6 +5631,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'The NOAA CDR Program''s official distribution point for CDRs is NOAA''s'
+    visualizations:
+      - name: "Leaf Area Index"
+        bands: ["LAI"]
+        vmin: [0]
+        vmax: [4000]
+        palette: ["3b0200", "977705", "ca9f06", "ffca09", "006a03", "003b02"]
     bands:
       LAI:
         description: Leaf area index
@@ -4804,6 +5663,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'The NOAA CDR Program''s official distribution point for CDRs is NOAA''s'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [-1000]
+        vmax: [5000]
+        palette: ["ffffff", "ce7e45", "fcd163", "c6ca02", "22cc04", "99b718", "207401", "012e01"]
     bands:
       NDVI:
         description: Normalized difference vegetation index
@@ -4831,6 +5696,11 @@ datasets:
       bbox: [-180, -65, 180, 75]
     default_reducer: mosaic
     license: public-domain
+    visualizations:
+      - name: "Nighttime Lights"
+        bands: ["avg_vis"]
+        vmin: [3]
+        vmax: [60]
     bands:
       avg_vis:
         description: Average DNB radiance (cloud-free observations only)
@@ -4849,6 +5719,11 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Nighttime Lights"
+        bands: ["avg_vis"]
+        vmin: [3]
+        vmax: [60]
     bands:
       avg_vis:
         description: The average of the visible band digital number values with no further filtering.
@@ -4878,6 +5753,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Default visualization"
+        bands: ["EVI"]
+        vmin: [0]
+        vmax: [10000]
+        palette: ["000000", "004400", "008800", "00bb00", "00ff00"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index
@@ -4910,6 +5791,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "Maximum Fire Radiative Power"
+        bands: ["MaxFRP"]
+        vmin: [1]
+        vmax: [10000]
+        palette: ["000000", "004400", "008800", "00bb00", "00ff00"]
     bands:
       FireMask:
         description: Confidence of fire.
@@ -4933,6 +5820,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "Leaf Area Index (LAI)"
+        bands: ["Lai"]
+        vmin: [0]
+        vmax: [4]
+        palette: ["a50026", "d73027", "f46d43", "fdae61", "fee08b", "ffffbf", "d9ef8b", "a6d96a", "66bd63", "1a9850", "006837"]
     bands:
       Fpar:
         description: Fraction of Photosynthetically Active Radiation.
@@ -4961,6 +5854,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "Default visualization"
+        bands: ["EVI2_Growing_Season_Area_1"]
+        vmin: [1]
+        vmax: [10000]
+        palette: ["000000", "004400", "008800", "00bb00", "00ff00"]
     bands:
       Date_Mid_Greenup_Phase_1:
         description: Date at a mid-greenup phase
@@ -5051,6 +5950,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "Isotropic parameter for band I1"
+        bands: ["BRDF_Albedo_Parameters_fiso_I1"]
+        vmin: [0]
+        vmax: [255]
+        palette: ["000080", "0000d9", "4000ff", "8000ff", "0080ff", "00ffff", "00ff80", "80ff00", "daff00", "ffff00", "fff500", "ffda00", "ffb000", "ffa400", "ff4f00", "ff2500", "ff0a00", "ff00ff"]
     bands:
       BRDF_Albedo_Band_Mandatory_Quality_I1:
         description: BRDF/Albedo mandatory quality for band I1
@@ -5089,6 +5994,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "Days of valid observation for band I1"
+        bands: ["BRDF_Albedo_ValidObs_I1"]
+        vmin: [35550]
+        vmax: [45535]
+        palette: ["000080", "0000d9", "4000ff", "8000ff", "0080ff", "00ffff", "00ff80", "80ff00", "daff00", "ffff00", "fff500", "ffda00", "ffb000", "ffa400", "ff4f00", "ff2500", "ff0a00", "ff00ff"]
     bands:
       BRDF_Albedo_Band_Quality_I1:
         description: BRDF inversion information I1
@@ -5129,6 +6040,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "Last day"
+        bands: ["Last_Day"]
+        vmin: [250]
+        vmax: [320]
+        palette: ["000080", "0000d9", "4000ff", "8000ff", "0080ff", "00ffff", "00ff80", "80ff00", "daff00", "ffff00", "fff500", "ffda00", "ffb000", "ffa400", "ff4f00", "ff2500", "ff0a00", "ff00ff"]
     bands:
       Burn_Date:
         description: Ordinal day of burn (1-366) for each 500-m grid cell.
@@ -5153,6 +6070,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-SA-4.0
     source: republished
+    visualizations:
+      - name: "Potential distribution of biomes"
+        bands: ["biome_type"]
+        vmin: [1]
+        vmax: [32]
+        palette: ["1c5510", "659208", "ae7d20", "000065", "bbcb35", "009a18", "caffca", "55eb49", "65b2ff", "0020ca", "8ea228", "ff9adf", "baff35", "ffba9a", "ffba35", "f7ffca", "e7e718", "798649", "65ff9a", "d29e96"]
     bands:
       biome_type:
         description: Potential distribution of biomes
@@ -5168,6 +6091,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-SA-4.0
     source: republished
+    visualizations:
+      - name: "Potential FAPAR monthly"
+        bands: ["jan"]
+        vmin: [0]
+        vmax: [220]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000"]
     bands:
       jan:
         description: Jan Potential FAPAR monthly
@@ -5251,6 +6180,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: CC-BY-NC-SA-4.0
+    visualizations:
+      - name: "EVI"
+        bands: ["Mean"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "fcd163", "99b718", "66a000", "3e8601", "207401", "056201", "004c00", "011301"]
     bands:
       Mean:
         description: Monthly mean Enhanced Vegetation Index
@@ -5273,6 +6208,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: CC-BY-NC-SA-4.0
+    visualizations:
+      - name: "Landcover"
+        bands: ["Overall_Class"]
+        vmin: [1]
+        vmax: [19]
+        palette: ["032f7e", "02740b", "02740b", "8cf502", "8cf502", "a4da01", "ffbd05", "ffbd05", "7a5a02", "f0ff0f", "869b36", "6091b4", "999999", "ff4e4e", "ff4e4e", "ffffff", "feffc0", "020202", "020202"]
     bands:
       Overall_Class:
         description: Dominant IGBP land-cover class per pixel
@@ -5310,6 +6251,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: CC-BY-NC-SA-4.0
+    visualizations:
+      - name: "Daytime Land Surface Temperature"
+        bands: ["Mean"]
+        vmin: [-20]
+        vmax: [50]
+        palette: ["800080", "0000ab", "0000ff", "008000", "19ff2b", "a8f7ff", "ffff00", "d6d600", "ffa500", "ff6b01", "ff0000"]
     bands:
       Mean:
         description: Monthly mean daytime land surface temperature
@@ -5331,6 +6278,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: CC-BY-NC-SA-4.0
+    visualizations:
+      - name: "Nighttime Land Surface Temperature"
+        bands: ["Mean"]
+        vmin: [-30]
+        vmax: [30]
+        palette: ["800080", "0000ab", "0000ff", "008000", "19ff2b", "a8f7ff", "ffff00", "d6d600", "ffa500", "ff6b01", "ff0000"]
     bands:
       Mean:
         description: Monthly mean nighttime land surface temperature
@@ -5352,6 +6305,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: CC-BY-NC-SA-4.0
+    visualizations:
+      - name: "TCB"
+        bands: ["Mean"]
+        vmin: [0]
+        vmax: [1.3]
+        palette: ["011301", "004c00", "056201", "207401", "3e8601", "66a000", "99b718", "fcd163", "ffffff"]
     bands:
       Mean:
         description: Monthly mean Tasselled Cap Brightness
@@ -5372,6 +6331,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: CC-BY-NC-SA-4.0
+    visualizations:
+      - name: "TCW"
+        bands: ["Mean"]
+        vmin: [-0.6]
+        vmax: [0.5]
+        palette: ["ffffff", "fcd163", "99b718", "66a000", "3e8601", "207401", "056201", "004c00", "011301"]
     bands:
       Mean:
         description: Monthly mean Tasselled Cap Wetness
@@ -5393,6 +6358,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Accessibility"
+        bands: ["accessibility"]
+        vmin: [0]
+        vmax: [41556]
+        gamma: [4]
     bands:
       accessibility:
         description: Travel time to the nearest densely-populated area
@@ -5411,6 +6382,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Accessibility"
+        bands: ["accessibility"]
+        vmin: [0]
+        vmax: [41556]
+        gamma: [4]
     bands:
       accessibility:
         description: Travel time to the nearest hospital or clinic (motorised)
@@ -5431,6 +6408,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Land-based travel speed"
+        bands: ["friction"]
+        vmin: [0]
+        vmax: [0.2]
+        gamma: [1.6]
     bands:
       friction:
         description: Land-based travel speed
@@ -5448,6 +6431,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Land-based travel speed"
+        bands: ["friction"]
+        vmin: [0]
+        vmax: [0.2]
+        gamma: [1.6]
     bands:
       friction:
         description: Land-based travel speed (motorised)
@@ -5478,6 +6467,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "LCZ"
+        bands: ["LCZ_Filter"]
+        vmin: [1]
+        vmax: [17]
+        palette: ["8c0000", "d10000", "ff0000", "bf4d00", "ff6600", "ff9955", "faee05", "bcbcbc", "ffccaa", "555555", "006a00", "00aa00", "648525", "b9db79", "000000", "fbf7ae", "6a6aff"]
     bands:
       LCZ:
         description: The raw, pixel-based global LCZ map with LCZ classes
@@ -5498,6 +6493,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "LCZ"
+        bands: ["LCZ_Filter"]
+        vmin: [1]
+        vmax: [17]
+        palette: ["8c0000", "d10000", "ff0000", "bf4d00", "ff6600", "ff9955", "faee05", "bcbcbc", "ffccaa", "555555", "006a00", "00aa00", "648525", "b9db79", "000000", "fbf7ae", "6a6aff"]
     bands:
       LCZ:
         description: The raw, pixel-based global LCZ map with LCZ classes
@@ -5519,6 +6520,12 @@ datasets:
     default_reducer: median
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Terraces"
+        bands: ["terrace"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "a3ff74"]
     bands:
       terrace:
         description: 1 when a terrace is present, 0 when it is not.
@@ -5533,6 +6540,12 @@ datasets:
       end_date: "2018-12-31"
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Change year index"
+        bands: ["change_year_index"]
+        vmin: [0]
+        vmax: [34]
+        palette: ["014352", "1a492c", "071ec4", "b5ca36", "729eac", "8ea5de", "818991", "62a3c3", "ccf4fe", "74f0b9", "32bc55", "c72144", "56613b", "c14683", "c31c25", "5f6253", "11bf85", "a61b26", "99fbc5", "188aaa", "c2d7f1", "b7d9d8", "856f96", "109c6b", "2de3f4", "9a777d", "151796", "c033d8", "510037", "640c21", "31a191", "223ab0", "b692ac", "2de3f4"]
     bands:
       change_year_index:
         description: Year of transition from pervious to impervious (1=1985 ... 34=2018)
@@ -5552,6 +6565,12 @@ datasets:
     license: proprietary
     terms_note: 'Free for any use (UMD/GLAD).'
     source: republished
+    visualizations:
+      - name: "Primary HT forests"
+        bands: ["Primary_HT_forests"]
+        vmin: [1]
+        vmax: [1]
+        palette: ["008000"]
     bands:
       Primary_HT_forests:
         description: Binary mask of primary humid tropical forest extent
@@ -5566,6 +6585,12 @@ datasets:
       end_date: null
     default_reducer: median
     license: CC-BY-4.0
+    visualizations:
+      - name: "Tree Canopy Cover"
+        bands: ["treecover2000"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["3d3d3d", "080a02", "080a02", "080a02", "106e12", "37a930", "03ff17"]
     bands:
       treecover2000:
         description: Tree canopy cover for year 2000, defined as canopy closure for all
@@ -5617,6 +6642,12 @@ datasets:
       end_date: null
     default_reducer: median
     license: CC-BY-4.0
+    visualizations:
+      - name: "Tree Canopy Cover"
+        bands: ["treecover2000"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["3d3d3d", "080a02", "080a02", "080a02", "106e12", "37a930", "03ff17"]
     bands:
       treecover2000:
         description: Tree canopy cover for year 2000, defined as canopy closure for all
@@ -5668,6 +6699,12 @@ datasets:
       end_date: "2014-12-31"
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Tree Canopy Cover"
+        bands: ["treecover2000"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["3d3d3d", "080a02", "080a02", "080a02", "106e12", "37a930", "03ff17"]
     bands:
       treecover2000:
         description: Year-2000 tree canopy cover (canopy closure for vegetation >5m)
@@ -5695,6 +6732,12 @@ datasets:
       end_date: null
     default_reducer: median
     license: CC-BY-4.0
+    visualizations:
+      - name: "Tree Canopy Cover"
+        bands: ["treecover2000"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["3d3d3d", "080a02", "080a02", "080a02", "106e12", "37a930", "03ff17"]
     bands:
       treecover2000:
         description: Tree canopy cover for year 2000, defined as canopy closure for all
@@ -5747,6 +6790,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Tree Canopy Cover"
+        bands: ["treecover2000"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["3d3d3d", "080a02", "080a02", "080a02", "106e12", "37a930", "03ff17"]
     bands:
       treecover2000:
         description: Year-2000 tree canopy cover (canopy closure for vegetation >5m)
@@ -5775,6 +6824,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Tree Canopy Cover"
+        bands: ["treecover2000"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["3d3d3d", "080a02", "080a02", "080a02", "106e12", "37a930", "03ff17"]
     bands:
       treecover2000:
         description: Year-2000 tree canopy cover (canopy closure for vegetation >5m)
@@ -5803,6 +6858,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Tree Canopy Cover"
+        bands: ["treecover2000"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["3d3d3d", "080a02", "080a02", "080a02", "106e12", "37a930", "03ff17"]
     bands:
       treecover2000:
         description: Year-2000 tree canopy cover (canopy closure for vegetation >5m)
@@ -5831,6 +6892,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Tree Canopy Cover"
+        bands: ["treecover2000"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["3d3d3d", "080a02", "080a02", "080a02", "106e12", "37a930", "03ff17"]
     bands:
       treecover2000:
         description: Year-2000 tree canopy cover (canopy closure for vegetation >5m)
@@ -5859,6 +6926,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Tree Canopy Cover"
+        bands: ["treecover2000"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["3d3d3d", "080a02", "080a02", "080a02", "106e12", "37a930", "03ff17"]
     bands:
       treecover2000:
         description: Year-2000 tree canopy cover (canopy closure for vegetation >5m)
@@ -5887,6 +6960,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Tree Canopy Cover"
+        bands: ["treecover2000"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["3d3d3d", "080a02", "080a02", "080a02", "106e12", "37a930", "03ff17"]
     bands:
       treecover2000:
         description: Year-2000 tree canopy cover (canopy closure for vegetation >5m)
@@ -5915,6 +6994,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Tree Canopy Cover"
+        bands: ["treecover2000"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["3d3d3d", "080a02", "080a02", "080a02", "106e12", "37a930", "03ff17"]
     bands:
       treecover2000:
         description: Year-2000 tree canopy cover (canopy closure for vegetation >5m)
@@ -5943,6 +7028,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Tree Canopy Cover"
+        bands: ["treecover2000"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["3d3d3d", "080a02", "080a02", "080a02", "106e12", "37a930", "03ff17"]
     bands:
       treecover2000:
         description: Year-2000 tree canopy cover (canopy closure for vegetation >5m)
@@ -5971,6 +7062,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Tree Canopy Cover"
+        bands: ["treecover2000"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["3d3d3d", "080a02", "080a02", "080a02", "106e12", "37a930", "03ff17"]
     bands:
       treecover2000:
         description: Year-2000 tree canopy cover (canopy closure for vegetation >5m)
@@ -5999,6 +7096,12 @@ datasets:
     default_reducer: median
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Tree Canopy Cover"
+        bands: ["treecover2000"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["3d3d3d", "080a02", "080a02", "080a02", "106e12", "37a930", "03ff17"]
     bands:
       treecover2000:
         description: Tree canopy cover for year 2000, defined as canopy closure for all
@@ -6052,6 +7155,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "IrrMapper Irrigated Lands (1986 - 2018)"
+        bands: ["classification"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["blue"]
     bands:
       classification:
         description: Irrigated pixels have the value of 1, the other pixels are masked out.
@@ -6068,6 +7177,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "IrrMapper Irrigated Lands (1986 - present)"
+        bands: ["classification"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["blue"]
     bands:
       classification:
         description: Irrigated pixels have the value of 1, the other pixels are masked out.
@@ -6086,6 +7201,12 @@ datasets:
     license: public-domain
     terms_note: 'This work is in the public domain and is free of known copyright'
     source: republished
+    visualizations:
+      - name: "GPP"
+        bands: ["GPP"]
+        vmin: [0]
+        vmax: [1000]
+        palette: ["bbe029", "0a9501", "074b03"]
     bands:
       GPP:
         description: 16-day gross primary production
@@ -6110,6 +7231,12 @@ datasets:
     license: public-domain
     terms_note: 'This work is in the public domain and is free of known copyright'
     source: republished
+    visualizations:
+      - name: "NPP"
+        bands: ["annualNPP"]
+        vmin: [0]
+        vmax: [20000]
+        palette: ["bbe029", "0a9501", "074b03"]
     bands:
       annualNPP:
         description: Annual net primary production
@@ -6137,6 +7264,12 @@ datasets:
     license: public-domain
     terms_note: 'This work is in the public domain and is free of known copyright'
     source: republished
+    visualizations:
+      - name: "GPP"
+        bands: ["GPP"]
+        vmin: [0]
+        vmax: [1000]
+        palette: ["bbe029", "0a9501", "074b03"]
     bands:
       GPP:
         description: 8-day gross primary production
@@ -6163,6 +7296,12 @@ datasets:
     license: public-domain
     terms_note: 'This work is in the public domain and is free of known copyright'
     source: republished
+    visualizations:
+      - name: "NPP"
+        bands: ["annualNPP"]
+        vmin: [0]
+        vmax: [20000]
+        palette: ["bbe029", "0a9501", "074b03"]
     bands:
       annualNPP:
         description: Annual net primary productivity
@@ -6188,6 +7327,12 @@ datasets:
       bbox: [-127, 24, -65, 51]
     default_reducer: mosaic
     license: public-domain
+    visualizations:
+      - name: "Crop Landcover"
+        bands: ["cropland"]
+        vmin: [11]
+        vmax: [95]
+        palette: ["ffd400", "ff2626", "00a9e6", "ff9e0f", "267300", "ffff00", "70a800", "00af4d", "e0a60f", "e0a60f", "80d4ff", "e2007f", "8a6453", "d9b56c", "a87000", "d69dbc", "737300", "ae017e", "a15889", "73004c", "d69dbc", "d1ff00", "8099ff", "d6d600", "d1ff00", "00af4d", "ffa8e3", "a5f58d", "00af4d", "d69dbc", "a900e6", "a80000", "732600", "00af4d", "b380ff", "732600", "ff6666", "ff6666", "ffcc66", "ff6666", "00af4d", "00deb0", "55ff00", "f5a27a", "ff6666", "00af4d", "80d4ff", "e8beff", "b2ffde", "00af4d", "bfbf7a", "95ce93", "c7d79e", "ccbfa3", "ff00ff", "ff91ab", "b90050", "704489", "007878", "b39c70", "ffff80", "b6705c", "00a884", "ebd6b0", "b39c70", "f7f7f7", "9c9c9c", "4d70a3", "80b3b3", "e9ffbe", "00ffff", "4d70a3", "d4e3fc", "9c9c9c", "9c9c9c", "9c9c9c", "9c9c9c", "ccbfa3", "95ce93", "95ce93", "95ce93", "c7d79e", "e9ffbe", "80b3b3", "80b3b3", "00ff8c", "d69dbc", "ff6666", "ff6666", "ff6666", "ff6666", "ff91ab", "344a34", "e67525", "ff6666", "ff6666", "66994d", "ff6666", "b39c70", "ff91ab", "ff6666", "ff91ab", "ff6666", "ff6666", "ff91ab", "00af4d", "ffd400", "ffd400", "ff6666", "ffd400", "ff6666", "8a6453", "ff6666", "ff2626", "e2007f", "ff9e0f", "ff9e0f", "a87000", "ffd400", "a87000", "267300", "267300", "ffd400", "000099", "ff6666", "ff6666", "ff6666", "ff6666", "ff6666", "ff6666", "ff6666", "ff6666", "267300"]
     bands:
       cropland:
         description: Crop-specific land-cover classification
@@ -6214,6 +7359,11 @@ datasets:
       bbox: [-180, -67.933, 18.854, 63.904]
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Annual burn probability"
+        bands: ["BP"]
+        vmin: [0]
+        vmax: [0.14]
     bands:
       BP:
         description: Annual Burn Probability.
@@ -6262,6 +7412,22 @@ datasets:
     license: public-domain
     terms_note: 'The USDA Forest Service makes no warranty, expressed or implied, including the warranties'
     source: republished
+    visualizations:
+      - name: "ChangeViz"
+        bands: ["Change"]
+        vmin: [1]
+        vmax: [5]
+        palette: ["3d4551", "f39268", "d54309", "00a398", "1b1716", "b30088"]
+      - name: "lcViz"
+        bands: ["Land_Cover"]
+        vmin: [1]
+        vmax: [15]
+        palette: ["005e00", "008000", "00cc00", "b3ff1a", "99ff99", "b30088", "e68a00", "ffad33", "ffe0b3", "ffff00", "aa7700", "d3bf9b", "ffffff", "4780f3", "1b1716"]
+      - name: "luViz"
+        bands: ["Land_Use"]
+        vmin: [1]
+        vmax: [7]
+        palette: ["3d4551", "f39268", "d54309", "00a398", "1b1716"]
     bands:
       Change:
         description: Final thematic LCMS change product. A total of three change classes (slow loss, fast
@@ -6329,6 +7495,22 @@ datasets:
     license: public-domain
     terms_note: 'The USDA Forest Service makes no warranty, expressed or implied, including'
     source: republished
+    visualizations:
+      - name: "ChangeViz"
+        bands: ["Change"]
+        vmin: [1]
+        vmax: [5]
+        palette: ["3d4551", "f39268", "d54309", "00a398", "1b1716", "b30088"]
+      - name: "lcViz"
+        bands: ["Land_Cover"]
+        vmin: [1]
+        vmax: [15]
+        palette: ["005e00", "008000", "00cc00", "b3ff1a", "99ff99", "b30088", "e68a00", "ffad33", "ffe0b3", "ffff00", "aa7700", "d3bf9b", "ffffff", "4780f3", "1b1716"]
+      - name: "luViz"
+        bands: ["Land_Use"]
+        vmin: [1]
+        vmax: [7]
+        palette: ["3d4551", "f39268", "d54309", "00a398", "1b1716"]
     bands:
       Change:
         description: Final thematic LCMS change product. A total of three change classes (slow loss, fast
@@ -6398,6 +7580,22 @@ datasets:
     license: public-domain
     terms_note: 'The USDA Forest Service makes no warranty, expressed or implied, including'
     source: republished
+    visualizations:
+      - name: "Thematic Change"
+        bands: ["Change"]
+        vmin: [1]
+        vmax: [5]
+        palette: ["3d4551", "f39268", "d54309", "00a398", "1b1716", "b30088"]
+      - name: "Land Cover"
+        bands: ["Land_Cover"]
+        vmin: [1]
+        vmax: [15]
+        palette: ["005e00", "008000", "00cc00", "b3ff1a", "99ff99", "b30088", "e68a00", "ffad33", "ffe0b3", "ffff00", "aa7700", "d3bf9b", "ffffff", "4780f3", "1b1716"]
+      - name: "Land Use"
+        bands: ["Land_Use"]
+        vmin: [1]
+        vmax: [7]
+        palette: ["3d4551", "f39268", "d54309", "00a398", "1b1716"]
     bands:
       Change:
         description: Final thematic LCMS change product. A total of three change classes
@@ -6467,6 +7665,22 @@ datasets:
     license: public-domain
     terms_note: 'The USDA Forest Service makes no warranty, expressed or implied, including the warranties'
     source: republished
+    visualizations:
+      - name: "ChangeViz"
+        bands: ["Change"]
+        vmin: [1]
+        vmax: [5]
+        palette: ["3d4551", "f39268", "d54309", "00a398", "1b1716", "b30088"]
+      - name: "lcViz"
+        bands: ["Land_Cover"]
+        vmin: [1]
+        vmax: [15]
+        palette: ["005e00", "008000", "00cc00", "b3ff1a", "99ff99", "b30088", "e68a00", "ffad33", "ffe0b3", "ffff00", "aa7700", "d3bf9b", "ffffff", "4780f3", "1b1716"]
+      - name: "luViz"
+        bands: ["Land_Use"]
+        vmin: [1]
+        vmax: [7]
+        palette: ["3d4551", "f39268", "d54309", "00a398", "1b1716"]
     bands:
       Change:
         description: Final thematic LCMS change product. A total of three change classes (slow loss, fast
@@ -6536,6 +7750,22 @@ datasets:
     license: public-domain
     terms_note: 'The USDA Forest Service makes no warranty, expressed or implied, including the warranties'
     source: republished
+    visualizations:
+      - name: "ChangeViz"
+        bands: ["Change"]
+        vmin: [1]
+        vmax: [5]
+        palette: ["3d4551", "f39268", "d54309", "00a398", "1b1716", "b30088"]
+      - name: "lcViz"
+        bands: ["Land_Cover"]
+        vmin: [1]
+        vmax: [15]
+        palette: ["005e00", "008000", "00cc00", "b3ff1a", "99ff99", "b30088", "e68a00", "ffad33", "ffe0b3", "ffff00", "aa7700", "d3bf9b", "ffffff", "4780f3", "1b1716"]
+      - name: "luViz"
+        bands: ["Land_Use"]
+        vmin: [1]
+        vmax: [7]
+        palette: ["3d4551", "f39268", "d54309", "00a398", "1b1716"]
     bands:
       Change:
         description: Final thematic LCMS change product. A total of three change classes (slow loss, fast
@@ -6605,6 +7835,22 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     source: republished
+    visualizations:
+      - name: "ChangeViz"
+        bands: ["Change"]
+        vmin: [1]
+        vmax: [5]
+        palette: ["3d4551", "f39268", "d54309", "00a398", "1b1716", "b30088"]
+      - name: "lcViz"
+        bands: ["Land_Cover"]
+        vmin: [1]
+        vmax: [15]
+        palette: ["005e00", "008000", "00cc00", "b3ff1a", "99ff99", "b30088", "e68a00", "ffad33", "ffe0b3", "ffff00", "aa7700", "d3bf9b", "ffffff", "4780f3", "1b1716"]
+      - name: "luViz"
+        bands: ["Land_Use"]
+        vmin: [1]
+        vmax: [7]
+        palette: ["3d4551", "f39268", "d54309", "00a398", "1b1716"]
     bands:
       Change:
         description: Final thematic LCMS change class (15-class)
@@ -6626,6 +7872,12 @@ datasets:
     license: public-domain
     terms_note: 'The USDA Forest Service makes no warranty, expressed or implied, including'
     source: republished
+    visualizations:
+      - name: "Severity"
+        bands: ["Severity"]
+        vmin: [0]
+        vmax: [6]
+        palette: ["000000", "006400", "7fffd4", "ffff00", "ff0000", "7fff00", "ffffff"]
     bands:
       Severity:
         description: Burn severity layers are thematic images depicting severity as
@@ -6657,6 +7909,92 @@ datasets:
     license: public-domain
     terms_note: 'The USDA Forest Service makes no warranty, expressed or implied, including the warranties'
     source: republished
+    visualizations:
+      - name: "ALSTK_Viz"
+        bands: ["ALSTK"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "BALIVE_Viz"
+        bands: ["BALIVE"]
+        vmin: [24]
+        vmax: [217]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "CANOPYPCT_Viz"
+        bands: ["CANOPYPCT"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "CARBON_D_Viz"
+        bands: ["CARBON_D"]
+        vmin: [0]
+        vmax: [9]
+        palette: ["ffffcc", "fbec9a", "f4cc68", "eca855", "e48751", "d2624d", "a54742", "73382f", "422818", "1a1a01"]
+      - name: "CARBON_DWN_Viz"
+        bands: ["CARBON_DWN"]
+        vmin: [0]
+        vmax: [7]
+        palette: ["ffffcc", "fbec9a", "f4cc68", "eca855", "e48751", "d2624d", "a54742", "73382f", "422818", "1a1a01"]
+      - name: "CARBON_L_Viz"
+        bands: ["CARBON_L"]
+        vmin: [2]
+        vmax: [59]
+        palette: ["1a1a01", "422818", "73382f", "a54742", "d2624d", "e48751", "eca855", "f4cc68", "fbec9a", "ffffcc"]
+      - name: "DRYBIO_D_Viz"
+        bands: ["DRYBIO_D"]
+        vmin: [0]
+        vmax: [10]
+        palette: ["ffffcc", "fbec9a", "f4cc68", "eca855", "e48751", "d2624d", "a54742", "73382f", "422818", "1a1a01"]
+      - name: "DRYBIO_L_Viz"
+        bands: ["DRYBIO_L"]
+        vmin: [4]
+        vmax: [118]
+        palette: ["1a1a01", "422818", "73382f", "a54742", "d2624d", "e48751", "eca855", "f4cc68", "fbec9a", "ffffcc"]
+      - name: "GSSTK_Viz"
+        bands: ["GSSTK"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "QMD_RMRS_Viz"
+        bands: ["QMD_RMRS"]
+        vmin: [2]
+        vmax: [25]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "SDIPCT_Viz"
+        bands: ["SDIPCT_RMRS"]
+        vmin: [6]
+        vmax: [99]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "STANDHT_Viz"
+        bands: ["STANDHT"]
+        vmin: [23]
+        vmax: [194]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "TPA_DEAD_Viz"
+        bands: ["TPA_DEAD"]
+        vmin: [38]
+        vmax: [126]
+        palette: ["00404d", "134b42", "265737", "3a652a", "52741c", "71870b", "969206", "c5ae32", "e7cd68", "ffe599"]
+      - name: "TPA_LIVE_Viz"
+        bands: ["TPA_LIVE"]
+        vmin: [252]
+        vmax: [1666]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "VOLBFNET_L_Viz"
+        bands: ["VOLBFNET_L"]
+        vmin: [441]
+        vmax: [36522]
+        palette: ["ffff66", "c4ea67", "98cb6d", "7bae74", "60927b", "497b85", "396b94", "2e599f", "2446a9", "1a33b3"]
+      - name: "VOLCFNET_D_Viz"
+        bands: ["VOLCFNET_D"]
+        vmin: [5]
+        vmax: [1326]
+        palette: ["ffff66", "c4ea67", "98cb6d", "7bae74", "60927b", "497b85", "396b94", "2e599f", "2446a9", "1a33b3"]
+      - name: "VOLCFNET_L_Viz"
+        bands: ["VOLCFNET_L"]
+        vmin: [137]
+        vmax: [5790]
+        palette: ["ffff66", "c4ea67", "98cb6d", "7bae74", "60927b", "497b85", "396b94", "2e599f", "2446a9", "1a33b3"]
     bands:
       ALSTK:
         description: All-Live-Tree Stocking. The sum of stocking percent values of all live trees on the
@@ -6733,6 +8071,92 @@ datasets:
     license: public-domain
     terms_note: 'The USDA Forest Service makes no warranty, expressed or implied, including the'
     source: republished
+    visualizations:
+      - name: "ALSTK_Viz"
+        bands: ["ALSTK"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "BALIVE_Viz"
+        bands: ["BALIVE"]
+        vmin: [24]
+        vmax: [217]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "CANOPYPCT_Viz"
+        bands: ["CANOPYPCT"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "CARBON_D_Viz"
+        bands: ["CARBON_D"]
+        vmin: [0]
+        vmax: [9]
+        palette: ["ffffcc", "fbec9a", "f4cc68", "eca855", "e48751", "d2624d", "a54742", "73382f", "422818", "1a1a01"]
+      - name: "CARBON_DWN_Viz"
+        bands: ["CARBON_DWN"]
+        vmin: [0]
+        vmax: [7]
+        palette: ["ffffcc", "fbec9a", "f4cc68", "eca855", "e48751", "d2624d", "a54742", "73382f", "422818", "1a1a01"]
+      - name: "CARBON_L_Viz"
+        bands: ["CARBON_L"]
+        vmin: [2]
+        vmax: [59]
+        palette: ["1a1a01", "422818", "73382f", "a54742", "d2624d", "e48751", "eca855", "f4cc68", "fbec9a", "ffffcc"]
+      - name: "DRYBIO_D_Viz"
+        bands: ["DRYBIO_D"]
+        vmin: [0]
+        vmax: [10]
+        palette: ["ffffcc", "fbec9a", "f4cc68", "eca855", "e48751", "d2624d", "a54742", "73382f", "422818", "1a1a01"]
+      - name: "DRYBIO_L_Viz"
+        bands: ["DRYBIO_L"]
+        vmin: [4]
+        vmax: [118]
+        palette: ["1a1a01", "422818", "73382f", "a54742", "d2624d", "e48751", "eca855", "f4cc68", "fbec9a", "ffffcc"]
+      - name: "GSSTK_Viz"
+        bands: ["GSSTK"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "QMD_Viz"
+        bands: ["QMD"]
+        vmin: [2]
+        vmax: [25]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "SDIsum_Viz"
+        bands: ["SDIsum"]
+        vmin: [30]
+        vmax: [460]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "STANDHT_Viz"
+        bands: ["STANDHT"]
+        vmin: [23]
+        vmax: [194]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "TPA_DEAD_Viz"
+        bands: ["TPA_DEAD"]
+        vmin: [38]
+        vmax: [126]
+        palette: ["00404d", "134b42", "265737", "3a652a", "52741c", "71870b", "969206", "c5ae32", "e7cd68", "ffe599"]
+      - name: "TPA_LIVE_Viz"
+        bands: ["TPA_LIVE"]
+        vmin: [252]
+        vmax: [1666]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "VOLBFNET_L_Viz"
+        bands: ["VOLBFNET_L"]
+        vmin: [441]
+        vmax: [36522]
+        palette: ["ffff66", "c4ea67", "98cb6d", "7bae74", "60927b", "497b85", "396b94", "2e599f", "2446a9", "1a33b3"]
+      - name: "VOLCFNET_D_Viz"
+        bands: ["VOLCFNET_D"]
+        vmin: [5]
+        vmax: [1326]
+        palette: ["ffff66", "c4ea67", "98cb6d", "7bae74", "60927b", "497b85", "396b94", "2e599f", "2446a9", "1a33b3"]
+      - name: "VOLCFNET_L_Viz"
+        bands: ["VOLCFNET_L"]
+        vmin: [137]
+        vmax: [5790]
+        palette: ["ffff66", "c4ea67", "98cb6d", "7bae74", "60927b", "497b85", "396b94", "2e599f", "2446a9", "1a33b3"]
     bands:
       ALSTK:
         description: All-Live-Tree Stocking. The sum of stocking percent values of all live trees on
@@ -6810,6 +8234,92 @@ datasets:
     license: public-domain
     terms_note: 'The USDA Forest Service makes no warranty, expressed or implied, including the'
     source: republished
+    visualizations:
+      - name: "ALSTK_Viz"
+        bands: ["ALSTK"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "BALIVE_Viz"
+        bands: ["BALIVE"]
+        vmin: [24]
+        vmax: [217]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "CANOPYPCT_Viz"
+        bands: ["CANOPYPCT"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "CARBON_D_Viz"
+        bands: ["CARBON_D"]
+        vmin: [0]
+        vmax: [9]
+        palette: ["ffffcc", "fbec9a", "f4cc68", "eca855", "e48751", "d2624d", "a54742", "73382f", "422818", "1a1a01"]
+      - name: "CARBON_DWN_Viz"
+        bands: ["CARBON_DWN"]
+        vmin: [0]
+        vmax: [7]
+        palette: ["ffffcc", "fbec9a", "f4cc68", "eca855", "e48751", "d2624d", "a54742", "73382f", "422818", "1a1a01"]
+      - name: "CARBON_L_Viz"
+        bands: ["CARBON_L"]
+        vmin: [2]
+        vmax: [59]
+        palette: ["1a1a01", "422818", "73382f", "a54742", "d2624d", "e48751", "eca855", "f4cc68", "fbec9a", "ffffcc"]
+      - name: "DRYBIO_D_Viz"
+        bands: ["DRYBIO_D"]
+        vmin: [0]
+        vmax: [10]
+        palette: ["ffffcc", "fbec9a", "f4cc68", "eca855", "e48751", "d2624d", "a54742", "73382f", "422818", "1a1a01"]
+      - name: "DRYBIO_L_Viz"
+        bands: ["DRYBIO_L"]
+        vmin: [4]
+        vmax: [118]
+        palette: ["1a1a01", "422818", "73382f", "a54742", "d2624d", "e48751", "eca855", "f4cc68", "fbec9a", "ffffcc"]
+      - name: "GSSTK_Viz"
+        bands: ["GSSTK"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "QMD_Viz"
+        bands: ["QMD"]
+        vmin: [2]
+        vmax: [25]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "SDIsum_Viz"
+        bands: ["SDIsum"]
+        vmin: [30]
+        vmax: [460]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "STANDHT_Viz"
+        bands: ["STANDHT"]
+        vmin: [23]
+        vmax: [194]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "TPA_DEAD_Viz"
+        bands: ["TPA_DEAD"]
+        vmin: [38]
+        vmax: [126]
+        palette: ["00404d", "134b42", "265737", "3a652a", "52741c", "71870b", "969206", "c5ae32", "e7cd68", "ffe599"]
+      - name: "TPA_LIVE_Viz"
+        bands: ["TPA_LIVE"]
+        vmin: [252]
+        vmax: [1666]
+        palette: ["ffe599", "e7cd68", "c5ae32", "969206", "71870b", "52741c", "3a652a", "265737", "134b42", "00404d"]
+      - name: "VOLBFNET_L_Viz"
+        bands: ["VOLBFNET_L"]
+        vmin: [441]
+        vmax: [36522]
+        palette: ["ffff66", "c4ea67", "98cb6d", "7bae74", "60927b", "497b85", "396b94", "2e599f", "2446a9", "1a33b3"]
+      - name: "VOLCFNET_D_Viz"
+        bands: ["VOLCFNET_D"]
+        vmin: [5]
+        vmax: [1326]
+        palette: ["ffff66", "c4ea67", "98cb6d", "7bae74", "60927b", "497b85", "396b94", "2e599f", "2446a9", "1a33b3"]
+      - name: "VOLCFNET_L_Viz"
+        bands: ["VOLCFNET_L"]
+        vmin: [137]
+        vmax: [5790]
+        palette: ["ffff66", "c4ea67", "98cb6d", "7bae74", "60927b", "497b85", "396b94", "2e599f", "2446a9", "1a33b3"]
     bands:
       ALSTK:
         description: All-Live-Tree Stocking. The sum of stocking percent values of all live trees on
@@ -6886,6 +8396,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'Most U.S. Geological Survey (USGS) information resides'
+    visualizations:
+      - name: "GAP Alaska"
+        bands: ["landcover"]
+        vmin: [1]
+        vmax: [143]
     bands:
       landcover:
         description: Landcover class descriptions
@@ -6904,6 +8419,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'Most U.S. Geological Survey (USGS) information resides'
+    visualizations:
+      - name: "GAP CONUS"
+        bands: ["landcover"]
+        vmin: [1]
+        vmax: [584]
     bands:
       landcover:
         description: Landcover class descriptions
@@ -6922,6 +8442,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'Most U.S. Geological Survey (USGS) information resides'
+    visualizations:
+      - name: "GAP Hawaii"
+        bands: ["landcover"]
+        vmin: [1]
+        vmax: [37]
     bands:
       landcover:
         description: Landcover class descriptions
@@ -6992,6 +8517,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'Most U.S. Geological Survey (USGS) information resides'
+    visualizations:
+      - name: "GAP Purto Rico"
+        bands: ["landcover"]
+        vmin: [1]
+        vmax: [70]
     bands:
       landcover:
         description: Landcover class descriptions
@@ -7009,6 +8539,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'Most U.S. Geological Survey (USGS) information resides'
+    visualizations:
+      - name: "Crop Dominance"
+        bands: ["landcover"]
+        vmin: [0]
+        vmax: [9]
+        palette: ["black", "white", "green", "yellow", "brown", "orange", "forestgreen", "darkgreen", "darkseagreen", "purple"]
     bands:
       landcover:
         description: Crop dominance class descriptions
@@ -7025,6 +8561,12 @@ datasets:
       end_date: "2010-12-31"
     default_reducer: mosaic
     license: public-domain
+    visualizations:
+      - name: "Crop Mask"
+        bands: ["landcover"]
+        vmin: [0]
+        vmax: [5]
+        palette: ["black", "orange", "brown", "darkseagreen", "green", "yellow"]
     bands:
       landcover:
         description: Cropland-extent class (0=non-cropland ... 9=other crop)
@@ -7043,6 +8585,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'Most U.S. Geological Survey (USGS) information resides'
+    visualizations:
+      - name: "Landcover"
+        bands: ["landcover"]
+        vmin: [0]
+        vmax: [95]
+        palette: ["466b9f", "d1def8", "dec5c5", "d99282", "eb0000", "ab0000", "b3ac9f", "68ab5f", "1c5f2c", "b5c58f", "af963c", "ccb879", "dfdfc2", "d1d182", "a3cc51", "82ba9e", "dcd939", "ab6c28", "b8d9eb", "6c9fb8"]
     bands:
       landcover:
         description: All images except NCLD2011_HI and NLCD2011_PR include the
@@ -7123,6 +8671,12 @@ datasets:
       bbox: [-130.24, 21.75, -63.66, 57.68]
     default_reducer: mosaic
     license: public-domain
+    visualizations:
+      - name: "Landcover"
+        bands: ["landcover"]
+        vmin: [0]
+        vmax: [95]
+        palette: ["466b9f", "d1def8", "dec5c5", "d99282", "eb0000", "ab0000", "b3ac9f", "68ab5f", "1c5f2c", "b5c58f", "af963c", "ccb879", "dfdfc2", "d1d182", "a3cc51", "82ba9e", "dcd939", "ab6c28", "b8d9eb", "6c9fb8"]
     bands:
       landcover:
         description: NLCD land-cover class (Anderson Level II)
@@ -7154,6 +8708,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     source: republished
+    visualizations:
+      - name: "Landcover"
+        bands: ["landcover"]
+        vmin: [0]
+        vmax: [95]
+        palette: ["466b9f", "d1def8", "dec5c5", "d99282", "eb0000", "ab0000", "b3ac9f", "68ab5f", "1c5f2c", "b5c58f", "af963c", "ccb879", "dfdfc2", "d1d182", "a3cc51", "82ba9e", "dcd939", "ab6c28", "b8d9eb", "6c9fb8"]
     bands:
       landcover:
         description: NLCD land-cover class (Anderson Level II)
@@ -7179,6 +8739,12 @@ datasets:
     default_reducer: mosaic
     license: CC0-1.0
     source: republished
+    visualizations:
+      - name: "NALCMS Land Cover"
+        bands: ["landcover"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["000000", "f9e8b7", "f7e3ac", "f0dfa3", "eedf9c", "eada91", "e8d687", "e0d281", "ddd077", "d6cc6d", "d3c667", "d0c55e", "cfc555", "c6bd4f", "c4ba46", "bdb83a", "bbb534", "b7b02c", "b0ad1f", "adac17", "aaaa0a", "a3a700", "9fa700", "9aa700", "92a700", "8fa700", "87a700", "85a700", "82aa00", "7aaa00", "77aa00", "70aa00", "6caa00", "67aa00", "5fa700", "57a700", "52a700", "4fa700", "4aa700", "42a700", "3ca700", "37a700", "37a300", "36a000", "369f00", "349d00", "339900", "339900", "2f9200", "2d9100", "2d8f00", "2c8a00", "2c8800", "2c8500", "2c8400", "2b8200", "297d00", "297a00", "297900", "277700", "247400", "247000", "29700f", "2c6d1c", "2d6d24", "336d2d", "366c39", "376c44", "396a4a", "396a55", "3a6a5f", "3a696a", "396774", "3a6782", "39668a", "376292", "34629f", "2f62ac", "2c5fb7", "245ec4", "1e5ed0", "115cdd", "005ae0", "0057dd", "0152d6", "0151d0", "014fcc", "014ac4", "0147bd", "0144b8", "0142b0", "0141ac", "013da7", "013aa0", "01399d", "013693", "013491", "012f8a", "012d85", "012c82", "01297a"]
     bands:
       landcover:
         description: Land-cover classification (CEC 19-class scheme)
@@ -7197,6 +8763,12 @@ datasets:
       bbox: [-130.24, 21.75, -63.66, 50]
     default_reducer: mosaic
     license: public-domain
+    visualizations:
+      - name: "landcover"
+        bands: ["landcover"]
+        vmin: [0]
+        vmax: [95]
+        palette: ["466b9f", "d1def8", "dec5c5", "d99282", "eb0000", "ab0000", "b3ac9f", "68ab5f", "1c5f2c", "b5c58f", "ccb879", "dfdfc2", "dcd939", "ab6c28", "b8d9eb", "6c9fb8"]
     bands:
       landcover:
         description: NLCD land-cover class (Anderson Level II)
@@ -7254,6 +8826,22 @@ datasets:
     default_reducer: mean
     license: public-domain
     source: republished
+    visualizations:
+      - name: "tccViz"
+        bands: ["Science_Percent_Tree_Canopy_Cover"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["CDA066", "D7C29E", "C2D096", "B7D692", "ADDD8E", "78C679", "5CB86B", "41AB5D", "39A156", "329750", "238443", "11763D", "006837", "004529"]
+      - name: "seViz"
+        bands: ["Science_Percent_Tree_Canopy_Cover_Standard_Error"]
+        vmin: [0]
+        vmax: [4000]
+        palette: ["000000", "FFFFFF"]
+      - name: "nlcdViz"
+        bands: ["NLCD_Percent_Tree_Canopy_Cover"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["CDA066", "D7C29E", "C2D096", "B7D692", "ADDD8E", "78C679", "5CB86B", "41AB5D", "39A156", "329750", "238443", "11763D", "006837", "004529"]
     bands:
       Science_Percent_Tree_Canopy_Cover:
         description: Direct model output of mean predicted tree-canopy cover
@@ -7280,6 +8868,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     source: republished
+    visualizations:
+      - name: "Rangeland Annual Herbaceous %"
+        bands: ["rangeland_annual_herbaceous"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["000000", "f9e8b7", "f7e3ac", "f0dfa3", "eedf9c", "eada91", "e8d687", "e0d281", "ddd077", "d6cc6d", "d3c667", "d0c55e", "cfc555", "c6bd4f", "c4ba46", "bdb83a", "bbb534", "b7b02c", "b0ad1f", "adac17", "aaaa0a", "a3a700", "9fa700", "9aa700", "92a700", "8fa700", "87a700", "85a700", "82aa00", "7aaa00", "77aa00", "70aa00", "6caa00", "67aa00", "5fa700", "57a700", "52a700", "4fa700", "4aa700", "42a700", "3ca700", "37a700", "37a300", "36a000", "369f00", "349d00", "339900", "339900", "2f9200", "2d9100", "2d8f00", "2c8a00", "2c8800", "2c8500", "2c8400", "2b8200", "297d00", "297a00", "297900", "277700", "247400", "247000", "29700f", "2c6d1c", "2d6d24", "336d2d", "366c39", "376c44", "396a4a", "396a55", "3a6a5f", "3a696a", "396774", "3a6782", "39668a", "376292", "34629f", "2f62ac", "2c5fb7", "245ec4", "1e5ed0", "115cdd", "005ae0", "0057dd", "0152d6", "0151d0", "014fcc", "014ac4", "0147bd", "0144b8", "0142b0", "0141ac", "013da7", "013aa0", "01399d", "013693", "013491", "012f8a", "012d85", "012c82", "01297a"]
     bands:
       rangeland_annual_herbaceous:
         description: Per-pixel cover of annual herbaceous vegetation
@@ -7335,6 +8929,12 @@ datasets:
     license: public-domain
     terms_note: 'This work was authored as part of the Contributor''s official duties as an'
     source: republished
+    visualizations:
+      - name: "annual herbaceous breakpoint in integer"
+        bands: ["annual_herbaceous_break_point"]
+        vmin: [0]
+        vmax: [5]
+        palette: ["000000", "f9e8b7", "f7e3ac", "f0dfa3", "eedf9c", "eada91", "e8d687", "e0d281", "ddd077", "d6cc6d", "d3c667", "d0c55e", "cfc555", "c6bd4f", "c4ba46", "bdb83a", "bbb534", "b7b02c", "b0ad1f", "adac17", "aaaa0a", "a3a700", "9fa700", "9aa700", "92a700", "8fa700", "87a700", "85a700", "82aa00", "7aaa00", "77aa00", "70aa00", "6caa00", "67aa00", "5fa700", "57a700", "52a700", "4fa700", "4aa700", "42a700", "3ca700", "37a700", "37a300", "36a000", "369f00", "349d00", "339900", "339900", "2f9200", "2d9100", "2d8f00", "2c8a00", "2c8800", "2c8500", "2c8400", "2b8200", "297d00", "297a00", "297900", "277700", "247400", "247000", "29700f", "2c6d1c", "2d6d24", "336d2d", "366c39", "376c44", "396a4a", "396a55", "3a6a5f", "3a696a", "396774", "3a6782", "39668a", "376292", "34629f", "2f62ac", "2c5fb7", "245ec4", "1e5ed0", "115cdd", "005ae0", "0057dd", "0152d6", "0151d0", "014fcc", "014ac4", "0147bd", "0144b8", "0142b0", "0141ac", "013da7", "013aa0", "01399d", "013693", "013491", "012f8a", "012d85", "012c82", "01297a"]
     bands:
       annual_herbaceous_break_point:
         description: Number of structural breaks observed in the annual herbaceous time series
@@ -7576,6 +9176,12 @@ datasets:
     license: public-domain
     terms_note: 'This work was authored as part of the Contributor''s official duties as an'
     source: republished
+    visualizations:
+      - name: "annual_herbaceous_segment_pvalue"
+        bands: ["annual_herbaceous_segment_pvalue"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["000000", "f9e8b7", "f7e3ac", "f0dfa3", "eedf9c", "eada91", "e8d687", "e0d281", "ddd077", "d6cc6d", "d3c667", "d0c55e", "cfc555", "c6bd4f", "c4ba46", "bdb83a", "bbb534", "b7b02c", "b0ad1f", "adac17", "aaaa0a", "a3a700", "9fa700", "9aa700", "92a700", "8fa700", "87a700", "85a700", "82aa00", "7aaa00", "77aa00", "70aa00", "6caa00", "67aa00", "5fa700", "57a700", "52a700", "4fa700", "4aa700", "42a700", "3ca700", "37a700", "37a300", "36a000", "369f00", "349d00", "339900", "339900", "2f9200", "2d9100", "2d8f00", "2c8a00", "2c8800", "2c8500", "2c8400", "2b8200", "297d00", "297a00", "297900", "277700", "247400", "247000", "29700f", "2c6d1c", "2d6d24", "336d2d", "366c39", "376c44", "396a4a", "396a55", "3a6a5f", "3a696a", "396774", "3a6782", "39668a", "376292", "34629f", "2f62ac", "2c5fb7", "245ec4", "1e5ed0", "115cdd", "005ae0", "0057dd", "0152d6", "0151d0", "014fcc", "014ac4", "0147bd", "0144b8", "0142b0", "0141ac", "013da7", "013aa0", "01399d", "013693", "013491", "012f8a", "012d85", "012c82", "01297a"]
     bands:
       annual_herbaceous_break_point:
         description: Annual structural breaks in each component of annual herbaceous present or
@@ -7761,6 +9367,22 @@ datasets:
     default_reducer: mean
     license: public-domain
     source: republished
+    visualizations:
+      - name: "tccViz"
+        bands: ["Science_Percent_Tree_Canopy_Cover"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["CDA066", "D7C29E", "C2D096", "B7D692", "ADDD8E", "78C679", "5CB86B", "41AB5D", "39A156", "329750", "238443", "11763D", "006837", "004529"]
+      - name: "seViz"
+        bands: ["Science_Percent_Tree_Canopy_Cover_Standard_Error"]
+        vmin: [0]
+        vmax: [4000]
+        palette: ["000000", "FFFFFF"]
+      - name: "nlcdViz"
+        bands: ["NLCD_Percent_Tree_Canopy_Cover"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["CDA066", "D7C29E", "C2D096", "B7D692", "ADDD8E", "78C679", "5CB86B", "41AB5D", "39A156", "329750", "238443", "11763D", "006837", "004529"]
     bands:
       Science_Percent_Tree_Canopy_Cover:
         description: Direct model output of mean predicted tree-canopy cover
@@ -7786,6 +9408,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-SA-4.0
     source: republished
+    visualizations:
+      - name: "carbon_tonnes_per_ha"
+        bands: ["carbon_tonnes_per_ha"]
+        vmin: [1]
+        vmax: [180]
+        palette: ["d9f0a3", "addd8e", "78c679", "41ab5d", "238443", "005a32"]
     bands:
       carbon_tonnes_per_ha:
         description: Above- + below-ground biomass carbon density
@@ -7804,6 +9432,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free for non-commercial use; see WHRC terms.'
+    visualizations:
+      - name: "Aboveground Live Woody Biomass"
+        bands: ["Mg"]
+        vmin: [0]
+        vmax: [350]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       Mg:
         description: Above-ground live woody biomass
@@ -7825,6 +9459,12 @@ datasets:
     license: public-domain
     terms_note: 'The FORMA datasets are available without restriction'
     source: republished
+    visualizations:
+      - name: "FORMA Alerts"
+        bands: ["alert_delta"]
+        vmin: [25]
+        vmax: [75]
+        palette: ["d65898", "da68a2"]
     bands:
       alert_delta:
         description: Percentage of clearing which during the 6 MODIS periods (96 + N days)
@@ -7848,6 +9488,11 @@ datasets:
     license: public-domain
     terms_note: 'The FORMA datasets are available without restriction'
     source: republished
+    visualizations:
+      - name: "Percentage of clearing in the last N days"
+        bands: ["nday"]
+        vmin: [0]
+        vmax: [0.01]
     bands:
       nday:
         description: Percentage of clearing in the last N days
@@ -7878,6 +9523,11 @@ datasets:
     license: public-domain
     terms_note: 'The FORMA datasets are available without restriction'
     source: republished
+    visualizations:
+      - name: "Percent of clearing in the last 365 days"
+        bands: ["clearing"]
+        vmin: [0]
+        vmax: [1]
     bands:
       delta:
         description: Percentage of clearing in the last 96 days
@@ -7913,6 +9563,11 @@ datasets:
     license: public-domain
     terms_note: 'The FORMA datasets are available without restriction'
     source: republished
+    visualizations:
+      - name: "Thresholds for FORMA alerts"
+        bands: ["delta_bound"]
+        vmin: [0]
+        vmax: [50]
     bands:
       delta_bound:
         description: The thresholds at which, when crossed, a FORMA alert is produced
@@ -7933,6 +9588,11 @@ datasets:
     license: public-domain
     terms_note: 'The FORMA datasets are available without restriction'
     source: republished
+    visualizations:
+      - name: "Reversed rectified t-statistics"
+        bands: ["tstat_r"]
+        vmin: [0]
+        vmax: [1]
     bands:
       tstat_r:
         description: Reversed rectified, ie (max(0,-t_stat)), t-statistics.
@@ -7950,6 +9610,10 @@ datasets:
       bbox: [-180, -60, 180, 75]
     default_reducer: mosaic
     license: CC-BY-NC-SA-4.0
+    visualizations:
+      - name: "Natural lands"
+        bands: ["natural"]
+        palette: ["969696", "a8ddb5"]
     bands:
       classification:
         description: Land cover classification.
@@ -7971,6 +9635,10 @@ datasets:
       bbox: [-180, -60, 180, 75]
     default_reducer: mosaic
     license: CC-BY-SA-4.0
+    visualizations:
+      - name: "Natural lands"
+        bands: ["natural"]
+        palette: ["969696", "a8ddb5"]
     bands:
       classification:
         description: Land cover classification.
@@ -7993,6 +9661,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Daytime UHI"
+        bands: ["Daytime"]
+        vmin: [-1.5]
+        vmax: [7.5]
+        palette: ["313695", "74add1", "fed976", "feb24c", "fd8d3c", "fc4e2a", "e31a1c", "b10026"]
     bands:
       Daytime:
         description: Daytime UHI
@@ -8013,6 +9687,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "All Daytime UHI"
+        bands: ["all_daytime_UHI"]
+        vmin: [-1.5]
+        vmax: [7.5]
+        palette: ["313695", "74add1", "fed976", "feb24c", "fd8d3c", "fc4e2a", "e31a1c", "b10026"]
     bands:
       all_daytime_UHI:
         description: All Daytime UHI
@@ -8045,6 +9725,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "January Daytime UHI"
+        bands: ["Jan_day_UHI"]
+        vmin: [-1.5]
+        vmax: [7.5]
+        palette: ["313695", "74add1", "fed976", "feb24c", "fd8d3c", "fc4e2a", "e31a1c", "b10026"]
     bands:
       Jan_day_UHI:
         description: January Daytime UHI
@@ -8131,6 +9817,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Daytime UHI"
+        bands: ["Daytime"]
+        vmin: [-1.5]
+        vmax: [7.5]
+        palette: ["313695", "74add1", "fed976", "feb24c", "fd8d3c", "fc4e2a", "e31a1c", "b10026"]
     bands:
       Daytime:
         description: Daytime UHI
@@ -8151,6 +9843,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Daytime UHI"
+        bands: ["Daytime"]
+        vmin: [-1.5]
+        vmax: [7.5]
+        palette: ["313695", "74add1", "fed976", "feb24c", "fd8d3c", "fc4e2a", "e31a1c", "b10026"]
     bands:
       Daytime:
         description: Daytime UHI
@@ -8171,6 +9869,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Daytime UHI"
+        bands: ["Daytime"]
+        vmin: [-1.5]
+        vmax: [7.5]
+        palette: ["313695", "74add1", "fed976", "feb24c", "fd8d3c", "fc4e2a", "e31a1c", "b10026"]
     bands:
       Daytime:
         description: Daytime UHI

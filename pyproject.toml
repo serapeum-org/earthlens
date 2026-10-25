@@ -74,6 +74,9 @@ sentinel-hub = ["earthlens-imagery[sentinel-hub]"]
 stac = ["earthlens-imagery[stac]"]
 tropycal = ["earthlens-atmosphere[tropycal]"]
 usgs-water = ["earthlens-ocean[usgs-water]"]
+# Visualization via digitalearth. earthlens renders nothing itself; see the
+# `viz` extra on earthlens-imagery for why the import stays lazy.
+viz = ["earthlens-imagery[viz]"]
 worldpop = ["earthlens-land[worldpop]"]
 
 # The self-referential "everything" extra: each entry re-activates one backend's
@@ -121,6 +124,7 @@ all = [
     "earthlens[stac]",
     "earthlens[tropycal]",
     "earthlens[usgs-water]",
+    "earthlens[viz]",
     "earthlens[worldpop]",
 ]
 

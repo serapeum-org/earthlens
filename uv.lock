@@ -1898,6 +1898,27 @@ wheels = [
 ]
 
 [[package]]
+name = "digitalearth"
+version = "0.13.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "cleopatra", extra = ["tiles"] },
+    { name = "geopandas" },
+    { name = "loguru" },
+    { name = "matplotlib" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "pandas" },
+    { name = "pyramids-gis" },
+    { name = "pyyaml" },
+    { name = "xyzservices" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e4/8f/144cbe17287e20e15daaa31e8fe26a593f3c6c68f35636447f711ec163f9/digitalearth-0.13.0.tar.gz", hash = "sha256:ffb08dc7920b4453751835dad6cc931664eab417793e794ab81596a3cc33d46c", size = 1356544, upload-time = "2026-10-08T21:06:56.424Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e1/f9/50ecbf3a2b03ef1bdd30f8824448254aecc613e86d899938bdeeb7c3586e/digitalearth-0.13.0-py3-none-any.whl", hash = "sha256:e56374b664092dc561531599f043ca046e73e8c425f7ec513a56771f1a76cbac", size = 1321919, upload-time = "2026-10-08T21:06:54.811Z" },
+]
+
+[[package]]
 name = "distlib"
 version = "0.4.3"
 source = { registry = "https://pypi.org/simple" }
@@ -2103,7 +2124,7 @@ dependencies = [
 all = [
     { name = "earthlens-atmosphere", extra = ["ecmwf", "ecmwf-modern", "eea-aq", "goes", "isimip", "mswep", "nwp", "radar", "s3", "tropycal"] },
     { name = "earthlens-hazards", extra = ["emdat", "fdsn", "hdx", "osm", "overture"] },
-    { name = "earthlens-imagery", extra = ["asf", "earthdata", "eumetsat", "gee", "jaxa", "sentinel-hub", "stac"] },
+    { name = "earthlens-imagery", extra = ["asf", "earthdata", "eumetsat", "gee", "jaxa", "sentinel-hub", "stac", "viz"] },
     { name = "earthlens-imagery", extra = ["openeo"], marker = "extra == 'extra-17-earthlens-imagery-openeo'" },
     { name = "earthlens-land", extra = ["dem", "gbif", "worldpop"] },
     { name = "earthlens-ocean", extra = ["cmems", "erddap", "nwm", "obis", "usgs-water"] },
@@ -2210,6 +2231,9 @@ tropycal = [
 usgs-water = [
     { name = "earthlens-ocean", extra = ["usgs-water"] },
 ]
+viz = [
+    { name = "earthlens-imagery", extra = ["viz"] },
+]
 worldpop = [
     { name = "earthlens-land", extra = ["worldpop"] },
 ]
@@ -2311,6 +2335,7 @@ requires-dist = [
     { name = "earthlens", extras = ["stac"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["tropycal"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["usgs-water"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["viz"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["worldpop"], marker = "extra == 'all'" },
     { name = "earthlens-atmosphere", editable = "libs/providers/atmosphere" },
     { name = "earthlens-atmosphere", extras = ["cmip6"], marker = "extra == 'cmip6'", editable = "libs/providers/atmosphere" },
@@ -2341,6 +2366,7 @@ requires-dist = [
     { name = "earthlens-imagery", extras = ["openeo"], marker = "extra == 'openeo'", editable = "libs/providers/imagery" },
     { name = "earthlens-imagery", extras = ["sentinel-hub"], marker = "extra == 'sentinel-hub'", editable = "libs/providers/imagery" },
     { name = "earthlens-imagery", extras = ["stac"], marker = "extra == 'stac'", editable = "libs/providers/imagery" },
+    { name = "earthlens-imagery", extras = ["viz"], marker = "extra == 'viz'", editable = "libs/providers/imagery" },
     { name = "earthlens-land", editable = "libs/providers/land" },
     { name = "earthlens-land", extras = ["dem"], marker = "extra == 'dem'", editable = "libs/providers/land" },
     { name = "earthlens-land", extras = ["gbif"], marker = "extra == 'gbif'", editable = "libs/providers/land" },
@@ -2354,7 +2380,7 @@ requires-dist = [
     { name = "earthlens-ocean", extras = ["obis"], marker = "extra == 'obis'", editable = "libs/providers/ocean" },
     { name = "earthlens-ocean", extras = ["usgs-water"], marker = "extra == 'usgs-water'", editable = "libs/providers/ocean" },
 ]
-provides-extras = ["argo", "asf", "cmems", "cmip6", "dem", "earthdata", "ecmwf", "ecmwf-modern", "eea-aq", "eedai", "emdat", "erddap", "eumetsat", "fdsn", "gbif", "gee", "ghsl", "goes", "hdx", "isimip", "jaxa", "mswep", "nwm", "nwp", "obis", "openeo", "osm", "overture", "radar", "s3", "sentinel-hub", "stac", "tropycal", "usgs-water", "worldpop", "all"]
+provides-extras = ["argo", "asf", "cmems", "cmip6", "dem", "earthdata", "ecmwf", "ecmwf-modern", "eea-aq", "eedai", "emdat", "erddap", "eumetsat", "fdsn", "gbif", "gee", "ghsl", "goes", "hdx", "isimip", "jaxa", "mswep", "nwm", "nwp", "obis", "openeo", "osm", "overture", "radar", "s3", "sentinel-hub", "stac", "tropycal", "usgs-water", "viz", "worldpop", "all"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -2632,10 +2658,14 @@ sentinel-hub = [
 stac = [
     { name = "pyramids-core", extra = ["stac"] },
 ]
+viz = [
+    { name = "digitalearth" },
+]
 
 [package.metadata]
 requires-dist = [
     { name = "asf-search", marker = "extra == 'asf'", specifier = ">=12.2.2" },
+    { name = "digitalearth", marker = "extra == 'viz'", specifier = ">=0.13.0" },
     { name = "earthaccess", marker = "python_full_version >= '3.12' and extra == 'earthdata'", specifier = ">=0.18.0" },
     { name = "earthengine-api", marker = "extra == 'gee'", specifier = ">=1.7.26" },
     { name = "earthlens-core", editable = "libs/core" },
@@ -2655,7 +2685,7 @@ requires-dist = [
     { name = "sentinelhub", marker = "extra == 'sentinel-hub'", specifier = ">=3.11.5" },
     { name = "urllib3", marker = "extra == 'gee'", specifier = ">=1.26" },
 ]
-provides-extras = ["earthdata", "asf", "eedai", "eumetsat", "gee", "jaxa", "openeo", "sentinel-hub", "stac"]
+provides-extras = ["earthdata", "asf", "eedai", "eumetsat", "gee", "jaxa", "openeo", "sentinel-hub", "stac", "viz"]
 
 [[package]]
 name = "earthlens-land"
@@ -7495,6 +7525,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/7b/57/9a866d1640ad61c134136404395c74617e177a50f63493bc84725aae9c77/pyramids_eo-0.11.0.tar.gz", hash = "sha256:2a39c486b9795f317627982463a36a30a83c74894f56216f9a6464168a6d2468", size = 296037, upload-time = "2026-10-21T17:31:28.721Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/38/2a/4190e8914a7042095517dcd4726f4c5d25e2a27811649165defa39f2c1b2/pyramids_eo-0.11.0-py3-none-any.whl", hash = "sha256:6625f016a4843b5dff6f9b81ddbeda6cdc549bbe93d4b7afaa920b900036bdc3", size = 187829, upload-time = "2026-10-21T17:31:27.568Z" },
+]
+
+[[package]]
+name = "pyramids-gis"
+version = "0.71.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyramids-core" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8d/f6/0daffe5f958481b3c51a156aace3779a745e2e443defc7c414d6ce41bbfa/pyramids_gis-0.71.0.tar.gz", hash = "sha256:8c2ac7ac9c8c4479c3745ffd82dfe1bc95a3e47f226210f3cd216e28725d6c06", size = 1438, upload-time = "2026-10-20T23:27:32.992Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c6/43/91a816452fa87fb08780ea57f98ac40acbd8986c9de57cd2e6559a2f7099/pyramids_gis-0.71.0-py3-none-any.whl", hash = "sha256:8bee41bac690fe368fa1f784969c16fed17a5bfa3f282da4b1cfe8d4f602fc39", size = 1311, upload-time = "2026-10-20T23:27:31.774Z" },
 ]
 
 [[package]]

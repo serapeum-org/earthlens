@@ -15,6 +15,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "SPEI"
+        bands: ["SPEI_24_month"]
+        vmin: [-2.33]
+        vmax: [2.33]
+        palette: ["8b1a1a", "de2929", "f3641d", "fdc404", "9afa94", "03f2fd", "12adf3", "1771de", "00008b"]
     bands:
       SPEI_01_month:
         description: SPEI accumulated over 1 month
@@ -50,6 +56,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free with attribution (JAXA GSMaP terms).'
+    visualizations:
+      - name: "Precipitation"
+        bands: ["hourlyPrecipRate"]
+        vmin: [0]
+        vmax: [30]
+        palette: ["1621a2", "ffffff", "03ffff", "13ff03", "efff00", "ffb103", "ff2300"]
     bands:
       hourlyPrecipRate:
         description: Hourly precipitation rate (snapshot)
@@ -73,6 +85,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free with attribution (JAXA GSMaP terms).'
+    visualizations:
+      - name: "Precipitation"
+        bands: ["hourlyPrecipRate"]
+        vmin: [0]
+        vmax: [30]
+        palette: ["1621a2", "ffffff", "03ffff", "13ff03", "efff00", "ffb103", "ff2300"]
     bands:
       hourlyPrecipRate:
         description: Hourly precipitation rate (snapshot)
@@ -93,6 +111,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free with attribution (JAXA GSMaP terms).'
+    visualizations:
+      - name: "Precipitation"
+        bands: ["hourlyPrecipRate"]
+        vmin: [0]
+        vmax: [30]
+        palette: ["1621a2", "ffffff", "03ffff", "13ff03", "efff00", "ffb103", "ff2300"]
     bands:
       hourlyPrecipRate:
         description: Hourly precipitation rate (snapshot)
@@ -114,6 +138,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free with attribution (JAXA GSMaP terms).'
+    visualizations:
+      - name: "Precipitation"
+        bands: ["hourlyPrecipRate"]
+        vmin: [0]
+        vmax: [30]
+        palette: ["1621a2", "ffffff", "03ffff", "13ff03", "efff00", "ffb103", "ff2300"]
     bands:
       hourlyPrecipRate:
         description: Hourly precipitation rate (snapshot)
@@ -138,6 +168,11 @@ datasets:
       end_date: "2021-09-30"
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Precipitation (mm/hr)"
+        bands: ["precipitation"]
+        vmin: [0]
+        vmax: [1.5]
     bands:
       precipitation:
         description: Merged satellite-gauge precipitation estimate
@@ -165,6 +200,11 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Precipitation (mm/hr)"
+        bands: ["precipitation"]
+        vmin: [0]
+        vmax: [1.5]
     bands:
       precipitation:
         description: Merged satellite-gauge precipitation estimate
@@ -192,6 +232,11 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Precipitation (mm/hr)"
+        bands: ["precipitationCal"]
+        vmin: [1]
+        vmax: [15]
     bands:
       precipitationCal:
         description: Final calibrated precipitation estimate
@@ -223,6 +268,11 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Precipitation (mm/hr)"
+        bands: ["precipitation"]
+        vmin: [1]
+        vmax: [15]
     bands:
       precipitation:
         description: Snapshot precipitation, calibrated
@@ -253,6 +303,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'The NOAA CPC datasets are available without restriction'
+    visualizations:
+      - name: "NOAA CPC Precipitation"
+        bands: ["precipitation"]
+        vmin: [0]
+        vmax: [150]
+        palette: ["ADD8E6", "008000", "FFFF00", "FFA500", "FF0000", "800080"]
     bands:
       precipitation:
         description: Daily total precipitation estimate in 0.1 mm
@@ -275,6 +331,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'The NOAA CPC datasets are available without restriction'
+    visualizations:
+      - name: "NOAA CPC Temperature"
+        bands: ["tmax"]
+        vmin: [-40]
+        vmax: [50]
+        palette: ["ADD8E6", "008000", "FFFF00", "FFA500", "FF0000", "800080"]
     bands:
       tmax:
         description: daily maximum temperature
@@ -307,6 +369,12 @@ datasets:
       bbox: [-180, -60, 180, 60]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Precipitation"
+        bands: ["precipitation"]
+        vmin: [0]
+        vmax: [50]
+        palette: ["3907ff", "03fff3", "28ff25", "fbff09", "ff1105"]
     bands:
       precipitation:
         description: Daily precipitation total
@@ -323,6 +391,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-SA-4.0
     source: republished
+    visualizations:
+      - name: "Precipitation monthly in mm"
+        bands: ["jan"]
+        vmin: [0]
+        vmax: [380]
+        palette: ["ecffbd", "ffff00", "3af6ff", "467aff", "313eff", "0008ff"]
     bands:
       jan:
         description: Jan Precipitation monthly
@@ -398,6 +472,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'This dataset is in the public domain and is available'
+    visualizations:
+      - name: "Precipitation"
+        bands: ["precipitation", "HQprecipitation", "IRprecipitation"]
+        vmin: [0]
+        vmax: [12]
+        gamma: [5]
     bands:
       precipitation:
         description: Merged microwave/IR precipitation estimate
@@ -440,6 +520,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'This dataset is in the public domain and is available'
+    visualizations:
+      - name: "Precipitation"
+        bands: ["precipitation"]
+        vmin: [0.1]
+        vmax: [1.2]
+        palette: ["blue", "purple", "cyan", "green", "yellow", "red"]
     bands:
       precipitation:
         description: Merged microwave/IR precipitation estimate
@@ -469,6 +555,12 @@ datasets:
       bbox: [-180, -60, 180, 60]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Precipitation"
+        bands: ["precipitation"]
+        vmin: [1]
+        vmax: [17]
+        palette: ["001137", "0aab1e", "e7eb05", "2c7fb8", "253494"]
     bands:
       precipitation:
         description: Daily precipitation (reanalysis-blended)
@@ -486,6 +578,12 @@ datasets:
       bbox: [-180, -60, 180, 60]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Precipitation"
+        bands: ["precipitation"]
+        vmin: [1]
+        vmax: [17]
+        palette: ["001137", "0aab1e", "e7eb05", "2c7fb8", "253494"]
     bands:
       precipitation:
         description: Daily precipitation (satellite-only NRT, no gauge merging)
@@ -505,6 +603,12 @@ datasets:
       bbox: [-180, -60, 180, 60]
     default_reducer: sum
     license: public-domain
+    visualizations:
+      - name: "Precipitation"
+        bands: ["precipitation"]
+        vmin: [0]
+        vmax: [112]
+        palette: ["001137", "0aab1e", "e7eb05", "ff4a2d", "e90000"]
     bands:
       precipitation:
         description: Pentad precipitation total
@@ -522,6 +626,12 @@ datasets:
       bbox: [-180, -50, 180, 50]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Precipitation"
+        bands: ["precipitation"]
+        vmin: [1]
+        vmax: [17]
+        palette: ["001137", "0aab1e", "e7eb05", "ff4a2d", "e90000"]
     bands:
       precipitation:
         description: Daily precipitation
@@ -544,6 +654,12 @@ datasets:
       bbox: [-180, -50, 180, 50]
     default_reducer: sum
     license: public-domain
+    visualizations:
+      - name: "Precipitation"
+        bands: ["precipitation"]
+        vmin: [0]
+        vmax: [112]
+        palette: ["001137", "0aab1e", "e7eb05", "ff4a2d", "e90000"]
     bands:
       precipitation:
         description: Pentad precipitation total

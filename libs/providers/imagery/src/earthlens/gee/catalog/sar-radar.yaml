@@ -23,6 +23,11 @@ datasets:
         calibration and terrain correction to dB, so there is nothing to mask
         and nothing to scale. Speckle filtering is the one remaining step:
         append SpeckleFilter() to the chain.
+    visualizations:
+      - name: "Grayscale"
+        bands: ["VV"]
+        vmin: [-25]
+        vmax: [0]
     bands:
       VV:
         description: Single co-polarization, vertical transmit / vertical receive
@@ -63,6 +68,11 @@ datasets:
       bbox: [-180, -79, 180, 82]
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Fall HH AMP"
+        bands: ["fall_hh_AMP"]
+        vmin: [0]
+        vmax: [1.25]
     bands:
       fall_hh_AMP:
         description: Fall (Sep-Nov 2020) HH backscatter amplitude.
@@ -124,6 +134,11 @@ datasets:
       bbox: [-180, -79, 180, 82]
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Fall HH COH06"
+        bands: ["fall_hh_COH06"]
+        vmin: [0]
+        vmax: [0.75]
     bands:
       fall_hh_COH06:
         description: Median HH coherence for fall (Sep-Nov 2020) based on all
@@ -233,6 +248,11 @@ datasets:
       bbox: [-180, -79, 180, 82]
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Fall HH rho"
+        bands: ["fall_hh_rho"]
+        vmin: [0]
+        vmax: [0.4]
     bands:
       fall_hh_rho:
         description: Fall (Sep-Nov 2020) HH rho.
@@ -294,6 +314,11 @@ datasets:
       bbox: [-180, -79, 180, 82]
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Incidence Angle"
+        bands: ["inc"]
+        vmin: [30]
+        vmax: [70]
     bands:
       inc:
         description: The angle between the incoming radar signal path and the normal
@@ -312,6 +337,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Anyone can use this data free of charge subject to non-commercial use only.'
+    visualizations:
+      - name: "HH polarization"
+        bands: ["b1"]
+        vmin: [0]
+        vmax: [8000]
     bands:
       b1:
         description: HH polarization Terrain-flattened Gamma-Nought backscatter
@@ -327,6 +357,11 @@ datasets:
     default_reducer: median
     license: proprietary
     terms_note: 'Free with attribution (JAXA EORC).'
+    visualizations:
+      - name: "HH polarization"
+        bands: ["HH"]
+        vmin: [0]
+        vmax: [8000]
     bands:
       HH:
         description: HH-polarisation terrain-flattened gamma-nought backscatter
@@ -351,6 +386,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free with attribution (JAXA EORC).'
+    visualizations:
+      - name: "Forest/Non-Forest Classification"
+        bands: ["fnf"]
+        vmin: [1]
+        vmax: [3]
+        palette: ["006400", "feff99", "0000ff"]
     bands:
       fnf:
         description: Forest / non-forest classification (1=forest, 2=non-forest, 3=water)
@@ -369,6 +410,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free with attribution (JAXA EORC).'
+    visualizations:
+      - name: "Forest/Non-Forest Classification"
+        bands: ["fnf"]
+        vmin: [1]
+        vmax: [4]
+        palette: ["00b200", "83ef62", "ffff99", "0000ff"]
     bands:
       fnf:
         description: Forest / non-forest classification (1=dense, 2=non-dense, 3=non-forest, 4=water)
@@ -387,6 +434,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free for any use with attribution (JAXA EORC).'
+    visualizations:
+      - name: "SAR HH"
+        bands: ["HH"]
+        vmin: [0]
+        vmax: [10000]
     bands:
       HH:
         description: HH-polarisation backscatter (16-bit DN; sigma0 = 10*log10(DN^2) - 83)
@@ -412,6 +464,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free with attribution (JAXA EORC).'
+    visualizations:
+      - name: "SAR HH"
+        bands: ["HH"]
+        vmin: [0]
+        vmax: [10000]
     bands:
       HH:
         description: HH-polarisation backscatter (16-bit DN; sigma0 = 10*log10(DN^2) - 83)
@@ -438,6 +495,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'This dataset is openly shared, without restriction, in accordance with the'
+    visualizations:
+      - name: "VV Polarization"
+        bands: ["VV"]
+        vmin: [0]
+        vmax: [0.5]
     bands:
       VV:
         description: VV polarization radar backscatter normalized to gamma0.
@@ -461,6 +523,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'This dataset is openly shared, without restriction, in accordance with'
+    visualizations:
+      - name: "Number of Looks"
+        bands: ["number_of_looks"]
+        vmin: [15]
+        vmax: [18]
+        palette: ["yellow", "green"]
     bands:
       local_incidence_angle:
         description: Angle between LOS vector and terrain normal vector at the

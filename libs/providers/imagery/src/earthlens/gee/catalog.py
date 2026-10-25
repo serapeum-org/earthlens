@@ -506,6 +506,125 @@ class Preprocess(SummarisedLeaf):
     note: str | None = None
 
 
+class Visualization(SummarisedLeaf):
+    """One of a dataset's publisher-authored default renderings.
+
+    Captured from the asset's STAC `gee:visualizations`, the same way
+    `Band.classes` is captured from `gee:classes`. This is what Earth
+    Engine's own catalog page draws, so it is the right default for a
+    preview: the publisher chose the band triple, the stretch and the
+    palette, and guessing them from band ids cannot do better.
+
+    Every field but `name` and `bands` is optional, because the upstream
+    entries genuinely vary — `ESA/WorldCover/v200` carries only `bands`,
+    `USGS/SRTMGL1_003` adds `gamma`, `UCSB-CHG/CHIRPS/DAILY` a `palette`,
+    and `MODIS/061/MOD13Q1` a `gain`.
+
+    `vmin` / `vmax` mirror upstream's `min` / `max`, which arrive as
+    **lists** that are allowed to be shorter than `bands`: a 3-band RGB
+    usually carries one `min` and one `max` for all three. `limits`
+    resolves that broadcast rather than making every caller do it.
+
+    Attributes:
+        name: The upstream `display_name` (`"RGB"`, `"True Color (432)"`,
+            `"Landcover"`), used to pick between several renderings.
+        bands: The band ids this rendering draws, in order — three for an
+            RGB composite, one for a single-band stretch.
+        vmin: Lower end of the stretch, per band or broadcast.
+        vmax: Upper end of the stretch, per band or broadcast.
+        palette: Colour ramp as upstream spells it, and it spells it two
+            ways: usually hex digits with no leading `#` (`"ffffff"`),
+            but a CSS colour name (`"blue"`) in a minority of rows — both
+            are what Earth Engine accepts, so neither is normalised here.
+            Empty for an RGB composite.
+        gamma: Gamma correction per band, or empty.
+        gain: Multiplier applied before the stretch, or empty.
+
+    Examples:
+        - The Sentinel-2 RGB entry, with one stretch broadcast over three
+          bands:
+            ```python
+            >>> rgb = Visualization(
+            ...     name="RGB", bands=("B4", "B3", "B2"), vmin=(0.0,), vmax=(3000.0,)
+            ... )
+            >>> rgb.limits
+            ((0.0, 3000.0), (0.0, 3000.0), (0.0, 3000.0))
+            >>> rgb.is_rgb
+            True
+
+            ```
+        - A single-band palette rendering is not an RGB composite:
+            ```python
+            >>> ndvi = Visualization(
+            ...     name="NDVI", bands=("NDVI",), vmin=(0.0,), vmax=(8000.0,),
+            ...     palette=("ffffff", "004c00"),
+            ... )
+            >>> ndvi.is_rgb
+            False
+            >>> ndvi.limits
+            ((0.0, 8000.0),)
+
+            ```
+        - A rendering with no stretch at all resolves to no limits, which
+          is the `ESA/WorldCover` case:
+            ```python
+            >>> Visualization(name="Landcover", bands=("Map",)).limits
+            ()
+
+            ```
+        - An unknown field is refused, so a typo cannot read as absent:
+            ```python
+            >>> Visualization(name="x", bands=("b",), pallete=())  # doctest: +IGNORE_EXCEPTION_DETAIL
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for Visualization
+
+            ```
+    """
+
+    _summary_fields = ("name", "bands")
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    name: str
+    bands: tuple[str, ...]
+    vmin: tuple[float, ...] = ()
+    vmax: tuple[float, ...] = ()
+    palette: tuple[str, ...] = ()
+    gamma: tuple[float, ...] = ()
+    gain: tuple[float, ...] = ()
+
+    @property
+    def is_rgb(self) -> bool:
+        """Whether this rendering is a three-band colour composite.
+
+        Returns:
+            `True` for exactly three bands, `False` otherwise.
+        """
+        return len(self.bands) == 3
+
+    @property
+    def limits(self) -> tuple[tuple[float, float], ...]:
+        """The per-band `(min, max)` stretch, with upstream's broadcast resolved.
+
+        Upstream may give one `min` / `max` for every band, one per band,
+        or none at all. A single value is repeated across the bands; a
+        per-band list is zipped; a missing side yields no limits, since
+        half a stretch is not usable as one.
+
+        Returns:
+            One `(min, max)` pair per band, or `()` when either side is
+            absent.
+        """
+        if not self.vmin or not self.vmax:
+            result: tuple[tuple[float, float], ...] = ()
+        else:
+            lows = self.vmin * len(self.bands) if len(self.vmin) == 1 else self.vmin
+            highs = self.vmax * len(self.bands) if len(self.vmax) == 1 else self.vmax
+            result = tuple(zip(lows, highs, strict=False))
+        return result
+
+
 class Dataset(SummarisedLeaf):
     """One Earth Engine collection/image with curated metadata.
 
@@ -562,6 +681,12 @@ class Dataset(SummarisedLeaf):
             per-image mask the sensor wants and whether to apply the
             band `scale` / `offset` — or `None` for a dataset with no
             curated recipe. Read by `earthlens.gee.preprocess`.
+        visualizations: The publisher's own default renderings, from the
+            asset's STAC `gee:visualizations`, or `()` for a row the
+            upstream catalog gives none (every community `projects/...`
+            asset, which the public STAC tree does not serve). Read by
+            `earthlens.gee.viz.style_for`, which falls back to band
+            metadata and name heuristics when this is empty.
     """
 
     model_config = ConfigDict(frozen=True)
@@ -583,6 +708,7 @@ class Dataset(SummarisedLeaf):
     source: Literal["ee_native", "republished", "community"] = "ee_native"
     bands: dict[str, Band] = Field(default_factory=dict)
     preprocess: Preprocess | None = None
+    visualizations: tuple[Visualization, ...] = ()
 
     def summary_parts(self) -> list[str]:
         """Return id, title, provider, resolution, period and band count.

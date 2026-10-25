@@ -13,7 +13,7 @@ from __future__ import annotations
 import datetime as dt
 import inspect
 import math
-import tempfile
+import shutil
 import zipfile
 from pathlib import Path
 from types import SimpleNamespace
@@ -1745,6 +1745,54 @@ class TestBuildCollection:
         assert any("static single-image" in w for w in warnings), warnings
 
 
+_JUNE_TIMES = ["2021-06-01", "2021-06-11", "2021-06-21"]
+
+
+class TestAsFileBackedStack:
+    """`_as_file_backed_stack` bridges the reader's in-memory collection.
+
+    The EEDAI reader returns an in-memory `DatasetCollection`, but pyramids'
+    `reduce_time` reads only a file- or zarr-backed one; this spills the former
+    to the latter so a `median` / `percentile` / `trend` composite can reduce.
+    """
+
+    def test_an_in_memory_stack_is_spilled_and_then_reduces(self):
+        """An in-memory stack reduces only after it is made file-backed."""
+        stack = _build_fake_stack([10.0, 20.0, 30.0], _JUNE_TIMES)
+        assert stack.files is None  # the reader's real shape: in-memory
+        backed, spill_dir = backend_module._as_file_backed_stack(stack)
+        try:
+            assert backed is not stack
+            assert spill_dir is not None  # a spill directory was created
+            assert backed.files  # now file-backed, so reduce_time can read it
+            reduced = backed.reduce_time(_JUNE_TIMES, freq="30D", op="median")
+            median = np.asarray(reduced[0][1].read_array()).ravel()[0]
+            assert median == 20.0
+        finally:
+            backend_module.close_quietly(backed)
+            # Best-effort, as in the backend: a lingering Windows handle leaves
+            # the temp for the OS to sweep, so the removal is not asserted.
+            shutil.rmtree(spill_dir, ignore_errors=True)
+
+    def test_an_already_backed_stack_is_returned_untouched(self, tmp_path):
+        """A file-backed stack is passed through, with no spill directory."""
+        from pyramids.dataset import Dataset, DatasetCollection
+        from pyramids.dataset.dataset import GeoReference
+
+        geo = GeoReference(top_left_corner=(31.2, 30.0), cell_size=0.05, epsg=4326)
+        paths = []
+        for i, value in enumerate((1.0, 2.0)):
+            path = str(tmp_path / f"scene{i}.tif")
+            Dataset.from_array(
+                np.full((2, 2), value), geo_ref=geo, no_data_value=-9999.0, path=path
+            )
+            paths.append(path)
+        backed_in = DatasetCollection.from_files(paths)
+        backed_out, spill_dir = backend_module._as_file_backed_stack(backed_in)
+        assert backed_out is backed_in
+        assert spill_dir is None
+
+
 class TestComposite:
     """Tests for `GEE._composite`."""
 
@@ -2391,29 +2439,32 @@ def _bind_to_real_signature(name: str, asset_id: str, kwargs: dict) -> None:
 
 
 def _build_fake_stack(values, times):
-    """Build a file-backed `DatasetCollection` of constant scenes carrying times.
+    """Build an **in-memory** `DatasetCollection` of constant scenes with times.
 
-    Mirrors what `pyramids_eo.collection_from_earthengine` returns — one aligned
-    scene per timestep with the acquisition times as the time axis — but
-    file-backed, because pyramids `reduce_time` (which `reduce_stack` uses) reads
-    a file- or zarr-backed collection. Each scene is a constant 2x2 raster, so
+    Mirrors what `pyramids_eo.collection_from_earthengine` actually returns: an
+    in-memory `DatasetCollection(datasets=...)` of warped scenes, one per
+    timestep. It used to be built file-backed here so pyramids `reduce_time`
+    (which `reduce_stack` uses) could read it — but that diverged from the real
+    reader and hid the defect where a `median` / `percentile` / `trend` EEDAI
+    composite failed with `DatasetCollection.data requires a file-backed
+    collection`. The backend now spills an in-memory stack to files before
+    reducing (`_as_file_backed_stack`), so the fake is realistic again and the
+    composite tests exercise that path. Each scene is a constant 2x2 raster, so
     the per-pixel reduction has a value the parity test can predict.
     """
     from pyramids.dataset import Dataset, DatasetCollection
     from pyramids.dataset.dataset import GeoReference
 
     geo = GeoReference(top_left_corner=(31.2, 30.0), cell_size=0.05, epsg=4326)
-    folder = tempfile.mkdtemp()
-    paths = []
-    for i, value in enumerate(values):
-        path = str(Path(folder) / f"scene{i}.tif")
+    scenes = [
         Dataset.from_array(
-            np.full((2, 2), float(value)), geo_ref=geo, no_data_value=-9999.0, path=path
+            np.full((2, 2), float(value)), geo_ref=geo, no_data_value=-9999.0
         )
-        paths.append(path)
-    stack = DatasetCollection.from_files(paths)
-    stack.time = list(times)
-    return stack
+        for value in values
+    ]
+    return DatasetCollection(
+        scenes[0], time_length=len(scenes), datasets=scenes, time=list(times)
+    )
 
 
 class _FakeReaderModule:
