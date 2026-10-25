@@ -998,5 +998,6 @@ its trees on the server, so fetch them first (`classifier.explain().getInfo()`) 
 ## See also
 
 - [Usage](usage.md) — the request shape, extents, and export sinks
+- [Sampling and vector interop](sampling-and-vector.md) — reading rasters over geometries, and the vector bridge
 - [Service account setup](service-account-setup.md) and [Registering a project](registering-a-project.md)
 - [Reference](gee.md) — the generated API surface
