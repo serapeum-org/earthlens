@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.31.0 (2026-10-25)
+
+### Feat
+
+- **gee**: add Epic 6 server-side compute, exports and asset management (#1341)
+
 ## 0.30.0 (2026-10-22)
 
 ### Fix
