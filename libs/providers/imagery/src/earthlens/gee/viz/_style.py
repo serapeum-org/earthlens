@@ -178,6 +178,35 @@ class StyleHints(BaseModel):
             out["gamma"] = self.gamma[0]
         return out
 
+    def clim_kwargs(self) -> dict[str, Any]:
+        """The keyword arguments the interactive / 3-D single-band draws take.
+
+        digitalearth's HoloViz and PyVista tiers spell the colour range `clim`
+        (a `(low, high)` pair), not the matplotlib `vmin` / `vmax` — passing the
+        latter to them is rejected by name. They take no `gamma`. This is the
+        same stretch as `field_kwargs`, spelled their way.
+
+        Returns:
+            The keyword arguments, with absent hints left out.
+
+        Examples:
+            - The stretch becomes a single `clim` pair:
+                ```python
+                >>> StyleHints(
+                ...     bands=("elevation",), limits=((0.0, 6000.0),), cmap="terrain",
+                ...     source="catalog",
+                ... ).clim_kwargs()
+                {'clim': (0.0, 6000.0), 'cmap': 'terrain'}
+
+                ```
+        """
+        out: dict[str, Any] = {}
+        if self.limits:
+            out["clim"] = self.limits[0]
+        if self.cmap is not None:
+            out["cmap"] = self.cmap
+        return out
+
     def rgb_kwargs(self) -> dict[str, Any]:
         """The keyword arguments an RGB `rgb_composite` draw takes.
 

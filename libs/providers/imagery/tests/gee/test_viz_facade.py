@@ -201,6 +201,22 @@ class TestStillSingleBand:
         _viz(_FakeResult()).still(backend=backend)
         assert fake_de.quickmap.kwargs_of("quickmap")["backend"] == backend
 
+    @pytest.mark.parametrize("backend", ["interactive", "3d"])
+    def test_the_holoviz_and_pyvista_tiers_get_clim_not_vmin(self, fake_de, backend):
+        """The interactive / 3-D fields spell the stretch `clim`, not `vmin`."""
+        viz = _viz(_FakeResult())
+        viz.still(backend=backend)
+        kwargs = fake_de.quickmap.kwargs_of("quickmap")
+        assert kwargs["clim"] == viz.hints.limits[0]
+        assert "vmin" not in kwargs
+
+    def test_the_web_tier_gets_neither_vmin_nor_clim(self, fake_de):
+        """The web field scales itself, so only a cmap is passed."""
+        _viz(_FakeResult()).still(backend="web")
+        kwargs = fake_de.quickmap.kwargs_of("quickmap")
+        assert "vmin" not in kwargs
+        assert "clim" not in kwargs
+
     def test_an_unknown_backend_is_refused_before_importing_digitalearth(self):
         """The check runs with no digitalearth installed at all."""
         viz = _viz(_FakeResult())

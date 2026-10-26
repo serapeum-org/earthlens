@@ -222,7 +222,7 @@ class Visualizer:
         data = self._data()
         module = _digitalearth()
         if not self.hints.is_rgb:
-            merged = {**self.hints.field_kwargs(), **kwargs}
+            merged = {**self._field_stretch(backend), **kwargs}
             return module.quickmap(data, backend=backend, **merged)
         if backend not in _RGB_SCENES:
             raise ValueError(
@@ -234,6 +234,28 @@ class Visualizer:
         scene = getattr(importlib.import_module(module_name), class_name)()
         merged = {**self.hints.rgb_kwargs(), **kwargs}
         return getattr(scene, verb)(data, **merged)
+
+    def _field_stretch(self, backend: str) -> dict[str, Any]:
+        """The single-band stretch kwargs the given backend's `field` takes.
+
+        digitalearth does not unify the colour-range keyword across tiers: the
+        matplotlib (`cleopatra`) field takes `vmin` / `vmax` / `gamma`, the
+        HoloViz and PyVista fields take a `clim` pair, and the web tier's field
+        takes neither (it scales its own), so only `cmap` is passed there.
+
+        Args:
+            backend: The digitalearth backend the draw will use.
+
+        Returns:
+            The stretch keyword arguments for that backend.
+        """
+        if backend == "matplotlib":
+            result = self.hints.field_kwargs()
+        elif backend == "web":
+            result = {"cmap": self.hints.cmap} if self.hints.cmap else {}
+        else:
+            result = self.hints.clim_kwargs()
+        return result
 
     def timelapse(self, path: str | Path, **kwargs: Any) -> Any:
         """Animate the result's collection through digitalearth's `animate`.
