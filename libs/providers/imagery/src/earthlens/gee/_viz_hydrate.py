@@ -132,7 +132,7 @@ def _entry_kwargs(entry: Any, index: int) -> dict[str, Any] | None:
         The constructor kwargs, or `None` to drop the entry.
     """
     result: dict[str, Any] | None = None
-    band_vis = {}
+    band_vis: dict[str, Any] = {}
     if isinstance(entry, dict):
         band_vis = (entry.get("image_visualization") or {}).get("band_vis") or {}
     bands = tuple(str(b) for b in (band_vis.get("bands") or []) if b)

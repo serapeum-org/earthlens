@@ -369,8 +369,9 @@ class TestTileMap:
     def test_a_non_tile_backend_is_refused(self, backend):
         """The static tier draws no slippy map and 3-D spells it differently."""
         viz = _viz()
+        image = _FakeImage()
         with pytest.raises(ValueError, match="is not a digitalearth backend"):
-            viz.tile_map(_FakeImage(), backend=backend)
+            viz.tile_map(image, backend=backend)
 
     def test_no_local_data_is_needed(self, fake_de):
         """A tile map downloads nothing, so it works with no bound result."""
