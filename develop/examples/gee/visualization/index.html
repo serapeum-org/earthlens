@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24898,7 +24898,8 @@ colour-map match table, for a dataset the STAC gives no rendering.</li>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">rgb</span> <span class="o">=</span> <span class="n">style_for</span><span class="p">(</span><span class="s2">"COPERNICUS/S2_SR_HARMONIZED"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">))</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">S2</span> <span class="o">=</span> <span class="s2">"COPERNICUS/S2_SR_HARMONIZED"</span>  <span class="c1"># reused below</span>
+<span class="n">rgb</span> <span class="o">=</span> <span class="n">style_for</span><span class="p">(</span><span class="n">S2</span><span class="p">,</span> <span class="p">(</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">))</span>
 <span class="n">dem</span> <span class="o">=</span> <span class="n">style_for</span><span class="p">(</span><span class="s2">"USGS/SRTMGL1_003"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"elevation"</span><span class="p">,))</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Sentinel-2 true colour:"</span><span class="p">,</span> <span class="n">rgb</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="n">rgb</span><span class="o">.</span><span class="n">bands</span><span class="p">,</span> <span class="s2">"rgb ="</span><span class="p">,</span> <span class="n">rgb</span><span class="o">.</span><span class="n">is_rgb</span><span class="p">)</span>
@@ -24906,7 +24907,8 @@ colour-map match table, for a dataset the STAC gives no rendering.</li>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"SRTM elevation:"</span><span class="p">,</span> <span class="n">dem</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="n">dem</span><span class="o">.</span><span class="n">bands</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"  field kwargs for digitalearth:"</span><span class="p">,</span> <span class="n">dem</span><span class="o">.</span><span class="n">field_kwargs</span><span class="p">())</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">rgb = style_for("COPERNICUS/S2_SR_HARMONIZED", ("B4", "B3", "B2"))
+<div class="clipboard-copy-txt" id="cell-3">S2 = "COPERNICUS/S2_SR_HARMONIZED"  # reused below
+rgb = style_for(S2, ("B4", "B3", "B2"))
 dem = style_for("USGS/SRTMGL1_003", ("elevation",))
 
 print("Sentinel-2 true colour:", rgb.source, rgb.bands, "rgb =", rgb.is_rgb)
@@ -24927,7 +24929,8 @@ print("  field kwargs for digitalearth:", dem.field_kwargs())</div>
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="2-render-a-downloaded-raster-client-side">2. Render a downloaded raster, client-side<a class="anchor-link" href="#2-render-a-downloaded-raster-client-side">¶</a></h2><p><code>GEE.visualize(result)</code> binds a download to its catalog style and delegates to
 digitalearth. A single-band request goes through <code>quickmap</code>, stretched with the
-hints' <code>vmin</code> / <code>vmax</code>. Here a single static SRTM tile over the Giza plateau.</p>
+hints' <code>vmin</code> / <code>vmax</code>. Here a single static SRTM tile over the Mont Blanc
+massif in the Alps, whose 500–4800 m relief fills the catalog's 0–6000 m stretch.</p>
 </div>
 </div>
 </div>
@@ -24955,10 +24958,10 @@ hints' <code>vmin</code> / <code>vmax</code>. Here a single static SRTM tile ove
     <span class="n">end</span><span class="o">=</span><span class="s2">"2000-02-12"</span><span class="p">,</span>
     <span class="n">dataset</span><span class="o">=</span><span class="s2">"USGS/SRTMGL1_003"</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"elevation"</span><span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">31.1</span><span class="p">,</span> <span class="mf">29.9</span><span class="p">,</span> <span class="mf">31.3</span><span class="p">,</span> <span class="mf">30.1</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">6.7</span><span class="p">,</span> <span class="mf">45.7</span><span class="p">,</span> <span class="mf">7.1</span><span class="p">,</span> <span class="mf">46.0</span><span class="p">],</span>
     <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span>
     <span class="n">path</span><span class="o">=</span><span class="n">OUT_DIR</span><span class="p">,</span>
-    <span class="n">scale</span><span class="o">=</span><span class="mf">200.0</span><span class="p">,</span>
+    <span class="n">scale</span><span class="o">=</span><span class="mf">150.0</span><span class="p">,</span>
     <span class="n">reducer</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">,</span>
     <span class="n">materialize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
@@ -24975,10 +24978,10 @@ hints' <code>vmin</code> / <code>vmax</code>. Here a single static SRTM tile ove
     end="2000-02-12",
     dataset="USGS/SRTMGL1_003",
     variables=["elevation"],
-    aoi=[31.1, 29.9, 31.3, 30.1],
+    aoi=[6.7, 45.7, 7.1, 46.0],
     cadence="raw",
     path=OUT_DIR,
-    scale=200.0,
+    scale=150.0,
     reducer="mean",
     materialize=True,
 )
@@ -25029,7 +25032,7 @@ per-band <code>limits</code>. Here a monthly Sentinel-2 median over the same are
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">s2_gee</span> <span class="o">=</span> <span class="n">GEE</span><span class="p">(</span>
     <span class="n">start</span><span class="o">=</span><span class="s2">"2021-06-01"</span><span class="p">,</span>
     <span class="n">end</span><span class="o">=</span><span class="s2">"2021-06-30"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"COPERNICUS/S2_SR_HARMONIZED"</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="n">S2</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">],</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">31.1</span><span class="p">,</span> <span class="mf">29.9</span><span class="p">,</span> <span class="mf">31.25</span><span class="p">,</span> <span class="mf">30.05</span><span class="p">],</span>
     <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
@@ -25049,7 +25052,7 @@ per-band <code>limits</code>. Here a monthly Sentinel-2 median over the same are
 <div class="clipboard-copy-txt" id="cell-5">s2_gee = GEE(
     start="2021-06-01",
     end="2021-06-30",
-    dataset="COPERNICUS/S2_SR_HARMONIZED",
+    dataset=S2,
     variables=["B4", "B3", "B2"],
     aoi=[31.1, 29.9, 31.25, 30.05],
     temporal_resolution="monthly",
@@ -25107,7 +25110,7 @@ they need no <code>materialize</code> and no local render. <code>thumbnail</code
 
 <span class="n">region</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">Geometry</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">([</span><span class="mf">31.0</span><span class="p">,</span> <span class="mf">29.9</span><span class="p">,</span> <span class="mf">31.3</span><span class="p">,</span> <span class="mf">30.2</span><span class="p">])</span>
 <span class="n">true_colour</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">ee</span><span class="o">.</span><span class="n">ImageCollection</span><span class="p">(</span><span class="s2">"COPERNICUS/S2_SR_HARMONIZED"</span><span class="p">)</span>
+    <span class="n">ee</span><span class="o">.</span><span class="n">ImageCollection</span><span class="p">(</span><span class="n">S2</span><span class="p">)</span>
     <span class="o">.</span><span class="n">filterBounds</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
     <span class="o">.</span><span class="n">filterDate</span><span class="p">(</span><span class="s2">"2021-06-01"</span><span class="p">,</span> <span class="s2">"2021-06-30"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">median</span><span class="p">()</span>
@@ -25125,7 +25128,7 @@ they need no <code>materialize</code> and no local render. <code>thumbnail</code
 
 region = ee.Geometry.Rectangle([31.0, 29.9, 31.3, 30.2])
 true_colour = (
-    ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
+    ee.ImageCollection(S2)
     .filterBounds(region)
     .filterDate("2021-06-01", "2021-06-30")
     .median()
@@ -25193,8 +25196,9 @@ Image(url=thumb_url)</div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="5-a-timelapse">5. A timelapse<a class="anchor-link" href="#5-a-timelapse">¶</a></h2><p><code>timelapse</code> stacks a multi-date download into one animation in a single call to
-digitalearth's collection-aware <code>animate</code>. Here three monthly means of daily
-CHIRPS precipitation.</p>
+digitalearth's collection-aware <code>animate</code>. Here monthly means of daily CHIRPS
+precipitation over the Sahel across the 2021 wet season — the monsoon sweeps in
+from May, peaks in August, and recedes by November.</p>
 </div>
 </div>
 </div>
@@ -25218,14 +25222,14 @@ CHIRPS precipitation.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">chirps_gee</span> <span class="o">=</span> <span class="n">GEE</span><span class="p">(</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"2021-06-01"</span><span class="p">,</span>
-    <span class="n">end</span><span class="o">=</span><span class="s2">"2021-09-01"</span><span class="p">,</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2021-05-01"</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s2">"2021-11-01"</span><span class="p">,</span>
     <span class="n">dataset</span><span class="o">=</span><span class="s2">"UCSB-CHG/CHIRPS/DAILY"</span><span class="p">,</span>
     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"precipitation"</span><span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">31.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">31.6</span><span class="p">,</span> <span class="mf">30.6</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">17.0</span><span class="p">],</span>
     <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
     <span class="n">path</span><span class="o">=</span><span class="n">OUT_DIR</span><span class="p">,</span>
-    <span class="n">scale</span><span class="o">=</span><span class="mf">5000.0</span><span class="p">,</span>
+    <span class="n">scale</span><span class="o">=</span><span class="mf">10000.0</span><span class="p">,</span>
     <span class="n">reducer</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">,</span>
     <span class="n">materialize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
@@ -25233,19 +25237,19 @@ CHIRPS precipitation.</p>
 <span class="n">chirps_result</span> <span class="o">=</span> <span class="n">chirps_gee</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"frames:"</span><span class="p">,</span> <span class="n">chirps_result</span><span class="o">.</span><span class="n">collection</span><span class="p">()</span><span class="o">.</span><span class="n">time_length</span><span class="p">)</span>
 
-<span class="n">gif_path</span> <span class="o">=</span> <span class="n">OUT_DIR</span> <span class="o">/</span> <span class="s2">"chirps_summer.gif"</span>
+<span class="n">gif_path</span> <span class="o">=</span> <span class="n">OUT_DIR</span> <span class="o">/</span> <span class="s2">"sahel_monsoon.gif"</span>
 <span class="n">chirps_gee</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">chirps_result</span><span class="p">)</span><span class="o">.</span><span class="n">timelapse</span><span class="p">(</span><span class="n">gif_path</span><span class="p">)</span>
 <span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">gif_path</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-8">chirps_gee = GEE(
-    start="2021-06-01",
-    end="2021-09-01",
+    start="2021-05-01",
+    end="2021-11-01",
     dataset="UCSB-CHG/CHIRPS/DAILY",
     variables=["precipitation"],
-    aoi=[31.0, 30.0, 31.6, 30.6],
+    aoi=[0.0, 10.0, 10.0, 17.0],
     temporal_resolution="monthly",
     path=OUT_DIR,
-    scale=5000.0,
+    scale=10000.0,
     reducer="mean",
     materialize=True,
 )
@@ -25253,7 +25257,7 @@ chirps_gee.authenticate(service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY
 chirps_result = chirps_gee.download(progress_bar=False)
 print("frames:", chirps_result.collection().time_length)
 
-gif_path = OUT_DIR / "chirps_summer.gif"
+gif_path = OUT_DIR / "sahel_monsoon.gif"
 chirps_gee.visualize(chirps_result).timelapse(gif_path)
 Image(filename=str(gif_path))</div>
 </div>
