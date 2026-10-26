@@ -51,7 +51,12 @@ def _as_float_list(value: Any) -> list[float]:
     Returns:
         The values that cast to `float`, in order.
     """
-    raw = value if isinstance(value, list) else [] if value is None else [value]
+    if isinstance(value, list):
+        raw = value
+    elif value is None:
+        raw = []
+    else:
+        raw = [value]
     out: list[float] = []
     for item in raw:
         try:
@@ -109,14 +114,29 @@ def visualizations_from_stac(doc: Any) -> list[dict[str, Any]]:
     """
     summaries = doc.get("summaries") or {} if isinstance(doc, dict) else {}
     entries = summaries.get(_VIS_KEY) or []
-    out: list[dict[str, Any]] = []
-    for index, entry in enumerate(entries):
-        if not isinstance(entry, dict):
-            continue
+    parsed = (_entry_kwargs(entry, index) for index, entry in enumerate(entries))
+    return [kwargs for kwargs in parsed if kwargs is not None]
+
+
+def _entry_kwargs(entry: Any, index: int) -> dict[str, Any] | None:
+    """Parse one `gee:visualizations` entry into `Visualization` kwargs, or `None`.
+
+    `None` for an entry that is not a mapping or names no band, since a
+    rendering with no bands cannot be drawn and `Visualization` requires them.
+
+    Args:
+        entry: One element of the `gee:visualizations` list.
+        index: Its position, used to name an entry with no `display_name`.
+
+    Returns:
+        The constructor kwargs, or `None` to drop the entry.
+    """
+    result: dict[str, Any] | None = None
+    band_vis = {}
+    if isinstance(entry, dict):
         band_vis = (entry.get("image_visualization") or {}).get("band_vis") or {}
-        bands = tuple(str(b) for b in (band_vis.get("bands") or []) if b)
-        if not bands:
-            continue
+    bands = tuple(str(b) for b in (band_vis.get("bands") or []) if b)
+    if bands:
         kwargs: dict[str, Any] = {
             "name": str(entry.get("display_name") or f"Visualization {index + 1}"),
             "bands": bands,
@@ -130,8 +150,8 @@ def visualizations_from_stac(doc: Any) -> list[dict[str, Any]]:
         )
         if palette:
             kwargs["palette"] = palette
-        out.append(kwargs)
-    return out
+        result = kwargs
+    return result
 
 
 def _scalar(value: float) -> str:
@@ -284,11 +304,11 @@ def _stac_doc(asset_id: str) -> dict[str, Any] | None:
 
 def _stanza_bounds(text: str, asset_id: str) -> tuple[int, int] | None:
     """Locate one dataset stanza's character span inside a catalog file."""
-    head = re.compile(rf"(?m)^  {re.escape(asset_id)}:[ \t]*$")
+    head = re.compile(rf"(?m)^ {{2}}{re.escape(asset_id)}:[ \t]*$")
     match = head.search(text)
     bounds: tuple[int, int] | None = None
     if match is not None:
-        nxt = re.compile(r"(?m)^  [A-Za-z0-9/_.-]+:[ \t]*$")
+        nxt = re.compile(r"(?m)^ {2}[A-Za-z0-9/_.-]+:[ \t]*$")
         following = nxt.search(text, match.end())
         bounds = match.start(), (following.start() if following else len(text))
     return bounds

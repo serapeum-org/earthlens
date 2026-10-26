@@ -203,18 +203,21 @@ class TestStillSingleBand:
 
     def test_an_unknown_backend_is_refused_before_importing_digitalearth(self):
         """The check runs with no digitalearth installed at all."""
+        viz = _viz(_FakeResult())
         with pytest.raises(ValueError, match="is not a digitalearth backend"):
-            _viz(_FakeResult()).still(backend="static")
+            viz.still(backend="static")
 
     def test_a_missing_result_is_refused(self):
         """There is nothing to render without a download."""
+        viz = _viz()
         with pytest.raises(ValueError, match="without a result"):
-            _viz().still()
+            viz.still()
 
     def test_a_paths_only_result_names_materialize(self, fake_de):
         """The remedy is the flag the caller did not pass."""
+        viz = _viz(_FakeResult(data=None))
         with pytest.raises(ValueError, match="materialize=True"):
-            _viz(_FakeResult(data=None)).still()
+            viz.still()
 
 
 class TestStillRgb:
@@ -245,8 +248,9 @@ class TestStillRgb:
 
     def test_the_3d_tier_has_no_composite_and_is_refused(self, fake_de):
         """3-D has no RGB composite renderer, so a composite there is refused."""
+        viz = _rgb_viz(_FakeResult())
         with pytest.raises(ValueError, match="no RGB composite renderer"):
-            _rgb_viz(_FakeResult()).still(backend="3d")
+            viz.still(backend="3d")
 
 
 class TestTimelapse:
@@ -281,22 +285,24 @@ class TestTimelapse:
 
     def test_a_single_frame_result_is_refused(self, fake_de, tmp_path):
         """A single raster is not a time series, and says so."""
+        viz = _viz(_FakeResult(frames=1))
         with pytest.raises(ValueError, match="not a time series"):
-            _viz(_FakeResult(frames=1)).timelapse(tmp_path / "o.gif")
+            viz.timelapse(tmp_path / "o.gif")
 
     def test_a_batch_export_result_propagates_the_collection_error(
         self, fake_de, tmp_path
     ):
         """`collection()` raises for a batch export, and that reaches the caller."""
         err = ValueError("no bucket wrote a file")
-        result = _FakeResult(collection_error=err)
+        viz = _viz(_FakeResult(collection_error=err))
         with pytest.raises(ValueError, match="no bucket wrote a file"):
-            _viz(result).timelapse(tmp_path / "o.gif")
+            viz.timelapse(tmp_path / "o.gif")
 
     def test_a_missing_result_is_refused(self, tmp_path):
         """Nothing to animate without a download."""
+        viz = _viz()
         with pytest.raises(ValueError, match="without a result"):
-            _viz().timelapse(tmp_path / "o.gif")
+            viz.timelapse(tmp_path / "o.gif")
 
 
 class TestChart:
@@ -310,8 +316,9 @@ class TestChart:
 
     def test_an_unknown_chart_kind_is_refused_with_the_choices(self):
         """A typo names what digitalearth does offer."""
+        viz = _viz(_FakeResult())
         with pytest.raises(ValueError, match="is not a digitalearth chart"):
-            _viz(_FakeResult()).chart("piechart", "SERIES")
+            viz.chart("piechart", "SERIES")
 
 
 class TestServerPreviews:
@@ -361,8 +368,9 @@ class TestTileMap:
     @pytest.mark.parametrize("backend", ["matplotlib", "3d"])
     def test_a_non_tile_backend_is_refused(self, backend):
         """The static tier draws no slippy map and 3-D spells it differently."""
+        viz = _viz()
         with pytest.raises(ValueError, match="is not a digitalearth backend"):
-            _viz().tile_map(_FakeImage(), backend=backend)
+            viz.tile_map(_FakeImage(), backend=backend)
 
     def test_no_local_data_is_needed(self, fake_de):
         """A tile map downloads nothing, so it works with no bound result."""
@@ -375,6 +383,7 @@ class TestTheExtraIsNotRequired:
 
     def test_a_missing_digitalearth_names_the_extra(self, monkeypatch):
         """The error tells the caller what to install, not what failed."""
+        viz = _viz(_FakeResult())
         monkeypatch.setitem(sys.modules, "digitalearth", None)
         with pytest.raises(ImportError, match=r"earthlens\[viz\]"):
-            _viz(_FakeResult()).still()
+            viz.still()

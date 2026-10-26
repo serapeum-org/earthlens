@@ -169,9 +169,11 @@ class TestStyleForCatalogPath:
 
     def test_an_unknown_rendering_name_is_refused_with_the_choices(self):
         """A misnamed rendering names what the row does offer."""
-        row = _row(visualizations=(Visualization(name="RGB", bands=("b1",)),))
+        catalog = _catalog(
+            _row(visualizations=(Visualization(name="RGB", bands=("b1",)),))
+        )
         with pytest.raises(ValueError, match="is not a rendering of"):
-            style_for("T/EST", None, name="Infra", catalog=_catalog(row))
+            style_for("T/EST", None, name="Infra", catalog=catalog)
 
     def test_a_rendering_for_other_bands_does_not_hijack_the_request(self):
         """Asking for one band does not get the publisher's three-band RGB."""
@@ -237,30 +239,35 @@ class TestStyleForRefusals:
 
     def test_an_unknown_dataset_is_refused(self):
         """A dataset outside the curated set has no style to resolve."""
+        catalog = _catalog(_row())
         with pytest.raises(ValueError, match="is not a curated GEE dataset"):
-            style_for("NO/SUCH", ("b1",), catalog=_catalog(_row()))
+            style_for("NO/SUCH", ("b1",), catalog=catalog)
 
     def test_an_unknown_band_is_refused_through_the_catalogs_own_check(self):
         """The message is `Dataset.get_band`'s, so the wording cannot drift."""
+        catalog = _catalog(_row())
         with pytest.raises(ValueError, match=r"is not a band of 'T/EST'"):
-            style_for("T/EST", ("b2",), catalog=_catalog(_row()))
+            style_for("T/EST", ("b2",), catalog=catalog)
 
     def test_a_near_miss_band_carries_the_closest_match_suggestion(self):
         """A plausible typo gets the same did-you-mean the catalog gives."""
-        row = _row(bands={"elevation": Band(id="elevation", min=0, max=1)})
+        catalog = _catalog(
+            _row(bands={"elevation": Band(id="elevation", min=0, max=1)})
+        )
         with pytest.raises(ValueError, match="Did you mean 'elevation'"):
-            style_for("T/EST", ("elevashun",), catalog=_catalog(row))
+            style_for("T/EST", ("elevashun",), catalog=catalog)
 
     def test_an_empty_band_tuple_is_a_mistake_not_a_default(self):
         """`bands=()` is refused rather than silently meaning "the default"."""
+        catalog = _catalog(_row())
         with pytest.raises(ValueError, match="names no band to style"):
-            style_for("T/EST", (), catalog=_catalog(_row()))
+            style_for("T/EST", (), catalog=catalog)
 
     def test_a_row_with_no_bands_is_refused(self):
         """An unhydrated row has nothing to draw."""
-        row = _row(bands={})
+        catalog = _catalog(_row(bands={}))
         with pytest.raises(ValueError, match="carries no bands"):
-            style_for("T/EST", None, catalog=_catalog(row))
+            style_for("T/EST", None, catalog=catalog)
 
 
 class TestAgainstTheRealCatalog:

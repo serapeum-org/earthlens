@@ -358,7 +358,33 @@ def style_for(
             "the dataset default"
         )
     cat = catalog if catalog is not None else _Catalog()
-    row = cat.datasets.get(asset_id)
+    row = _resolved_row(cat, asset_id, name)
+    chosen = _pick_visualization(row, bands, name)
+    if bands is not None:
+        for band_id in bands:
+            row.get_band(band_id)
+    if chosen is not None:
+        hints = _catalog_hints(chosen)
+    else:
+        hints = _default_hints(row, bands, asset_id)
+    return hints
+
+
+def _resolved_row(catalog: Catalog, asset_id: str, name: str | None) -> Dataset:
+    """Return the catalog row for `asset_id`, refusing an unknown id or `name`.
+
+    Args:
+        catalog: The loaded catalog to look `asset_id` up in.
+        asset_id: The Earth Engine asset id.
+        name: A rendering name to require on the row, or `None`.
+
+    Returns:
+        The matching `Dataset`.
+
+    Raises:
+        ValueError: If `asset_id` is not curated, or `name` names no rendering.
+    """
+    row = catalog.datasets.get(asset_id)
     if row is None:
         raise ValueError(
             f"{asset_id!r} is not a curated GEE dataset, so it has no style to "
@@ -369,27 +395,33 @@ def style_for(
         raise ValueError(
             f"{name!r} is not a rendering of {asset_id!r}; it offers {known}"
         )
+    return row
 
-    chosen = _pick_visualization(row, bands, name)
-    if bands is not None:
-        for band_id in bands:
-            row.get_band(band_id)
 
-    if chosen is not None:
-        hints = StyleHints(
-            bands=tuple(chosen.bands),
-            limits=chosen.limits,
-            palette=tuple(chosen.palette),
-            gamma=tuple(chosen.gamma),
-            gain=tuple(chosen.gain),
-            source="catalog",
+def _catalog_hints(chosen: Visualization) -> StyleHints:
+    """Build `StyleHints` from a publisher rendering."""
+    return StyleHints(
+        bands=tuple(chosen.bands),
+        limits=chosen.limits,
+        palette=tuple(chosen.palette),
+        gamma=tuple(chosen.gamma),
+        gain=tuple(chosen.gain),
+        source="catalog",
+    )
+
+
+def _default_hints(
+    row: Dataset, bands: tuple[str, ...] | None, asset_id: str
+) -> StyleHints:
+    """Build heuristic hints for the requested bands, or the row's first band.
+
+    Raises:
+        ValueError: If no bands are requested and the row carries none.
+    """
+    selected = bands if bands is not None else (next(iter(row.bands), ""),)
+    if not selected[0]:
+        raise ValueError(
+            f"{asset_id!r} carries no bands, so it has no default to style; "
+            f"hydrate the row or pass bands explicitly"
         )
-    else:
-        selected = bands if bands is not None else (next(iter(row.bands), ""),)
-        if not selected[0]:
-            raise ValueError(
-                f"{asset_id!r} carries no bands, so it has no default to style; "
-                f"hydrate the row or pass bands explicitly"
-            )
-        hints = _heuristic_hints(row, selected)
-    return hints
+    return _heuristic_hints(row, selected)

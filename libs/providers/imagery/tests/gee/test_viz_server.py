@@ -181,8 +181,9 @@ class TestMapTiles:
     def test_a_response_with_no_url_is_refused_naming_its_keys(self):
         """An unusable layer is impossible: no template means an error."""
         image = _FakeImage(map_info={"mapid": "m"})
+        tiles = MapTiles()
         with pytest.raises(ValueError, match="no tile URL format"):
-            MapTiles().resolve(image)
+            tiles.resolve(image)
 
     def test_the_layer_name_is_carried(self):
         """A name given for the legend is kept."""
