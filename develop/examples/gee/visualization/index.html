@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -15804,23 +15804,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Setup">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#credentials" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Credentials
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -15835,10 +15818,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-render-a-downloaded-raster-client-side" class="md-nav__link">
+  <a href="#2-one-elevation-download-three-backends" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Render a downloaded raster, client-side
+        2. One elevation download, three backends
       
     </span>
   </a>
@@ -15857,10 +15840,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-server-side-previews-no-download" class="md-nav__link">
+  <a href="#4-the-data-itself-as-earth-engine-tiles-on-a-slippy-map" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Server-side previews — no download
+        4. The data itself, as Earth Engine tiles on a slippy map
       
     </span>
   </a>
@@ -15868,10 +15851,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-a-timelapse" class="md-nav__link">
+  <a href="#5-server-side-previews-no-download" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. A timelapse
+        5. Server-side previews — no download
       
     </span>
   </a>
@@ -15879,10 +15862,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-an-earth-engine-tile-layer-on-a-slippy-map" class="md-nav__link">
+  <a href="#6-a-timelapse" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. An Earth Engine tile layer on a slippy map
+        6. A timelapse
       
     </span>
   </a>
@@ -23882,23 +23865,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Setup">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#credentials" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Credentials
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -23913,10 +23879,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-render-a-downloaded-raster-client-side" class="md-nav__link">
+  <a href="#2-one-elevation-download-three-backends" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Render a downloaded raster, client-side
+        2. One elevation download, three backends
       
     </span>
   </a>
@@ -23935,10 +23901,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-server-side-previews-no-download" class="md-nav__link">
+  <a href="#4-the-data-itself-as-earth-engine-tiles-on-a-slippy-map" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Server-side previews — no download
+        4. The data itself, as Earth Engine tiles on a slippy map
       
     </span>
   </a>
@@ -23946,10 +23912,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-a-timelapse" class="md-nav__link">
+  <a href="#5-server-side-previews-no-download" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. A timelapse
+        5. Server-side previews — no download
       
     </span>
   </a>
@@ -23957,10 +23923,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-an-earth-engine-tile-layer-on-a-slippy-map" class="md-nav__link">
+  <a href="#6-a-timelapse" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. An Earth Engine tile layer on a slippy map
+        6. A timelapse
       
     </span>
   </a>
@@ -24749,15 +24715,16 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="visualization-earthlens-fetches-digitalearth-draws">Visualization — earthlens fetches, digitalearth draws<a class="anchor-link" href="#visualization-earthlens-fetches-digitalearth-draws">¶</a></h1><p>earthlens owns no plotting layer. It fetches pixels from Earth Engine and
-returns pyramids objects; every figure, map, animation and chart is produced by
-<a href="https://github.com/serapeum-org/Digital-Earth"><strong>digitalearth</strong></a> over
-cleopatra. This notebook walks the whole <code>earthlens → digitalearth</code> seam for the
-GEE backend: resolving a dataset's default style from the catalog, rendering a
-download client-side, the two Earth-Engine-side previews that need no download,
-and a timelapse.</p>
-<p>The plotting stack is an optional extra:</p>
-<div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>viz<span class="o">]</span><span class="w">      </span><span class="c1"># or: uv sync --extra viz</span>
+<h1 id="visualization-earthlens-fetches-digitalearth-draws">Visualization — earthlens fetches, digitalearth draws<a class="anchor-link" href="#visualization-earthlens-fetches-digitalearth-draws">¶</a></h1><p>earthlens owns no plotting layer. It fetches pixels from Earth Engine and returns
+pyramids objects; every figure, map, animation and chart is produced by
+<a href="https://github.com/serapeum-org/Digital-Earth"><strong>digitalearth</strong></a> over cleopatra,
+across its four backend tiers — <code>matplotlib</code> (static), <code>interactive</code> (HoloViz),
+<code>web</code> (MapLibre) and <code>3d</code> (PyVista). earthlens contributes only the parts that are
+genuinely Earth Engine's — catalog-driven style hints and the two server-side
+preview URLs — plus a <code>Visualizer</code> facade that calls a digitalearth verb.</p>
+<p>One download, rendered four ways.</p>
+<div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>viz<span class="o">]</span><span class="w">                 </span><span class="c1"># base: the static (matplotlib) tier</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s1">'digitalearth[web,interactive,3d]'</span><span class="w">   </span><span class="c1"># the slippy-map and 3-D tiers</span>
 </pre></div>
 </div>
 </div>
@@ -24769,9 +24736,7 @@ and a timelapse.</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p><code>pyramids</code> provides the <code>Dataset</code> that <code>earthlens</code> returns; <code>earthlens.gee</code>
-provides the <code>GEE</code> backend and the <code>viz</code> helpers. The per-notebook output
-directory holds the rasters each download writes.</p>
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2>
 </div>
 </div>
 </div>
@@ -24795,22 +24760,44 @@ directory holds the rasters each download writes.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"PYVISTA_OFF_SCREEN"</span><span class="p">,</span> <span class="s2">"true"</span><span class="p">)</span>  <span class="c1"># render the 3-D tier headless</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">holoviews</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">hv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">GEE</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">style_for</span>
 
+<span class="n">hv</span><span class="o">.</span><span class="n">extension</span><span class="p">(</span><span class="s2">"bokeh"</span><span class="p">)</span>  <span class="c1"># load the HoloViz JS so the interactive tier renders inline</span>
+
 <span class="n">OUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"out"</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"visualization"</span>
 <span class="n">OUT_DIR</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>
+<span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os
+
+os.environ.setdefault("PYVISTA_OFF_SCREEN", "true")  # render the 3-D tier headless
+
 from pathlib import Path
+
+import holoviews as hv
+from IPython.display import Image
 
 from earthlens.gee import GEE
 from earthlens.gee.viz import style_for
 
+hv.extension("bokeh")  # load the HoloViz JS so the interactive tier renders inline
+
 OUT_DIR = Path("out") / "visualization"
-OUT_DIR.mkdir(parents=True, exist_ok=True)</div>
+OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]
+SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]</div>
 </div>
 </div>
 </div>
@@ -24823,9 +24810,10 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="credentials">Credentials<a class="anchor-link" href="#credentials">¶</a></h3><p>The GEE backend reads its service-account credentials from the
-<code>GEE_SERVICE_ACCOUNT</code> / <code>GEE_SERVICE_KEY</code> environment variables. Both must be
-set before running the download cells.</p>
+<h2 id="1-style-hints-from-the-catalog">1. Style hints from the catalog<a class="anchor-link" href="#1-style-hints-from-the-catalog">¶</a></h2><p><code>style_for</code> answers "how should this dataset be drawn?" from the catalog rather
+than from a guess, and <code>source</code> says where the answer came from — the publisher's
+own <code>gee:visualizations</code> rendering (894 of the 1104 curated datasets carry one),
+or a heuristic over the band's declared range. No network needed.</p>
 </div>
 </div>
 </div>
@@ -24848,11 +24836,19 @@ set before running the download cells.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>
-<span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">S2</span> <span class="o">=</span> <span class="s2">"COPERNICUS/S2_SR_HARMONIZED"</span>
+<span class="n">rgb</span> <span class="o">=</span> <span class="n">style_for</span><span class="p">(</span><span class="n">S2</span><span class="p">,</span> <span class="p">(</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">))</span>
+<span class="n">dem</span> <span class="o">=</span> <span class="n">style_for</span><span class="p">(</span><span class="s2">"USGS/SRTMGL1_003"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"elevation"</span><span class="p">,))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Sentinel-2 true colour:"</span><span class="p">,</span> <span class="n">rgb</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="n">rgb</span><span class="o">.</span><span class="n">bands</span><span class="p">,</span> <span class="s2">"| rgb:"</span><span class="p">,</span> <span class="n">rgb</span><span class="o">.</span><span class="n">is_rgb</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"SRTM elevation       :"</span><span class="p">,</span> <span class="n">dem</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="n">dem</span><span class="o">.</span><span class="n">bands</span><span class="p">,</span> <span class="s2">"| limits:"</span><span class="p">,</span> <span class="n">dem</span><span class="o">.</span><span class="n">limits</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]
-SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]</div>
+<div class="clipboard-copy-txt" id="cell-2">S2 = "COPERNICUS/S2_SR_HARMONIZED"
+rgb = style_for(S2, ("B4", "B3", "B2"))
+dem = style_for("USGS/SRTMGL1_003", ("elevation",))
+
+print("Sentinel-2 true colour:", rgb.source, rgb.bands, "| rgb:", rgb.is_rgb)
+print("SRTM elevation       :", dem.source, dem.bands, "| limits:", dem.limits)</div>
 </div>
 </div>
 </div>
@@ -24865,17 +24861,10 @@ SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="1-style-hints-from-the-catalog">1. Style hints from the catalog<a class="anchor-link" href="#1-style-hints-from-the-catalog">¶</a></h2><p><code>style_for</code> answers "how should this dataset be drawn?" from the catalog rather
-than from a guess. It returns a frozen <code>StyleHints</code>, and its <code>source</code> says where
-the answer came from:</p>
-<ul>
-<li><code>"catalog"</code> — the publisher's own rendering, captured from the asset's STAC
-<code>gee:visualizations</code> (the band triple, stretch and palette Earth Engine's own
-catalog page uses). 894 of the 1104 curated datasets carry one.</li>
-<li><code>"heuristic"</code> — derived from the band's declared <code>min</code> / <code>max</code> plus a
-colour-map match table, for a dataset the STAC gives no rendering.</li>
-</ul>
-<p>No network or credentials are needed to resolve a style.</p>
+<h2 id="2-one-elevation-download-three-backends">2. One elevation download, three backends<a class="anchor-link" href="#2-one-elevation-download-three-backends">¶</a></h2><p>A single SRTM tile over the Mont Blanc massif (500–4800 m of relief). The same
+<code>DownloadResult</code> is drawn by three digitalearth tiers through <code>GEE.visualize</code>.
+The facade spells the stretch each tier's own way — <code>vmin</code>/<code>vmax</code> for matplotlib,
+<code>clim</code> for HoloViz and PyVista — so the one catalog style drives all of them.</p>
 </div>
 </div>
 </div>
@@ -24898,23 +24887,37 @@ colour-map match table, for a dataset the STAC gives no rendering.</li>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">S2</span> <span class="o">=</span> <span class="s2">"COPERNICUS/S2_SR_HARMONIZED"</span>  <span class="c1"># reused below</span>
-<span class="n">rgb</span> <span class="o">=</span> <span class="n">style_for</span><span class="p">(</span><span class="n">S2</span><span class="p">,</span> <span class="p">(</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">))</span>
-<span class="n">dem</span> <span class="o">=</span> <span class="n">style_for</span><span class="p">(</span><span class="s2">"USGS/SRTMGL1_003"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"elevation"</span><span class="p">,))</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Sentinel-2 true colour:"</span><span class="p">,</span> <span class="n">rgb</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="n">rgb</span><span class="o">.</span><span class="n">bands</span><span class="p">,</span> <span class="s2">"rgb ="</span><span class="p">,</span> <span class="n">rgb</span><span class="o">.</span><span class="n">is_rgb</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"  per-band limits:"</span><span class="p">,</span> <span class="n">rgb</span><span class="o">.</span><span class="n">limits</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"SRTM elevation:"</span><span class="p">,</span> <span class="n">dem</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="n">dem</span><span class="o">.</span><span class="n">bands</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"  field kwargs for digitalearth:"</span><span class="p">,</span> <span class="n">dem</span><span class="o">.</span><span class="n">field_kwargs</span><span class="p">())</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">dem_gee</span> <span class="o">=</span> <span class="n">GEE</span><span class="p">(</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2000-02-11"</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s2">"2000-02-12"</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s2">"USGS/SRTMGL1_003"</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"elevation"</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">6.7</span><span class="p">,</span> <span class="mf">45.7</span><span class="p">,</span> <span class="mf">7.1</span><span class="p">,</span> <span class="mf">46.0</span><span class="p">],</span>
+    <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">OUT_DIR</span><span class="p">,</span>
+    <span class="n">scale</span><span class="o">=</span><span class="mf">150.0</span><span class="p">,</span>
+    <span class="n">reducer</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">,</span>
+    <span class="n">materialize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">dem_gee</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
+<span class="n">dem_viz</span> <span class="o">=</span> <span class="n">dem_gee</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">dem_gee</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"style:"</span><span class="p">,</span> <span class="n">dem_viz</span><span class="o">.</span><span class="n">hints</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="n">dem_viz</span><span class="o">.</span><span class="n">hints</span><span class="o">.</span><span class="n">field_kwargs</span><span class="p">())</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">S2 = "COPERNICUS/S2_SR_HARMONIZED"  # reused below
-rgb = style_for(S2, ("B4", "B3", "B2"))
-dem = style_for("USGS/SRTMGL1_003", ("elevation",))
-
-print("Sentinel-2 true colour:", rgb.source, rgb.bands, "rgb =", rgb.is_rgb)
-print("  per-band limits:", rgb.limits)
-print("SRTM elevation:", dem.source, dem.bands)
-print("  field kwargs for digitalearth:", dem.field_kwargs())</div>
+<div class="clipboard-copy-txt" id="cell-3">dem_gee = GEE(
+    start="2000-02-11",
+    end="2000-02-12",
+    dataset="USGS/SRTMGL1_003",
+    variables=["elevation"],
+    aoi=[6.7, 45.7, 7.1, 46.0],
+    cadence="raw",
+    path=OUT_DIR,
+    scale=150.0,
+    reducer="mean",
+    materialize=True,
+)
+dem_gee.authenticate(service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY)
+dem_viz = dem_gee.visualize(dem_gee.download(progress_bar=False))
+print("style:", dem_viz.hints.source, dem_viz.hints.field_kwargs())</div>
 </div>
 </div>
 </div>
@@ -24927,10 +24930,7 @@ print("  field kwargs for digitalearth:", dem.field_kwargs())</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="2-render-a-downloaded-raster-client-side">2. Render a downloaded raster, client-side<a class="anchor-link" href="#2-render-a-downloaded-raster-client-side">¶</a></h2><p><code>GEE.visualize(result)</code> binds a download to its catalog style and delegates to
-digitalearth. A single-band request goes through <code>quickmap</code>, stretched with the
-hints' <code>vmin</code> / <code>vmax</code>. Here a single static SRTM tile over the Mont Blanc
-massif in the Alps, whose 500–4800 m relief fills the catalog's 0–6000 m stretch.</p>
+<p><strong>Static (matplotlib)</strong> — over a basemap, with coastlines.</p>
 </div>
 </div>
 </div>
@@ -24953,45 +24953,11 @@ massif in the Alps, whose 500–4800 m relief fills the catalog's 0–6000 m str
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">dem_gee</span> <span class="o">=</span> <span class="n">GEE</span><span class="p">(</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"2000-02-11"</span><span class="p">,</span>
-    <span class="n">end</span><span class="o">=</span><span class="s2">"2000-02-12"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"USGS/SRTMGL1_003"</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"elevation"</span><span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">6.7</span><span class="p">,</span> <span class="mf">45.7</span><span class="p">,</span> <span class="mf">7.1</span><span class="p">,</span> <span class="mf">46.0</span><span class="p">],</span>
-    <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span>
-    <span class="n">path</span><span class="o">=</span><span class="n">OUT_DIR</span><span class="p">,</span>
-    <span class="n">scale</span><span class="o">=</span><span class="mf">150.0</span><span class="p">,</span>
-    <span class="n">reducer</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">,</span>
-    <span class="n">materialize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">dem_gee</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
-<span class="n">dem_result</span> <span class="o">=</span> <span class="n">dem_gee</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="n">dem_viz</span> <span class="o">=</span> <span class="n">dem_gee</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">dem_result</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"style source:"</span><span class="p">,</span> <span class="n">dem_viz</span><span class="o">.</span><span class="n">hints</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="s2">"| kwargs:"</span><span class="p">,</span> <span class="n">dem_viz</span><span class="o">.</span><span class="n">hints</span><span class="o">.</span><span class="n">field_kwargs</span><span class="p">())</span>
-<span class="n">dem_map</span> <span class="o">=</span> <span class="n">dem_viz</span><span class="o">.</span><span class="n">still</span><span class="p">()</span>
-<span class="n">dem_map</span><span class="o">.</span><span class="n">fig</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">static_map</span> <span class="o">=</span> <span class="n">dem_viz</span><span class="o">.</span><span class="n">still</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s2">"matplotlib"</span><span class="p">,</span> <span class="n">basemap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">coastlines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">static_map</span><span class="o">.</span><span class="n">fig</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">dem_gee = GEE(
-    start="2000-02-11",
-    end="2000-02-12",
-    dataset="USGS/SRTMGL1_003",
-    variables=["elevation"],
-    aoi=[6.7, 45.7, 7.1, 46.0],
-    cadence="raw",
-    path=OUT_DIR,
-    scale=150.0,
-    reducer="mean",
-    materialize=True,
-)
-dem_gee.authenticate(service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY)
-dem_result = dem_gee.download(progress_bar=False)
-
-dem_viz = dem_gee.visualize(dem_result)
-print("style source:", dem_viz.hints.source, "| kwargs:", dem_viz.hints.field_kwargs())
-dem_map = dem_viz.still()
-dem_map.fig</div>
+<div class="clipboard-copy-txt" id="cell-4">static_map = dem_viz.still(backend="matplotlib", basemap=True, coastlines=True)
+static_map.fig</div>
 </div>
 </div>
 </div>
@@ -25004,9 +24970,7 @@ dem_map.fig</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="3-a-true-colour-composite">3. A true-colour composite<a class="anchor-link" href="#3-a-true-colour-composite">¶</a></h2><p>A three-band request is an RGB composite. <code>quickmap</code> has no composite renderer,
-so the facade routes it to the tier's own <code>rgb_composite</code>, passing the catalog's
-per-band <code>limits</code>. Here a monthly Sentinel-2 median over the same area.</p>
+<p><strong>3-D (PyVista)</strong> — the same tile as a terrain surface. Rendered headless to a PNG.</p>
 </div>
 </div>
 </div>
@@ -25029,45 +24993,13 @@ per-band <code>limits</code>. Here a monthly Sentinel-2 median over the same are
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">s2_gee</span> <span class="o">=</span> <span class="n">GEE</span><span class="p">(</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"2021-06-01"</span><span class="p">,</span>
-    <span class="n">end</span><span class="o">=</span><span class="s2">"2021-06-30"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="n">S2</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">31.1</span><span class="p">,</span> <span class="mf">29.9</span><span class="p">,</span> <span class="mf">31.25</span><span class="p">,</span> <span class="mf">30.05</span><span class="p">],</span>
-    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
-    <span class="n">path</span><span class="o">=</span><span class="n">OUT_DIR</span><span class="p">,</span>
-    <span class="n">scale</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>
-    <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">,</span>
-    <span class="n">materialize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">s2_gee</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
-<span class="n">s2_result</span> <span class="o">=</span> <span class="n">s2_gee</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="n">s2_viz</span> <span class="o">=</span> <span class="n">s2_gee</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">s2_result</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"RGB composite, limits:"</span><span class="p">,</span> <span class="n">s2_viz</span><span class="o">.</span><span class="n">hints</span><span class="o">.</span><span class="n">rgb_kwargs</span><span class="p">()[</span><span class="s2">"limits"</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">s2_map</span> <span class="o">=</span> <span class="n">s2_viz</span><span class="o">.</span><span class="n">still</span><span class="p">()</span>
-<span class="n">s2_map</span><span class="o">.</span><span class="n">fig</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">scene_3d</span> <span class="o">=</span> <span class="n">dem_viz</span><span class="o">.</span><span class="n">still</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s2">"3d"</span><span class="p">)</span>
+<span class="n">scene_3d</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span> <span class="o">/</span> <span class="s2">"mont_blanc_3d.png"</span><span class="p">))</span>
+<span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span> <span class="o">/</span> <span class="s2">"mont_blanc_3d.png"</span><span class="p">))</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">s2_gee = GEE(
-    start="2021-06-01",
-    end="2021-06-30",
-    dataset=S2,
-    variables=["B4", "B3", "B2"],
-    aoi=[31.1, 29.9, 31.25, 30.05],
-    temporal_resolution="monthly",
-    path=OUT_DIR,
-    scale=100.0,
-    reducer="median",
-    materialize=True,
-)
-s2_gee.authenticate(service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY)
-s2_result = s2_gee.download(progress_bar=False)
-
-s2_viz = s2_gee.visualize(s2_result)
-print("RGB composite, limits:", s2_viz.hints.rgb_kwargs()["limits"][0])
-s2_map = s2_viz.still()
-s2_map.fig</div>
+<div class="clipboard-copy-txt" id="cell-5">scene_3d = dem_viz.still(backend="3d")
+scene_3d.save(str(OUT_DIR / "mont_blanc_3d.png"))
+Image(filename=str(OUT_DIR / "mont_blanc_3d.png"))</div>
 </div>
 </div>
 </div>
@@ -25080,10 +25012,7 @@ s2_map.fig</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="4-server-side-previews-no-download">4. Server-side previews — no download<a class="anchor-link" href="#4-server-side-previews-no-download">¶</a></h2><p>Two previews are rendered by Earth Engine itself, before any pixels move, so
-they need no <code>materialize</code> and no local render. <code>thumbnail</code> wraps <code>getThumbURL</code>
-(a PNG URL Earth Engine renders on demand); <code>tiles</code> wraps <code>getMapId</code> to a
-<code>{z}/{x}/{y}</code> XYZ template. Both are stretched by the same catalog hints.</p>
+<p><strong>Interactive (HoloViz)</strong> — pan and zoom; the widget renders inline.</p>
 </div>
 </div>
 </div>
@@ -25106,41 +25035,9 @@ they need no <code>materialize</code> and no local render. <code>thumbnail</code
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ee</span>
-
-<span class="n">region</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">Geometry</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">([</span><span class="mf">31.0</span><span class="p">,</span> <span class="mf">29.9</span><span class="p">,</span> <span class="mf">31.3</span><span class="p">,</span> <span class="mf">30.2</span><span class="p">])</span>
-<span class="n">true_colour</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">ee</span><span class="o">.</span><span class="n">ImageCollection</span><span class="p">(</span><span class="n">S2</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">filterBounds</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">filterDate</span><span class="p">(</span><span class="s2">"2021-06-01"</span><span class="p">,</span> <span class="s2">"2021-06-30"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">median</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">])</span>
-<span class="p">)</span>
-
-<span class="n">preview</span> <span class="o">=</span> <span class="n">s2_gee</span><span class="o">.</span><span class="n">visualize</span><span class="p">()</span>  <span class="c1"># no result needed for the EE-side previews</span>
-<span class="n">thumb_url</span> <span class="o">=</span> <span class="n">preview</span><span class="o">.</span><span class="n">thumbnail</span><span class="p">(</span><span class="n">true_colour</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
-<span class="n">tile_source</span> <span class="o">=</span> <span class="n">preview</span><span class="o">.</span><span class="n">tiles</span><span class="p">(</span><span class="n">true_colour</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"S2 true colour"</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">"thumbnail URL:"</span><span class="p">,</span> <span class="n">thumb_url</span><span class="p">[:</span><span class="mi">72</span><span class="p">],</span> <span class="s2">"..."</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"tile template:"</span><span class="p">,</span> <span class="n">tile_source</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/tiles/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">dem_viz</span><span class="o">.</span><span class="n">still</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s2">"interactive"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">import ee
-
-region = ee.Geometry.Rectangle([31.0, 29.9, 31.3, 30.2])
-true_colour = (
-    ee.ImageCollection(S2)
-    .filterBounds(region)
-    .filterDate("2021-06-01", "2021-06-30")
-    .median()
-    .select(["B4", "B3", "B2"])
-)
-
-preview = s2_gee.visualize()  # no result needed for the EE-side previews
-thumb_url = preview.thumbnail(true_colour, dimensions=400)
-tile_source = preview.tiles(true_colour, name="S2 true colour")
-
-print("thumbnail URL:", thumb_url[:72], "...")
-print("tile template:", tile_source.url.split("/tiles/")[-1])</div>
+<div class="clipboard-copy-txt" id="cell-6">dem_viz.still(backend="interactive")</div>
 </div>
 </div>
 </div>
@@ -25153,7 +25050,9 @@ print("tile template:", tile_source.url.split("/tiles/")[-1])</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>The thumbnail URL renders a real PNG when fetched — here it is inline.</p>
+<h2 id="3-a-true-colour-composite">3. A true-colour composite<a class="anchor-link" href="#3-a-true-colour-composite">¶</a></h2><p>A monthly Sentinel-2 median over Cairo and the Nile. A three-band request is an
+RGB composite, which <code>quickmap</code> cannot draw, so the facade routes it to the tier's
+own <code>rgb_composite</code> with the catalog's per-band limits.</p>
 </div>
 </div>
 </div>
@@ -25176,13 +25075,37 @@ print("tile template:", tile_source.url.split("/tiles/")[-1])</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
-
-<span class="n">Image</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">thumb_url</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">s2_gee</span> <span class="o">=</span> <span class="n">GEE</span><span class="p">(</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2021-06-01"</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="s2">"2021-06-30"</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="n">S2</span><span class="p">,</span>
+    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">],</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">31.0</span><span class="p">,</span> <span class="mf">29.9</span><span class="p">,</span> <span class="mf">31.3</span><span class="p">,</span> <span class="mf">30.2</span><span class="p">],</span>
+    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">"monthly"</span><span class="p">,</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">OUT_DIR</span><span class="p">,</span>
+    <span class="n">scale</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>
+    <span class="n">reducer</span><span class="o">=</span><span class="s2">"median"</span><span class="p">,</span>
+    <span class="n">materialize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">s2_gee</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
+<span class="n">s2_viz</span> <span class="o">=</span> <span class="n">s2_gee</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">s2_gee</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<span class="n">s2_viz</span><span class="o">.</span><span class="n">still</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s2">"matplotlib"</span><span class="p">)</span><span class="o">.</span><span class="n">fig</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7">from IPython.display import Image
-
-Image(url=thumb_url)</div>
+<div class="clipboard-copy-txt" id="cell-7">s2_gee = GEE(
+    start="2021-06-01",
+    end="2021-06-30",
+    dataset=S2,
+    variables=["B4", "B3", "B2"],
+    aoi=[31.0, 29.9, 31.3, 30.2],
+    temporal_resolution="monthly",
+    path=OUT_DIR,
+    scale=100.0,
+    reducer="median",
+    materialize=True,
+)
+s2_gee.authenticate(service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY)
+s2_viz = s2_gee.visualize(s2_gee.download(progress_bar=False))
+s2_viz.still(backend="matplotlib").fig</div>
 </div>
 </div>
 </div>
@@ -25195,10 +25118,11 @@ Image(url=thumb_url)</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="5-a-timelapse">5. A timelapse<a class="anchor-link" href="#5-a-timelapse">¶</a></h2><p><code>timelapse</code> stacks a multi-date download into one animation in a single call to
-digitalearth's collection-aware <code>animate</code>. Here monthly means of daily CHIRPS
-precipitation over the Sahel across the 2021 wet season — the monsoon sweeps in
-from May, peaks in August, and recedes by November.</p>
+<h2 id="4-the-data-itself-as-earth-engine-tiles-on-a-slippy-map">4. The data itself, as Earth Engine tiles on a slippy map<a class="anchor-link" href="#4-the-data-itself-as-earth-engine-tiles-on-a-slippy-map">¶</a></h2><p>The showcase of the earthlens→digitalearth seam: earthlens resolves an Earth
+Engine <code>getMapId</code> tile template, digitalearth draws it on a MapLibre web map.
+Nothing is downloaded — the viewport decides which tiles Earth Engine renders, so
+you can pan and zoom the <strong>whole</strong> Sentinel-2 archive. A standalone, shareable
+HTML is written alongside; the widget also renders inline.</p>
 </div>
 </div>
 </div>
@@ -25212,6 +25136,120 @@ from May, peaks in August, and recedes by November.</p>
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-8">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ee</span>
+
+<span class="n">region</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">Geometry</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">([</span><span class="mf">31.0</span><span class="p">,</span> <span class="mf">29.9</span><span class="p">,</span> <span class="mf">31.3</span><span class="p">,</span> <span class="mf">30.2</span><span class="p">])</span>
+<span class="n">true_colour</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">ee</span><span class="o">.</span><span class="n">ImageCollection</span><span class="p">(</span><span class="n">S2</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">filterBounds</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">filterDate</span><span class="p">(</span><span class="s2">"2021-06-01"</span><span class="p">,</span> <span class="s2">"2021-06-30"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">median</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">])</span>
+<span class="p">)</span>
+
+<span class="n">web_map</span> <span class="o">=</span> <span class="n">s2_viz</span><span class="o">.</span><span class="n">tile_map</span><span class="p">(</span><span class="n">true_colour</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">"web"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Sentinel-2 true colour"</span><span class="p">)</span>
+<span class="n">web_map</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">OUT_DIR</span> <span class="o">/</span> <span class="s2">"s2_slippy_map.html"</span><span class="p">),</span> <span class="n">offline</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"standalone map:"</span><span class="p">,</span> <span class="n">OUT_DIR</span> <span class="o">/</span> <span class="s2">"s2_slippy_map.html"</span><span class="p">)</span>
+<span class="n">web_map</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-8">import ee
+
+region = ee.Geometry.Rectangle([31.0, 29.9, 31.3, 30.2])
+true_colour = (
+    ee.ImageCollection(S2)
+    .filterBounds(region)
+    .filterDate("2021-06-01", "2021-06-30")
+    .median()
+    .select(["B4", "B3", "B2"])
+)
+
+web_map = s2_viz.tile_map(true_colour, backend="web", name="Sentinel-2 true colour")
+web_map.save(str(OUT_DIR / "s2_slippy_map.html"), offline=True)
+print("standalone map:", OUT_DIR / "s2_slippy_map.html")
+web_map</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=17">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="5-server-side-previews-no-download">5. Server-side previews — no download<a class="anchor-link" href="#5-server-side-previews-no-download">¶</a></h2><p>Two previews are rendered by Earth Engine itself, before any pixels move:
+<code>thumbnail</code> wraps <code>getThumbURL</code> (a PNG URL Earth Engine renders on demand), and
+<code>tiles</code> wraps <code>getMapId</code> to the <code>{z}/{x}/{y}</code> template the map above consumed.
+Both are stretched by the catalog hints.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=18">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-9">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">thumb_url</span> <span class="o">=</span> <span class="n">s2_viz</span><span class="o">.</span><span class="n">thumbnail</span><span class="p">(</span><span class="n">true_colour</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"tile template:"</span><span class="p">,</span> <span class="n">s2_viz</span><span class="o">.</span><span class="n">tiles</span><span class="p">(</span><span class="n">true_colour</span><span class="p">)</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/tiles/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">Image</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">thumb_url</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-9">thumb_url = s2_viz.thumbnail(true_colour, dimensions=400)
+print("tile template:", s2_viz.tiles(true_colour).url.split("/tiles/")[-1])
+Image(url=thumb_url)</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=19">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="6-a-timelapse">6. A timelapse<a class="anchor-link" href="#6-a-timelapse">¶</a></h2><p><code>timelapse</code> stacks a multi-date download into one animation in a single call to
+digitalearth's collection-aware <code>animate</code> — here monthly means of daily CHIRPS
+precipitation across the 2021 Sahel wet season, the monsoon sweeping north from
+May and receding by November.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=20">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-10">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -25238,10 +25276,10 @@ from May, peaks in August, and recedes by November.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"frames:"</span><span class="p">,</span> <span class="n">chirps_result</span><span class="o">.</span><span class="n">collection</span><span class="p">()</span><span class="o">.</span><span class="n">time_length</span><span class="p">)</span>
 
 <span class="n">gif_path</span> <span class="o">=</span> <span class="n">OUT_DIR</span> <span class="o">/</span> <span class="s2">"sahel_monsoon.gif"</span>
-<span class="n">chirps_gee</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">chirps_result</span><span class="p">)</span><span class="o">.</span><span class="n">timelapse</span><span class="p">(</span><span class="n">gif_path</span><span class="p">)</span>
+<span class="n">chirps_gee</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">chirps_result</span><span class="p">)</span><span class="o">.</span><span class="n">timelapse</span><span class="p">(</span><span class="n">gif_path</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"Blues"</span><span class="p">)</span>
 <span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">gif_path</span><span class="p">))</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-8">chirps_gee = GEE(
+<div class="clipboard-copy-txt" id="cell-10">chirps_gee = GEE(
     start="2021-05-01",
     end="2021-11-01",
     dataset="UCSB-CHG/CHIRPS/DAILY",
@@ -25258,7 +25296,7 @@ chirps_result = chirps_gee.download(progress_bar=False)
 print("frames:", chirps_result.collection().time_length)
 
 gif_path = OUT_DIR / "sahel_monsoon.gif"
-chirps_gee.visualize(chirps_result).timelapse(gif_path)
+chirps_gee.visualize(chirps_result).timelapse(gif_path, cmap="Blues")
 Image(filename=str(gif_path))</div>
 </div>
 </div>
@@ -25266,25 +25304,7 @@ Image(filename=str(gif_path))</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=17">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="6-an-earth-engine-tile-layer-on-a-slippy-map">6. An Earth Engine tile layer on a slippy map<a class="anchor-link" href="#6-an-earth-engine-tile-layer-on-a-slippy-map">¶</a></h2><p><code>tile_map</code> puts the Earth Engine tiles onto a digitalearth web or interactive
-map — earthlens resolves the template inside Earth Engine, digitalearth draws
-it, and nothing is downloaded. The slippy-map tiers are digitalearth's own
-extras, so this needs <code>pip install 'digitalearth[web]'</code> (or <code>[interactive]</code>)
-beyond <code>earthlens[viz]</code>; with those installed the call is:</p>
-<div class="highlight"><pre><span></span><span class="n">web_map</span> <span class="o">=</span> <span class="n">s2_gee</span><span class="o">.</span><span class="n">visualize</span><span class="p">()</span><span class="o">.</span><span class="n">tile_map</span><span class="p">(</span><span class="n">true_colour</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">"web"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"S2"</span><span class="p">)</span>
-<span class="n">web_map</span>  <span class="c1"># a MapLibre map with the Earth Engine layer</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=18">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=21">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -25307,7 +25327,7 @@ beyond <code>earthlens[viz]</code>; with those installed the call is:</p>
 <td>earthlens (<code>earthlens.gee.viz</code>)</td>
 </tr>
 <tr>
-<td>Maps, animations, charts, layout</td>
+<td>Maps, animations, charts, the four backend tiers</td>
 <td>digitalearth</td>
 </tr>
 <tr>
@@ -25318,8 +25338,7 @@ beyond <code>earthlens[viz]</code>; with those installed the call is:</p>
 </table>
 <h2 id="see-also">See also<a class="anchor-link" href="#see-also">¶</a></h2><ul>
 <li><a href="../../reference/gee/usage.md">Usage</a> — the request shape and the object API.</li>
-<li><a href="../../reference/gee/server-side-compute.md">Server-side computation</a> — masks,
-filters, temporal helpers and the export sinks.</li>
+<li><a href="../../reference/gee/server-side-compute.md">Server-side computation</a>.</li>
 </ul>
 </div>
 </div>
