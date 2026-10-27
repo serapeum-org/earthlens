@@ -625,6 +625,7 @@ nav:
       - Precipitation — CHIRPS daily: examples/gee/precipitation.ipynb
       - SAR / radar — Sentinel-1 GRD VV: examples/gee/sar-radar.ipynb
       - Tracking batch exports (end-to-end demo): examples/gee/track-batch-exports.ipynb
+      - Visualization — maps, previews, timelapse (via digitalearth): examples/gee/visualization.ipynb
     - Satellite imagery (STAC):
       - Quickstart — Sentinel-2 COGs: examples/stac/quickstart.ipynb
       - NDVI time-series — monthly Sentinel-2: examples/stac/sentinel2_ndvi_timeseries.ipynb

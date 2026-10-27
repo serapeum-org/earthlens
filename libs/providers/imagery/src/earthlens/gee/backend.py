@@ -55,6 +55,8 @@ import datetime as dt
 import gc
 import math
 import os
+import shutil
+import tempfile
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, cast
@@ -63,6 +65,7 @@ import ee
 import pandas as pd
 from loguru import logger
 from pyramids.dataset import Dataset as PyramidsDataset
+from pyramids.dataset.collection import DatasetCollection
 from pyramids.dataset.merge import merge_rasters
 from tqdm import tqdm
 
@@ -146,6 +149,7 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
     from earthlens.base.http import HttpClient
     from earthlens.gee.analysis.base import OperationChain, RasterOperation
     from earthlens.gee.sampling.base import Sampler
+    from earthlens.gee.viz import Visualizer
 
 __all__ = [
     "GEE",
@@ -662,6 +666,45 @@ def _discard_quietly(path: Path) -> None:
             stray.unlink(missing_ok=True)
         except OSError as exc:
             logger.debug(f"Could not remove the staging file {stray}: {exc}")
+
+
+def _as_file_backed_stack(
+    stack: DatasetCollection,
+) -> tuple[DatasetCollection, Path | None]:
+    """Return a file-backed view of a scene stack, spilling it if it is not one.
+
+    pyramids reduces a `DatasetCollection` through its `data` property, which
+    requires a **file-backed** (or zarr-backed) collection; the EEDAI reader's
+    `collection_from_earthengine`, though, returns an **in-memory** collection
+    of warped scenes (`DatasetCollection(datasets=...)`). Reducing that raises
+    `DatasetCollection.data requires a file-backed collection`, so a `median` /
+    `percentile` / `trend` EEDAI composite fails before it can be written.
+
+    This bridges the two with pyramids' own public API: an in-memory stack is
+    spilled to COGs in a temporary directory and reloaded with `from_files`,
+    which the reducer then reads. A stack that is already file-backed is
+    returned untouched. This is a workaround for the pyramids-eo / pyramids-core
+    contract gap (the reader hands back in-memory scenes the reducer cannot
+    consume), tracked upstream; it reimplements no raster logic of its own —
+    the reduction stays pyramids' `reduce_time`.
+
+    Args:
+        stack: The scene stack from the reader.
+
+    Returns:
+        A `(collection, spill_dir)` pair. `collection` is file-backed and ready
+        to reduce; `spill_dir` is the temporary directory to remove once the
+        reduction is done, or `None` when the stack was already backed and
+        nothing was spilled.
+    """
+    if stack.files:
+        result: tuple[DatasetCollection, Path | None] = (stack, None)
+    else:
+        spill_dir = Path(tempfile.mkdtemp(prefix="earthlens-eedai-stack-"))
+        paths = stack.to_cog_stack(spill_dir, name="scene")
+        backed = DatasetCollection.from_files([str(path) for path in paths])
+        result = (backed, spill_dir)
+    return result
 
 
 def _declaring(reader: Any, nodata: float | int) -> Any:
@@ -2015,6 +2058,72 @@ class GEE(LazyClientMixin, AbstractDataSource):
             self.download(progress_bar=progress_bar, materialize=True),
         )
         return analysis.run_on_result(result, write_to=write_to, overwrite=overwrite)
+
+    def visualize(
+        self,
+        result: DownloadResult | None = None,
+        *,
+        asset_id: str | None = None,
+        bands: tuple[str, ...] | None = None,
+        name: str | None = None,
+    ) -> Visualizer:
+        """Return a `Visualizer` binding a download to its catalog style hints.
+
+        earthlens does no rendering: the returned object resolves what to draw
+        and how to stretch it from this request's catalog row, then delegates
+        every figure to **digitalearth**. It is the only part of the backend
+        that needs the `viz` extra, and only once a method is called — this
+        one imports nothing.
+
+        Args:
+            result: The `DownloadResult` to render. `None` gives a visualizer
+                usable for style resolution and the Earth-Engine-side
+                previews (`thumbnail` / `tiles`), which need no local pixels.
+            asset_id: Which asset's style to resolve. Defaults to this
+                request's asset when it names exactly one.
+            bands: Band ids to draw. Defaults to the bands this request asked
+                for, falling back to the dataset's own default rendering.
+            name: Pick a specific publisher rendering by its display name
+                (`"True Color (432)"`) for a dataset offering several.
+
+        Returns:
+            The `Visualizer` for this request.
+
+        Raises:
+            ValueError: If `asset_id` is omitted and the request names more
+                than one asset, so there is no single style to resolve.
+
+        Examples:
+            - Render what came back, through digitalearth:
+                ```python
+                >>> gee = GEE(  # doctest: +SKIP
+                ...     start="2020-06-01",
+                ...     end="2020-06-30",
+                ...     variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4", "B3", "B2"]},
+                ...     lat_lim=[30.0, 31.0],
+                ...     lon_lim=[31.0, 32.0],
+                ...     scale=20,
+                ... )
+                >>> result = gee.download(materialize=True)  # doctest: +SKIP
+                >>> gee.visualize(result).still()  # doctest: +SKIP
+                ```
+        """
+        from earthlens.gee.viz import Visualizer
+
+        chosen = asset_id
+        if chosen is None:
+            assets = list(self.vars)
+            if len(assets) != 1:
+                raise ValueError(
+                    f"this request names {len(assets)} assets, so there is no "
+                    f"single dataset whose style to resolve; pass asset_id= "
+                    f"with one of {sorted(assets)}"
+                )
+            chosen = assets[0]
+        selected = bands
+        if selected is None and isinstance(self.vars, dict):
+            selected = tuple(self.vars.get(chosen) or ()) or None
+        return Visualizer(result, chosen, selected, name=name)
 
     def workload_tag(self, tag: str) -> WorkloadTag:
         """Return a nest-safe scope tagging this backend's Earth Engine traffic.
@@ -3925,13 +4034,25 @@ class GEE(LazyClientMixin, AbstractDataSource):
         if filter_expression is not None:
             collection_kwargs["property_filter"] = filter_expression
         stack = reader.collection_from_earthengine(var_info.id, **collection_kwargs)
+        times = list(stack.time)
+        backed, spill_dir = _as_file_backed_stack(stack)
         try:
-            return reducer.reduce_stack(stack, list(stack.time))
+            return reducer.reduce_stack(backed, times)
         finally:
             # The reduced dataset is materialised in memory, independent of the
-            # stack's per-scene handles, so the stack can be released now — which
-            # matters on Windows, where an open scene handle locks its file.
+            # stack's per-scene handles, so the stacks can be released now —
+            # which matters on Windows, where an open scene handle locks its
+            # file. `backed` may be `stack` itself (already file-backed) or the
+            # spilled copy; closing both is safe and releases either.
             close_quietly(stack)
+            if backed is not stack:
+                close_quietly(backed)
+            if spill_dir is not None:
+                # Drop the scene handles before removing the spill, so Windows
+                # does not keep the COGs locked; `ignore_errors` still tolerates
+                # a handle that outlives this, leaving the OS to sweep the temp.
+                gc.collect()
+                shutil.rmtree(spill_dir, ignore_errors=True)
 
     def _export_via_eedai(
         self,

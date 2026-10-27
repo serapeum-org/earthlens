@@ -18,6 +18,7 @@ import ast
 import functools
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 from types import MappingProxyType
@@ -3062,4 +3063,104 @@ class TestBucketTestsUseTheEmulator:
         assert _s3_doubles(path), (
             f"{relative} no longer defines an S3 client double "
             f"({_S3_DOUBLE_ALLOWED[relative]}); drop its _S3_DOUBLE_ALLOWED entry"
+        )
+
+
+#: Packages that must never be reachable from an `import earthlens.*` — the
+#: rendering stack earthlens delegates to rather than depends on. Each is
+#: declared as an optional extra and imported inside the one method that needs
+#: it, so a bare install pulls no plotting stack at all.
+_RENDERER_MODULES = ("digitalearth", "cleopatra", "matplotlib")
+
+#: The earthlens modules a renderer could plausibly leak into, including the
+#: visualization package itself — whose whole point is that it resolves style
+#: hints and Earth Engine preview URLs without importing a renderer.
+_RENDERER_FREE_IMPORTS = (
+    "earthlens.core",
+    "earthlens.gee",
+    "earthlens.gee.viz",
+    "earthlens.gee.viz.facade",
+)
+
+
+class TestRenderingStaysOptional:
+    """earthlens owns no plotting layer, and importing it must not load one.
+
+    The `viz` extra pulls digitalearth, which renders through cleopatra and
+    matplotlib. Those are heavy, and they are the layer earthlens delegates
+    to — so the import has to stay inside the `Visualizer` method that needs
+    it. A module-scope `import digitalearth` would be invisible in review and
+    would quietly make a bare install carry the whole plotting stack.
+    """
+
+    @pytest.mark.parametrize("module", _RENDERER_FREE_IMPORTS)
+    def test_importing_earthlens_does_not_import_a_renderer(self, module):
+        """A fresh interpreter importing earthlens loads no rendering stack."""
+        banned = ", ".join(repr(m) for m in _RENDERER_MODULES)
+        code = (
+            f"import importlib, sys; importlib.import_module({module!r}); "
+            f"print([m for m in ({banned},) if m in sys.modules])"
+        )
+        completed = subprocess.run(  # noqa: S603 - fixed argv, no shell
+            [sys.executable, "-I", "-c", code],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert completed.returncode == 0, completed.stderr
+        assert completed.stdout.strip() == "[]", (
+            f"importing {module} pulled in {completed.stdout.strip()}. "
+            "earthlens renders nothing itself: digitalearth must be imported "
+            "inside the `Visualizer` method that needs it, so a bare install "
+            "carries no plotting stack"
+        )
+
+    def test_the_viz_extra_is_declared(self):
+        """The dependency the lazy import needs must be a declared extra."""
+        text = (_ROOT / "libs" / "providers" / "imagery" / "pyproject.toml").read_text(
+            encoding="utf-8"
+        )
+        assert "\nviz = [" in text, (
+            "earthlens-imagery must declare a `viz` extra; a package the code "
+            "imports is never allowed to arrive transitively"
+        )
+        assert "digitalearth" in text
+
+    def test_no_shipped_module_imports_a_renderer_at_module_scope(self):
+        """The rule the lazy import exists for, over the shipped package only.
+
+        Scoped to `libs/*/src/earthlens/**.py` deliberately. The example
+        notebooks may import matplotlib at the top — they are allowed it for
+        figure/axes **layout**, which pyramids then draws into — and the test
+        modules fake renderers on purpose. Neither ships in a wheel, so
+        neither can make a bare install carry the plotting stack.
+        """
+        shipped = [
+            path
+            for path in _earthlens_sources()
+            if path.suffix == ".py" and "src" in path.parts and "libs" in path.parts
+        ]
+        assert shipped, "no shipped sources found; the path filter is wrong"
+        offenders: list[str] = []
+        for path in shipped:
+            tree = ast.parse(_source_text(path))
+            scopes = _enclosing_functions(tree)
+            for node in ast.walk(tree):
+                names: list[str] = []
+                if isinstance(node, ast.Import):
+                    names = [alias.name for alias in node.names]
+                elif (
+                    isinstance(node, ast.ImportFrom) and node.module and not node.level
+                ):
+                    names = [node.module]
+                for name in names:
+                    root = name.split(".")[0]
+                    if root in _RENDERER_MODULES and scopes.get(id(node)) is None:
+                        relative = path.relative_to(_ROOT).as_posix()
+                        offenders.append(f"{relative}:{node.lineno} imports {name}")
+        assert not offenders, (
+            "a renderer is imported at module scope: "
+            + "; ".join(offenders)
+            + ". Move it inside the function that needs it, so importing "
+            "earthlens stays free of the plotting stack"
         )

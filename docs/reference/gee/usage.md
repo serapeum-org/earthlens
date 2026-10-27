@@ -692,3 +692,149 @@ wetness = TasseledCap(sensor="landsat8_oli", components=("wetness",))(reflectanc
 The bundled sensors are `landsat5_tm`, `landsat7_etm` and `landsat8_oli`; the
 input must be a reflectance factor (a DN stack is warned about, not rejected),
 and voids are carried through as NaN in every component.
+
+## 8. Visualization
+
+earthlens draws nothing. Every figure, map, animation and chart is produced by
+[**digitalearth**](https://github.com/serapeum-org/Digital-Earth), which reads
+the pyramids objects a download returns and renders them through cleopatra
+across four backend tiers. earthlens contributes only the two things that are
+genuinely Earth Engine's — the publisher's style metadata, and the two
+server-side preview URLs — and then delegates.
+
+That means the plotting stack is **optional**:
+
+```bash
+pip install earthlens[viz]        # or: uv sync --extra viz
+```
+
+A bare install pulls no digitalearth, no cleopatra and no matplotlib, and
+`import earthlens.gee` does not reach any of them. The import happens inside
+the `Visualizer` method that needs it, and a boundary test holds that line.
+
+### Style hints come from the catalog
+
+`earthlens.gee.viz.style_for` answers "how should this dataset be drawn?" from
+the catalog rather than from a guess:
+
+```python
+from earthlens.gee.viz import style_for
+
+hints = style_for("COPERNICUS/S2_SR_HARMONIZED", ("B4", "B3", "B2"))
+hints.limits          # ((0.0, 3000.0), (0.0, 3000.0), (0.0, 3000.0))
+hints.source          # 'catalog'
+hints.digitalearth_kwargs()
+```
+
+There are two sources, and `source` says which one answered:
+
+- **`'catalog'`** — the publisher's own rendering, captured on the catalog row
+  as `Dataset.visualizations` from the asset's STAC `gee:visualizations`. This
+  is what Earth Engine's own catalog page draws: the band triple, the stretch
+  and the palette the data's publisher chose. **894 of the 1104 curated
+  datasets carry one** (111 are served by the STAC with no rendering declared,
+  and 99 are community `projects/...` assets the public STAC does not serve).
+- **`'heuristic'`** — derived from `Band.min` / `Band.max` plus a colour-map
+  match table that deliberately mirrors digitalearth's own
+  `base/autostyle/library/variables.yml`, so a fallback agrees with what
+  digitalearth would have picked rather than inventing a second opinion.
+
+The distinction matters: "the publisher says 0–3000" and "we read the band's
+declared range" are different claims, and `source` lets you treat them
+differently. A dataset offering several renderings can be asked for one by
+name:
+
+```python
+style_for("LANDSAT/LC09/C02/T1_L2", name="Near Infrared (543)")
+```
+
+### Rendering a download
+
+`GEE.visualize(result)` returns a `Visualizer` bound to the result and its
+hints. Each method resolves the hints, builds the keyword arguments and calls
+one digitalearth verb — nothing is composed here:
+
+```python
+from earthlens.gee import GEE
+
+gee = GEE(
+    start="2020-06-01",
+    end="2020-08-31",
+    variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4", "B3", "B2"]},
+    lat_lim=[30.0, 31.0],
+    lon_lim=[31.0, 32.0],
+    temporal_resolution="monthly",
+    scale=100,
+)
+result = gee.download(materialize=True)
+viz = gee.visualize(result)
+
+still = viz.still()                       # digitalearth.quickmap
+web = viz.still(backend="web")            # the MapLibre tier
+viz.timelapse("out/summer.gif")           # Map.animate over the collection
+viz.chart("line", series)                 # digitalearth.line
+```
+
+`backend=` takes digitalearth's own four names — `"matplotlib"` (the default),
+`"interactive"`, `"web"` and `"3d"`. Anything you pass as a keyword argument
+overrides the catalog's hint, so the catalog sets the default and you keep the
+last word:
+
+```python
+viz.still(cmap="magma", limits=(0, 2000))
+```
+
+`timelapse` hands the **whole** `DatasetCollection` to digitalearth in one
+call, because its animation builder is already collection-aware; emitting
+frames here would be exactly the rendering logic this layer must not contain.
+It needs a time series, so request several dates and `materialize=True`.
+
+### Server-side previews: no download at all
+
+Two previews are rendered by Earth Engine itself, before any pixels move.
+These are the genuinely GEE-specific part of visualization, and they need no
+digitalearth:
+
+```python
+viz = gee.visualize()                     # no result needed
+url = viz.thumbnail(image, dimensions=512)   # ee.Image.getThumbURL
+source = viz.tiles(image)                    # ee.Image.getMapId
+source.url                                   # '.../tiles/{z}/{x}/{y}'
+```
+
+A thumbnail is the cheapest possible look at a request: Earth Engine
+rasterises the PNG on demand when the URL is fetched, so it is not subject to
+the 32768-px download cap. Its own cap is 4096 px per axis, which earthlens
+checks at construction and names the remedy for rather than letting the SDK
+raise from inside.
+
+Both previews honour the style hints, so a preview is stretched the way the
+publisher intended rather than across the full dynamic range of the data type,
+which is Earth Engine's unhelpful default.
+
+### An Earth Engine tile layer on a slippy map
+
+This is the whole seam between the two packages: earthlens resolves the tile
+template inside Earth Engine, digitalearth draws it.
+
+```python
+viz.tile_map(image, backend="web", name="True colour")
+```
+
+The map is built **empty** — nothing local is drawn or downloaded — and the
+viewport decides which tiles Earth Engine renders. `backend=` is `"web"` or
+`"interactive"`; the matplotlib tier draws no slippy map, and the 3-D tier's
+`tiles_3d` has different semantics, so neither is offered here. The layer
+carries Earth Engine attribution, which its terms require on a published map.
+
+### What lives where
+
+| Concern | Package |
+|---|---|
+| Fetching, catalogs, request shaping | earthlens |
+| `getThumbURL` / `getMapId`, catalog style hints | earthlens (`earthlens.gee.viz`) |
+| Maps, animations, charts, layout, basemaps | digitalearth |
+| Colour ramps, glyphs, the actual drawing | cleopatra |
+
+If a figure cannot be expressed, the fix belongs in digitalearth or cleopatra —
+not in a renderer added here.

@@ -17,6 +17,12 @@ datasets:
     license: proprietary
     terms_note: 'Free for use with citation (PML_V2).'
     source: republished
+    visualizations:
+      - name: "PML_V2 0.1.4 Gross Primary Product (GPP)"
+        bands: ["GPP"]
+        vmin: [0]
+        vmax: [9]
+        palette: ["a50026", "d73027", "f46d43", "fdae61", "fee08b", "ffffbf", "d9ef8b", "a6d96a", "66bd63", "1a9850", "006837"]
     bands:
       GPP:
         description: Gross primary production
@@ -48,6 +54,12 @@ datasets:
     license: unknown
     terms_note: 'Acknowledgements'
     source: republished
+    visualizations:
+      - name: "PML_V2 0.1.7 Gross Primary Product (GPP)"
+        bands: ["GPP"]
+        vmin: [0]
+        vmax: [9]
+        palette: ["a50026", "d73027", "f46d43", "fdae61", "fee08b", "ffffbf", "d9ef8b", "a6d96a", "66bd63", "1a9850", "006837"]
     bands:
       GPP:
         description: Gross primary production
@@ -89,6 +101,12 @@ datasets:
     license: unknown
     terms_note: 'Acknowledgements'
     source: republished
+    visualizations:
+      - name: "PML_V2 0.1.8 Gross Primary Product (GPP)"
+        bands: ["GPP"]
+        vmin: [0]
+        vmax: [9]
+        palette: ["a50026", "d73027", "f46d43", "fdae61", "fee08b", "ffffbf", "d9ef8b", "a6d96a", "66bd63", "1a9850", "006837"]
     bands:
       GPP:
         description: Gross primary production
@@ -128,6 +146,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'The data is provided free of charge by the Copernicus Marine Service.'
+    visualizations:
+      - name: "Global BGC BIO Forecast"
+        bands: ["nppv_depth1"]
+        vmin: [1]
+        vmax: [50]
+        palette: ["black", "blue", "cyan", "green", "yellow", "red", "white"]
     bands:
       nppv_depth1:
         description: Total Primary Production of Phyto (depth 1, 0.4940m)
@@ -642,6 +666,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'The data is provided free of charge by the Copernicus Marine Service.'
+    visualizations:
+      - name: "Global BGC CAR Forecast"
+        bands: ["ph_depth1"]
+        vmin: [8]
+        vmax: [8.2]
+        palette: ["black", "blue", "cyan", "green", "yellow", "red", "white"]
     bands:
       ph_depth1:
         description: Ocean pH (depth 1, 0.4940m)
@@ -1156,6 +1186,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'The data is provided free of charge by the Copernicus Marine Service.'
+    visualizations:
+      - name: "Global BGC CO2 Forecast"
+        bands: ["spco2_depth1"]
+        vmin: [20]
+        vmax: [40]
+        palette: ["black", "blue", "cyan", "green", "yellow", "red", "white"]
     bands:
       spco2_depth1:
         description: Surface Partial Pressure of Carbon Dioxide
@@ -1175,6 +1211,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'The data is provided free of charge by the Copernicus Marine Service.'
+    visualizations:
+      - name: "Global BGC NUT Forecast - Nitrate"
+        bands: ["no3_depth1"]
+        vmin: [0]
+        vmax: [20]
+        palette: ["black", "blue", "cyan", "green", "yellow", "red", "white"]
     bands:
       no3_depth1:
         description: Nitrate (depth 1, 0.4940m)
@@ -2189,6 +2231,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'The data is provided free of charge by the Copernicus Marine Service.'
+    visualizations:
+      - name: "Global BGC OPTICS Forecast - kd"
+        bands: ["kd_depth1"]
+        vmin: [0]
+        vmax: [0.1]
+        palette: ["black", "blue", "cyan", "green", "yellow", "red", "white"]
     bands:
       kd_depth1:
         description: diffuse attenuation coeff of light in sea water (depth 1, 0.4940m)
@@ -2453,6 +2501,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'The data is provided free of charge by the Copernicus Marine Service.'
+    visualizations:
+      - name: "Global BGC PFT Forecast - Chlorophyll"
+        bands: ["chl_depth1"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["black", "blue", "cyan", "green", "yellow", "red", "white"]
     bands:
       chl_depth1:
         description: Total Chlorophyll (depth 1, 0.4940m)
@@ -2967,6 +3021,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'The data is provided free of charge by the Copernicus Marine Service.'
+    visualizations:
+      - name: "Global BGC PLANKTON Forecast - zooc"
+        bands: ["zooc_depth1"]
+        vmin: [0]
+        vmax: [3]
+        palette: ["black", "blue", "cyan", "green", "yellow", "red", "white"]
     bands:
       zooc_depth1:
         description: Total Zooplankton (depth 1, 0.4940m)
@@ -3231,6 +3291,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for use under Copernicus Marine SLA.'
+    visualizations:
+      - name: "Sea Surface Height"
+        bands: ["zos"]
+        vmin: [-2]
+        vmax: [1.5]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000", "ffffff"]
     bands:
       siconc:
         description: Sea-ice concentration
@@ -3262,6 +3328,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for use under Copernicus Marine SLA.'
+    visualizations:
+      - name: "DOS"
+        bands: ["dos"]
+        vmin: [1020.41]
+        vmax: [1027.596]
+        palette: ["040613", "121328", "3F59A5", "3E80C0", "3EADCB", "8CCBD6", "EAFDFD"]
     bands:
       sos:
         description: Sea-surface salinity
@@ -3291,6 +3363,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for use under Copernicus Marine SLA.'
+    visualizations:
+      - name: "SOS"
+        bands: ["sos"]
+        vmin: [27.869]
+        vmax: [36.981]
+        palette: ["040613", "121328", "3F59A5", "3E80C0", "3EADCB", "8CCBD6", "EAFDFD"]
     bands:
       sos:
         description: Sea-surface salinity
@@ -3368,6 +3446,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'This dataset is released for use under Service Level Agreement (SLA),'
+    visualizations:
+      - name: "CDM"
+        bands: ["CDM"]
+        vmin: [0.003]
+        vmax: [0.109]
+        palette: ["D7F9D0", "91CA85", "5AB05D", "129450", "0F7347", "195437", "122414"]
     bands:
       BBP:
         description: Particulate Backscattering
@@ -3396,6 +3480,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'This dataset is released for use under Service Level Agreement (SLA),'
+    visualizations:
+      - name: "CHL"
+        bands: ["CHL"]
+        vmin: [0.027]
+        vmax: [1.813]
+        palette: ["D7F9D0", "91CA85", "5AB05D", "129450", "0F7347", "195437", "122414"]
     bands:
       CHL:
         description: Chlorophyll-a concentration
@@ -3418,6 +3508,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for use under Copernicus Marine SLA.'
+    visualizations:
+      - name: "CHL"
+        bands: ["CHL"]
+        vmin: [0.027]
+        vmax: [1.813]
+        palette: ["D7F9D0", "91CA85", "5AB05D", "129450", "0F7347", "195437", "122414"]
     bands:
       CHL:
         description: Chlorophyll-a concentration
@@ -3440,6 +3536,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'This dataset is released for use under Service Level Agreement (SLA),'
+    visualizations:
+      - name: "Primary Production"
+        bands: ["PP"]
+        vmin: [57.26]
+        vmax: [1031.191]
+        palette: ["D7F9D0", "91CA85", "5AB05D", "129450", "0F7347", "195437", "122414"]
     bands:
       PP:
         description: Primary Production
@@ -3462,6 +3564,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'This dataset is released for use under Service Level Agreement (SLA),'
+    visualizations:
+      - name: "RRS412"
+        bands: ["RRS412"]
+        vmin: [0.001]
+        vmax: [0.018]
+        palette: ["D7F9D0", "91CA85", "5AB05D", "129450", "0F7347", "195437", "122414"]
     bands:
       RRS412:
         description: Remote Sensing Reflectance at 412 nm
@@ -3508,6 +3616,12 @@ datasets:
     default_reducer: median
     license: proprietary
     terms_note: 'Free for use under Copernicus Marine SLA.'
+    visualizations:
+      - name: "RRS412"
+        bands: ["RRS412"]
+        vmin: [6.9e-05]
+        vmax: [0.017]
+        palette: ["D7F9D0", "91CA85", "5AB05D", "129450", "0F7347", "195437", "122414"]
     bands:
       RRS400:
         description: Remote-sensing reflectance at 400 nm
@@ -3548,6 +3662,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'This dataset is released for use under Service Level Agreement (SLA),'
+    visualizations:
+      - name: "ZSD"
+        bands: ["ZSD"]
+        vmin: [5.712]
+        vmax: [51.91]
+        palette: ["D7F9D0", "91CA85", "5AB05D", "129450", "0F7347", "195437", "122414"]
     bands:
       KD490:
         description: Diffuse attenuation coefficient at 490 nm
@@ -3576,6 +3696,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'This dataset is released for use under Service Level Agreement (SLA),'
+    visualizations:
+      - name: "KD490"
+        bands: ["KD490"]
+        vmin: [0.021]
+        vmax: [0.212]
+        palette: ["D7F9D0", "91CA85", "5AB05D", "129450", "0F7347", "195437", "122414"]
     bands:
       KD490:
         description: Diffuse attenuation coefficient at 490 nm
@@ -3598,6 +3724,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     terms_note: 'CC-BY (Copernicus Marine).'
+    visualizations:
+      - name: "Chlorophyll-a concentration"
+        bands: ["chlor_a"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["blue", "purple", "cyan", "green", "yellow", "red"]
     bands:
       chlor_a:
         description: Chlorophyll-a concentration
@@ -3637,6 +3769,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'This dataset is released for use under Service Level Agreement (SLA),'
+    visualizations:
+      - name: "Significant Wave Height"
+        bands: ["VHM0"]
+        vmin: [0]
+        vmax: [10]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000", "ffffff"]
     bands:
       VHM0:
         description: Spectral significant wave height
@@ -3707,6 +3845,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'This dataset is released for use under Service Level Agreement (SLA),'
+    visualizations:
+      - name: "Sea Floor Depth"
+        bands: ["deptho"]
+        vmin: [-8000]
+        vmax: [0]
+        palette: ["000080", "0000d0", "0000ff", "87ceeb", "ffffff"]
     bands:
       deptho:
         description: Sea floor depth
@@ -3726,6 +3870,11 @@ datasets:
     license: proprietary
     terms_note: 'The Food and Agriculture Organization of the United Nations (FAO) is'
     source: republished
+    visualizations:
+      - name: "Actual Evapotranspiration and Interception (Dekadal) [mm]"
+        bands: ["L1_AETI_D"]
+        vmin: [0]
+        vmax: [50]
     bands:
       L1_AETI_D:
         description: Actual Evapotranspiration and Interception (Dekadal) [mm]
@@ -3746,6 +3895,11 @@ datasets:
     license: proprietary
     terms_note: 'The Food and Agriculture Organization of the United Nations (FAO) is'
     source: republished
+    visualizations:
+      - name: "Evaporation (Dekadal) [mm]"
+        bands: ["L1_E_D"]
+        vmin: [0]
+        vmax: [50]
     bands:
       L1_E_D:
         description: Evaporation (Dekadal) [mm]
@@ -3766,6 +3920,11 @@ datasets:
     license: proprietary
     terms_note: 'The Food and Agriculture Organization of the United Nations (FAO) is'
     source: republished
+    visualizations:
+      - name: "Interception (Dekadal) [mm]"
+        bands: ["L1_I_D"]
+        vmin: [0]
+        vmax: [10]
     bands:
       L1_I_D:
         description: Interception (Dekadal) [mm]
@@ -3786,6 +3945,11 @@ datasets:
     license: proprietary
     terms_note: 'The Food and Agriculture Organization of the United Nations (FAO) is'
     source: republished
+    visualizations:
+      - name: "Net Primary Production"
+        bands: ["L1_NPP_D"]
+        vmin: [0]
+        vmax: [5000]
     bands:
       L1_NPP_D:
         description: Net Primary Production
@@ -3806,6 +3970,11 @@ datasets:
     license: proprietary
     terms_note: 'The Food and Agriculture Organization of the United Nations (FAO) is'
     source: republished
+    visualizations:
+      - name: "Reference Evapotranspiration (Dekadal) [mm]"
+        bands: ["L1_RET_D"]
+        vmin: [0]
+        vmax: [100]
     bands:
       L1_RET_D:
         description: Reference Evapotranspiration (Dekadal) [mm]
@@ -3826,6 +3995,11 @@ datasets:
     license: proprietary
     terms_note: 'The Food and Agriculture Organization of the United Nations (FAO) is'
     source: republished
+    visualizations:
+      - name: "Reference Evapotranspiration (Daily) [mm]"
+        bands: ["L1_RET_E"]
+        vmin: [0]
+        vmax: [100]
     bands:
       L1_RET_E:
         description: Reference Evapotranspiration (Daily) [mm]
@@ -3846,6 +4020,11 @@ datasets:
     license: proprietary
     terms_note: 'The Food and Agriculture Organization of the United Nations (FAO) is'
     source: republished
+    visualizations:
+      - name: "Transpiration (Dekadal) [mm]"
+        bands: ["L1_T_D"]
+        vmin: [0]
+        vmax: [50]
     bands:
       L1_T_D:
         description: Transpiration (Dekadal) [mm]
@@ -3867,6 +4046,11 @@ datasets:
     license: proprietary
     terms_note: 'Free with attribution (FAO WAPOR).'
     source: republished
+    visualizations:
+      - name: "Actual Evapotranspiration and Interception (Dekadal) [mm]"
+        bands: ["L1-AETI-D"]
+        vmin: [0]
+        vmax: [50]
     bands:
       L1-AETI-D:
         description: Actual evapotranspiration + interception (dekadal)
@@ -3886,6 +4070,11 @@ datasets:
     license: proprietary
     terms_note: 'Free with attribution (FAO WAPOR).'
     source: republished
+    visualizations:
+      - name: "Evaporation (Dekadal) [mm]"
+        bands: ["L1-E-D"]
+        vmin: [0]
+        vmax: [50]
     bands:
       L1-E-D:
         description: Soil evaporation (dekadal)
@@ -3906,6 +4095,11 @@ datasets:
     license: proprietary
     terms_note: 'The Food and Agriculture Organization of the United Nations (FAO) is'
     source: republished
+    visualizations:
+      - name: "Interception (Dekadal) [mm]"
+        bands: ["L1-I-D"]
+        vmin: [0]
+        vmax: [10]
     bands:
       L1-I-D:
         description: Interception (Dekadal) [mm]
@@ -3925,6 +4119,11 @@ datasets:
     license: proprietary
     terms_note: 'Free with attribution (FAO WAPOR).'
     source: republished
+    visualizations:
+      - name: "Reference Evapotranspiration (Dekadal) [mm]"
+        bands: ["L1-RET-D"]
+        vmin: [0]
+        vmax: [100]
     bands:
       L1-RET-D:
         description: Reference evapotranspiration (dekadal)
@@ -3944,6 +4143,11 @@ datasets:
     license: proprietary
     terms_note: 'Free with attribution (FAO WAPOR).'
     source: republished
+    visualizations:
+      - name: "Reference Evapotranspiration (Daily) [mm]"
+        bands: ["L1-RET-E"]
+        vmin: [0]
+        vmax: [100]
     bands:
       L1-RET-E:
         description: Reference evapotranspiration (daily)
@@ -3964,6 +4168,11 @@ datasets:
     license: proprietary
     terms_note: 'Free with attribution (FAO WAPOR).'
     source: republished
+    visualizations:
+      - name: "Transpiration (Dekadal) [mm]"
+        bands: ["L1-T-D"]
+        vmin: [0]
+        vmax: [50]
     bands:
       L1-T-D:
         description: Transpiration (dekadal)
@@ -3981,6 +4190,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Intellectual property rights to this dataset belong to University of'
+    visualizations:
+      - name: "Water"
+        bands: ["water"]
+        vmin: [1]
+        vmax: [4]
+        palette: ["fafafa", "00c5ff", "df73ff", "828282", "cccccc"]
     bands:
       water:
         description: Water classification
@@ -4057,6 +4272,12 @@ datasets:
     license: CC-BY-NC-4.0
     terms_note: 'This work is licensed under the Creative Commons Attribution Non Commercial 4.0'
     source: republished
+    visualizations:
+      - name: "Flood duration in days"
+        bands: ["duration"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["d0efff", "2a9df4", "187bcd", "1167b1", "03254c"]
     bands:
       flooded:
         description: Maximum extent of flood water during an event.
@@ -4095,6 +4316,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'This dataset is freely available with no restrictions.'
+    visualizations:
+      - name: "Surface Elevation"
+        bands: ["surface_elevation"]
+        vmin: [-2000]
+        vmax: [2000]
+        palette: ["blue", "cyan", "yellow", "red"]
     bands:
       surface_elevation:
         description: Sea surface elevation anomaly relative to the modeled elevation mean
@@ -4116,6 +4343,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'This dataset is freely available with no restrictions.'
+    visualizations:
+      - name: "Sea Water Temperature"
+        bands: ["water_temp_0"]
+        vmin: [-20000]
+        vmax: [15000]
+        palette: ["000000", "005aff", "43c8c8", "fff700", "ff0000"]
     bands:
       water_temp_0:
         description: Sea water temperature at a depth of 0m
@@ -4691,6 +4924,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'This dataset is freely available with no restrictions.'
+    visualizations:
+      - name: "Water Velocity"
+        bands: ["velocity_u_0", "velocity_v_0", "velocity_v_0"]
+        vmin: [-1000]
+        vmax: [4000]
     bands:
       velocity_u_0:
         description: Eastward sea water velocity at a depth of 0m
@@ -5186,6 +5424,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (HYCOM Consortium).'
+    visualizations:
+      - name: "Surface Elevation"
+        bands: ["surface_elevation"]
+        vmin: [-2000]
+        vmax: [2000]
+        palette: ["blue", "cyan", "yellow", "red"]
     bands:
       surface_elevation:
         description: Sea-surface elevation anomaly relative to the modelled mean
@@ -5205,6 +5449,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (HYCOM Consortium).'
+    visualizations:
+      - name: "Sea Water Temperature"
+        bands: ["water_temp_0"]
+        vmin: [-20000]
+        vmax: [15000]
+        palette: ["000000", "005aff", "43c8c8", "fff700", "ff0000"]
     bands:
       water_temp_0:
         description: Sea-water temperature at 0 m depth
@@ -5250,6 +5500,11 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (HYCOM Consortium).'
+    visualizations:
+      - name: "Water Velocity"
+        bands: ["velocity_u_0", "velocity_v_0", "velocity_v_0"]
+        vmin: [-1000]
+        vmax: [4000]
     bands:
       velocity_u_0:
         description: Eastward sea-water velocity, 0 m
@@ -5288,6 +5543,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     terms_note: 'This dataset is licensed under a Creative Commons Attribution 4.0'
+    visualizations:
+      - name: "Floodplains"
+        bands: ["flood"]
+        vmin: [0]
+        vmax: [0]
+        palette: ["ffffff", "0000ff"]
     bands:
       flood:
         description: Flood plain
@@ -5306,6 +5567,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (JAXA GCOM-C terms).'
+    visualizations:
+      - name: "Chlorophyll-a concentration"
+        bands: ["CHLA_AVE"]
+        vmin: [-3000]
+        vmax: [4000]
+        palette: ["3500a8", "0800ba", "003fd6", "00aca9", "77f800", "ff8800", "b30000", "920000", "880000"]
     bands:
       CHLA_AVE:
         description: Sea-surface chlorophyll-a concentration
@@ -5325,6 +5592,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (JAXA GCOM-C terms).'
+    visualizations:
+      - name: "Chlorophyll-a concentration"
+        bands: ["CHLA_AVE"]
+        vmin: [-3000]
+        vmax: [4000]
+        palette: ["3500a8", "0800ba", "003fd6", "00aca9", "77f800", "ff8800", "b30000", "920000", "880000"]
     bands:
       CHLA_AVE:
         description: Sea-surface chlorophyll-a concentration
@@ -5344,6 +5617,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (JAXA GCOM-C terms).'
+    visualizations:
+      - name: "Chlorophyll-a concentration"
+        bands: ["CHLA_AVE"]
+        vmin: [-3000]
+        vmax: [4000]
+        palette: ["3500a8", "0800ba", "003fd6", "00aca9", "77f800", "ff8800", "b30000", "920000", "880000"]
     bands:
       CHLA_AVE:
         description: Sea-surface chlorophyll-a concentration
@@ -5362,6 +5641,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Wetland Loss"
+        bands: ["loss"]
+        vmin: [1]
+        vmax: [1]
     bands:
       loss:
         description: Set to 1 for loss locations, masked out otherwise.
@@ -5392,6 +5676,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free for any use (JRC).'
+    visualizations:
+      - name: "JRC Flood Hazard Maps"
+        bands: ["depth"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "0000ff"]
     bands:
       depth:
         description: Modelled flood inundation depth
@@ -5409,6 +5699,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free for any use (JRC).'
+    visualizations:
+      - name: "JRC Flood Hazard Maps"
+        bands: ["RP100_depth"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "0000ff"]
     bands:
       RP10_depth:
         description: Flood inundation depth, 10-year return period
@@ -5445,6 +5741,12 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Occurrence"
+        bands: ["occurrence"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffffff", "ffbbbb", "0000ff"]
     bands:
       occurrence:
         description: The frequency with which water was present.
@@ -5487,6 +5789,11 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Detections/Observations"
+        bands: ["detections", "valid_obs", "total_obs"]
+        vmin: [100]
+        vmax: [900]
     bands:
       detections:
         description: The number of water detections in the study period.
@@ -5515,6 +5822,12 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Water"
+        bands: ["water"]
+        vmin: [0]
+        vmax: [2]
+        palette: ["ffffff", "fffcb8", "0905ff"]
     bands:
       water:
         description: Water detection for the month.
@@ -5532,6 +5845,12 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Monthly Recurrence"
+        bands: ["monthly_recurrence"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffffff", "ffbbbb", "0000ff"]
     bands:
       monthly_recurrence:
         description: The recurrence value expressed as a percentage for this month.
@@ -5555,6 +5874,12 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Water Class"
+        bands: ["waterClass"]
+        vmin: [0]
+        vmax: [3]
+        palette: ["cccccc", "ffffff", "99d9ea", "0000ff"]
     bands:
       waterClass:
         description: Classification of the seasonality of water throughout the year.
@@ -5571,6 +5896,12 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Occurrence"
+        bands: ["occurrence"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffffff", "ffbbbb", "0000ff"]
     bands:
       occurrence:
         description: The frequency with which water was present.
@@ -5613,6 +5944,11 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Detections/Observations"
+        bands: ["detections", "valid_obs", "total_obs"]
+        vmin: [100]
+        vmax: [900]
     bands:
       detections:
         description: The number of water detections in the study period.
@@ -5641,6 +5977,12 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Water"
+        bands: ["water"]
+        vmin: [0]
+        vmax: [2]
+        palette: ["ffffff", "fffcb8", "0905ff"]
     bands:
       water:
         description: Water detection for the month.
@@ -5658,6 +6000,12 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Monthly Recurrence"
+        bands: ["monthly_recurrence"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffffff", "ffbbbb", "0000ff"]
     bands:
       monthly_recurrence:
         description: The recurrence value expressed as a percentage for this month.
@@ -5681,6 +6029,12 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Water Class"
+        bands: ["waterClass"]
+        vmin: [0]
+        vmax: [3]
+        palette: ["cccccc", "ffffff", "99d9ea", "0000ff"]
     bands:
       waterClass:
         description: Classification of the seasonality of water throughout the year.
@@ -5697,6 +6051,12 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Occurrence"
+        bands: ["occurrence"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffffff", "ffbbbb", "0000ff"]
     bands:
       occurrence:
         description: The frequency with which water was present.
@@ -5739,6 +6099,11 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Detections/Observations"
+        bands: ["detections", "valid_obs", "total_obs"]
+        vmin: [100]
+        vmax: [900]
     bands:
       detections:
         description: The number of water detections in the study period.
@@ -5767,6 +6132,12 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Water"
+        bands: ["water"]
+        vmin: [0]
+        vmax: [2]
+        palette: ["ffffff", "fffcb8", "0905ff"]
     bands:
       water:
         description: Water detection for the month.
@@ -5784,6 +6155,12 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Monthly Recurrence"
+        bands: ["monthly_recurrence"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffffff", "ffbbbb", "0000ff"]
     bands:
       monthly_recurrence:
         description: The recurrence value expressed as a percentage for this month.
@@ -5807,6 +6184,12 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Water Class"
+        bands: ["waterClass"]
+        vmin: [0]
+        vmax: [3]
+        palette: ["cccccc", "ffffff", "99d9ea", "0000ff"]
     bands:
       waterClass:
         description: Classification of the seasonality of water throughout the year.
@@ -5823,6 +6206,12 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Occurrence"
+        bands: ["occurrence"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffffff", "ffbbbb", "0000ff"]
     bands:
       occurrence:
         description: The frequency with which water was present.
@@ -5865,6 +6254,11 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Detections/Observations"
+        bands: ["detections", "valid_obs", "total_obs"]
+        vmin: [100]
+        vmax: [900]
     bands:
       detections:
         description: The number of water detections in the study period.
@@ -5893,6 +6287,12 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Water"
+        bands: ["water"]
+        vmin: [0]
+        vmax: [2]
+        palette: ["ffffff", "fffcb8", "0905ff"]
     bands:
       water:
         description: Water detection for the month.
@@ -5910,6 +6310,12 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Monthly Recurrence"
+        bands: ["monthly_recurrence"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffffff", "ffbbbb", "0000ff"]
     bands:
       monthly_recurrence:
         description: The recurrence value expressed as a percentage for this month.
@@ -5933,6 +6339,12 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Water Class"
+        bands: ["waterClass"]
+        vmin: [0]
+        vmax: [3]
+        palette: ["cccccc", "ffffff", "99d9ea", "0000ff"]
     bands:
       waterClass:
         description: Classification of the seasonality of water throughout the year.
@@ -5948,6 +6360,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free for use under the Copernicus Programme licence.'
+    visualizations:
+      - name: "Occurrence"
+        bands: ["occurrence"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffffff", "ffbbbb", "0000ff"]
     bands:
       occurrence:
         description: Frequency with which water was present (1984-2021)
@@ -5980,6 +6398,11 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Detections/Observations"
+        bands: ["detections", "valid_obs", "total_obs"]
+        vmin: [100]
+        vmax: [900]
     bands:
       detections:
         description: The number of water detections in the study period.
@@ -6007,6 +6430,12 @@ datasets:
     default_reducer: mode
     license: proprietary
     terms_note: 'Free for use under the Copernicus Programme licence.'
+    visualizations:
+      - name: "Water"
+        bands: ["water"]
+        vmin: [0]
+        vmax: [2]
+        palette: ["ffffff", "fffcb8", "0905ff"]
     bands:
       water:
         description: Water mask for the month (0=no_data, 1=not_water, 2=water)
@@ -6026,6 +6455,12 @@ datasets:
     license: proprietary
     terms_note: 'All data here is produced under the Copernicus Programme and is provided'
     source: republished
+    visualizations:
+      - name: "Monthly Recurrence"
+        bands: ["monthly_recurrence"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffffff", "ffbbbb", "0000ff"]
     bands:
       monthly_recurrence:
         description: The recurrence value expressed as a percentage for this month.
@@ -6048,6 +6483,12 @@ datasets:
     default_reducer: mode
     license: proprietary
     terms_note: 'Free for use under the Copernicus Programme licence.'
+    visualizations:
+      - name: "Water Class"
+        bands: ["waterClass"]
+        vmin: [0]
+        vmax: [3]
+        palette: ["cccccc", "ffffff", "99d9ea", "0000ff"]
     bands:
       waterClass:
         description: "Water seasonality class (0=no_data, 1=not_water, 2=seasonal, 3=permanent)"
@@ -6066,6 +6507,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'You may download and use photographs, imagery, or text'
+    visualizations:
+      - name: "Snow Cover"
+        bands: ["NDSI_Snow_Cover"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["000000", "0dffff", "0524ff", "ffffff"]
     bands:
       NDSI_Snow_Cover:
         description: NDSI snow cover. This value is
@@ -6105,6 +6552,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Evapotranspiration"
+        bands: ["ET"]
+        vmin: [0]
+        vmax: [300]
+        palette: ["ffffff", "fcd163", "99b718", "66a000", "3e8601", "207401", "056201", "004c00", "011301"]
     bands:
       ET:
         description: Total evapotranspiration over 8 days
@@ -6137,6 +6590,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'You may download and use photographs, imagery, or text'
+    visualizations:
+      - name: "Snow Cover"
+        bands: ["NDSI_Snow_Cover"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["000000", "0dffff", "0524ff", "ffffff"]
     bands:
       NDSI_Snow_Cover:
         description: NDSI snow cover. This value is
@@ -6175,6 +6634,12 @@ datasets:
       end_date: null
     default_reducer: mosaic
     license: public-domain
+    visualizations:
+      - name: "Snow Cover"
+        bands: ["NDSI_Snow_Cover"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["000000", "0dffff", "0524ff", "ffffff"]
     bands:
       NDSI_Snow_Cover:
         description: NDSI snow cover (0-100)
@@ -6205,6 +6670,12 @@ datasets:
       end_date: null
     default_reducer: mosaic
     license: public-domain
+    visualizations:
+      - name: "Maximum Snow Extent"
+        bands: ["Maximum_Snow_Extent"]
+        vmin: [50]
+        vmax: [150]
+        palette: ["000000", "0dffff", "0524ff", "ffffff"]
     bands:
       Maximum_Snow_Extent:
         description: Maximum snow extent observed over the 8-day period
@@ -6223,6 +6694,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Evapotranspiration"
+        bands: ["ET"]
+        vmin: [0]
+        vmax: [300]
+        palette: ["ffffff", "fcd163", "99b718", "66a000", "3e8601", "207401", "056201", "004c00", "011301"]
     bands:
       ET:
         description: Total evapotranspiration over 8 days
@@ -6255,6 +6732,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Evapotranspiration"
+        bands: ["ET"]
+        vmin: [0]
+        vmax: [300]
+        palette: ["ffffff", "fcd163", "99b718", "66a000", "3e8601", "207401", "056201", "004c00", "011301"]
     bands:
       ET:
         description: Total evapotranspiration over 8 days
@@ -6286,6 +6769,12 @@ datasets:
       end_date: null
     default_reducer: mosaic
     license: public-domain
+    visualizations:
+      - name: "Snow Cover"
+        bands: ["NDSI_Snow_Cover"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["000000", "0dffff", "0524ff", "ffffff"]
     bands:
       NDSI_Snow_Cover:
         description: NDSI snow cover (0-100)
@@ -6315,6 +6804,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Evapotranspiration"
+        bands: ["ET"]
+        vmin: [0]
+        vmax: [300]
+        palette: ["ffffff", "fcd163", "99b718", "66a000", "3e8601", "207401", "056201", "004c00", "011301"]
     bands:
       ET:
         description: Total evapotranspiration over 8 days
@@ -6347,6 +6842,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'You may download and use photographs, imagery, or text'
+    visualizations:
+      - name: "Snow Cover"
+        bands: ["Snow_Cover_Daily_Tile"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["000000", "0dffff", "0524ff", "ffffff"]
     bands:
       Snow_Cover_Daily_Tile:
         description: NDSI snow cover plus other results. This value is
@@ -6373,6 +6874,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'You may download and use photographs, imagery, or text'
+    visualizations:
+      - name: "Snow Cover"
+        bands: ["Snow_Cover_Daily_Tile"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["000000", "0dffff", "0524ff", "ffffff"]
     bands:
       Snow_Cover_Daily_Tile:
         description: NDSI snow cover plus other results. This value is
@@ -6399,6 +6906,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'All NTSG data distributed through this [site](http://files.ntsg.umt.edu/)'
+    visualizations:
+      - name: "Evapotranspiration"
+        bands: ["ET"]
+        vmin: [0]
+        vmax: [300]
+        palette: ["a50000", "ff4f1a", "f1e342", "c7ef1f", "05fff3", "1707ff", "d90bff"]
     bands:
       ET:
         description: Evapotranspiration, aggregated for period of coverage.
@@ -6439,6 +6952,12 @@ datasets:
       bbox: [-180, -60, 180, 90]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Average Evapotranspiration"
+        bands: ["Evap_tavg"]
+        vmin: [0]
+        vmax: [5e-05]
+        palette: ["black", "blue", "purple", "cyan", "green", "yellow", "red"]
     bands:
       Evap_tavg:
         description: Total evapotranspiration
@@ -6484,6 +7003,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Average Surface Skin Temperature [K]"
+        bands: ["AvgSurfT_inst"]
+        vmin: [250]
+        vmax: [300]
+        palette: ["1303ff", "42fff6", "f3ff40", "ff5d0f"]
     bands:
       AvgSurfT_inst:
         description: Average surface skin temperature
@@ -6533,6 +7058,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Average Surface Skin Temperature [K]"
+        bands: ["AvgSurfT_tavg"]
+        vmin: [258]
+        vmax: [316]
+        palette: ["1303ff", "42fff6", "f3ff40", "ff5d0f"]
     bands:
       AvgSurfT_tavg:
         description: Average surface skin temperature
@@ -6576,6 +7107,12 @@ datasets:
       end_date: "2014-12-31"
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Average Surface Skin Temperature [K]"
+        bands: ["AvgSurfT_inst"]
+        vmin: [250]
+        vmax: [300]
+        palette: ["1303ff", "42fff6", "f3ff40", "ff5d0f"]
     bands:
       AvgSurfT_inst:
         description: Average surface skin temperature
@@ -6622,6 +7159,11 @@ datasets:
       end_date: "2017-06-30"
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Equivalent Water Thickness CSR"
+        bands: ["lwe_thickness_csr"]
+        vmin: [-25]
+        vmax: [25]
     bands:
       lwe_thickness_csr:
         description: Liquid-water-equivalent thickness anomaly (CSR processing centre)
@@ -6644,6 +7186,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'All NASA-produced data from the GRACE mission is made freely available'
+    visualizations:
+      - name: "Equivalent Water Thickness"
+        bands: ["lwe_thickness"]
+        vmin: [-25]
+        vmax: [25]
     bands:
       lwe_thickness:
         description: Equivalent liquid water thickness in centimeters.
@@ -6666,6 +7213,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'All NASA-produced data from the GRACE mission is made freely available'
+    visualizations:
+      - name: "Equivalent Water Thickness"
+        bands: ["lwe_thickness"]
+        vmin: [-25]
+        vmax: [25]
     bands:
       lwe_thickness:
         description: Equivalent liquid water thickness in centimeters.
@@ -6688,6 +7240,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'All NASA-produced data from the GRACE mission is made freely available'
+    visualizations:
+      - name: "Equivalent Water Thickness CSR"
+        bands: ["lwe_thickness_csr"]
+        vmin: [-10]
+        vmax: [10]
     bands:
       lwe_thickness_csr:
         description: Equivalent liquid water thickness in centimeters calculated by CSR.
@@ -6716,6 +7273,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'All NASA-produced data from the GRACE mission is made freely available'
+    visualizations:
+      - name: "Equivalent Water Thickness CSR"
+        bands: ["lwe_thickness_csr"]
+        vmin: [-10]
+        vmax: [10]
     bands:
       lwe_thickness_csr:
         description: Equivalent liquid water thickness in centimeters calculated by CSR.
@@ -6744,6 +7306,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'All NASA-produced data from the GRACE mission is made freely available'
+    visualizations:
+      - name: "Equivalent Water Thickness"
+        bands: ["lwe_thickness"]
+        vmin: [-25]
+        vmax: [25]
     bands:
       lwe_thickness:
         description: Equivalent liquid water thickness in centimeters.
@@ -6762,6 +7329,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'All NASA-produced data from the GRACE mission is made freely available'
+    visualizations:
+      - name: "Equivalent Water Thickness"
+        bands: ["lwe_thickness"]
+        vmin: [-25]
+        vmax: [25]
     bands:
       lwe_thickness:
         description: Equivalent liquid water thickness in centimeters.
@@ -6780,6 +7352,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'All NASA-produced data from the GRACE mission is made freely available'
+    visualizations:
+      - name: "Equivalent Water Thickness CSR"
+        bands: ["lwe_thickness_csr"]
+        vmin: [-0.78]
+        vmax: [0.57]
     bands:
       lwe_thickness_csr:
         description: Equivalent liquid water thickness in centimeters calculated by CSR.
@@ -6808,6 +7385,11 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'All NASA-produced data from the GRACE mission is made freely available'
+    visualizations:
+      - name: "Equivalent Water Thickness"
+        bands: ["lwe_thickness"]
+        vmin: [-25]
+        vmax: [25]
     bands:
       lwe_thickness:
         description: Equivalent liquid water thickness in centimeters.
@@ -6826,6 +7408,11 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'All NASA-produced data from the GRACE mission is made freely available'
+    visualizations:
+      - name: "Equivalent Water Thickness"
+        bands: ["lwe_thickness"]
+        vmin: [-25]
+        vmax: [25]
     bands:
       lwe_thickness:
         description: Equivalent liquid water thickness in centimeters.
@@ -6844,6 +7431,11 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'All NASA-produced data from the GRACE mission is made freely available'
+    visualizations:
+      - name: "Equivalent Water Thickness CSR"
+        bands: ["lwe_thickness_csr"]
+        vmin: [-10]
+        vmax: [10]
     bands:
       lwe_thickness_csr:
         description: Equivalent liquid water thickness in centimeters calculated by CSR.
@@ -6867,6 +7459,12 @@ datasets:
       bbox: [-125.15, 24.85, -66.85, 53.28]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Temperature"
+        bands: ["temperature"]
+        vmin: [-5]
+        vmax: [40]
+        palette: ["3d2bd8", "4e86da", "62c7d8", "91ed90", "e4f178", "ed6a4c"]
     bands:
       temperature:
         description: Air temperature at 2 m above the surface
@@ -6903,6 +7501,11 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Remote Sensing Reflectance"
+        bands: ["Rrs_645", "Rrs_555", "Rrs_443"]
+        vmin: [0]
+        vmax: [0.011]
     bands:
       chlor_a:
         description: Chlorophyll-a concentration
@@ -6942,6 +7545,11 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'This dataset is in the public domain and is available'
+    visualizations:
+      - name: "Remote Sensing Reflectance"
+        bands: ["Rrs_645", "Rrs_555", "Rrs_443"]
+        vmin: [0]
+        vmax: [0.02]
     bands:
       chlor_a:
         description: Chlorophyll a concentration
@@ -7036,6 +7644,11 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'This dataset is in the public domain and is available'
+    visualizations:
+      - name: "Remote Sensing Reflectance"
+        bands: ["Rrs_670", "Rrs_555", "Rrs_443"]
+        vmin: [0]
+        vmax: [0.03]
     bands:
       chlor_a:
         description: Chlorophyll a concentration
@@ -7094,6 +7707,12 @@ datasets:
       bbox: [-180, -84, 180, 84]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Soil Moisture"
+        bands: ["soil_moisture_am"]
+        vmin: [0]
+        vmax: [0.5]
+        palette: ["0300ff", "418504", "efff07", "efff07", "ff0303"]
     bands:
       soil_moisture_am:
         description: Retrieved volumetric soil moisture (AM overpass)
@@ -7125,6 +7744,12 @@ datasets:
       bbox: [-180, -84, 180, 84]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Soil Moisture"
+        bands: ["soil_moisture_am"]
+        vmin: [0]
+        vmax: [0.5]
+        palette: ["0300ff", "418504", "efff07", "efff07", "ff0303"]
     bands:
       soil_moisture_am:
         description: Retrieved volumetric soil moisture (AM overpass)
@@ -7156,6 +7781,12 @@ datasets:
       bbox: [-180, -84, 180, 84]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "SM Surface"
+        bands: ["sm_surface"]
+        vmin: [0]
+        vmax: [0.9]
+        palette: ["0300ff", "418504", "efff07", "efff07", "ff0303"]
     bands:
       sm_surface:
         description: Top-layer soil moisture (0-5 cm)
@@ -7189,6 +7820,12 @@ datasets:
       bbox: [-180, -85.044, 180, 85.044]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "SM Surface"
+        bands: ["sm_surface"]
+        vmin: [0]
+        vmax: [0.9]
+        palette: ["0300ff", "418504", "efff07", "efff07", "ff0303"]
     bands:
       sm_surface:
         description: Top-layer soil moisture (0-5 cm)
@@ -7227,6 +7864,12 @@ datasets:
     license: public-domain
     terms_note: 'This dataset is in the public domain and is available'
     source: republished
+    visualizations:
+      - name: "Soil Moisture"
+        bands: ["ssm"]
+        vmin: [0]
+        vmax: [28]
+        palette: ["0300ff", "418504", "efff07", "efff07", "ff0303"]
     bands:
       ssm:
         description: Surface soil moisture
@@ -7268,6 +7911,12 @@ datasets:
     license: public-domain
     terms_note: 'This dataset is in the public domain and is available'
     source: republished
+    visualizations:
+      - name: "Soil Moisture"
+        bands: ["ssm"]
+        vmin: [0]
+        vmax: [28]
+        palette: ["0300ff", "418504", "efff07", "efff07", "ff0303"]
     bands:
       ssm:
         description: Surface soil moisture
@@ -7309,6 +7958,12 @@ datasets:
     license: public-domain
     terms_note: 'This dataset is in the public domain and is available'
     source: republished
+    visualizations:
+      - name: "Soil Moisture"
+        bands: ["ssm"]
+        vmin: [0]
+        vmax: [28]
+        palette: ["0300ff", "418504", "efff07", "efff07", "ff0303"]
     bands:
       ssm:
         description: Surface soil moisture
@@ -7348,6 +8003,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'The NOAA CDR Program''s official distribution point for CDRs is NOAA''s'
+    visualizations:
+      - name: "Sea Surface Temperature"
+        bands: ["sst"]
+        vmin: [-180]
+        vmax: [3000]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       sst:
         description: Daily sea surface temperature
@@ -7385,6 +8046,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Sea Surface Temperature"
+        bands: ["sst"]
+        vmin: [-180]
+        vmax: [3000]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       sst:
         description: Daily sea-surface temperature
@@ -7416,6 +8083,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Sea Surface Temperature"
+        bands: ["sea_surface_temperature"]
+        vmin: [0]
+        vmax: [2500]
+        palette: ["030d81", "0519ff", "05e8ff", "11ff01", "fbff01", "ff9901", "ff0000", "ad0000"]
     bands:
       sea_surface_temperature:
         description: Skin sea-surface temperature
@@ -7444,6 +8117,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Sea Surface Temperature"
+        bands: ["sea_surface_temperature"]
+        vmin: [0]
+        vmax: [30]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       sea_surface_temperature:
         description: OISST with diurnal warming correction
@@ -7463,6 +8142,12 @@ datasets:
       bbox: [-130.17, 20.15, -60.81, 52.91]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Wind Speed"
+        bands: ["WIND"]
+        vmin: [0]
+        vmax: [12]
+        palette: ["001137", "01abab", "e7eb05", "620500"]
     bands:
       TMP:
         description: 2 m air temperature
@@ -7509,6 +8194,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'This dataset is openly shared, without restriction, in accordance with'
+    visualizations:
+      - name: "Surface Water"
+        bands: ["WTR_Water_classification"]
+        vmin: [0]
+        vmax: [3]
+        palette: ["white", "blue", "cyan", "black"]
     bands:
       WTR_Water_classification:
         description: Water Classification - This represents pixel-wise classification
@@ -7541,6 +8232,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'This dataset is openly shared, without restriction, in accordance with'
+    visualizations:
+      - name: "Surface Water"
+        bands: ["WTR_Water_classification"]
+        vmin: [0]
+        vmax: [3]
+        palette: ["white", "blue", "cyan", "black"]
     bands:
       WTR_Water_classification:
         description: Masked interpreted water classification layer. This represents
@@ -7564,6 +8261,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "OpenET DisALEXI Monthly ET"
+        bands: ["et"]
+        vmin: [0]
+        vmax: [1400]
+        palette: ["9e6212", "ac7d1d", "ba9829", "c8b434", "d6cf40", "bed44b", "9fcb51", "80c256", "61b95c", "42b062", "45b677", "49bc8d", "4dc2a2", "51c8b8", "55cece", "4db4ba", "459aa7", "3d8094", "356681", "2d4c6e"]
     bands:
       et:
         description: DisALEXI monthly evapotranspiration (two-source energy balance)
@@ -7584,6 +8287,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "OpenET eeMETRIC Monthly ET"
+        bands: ["et"]
+        vmin: [0]
+        vmax: [1400]
+        palette: ["9e6212", "ac7d1d", "ba9829", "c8b434", "d6cf40", "bed44b", "9fcb51", "80c256", "61b95c", "42b062", "45b677", "49bc8d", "4dc2a2", "51c8b8", "55cece", "4db4ba", "459aa7", "3d8094", "356681", "2d4c6e"]
     bands:
       et:
         description: eeMETRIC monthly evapotranspiration (METRIC adapted to EE)
@@ -7604,6 +8313,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "OpenET Ensemble Monthly ET"
+        bands: ["et_ensemble_mad"]
+        vmin: [0]
+        vmax: [1400]
+        palette: ["9e6212", "ac7d1d", "ba9829", "c8b434", "d6cf40", "bed44b", "9fcb51", "80c256", "61b95c", "42b062", "45b677", "49bc8d", "4dc2a2", "51c8b8", "55cece", "4db4ba", "459aa7", "3d8094", "356681", "2d4c6e"]
     bands:
       et_ensemble_mad:
         description: Ensemble ET, mean of the median-absolute-deviation-filtered models
@@ -7633,6 +8348,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "OpenET geeSEBAL Monthly ET"
+        bands: ["et"]
+        vmin: [0]
+        vmax: [1400]
+        palette: ["9e6212", "ac7d1d", "ba9829", "c8b434", "d6cf40", "bed44b", "9fcb51", "80c256", "61b95c", "42b062", "45b677", "49bc8d", "4dc2a2", "51c8b8", "55cece", "4db4ba", "459aa7", "3d8094", "356681", "2d4c6e"]
     bands:
       et:
         description: geeSEBAL monthly evapotranspiration (SEBAL on EE)
@@ -7653,6 +8374,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "OpenET PT-JPL Monthly ET"
+        bands: ["et"]
+        vmin: [0]
+        vmax: [1400]
+        palette: ["9e6212", "ac7d1d", "ba9829", "c8b434", "d6cf40", "bed44b", "9fcb51", "80c256", "61b95c", "42b062", "45b677", "49bc8d", "4dc2a2", "51c8b8", "55cece", "4db4ba", "459aa7", "3d8094", "356681", "2d4c6e"]
     bands:
       et:
         description: PT-JPL monthly evapotranspiration (Priestley-Taylor JPL)
@@ -7673,6 +8400,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "OpenET SIMS Monthly ET"
+        bands: ["et"]
+        vmin: [0]
+        vmax: [1400]
+        palette: ["9e6212", "ac7d1d", "ba9829", "c8b434", "d6cf40", "bed44b", "9fcb51", "80c256", "61b95c", "42b062", "45b677", "49bc8d", "4dc2a2", "51c8b8", "55cece", "4db4ba", "459aa7", "3d8094", "356681", "2d4c6e"]
     bands:
       et:
         description: SIMS monthly evapotranspiration (Satellite Irrigation Management Support)
@@ -7693,6 +8426,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "OpenET SSEBop Monthly ET"
+        bands: ["et"]
+        vmin: [0]
+        vmax: [1400]
+        palette: ["9e6212", "ac7d1d", "ba9829", "c8b434", "d6cf40", "bed44b", "9fcb51", "80c256", "61b95c", "42b062", "45b677", "49bc8d", "4dc2a2", "51c8b8", "55cece", "4db4ba", "459aa7", "3d8094", "356681", "2d4c6e"]
     bands:
       et:
         description: SSEBop monthly evapotranspiration
@@ -7712,6 +8451,12 @@ datasets:
     default_reducer: median
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Average daily evapotranspiration"
+        bands: ["ETa"]
+        vmin: [0]
+        vmax: [7]
+        palette: ["d7191c", "fdae61", "ffffbf", "abd9e9", "2c7bb6"]
     bands:
       ETa:
         description: Average daily evapotranspiration (mm/day)
@@ -7731,6 +8476,12 @@ datasets:
     default_reducer: median
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Average daily evapotranspiration (mm/day)"
+        bands: ["ETa"]
+        vmin: [0]
+        vmax: [7]
+        palette: ["d7191c", "fdae61", "ffffbf", "abd9e9", "2c7bb6"]
     bands:
       ETa:
         description: Average daily evapotranspiration
@@ -7750,6 +8501,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Data mask"
+        bands: ["datamask"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["000000", "ffffff"]
     bands:
       datamask:
         description: A flag to indicate data inclusion.
@@ -7768,6 +8525,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Intertidal areas"
+        bands: ["classification"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["0000ff"]
     bands:
       classification:
         description: Intertertidal area classification for the interval.
@@ -7787,6 +8550,12 @@ datasets:
     license: CC-BY-4.0
     terms_note: 'This work is licensed under a Creative Commons Attribution 4.0'
     source: republished
+    visualizations:
+      - name: "QA Pixel Count"
+        bands: ["pixel_count"]
+        vmin: [0]
+        vmax: [300]
+        palette: ["000000", "ffffff"]
     bands:
       pixel_count:
         description: Input image count.
@@ -7883,6 +8652,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'The WRI datasets are available without restriction'
+    visualizations:
+      - name: "Aqueduct Flood Hazard Maps"
+        bands: ["inundation_depth"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "0000ff"]
     bands:
       inundation_depth:
         description: Flood inundation depth
@@ -8058,6 +8833,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'HydroSHEDS data are free for non-commercial and commercial'
+    visualizations:
+      - name: "Elevation"
+        bands: ["b1"]
+        vmin: [-50]
+        vmax: [3000]
+        gamma: [2]
     bands:
       b1:
         description: Elevation
@@ -8077,6 +8858,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free for non-commercial and commercial use.'
+    visualizations:
+      - name: "Drainage Direction"
+        bands: ["b1"]
+        vmin: [1]
+        vmax: [128]
+        palette: ["000000", "023858", "006837", "1a9850", "66bd63", "a6d96a", "d9ef8b", "ffffbf", "fee08b", "fdae61", "f46d43", "d73027"]
     bands:
       b1:
         description: "Drainage direction (1=E, 2=SE, 4=S, 8=SW, 16=W, 32=NW, 64=N, 128=NE)"
@@ -8095,6 +8882,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'HydroSHEDS data are free for non-commercial and commercial'
+    visualizations:
+      - name: "Elevation"
+        bands: ["b1"]
+        vmin: [-50]
+        vmax: [3000]
+        gamma: [2]
     bands:
       b1:
         description: Elevation
@@ -8114,6 +8907,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free for non-commercial and commercial use.'
+    visualizations:
+      - name: "Flow Accumulation"
+        bands: ["b1"]
+        vmin: [0]
+        vmax: [500]
+        palette: ["000000", "023858", "006837", "1a9850", "66bd63", "a6d96a", "d9ef8b", "ffffbf", "fee08b", "fdae61", "f46d43", "d73027"]
     bands:
       b1:
         description: Upstream flow accumulation (number of contributing pixels)
@@ -8130,6 +8929,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'HydroSHEDS data are free for non-commercial and commercial'
+    visualizations:
+      - name: "Drainage Direction"
+        bands: ["b1"]
+        vmin: [1]
+        vmax: [128]
+        palette: ["000000", "023858", "006837", "1a9850", "66bd63", "a6d96a", "d9ef8b", "ffffbf", "fee08b", "fdae61", "f46d43", "d73027"]
     bands:
       b1:
         description: 'Drainage direction possible values: 1=E, 2=SE, 4=S,'
@@ -8148,6 +8953,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'HydroSHEDS data are free for non-commercial and commercial'
+    visualizations:
+      - name: "Flow Accumulation"
+        bands: ["b1"]
+        vmin: [0]
+        vmax: [500]
+        palette: ["000000", "023858", "006837", "1a9850", "66bd63", "a6d96a", "d9ef8b", "ffffbf", "fee08b", "fdae61", "f46d43", "d73027"]
     bands:
       b1:
         description: Flow accumulation
@@ -8166,6 +8977,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free for non-commercial and commercial use.'
+    visualizations:
+      - name: "Drainage Direction"
+        bands: ["b1"]
+        vmin: [1]
+        vmax: [128]
+        palette: ["000000", "023858", "006837", "1a9850", "66bd63", "a6d96a", "d9ef8b", "ffffbf", "fee08b", "fdae61", "f46d43", "d73027"]
     bands:
       b1:
         description: "Drainage direction (1=E, 2=SE, 4=S, 8=SW, 16=W, 32=NW, 64=N, 128=NE)"

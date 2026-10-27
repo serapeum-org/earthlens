@@ -153,6 +153,7 @@ _EXPECTED_EXPORTS = {
     "Extent",
     "Preprocess",
     "Provider",
+    "Visualization",
     "CATALOG_PATH",
     "PROVIDERS_PATH",
     "EarthEngineAuth",
