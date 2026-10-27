@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -3492,6 +3492,78 @@
     <span class="md-ellipsis">
       
         Sensor-specific spectral transforms
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Visualization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Visualization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#style-hints-come-from-the-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Style hints come from the catalog
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rendering-a-download" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rendering a download
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#server-side-previews-no-download-at-all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Server-side previews: no download at all
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#an-earth-engine-tile-layer-on-a-slippy-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        An Earth Engine tile layer on a slippy map
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-lives-where" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What lives where
       
     </span>
   </a>
@@ -16019,6 +16091,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/gee/visualization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visualization — earthlens fetches, digitalearth draws
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -24215,6 +24315,78 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#8-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Visualization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Visualization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#style-hints-come-from-the-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Style hints come from the catalog
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rendering-a-download" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rendering a download
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#server-side-previews-no-download-at-all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Server-side previews: no download at all
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#an-earth-engine-tile-layer-on-a-slippy-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        An Earth Engine tile layer on a slippy map
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-lives-where" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What lives where
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -24907,6 +25079,137 @@ and it assumes the documented order and only checks the band count.</p>
 <p>The bundled sensors are <code>landsat5_tm</code>, <code>landsat7_etm</code> and <code>landsat8_oli</code>; the
 input must be a reflectance factor (a DN stack is warned about, not rejected),
 and voids are carried through as NaN in every component.</p>
+<h2 id="8-visualization"><a class="toclink" href="#8-visualization">8. Visualization</a><a class="headerlink" href="#8-visualization" title="Permanent link">#</a></h2>
+<p>earthlens draws nothing. Every figure, map, animation and chart is produced by
+<a href="https://github.com/serapeum-org/Digital-Earth"><strong>digitalearth</strong></a>, which reads
+the pyramids objects a download returns and renders them through cleopatra
+across four backend tiers. earthlens contributes only the two things that are
+genuinely Earth Engine's — the publisher's style metadata, and the two
+server-side preview URLs — and then delegates.</p>
+<p>That means the plotting stack is <strong>optional</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>viz<span class="o">]</span><span class="w">        </span><span class="c1"># or: uv sync --extra viz</span>
+</code></pre></div>
+<p>A bare install pulls no digitalearth, no cleopatra and no matplotlib, and
+<code>import earthlens.gee</code> does not reach any of them. The import happens inside
+the <code>Visualizer</code> method that needs it, and a boundary test holds that line.</p>
+<h3 id="style-hints-come-from-the-catalog"><a class="toclink" href="#style-hints-come-from-the-catalog">Style hints come from the catalog</a><a class="headerlink" href="#style-hints-come-from-the-catalog" title="Permanent link">#</a></h3>
+<p><code>earthlens.gee.viz.style_for</code> answers "how should this dataset be drawn?" from
+the catalog rather than from a guess:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">style_for</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="n">hints</span> <span class="o">=</span> <span class="n">style_for</span><span class="p">(</span><span class="s2">&quot;COPERNICUS/S2_SR_HARMONIZED&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;B4&quot;</span><span class="p">,</span> <span class="s2">&quot;B3&quot;</span><span class="p">,</span> <span class="s2">&quot;B2&quot;</span><span class="p">))</span>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="n">hints</span><span class="o">.</span><span class="n">limits</span>          <span class="c1"># ((0.0, 3000.0), (0.0, 3000.0), (0.0, 3000.0))</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="n">hints</span><span class="o">.</span><span class="n">source</span>          <span class="c1"># &#39;catalog&#39;</span>
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="n">hints</span><span class="o">.</span><span class="n">digitalearth_kwargs</span><span class="p">()</span>
+</code></pre></div>
+<p>There are two sources, and <code>source</code> says which one answered:</p>
+<ul>
+<li><strong><code>'catalog'</code></strong> — the publisher's own rendering, captured on the catalog row
+  as <code>Dataset.visualizations</code> from the asset's STAC <code>gee:visualizations</code>. This
+  is what Earth Engine's own catalog page draws: the band triple, the stretch
+  and the palette the data's publisher chose. <strong>894 of the 1104 curated
+  datasets carry one</strong> (111 are served by the STAC with no rendering declared,
+  and 99 are community <code>projects/...</code> assets the public STAC does not serve).</li>
+<li><strong><code>'heuristic'</code></strong> — derived from <code>Band.min</code> / <code>Band.max</code> plus a colour-map
+  match table that deliberately mirrors digitalearth's own
+  <code>base/autostyle/library/variables.yml</code>, so a fallback agrees with what
+  digitalearth would have picked rather than inventing a second opinion.</li>
+</ul>
+<p>The distinction matters: "the publisher says 0–3000" and "we read the band's
+declared range" are different claims, and <code>source</code> lets you treat them
+differently. A dataset offering several renderings can be asked for one by
+name:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">style_for</span><span class="p">(</span><span class="s2">&quot;LANDSAT/LC09/C02/T1_L2&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Near Infrared (543)&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="rendering-a-download"><a class="toclink" href="#rendering-a-download">Rendering a download</a><a class="headerlink" href="#rendering-a-download" title="Permanent link">#</a></h3>
+<p><code>GEE.visualize(result)</code> returns a <code>Visualizer</code> bound to the result and its
+hints. Each method resolves the hints, builds the keyword arguments and calls
+one digitalearth verb — nothing is composed here:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.gee</span><span class="w"> </span><span class="kn">import</span> <span class="n">GEE</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="n">gee</span> <span class="o">=</span> <span class="n">GEE</span><span class="p">(</span>
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020-06-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2020-08-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;COPERNICUS/S2_SR_HARMONIZED&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;B4&quot;</span><span class="p">,</span> <span class="s2">&quot;B3&quot;</span><span class="p">,</span> <span class="s2">&quot;B2&quot;</span><span class="p">]},</span>
+<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">31.0</span><span class="p">],</span>
+<a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">31.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">],</span>
+<a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a>    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">&quot;monthly&quot;</span><span class="p">,</span>
+<a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a>    <span class="n">scale</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a><span class="p">)</span>
+<a id="__codelineno-27-12" name="__codelineno-27-12" href="#__codelineno-27-12"></a><span class="n">result</span> <span class="o">=</span> <span class="n">gee</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">materialize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-27-13" name="__codelineno-27-13" href="#__codelineno-27-13"></a><span class="n">viz</span> <span class="o">=</span> <span class="n">gee</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<a id="__codelineno-27-14" name="__codelineno-27-14" href="#__codelineno-27-14"></a>
+<a id="__codelineno-27-15" name="__codelineno-27-15" href="#__codelineno-27-15"></a><span class="n">still</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">still</span><span class="p">()</span>                       <span class="c1"># digitalearth.quickmap</span>
+<a id="__codelineno-27-16" name="__codelineno-27-16" href="#__codelineno-27-16"></a><span class="n">web</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">still</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s2">&quot;web&quot;</span><span class="p">)</span>            <span class="c1"># the MapLibre tier</span>
+<a id="__codelineno-27-17" name="__codelineno-27-17" href="#__codelineno-27-17"></a><span class="n">viz</span><span class="o">.</span><span class="n">timelapse</span><span class="p">(</span><span class="s2">&quot;out/summer.gif&quot;</span><span class="p">)</span>           <span class="c1"># Map.animate over the collection</span>
+<a id="__codelineno-27-18" name="__codelineno-27-18" href="#__codelineno-27-18"></a><span class="n">viz</span><span class="o">.</span><span class="n">chart</span><span class="p">(</span><span class="s2">&quot;line&quot;</span><span class="p">,</span> <span class="n">series</span><span class="p">)</span>                 <span class="c1"># digitalearth.line</span>
+</code></pre></div>
+<p><code>backend=</code> takes digitalearth's own four names — <code>"matplotlib"</code> (the default),
+<code>"interactive"</code>, <code>"web"</code> and <code>"3d"</code>. Anything you pass as a keyword argument
+overrides the catalog's hint, so the catalog sets the default and you keep the
+last word:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="n">viz</span><span class="o">.</span><span class="n">still</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;magma&quot;</span><span class="p">,</span> <span class="n">limits</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2000</span><span class="p">))</span>
+</code></pre></div>
+<p><code>timelapse</code> hands the <strong>whole</strong> <code>DatasetCollection</code> to digitalearth in one
+call, because its animation builder is already collection-aware; emitting
+frames here would be exactly the rendering logic this layer must not contain.
+It needs a time series, so request several dates and <code>materialize=True</code>.</p>
+<h3 id="server-side-previews-no-download-at-all"><a class="toclink" href="#server-side-previews-no-download-at-all">Server-side previews: no download at all</a><a class="headerlink" href="#server-side-previews-no-download-at-all" title="Permanent link">#</a></h3>
+<p>Two previews are rendered by Earth Engine itself, before any pixels move.
+These are the genuinely GEE-specific part of visualization, and they need no
+digitalearth:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="n">viz</span> <span class="o">=</span> <span class="n">gee</span><span class="o">.</span><span class="n">visualize</span><span class="p">()</span>                     <span class="c1"># no result needed</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="n">url</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">thumbnail</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>   <span class="c1"># ee.Image.getThumbURL</span>
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="n">source</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">tiles</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>                    <span class="c1"># ee.Image.getMapId</span>
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="n">source</span><span class="o">.</span><span class="n">url</span>                                   <span class="c1"># &#39;.../tiles/{z}/{x}/{y}&#39;</span>
+</code></pre></div>
+<p>A thumbnail is the cheapest possible look at a request: Earth Engine
+rasterises the PNG on demand when the URL is fetched, so it is not subject to
+the 32768-px download cap. Its own cap is 4096 px per axis, which earthlens
+checks at construction and names the remedy for rather than letting the SDK
+raise from inside.</p>
+<p>Both previews honour the style hints, so a preview is stretched the way the
+publisher intended rather than across the full dynamic range of the data type,
+which is Earth Engine's unhelpful default.</p>
+<h3 id="an-earth-engine-tile-layer-on-a-slippy-map"><a class="toclink" href="#an-earth-engine-tile-layer-on-a-slippy-map">An Earth Engine tile layer on a slippy map</a><a class="headerlink" href="#an-earth-engine-tile-layer-on-a-slippy-map" title="Permanent link">#</a></h3>
+<p>This is the whole seam between the two packages: earthlens resolves the tile
+template inside Earth Engine, digitalearth draws it.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="n">viz</span><span class="o">.</span><span class="n">tile_map</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;web&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;True colour&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>The map is built <strong>empty</strong> — nothing local is drawn or downloaded — and the
+viewport decides which tiles Earth Engine renders. <code>backend=</code> is <code>"web"</code> or
+<code>"interactive"</code>; the matplotlib tier draws no slippy map, and the 3-D tier's
+<code>tiles_3d</code> has different semantics, so neither is offered here. The layer
+carries Earth Engine attribution, which its terms require on a published map.</p>
+<h3 id="what-lives-where"><a class="toclink" href="#what-lives-where">What lives where</a><a class="headerlink" href="#what-lives-where" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Package</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fetching, catalogs, request shaping</td>
+<td>earthlens</td>
+</tr>
+<tr>
+<td><code>getThumbURL</code> / <code>getMapId</code>, catalog style hints</td>
+<td>earthlens (<code>earthlens.gee.viz</code>)</td>
+</tr>
+<tr>
+<td>Maps, animations, charts, layout, basemaps</td>
+<td>digitalearth</td>
+</tr>
+<tr>
+<td>Colour ramps, glyphs, the actual drawing</td>
+<td>cleopatra</td>
+</tr>
+</tbody>
+</table>
+<p>If a figure cannot be expressed, the fix belongs in digitalearth or cleopatra —
+not in a renderer added here.</p>
 
 
 
