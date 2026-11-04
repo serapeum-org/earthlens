@@ -18,10 +18,11 @@ range.
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import TYPE_CHECKING, Any, ClassVar, cast
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, cast
 
 from pydantic import field_validator
 
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.reducers import resolve_reducer
 from earthlens.gee.sampling.base import Sampler
 from earthlens.gee.vector.geometry import GeometryConverter
@@ -79,7 +80,9 @@ class RegionSampler(Sampler):
 
     strategy: ZonalStrategy = ZonalStrategy.SERVER  # Earth Engine or local pyramids
     stats: tuple[str, ...] = ("mean",)  # one column per registry reducer name
-    tile_scale: float = 1.0  # Earth Engine tileScale (0.1-16); raise to 2/4 on OOM
+    tile_scale: Annotated[float, NoBool] = (
+        1.0  # Earth Engine tileScale (0.1-16); raise to 2/4 on OOM
+    )
 
     @field_validator("stats")
     @classmethod

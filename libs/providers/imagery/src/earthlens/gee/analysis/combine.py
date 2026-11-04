@@ -25,10 +25,11 @@ so it lives in its own module, `analysis.spectral`, and delegates to pyramids-eo
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Annotated, Any, Literal
 
 from pydantic import ConfigDict
 
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.analysis.base import RasterOperation
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -82,7 +83,7 @@ class PanSharpen(RasterOperation):
         "nearest", "bilinear", "cubic", "cubicspline", "lanczos", "average"
     ] = "cubic"
     bands: tuple[int, ...] | None = None
-    nodata: float | None = None
+    nodata: Annotated[float | None, NoBool] = None
 
     def apply(self, ds: Dataset) -> Dataset:
         """Return the pan-sharpened raster.
@@ -145,9 +146,9 @@ class MatchHistogram(RasterOperation):
     model_config = ConfigDict(frozen=True, extra="forbid", arbitrary_types_allowed=True)
 
     reference: Any  # a pyramids Dataset; Any so the annotation stays import-free
-    band: int = 0
-    reference_band: int | None = None
-    bins: int = 256
+    band: Annotated[int, NoBool] = 0
+    reference_band: Annotated[int | None, NoBool] = None
+    bins: Annotated[int, NoBool] = 256
 
     def apply(self, ds: Dataset) -> Dataset:
         """Return a raster whose `band` matches the reference's distribution.

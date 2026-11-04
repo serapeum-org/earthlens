@@ -13,10 +13,11 @@ introduced.
 from __future__ import annotations
 
 import abc
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.reducers import Reducer, resolve_reducer, sampling_reducers
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -72,7 +73,7 @@ class Sampler(BaseModel, abc.ABC):
     #: A time-series sampler sets this True; most samplers reduce one image.
     consumes_stack: ClassVar[bool] = False
 
-    scale_m: float
+    scale_m: Annotated[float, NoBool]
     reducer: Reducer = Field(default_factory=lambda: resolve_reducer("first"))
     #: When True (the default), `reducer` must be one a `sample`/`reduceRegions`
     #: path can actually run — i.e. a name in `sampling_reducers()` (or a

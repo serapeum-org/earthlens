@@ -20,11 +20,12 @@ reads the pair back through `EngineConfig.grid_inputs`.
 
 from __future__ import annotations
 
-from typing import Any, ClassVar
+from typing import Annotated, Any, ClassVar
 
 from pydantic import ConfigDict, Field, model_validator
 
 from earthlens.base.leaves import SummarisedLeaf
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.sinks import resolve_sink
 
 __all__ = ["ExportConfig", "EngineConfig"]
@@ -109,7 +110,7 @@ class ExportConfig(SummarisedLeaf):
     cog: bool = False
     resample: str = "nearest"
     auto_split: bool = False
-    http_timeout: float = Field(default=DEFAULT_HTTP_TIMEOUT_S, gt=0)
+    http_timeout: Annotated[float, NoBool] = Field(default=DEFAULT_HTTP_TIMEOUT_S, gt=0)
     wait_for_export: bool = True
     materialize: bool = False
     # Set from `GEE(nodata=...)`. NOT a field on the pixel API's request:
@@ -120,7 +121,7 @@ class ExportConfig(SummarisedLeaf):
     # it writes, and a file-based batch export passes it as Earth Engine's own
     # `GeoTiffImageExportOptions.noData`. The backend warns on the paths that
     # can do neither.
-    nodata: float | int | None = None
+    nodata: Annotated[float | int | None, NoBool] = None
     # No constructor kwarg: nothing reads it yet. `computePixels` does take a
     # `dataType`, but the dtype a user asks for and the dtype pyramids writes
     # have to agree, and that pairing is not built. A kwarg that set this field
@@ -198,7 +199,7 @@ class EngineConfig(SummarisedLeaf):
     engine: str = "auto"
     reducer: Any = None
     crs: str = "EPSG:4326"
-    scale: float | None = None
+    scale: Annotated[float | None, NoBool] = None
     cloud_mask: Any = None
     server_side_ops: bool = False
     filters: tuple[Any, ...] = ()

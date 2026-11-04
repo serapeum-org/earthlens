@@ -34,11 +34,12 @@ from __future__ import annotations
 
 import math
 from collections.abc import Iterable
-from typing import Any, ClassVar
+from typing import Annotated, Any, ClassVar
 
 from pydantic import ConfigDict, Field
 
 from earthlens.base.leaves import SummarisedLeaf
+from earthlens.gee._helpers import NoBool
 
 __all__ = [
     "OutputGrid",
@@ -586,9 +587,9 @@ class OutputGrid(SummarisedLeaf):
     crs: str
     # `ge=1`: a 0x0 grid used to satisfy `fits()` with room to spare, and a
     # negative one passed the per-axis cap through `longest_axis`.
-    rows: int = Field(ge=1)
-    cols: int = Field(ge=1)
-    scale: float | None = None
+    rows: Annotated[int, NoBool] = Field(ge=1)
+    cols: Annotated[int, NoBool] = Field(ge=1)
+    scale: Annotated[float | None, NoBool] = None
     convention: str = "metre"
     cutline: Any = None
     crs_transform: tuple[float, ...] | None = None

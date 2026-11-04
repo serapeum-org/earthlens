@@ -25,10 +25,11 @@ classification produces thousands of single-pixel polygons.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import TYPE_CHECKING, Annotated, Any, Literal, cast
 
 from pydantic import BaseModel, ConfigDict
 
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.reducers import resolve_reducer
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -72,12 +73,12 @@ class Vectorize(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    scale_m: float  # pixel scale (metres) at which to vectorise
+    scale_m: Annotated[float, NoBool]  # pixel scale (metres) at which to vectorise
     geometry_type: Literal["polygon", "centroid", "bb"] = "polygon"  # output shape
     eight_connected: bool = True  # diagonally-touching pixels join one polygon
     label_property: str = "label"  # property carrying each polygon's class value
     reducer: str | None = None  # optional registry reducer attached per polygon
-    max_pixels: int = 100_000_000  # reduceToVectors pixel budget
+    max_pixels: Annotated[int, NoBool] = 100_000_000  # reduceToVectors pixel budget
 
     def to_ee(self, image: ee.Image) -> ee.FeatureCollection:
         """Vectorise `image` server-side with `reduceToVectors`.

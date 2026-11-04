@@ -16,12 +16,13 @@ at the call site:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, cast
+from typing import TYPE_CHECKING, Annotated, ClassVar, cast
 
 import geopandas as gpd
 import numpy as np
 from pydantic import Field
 
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.sampling.base import Sampler
 from earthlens.gee.sampling.point import PointSampler
 
@@ -52,8 +53,8 @@ class TransectSampler(Sampler):
         {"LineString", "MultiLineString"}
     )
 
-    n_points: int = Field(default=100, gt=0)
-    band: int = 0
+    n_points: Annotated[int, NoBool] = Field(default=100, gt=0)
+    band: Annotated[int, NoBool] = 0
 
     def sample(self, image: ee.Image, geometry: GeoDataFrame) -> ee.FeatureCollection:
         """Densify the line into ordered points and reduce them in Earth Engine.

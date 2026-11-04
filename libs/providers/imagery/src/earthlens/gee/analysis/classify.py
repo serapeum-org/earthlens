@@ -17,11 +17,12 @@ would invent a class. Unclassifiable cells carry `no_data_label`.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Annotated, Any
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict, PrivateAttr, model_validator
 
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.analysis._arrays import read_masked, result_like
 from earthlens.gee.analysis._sklearn import import_ensemble
 from earthlens.gee.analysis.base import RasterOperation
@@ -108,7 +109,7 @@ class TrainingExtractor(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     bands: tuple[int, ...] | None = None
-    label_band: int = 0
+    label_band: Annotated[int, NoBool] = 0
 
     def extract(self, ds: Dataset, labels: Dataset) -> TrainingSet:
         """Return the training pair for the labelled cells.
@@ -204,10 +205,10 @@ class Classify(RasterOperation):
 
     training: TrainingSet
     bands: tuple[int, ...] | None = None
-    n_estimators: int = 100
-    max_depth: int | None = None
-    random_state: int | None = 0
-    no_data_label: int = -1
+    n_estimators: Annotated[int, NoBool] = 100
+    max_depth: Annotated[int | None, NoBool] = None
+    random_state: Annotated[int | None, NoBool] = 0
+    no_data_label: Annotated[int, NoBool] = -1
     dtype: str = "int32"
 
     #: The fitted estimator, built on first use. A private attribute rather

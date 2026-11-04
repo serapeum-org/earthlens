@@ -12,10 +12,11 @@ edge-handling bugs.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Annotated, Literal
 
 import numpy as np
 
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.analysis._arrays import read_masked, result_like
 from earthlens.gee.analysis.base import RasterOperation
 
@@ -92,7 +93,7 @@ class Slope(RasterOperation):
             ```
     """
 
-    band: int = 0
+    band: Annotated[int, NoBool] = 0
     units: Literal["degrees", "radians", "percent"] = "degrees"
 
     def apply(self, ds: Dataset) -> Dataset:
@@ -122,7 +123,7 @@ class Slope(RasterOperation):
 class Aspect(RasterOperation):
     """Downslope compass direction of an elevation band, in degrees."""
 
-    band: int = 0
+    band: Annotated[int, NoBool] = 0
 
     def apply(self, ds: Dataset) -> Dataset:
         """Return a one-band aspect raster.
@@ -144,9 +145,9 @@ class Hillshade(RasterOperation):
     rather than as an inverted embossing.
     """
 
-    band: int = 0
-    azimuth: float = 315.0
-    altitude: float = 45.0
+    band: Annotated[int, NoBool] = 0
+    azimuth: Annotated[float, NoBool] = 315.0
+    altitude: Annotated[float, NoBool] = 45.0
 
     def apply(self, ds: Dataset) -> Dataset:
         """Return a one-band hillshade raster.
