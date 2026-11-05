@@ -1,14 +1,14 @@
 """Live end-to-end check that a real bathymetry exchange parses.
 
 Gated behind the `e2e` + `bathymetry` markers plus a host-reachability skip.
-It cannot run offline in the unit lane: `pyramids.Dataset.from_wcs` fetches
-the `GetCapabilities` handshake over `urllib` (which a cassette can replay),
-but issues the `GetCoverage` payload through GDAL, whose transport a
-Python-level cassette (vcrpy) or socket guard (pytest-socket) cannot
-intercept. So a recording replays only the handshake, never the coverage
-read, and the test reaches the live service either way. This pins the shape
-of what bathymetry actually sends back; the sibling fake-based tests cover
-the error branches.
+It cannot run offline in the unit lane: `pyramids.Dataset.from_wcs` makes one
+`GetCapabilities` probe over `urllib` (which a cassette can replay), then hands
+the read to GDAL's native WCS driver, which runs its own capabilities and
+coverage requests over a transport that a Python-level cassette (vcrpy) or
+socket guard (pytest-socket) cannot intercept. So a recording replays only
+that first probe, never the GDAL-driven read, and the test reaches the live
+service either way. This pins the shape of what bathymetry actually sends
+back; the sibling fake-based tests cover the error branches.
 
 Run with:
 
