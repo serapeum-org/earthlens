@@ -2,13 +2,18 @@
 
 from __future__ import annotations
 
+from typing import Annotated
+
 import pytest
+from pydantic import TypeAdapter, ValidationError
 
 from earthlens.base import SpatialExtent
 from earthlens.gee._helpers import (
     EE_MAX_DIMENSION,
+    NoBool,
     checked_handle,
     reduce_collection,
+    refuse_bool,
     slug_asset_id,
     split_aoi_for_url,
     task_state_name,
@@ -289,3 +294,36 @@ class TestCheckedHandle:
         """The message lists the payload's keys, sorted, for diagnosis."""
         with pytest.raises(ValueError, match=r"got keys \['alpha', 'zulu'\]"):
             checked_handle("", "task", ("name",), {"zulu": 1, "alpha": 2})
+
+
+class TestRefuseBool:
+    """Tests for `refuse_bool`."""
+
+    @pytest.mark.parametrize("value", [1, 0, -3, 0.5, 2.0, None, "1", [1], (1,)])
+    def test_non_bool_passes_through_unchanged(self, value):
+        """Anything that is not a `bool` is returned as the same object."""
+        assert refuse_bool(value) is value
+
+    @pytest.mark.parametrize("value, becomes", [(True, "1"), (False, "0")])
+    def test_a_bool_is_refused(self, value, becomes):
+        """`True` / `False` raise `ValueError` naming the int they would become."""
+        with pytest.raises(ValueError, match="got the boolean") as exc:
+            refuse_bool(value)
+        message = str(exc.value)
+        assert repr(value) in message, message
+        assert f"silently become {becomes}" in message, message
+
+
+class TestNoBool:
+    """Tests for the shared `NoBool` field annotation."""
+
+    def test_guards_a_field_before_its_own_type(self):
+        """`Annotated[int, NoBool]` refuses `True` with the `refuse_bool` message."""
+        adapter = TypeAdapter(Annotated[int, NoBool])
+        with pytest.raises(ValidationError, match="got the boolean"):
+            adapter.validate_python(True)
+
+    def test_a_plain_number_still_validates(self):
+        """The guard rejects only a `bool`; a real number passes through."""
+        adapter = TypeAdapter(Annotated[int, NoBool])
+        assert adapter.validate_python(1) == 1
