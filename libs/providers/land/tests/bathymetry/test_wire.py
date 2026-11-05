@@ -37,9 +37,7 @@ def test_a_real_request_parses(tmp_path):
         path=str(tmp_path),
     ).download(progress_bar=False)
 
-    assert result is not None, "download never returns None"
-    if isinstance(result, list):
-        assert result, "a file-writing backend returns the paths it wrote"
-        assert all(Path(p).exists() for p in result), "every path exists"
-    else:
-        assert hasattr(result, "columns"), "a tabular backend returns a frame"
+    assert isinstance(result, list) and result, (
+        "bathymetry is a file-writing backend: download returns the paths it wrote"
+    )
+    assert all(Path(p).exists() for p in result), "every returned path exists"
