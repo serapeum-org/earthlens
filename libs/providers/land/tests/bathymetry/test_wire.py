@@ -1,11 +1,14 @@
 """Live end-to-end check that a real bathymetry exchange parses.
 
 Gated behind the `e2e` + `bathymetry` markers plus a host-reachability skip.
-It cannot run offline in the unit lane: the EMODnet coverage fetch is issued
-by GDAL (`pyramids.Dataset.from_wcs`), whose request a Python-level cassette
-(vcrpy) or socket guard (pytest-socket) cannot intercept, so there is nothing
-to record or replay. This pins the shape of what bathymetry actually sends
-back; the sibling fake-based tests cover the error branches.
+It cannot run offline in the unit lane: `pyramids.Dataset.from_wcs` fetches
+the `GetCapabilities` handshake over `urllib` (which a cassette can replay),
+but issues the `GetCoverage` payload through GDAL, whose transport a
+Python-level cassette (vcrpy) or socket guard (pytest-socket) cannot
+intercept. So a recording replays only the handshake, never the coverage
+read, and the test reaches the live service either way. This pins the shape
+of what bathymetry actually sends back; the sibling fake-based tests cover
+the error branches.
 
 Run with:
 
