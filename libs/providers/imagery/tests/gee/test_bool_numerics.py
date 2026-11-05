@@ -150,6 +150,7 @@ def test_the_sweep_found_the_fields_it_is_meant_to_guard():
     names = set(_GUARDED_IDS)
     assert {
         "VideoSink.fps",
+        "VideoSink.dimensions",
         "VideoSink.max_frames",
         "LandTrendr.maxSegments",
         "OutputGrid.rows",
