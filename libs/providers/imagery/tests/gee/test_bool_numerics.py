@@ -11,8 +11,10 @@ Engine response - rather than a hand-typed constructor. There a `bool` is a
 schema surprise to catch upstream, not a user typo to refuse at the boundary,
 so those fields are deliberately left coercing. `test_only_machine_fed_fields
 _stay_unguarded` pins that set so the triage cannot silently rot: any new
-unguarded field that accepts the integer `0` or `1` - every real numeric field
-- fails it. (A field whose domain admits neither cannot take a `bool` at all.)
+unguarded *scalar* numeric field - one that accepts the integer `0` or `1` -
+fails it. Numeric *elements* of tuples and numeric dict *keys* accept no scalar
+`0`/`1`, so they fall outside this sweep by construction; that wider surface is
+guarded field-by-field (e.g. `StyleHints` already does) rather than pinned here.
 """
 
 from __future__ import annotations
@@ -180,10 +182,11 @@ def test_a_numeric_field_still_takes_a_number(model, field, adapter):
 def test_only_machine_fed_fields_stay_unguarded():
     """The unguarded population is exactly the recorded machine-fed set.
 
-    Fails if a new field that accepts the integer `0` or `1` starts coercing a
-    `bool` (drift up), or if a machine-fed field is guarded without updating
-    `_MACHINE_FED` (drift down). A field whose domain admits neither `0` nor `1`
-    cannot take a `bool` at all and is out of the sweep's reach by construction.
+    Fails if a new *scalar* numeric field (one accepting the integer `0` or `1`)
+    starts coercing a `bool` (drift up), or if a machine-fed field is guarded
+    without updating `_MACHINE_FED` (drift down). Numeric elements of tuples and
+    numeric dict keys accept no scalar `0`/`1`, so they fall outside this sweep
+    by construction - a wider surface guarded per field, not pinned here.
     """
     unguarded = {f"{m.__name__}.{f}" for m, f, _, g in _FIELDS if not g}
     assert unguarded == set(_MACHINE_FED)
