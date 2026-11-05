@@ -202,3 +202,11 @@ def test_classify_sees_a_hazard_whose_domain_excludes_one_but_admits_zero():
     assert _classify(hazard) is False, "a False->0 coercion must register as a hazard"
     guarded = TypeAdapter(typing.Annotated[int, Field(le=0), NoBool])
     assert _classify(guarded) is True, "NoBool must register as guarded even when le=0"
+
+
+def test_stratified_sampler_refuses_a_bool_count_inside_the_mapping():
+    """A per-class count of `True` is the #1355 trap one level down; refuse it too."""
+    from earthlens.gee.sampling.random import StratifiedSampler
+
+    with pytest.raises(ValidationError, match="got the boolean"):
+        StratifiedSampler(scale_m=30, class_band="landcover", n_per_class={1: True})
