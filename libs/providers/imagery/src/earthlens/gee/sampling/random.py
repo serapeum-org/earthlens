@@ -110,8 +110,8 @@ class StratifiedSampler(Sampler):
 
     class_band: str  # the band naming each pixel's class
     n_per_class: Annotated[
-        int | dict[int, Annotated[int, NoBool]], NoBool
-    ]  # scalar count per class, or {class: count} - NoBool guards both levels
+        int | dict[Annotated[int, NoBool], Annotated[int, NoBool]], NoBool
+    ]  # scalar count per class, or {class: count}; NoBool guards scalar, key, value
     class_values: tuple[int, ...] | None = (
         None  # classes to draw (scalar case); None = all
     )

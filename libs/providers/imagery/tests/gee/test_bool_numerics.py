@@ -210,3 +210,5 @@ def test_stratified_sampler_refuses_a_bool_count_inside_the_mapping():
 
     with pytest.raises(ValidationError, match="got the boolean"):
         StratifiedSampler(scale_m=30, class_band="landcover", n_per_class={1: True})
+    with pytest.raises(ValidationError, match="got the boolean"):
+        StratifiedSampler(scale_m=30, class_band="landcover", n_per_class={True: 100})
