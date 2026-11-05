@@ -30,7 +30,7 @@ pytest.importorskip("ee")
 from pydantic import BaseModel, TypeAdapter, ValidationError  # noqa: E402
 
 import earthlens.gee as _gee_pkg  # noqa: E402
-from earthlens.gee._helpers import NoBool  # noqa: E402
+from earthlens.gee._helpers import BOOL_REFUSAL_HINT, NoBool  # noqa: E402
 
 #: Fields built from machine input, deliberately left coercing a `bool`. Keyed
 #: `Model.field`. `Band` / `Cadence` / `Dataset` are parsed from
@@ -109,7 +109,7 @@ def _classify(adapter: TypeAdapter) -> bool | None:
         try:
             adapter.validate_python(value)
         except ValidationError as error:
-            if "got the boolean" in str(error):
+            if BOOL_REFUSAL_HINT in str(error):
                 return True  # refused by NoBool
             # refused by the field's own type/range for this value; try the other
         else:
@@ -169,7 +169,7 @@ def test_the_sweep_found_the_fields_it_is_meant_to_guard():
 @pytest.mark.parametrize("given", [True, False], ids=["True", "False"])
 def test_a_numeric_field_refuses_a_bool(model, field, adapter, given):
     """`True` is not the number 1, so it is refused rather than coerced."""
-    with pytest.raises(ValidationError, match="got the boolean"):
+    with pytest.raises(ValidationError, match=BOOL_REFUSAL_HINT):
         adapter.validate_python(given)
 
 
@@ -211,7 +211,7 @@ def test_stratified_sampler_refuses_a_bool_count_inside_the_mapping():
     """A per-class count of `True` is the #1355 trap one level down; refuse it too."""
     from earthlens.gee.sampling.random import StratifiedSampler
 
-    with pytest.raises(ValidationError, match="got the boolean"):
+    with pytest.raises(ValidationError, match=BOOL_REFUSAL_HINT):
         StratifiedSampler(scale_m=30, class_band="landcover", n_per_class={1: True})
-    with pytest.raises(ValidationError, match="got the boolean"):
+    with pytest.raises(ValidationError, match=BOOL_REFUSAL_HINT):
         StratifiedSampler(scale_m=30, class_band="landcover", n_per_class={True: 100})

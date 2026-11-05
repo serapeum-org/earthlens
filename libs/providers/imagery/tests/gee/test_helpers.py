@@ -9,6 +9,7 @@ from pydantic import TypeAdapter, ValidationError
 
 from earthlens.base import SpatialExtent
 from earthlens.gee._helpers import (
+    BOOL_REFUSAL_HINT,
     EE_MAX_DIMENSION,
     NoBool,
     checked_handle,
@@ -307,7 +308,7 @@ class TestRefuseBool:
     @pytest.mark.parametrize("value, becomes", [(True, "1"), (False, "0")])
     def test_a_bool_is_refused(self, value, becomes):
         """`True` / `False` raise `ValueError` naming the int they would become."""
-        with pytest.raises(ValueError, match="got the boolean") as exc:
+        with pytest.raises(ValueError, match=BOOL_REFUSAL_HINT) as exc:
             refuse_bool(value)
         message = str(exc.value)
         assert repr(value) in message, message
@@ -320,7 +321,7 @@ class TestNoBool:
     def test_guards_a_field_before_its_own_type(self):
         """`Annotated[int, NoBool]` refuses `True` with the `refuse_bool` message."""
         adapter = TypeAdapter(Annotated[int, NoBool])
-        with pytest.raises(ValidationError, match="got the boolean"):
+        with pytest.raises(ValidationError, match=BOOL_REFUSAL_HINT):
             adapter.validate_python(True)
 
     def test_a_plain_number_still_validates(self):
