@@ -1784,7 +1784,13 @@ datasets:
       grid_resolution: [0_1deg]
       period: [full_period]
       product_type: [elevation]
-      version: [27_0e]
+      # E-OBS retired v27.0e from the CDS store (it now serves 28_0e-33_0e) and
+      # added a required `licence_type` dimension. `open_data_licence` serves
+      # only the newest 33_0e; the restricted_research licence covers the older
+      # versions. Pin the open, newest combination so no research agreement is
+      # needed - a caller wanting an older version overrides both selectors.
+      version: [33_0e]
+      licence_type: [open_data_licence]
       day: null
       month: null
       year: null
@@ -1854,7 +1860,9 @@ datasets:
         units: metres
         extras:
           grid_resolution: [0_1deg, 0_25deg]
-          version: [27_0e, 28_0e, 29_0e, 30_0e, 31_0e, 32_0e, 33_0e]
+          # Match the stanza's open_data_licence, which serves only 33_0e; the
+          # retired 27_0e and the older versions need the research licence.
+          version: [33_0e]
   insitu-gridded-observations-global-and-regional:
     endpoint: cds
     request_kind: form
@@ -1895,7 +1903,10 @@ datasets:
     request_kind: form
     extras:
       spatial_interpolation_method: [type_1]
-      version: ['24_09']
+      # The store retired v24_09; it now serves 25_03 / 25_09 / 26_03 / 26_09.
+      # Pin the newest. (Same E-OBS version drift as the -europe sibling; no
+      # licence_type dimension here.)
+      version: ['26_09']
       time: null
       data_format: null
       area: null
