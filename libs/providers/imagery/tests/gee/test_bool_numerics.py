@@ -10,8 +10,9 @@ A small set of models is fed from machine input - the YAML catalog, an Earth
 Engine response - rather than a hand-typed constructor. There a `bool` is a
 schema surprise to catch upstream, not a user typo to refuse at the boundary,
 so those fields are deliberately left coercing. `test_only_machine_fed_fields
-_stay_unguarded` pins that set so the triage cannot silently rot: a new
-unguarded field anywhere else fails it.
+_stay_unguarded` pins that set so the triage cannot silently rot: any new
+unguarded field that accepts the integer `0` or `1` - every real numeric field
+- fails it. (A field whose domain admits neither cannot take a `bool` at all.)
 """
 
 from __future__ import annotations
@@ -27,6 +28,7 @@ pytest.importorskip("ee")
 from pydantic import BaseModel, TypeAdapter, ValidationError  # noqa: E402
 
 import earthlens.gee as _gee_pkg  # noqa: E402
+from earthlens.gee._helpers import NoBool  # noqa: E402
 
 #: Fields built from machine input, deliberately left coercing a `bool`. Keyed
 #: `Model.field`. `Band` / `Cadence` / `Dataset` are parsed from
@@ -74,14 +76,53 @@ def _public_models() -> list[type[BaseModel]]:
     return list(models.values())
 
 
-def _numeric_fields() -> list[tuple[type[BaseModel], str, TypeAdapter, bool]]:
-    """Every field where a `bool` is a live question, flagged guarded or not.
+#: The plain integers a `bool` collapses to: `True` is `1`, `False` is `0`. A
+#: field that accepts neither cannot silently take a `bool`, so it is not a
+#: numeric field this sweep needs to see - probing both (not just `1`) means a
+#: field whose domain excludes `1` but admits `0` is still examined.
+_INT_PROBES = (1, 0)
 
-    A field qualifies only if feeding it a `bool` either coerces (the hazard,
-    `guarded=False`) or is refused by `NoBool` (`guarded=True`). A field whose
-    own type refuses a `bool` for its own reasons - a `datetime` accepts the
-    integer `1` as a timestamp but rejects `True` natively - is out of scope and
-    skipped, so the suite does not mistake that native refusal for a guard.
+
+def _accepts(adapter: TypeAdapter, value: object) -> bool:
+    """Say whether `adapter` validates `value` without raising."""
+    try:
+        adapter.validate_python(value)
+    except Exception:  # noqa: BLE001 - any failure means "does not accept"
+        return False
+    return True
+
+
+def _classify(adapter: TypeAdapter) -> bool | None:
+    """Classify one field adapter against the `bool`-coercion hazard.
+
+    Returns `True` when a `bool` is refused by `NoBool`, `False` when a `bool`
+    coerces silently (the hazard), or `None` when the field accepts no plain
+    integer - so no `bool` could slip into it - or refuses a `bool` for its own
+    type's reasons (a `datetime` takes the integer `1` as a timestamp but
+    rejects `True` natively, and must not be mistaken for a guard).
+    """
+    if not any(_accepts(adapter, probe) for probe in _INT_PROBES):
+        return None
+    for value in (True, False):
+        try:
+            adapter.validate_python(value)
+        except ValidationError as error:
+            if "got the boolean" in str(error):
+                return True  # refused by NoBool
+            # refused by the field's own type/range for this value; try the other
+        else:
+            return False  # coerced silently - a hazard
+    return None
+
+
+def _numeric_fields() -> list[tuple[type[BaseModel], str, TypeAdapter, bool]]:
+    """Every field a `bool` could reach, flagged guarded (`True`) or not.
+
+    A field is included when it accepts at least one of `0` / `1` as a plain
+    integer - the two values a `bool` collapses to - and either coerces a `bool`
+    (`guarded=False`) or refuses it via `NoBool` (`guarded=True`). Fields that
+    accept no integer, or that refuse a `bool` for their own type's reasons, are
+    skipped (see `_classify`).
     """
     found: list[tuple[type[BaseModel], str, TypeAdapter, bool]] = []
     for model in _public_models():
@@ -91,17 +132,11 @@ def _numeric_fields() -> list[tuple[type[BaseModel], str, TypeAdapter, bool]]:
                 continue
             try:
                 adapter: TypeAdapter = TypeAdapter(annotation)
-                adapter.validate_python(1)
-            except Exception:  # noqa: BLE001 - does not take a number, skip
+            except Exception:  # noqa: BLE001 - unbuildable schema, not numeric
                 continue
-            try:
-                adapter.validate_python(True)
-            except ValidationError as error:
-                if "got the boolean" in str(error):
-                    found.append((model, name, adapter, True))  # NoBool-guarded
-                # else: the field's own type refused it - not in scope.
-            else:
-                found.append((model, name, adapter, False))  # coerced - a hazard
+            guarded = _classify(adapter)
+            if guarded is not None:
+                found.append((model, name, adapter, guarded))
     return found
 
 
@@ -144,8 +179,25 @@ def test_a_numeric_field_still_takes_a_number(model, field, adapter):
 def test_only_machine_fed_fields_stay_unguarded():
     """The unguarded population is exactly the recorded machine-fed set.
 
-    Fails if a new user-facing field starts coercing a `bool` (drift up), or if
-    a machine-fed field is guarded without updating `_MACHINE_FED` (drift down).
+    Fails if a new field that accepts the integer `0` or `1` starts coercing a
+    `bool` (drift up), or if a machine-fed field is guarded without updating
+    `_MACHINE_FED` (drift down). A field whose domain admits neither `0` nor `1`
+    cannot take a `bool` at all and is out of the sweep's reach by construction.
     """
     unguarded = {f"{m.__name__}.{f}" for m, f, _, g in _FIELDS if not g}
     assert unguarded == set(_MACHINE_FED)
+
+
+def test_classify_sees_a_hazard_whose_domain_excludes_one_but_admits_zero():
+    """A field rejecting `1` but accepting `0` still coerces `False`; the sweep catches it.
+
+    This is the blind spot of probing `1` alone: `Field(le=0)` refuses `1`, so a
+    `1`-only probe would skip the field entirely, yet an unguarded such field
+    still silently turns `False` into `0`. Probing `0` as well keeps it visible.
+    """
+    from pydantic import Field
+
+    hazard = TypeAdapter(typing.Annotated[int, Field(le=0)])
+    assert _classify(hazard) is False, "a False->0 coercion must register as a hazard"
+    guarded = TypeAdapter(typing.Annotated[int, Field(le=0), NoBool])
+    assert _classify(guarded) is True, "NoBool must register as guarded even when le=0"
