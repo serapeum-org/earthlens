@@ -14,10 +14,11 @@ asset rather than the raster that came back.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, Annotated, ClassVar
 
 import numpy as np
 
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.analysis._arrays import read_masked, result_like
 from earthlens.gee.analysis.base import RasterOperation
 
@@ -62,8 +63,8 @@ class NormalizedDifference(RasterOperation):
             ```
     """
 
-    a: int = 0
-    b: int = 1
+    a: Annotated[int, NoBool] = 0
+    b: Annotated[int, NoBool] = 1
 
     def apply(self, ds: Dataset) -> Dataset:
         """Return a one-band raster holding the index.
@@ -133,8 +134,8 @@ class Ndvi(_NormalizedDifferencePreset):
 
     _band_fields: ClassVar[tuple[str, str]] = ("nir", "red")
 
-    nir: int = 0
-    red: int = 1
+    nir: Annotated[int, NoBool] = 0
+    red: Annotated[int, NoBool] = 1
 
 
 class Ndwi(_NormalizedDifferencePreset):
@@ -142,8 +143,8 @@ class Ndwi(_NormalizedDifferencePreset):
 
     _band_fields: ClassVar[tuple[str, str]] = ("green", "nir")
 
-    green: int = 0
-    nir: int = 1
+    green: Annotated[int, NoBool] = 0
+    nir: Annotated[int, NoBool] = 1
 
 
 class Ndbi(_NormalizedDifferencePreset):
@@ -151,5 +152,5 @@ class Ndbi(_NormalizedDifferencePreset):
 
     _band_fields: ClassVar[tuple[str, str]] = ("swir", "nir")
 
-    swir: int = 0
-    nir: int = 1
+    swir: Annotated[int, NoBool] = 0
+    nir: Annotated[int, NoBool] = 1

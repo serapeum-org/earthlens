@@ -281,6 +281,9 @@ class Cadence(SummarisedLeaf):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
+    # Parsed from gee_data_catalog.yaml, not a hand-typed constructor, so this
+    # numeric field is left coercing a bool rather than guarded with NoBool: a
+    # bool here is a catalog-authoring surprise to catch upstream (#1355).
     interval: int = Field(gt=0)
     unit: Literal["minute", "hour", "day", "pentad", "dekad", "month", "year"]
 
@@ -349,6 +352,9 @@ class Band(SummarisedLeaf):
     id: str
     description: str | None = None
     units: str | None = None
+    # Parsed from gee_data_catalog.yaml, not a hand-typed constructor, so these
+    # numeric fields are left coercing a bool rather than guarded with NoBool: a
+    # bool here is a catalog-authoring surprise to catch upstream (#1355).
     scale: float | None = None
     offset: float | None = None
     wavelength: float | None = None
@@ -698,6 +704,8 @@ class Dataset(SummarisedLeaf):
         "image", "image_collection", "table", "table_collection", "bigquery_table"
     ] = "image_collection"
     cadence: Cadence | None = None
+    # Parsed from gee_data_catalog.yaml (see Band.scale) - left coercing a bool
+    # rather than guarded with NoBool (#1355).
     spatial_resolution: float | None = None
     extent: Extent
     default_reducer: Literal[

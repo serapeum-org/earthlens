@@ -18,10 +18,11 @@ themselves; its first geometry is converted to an `ee.Geometry` by the shared
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, cast
+from typing import TYPE_CHECKING, Annotated, ClassVar, cast
 
 from pydantic import Field, field_validator
 
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.sampling.base import Sampler
 from earthlens.gee.vector.geometry import GeometryConverter
 
@@ -52,8 +53,10 @@ class RandomSampler(Sampler):
         {"Polygon", "MultiPolygon"}
     )
 
-    n_points: int = Field(gt=0)  # how many pixels to draw
-    seed: int | None = None  # random seed for reproducibility, or None
+    n_points: Annotated[int, NoBool] = Field(gt=0)  # how many pixels to draw
+    seed: Annotated[int | None, NoBool] = (
+        None  # random seed for reproducibility, or None
+    )
 
     def sample(self, image: ee.Image, geometry: GeoDataFrame) -> ee.FeatureCollection:
         """Draw random points over the region and read `image` at each.
@@ -106,11 +109,15 @@ class StratifiedSampler(Sampler):
     )
 
     class_band: str  # the band naming each pixel's class
-    n_per_class: int | dict[int, int]  # scalar count per class, or {class: count}
+    n_per_class: Annotated[
+        int | dict[Annotated[int, NoBool], Annotated[int, NoBool]], NoBool
+    ]  # scalar count per class, or {class: count}; NoBool guards scalar, key, value
     class_values: tuple[int, ...] | None = (
         None  # classes to draw (scalar case); None = all
     )
-    seed: int | None = None  # random seed for reproducibility, or None
+    seed: Annotated[int | None, NoBool] = (
+        None  # random seed for reproducibility, or None
+    )
 
     @field_validator("n_per_class")
     @classmethod

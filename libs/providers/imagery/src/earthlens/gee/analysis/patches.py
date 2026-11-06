@@ -13,11 +13,12 @@ connected-component labelling. `Dataset.sieve` wraps `gdal.SieveFilter`.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Annotated, Literal
 
 import numpy as np
 from pydantic import model_validator
 
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.analysis.base import RasterOperation
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -61,9 +62,9 @@ class ConnectedComponents(RasterOperation):
             ```
     """
 
-    lower_bound: float = 1.0
-    upper_bound: float = 1.0
-    band: int = 0
+    lower_bound: Annotated[float, NoBool] = 1.0
+    upper_bound: Annotated[float, NoBool] = 1.0
+    band: Annotated[int, NoBool] = 0
     dtype: str = "int32"
 
     @model_validator(mode="after")
@@ -140,9 +141,9 @@ class Sieve(RasterOperation):
             ```
     """
 
-    min_patch_cells: int = 4
+    min_patch_cells: Annotated[int, NoBool] = 4
     connectedness: Literal[4, 8] = 4
-    band: int = 0
+    band: Annotated[int, NoBool] = 0
 
     @model_validator(mode="after")
     def _threshold_is_meaningful(self) -> Sieve:

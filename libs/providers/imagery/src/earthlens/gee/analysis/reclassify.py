@@ -15,11 +15,12 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from types import MappingProxyType
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Annotated
 
 import numpy as np
 from pydantic import field_validator, model_validator
 
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.analysis._arrays import read_masked, result_like, validate_no_data
 from earthlens.gee.analysis.base import RasterOperation
 
@@ -70,9 +71,9 @@ class Reclassify(RasterOperation):
     """
 
     bins: tuple[tuple[float, float, float], ...]
-    band: int = 0
+    band: Annotated[int, NoBool] = 0
     dtype: str = "float32"
-    no_data: float | int | None = None
+    no_data: Annotated[float | int | None, NoBool] = None
 
     @field_validator("bins")
     @classmethod
@@ -243,7 +244,7 @@ class ConvertUnits(RasterOperation):
     """
 
     target: str
-    band: int | None = None
+    band: Annotated[int | None, NoBool] = None
 
     @property
     def name(self) -> str:

@@ -27,11 +27,12 @@ import datetime as dt
 import functools
 import math
 from collections.abc import Callable
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 import ee
 from pydantic import BaseModel, ConfigDict, model_validator
 
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.joins import SaveAllJoin
 
 __all__ = ["GapFill"]
@@ -100,7 +101,7 @@ class GapFill(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     method: Literal["linear", "nearest", "harmonic"] = "linear"
-    max_gap: dt.timedelta
+    max_gap: Annotated[dt.timedelta, NoBool]
     band: str | None = None
 
     @model_validator(mode="after")

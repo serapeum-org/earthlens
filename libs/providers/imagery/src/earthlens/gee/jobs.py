@@ -155,6 +155,9 @@ class TaskInfo(BaseModel):
     create_time: dt.datetime
     update_time: dt.datetime
     start_time: dt.datetime | None = None
+    # Built from an Earth Engine task response, not a hand-typed constructor, so
+    # these numeric fields are left coercing a bool rather than guarded with
+    # NoBool: a bool here is an EE-response surprise to catch upstream (#1355).
     attempt: int = 1
     priority: int | None = None
     destination_uris: tuple[str, ...] = ()

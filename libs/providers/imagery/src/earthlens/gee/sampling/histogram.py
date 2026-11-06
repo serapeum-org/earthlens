@@ -17,11 +17,12 @@ or `area` in m^2).
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, cast
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Literal, cast
 
 import ee
 from pydantic import field_validator
 
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.sampling.base import Sampler
 from earthlens.gee.vector.geometry import GeometryConverter
 
@@ -97,7 +98,9 @@ class ZonalHistogram(Sampler):
     normalize: Literal["count", "fraction", "area"] = "count"  # column unit
     class_labels: dict[int, str] | None = None  # code -> column name; None = raw codes
     dataset_id: str | None = None  # resolve labels from this dataset's catalog legend
-    tile_scale: float = 1.0  # Earth Engine tileScale (0.1-16); raise to 2/4 on OOM
+    tile_scale: Annotated[float, NoBool] = (
+        1.0  # Earth Engine tileScale (0.1-16); raise to 2/4 on OOM
+    )
 
     @field_validator("tile_scale")
     @classmethod

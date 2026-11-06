@@ -16,10 +16,12 @@ caller gets nothing, which is the honest answer, instead of a wrong something.
 from __future__ import annotations
 
 import datetime as dt
-from typing import Any
+from typing import Annotated, Any
 
 import ee
 from pydantic import BaseModel, ConfigDict, model_validator
+
+from earthlens.gee._helpers import NoBool
 
 __all__ = ["ClosestImage"]
 
@@ -71,7 +73,7 @@ class ClosestImage(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     target: dt.date
-    tolerance: dt.timedelta | None = None
+    tolerance: Annotated[dt.timedelta | None, NoBool] = None
 
     @model_validator(mode="after")
     def _check_tolerance(self) -> ClosestImage:

@@ -87,6 +87,9 @@ class EnginePlan(SummarisedLeaf):
 
     engine: str = "eedai"
     can_serve: bool
+    # Built from an Earth Engine compute plan, not a hand-typed constructor, so
+    # these numeric fields are left coercing a bool rather than guarded with
+    # NoBool: a bool here is an EE-response surprise to catch upstream (#1355).
     tile_size: int | None = None
     tiles: int = Field(default=1, ge=0)
     reason: str = ""

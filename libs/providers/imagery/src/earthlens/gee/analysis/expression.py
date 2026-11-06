@@ -40,11 +40,12 @@ import ast
 from collections.abc import Callable, Mapping
 from functools import lru_cache
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Annotated, Any, cast
 
 import numpy as np
 from pydantic import field_validator, model_validator
 
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.analysis._arrays import read_masked, result_like, validate_no_data
 from earthlens.gee.analysis.base import RasterOperation
 
@@ -430,7 +431,7 @@ class BandExpression(RasterOperation):
 
     formula: str
     dtype: str = "float32"
-    no_data: float | int | None = None
+    no_data: Annotated[float | int | None, NoBool] = None
 
     @field_validator("formula")
     @classmethod

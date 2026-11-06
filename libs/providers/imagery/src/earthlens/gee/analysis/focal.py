@@ -17,11 +17,12 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Annotated, Any
 
 import numpy as np
 from pydantic import ConfigDict, field_validator
 
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.analysis.base import RasterOperation
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -59,8 +60,8 @@ def _focal(
 class _Window(RasterOperation):
     """Shared configuration for the window reducers."""
 
-    radius: int = 1
-    band: int = 0
+    radius: Annotated[int, NoBool] = 1
+    band: Annotated[int, NoBool] = 0
 
     @field_validator("radius")
     @classmethod
