@@ -145,6 +145,7 @@ __all__ = [
     "ModisState1kmMask",
     "PassThrough",
     "QaBitsMask",
+    "S2Cloudless",
     "Sensor",
     "Sentinel2Cdi",
     "Sentinel2Qa60Mask",
@@ -180,6 +181,11 @@ _S2_SCL_MASKED_CLASSES: tuple[int, ...] = (3, 8, 9, 10)
 #: Google's Cloud Score+ collection, aligned to the harmonized Sentinel-2
 #: archive by `system:index` — the default `CloudScorePlus.cs_collection`.
 _CS_PLUS_COLLECTION: str = "GOOGLE/CLOUD_SCORE_PLUS/V1/S2_HARMONIZED"
+
+#: The s2cloudless cloud-probability collection, aligned to the harmonized S2
+#: archive by `system:index`. Its `probability` band is 0-100, higher = more
+#: likely cloud — the opposite polarity to Cloud Score+'s quality score.
+_S2_CLOUDLESS_COLLECTION: str = "COPERNICUS/S2_CLOUD_PROBABILITY"
 
 #: Bit 10 of the Sentinel-2 `QA60` bitmask: opaque clouds.
 _S2_QA60_CLOUD_BIT: int = 1 << 10
@@ -832,6 +838,99 @@ class CloudScorePlus(ImageMask):
             ee.ImageCollection(self.cs_collection), [self.band]
         )
         return linked.updateMask(linked.select(self.band).gte(self.threshold))
+
+
+class S2Cloudless(ImageMask):
+    """Mask a Sentinel-2 scene with the s2cloudless cloud-probability join.
+
+    s2cloudless was the community-standard Sentinel-2 cloud mask before Cloud
+    Score+, and is still widely used. Its per-pixel cloud probability lives in
+    a *separate* collection (`COPERNICUS/S2_CLOUD_PROBABILITY`) aligned to the
+    harmonized S2 archive, so this links each scene to its probability image
+    with `ee.Image.linkCollection` — a per-image match on `system:index` — and
+    keeps pixels whose probability is **at or below** `threshold`. The polarity
+    is the opposite of `CloudScorePlus`: `probability` runs 0-100 and *higher*
+    means *more likely cloud*, so clear pixels are the low ones. Being a
+    per-image link, it works unchanged under `collection.map(...)` and slots
+    into the `cloud_mask=` hook (which forces the request onto an Earth Engine
+    engine — reading a second collection is server-side compute the EEDAI
+    reader cannot run).
+
+    s2cloudless flags cloud only; it does not project shadows. Chain a shadow
+    step after it (`S2Cloudless() >> ...`) if shadow screening is needed.
+
+    Attributes:
+        threshold: Pixels whose cloud probability exceeds this are masked out.
+            A `[0, 100]` percentage (not a unit fraction); validated at
+            construction. Defaults to `40`, a common clear-sky cutoff.
+        probability_collection: The probability collection to link. Defaults to
+            `COPERNICUS/S2_CLOUD_PROBABILITY`.
+
+    Examples:
+        - The default keeps pixels under a 40% cloud probability:
+            ```python
+            >>> S2Cloudless().threshold
+            40.0
+
+            ```
+        - Tighten the cutoff to 20%:
+            ```python
+            >>> S2Cloudless(threshold=20).threshold
+            20.0
+
+            ```
+        - A probability outside `[0, 100]` is refused at construction:
+            ```python
+            >>> S2Cloudless(threshold=150)
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for S2Cloudless
+            ...
+
+            ```
+    """
+
+    threshold: Annotated[float, NoBool] = 40.0
+    probability_collection: str = _S2_CLOUDLESS_COLLECTION
+
+    @field_validator("threshold")
+    @classmethod
+    def _in_percentage_range(cls, value: float) -> float:
+        """Refuse a probability threshold outside the inclusive `[0, 100]` range.
+
+        Args:
+            value: The parsed `threshold` input.
+
+        Returns:
+            The value unchanged when it is in range.
+
+        Raises:
+            ValueError: If `value` is outside `[0, 100]` — `probability` is a
+                percentage, not a unit fraction.
+        """
+        if not 0 <= value <= 100:
+            raise ValueError(f"threshold must be in [0, 100], got {value!r}")
+        return value
+
+    def __call__(self, image: ee.Image) -> ee.Image:
+        """Link the probability band onto one scene and mask by the threshold.
+
+        Args:
+            image: An `ee.Image` from the harmonized Sentinel-2 archive
+                (`COPERNICUS/S2_SR_HARMONIZED` / `S2_HARMONIZED`) — the
+                collections s2cloudless shares `system:index` with.
+
+        Returns:
+            The scene, with the `probability` band added by `linkCollection`
+            and `updateMask(probability <= threshold)` applied — properties,
+            `system:time_start` included, are preserved. A scene with no
+            s2cloudless match gets a fully masked probability band, so it drops
+            out of a composite rather than passing unmasked.
+        """
+        linked = image.linkCollection(
+            ee.ImageCollection(self.probability_collection), ["probability"]
+        )
+        return linked.updateMask(linked.select("probability").lte(self.threshold))
 
 
 class Sentinel2Cdi(ImageMask):

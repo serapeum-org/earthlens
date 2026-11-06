@@ -281,7 +281,8 @@ median composite is a facade call rather than raw `ee`:
   state), `Sentinel2Cdi` (the `ee.Algorithms.Sentinel2.CDI`
   parallax discriminator, thresholded — TOA scenes only) and
   `CloudScorePlus` (Google's Cloud Score+ quality score, linked per
-  scene by `system:index`) under the `ImageMask` base, plus the
+  scene by `system:index`) and `S2Cloudless` (the s2cloudless
+  cloud-probability join, opposite polarity) under the `ImageMask` base, plus the
   generic `QaBitsMask` / `qa_bits(band, bits=..., keep=.../drop=...)`
   primitive that unpacks any packed-QA bit field (single bit or a
   contiguous run) so a new dataset needs a call, not a bespoke class,
