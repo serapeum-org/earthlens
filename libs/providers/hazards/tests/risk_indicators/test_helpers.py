@@ -494,6 +494,11 @@ def _drop_log_sinks():
         logger.remove(_ADDED_SINKS.pop())
 
 
+RELEASE = "/inform-index/Portals/0/InfoRM/2026"
+ANNUAL = "INFORM_Risk_2026_v072.xlsx"
+MID = "INFORM_Risk_Mid_2026_v073.xlsx"
+
+
 class TestInformRelease:
     """Discovery and parsing of the published INFORM Risk release workbook."""
 
@@ -560,9 +565,10 @@ class TestInformRelease:
         assert any("yielded a workbook link on read 2 of 3" in m for m in messages), (
             f"the recovery must be visible to an operator: {messages}"
         )
-        assert _helpers._RELEASE_CACHE[_helpers.INFORM_RESULTS_PAGE] == (url, 2026), (
-            "the recovered workbook must be memoised like a first-read one"
-        )
+        assert _helpers._RELEASE_CACHE[_helpers.INFORM_RESULTS_PAGE] == (
+            url,
+            (2026, 72),
+        ), "the recovered workbook must be memoised with its (year, version)"
 
     def test_release_url_stops_rereading_after_the_attempt_budget(self, monkeypatch):
         """A page that never renders a link raises after exactly three reads."""
@@ -777,3 +783,235 @@ class TestInformRelease:
             _helpers.inform_release_to_frame(
                 release_workbook, "NOT A COLUMN", indicator_id="INFORM"
             )
+
+
+class TestInformReleaseFloor:
+    """The floor that keeps a partial render from serving an older release."""
+
+    def test_identity_orders_a_mid_year_release_above_the_annual_one(self):
+        """A release name parses into a comparable (year, version)."""
+        assert _helpers.release_identity("INFORM_Risk_2026_v072.xlsx") == (2026, 72)
+        assert _helpers.release_identity("INFORM_Risk_Mid_2026_v073.xlsx") == (2026, 73)
+
+    def test_identity_ignores_a_non_release_workbook(self):
+        """The trend workbook on the same page is not a release."""
+        assert (
+            _helpers.release_identity("INFORM2026_TREND_2017_2026_v72_ALL.xlsx") is None
+        )
+
+    def test_identity_rejects_a_trailing_newline(self):
+        """The end-of-string anchor rejects a name with a trailing newline."""
+        assert _helpers.release_identity("INFORM_Risk_2026_v072.xlsx\n") is None
+
+    def test_identity_reads_a_full_url(self):
+        """A discovered URL can be read back without stripping it first."""
+        assert _helpers.release_identity(
+            f"https://drmkc.jrc.ec.europa.eu{RELEASE}/{ANNUAL}"
+        ) == (2026, 72)
+
+    def test_floor_is_the_newest_cached_workbook(self, tmp_path):
+        """The floor comes from the newest release already downloaded."""
+        for name in (ANNUAL, MID, "INFORM2026_TREND_2017_2026_v72_ALL.xlsx"):
+            (tmp_path / name).write_bytes(b"")
+        assert _helpers.cached_release_floor(tmp_path) == (2026, 73)
+
+    def test_floor_is_none_for_an_empty_or_missing_cache(self, tmp_path):
+        """A cold cache sets no floor, which is all a first run can do."""
+        assert _helpers.cached_release_floor(tmp_path) is None
+        assert _helpers.cached_release_floor(tmp_path / "absent") is None
+
+    def test_floor_ignores_an_implausible_year(self, tmp_path):
+        """A file whose year is outside the plausible range cannot set the floor."""
+        for name in ("INFORM_Risk_2026_v072.xlsx", "INFORM_Risk_3999_v099.xlsx"):
+            (tmp_path / name).write_bytes(b"")
+        assert _helpers.cached_release_floor(tmp_path) == (2026, 72)
+
+    def test_floor_reads_an_uppercase_extension(self, tmp_path):
+        """A workbook written with an upper-case extension still counts."""
+        (tmp_path / "INFORM_Risk_2026_V072.XLSX").write_bytes(b"")
+        assert _helpers.cached_release_floor(tmp_path) == (2026, 72)
+
+    def test_floor_ignores_an_in_progress_part_file(self, tmp_path):
+        """A half-written .part staging file never sets the floor."""
+        (tmp_path / "INFORM_Risk_Mid_2026_v073.xlsx.4321.part").write_bytes(b"")
+        assert _helpers.cached_release_floor(tmp_path) is None
+
+    def test_a_partial_render_is_rejected_and_the_recovery_accepted(self, monkeypatch):
+        """A page offering only the older version is re-read, not served."""
+        pages = [
+            f'<a href="{RELEASE}/{ANNUAL}">annual</a>',
+            f'<a href="{RELEASE}/{ANNUAL}">annual</a><a href="{RELEASE}/{MID}">mid</a>',
+        ]
+        waits = _record_sleeps(monkeypatch)
+        serve = _serve_in_order(pages)
+        monkeypatch.setattr(_helpers.HttpClient, "get", serve)
+        messages = _record_log()
+        url, year = _helpers.inform_release_url(floor=(2026, 73))
+        assert url.endswith(f"/{MID}"), f"the recovered mid-year release wins: {url}"
+        assert year == 2026
+        assert len(serve.served) == 2, f"exactly two reads: {serve.served}"
+        assert waits == [1.0], f"one 1s wait between the reads: {waits}"
+        assert any("older than 2026/v073" in str(m) for m in messages), (
+            f"the warning must name the floor it failed: {messages}"
+        )
+
+    def test_a_persistent_partial_render_raises_instead_of_serving_stale(
+        self, monkeypatch
+    ):
+        """When only the older release is ever offered, nothing is served."""
+        monkeypatch.setattr(
+            _helpers.HttpClient,
+            "get",
+            lambda self, url, **kwargs: _TextResponse(
+                f'<a href="{RELEASE}/{ANNUAL}">annual</a>'
+            ),
+        )
+        _record_sleeps(monkeypatch)
+        with pytest.raises(ValueError, match="refusing to serve a stale release"):
+            _helpers.inform_release_url(floor=(2026, 73))
+        assert _helpers.INFORM_RESULTS_PAGE not in _helpers._RELEASE_CACHE, (
+            "a refused pick must not be memoised"
+        )
+
+    def test_a_stale_release_seen_on_any_read_is_reported_as_stale(self, monkeypatch):
+        """A sub-floor read earlier in the budget is reported, not masked by a later linkless one."""
+        serve = _serve_in_order(
+            [
+                f'<a href="{RELEASE}/{ANNUAL}">annual</a>',
+                "<p>no downloads</p>",
+                "<p>no downloads</p>",
+            ]
+        )
+        monkeypatch.setattr(_helpers.HttpClient, "get", serve)
+        _record_sleeps(monkeypatch)
+        with pytest.raises(ValueError, match="refusing to serve a stale release"):
+            _helpers.inform_release_url(floor=(2026, 73))
+
+    def test_the_floor_itself_is_acceptable(self, monkeypatch):
+        """Re-serving the release already cached is not a regression."""
+        monkeypatch.setattr(
+            _helpers.HttpClient,
+            "get",
+            lambda self, url, **kwargs: _TextResponse(
+                f'<a href="{RELEASE}/{MID}">mid</a>'
+            ),
+        )
+        url, _year = _helpers.inform_release_url(floor=(2026, 73))
+        assert url.endswith(f"/{MID}")
+
+    def test_without_a_floor_the_page_is_taken_at_its_word(self, monkeypatch):
+        """A cold cache cannot detect a partial render, and must not block."""
+        monkeypatch.setattr(
+            _helpers.HttpClient,
+            "get",
+            lambda self, url, **kwargs: _TextResponse(
+                f'<a href="{RELEASE}/{ANNUAL}">annual</a>'
+            ),
+        )
+        url, year = _helpers.inform_release_url()
+        assert url.endswith(f"/{ANNUAL}")
+        assert year == 2026
+
+    def test_a_memo_below_a_risen_floor_is_re_read(self, monkeypatch):
+        """The memo is re-checked, so a pick taken before the floor rose is dropped."""
+        monkeypatch.setattr(
+            _helpers.HttpClient,
+            "get",
+            lambda self, url, **kwargs: _TextResponse(
+                f'<a href="{RELEASE}/{ANNUAL}">annual</a>'
+            ),
+        )
+        first, _ = _helpers.inform_release_url()
+        assert first.endswith(f"/{ANNUAL}")
+        monkeypatch.setattr(
+            _helpers.HttpClient,
+            "get",
+            lambda self, url, **kwargs: _TextResponse(
+                f'<a href="{RELEASE}/{MID}">mid</a>'
+            ),
+        )
+        second, _ = _helpers.inform_release_url(floor=(2026, 73))
+        assert second.endswith(f"/{MID}"), "the stale memo must not be returned"
+        assert _helpers._RELEASE_CACHE[_helpers.INFORM_RESULTS_PAGE][0] == second, (
+            "the accepted pick replaces the memo"
+        )
+
+    def test_a_satisfied_memo_is_reused_without_re_reading(self, monkeypatch):
+        """A second call whose memo already clears the floor does no further read."""
+        serve = _serve_in_order([f'<a href="{RELEASE}/{MID}?download=1">mid</a>'])
+        monkeypatch.setattr(_helpers.HttpClient, "get", serve)
+        first, _ = _helpers.inform_release_url(floor=(2026, 73))
+        second, _ = _helpers.inform_release_url(floor=(2026, 73))
+        assert first == second, (
+            f"the memo must return the same URL: {first} vs {second}"
+        )
+        assert len(serve.served) == 1, (
+            f"a satisfied memo must be reused, even when its URL carries a query "
+            f"string, not re-read: {serve.served}"
+        )
+
+
+class TestReleaseFloorHelpers:
+    """The pure helpers behind the release floor, exercised directly."""
+
+    @pytest.mark.parametrize(
+        "identity, floor, expected",
+        [
+            ((2026, 72), None, True),
+            (None, None, True),
+            ((2026, 73), (2026, 73), True),
+            ((2026, 74), (2026, 73), True),
+            ((2026, 72), (2026, 73), False),
+            ((2025, 99), (2026, 1), False),
+            (None, (2026, 73), False),
+        ],
+    )
+    def test_meets_floor(self, identity, floor, expected):
+        """A release clears the floor when there is none, or it is not older."""
+        assert _helpers._meets_floor(identity, floor) is expected
+
+    @pytest.mark.parametrize(
+        "identity, expected",
+        [
+            ((2026, 73), "2026/v073"),
+            ((2026, 7), "2026/v007"),
+            (None, "the required release"),
+        ],
+    )
+    def test_release_text(self, identity, expected):
+        """An identity renders as year/vNNN, or a placeholder when absent."""
+        assert _helpers._release_text(identity) == expected
+
+    def test_degraded_render_names_a_dropped_link(self):
+        """A read with no release link is phrased as a missing link."""
+        assert (
+            _helpers._degraded_render(None, (2026, 73)) == "rendered no workbook link"
+        )
+
+    def test_degraded_render_names_the_floor_a_sub_floor_read_missed(self):
+        """A sub-floor read is phrased with both the release offered and the floor."""
+        message = _helpers._degraded_render((2026, 72), (2026, 73))
+        assert message == "offered only release 2026/v072, older than 2026/v073"
+
+    def test_best_release_candidate_picks_the_newest_link(self):
+        """The newest (year, version) link wins over the others on the page."""
+        html = (
+            f'<a href="{RELEASE}/{ANNUAL}">annual</a><a href="{RELEASE}/{MID}">mid</a>'
+        )
+        href, identity = _helpers._best_release_candidate(html)
+        assert href.endswith(f"/{MID}")
+        assert identity == (2026, 73)
+
+    def test_best_release_candidate_ignores_an_implausible_year(self):
+        """A year outside the plausibility range cannot win the comparison."""
+        html = (
+            f'<a href="{RELEASE}/{ANNUAL}">annual</a>'
+            '<a href="/x/INFORM_Risk_3999_v099.xlsx">bogus</a>'
+        )
+        href, identity = _helpers._best_release_candidate(html)
+        assert href.endswith(f"/{ANNUAL}")
+        assert identity == (2026, 72)
+
+    def test_best_release_candidate_is_none_without_a_release_link(self):
+        """A body carrying no release link yields no candidate."""
+        assert _helpers._best_release_candidate("<p>nothing here</p>") is None

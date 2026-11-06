@@ -615,11 +615,16 @@ class RiskIndicators(AbstractDataSource):
         Raises:
             requests.RequestException: If the page or the workbook cannot be
                 fetched after retries.
-            ValueError: If the page carries no workbook link, or the workbook
-                has no matching sheet / column.
+            ValueError: If the page carries no workbook link, if every read
+                offers only a release older than the newest already cached, or
+                if the workbook has no matching sheet / column.
         """
-        url, year = _helpers.inform_release_url()
-        target = self._cache_root / url.rsplit("/", 1)[-1]
+        # The cache is the only record of what this page served before, so it is
+        # what a partially rendered page is checked against (issue #1286).
+        url, year = _helpers.inform_release_url(
+            floor=_helpers.cached_release_floor(self._cache_root)
+        )
+        target = self._cache_root / _helpers.release_workbook_name(url)
         if not _helpers.is_xlsx(target):
             logger.info(
                 f"RiskIndicators {self._dataset.id}: downloading the INFORM {year} "

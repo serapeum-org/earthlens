@@ -78,6 +78,19 @@ INFORM_RELEASE_LINK = re.compile(
 #: cannot win the "newest" comparison against a real release.
 INFORM_RELEASE_YEARS = range(2010, 2100)
 
+#: The same release stem anchored to a bare file name, so a workbook already in
+#: the cache can be read back as the `(year, version)` it carries. It parses the
+#: file names `inform_download_release` writes, which are always bare
+#: `INFORM_Risk[_Mid]_<year>_v<nnn>.xlsx` with no query string, so it is
+#: anchored (`^...$`) where `INFORM_RELEASE_LINK` instead tolerates trailing URL
+#: content. The discovered release's identity is parsed once from the link's own
+#: capture groups and memoised, so the floor re-check never depends on this
+#: pattern matching a URL; this pattern's one job is reading identities back off
+#: the cache directory in `cached_release_floor`.
+INFORM_RELEASE_FILE = re.compile(
+    r"^INFORM_Risk_(?:Mid_)?(\d{4})_v(\d+)\.xlsx\Z", re.IGNORECASE
+)
+
 #: How many times to read the results page before concluding the layout moved.
 #: The page intermittently serves a body with no workbook link at all — not a
 #: changed pattern, since the same regex matches both 2026 workbooks seconds
@@ -87,15 +100,13 @@ INFORM_RELEASE_YEARS = range(2010, 2100)
 #: raises, just a few seconds later.
 #:
 #: Scope, so the next reader does not assume more: the re-read covers a `200`
-#: carrying *no* matching link. A dropped connection or a 5xx is already
-#: retried inside `HttpClient` and never reaches the loop, and a *partial*
-#: render — one that drops the newest anchor but keeps an older one — is not
-#: covered here, because the loop stops at the first non-empty result. A
-#: partial render on a re-read is therefore accepted and memoised exactly as
-#: one on the first read always was. The hazard predates this loop (issue
-#: #1286), but note the loop gives it more chances to occur: a linkless read
-#: that used to raise now leads to up to two further reads, any of which may
-#: be the partial one.
+#: carrying *no* matching link, and — through the `floor` argument — one
+#: carrying only releases older than a workbook already downloaded (issue
+#: #1286). A dropped connection or a 5xx is already retried inside
+#: `HttpClient` and never reaches the loop. What stays uncovered is a partial
+#: render on a *cold* cache: with nothing downloaded yet there is no floor to
+#: compare against, so the first run of a fresh install takes the page at its
+#: word.
 INFORM_RELEASE_ATTEMPTS: int = 3
 
 #: Linear back-off between those reads: `n * 1s`, so a flap that clears in a
@@ -412,7 +423,10 @@ def filter_iso3(frame: pd.DataFrame, country: str | None) -> pd.DataFrame:
 
 #: Discovered release per results page, so four datasets in one process scrape
 #: the page once - the JRC host drops connections under rapid repeat requests.
-_RELEASE_CACHE: dict[str, tuple[str, int]] = {}
+#: The value is `(url, (year, version))`: the identity is kept beside the URL so
+#: the floor re-check reads it back directly rather than re-parsing the URL,
+#: which a trailing query string or fragment on the link would defeat.
+_RELEASE_CACHE: dict[str, tuple[str, tuple[int, int]]] = {}
 
 
 def clear_release_cache() -> None:
@@ -420,8 +434,199 @@ def clear_release_cache() -> None:
     _RELEASE_CACHE.clear()
 
 
+def release_identity(name: str) -> tuple[int, int] | None:
+    """Read the `(year, version)` a release workbook name carries.
+
+    Args:
+        name: A workbook file name, or a URL ending in one.
+
+    Returns:
+        tuple[int, int] | None: The release year and version, ordered so the
+            newer of two releases compares greater; `None` for a name that is
+            not a release workbook (the trend workbook, say).
+
+    Examples:
+        - An annual release, and the mid-year one that supersedes it:
+            ```python
+            >>> from earthlens.risk_indicators._helpers import release_identity
+            >>> release_identity("INFORM_Risk_2026_v072.xlsx")
+            (2026, 72)
+            >>> release_identity("INFORM_Risk_Mid_2026_v073.xlsx")
+            (2026, 73)
+            >>> release_identity("INFORM_Risk_Mid_2026_v073.xlsx") > release_identity(
+            ...     "INFORM_Risk_2026_v072.xlsx"
+            ... )
+            True
+
+            ```
+        - A full URL parses, and the trend workbook on the same page is not a
+          release:
+            ```python
+            >>> from earthlens.risk_indicators._helpers import release_identity
+            >>> release_identity(
+            ...     "https://drmkc.jrc.ec.europa.eu/inform-index/Portals/0/"
+            ...     "InfoRM/2026/INFORM_Risk_2026_v072.xlsx"
+            ... )
+            (2026, 72)
+            >>> release_identity("INFORM2026_TREND_2017_2026_v72_ALL.xlsx") is None
+            True
+
+            ```
+    """
+    matched = INFORM_RELEASE_FILE.match(name.rsplit("/", 1)[-1])
+    return (int(matched.group(1)), int(matched.group(2))) if matched else None
+
+
+def release_workbook_name(url: str) -> str:
+    """Return the bare workbook file name a release URL points at.
+
+    The workbook is cached under this name and `cached_release_floor` reads it
+    back through `INFORM_RELEASE_FILE`, so any query string or fragment the link
+    carried is dropped here: `INFORM_RELEASE_LINK` tolerates trailing URL
+    content, but it does not belong in a file name (and `?` is an illegal file
+    name character on Windows), and keeping it would hide the download from the
+    floor.
+
+    Args:
+        url: A release workbook URL, with or without a query string or fragment.
+
+    Returns:
+        str: The final path segment, e.g. `INFORM_Risk_Mid_2026_v073.xlsx`.
+
+    Examples:
+        - A bare URL and one carrying a query string resolve to the same name:
+            ```python
+            >>> from earthlens.risk_indicators._helpers import release_workbook_name
+            >>> release_workbook_name(
+            ...     "https://x/InfoRM/2026/INFORM_Risk_Mid_2026_v073.xlsx"
+            ... )
+            'INFORM_Risk_Mid_2026_v073.xlsx'
+            >>> release_workbook_name(
+            ...     "https://x/InfoRM/2026/INFORM_Risk_Mid_2026_v073.xlsx?download=1"
+            ... )
+            'INFORM_Risk_Mid_2026_v073.xlsx'
+
+            ```
+    """
+    return urlsplit(url).path.rsplit("/", 1)[-1]
+
+
+def cached_release_floor(cache_dir: Path | str) -> tuple[int, int] | None:
+    """Return the newest release already downloaded into `cache_dir`.
+
+    This is the floor `inform_release_url` refuses to go below. It is read off
+    the cache rather than configured, because the cache is evidence rather than
+    a guess: every workbook in it came from this same page, so a page now
+    offering nothing newer than one of them has rendered incompletely.
+
+    Only names that parse as a release workbook (case-insensitively, the same
+    `(year, version)` pattern discovery captures) and whose year is within
+    `INFORM_RELEASE_YEARS` count, so a non-workbook file or a grossly misdated
+    one is ignored. Within that window the newest cached workbook is trusted as
+    evidence of what the page served: a stray but plausibly-named file (say a
+    hand-placed `INFORM_Risk_2099_v001.xlsx`) would still set the floor and, if
+    it is newer than anything the page offers, wedge discovery until it is
+    removed. Only this module writes the directory, so in practice every file
+    in it is a real past release.
+
+    Args:
+        cache_dir: Directory holding downloaded release workbooks. A missing
+            directory is treated as empty.
+
+    Returns:
+        tuple[int, int] | None: The newest `(year, version)` cached, or `None`
+            when nothing has been downloaded yet.
+
+    Examples:
+        - An empty cache sets no floor; once workbooks are in it, the newest
+          one does:
+            ```python
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from earthlens.risk_indicators._helpers import cached_release_floor
+            >>> with tempfile.TemporaryDirectory() as tmp:
+            ...     cache = Path(tmp)
+            ...     print(cached_release_floor(cache))
+            ...     for name in ("INFORM_Risk_2026_v072.xlsx",
+            ...                  "INFORM_Risk_Mid_2026_v073.xlsx"):
+            ...         _ = (cache / name).write_bytes(b"")
+            ...     print(cached_release_floor(cache))
+            None
+            (2026, 73)
+
+            ```
+    """
+    identities = [
+        identity
+        for path in Path(cache_dir).glob("*")
+        if (identity := release_identity(path.name)) is not None
+        and identity[0] in INFORM_RELEASE_YEARS
+    ]
+    return max(identities) if identities else None
+
+
+def _best_release_candidate(html: str) -> tuple[str, tuple[int, int]] | None:
+    """Pick the newest release link a page body offers.
+
+    Args:
+        html: The results-page body.
+
+    Returns:
+        tuple[str, tuple[int, int]] | None: The winning href and its
+            `(year, version)`, or `None` when the body carries no release link.
+    """
+    candidates = [
+        hit
+        for hit in INFORM_RELEASE_LINK.findall(html)
+        if int(hit[1]) in INFORM_RELEASE_YEARS
+    ]
+    best: tuple[str, tuple[int, int]] | None = None
+    if candidates:
+        href, year, version = max(
+            candidates, key=lambda hit: (int(hit[1]), int(hit[2]))
+        )
+        best = href, (int(year), int(version))
+    return best
+
+
+def _meets_floor(
+    identity: tuple[int, int] | None, floor: tuple[int, int] | None
+) -> bool:
+    """Report whether a release is new enough to serve.
+
+    Args:
+        identity: The candidate's `(year, version)`, or `None` when its name
+            does not parse as a release.
+        floor: The minimum acceptable `(year, version)`, or `None` for no floor.
+
+    Returns:
+        bool: True when there is no floor to clear, or `identity` clears it.
+    """
+    return floor is None or (identity is not None and identity >= floor)
+
+
+def _release_text(identity: tuple[int, int] | None) -> str:
+    """Render a release identity for a log line or an error message.
+
+    Args:
+        identity: The `(year, version)` to describe, or `None`.
+
+    Returns:
+        str: `"2026/v073"`, or `"the required release"` when there is nothing
+            to name.
+    """
+    return (
+        f"{identity[0]}/v{identity[1]:03d}"
+        if identity is not None
+        else "the required release"
+    )
+
+
 def inform_release_url(
-    *, page: str = INFORM_RESULTS_PAGE, timeout: float = _HTTP_TIMEOUT
+    *,
+    page: str = INFORM_RESULTS_PAGE,
+    timeout: float = _HTTP_TIMEOUT,
+    floor: tuple[int, int] | None = None,
 ) -> tuple[str, int]:
     """Find the newest INFORM Risk release workbook published on the JRC site.
 
@@ -430,9 +635,21 @@ def inform_release_url(
     datasets would otherwise hit the results page four times, and the host drops
     connections under rapid repeat requests.
 
+    A render that drops the newest anchor but keeps an older one cannot be told
+    from a complete page by reading it once, so `floor` supplies the missing
+    history: the newest release already downloaded, which the answer may not go
+    below (see `cached_release_floor`). A sub-floor pick is treated like a
+    linkless one — re-read, and raise if it persists — rather than served,
+    because an older release carries different scores under an
+    indistinguishable label: two versions of one year's release both stamp that
+    year, so nothing downstream would show the difference.
+
     Args:
         page: The results page to read (overridable for tests).
         timeout: Per-request timeout in seconds.
+        floor: The `(year, version)` the answer must be at least, normally from
+            `cached_release_floor`. `None` accepts whatever the page offers,
+            which is all a cold cache can do.
 
     Returns:
         tuple[str, int]: The absolute workbook URL and its release year.
@@ -440,8 +657,9 @@ def inform_release_url(
     Raises:
         ValueError: If the page still carries no plausible release-workbook
             link after `INFORM_RELEASE_ATTEMPTS` reads, which means the page
-            layout changed and the pattern needs revisiting, or if a link
-            points off the INFORM site.
+            layout changed and the pattern needs revisiting; if every read
+            offers only a release older than `floor`; or if a link points off
+            the INFORM site.
         requests.RequestException: If the page cannot be fetched.
 
     Examples:
@@ -474,20 +692,90 @@ def inform_release_url(
 
             ```
     """
-    if page in _RELEASE_CACHE:
-        return _RELEASE_CACHE[page]
+    memoised = _RELEASE_CACHE.get(page)
+    # The memo is re-checked rather than trusted: one taken while the page was
+    # rendering partially, or before the floor rose, is itself the stale pick
+    # this guard exists to refuse. The guarantee is about what is returned, not
+    # about when it was first read. The stored identity is used directly, so a
+    # trailing query string on the URL cannot defeat the re-check.
+    if memoised is not None and _meets_floor(memoised[1], floor):
+        result = memoised
+    else:
+        result = _discover_release(page, timeout, floor)
+        _RELEASE_CACHE[page] = result
+    return result[0], result[1][0]
+
+
+def _discover_release(
+    page: str, timeout: float, floor: tuple[int, int] | None
+) -> tuple[str, tuple[int, int]]:
+    """Read the results page until it offers a release at or above `floor`.
+
+    Args:
+        page: The results page to read.
+        timeout: Per-request timeout in seconds.
+        floor: The minimum acceptable `(year, version)`, or `None`.
+
+    Returns:
+        tuple[str, tuple[int, int]]: The absolute workbook URL and its
+            `(year, version)` identity, parsed from the link's own capture
+            groups so the caller never has to re-parse the URL.
+
+    Raises:
+        ValueError: If no read offers an acceptable release, or the winning
+            link points off the INFORM site.
+        requests.RequestException: If the page cannot be fetched.
+    """
     client = _client(timeout)
-    # Bound before the loop: a budget of zero must still reach the raise below
-    # with the documented `ValueError`, not an `UnboundLocalError`.
-    candidates: list[tuple[str, str, str]] = []
+    chosen, best_offered = _scan_for_release(client, page, floor)
+    return _require_release(page, chosen, best_offered, floor)
+
+
+def _newer(
+    current: tuple[int, int] | None, candidate: tuple[int, int] | None
+) -> tuple[int, int] | None:
+    """Return the newer of two optional `(year, version)` identities.
+
+    Args:
+        current: The newest identity seen so far, or `None`.
+        candidate: A freshly observed identity, or `None`.
+
+    Returns:
+        tuple[int, int] | None: `candidate` when it outranks `current` (or
+            `current` is `None`), otherwise `current`.
+    """
+    result = current
+    if candidate is not None and (current is None or candidate > current):
+        result = candidate
+    return result
+
+
+def _scan_for_release(
+    client: HttpClient, page: str, floor: tuple[int, int] | None
+) -> tuple[tuple[str, tuple[int, int]] | None, tuple[int, int] | None]:
+    """Read the results page up to the attempt budget, looking for a release.
+
+    Args:
+        client: The HTTP client to read the page with.
+        page: The results page URL.
+        floor: The minimum acceptable `(year, version)`, or `None`.
+
+    Returns:
+        tuple: `(chosen, best_offered)` — the first link at or above `floor`
+            (href and identity) or `None`, and the newest identity any read
+            offered (sub-floor or not) so the caller can classify a failure.
+            `best_offered` is kept across the whole budget so a stale release
+            glimpsed on read 1 is not masked as a layout change by a linkless
+            read 3.
+    """
+    chosen: tuple[str, tuple[int, int]] | None = None
+    best_offered: tuple[int, int] | None = None
     for attempt in range(INFORM_RELEASE_ATTEMPTS):
-        html = client.get(page).text
-        candidates = [
-            hit
-            for hit in INFORM_RELEASE_LINK.findall(html)
-            if int(hit[1]) in INFORM_RELEASE_YEARS
-        ]
-        if candidates:
+        best = _best_release_candidate(client.get(page).text)
+        offered = best[1] if best is not None else None
+        best_offered = _newer(best_offered, offered)
+        if best is not None and _meets_floor(offered, floor):
+            chosen = best
             if attempt:
                 logger.info(
                     f"INFORM results page yielded a workbook link on read "
@@ -496,24 +784,81 @@ def inform_release_url(
             break
         if attempt + 1 < INFORM_RELEASE_ATTEMPTS:
             logger.warning(
-                f"INFORM results page {page} rendered no workbook link "
+                f"INFORM results page {page} "
+                f"{_degraded_render(offered, floor)} "
                 f"(read {attempt + 1} of {INFORM_RELEASE_ATTEMPTS}); re-reading."
             )
             _sleep(INFORM_RELEASE_BACKOFF_SECONDS * (attempt + 1))
-    if not candidates:
+    return chosen, best_offered
+
+
+def _require_release(
+    page: str,
+    chosen: tuple[str, tuple[int, int]] | None,
+    best_offered: tuple[int, int] | None,
+    floor: tuple[int, int] | None,
+) -> tuple[str, tuple[int, int]]:
+    """Turn a scan result into a validated `(url, identity)`, or raise.
+
+    Args:
+        page: The results page the scan read, for the error messages.
+        chosen: The accepted link and identity, or `None` if none cleared.
+        best_offered: The newest identity any read offered, or `None`.
+        floor: The minimum acceptable `(year, version)`, named in the error.
+
+    Returns:
+        tuple[str, tuple[int, int]]: The absolute workbook URL and its identity.
+
+    Raises:
+        ValueError: If no read offered any link, if every read offered only a
+            release below `floor`, or if the winning link points off the INFORM
+            site.
+    """
+    if chosen is None and best_offered is None:
         raise ValueError(
             f"No INFORM Risk release workbook link found on {page} after "
             f"{INFORM_RELEASE_ATTEMPTS} attempts; the page layout may have "
             "changed."
         )
-    href, year, _version = max(candidates, key=lambda hit: (int(hit[1]), int(hit[2])))
+    if chosen is None:
+        raise ValueError(
+            f"INFORM results page {page} offered only release "
+            f"{_release_text(best_offered)} after {INFORM_RELEASE_ATTEMPTS} "
+            f"attempts, older than the {_release_text(floor)} workbook already "
+            "downloaded; refusing to serve a stale release. Delete that cached "
+            "workbook if the newer release was withdrawn upstream."
+        )
+    href, identity = chosen
     url = urljoin(page, href)
     if urlsplit(url).netloc.lower() != urlsplit(INFORM_SITE).netloc.lower():
         raise ValueError(
             f"Release workbook link on {page} points off the INFORM site: {url}"
         )
-    _RELEASE_CACHE[page] = (url, int(year))
-    return url, int(year)
+    return url, identity
+
+
+def _degraded_render(
+    offered: tuple[int, int] | None, floor: tuple[int, int] | None
+) -> str:
+    """Phrase what was wrong with a read, for the re-read warning.
+
+    Args:
+        offered: The newest `(year, version)` the body carried, or `None` when
+            it carried no release link at all.
+        floor: The minimum acceptable release, if any.
+
+    Returns:
+        str: A fragment naming the newest release offered and the floor it
+            failed to clear, or saying no link was rendered.
+    """
+    return (
+        "rendered no workbook link"
+        if offered is None
+        else (
+            f"offered only release {_release_text(offered)}, older than "
+            f"{_release_text(floor)}"
+        )
+    )
 
 
 def inform_download_release(
