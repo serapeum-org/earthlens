@@ -39,6 +39,12 @@ dependencies = [
     "joblib >=1.5.0",
     "loguru >=0.7.3",
     "numpy >=2.0.0",
+    # The `<3` cap was lifted once the gee GeoDataFrame -> ee.Feature conversion
+    # was made pandas-3 correct (#1339). `openeo` and `ohsome` still pin
+    # `pandas<3`, so `earthlens[all]` and the workspace lock still resolve
+    # pandas 2; only a lean install (e.g. `earthlens[gee]`) pulls pandas 3. The
+    # pandas-3 path is verified out of band (the gee conversion tests run under
+    # pandas 3) rather than by a CI leg, since no default resolve selects it.
     "pandas >=2.0.0",
     "platformdirs >=3.0.0",
     "pydantic >=2.0",
