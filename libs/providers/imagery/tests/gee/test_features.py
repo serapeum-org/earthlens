@@ -126,6 +126,34 @@ class TestCreateFeature:
         assert len(fc.features) == 2
         assert all(f.properties is None for f in fc.features)
 
+    def test_pandas3_record_shape_still_yields_no_properties(
+        self, fake_ee, monkeypatch
+    ):
+        """A column-less frame yields no properties under pandas 3's to_dict shape.
+
+        pandas 3 serialises a column-less frame to `[{}, ...]` where pandas 2
+        gives `[]`; keying the no-properties branch on the column set rather than
+        on `to_dict` being empty must hold under either, so the fix cannot
+        silently regress on pandas-2 CI (which never sees the `[{}, ...]` shape).
+        """
+        import pandas as pd
+
+        original = pd.DataFrame.to_dict
+
+        def pandas3_records(self, orient="dict", *args, **kwargs):
+            if orient == "records" and self.columns.empty:
+                return [{} for _ in range(len(self))]
+            return original(self, orient, *args, **kwargs)
+
+        monkeypatch.setattr(pd.DataFrame, "to_dict", pandas3_records)
+        gdf = gpd.GeoDataFrame({"geometry": [_SQUARE, _SQUARE_2]}, crs="EPSG:4326")
+        fc = create_feature(gdf)
+        properties = [f.properties for f in fc.features]
+        assert properties == [None, None], (
+            f"column-less frame must yield no properties under the pandas-3 "
+            f"record shape, got {properties}"
+        )
+
     def test_multipolygon_is_exploded(self, fake_ee):
         """A `MultiPolygon` row is exploded into one feature per part."""
         gdf = gpd.GeoDataFrame(
