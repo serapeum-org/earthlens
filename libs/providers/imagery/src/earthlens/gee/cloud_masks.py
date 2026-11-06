@@ -150,9 +150,13 @@ __all__ = [
     "Sentinel2Qa60Mask",
     "Sentinel2SclMask",
     "SpeckleFilter",
+    "ToDb",
+    "ToPower",
     "landsat_sr",
     "qa_bits",
     "sentinel2_scl",
+    "to_db",
+    "to_power",
 ]
 
 #: A per-image Earth Engine op: what the `cloud_mask=` hook accepts, and so
@@ -1578,6 +1582,98 @@ class SpeckleFilter(ImageMask):
         return _with_properties(smoothed, image)
 
 
+class ToPower(ImageMask):
+    """Convert a SAR backscatter band from decibels to linear power.
+
+    Applies `10 ** (dB / 10)` per band — the inverse of `ToDb`. Earth Engine's
+    `COPERNICUS/S1_GRD` arrives in dB (already thermal-noise-removed,
+    radiometrically calibrated and terrain-corrected), but a statistical
+    composite (`mean`, a percentile) should be taken in **linear power** and
+    only then converted back, since averaging decibels is not physically
+    meaningful. This is an `ImageMask`-family per-image op, so it rides the
+    `cloud_mask=` hook and composes with `>>`; it does **not** add calibration
+    or terrain correction, which S1_GRD already carries.
+
+    Attributes:
+        bands: The bands to convert; `None` (the default) converts every band.
+
+    Examples:
+        - Convert the VV/VH backscatter bands, leaving the rest:
+            ```python
+            >>> ToPower(bands=("VV", "VH")).bands
+            ('VV', 'VH')
+
+            ```
+        - The default converts every band:
+            ```python
+            >>> ToPower().bands is None
+            True
+
+            ```
+    """
+
+    bands: tuple[str, ...] | None = None
+
+    def __call__(self, image: ee.Image) -> ee.Image:
+        """Convert `image` from decibels to linear power.
+
+        Args:
+            image: An `ee.Image` whose `bands` are in decibels.
+
+        Returns:
+            The image with the selected bands replaced by `10 ** (dB / 10)`,
+            other bands and properties preserved.
+        """
+        if self.bands is None:
+            return _with_properties(ee.Image(10).pow(image.divide(10)), image)
+        converted = image
+        for band in self.bands:
+            one = ee.Image(10).pow(image.select(band).divide(10)).rename(band)
+            converted = converted.addBands(one, overwrite=True)
+        return _with_properties(converted, image)
+
+
+class ToDb(ImageMask):
+    """Convert a SAR backscatter band from linear power to decibels.
+
+    Applies `10 * log10(power)` per band — the inverse of `ToPower`. Use it to
+    return to dB after a power-domain reduction (`ToPower() >> ... >> ToDb()`).
+    An `ImageMask`-family per-image op, so it plugs into the `cloud_mask=` hook
+    and composes with `>>`.
+
+    Attributes:
+        bands: The bands to convert; `None` (the default) converts every band.
+
+    Examples:
+        - Convert only the VV band back to dB:
+            ```python
+            >>> ToDb(bands=("VV",)).bands
+            ('VV',)
+
+            ```
+    """
+
+    bands: tuple[str, ...] | None = None
+
+    def __call__(self, image: ee.Image) -> ee.Image:
+        """Convert `image` from linear power to decibels.
+
+        Args:
+            image: An `ee.Image` whose `bands` are in linear power.
+
+        Returns:
+            The image with the selected bands replaced by `10 * log10(power)`,
+            other bands and properties preserved.
+        """
+        if self.bands is None:
+            return _with_properties(image.log10().multiply(10), image)
+        converted = image
+        for band in self.bands:
+            one = image.select(band).log10().multiply(10).rename(band)
+            converted = converted.addBands(one, overwrite=True)
+        return _with_properties(converted, image)
+
+
 def landsat_sr(image: ee.Image, sensor: Sensor = "auto") -> ee.Image:
     """Mask a Landsat C2-L2 surface-reflectance image to its Clear pixels.
 
@@ -1731,3 +1827,54 @@ def qa_bits(
         keep=None if keep is None else tuple(keep),
         drop=None if drop is None else tuple(drop),
     )
+
+
+def to_power(image: ee.Image, *, bands: Iterable[str] | None = None) -> ee.Image:
+    """Convert a SAR image from decibels to linear power (`10 ** (dB / 10)`).
+
+    The function form of `ToPower`. Earth Engine's `COPERNICUS/S1_GRD` is in
+    dB, so a statistical composite should be taken in linear power — convert
+    with this, reduce, then `to_db` back. Calibration and terrain correction
+    are deliberately not included; S1_GRD already carries them.
+
+    Args:
+        image: An `ee.Image` whose `bands` are in decibels.
+        bands: The bands to convert; `None` (the default) converts every band.
+
+    Returns:
+        The image with the selected bands in linear power, properties kept.
+
+    Examples:
+        - Convert a scene to power before averaging:
+            ```python
+            >>> import ee  # doctest: +SKIP
+            >>> s1 = ee.ImageCollection("COPERNICUS/S1_GRD")  # doctest: +SKIP
+            >>> power_mean = s1.map(to_power).mean()  # doctest: +SKIP
+
+            ```
+    """
+    return ToPower(bands=None if bands is None else tuple(bands))(image)
+
+
+def to_db(image: ee.Image, *, bands: Iterable[str] | None = None) -> ee.Image:
+    """Convert a SAR image from linear power to decibels (`10 * log10(power)`).
+
+    The function form of `ToDb`, the inverse of `to_power`: use it to return
+    to dB after a power-domain reduction.
+
+    Args:
+        image: An `ee.Image` whose `bands` are in linear power.
+        bands: The bands to convert; `None` (the default) converts every band.
+
+    Returns:
+        The image with the selected bands in decibels, properties kept.
+
+    Examples:
+        - Round-trip: dB to power and back is the identity:
+            ```python
+            >>> import ee  # doctest: +SKIP
+            >>> back = to_db(to_power(image))  # doctest: +SKIP
+
+            ```
+    """
+    return ToDb(bands=None if bands is None else tuple(bands))(image)

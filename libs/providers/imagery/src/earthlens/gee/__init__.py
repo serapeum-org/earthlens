@@ -289,8 +289,10 @@ median composite is a facade call rather than raw `ee`:
   `sentinel2_scl(image)`. Two family members are not masks but the
   same shape: `BandScaler` (with `BandFactor`), which converts raw DN
   to physical units from the `scale` / `offset` the catalog declares
-  per band, and `SpeckleFilter`, the server-side `ee.Image.focalMedian`
-  counterpart of the client-side `FocalMedian`. Because the backend has
+  per band, `SpeckleFilter`, the server-side `ee.Image.focalMedian`
+  counterpart of the client-side `FocalMedian`, and the SAR dB <-> linear
+  power conversions `ToPower` / `ToDb` (`to_power` / `to_db`) that make a
+  power-domain `COPERNICUS/S1_GRD` reduction expressible. Because the backend has
   one `cloud_mask` slot, the ops compose with `>>` into a `MaskChain`
   (itself an `ImageMask`), with `PassThrough` as the documented no-op.
 * `earthlens.gee.filters` — collection filters: `ByYear` / `ByBounds`
