@@ -83,7 +83,7 @@ Narrow the window, shorten `temporal_resolution`, add a `property_filter`, or us
 get back under the budget. These thresholds are internal constants, not public API — treat them as
 current behaviour rather than a contract.
 
-!!! note "Client-side reduction needs pyramids-core >= 0.70.0, and the live EEDAI path has a known gap"
+!!! note "Client-side reduction needs pyramids-core >= 0.70.0 (>= 0.73.0 for the live EEDAI path)"
     The client-side composite — the true per-pixel `median`, and the `percentile` / `trend` / `sens_slope`
     reducers — runs through pyramids' `DatasetCollection.reduce_time`, whose `median` / `percentile` /
     `linear_trend` / `sens_slope` operations ship in **pyramids-core >= 0.70.0** (the distribution formerly

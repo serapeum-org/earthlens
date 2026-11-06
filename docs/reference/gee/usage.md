@@ -216,12 +216,13 @@ argument — so pass `engine="ee"` when you need Earth Engine's masking exactly.
 The client-side reduction — the true per-pixel `median`, and the `"p90"` /
 `"trend"` / `"sens_slope"` reducers — needs **pyramids-core >= 0.73.0** (the
 distribution formerly published as `pyramids-gis`; the import name stays
-`pyramids`), which is where `reduce_time`'s percentile / linear-trend /
-Theil-Sen operations ship and, from 0.73.0, where it also reduces an in-memory
-collection. `pyramids_eo.collection_from_earthengine` hands back exactly such an
-in-memory (`datasets=`-backed) `DatasetCollection`, so a live `engine="eedai"`
-collection composite reduces the scene stack directly — no spill to disk — and
-runs end to end (pyramids-core #1349).
+`pyramids`). `reduce_time`'s percentile / linear-trend / Theil-Sen operations
+themselves shipped earlier (0.70.0); the `>= 0.73.0` floor is specifically for
+reducing an *in-memory* collection, which is what
+`pyramids_eo.collection_from_earthengine` hands back (a `datasets=`-backed
+`DatasetCollection`). So a live `engine="eedai"` collection composite reduces
+the scene stack directly — no spill to disk — and runs end to end
+(pyramids-core #1349).
 
 What you gain: no 32768-px synchronous cap and no HTTP/zip round-trip,
 so `auto_split` is unnecessary. What to know before switching:
