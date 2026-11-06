@@ -351,6 +351,39 @@ class TestRouting:
         ).download()
         assert seen["dest"] == tmp_path / "wb" / "INFORM_Risk_2026_v072.xlsx"
 
+    def test_release_lookup_is_floored_by_the_cached_workbook(
+        self, fake_http, monkeypatch, tmp_path, release_workbook
+    ):
+        """The discovery call is told the newest release already downloaded."""
+        cache = tmp_path / "wb"
+        cache.mkdir()
+        (cache / "INFORM_Risk_Mid_2026_v073.xlsx").write_bytes(b"")
+        seen: dict[str, object] = {}
+
+        def _capture(**kwargs):
+            seen.update(kwargs)
+            return (
+                "https://drmkc.jrc.ec.europa.eu/x/INFORM_Risk_Mid_2026_v073.xlsx",
+                2026,
+            )
+
+        monkeypatch.setattr(_helpers, "inform_release_url", _capture)
+        monkeypatch.setattr(
+            _helpers,
+            "inform_download_release",
+            lambda url, dest, **kw: release_workbook,
+        )
+        _build(
+            monkeypatch,
+            variables=["inform:risk"],
+            country="KEN",
+            cache_dir=cache,
+            path=tmp_path,
+        ).download()
+        assert seen["floor"] == (2026, 73), (
+            f"the cached release must become the floor: {seen}"
+        )
+
     def test_source_api_reads_the_scores_endpoint(
         self, fake_http, monkeypatch, tmp_path
     ):
