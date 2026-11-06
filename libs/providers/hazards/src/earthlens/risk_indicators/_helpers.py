@@ -727,19 +727,53 @@ def _discover_release(
         requests.RequestException: If the page cannot be fetched.
     """
     client = _client(timeout)
-    # Bound before the loop: a budget of zero must still reach the raise below
-    # with the documented `ValueError`, not an `UnboundLocalError`.
+    chosen, best_offered = _scan_for_release(client, page, floor)
+    return _require_release(page, chosen, best_offered, floor)
+
+
+def _newer(
+    current: tuple[int, int] | None, candidate: tuple[int, int] | None
+) -> tuple[int, int] | None:
+    """Return the newer of two optional `(year, version)` identities.
+
+    Args:
+        current: The newest identity seen so far, or `None`.
+        candidate: A freshly observed identity, or `None`.
+
+    Returns:
+        tuple[int, int] | None: `candidate` when it outranks `current` (or
+            `current` is `None`), otherwise `current`.
+    """
+    result = current
+    if candidate is not None and (current is None or candidate > current):
+        result = candidate
+    return result
+
+
+def _scan_for_release(
+    client: HttpClient, page: str, floor: tuple[int, int] | None
+) -> tuple[tuple[str, tuple[int, int]] | None, tuple[int, int] | None]:
+    """Read the results page up to the attempt budget, looking for a release.
+
+    Args:
+        client: The HTTP client to read the page with.
+        page: The results page URL.
+        floor: The minimum acceptable `(year, version)`, or `None`.
+
+    Returns:
+        tuple: `(chosen, best_offered)` — the first link at or above `floor`
+            (href and identity) or `None`, and the newest identity any read
+            offered (sub-floor or not) so the caller can classify a failure.
+            `best_offered` is kept across the whole budget so a stale release
+            glimpsed on read 1 is not masked as a layout change by a linkless
+            read 3.
+    """
     chosen: tuple[str, tuple[int, int]] | None = None
-    # The newest release any read offered, sub-floor or not, kept across the
-    # whole budget so the terminal error reflects what was actually seen: a
-    # stale release glimpsed on read 1 must not be masked as a layout change by
-    # a linkless read 3.
     best_offered: tuple[int, int] | None = None
     for attempt in range(INFORM_RELEASE_ATTEMPTS):
         best = _best_release_candidate(client.get(page).text)
         offered = best[1] if best is not None else None
-        if offered is not None and (best_offered is None or offered > best_offered):
-            best_offered = offered
+        best_offered = _newer(best_offered, offered)
         if best is not None and _meets_floor(offered, floor):
             chosen = best
             if attempt:
@@ -755,6 +789,31 @@ def _discover_release(
                 f"(read {attempt + 1} of {INFORM_RELEASE_ATTEMPTS}); re-reading."
             )
             _sleep(INFORM_RELEASE_BACKOFF_SECONDS * (attempt + 1))
+    return chosen, best_offered
+
+
+def _require_release(
+    page: str,
+    chosen: tuple[str, tuple[int, int]] | None,
+    best_offered: tuple[int, int] | None,
+    floor: tuple[int, int] | None,
+) -> tuple[str, tuple[int, int]]:
+    """Turn a scan result into a validated `(url, identity)`, or raise.
+
+    Args:
+        page: The results page the scan read, for the error messages.
+        chosen: The accepted link and identity, or `None` if none cleared.
+        best_offered: The newest identity any read offered, or `None`.
+        floor: The minimum acceptable `(year, version)`, named in the error.
+
+    Returns:
+        tuple[str, tuple[int, int]]: The absolute workbook URL and its identity.
+
+    Raises:
+        ValueError: If no read offered any link, if every read offered only a
+            release below `floor`, or if the winning link points off the INFORM
+            site.
+    """
     if chosen is None and best_offered is None:
         raise ValueError(
             f"No INFORM Risk release workbook link found on {page} after "
