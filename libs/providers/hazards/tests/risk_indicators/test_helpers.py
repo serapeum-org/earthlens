@@ -816,6 +816,17 @@ class TestInformReleaseFloor:
         assert _helpers.cached_release_floor(tmp_path) is None
         assert _helpers.cached_release_floor(tmp_path / "absent") is None
 
+    def test_floor_ignores_an_implausible_year(self, tmp_path):
+        """A file whose year is outside the plausible range cannot set the floor."""
+        for name in ("INFORM_Risk_2026_v072.xlsx", "INFORM_Risk_3999_v099.xlsx"):
+            (tmp_path / name).write_bytes(b"")
+        assert _helpers.cached_release_floor(tmp_path) == (2026, 72)
+
+    def test_floor_reads_an_uppercase_extension(self, tmp_path):
+        """A workbook written with an upper-case extension still counts."""
+        (tmp_path / "INFORM_Risk_2026_V072.XLSX").write_bytes(b"")
+        assert _helpers.cached_release_floor(tmp_path) == (2026, 72)
+
     def test_a_partial_render_is_rejected_and_the_recovery_accepted(self, monkeypatch):
         """A page offering only the older version is re-read, not served."""
         pages = [

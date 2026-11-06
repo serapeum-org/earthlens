@@ -485,6 +485,11 @@ def cached_release_floor(cache_dir: Path | str) -> tuple[int, int] | None:
     a guess: every workbook in it came from this same page, so a page now
     offering nothing newer than one of them has rendered incompletely.
 
+    Only names that parse as a release workbook (case-insensitively, the same
+    `(year, version)` pattern discovery captures) and whose year is within
+    `INFORM_RELEASE_YEARS` count, so a stray or implausibly dated file dropped
+    in the directory cannot raise the floor above anything the page can offer.
+
     Args:
         cache_dir: Directory holding downloaded release workbooks. A missing
             directory is treated as empty.
@@ -514,8 +519,9 @@ def cached_release_floor(cache_dir: Path | str) -> tuple[int, int] | None:
     """
     identities = [
         identity
-        for path in Path(cache_dir).glob("*.xlsx")
+        for path in Path(cache_dir).glob("*")
         if (identity := release_identity(path.name)) is not None
+        and identity[0] in INFORM_RELEASE_YEARS
     ]
     return max(identities) if identities else None
 
