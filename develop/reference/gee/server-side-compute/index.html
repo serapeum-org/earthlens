@@ -24699,12 +24699,11 @@ published as <code>pyramids-gis</code>; the import name stays <code>pyramids</co
 unavailable. The no-nodata caveat carries into them: the EEDAI driver declares no fill, so a statistical
 reducer folds a scene's fill pixels into the result where Earth Engine would have masked them — the two
 agree only where the scenes carry no fill over the AOI.</p>
-<p><strong>Known limitation — live EEDAI reduction.</strong> <code>pyramids_eo.collection_from_earthengine</code> currently returns
-an <em>in-memory</em> (<code>datasets=</code>-backed) <code>DatasetCollection</code>, which <code>reduce_time</code> cannot consume — it reads a
-file- or zarr-backed collection — so a live <code>engine="eedai"</code> collection composite (even <code>median</code>) raises
-a <code>RuntimeError</code> today. The earthlens wiring is correct, and the reduction is verified against <code>numpy</code> on
-a file-backed stack; it will work end to end once that upstream reader gap is closed. Until then, pass
-<code>engine="ee"</code> for a collection composite.</p>
+<p><strong>Live EEDAI reduction.</strong> <code>pyramids_eo.collection_from_earthengine</code> returns an <em>in-memory</em>
+(<code>datasets=</code>-backed) <code>DatasetCollection</code>, and from <strong>pyramids-core &gt;= 0.73.0</strong> <code>reduce_time</code> consumes
+that directly, so a live <code>engine="eedai"</code> collection composite (<code>median</code> / <code>percentile</code> / <code>trend</code> /
+<code>sens_slope</code>) reduces the scene stack as-is — no spill to disk — and runs end to end
+(pyramids-core #1349).</p>
 </div>
 <h3 id="the-two-engines-are-not-byte-identical"><a class="toclink" href="#the-two-engines-are-not-byte-identical">The two engines are not byte-identical</a><a class="headerlink" href="#the-two-engines-are-not-byte-identical" title="Permanent link">#</a></h3>
 <p>Worth knowing before you compare outputs:</p>
