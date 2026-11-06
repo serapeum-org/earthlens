@@ -127,7 +127,7 @@ from typing import TYPE_CHECKING, Annotated, Literal, cast
 
 import ee
 from loguru import logger
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from earthlens.gee._helpers import NoBool, checked_cdi_threshold
 
@@ -144,12 +144,14 @@ __all__ = [
     "MaskChain",
     "ModisState1kmMask",
     "PassThrough",
+    "QaBitsMask",
     "Sensor",
     "Sentinel2Cdi",
     "Sentinel2Qa60Mask",
     "Sentinel2SclMask",
     "SpeckleFilter",
     "landsat_sr",
+    "qa_bits",
     "sentinel2_scl",
 ]
 
@@ -1086,6 +1088,149 @@ class LandsatQaRefinedMask(ImageMask):
         return image.updateMask(keep)
 
 
+class QaBitsMask(ImageMask):
+    """Keep pixels whose packed QA-band bit field matches, by bit position.
+
+    A generic bit-unpacking mask. It reads `band`, extracts the field at
+    `bits` — a single flag bit, or a contiguous multi-bit field given as the
+    tuple of its bit positions — and keeps pixels whose extracted value is in
+    `keep` (or, with `drop`, every value except those). Most Earth Engine
+    datasets pack cloud / quality flags into one integer band, so this one
+    primitive replaces a hand-written `rightShift` / `bitwiseAnd` per product.
+
+    Exactly one of `keep` / `drop` must be given, so the polarity is never
+    ambiguous. The two existing Landsat / Sentinel-2 masks are deliberately
+    *not* rebuilt on this: `LandsatSrMask` carries validated `sensor` config
+    this primitive has no slot for, and `Sentinel2SclMask` screens categorical
+    `SCL` class codes by equality, not a packed bit field, so `qa_bits` does
+    not model it.
+
+    Attributes:
+        band: The packed QA band to read (e.g. `"QA_PIXEL"`, `"state_1km"`).
+        bits: The field's bit position(s). An `int` is a single flag bit; a
+            tuple is a contiguous multi-bit field named by every one of its
+            positions, e.g. `(8, 9)` for the 2-bit field at bits 8-9.
+        keep: Field values to keep. Exactly one of `keep` / `drop` is given.
+        drop: Field values to drop, keeping every other value. Exactly one of
+            `keep` / `drop` is given.
+
+    Examples:
+        - A single Clear bit (6), kept when set:
+            ```python
+            >>> mask = QaBitsMask(band="QA_PIXEL", bits=6, keep=(1,))
+            >>> (mask.low, mask.width)
+            (6, 1)
+
+            ```
+        - A contiguous 2-bit confidence field at bits 8-9, keeping 0/1:
+            ```python
+            >>> mask = QaBitsMask(band="QA_PIXEL", bits=(8, 9), keep=(0, 1))
+            >>> (mask.low, mask.width)
+            (8, 2)
+
+            ```
+        - Giving neither `keep` nor `drop` is refused:
+            ```python
+            >>> QaBitsMask(band="QA_PIXEL", bits=6)
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for QaBitsMask
+            ...
+
+            ```
+    """
+
+    band: str
+    bits: Annotated[int, NoBool] | tuple[Annotated[int, NoBool], ...]
+    keep: tuple[Annotated[int, NoBool], ...] | None = None
+    drop: tuple[Annotated[int, NoBool], ...] | None = None
+
+    @field_validator("bits")
+    @classmethod
+    def _bits_are_a_contiguous_field(
+        cls, value: int | tuple[int, ...]
+    ) -> int | tuple[int, ...]:
+        """Refuse a negative bit, or a tuple that is not an ascending run.
+
+        Args:
+            value: The raw `bits` input — a single bit index or a tuple of
+                positions.
+
+        Returns:
+            `value` unchanged once it is a valid single bit or a contiguous
+            ascending run of non-negative positions.
+
+        Raises:
+            ValueError: If a bit is negative, or the tuple is empty or not a
+                contiguous ascending run (e.g. `(8, 10)` or `(9, 8)`).
+        """
+        if isinstance(value, int):
+            if value < 0:
+                raise ValueError(f"bits must be non-negative, got {value}")
+            return value
+        if not value:
+            raise ValueError("bits tuple must name at least one position")
+        if any(bit < 0 for bit in value):
+            raise ValueError(f"bits must be non-negative, got {value}")
+        if list(value) != list(range(value[0], value[0] + len(value))):
+            raise ValueError(
+                f"bits must be a contiguous ascending run (e.g. (8, 9)), got {value}"
+            )
+        return value
+
+    @model_validator(mode="after")
+    def _exactly_one_polarity(self) -> QaBitsMask:
+        """Require exactly one of `keep` / `drop`, each naming a value.
+
+        Returns:
+            `self` unchanged once the polarity is unambiguous.
+
+        Raises:
+            ValueError: If neither or both of `keep` / `drop` are given, or
+                the one given is empty.
+        """
+        given = [name for name in ("keep", "drop") if getattr(self, name)]
+        if len(given) != 1:
+            raise ValueError(
+                "exactly one of keep / drop must be given (and non-empty); "
+                f"got {given or 'neither'}"
+            )
+        return self
+
+    @property
+    def low(self) -> int:
+        """The lowest bit position of the field (the right-shift amount)."""
+        return self.bits if isinstance(self.bits, int) else self.bits[0]
+
+    @property
+    def width(self) -> int:
+        """The field width in bits (1 for a single flag bit)."""
+        return 1 if isinstance(self.bits, int) else len(self.bits)
+
+    def __call__(self, image: ee.Image) -> ee.Image:
+        """Mask one image to the pixels whose QA field matches.
+
+        Args:
+            image: An `ee.Image` carrying `band` as a packed integer QA band.
+
+        Returns:
+            The input image with `updateMask(...)` applied — the mask is the
+            field at `bits` being in `keep` (or not in `drop`). Properties,
+            `system:time_start` included, are preserved by `updateMask`.
+        """
+        field = (
+            image.select(self.band)
+            .rightShift(self.low)
+            .bitwiseAnd((1 << self.width) - 1)
+        )
+        values = self.keep if self.keep is not None else self.drop
+        membership = field.eq(values[0])
+        for value in values[1:]:
+            membership = membership.Or(field.eq(value))
+        keep_mask = membership if self.keep is not None else membership.Not()
+        return image.updateMask(keep_mask)
+
+
 class ModisState1kmMask(ImageMask):
     """Mask a daily MODIS surface-reflectance image via `state_1km`.
 
@@ -1532,3 +1677,57 @@ def sentinel2_scl(image: ee.Image) -> ee.Image:
             ```
     """
     return Sentinel2SclMask()(image)
+
+
+def qa_bits(
+    band: str,
+    *,
+    bits: int | Iterable[int],
+    keep: Iterable[int] | None = None,
+    drop: Iterable[int] | None = None,
+) -> QaBitsMask:
+    """Build a `QaBitsMask` from a band and a bit field, the concise way.
+
+    The free-function form of `QaBitsMask`: it turns "write a mask for this
+    dataset's packed QA band" from a code change into one call, so a dataset
+    whose quality flags live in bits does not need its own hand-written
+    `rightShift` / `bitwiseAnd` class.
+
+    Args:
+        band: The packed QA band to read (e.g. `"QA_PIXEL"`).
+        bits: The field's bit position(s). A single `int` is one flag bit; an
+            iterable is a contiguous multi-bit field named by every one of its
+            positions, e.g. `(8, 9)` for the 2-bit field at bits 8-9.
+        keep: Field values to keep. Give exactly one of `keep` / `drop`.
+        drop: Field values to drop, keeping every other value. Give exactly
+            one of `keep` / `drop`.
+
+    Returns:
+        A `QaBitsMask` — an `ImageMask`, so it plugs straight into the
+        `cloud_mask=` hook and composes with `>>` like the other masks.
+
+    Raises:
+        ValueError: If `bits` is not a single non-negative bit or a contiguous
+            ascending run, or if neither / both of `keep` / `drop` are given.
+
+    Examples:
+        - Keep pixels whose 2-bit Cloud Confidence field (bits 8-9) is 0 or 1:
+            ```python
+            >>> mask = qa_bits("QA_PIXEL", bits=(8, 9), keep=(0, 1))
+            >>> (mask.band, mask.low, mask.width, mask.keep)
+            ('QA_PIXEL', 8, 2, (0, 1))
+
+            ```
+        - Drop pixels whose single Cloud bit (3) is set:
+            ```python
+            >>> qa_bits("QA_PIXEL", bits=3, drop=(1,)).drop
+            (1,)
+
+            ```
+    """
+    return QaBitsMask(
+        band=band,
+        bits=bits if isinstance(bits, int) else tuple(bits),
+        keep=None if keep is None else tuple(keep),
+        drop=None if drop is None else tuple(drop),
+    )

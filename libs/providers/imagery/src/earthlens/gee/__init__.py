@@ -282,7 +282,10 @@ median composite is a facade call rather than raw `ee`:
   parallax discriminator, thresholded — TOA scenes only) and
   `CloudScorePlus` (Google's Cloud Score+ quality score, linked per
   scene by `system:index`) under the `ImageMask` base, plus the
-  function forms `landsat_sr(image, sensor=...)` and
+  generic `QaBitsMask` / `qa_bits(band, bits=..., keep=.../drop=...)`
+  primitive that unpacks any packed-QA bit field (single bit or a
+  contiguous run) so a new dataset needs a call, not a bespoke class,
+  and the function forms `landsat_sr(image, sensor=...)` and
   `sentinel2_scl(image)`. Two family members are not masks but the
   same shape: `BandScaler` (with `BandFactor`), which converts raw DN
   to physical units from the `scale` / `offset` the catalog declares
