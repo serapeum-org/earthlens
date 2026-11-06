@@ -72,9 +72,10 @@ jobs:
           # freeze is produced by `uv run` in the matrix env, and pinning pip-audit
           # to that interpreter avoids the cross-version mismatch that made the audit
           # try to install a package the freeze pinned under a different Python (e.g.
-          # backports.zstd==1.6.0, which has no >=3.14 build).
-          PYBIN="$(uv run --locked python -c 'import sys; print(sys.executable)')"
-          uv run --locked python -m pip freeze --exclude-editable \
+          # backports.zstd==1.6.0, which has no >=3.14 build). `--no-build` forbids
+          # building any sdist in these uv steps, so no package setup script runs.
+          PYBIN="$(uv run --locked --no-build python -c 'import sys; print(sys.executable)')"
+          uv run --locked --no-build python -m pip freeze --exclude-editable \
             | grep -E '^[A-Za-z0-9_.-]+==' > "${RUNNER_TEMP}/pip-audit-reqs.txt"
           echo "Auditing $(wc -l < "${RUNNER_TEMP}/pip-audit-reqs.txt") pinned packages on Python ${{ matrix.python-version }}"
           pipx run --python "$PYBIN" pip-audit --requirement "${RUNNER_TEMP}/pip-audit-reqs.txt" --desc $IGNORE_FLAGS
