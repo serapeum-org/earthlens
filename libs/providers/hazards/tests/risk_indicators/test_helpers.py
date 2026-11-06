@@ -799,6 +799,10 @@ class TestInformReleaseFloor:
             _helpers.release_identity("INFORM2026_TREND_2017_2026_v72_ALL.xlsx") is None
         )
 
+    def test_identity_rejects_a_trailing_newline(self):
+        """The end-of-string anchor rejects a name with a trailing newline."""
+        assert _helpers.release_identity("INFORM_Risk_2026_v072.xlsx\n") is None
+
     def test_identity_reads_a_full_url(self):
         """A discovered URL can be read back without stripping it first."""
         assert _helpers.release_identity(
@@ -826,6 +830,11 @@ class TestInformReleaseFloor:
         """A workbook written with an upper-case extension still counts."""
         (tmp_path / "INFORM_Risk_2026_V072.XLSX").write_bytes(b"")
         assert _helpers.cached_release_floor(tmp_path) == (2026, 72)
+
+    def test_floor_ignores_an_in_progress_part_file(self, tmp_path):
+        """A half-written .part staging file never sets the floor."""
+        (tmp_path / "INFORM_Risk_Mid_2026_v073.xlsx.4321.part").write_bytes(b"")
+        assert _helpers.cached_release_floor(tmp_path) is None
 
     def test_a_partial_render_is_rejected_and_the_recovery_accepted(self, monkeypatch):
         """A page offering only the older version is re-read, not served."""
