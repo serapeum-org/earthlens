@@ -25,6 +25,15 @@ jobs:
   pip-audit:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Audit the resolved tree on every supported Python. The tree is
+    # marker-dependent (e.g. backports.zstd is present only on <3.14), so each
+    # version resolves a slightly different set; the matrix catches a
+    # version-specific vulnerable dependency. fail-fast off so one version's
+    # result never hides another's.
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -33,7 +42,7 @@ jobs:
       - name: Set up Python
         uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
         with:
-          python-version: "3.11"
+          python-version: "${{ matrix.python-version }}"
           install-groups: "groups: dev, extras: all"
           version: "0.11.29"
 
@@ -59,7 +68,13 @@ jobs:
           IGNORED_VULNS="PYSEC-2026-1097 PYSEC-2026-1099 PYSEC-2026-1100 PYSEC-2026-1101 PYSEC-2026-1105 PYSEC-2026-1106 PYSEC-2026-1107 PYSEC-2026-1109 PYSEC-2026-2094 PYSEC-2026-2095 PYSEC-2026-2096 PYSEC-2026-2097 PYSEC-2026-2098 PYSEC-2026-2099 PYSEC-2026-2100 PYSEC-2026-2101 PYSEC-2026-2102 PYSEC-2026-2103 PYSEC-2026-2104 PYSEC-2026-2105 PYSEC-2026-2106 PYSEC-2026-2107 PYSEC-2026-2108 PYSEC-2026-2109 PYSEC-2026-2110 PYSEC-2026-2111 PYSEC-2026-2112 PYSEC-2026-2113 PYSEC-2026-237 PYSEC-2026-2858 PYSEC-2026-3545 PYSEC-2026-3546 PYSEC-2026-3547"
           IGNORE_FLAGS=""
           for id in $IGNORED_VULNS; do IGNORE_FLAGS="$IGNORE_FLAGS --ignore-vuln $id"; done
+          # Freeze and audit under the SAME interpreter (the matrix Python): the
+          # freeze is produced by `uv run` in the matrix env, and pinning pip-audit
+          # to that interpreter avoids the cross-version mismatch that made the audit
+          # try to install a package the freeze pinned under a different Python (e.g.
+          # backports.zstd==1.6.0, which has no >=3.14 build).
+          PYBIN="$(uv run --locked python -c 'import sys; print(sys.executable)')"
           uv run --locked python -m pip freeze --exclude-editable \
             | grep -E '^[A-Za-z0-9_.-]+==' > "${RUNNER_TEMP}/pip-audit-reqs.txt"
-          echo "Auditing $(wc -l < "${RUNNER_TEMP}/pip-audit-reqs.txt") pinned packages against the advisory DB"
-          pipx run pip-audit --requirement "${RUNNER_TEMP}/pip-audit-reqs.txt" --desc $IGNORE_FLAGS
+          echo "Auditing $(wc -l < "${RUNNER_TEMP}/pip-audit-reqs.txt") pinned packages on Python ${{ matrix.python-version }}"
+          pipx run --python "$PYBIN" pip-audit --requirement "${RUNNER_TEMP}/pip-audit-reqs.txt" --desc $IGNORE_FLAGS
