@@ -79,12 +79,16 @@ INFORM_RELEASE_LINK = re.compile(
 INFORM_RELEASE_YEARS = range(2010, 2100)
 
 #: The same release stem anchored to a bare file name, so a workbook already in
-#: the cache can be read back as the `(year, version)` it carries. Kept beside
-#: `INFORM_RELEASE_LINK` because the two must accept the same names: a release
-#: the link pattern admits but this one does not would never raise the floor,
-#: and the guard built on it would quietly stop guarding.
+#: the cache can be read back as the `(year, version)` it carries. It parses the
+#: file names `inform_download_release` writes, which are always bare
+#: `INFORM_Risk[_Mid]_<year>_v<nnn>.xlsx` with no query string, so it is
+#: anchored (`^...$`) where `INFORM_RELEASE_LINK` instead tolerates trailing URL
+#: content. The discovered release's identity is parsed once from the link's own
+#: capture groups and memoised, so the floor re-check never depends on this
+#: pattern matching a URL; this pattern's one job is reading identities back off
+#: the cache directory in `cached_release_floor`.
 INFORM_RELEASE_FILE = re.compile(
-    r"^INFORM_Risk_(?:Mid_)?(\d{4})_v(\d+)\.xlsx$", re.IGNORECASE
+    r"^INFORM_Risk_(?:Mid_)?(\d{4})_v(\d+)\.xlsx\Z", re.IGNORECASE
 )
 
 #: How many times to read the results page before concluding the layout moved.
@@ -419,7 +423,10 @@ def filter_iso3(frame: pd.DataFrame, country: str | None) -> pd.DataFrame:
 
 #: Discovered release per results page, so four datasets in one process scrape
 #: the page once - the JRC host drops connections under rapid repeat requests.
-_RELEASE_CACHE: dict[str, tuple[str, int]] = {}
+#: The value is `(url, (year, version))`: the identity is kept beside the URL so
+#: the floor re-check reads it back directly rather than re-parsing the URL,
+#: which a trailing query string or fragment on the link would defeat.
+_RELEASE_CACHE: dict[str, tuple[str, tuple[int, int]]] = {}
 
 
 def clear_release_cache() -> None:
@@ -644,18 +651,19 @@ def inform_release_url(
     # The memo is re-checked rather than trusted: one taken while the page was
     # rendering partially, or before the floor rose, is itself the stale pick
     # this guard exists to refuse. The guarantee is about what is returned, not
-    # about when it was first read.
-    if memoised is not None and _meets_floor(release_identity(memoised[0]), floor):
+    # about when it was first read. The stored identity is used directly, so a
+    # trailing query string on the URL cannot defeat the re-check.
+    if memoised is not None and _meets_floor(memoised[1], floor):
         result = memoised
     else:
         result = _discover_release(page, timeout, floor)
         _RELEASE_CACHE[page] = result
-    return result
+    return result[0], result[1][0]
 
 
 def _discover_release(
     page: str, timeout: float, floor: tuple[int, int] | None
-) -> tuple[str, int]:
+) -> tuple[str, tuple[int, int]]:
     """Read the results page until it offers a release at or above `floor`.
 
     Args:
@@ -664,7 +672,9 @@ def _discover_release(
         floor: The minimum acceptable `(year, version)`, or `None`.
 
     Returns:
-        tuple[str, int]: The absolute workbook URL and its release year.
+        tuple[str, tuple[int, int]]: The absolute workbook URL and its
+            `(year, version)` identity, parsed from the link's own capture
+            groups so the caller never has to re-parse the URL.
 
     Raises:
         ValueError: If no read offers an acceptable release, or the winning
@@ -714,7 +724,7 @@ def _discover_release(
         raise ValueError(
             f"Release workbook link on {page} points off the INFORM site: {url}"
         )
-    return url, identity[0]
+    return url, identity
 
 
 def _degraded_render(

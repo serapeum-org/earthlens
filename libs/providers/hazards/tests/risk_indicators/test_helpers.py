@@ -565,9 +565,10 @@ class TestInformRelease:
         assert any("yielded a workbook link on read 2 of 3" in m for m in messages), (
             f"the recovery must be visible to an operator: {messages}"
         )
-        assert _helpers._RELEASE_CACHE[_helpers.INFORM_RESULTS_PAGE] == (url, 2026), (
-            "the recovered workbook must be memoised like a first-read one"
-        )
+        assert _helpers._RELEASE_CACHE[_helpers.INFORM_RESULTS_PAGE] == (
+            url,
+            (2026, 72),
+        ), "the recovered workbook must be memoised with its (year, version)"
 
     def test_release_url_stops_rereading_after_the_attempt_budget(self, monkeypatch):
         """A page that never renders a link raises after exactly three reads."""
@@ -898,6 +899,20 @@ class TestInformReleaseFloor:
         assert second.endswith(f"/{MID}"), "the stale memo must not be returned"
         assert _helpers._RELEASE_CACHE[_helpers.INFORM_RESULTS_PAGE][0] == second, (
             "the accepted pick replaces the memo"
+        )
+
+    def test_a_satisfied_memo_is_reused_without_re_reading(self, monkeypatch):
+        """A second call whose memo already clears the floor does no further read."""
+        serve = _serve_in_order([f'<a href="{RELEASE}/{MID}?download=1">mid</a>'])
+        monkeypatch.setattr(_helpers.HttpClient, "get", serve)
+        first, _ = _helpers.inform_release_url(floor=(2026, 73))
+        second, _ = _helpers.inform_release_url(floor=(2026, 73))
+        assert first == second, (
+            f"the memo must return the same URL: {first} vs {second}"
+        )
+        assert len(serve.served) == 1, (
+            f"a satisfied memo must be reused, even when its URL carries a query "
+            f"string, not re-read: {serve.served}"
         )
 
 
