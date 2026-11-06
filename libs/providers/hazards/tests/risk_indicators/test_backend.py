@@ -37,6 +37,18 @@ def _stub_release(monkeypatch, workbook):
     )
 
 
+class _DestCapture:
+    """A `inform_download_release` stand-in that records the dest it was given."""
+
+    def __init__(self, workbook):
+        self.workbook = workbook
+        self.dest: Path | None = None
+
+    def __call__(self, url, dest, **kwargs):
+        self.dest = Path(dest)
+        return self.workbook
+
+
 class TestConstruction:
     """Constructor validation and per-instance OUTPUT_KIND."""
 
@@ -350,6 +362,34 @@ class TestRouting:
             path=tmp_path,
         ).download()
         assert seen["dest"] == tmp_path / "wb" / "INFORM_Risk_2026_v072.xlsx"
+
+    def test_release_download_name_drops_a_query_string(
+        self, fake_http, monkeypatch, tmp_path, release_workbook
+    ):
+        """A query string on the link never reaches the cached file name."""
+        monkeypatch.setattr(
+            _helpers,
+            "inform_release_url",
+            lambda **kwargs: (
+                "https://drmkc.jrc.ec.europa.eu/x/INFORM_Risk_Mid_2026_v073.xlsx?download=1",
+                2026,
+            ),
+        )
+        capture = _DestCapture(release_workbook)
+        monkeypatch.setattr(_helpers, "inform_download_release", capture)
+        _build(
+            monkeypatch,
+            variables=["inform:risk"],
+            country="KEN",
+            cache_dir=tmp_path / "wb",
+            path=tmp_path,
+        ).download()
+        assert capture.dest == tmp_path / "wb" / "INFORM_Risk_Mid_2026_v073.xlsx", (
+            f"the query string must be stripped from the cached name: {capture.dest}"
+        )
+        assert _helpers.release_identity(capture.dest.name) == (2026, 73), (
+            "the written name must be one cached_release_floor can read back"
+        )
 
     def test_release_lookup_is_floored_by_the_cached_workbook(
         self, fake_http, monkeypatch, tmp_path, release_workbook

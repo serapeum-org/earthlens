@@ -624,7 +624,7 @@ class RiskIndicators(AbstractDataSource):
         url, year = _helpers.inform_release_url(
             floor=_helpers.cached_release_floor(self._cache_root)
         )
-        target = self._cache_root / url.rsplit("/", 1)[-1]
+        target = self._cache_root / _helpers.release_workbook_name(url)
         if not _helpers.is_xlsx(target):
             logger.info(
                 f"RiskIndicators {self._dataset.id}: downloading the INFORM {year} "

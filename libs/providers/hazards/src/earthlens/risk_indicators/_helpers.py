@@ -477,6 +477,40 @@ def release_identity(name: str) -> tuple[int, int] | None:
     return (int(matched.group(1)), int(matched.group(2))) if matched else None
 
 
+def release_workbook_name(url: str) -> str:
+    """Return the bare workbook file name a release URL points at.
+
+    The workbook is cached under this name and `cached_release_floor` reads it
+    back through `INFORM_RELEASE_FILE`, so any query string or fragment the link
+    carried is dropped here: `INFORM_RELEASE_LINK` tolerates trailing URL
+    content, but it does not belong in a file name (and `?` is an illegal file
+    name character on Windows), and keeping it would hide the download from the
+    floor.
+
+    Args:
+        url: A release workbook URL, with or without a query string or fragment.
+
+    Returns:
+        str: The final path segment, e.g. `INFORM_Risk_Mid_2026_v073.xlsx`.
+
+    Examples:
+        - A bare URL and one carrying a query string resolve to the same name:
+            ```python
+            >>> from earthlens.risk_indicators._helpers import release_workbook_name
+            >>> release_workbook_name(
+            ...     "https://x/InfoRM/2026/INFORM_Risk_Mid_2026_v073.xlsx"
+            ... )
+            'INFORM_Risk_Mid_2026_v073.xlsx'
+            >>> release_workbook_name(
+            ...     "https://x/InfoRM/2026/INFORM_Risk_Mid_2026_v073.xlsx?download=1"
+            ... )
+            'INFORM_Risk_Mid_2026_v073.xlsx'
+
+            ```
+    """
+    return urlsplit(url).path.rsplit("/", 1)[-1]
+
+
 def cached_release_floor(cache_dir: Path | str) -> tuple[int, int] | None:
     """Return the newest release already downloaded into `cache_dir`.
 
