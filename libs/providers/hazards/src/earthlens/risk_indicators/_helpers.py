@@ -521,8 +521,13 @@ def cached_release_floor(cache_dir: Path | str) -> tuple[int, int] | None:
 
     Only names that parse as a release workbook (case-insensitively, the same
     `(year, version)` pattern discovery captures) and whose year is within
-    `INFORM_RELEASE_YEARS` count, so a stray or implausibly dated file dropped
-    in the directory cannot raise the floor above anything the page can offer.
+    `INFORM_RELEASE_YEARS` count, so a non-workbook file or a grossly misdated
+    one is ignored. Within that window the newest cached workbook is trusted as
+    evidence of what the page served: a stray but plausibly-named file (say a
+    hand-placed `INFORM_Risk_2099_v001.xlsx`) would still set the floor and, if
+    it is newer than anything the page offers, wedge discovery until it is
+    removed. Only this module writes the directory, so in practice every file
+    in it is a real past release.
 
     Args:
         cache_dir: Directory holding downloaded release workbooks. A missing
