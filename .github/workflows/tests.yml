@@ -91,6 +91,13 @@ jobs:
         # behind `requires_host`, and this keeps them there. Unix sockets and
         # loopback stay open so a local emulator (moto, fake-gcs) still works.
         #
+        # Caveat (see #1356 / #1375): pytest-socket patches Python's `socket`, so
+        # this blocks Python-level transports only. A request GDAL/curl issues in
+        # C via pyramids (e.g. `Dataset.from_wcs`, a `/vsicurl` read) opens its
+        # own socket and is NOT blocked here -- a test whose data fetch goes
+        # through GDAL must be gated behind `requires_host` / `e2e`, not left in
+        # this lane.
+        #
         # Coverage is measured on the Linux legs only. The Windows leg exists
         # to catch path and filename-case bugs, and uploading a second report
         # under the same flag would only duplicate what ubuntu already sent.
@@ -161,6 +168,10 @@ jobs:
   #                 `--block-network` is pytest-recording's own guard: a
   #                 `vcr`-marked test that asks for an exchange its cassette
   #                 does not hold fails instead of reaching the provider.
+  #                 Like `--disable-socket`, this covers Python transports only;
+  #                 a GDAL/curl-issued fetch (pyramids `from_wcs`, `/vsicurl`)
+  #                 slips past both guards, so such tests belong behind
+  #                 `requires_host` / `e2e` (see #1356 / #1375).
   marker-lanes:
     name: ${{ matrix.lane.name }} contract
     runs-on: ubuntu-latest

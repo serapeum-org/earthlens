@@ -218,7 +218,13 @@ def vcr_config(request: pytest.FixtureRequest) -> dict[str, Any]:
     """
     return {
         # Default `none`: a marked test replays or fails, never reaching the
-        # network. Passed through from `--record-mode` rather than hardcoded,
+        # network -- but only for traffic vcrpy can see (the Python HTTP clients
+        # urllib3 / http.client / requests). A request GDAL/curl issues in C via
+        # pyramids (`Dataset.from_wcs`, a `/vsicurl` read) is invisible to vcrpy,
+        # so `none` neither replays nor refuses it and it goes live; a `vcr`-marked
+        # test must not depend on such a fetch -- gate it behind `requires_host` /
+        # `e2e` instead (see #1356 / #1375). Passed through from `--record-mode`
+        # rather than hardcoded,
         # because this fixture *overrides* the command line — `use_cassette`
         # ends with `if "record_mode" in merged_config: record_mode =
         # merged_config["record_mode"]`, so pinning it here would make
