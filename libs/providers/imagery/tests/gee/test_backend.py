@@ -1772,6 +1772,22 @@ class TestInMemoryStackReduces:
         value = np.asarray(reduced.read_array()).ravel()[0]
         assert value == 28.0, f"p90 of 10/20/30 should be 28, got {value}"
 
+    def test_the_reduced_dataset_survives_closing_the_stack(self):
+        """The reduced Dataset outlives `close_quietly(stack)` — it is buffer-independent.
+
+        The backend closes the in-memory scene stack in a `finally` immediately
+        after `reduce_stack` returns, before the caller reads the result; this
+        pins that the reduced Dataset copies its values rather than lazily
+        viewing the stack's buffers, so closing the stack cannot corrupt it.
+        """
+        stack = _build_fake_stack([10.0, 20.0, 30.0], _JUNE_TIMES)
+        reduced = temporal_reducer_for("median").reduce_stack(stack, _JUNE_TIMES)
+        backend_module.close_quietly(stack)
+        median = np.asarray(reduced.read_array()).ravel()[0]
+        assert median == 20.0, (
+            f"reduced dataset must survive the stack being closed, got {median}"
+        )
+
 
 class TestComposite:
     """Tests for `GEE._composite`."""
