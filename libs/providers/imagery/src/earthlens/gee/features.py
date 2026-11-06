@@ -191,6 +191,7 @@ def create_feature(
     else:
         records = records_df.to_dict("records")
         ee_feature_list = [
-            ee.Feature(geom, record) for geom, record in zip(ee_geom_list, records)
+            ee.Feature(geom, record)
+            for geom, record in zip(ee_geom_list, records, strict=True)
         ]
     return cast("FeatureCollection", ee.FeatureCollection(ee_feature_list))
