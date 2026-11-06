@@ -2633,6 +2633,7 @@ earthdata = [
     { name = "earthaccess", version = "0.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
 eedai = [
+    { name = "pyramids-core", extra = ["lazy"] },
     { name = "pyramids-eo" },
 ]
 eumetsat = [
@@ -2679,6 +2680,7 @@ requires-dist = [
     { name = "openeo", marker = "extra == 'openeo'", specifier = ">=0.47,<0.52" },
     { name = "pyproj", specifier = ">=3.7.0" },
     { name = "pyramids-core", specifier = ">=0.73.0" },
+    { name = "pyramids-core", extras = ["lazy"], marker = "extra == 'eedai'", specifier = ">=0.73.0" },
     { name = "pyramids-core", extras = ["stac"], marker = "extra == 'stac'", specifier = ">=0.71.0" },
     { name = "pyramids-eo", specifier = ">=0.11.0,<0.12" },
     { name = "pyramids-eo", marker = "extra == 'eedai'", specifier = ">=0.11.0,<0.12" },
@@ -7472,6 +7474,16 @@ wheels = [
 ]
 
 [package.optional-dependencies]
+lazy = [
+    { name = "dask" },
+    { name = "distributed" },
+    { name = "fsspec" },
+    { name = "h5py" },
+    { name = "kerchunk" },
+    { name = "s3fs" },
+    { name = "zarr", version = "3.1.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "zarr", version = "3.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+]
 parquet = [
     { name = "dask" },
     { name = "dask-geopandas" },

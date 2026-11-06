@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import datetime as dt
 import functools
+import importlib.util
 import os
 
 import pytest
@@ -30,6 +31,15 @@ _SERVICE_KEY = os.environ.get("GEE_SERVICE_KEY")
 _skip_without_creds = pytest.mark.skipif(
     not (_SERVICE_ACCOUNT and _SERVICE_KEY),
     reason="GEE_SERVICE_ACCOUNT / GEE_SERVICE_KEY not set",
+)
+
+#: The client-side collection reduce (`reduce_time` -> `DatasetCollection.data`)
+#: needs pyramids-core's `lazy` extra (dask); installed via
+#: `earthlens-imagery[eedai]`. Skip the reduce e2e where it is absent rather than
+#: erroring, mirroring the eedai/creds guards.
+_skip_without_dask = pytest.mark.skipif(
+    importlib.util.find_spec("dask") is None,
+    reason="client-side EEDAI reduce needs pyramids-core[lazy] (dask)",
 )
 
 
@@ -674,6 +684,7 @@ def _download_chirps(tmp_path, engine: str):
 @pytest.mark.skipif(
     not eedai_available(), reason="the [eedai] extra (pyramids-eo) is not installed"
 )
+@_skip_without_dask
 def test_live_chirps_collection_eedai_matches_ee(tmp_path):
     """A collection composited through the reader matches Earth Engine's reduce.
 
@@ -756,6 +767,7 @@ def test_live_property_filter_narrows_the_selection_through_the_backend(
 @pytest.mark.skipif(
     not eedai_available(), reason="the [eedai] extra (pyramids-eo) is not installed"
 )
+@_skip_without_dask
 def test_live_monthly_buckets_are_disjoint_and_cost_one_query_each(
     tmp_path, monkeypatch
 ):

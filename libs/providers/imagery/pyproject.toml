@@ -68,11 +68,15 @@ dependencies = [
 [project.optional-dependencies]
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 asf = ["asf_search >=12.2.2", "earthlens-imagery[earthdata]"]
-# pyramids-eo is now a base dependency (see `[project.dependencies]`), so this
-# extra is redundant -- retained as a no-op alias so `earthlens-imagery[eedai]`
-# (and the meta-package's `[eedai]`) keep resolving. The floor is kept in step
-# with the base pin.
-eedai = ["pyramids-eo >=0.11.0,<0.12"]
+# pyramids-eo (the EEDAI reader) is now a base dependency, so this extra no
+# longer carries it alone. What it adds is `pyramids-core[lazy]`: the EEDAI
+# client-side collection reduce (median / percentile / trend / sens_slope over a
+# scene stack) runs through pyramids' `reduce_time`, whose `DatasetCollection.data`
+# needs the `lazy` stack (dask, ...). So the full client-side-composite capability
+# lives behind `earthlens-imagery[eedai]`; a bare `[gee]` install stays lean and a
+# client-side reduce there raises pyramids-core's `OptionalPackageDoesNotExist`
+# naming `pyramids-core[lazy]`. Floor kept in step with the base pyramids-core pin.
+eedai = ["pyramids-eo >=0.11.0,<0.12", "pyramids-core[lazy] >=0.73.0"]
 eumetsat = ["eumdac >=3.1"]
 # scikit-learn drives the two client-side learning operations in
 # `earthlens.gee.analysis` (k-means clustering and the supervised classifier).

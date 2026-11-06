@@ -224,6 +224,13 @@ reducing an *in-memory* collection, which is what
 the scene stack directly — no spill to disk — and runs end to end
 (pyramids-core #1349).
 
+The reduce reads the stack through `DatasetCollection.data`, which needs
+pyramids-core's `lazy` extra (dask). Install it with the `eedai` extra —
+`pip install earthlens[gee,eedai]` pulls `pyramids-core[lazy]` — so the full
+client-side-composite capability is present. A bare `earthlens[gee]` stays
+lean; a client-side reduce there raises pyramids-core's
+`OptionalPackageDoesNotExist` naming `pyramids-core[lazy]`.
+
 What you gain: no 32768-px synchronous cap and no HTTP/zip round-trip,
 so `auto_split` is unnecessary. What to know before switching:
 
