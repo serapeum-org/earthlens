@@ -24644,16 +24644,21 @@ mask them. The two agree wherever the scenes carry no fill over the AOI. There
 is no way to supply the fill from here — the composite read takes no <code>nodata</code>
 argument — so pass <code>engine="ee"</code> when you need Earth Engine's masking exactly.</p>
 <p>The client-side reduction — the true per-pixel <code>median</code>, and the <code>"p90"</code> /
-<code>"trend"</code> / <code>"sens_slope"</code> reducers — needs <strong>pyramids-core &gt;= 0.70.0</strong> (the
+<code>"trend"</code> / <code>"sens_slope"</code> reducers — needs <strong>pyramids-core &gt;= 0.73.0</strong> (the
 distribution formerly published as <code>pyramids-gis</code>; the import name stays
-<code>pyramids</code>), which is where <code>reduce_time</code>'s percentile / linear-trend /
-Theil-Sen operations ship. One known limitation applies today:
-<code>pyramids_eo.collection_from_earthengine</code> hands back an in-memory
-(<code>datasets=</code>-backed) <code>DatasetCollection</code>, which <code>reduce_time</code> cannot consume
-(it reads a file- or zarr-backed collection), so a live <code>engine="eedai"</code>
-collection composite raises a <code>RuntimeError</code>. The wiring is correct and is
-verified against <code>numpy</code> on a file-backed stack; until that upstream reader gap
-is closed, pass <code>engine="ee"</code> for a collection composite.</p>
+<code>pyramids</code>). <code>reduce_time</code>'s percentile / linear-trend / Theil-Sen operations
+themselves shipped earlier (0.70.0); the <code>&gt;= 0.73.0</code> floor is specifically for
+reducing an <em>in-memory</em> collection, which is what
+<code>pyramids_eo.collection_from_earthengine</code> hands back (a <code>datasets=</code>-backed
+<code>DatasetCollection</code>). So a live <code>engine="eedai"</code> collection composite reduces
+the scene stack directly — no spill to disk — and runs end to end
+(pyramids-core #1349).</p>
+<p>The reduce reads the stack through <code>DatasetCollection.data</code>, which needs
+pyramids-core's <code>lazy</code> extra (dask). Install it with the <code>eedai</code> extra —
+<code>pip install earthlens[gee,eedai]</code> pulls <code>pyramids-core[lazy]</code> — so the full
+client-side-composite capability is present. A bare <code>earthlens[gee]</code> stays
+lean; a client-side reduce there raises pyramids-core's
+<code>OptionalPackageDoesNotExist</code> naming <code>pyramids-core[lazy]</code>.</p>
 <p>What you gain: no 32768-px synchronous cap and no HTTP/zip round-trip,
 so <code>auto_split</code> is unnecessary. What to know before switching:</p>
 <ul>
