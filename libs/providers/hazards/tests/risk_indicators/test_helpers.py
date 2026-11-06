@@ -899,3 +899,67 @@ class TestInformReleaseFloor:
         assert _helpers._RELEASE_CACHE[_helpers.INFORM_RESULTS_PAGE][0] == second, (
             "the accepted pick replaces the memo"
         )
+
+
+class TestReleaseFloorHelpers:
+    """The pure helpers behind the release floor, exercised directly."""
+
+    @pytest.mark.parametrize(
+        "identity, floor, expected",
+        [
+            ((2026, 72), None, True),
+            (None, None, True),
+            ((2026, 73), (2026, 73), True),
+            ((2026, 74), (2026, 73), True),
+            ((2026, 72), (2026, 73), False),
+            ((2025, 99), (2026, 1), False),
+            (None, (2026, 73), False),
+        ],
+    )
+    def test_meets_floor(self, identity, floor, expected):
+        """A release clears the floor when there is none, or it is not older."""
+        assert _helpers._meets_floor(identity, floor) is expected
+
+    @pytest.mark.parametrize(
+        "identity, expected",
+        [
+            ((2026, 73), "2026/v073"),
+            ((2026, 7), "2026/v007"),
+            (None, "the required release"),
+        ],
+    )
+    def test_release_text(self, identity, expected):
+        """An identity renders as year/vNNN, or a placeholder when absent."""
+        assert _helpers._release_text(identity) == expected
+
+    def test_degraded_render_names_a_dropped_link(self):
+        """A read with no release link is phrased as a missing link."""
+        assert (
+            _helpers._degraded_render(None, (2026, 73)) == "rendered no workbook link"
+        )
+
+    def test_degraded_render_names_the_floor_a_sub_floor_read_missed(self):
+        """A sub-floor read is phrased with both the release offered and the floor."""
+        message = _helpers._degraded_render((2026, 72), (2026, 73))
+        assert message == "offered only release 2026/v072, older than 2026/v073"
+
+    def test_best_release_candidate_picks_the_newest_link(self):
+        """The newest (year, version) link wins over the others on the page."""
+        html = (
+            f'<a href="{RELEASE}/{ANNUAL}">annual</a><a href="{RELEASE}/{MID}">mid</a>'
+        )
+        href, identity = _helpers._best_release_candidate(html)
+        assert href.endswith(f"/{MID}") and identity == (2026, 73)
+
+    def test_best_release_candidate_ignores_an_implausible_year(self):
+        """A year outside the plausibility range cannot win the comparison."""
+        html = (
+            f'<a href="{RELEASE}/{ANNUAL}">annual</a>'
+            '<a href="/x/INFORM_Risk_3999_v099.xlsx">bogus</a>'
+        )
+        href, identity = _helpers._best_release_candidate(html)
+        assert href.endswith(f"/{ANNUAL}") and identity == (2026, 72)
+
+    def test_best_release_candidate_is_none_without_a_release_link(self):
+        """A body carrying no release link yields no candidate."""
+        assert _helpers._best_release_candidate("<p>nothing here</p>") is None
