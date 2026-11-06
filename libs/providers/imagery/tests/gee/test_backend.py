@@ -13,7 +13,6 @@ from __future__ import annotations
 import datetime as dt
 import inspect
 import math
-import shutil
 import zipfile
 from pathlib import Path
 from types import SimpleNamespace
@@ -1748,49 +1747,30 @@ class TestBuildCollection:
 _JUNE_TIMES = ["2021-06-01", "2021-06-11", "2021-06-21"]
 
 
-class TestAsFileBackedStack:
-    """`_as_file_backed_stack` bridges the reader's in-memory collection.
+class TestInMemoryStackReduces:
+    """The reader's in-memory scene stack reduces directly, with no spill.
 
-    The EEDAI reader returns an in-memory `DatasetCollection`, but pyramids'
-    `reduce_time` reads only a file- or zarr-backed one; this spills the former
-    to the latter so a `median` / `percentile` / `trend` composite can reduce.
+    `pyramids_eo.collection_from_earthengine` returns an in-memory
+    `DatasetCollection` (`.files is None`). Since pyramids-core 0.73.0 its
+    `reduce_time` consumes that in-memory collection directly, so the backend
+    reduces the stack as-is rather than spilling it to COGs first (#1336).
     """
 
-    def test_an_in_memory_stack_is_spilled_and_then_reduces(self):
-        """An in-memory stack reduces only after it is made file-backed."""
+    def test_an_in_memory_stack_reduces_without_spilling(self):
+        """An in-memory stack reduces straight through `reduce_stack`."""
         stack = _build_fake_stack([10.0, 20.0, 30.0], _JUNE_TIMES)
         assert stack.files is None  # the reader's real shape: in-memory
-        backed, spill_dir = backend_module._as_file_backed_stack(stack)
-        try:
-            assert backed is not stack
-            assert spill_dir is not None  # a spill directory was created
-            assert backed.files  # now file-backed, so reduce_time can read it
-            reduced = backed.reduce_time(_JUNE_TIMES, freq="30D", op="median")
-            median = np.asarray(reduced[0][1].read_array()).ravel()[0]
-            assert median == 20.0
-        finally:
-            backend_module.close_quietly(backed)
-            # Best-effort, as in the backend: a lingering Windows handle leaves
-            # the temp for the OS to sweep, so the removal is not asserted.
-            shutil.rmtree(spill_dir, ignore_errors=True)
+        reduced = temporal_reducer_for("median").reduce_stack(stack, _JUNE_TIMES)
+        median = np.asarray(reduced.read_array()).ravel()[0]
+        assert median == 20.0, f"median of 10/20/30 should be 20, got {median}"
 
-    def test_an_already_backed_stack_is_returned_untouched(self, tmp_path):
-        """A file-backed stack is passed through, with no spill directory."""
-        from pyramids.dataset import Dataset, DatasetCollection
-        from pyramids.dataset.dataset import GeoReference
-
-        geo = GeoReference(top_left_corner=(31.2, 30.0), cell_size=0.05, epsg=4326)
-        paths = []
-        for i, value in enumerate((1.0, 2.0)):
-            path = str(tmp_path / f"scene{i}.tif")
-            Dataset.from_array(
-                np.full((2, 2), value), geo_ref=geo, no_data_value=-9999.0, path=path
-            )
-            paths.append(path)
-        backed_in = DatasetCollection.from_files(paths)
-        backed_out, spill_dir = backend_module._as_file_backed_stack(backed_in)
-        assert backed_out is backed_in
-        assert spill_dir is None
+    def test_a_percentile_also_reduces_an_in_memory_stack(self):
+        """A parameterised reducer consumes the in-memory stack too."""
+        stack = _build_fake_stack([10.0, 20.0, 30.0], _JUNE_TIMES)
+        assert stack.files is None
+        reduced = temporal_reducer_for("p90").reduce_stack(stack, _JUNE_TIMES)
+        value = np.asarray(reduced.read_array()).ravel()[0]
+        assert value == 28.0, f"p90 of 10/20/30 should be 28, got {value}"
 
 
 class TestComposite:
@@ -2447,10 +2427,10 @@ def _build_fake_stack(values, times):
     (which `reduce_stack` uses) could read it — but that diverged from the real
     reader and hid the defect where a `median` / `percentile` / `trend` EEDAI
     composite failed with `DatasetCollection.data requires a file-backed
-    collection`. The backend now spills an in-memory stack to files before
-    reducing (`_as_file_backed_stack`), so the fake is realistic again and the
-    composite tests exercise that path. Each scene is a constant 2x2 raster, so
-    the per-pixel reduction has a value the parity test can predict.
+    collection`. Since pyramids-core 0.73.0 `reduce_time` consumes an in-memory
+    collection directly, so the backend reduces this stack as-is and the fake is
+    realistic again (#1336). Each scene is a constant 2x2 raster, so the
+    per-pixel reduction has a value the parity test can predict.
     """
     from pyramids.dataset import Dataset, DatasetCollection
     from pyramids.dataset.dataset import GeoReference

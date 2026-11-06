@@ -92,12 +92,11 @@ current behaviour rather than a contract.
     reducer folds a scene's fill pixels into the result where Earth Engine would have masked them — the two
     agree only where the scenes carry no fill over the AOI.
 
-    **Known limitation — live EEDAI reduction.** `pyramids_eo.collection_from_earthengine` currently returns
-    an *in-memory* (`datasets=`-backed) `DatasetCollection`, which `reduce_time` cannot consume — it reads a
-    file- or zarr-backed collection — so a live `engine="eedai"` collection composite (even `median`) raises
-    a `RuntimeError` today. The earthlens wiring is correct, and the reduction is verified against `numpy` on
-    a file-backed stack; it will work end to end once that upstream reader gap is closed. Until then, pass
-    `engine="ee"` for a collection composite.
+    **Live EEDAI reduction.** `pyramids_eo.collection_from_earthengine` returns an *in-memory*
+    (`datasets=`-backed) `DatasetCollection`, and from **pyramids-core >= 0.73.0** `reduce_time` consumes
+    that directly, so a live `engine="eedai"` collection composite (`median` / `percentile` / `trend` /
+    `sens_slope`) reduces the scene stack as-is — no spill to disk — and runs end to end
+    (pyramids-core #1349).
 
 ### The two engines are not byte-identical
 
