@@ -34,12 +34,7 @@ requires-python = ">=3.11,<4"
 # unconditionally-registered console script. No provider SDK belongs here —
 # those live in the thematic provider distributions' own dependencies.
 dependencies = [
-    # Floor 0.73.0: the first release whose `DatasetCollection.reduce_time` /
-    # `.data` work on an in-memory (`datasets=`-backed) collection, not only a
-    # file-backed one (pyramids-core #1349 / #1412). The GEE EEDAI client-side
-    # composite reduces exactly such an in-memory stack, so below this it had to
-    # spill the scenes to COGs first (#1336).
-    "pyramids-core >=0.73.0",
+    "pyramids-core >=0.71.0",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",

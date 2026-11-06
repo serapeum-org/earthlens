@@ -53,6 +53,16 @@ dependencies = [
     # the reader stayed opt-in. The reader is still only *reachable* through
     # `engine=`, so `engine="ee"` keeps Earth Engine's exact semantics.
     "pyramids-eo >=0.11.0,<0.12",
+    # pyramids-core is imported directly here (earthlens.gee.reducers /
+    # backend.py: `DatasetCollection`, `Dataset`, `merge_rasters`,
+    # `reduce_time`), so it is a declared direct dependency, not left to arrive
+    # transitively. Floor 0.73.0: the first release whose
+    # `DatasetCollection.reduce_time` / `.data` work on an in-memory
+    # (`datasets=`-backed) collection, not only a file-backed one
+    # (pyramids-core #1349 / #1412). The GEE EEDAI client-side composite reduces
+    # exactly such an in-memory stack; below this release it had to spill the
+    # scenes to COGs first (#1336).
+    "pyramids-core >=0.73.0",
 ]
 
 [project.optional-dependencies]

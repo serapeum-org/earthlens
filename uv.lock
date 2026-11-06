@@ -2554,7 +2554,7 @@ requires-dist = [
     { name = "platformdirs", specifier = ">=3.0.0" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pyproj", specifier = ">=3.7.0" },
-    { name = "pyramids-core", specifier = ">=0.73.0" },
+    { name = "pyramids-core", specifier = ">=0.71.0" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=8" },
     { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "requests", specifier = ">=2.28.1" },
@@ -2620,6 +2620,7 @@ source = { editable = "libs/providers/imagery" }
 dependencies = [
     { name = "earthlens-core" },
     { name = "pyproj" },
+    { name = "pyramids-core" },
     { name = "pyramids-eo" },
 ]
 
@@ -2677,6 +2678,7 @@ requires-dist = [
     { name = "jaxa-earth", marker = "extra == 'jaxa'", specifier = ">=0.1.6,<0.2" },
     { name = "openeo", marker = "extra == 'openeo'", specifier = ">=0.47,<0.52" },
     { name = "pyproj", specifier = ">=3.7.0" },
+    { name = "pyramids-core", specifier = ">=0.73.0" },
     { name = "pyramids-core", extras = ["stac"], marker = "extra == 'stac'", specifier = ">=0.71.0" },
     { name = "pyramids-eo", specifier = ">=0.11.0,<0.12" },
     { name = "pyramids-eo", marker = "extra == 'eedai'", specifier = ">=0.11.0,<0.12" },
