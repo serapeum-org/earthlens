@@ -37,7 +37,6 @@ def test_a_real_request_parses(tmp_path):
         path=str(tmp_path),
     ).download(progress_bar=False)
 
-    assert isinstance(result, list) and result, (
-        "bathymetry is a file-writing backend: download returns the paths it wrote"
-    )
+    assert isinstance(result, list), "bathymetry download returns a list of paths"
+    assert result, "a file-writing backend returns at least one written path"
     assert all(Path(p).exists() for p in result), "every returned path exists"
