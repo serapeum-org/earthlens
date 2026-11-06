@@ -182,10 +182,14 @@ def create_feature(
     records_df = pd.DataFrame(gdf.drop("geometry", axis=1))
     if columns:
         records_df = records_df[columns]
-    records = records_df.to_dict("records")
-    if not records:
+    # A geometry-only frame has no non-geometry columns, so each row serialises
+    # to an empty dict. pandas 2 collapses that to `[]`, pandas 3 keeps it as
+    # `[{}, ...]`; key the "no properties" decision on the column set so a
+    # geometry-only frame yields features without properties, never `{}` (#1339).
+    if records_df.columns.empty:
         ee_feature_list = [ee.Feature(geom) for geom in ee_geom_list]
     else:
+        records = records_df.to_dict("records")
         ee_feature_list = [
             ee.Feature(geom, record) for geom, record in zip(ee_geom_list, records)
         ]
