@@ -909,7 +909,8 @@ class TestInformReleaseFloor:
             ),
         )
         url, year = _helpers.inform_release_url()
-        assert url.endswith(f"/{ANNUAL}") and year == 2026
+        assert url.endswith(f"/{ANNUAL}")
+        assert year == 2026
 
     def test_a_memo_below_a_risen_floor_is_re_read(self, monkeypatch):
         """The memo is re-checked, so a pick taken before the floor rose is dropped."""
@@ -998,7 +999,8 @@ class TestReleaseFloorHelpers:
             f'<a href="{RELEASE}/{ANNUAL}">annual</a><a href="{RELEASE}/{MID}">mid</a>'
         )
         href, identity = _helpers._best_release_candidate(html)
-        assert href.endswith(f"/{MID}") and identity == (2026, 73)
+        assert href.endswith(f"/{MID}")
+        assert identity == (2026, 73)
 
     def test_best_release_candidate_ignores_an_implausible_year(self):
         """A year outside the plausibility range cannot win the comparison."""
@@ -1007,7 +1009,8 @@ class TestReleaseFloorHelpers:
             '<a href="/x/INFORM_Risk_3999_v099.xlsx">bogus</a>'
         )
         href, identity = _helpers._best_release_candidate(html)
-        assert href.endswith(f"/{ANNUAL}") and identity == (2026, 72)
+        assert href.endswith(f"/{ANNUAL}")
+        assert identity == (2026, 72)
 
     def test_best_release_candidate_is_none_without_a_release_link(self):
         """A body carrying no release link yields no candidate."""
