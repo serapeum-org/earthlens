@@ -16,11 +16,12 @@ reader can tell "not classified" from cluster 0.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Annotated
 
 import numpy as np
 from pydantic import field_validator
 
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.analysis._arrays import read_masked, result_like
 from earthlens.gee.analysis._sklearn import import_cluster
 from earthlens.gee.analysis.base import RasterOperation
@@ -60,10 +61,10 @@ class Cluster(RasterOperation):
             ```
     """
 
-    n_clusters: int = 5
+    n_clusters: Annotated[int, NoBool] = 5
     bands: tuple[int, ...] | None = None
-    random_state: int | None = 0
-    no_data_label: int = -1
+    random_state: Annotated[int | None, NoBool] = 0
+    no_data_label: Annotated[int, NoBool] = -1
     dtype: str = "int32"
 
     @field_validator("n_clusters")

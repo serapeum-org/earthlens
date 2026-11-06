@@ -16,11 +16,12 @@ matrix dense enough to be meaningful in a small window.
 from __future__ import annotations
 
 from functools import lru_cache, partial
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Annotated, Literal
 
 import numpy as np
 from pydantic import field_validator
 
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.analysis._arrays import read_masked, result_like
 from earthlens.gee.analysis.base import RasterOperation
 
@@ -158,9 +159,9 @@ class Texture(RasterOperation):
     measure: Literal[
         "contrast", "dissimilarity", "homogeneity", "energy", "entropy"
     ] = "contrast"
-    radius: int = 1
-    levels: int = 16
-    band: int = 0
+    radius: Annotated[int, NoBool] = 1
+    levels: Annotated[int, NoBool] = 16
+    band: Annotated[int, NoBool] = 0
 
     @field_validator("radius")
     @classmethod

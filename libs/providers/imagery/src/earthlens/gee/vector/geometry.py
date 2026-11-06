@@ -15,7 +15,7 @@ directly, with no adapter.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Annotated, cast
 
 import ee
 import pandas as pd
@@ -23,6 +23,8 @@ from ee.featurecollection import FeatureCollection
 from ee.geometry import Geometry
 from pydantic import BaseModel, ConfigDict
 from shapely.geometry.base import BaseGeometry
+
+from earthlens.gee._helpers import NoBool
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from geopandas.geodataframe import GeoDataFrame
@@ -64,7 +66,7 @@ class GeometryConverterConfig(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    epsg: int = 4326
+    epsg: Annotated[int, NoBool] = 4326
     columns: tuple[str, ...] | None = None
 
 

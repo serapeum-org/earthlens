@@ -75,6 +75,12 @@ TERMINAL_TASK_STATES: frozenset[str] = frozenset(
     {"COMPLETED", "FAILED", "CANCELLED", "CANCEL_REQUESTED"}
 )
 
+#: The marker phrase `refuse_bool`'s `ValueError` carries. Callers that need to
+#: recognise a `NoBool` refusal (the test sweep, `pytest.raises(match=...)`)
+#: match this constant rather than re-typing the wording, so a reword here stays
+#: in one place instead of silently desynchronising from them.
+BOOL_REFUSAL_HINT = "got the boolean"
+
 
 def refuse_bool(value: Any) -> Any:
     """Refuse a `bool` where a number is wanted, before pydantic coerces it.
@@ -125,7 +131,7 @@ def refuse_bool(value: Any) -> Any:
     """
     if isinstance(value, bool):
         raise ValueError(
-            f"expected a number, got the boolean {value!r}; bool is a subclass "
+            f"expected a number, {BOOL_REFUSAL_HINT} {value!r}; bool is a subclass "
             "of int, so this would silently become "
             f"{int(value)} — pass the number you mean"
         )

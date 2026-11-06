@@ -41,10 +41,12 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
-from typing import Any, ClassVar
+from typing import Annotated, Any, ClassVar
 
 import ee
 from pydantic import BaseModel, ConfigDict, Field
+
+from earthlens.gee._helpers import NoBool
 
 __all__ = ["Ccdc", "LandTrendr", "SegmentationResult", "TemporalSegmentation"]
 
@@ -270,14 +272,14 @@ class LandTrendr(TemporalSegmentation):
 
     invert: bool = True
 
-    maxSegments: int = Field(ge=1)
-    spikeThreshold: float = Field(default=0.9, ge=0, le=1)
-    vertexCountOvershoot: int = Field(default=3, ge=0)
+    maxSegments: Annotated[int, NoBool] = Field(ge=1)
+    spikeThreshold: Annotated[float, NoBool] = Field(default=0.9, ge=0, le=1)
+    vertexCountOvershoot: Annotated[int, NoBool] = Field(default=3, ge=0)
     preventOneYearRecovery: bool = False
-    recoveryThreshold: float = Field(default=0.25, ge=0, le=1)
-    pvalThreshold: float = Field(default=0.1, ge=0, le=1)
-    bestModelProportion: float = Field(default=0.75, ge=0, le=1)
-    minObservationsNeeded: int = Field(default=6, ge=1)
+    recoveryThreshold: Annotated[float, NoBool] = Field(default=0.25, ge=0, le=1)
+    pvalThreshold: Annotated[float, NoBool] = Field(default=0.1, ge=0, le=1)
+    bestModelProportion: Annotated[float, NoBool] = Field(default=0.75, ge=0, le=1)
+    minObservationsNeeded: Annotated[int, NoBool] = Field(default=6, ge=1)
 
     def _run(self, time_series: Any) -> Any:
         """Call `ee.Algorithms.TemporalSegmentation.LandTrendr`.

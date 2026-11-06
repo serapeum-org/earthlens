@@ -14,12 +14,13 @@ retry / transient-exception helpers are a monkeypatch seam the io tests rely on)
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Annotated
 
 from pydantic import BaseModel, ConfigDict
 from pyramids.feature import FeatureCollection
 
 from earthlens.gee import io as _io
+from earthlens.gee._helpers import NoBool
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from collections.abc import Iterable
@@ -53,9 +54,9 @@ class FeatureDownloaderConfig(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    pool_size: int = 25
-    tries: int = 5
-    backoff: float = 2.0
+    pool_size: Annotated[int, NoBool] = 25
+    tries: Annotated[int, NoBool] = 5
+    backoff: Annotated[float, NoBool] = 2.0
 
 
 class FeatureDownloader:

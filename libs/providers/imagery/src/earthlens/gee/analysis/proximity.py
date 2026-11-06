@@ -9,10 +9,11 @@ distance-to-river and buffer analyses are all this operation with a different
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Annotated, Literal
 
 from pydantic import field_validator
 
+from earthlens.gee._helpers import NoBool
 from earthlens.gee.analysis.base import RasterOperation
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -49,11 +50,11 @@ class Proximity(RasterOperation):
             ```
     """
 
-    band: int = 0
+    band: Annotated[int, NoBool] = 0
     target_values: tuple[int, ...] | None = None
     distance_units: Literal["GEO", "PIXEL"] = "GEO"
-    max_distance: float | None = None
-    nodata: float | None = None
+    max_distance: Annotated[float | None, NoBool] = None
+    nodata: Annotated[float | None, NoBool] = None
 
     @field_validator("target_values")
     @classmethod
