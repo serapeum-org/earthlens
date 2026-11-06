@@ -55,8 +55,6 @@ import datetime as dt
 import gc
 import math
 import os
-import shutil
-import tempfile
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, cast
@@ -65,7 +63,6 @@ import ee
 import pandas as pd
 from loguru import logger
 from pyramids.dataset import Dataset as PyramidsDataset
-from pyramids.dataset.collection import DatasetCollection
 from pyramids.dataset.merge import merge_rasters
 from tqdm import tqdm
 
@@ -666,45 +663,6 @@ def _discard_quietly(path: Path) -> None:
             stray.unlink(missing_ok=True)
         except OSError as exc:
             logger.debug(f"Could not remove the staging file {stray}: {exc}")
-
-
-def _as_file_backed_stack(
-    stack: DatasetCollection,
-) -> tuple[DatasetCollection, Path | None]:
-    """Return a file-backed view of a scene stack, spilling it if it is not one.
-
-    pyramids reduces a `DatasetCollection` through its `data` property, which
-    requires a **file-backed** (or zarr-backed) collection; the EEDAI reader's
-    `collection_from_earthengine`, though, returns an **in-memory** collection
-    of warped scenes (`DatasetCollection(datasets=...)`). Reducing that raises
-    `DatasetCollection.data requires a file-backed collection`, so a `median` /
-    `percentile` / `trend` EEDAI composite fails before it can be written.
-
-    This bridges the two with pyramids' own public API: an in-memory stack is
-    spilled to COGs in a temporary directory and reloaded with `from_files`,
-    which the reducer then reads. A stack that is already file-backed is
-    returned untouched. This is a workaround for the pyramids-eo / pyramids-core
-    contract gap (the reader hands back in-memory scenes the reducer cannot
-    consume), tracked upstream; it reimplements no raster logic of its own —
-    the reduction stays pyramids' `reduce_time`.
-
-    Args:
-        stack: The scene stack from the reader.
-
-    Returns:
-        A `(collection, spill_dir)` pair. `collection` is file-backed and ready
-        to reduce; `spill_dir` is the temporary directory to remove once the
-        reduction is done, or `None` when the stack was already backed and
-        nothing was spilled.
-    """
-    if stack.files:
-        result: tuple[DatasetCollection, Path | None] = (stack, None)
-    else:
-        spill_dir = Path(tempfile.mkdtemp(prefix="earthlens-eedai-stack-"))
-        paths = stack.to_cog_stack(spill_dir, name="scene")
-        backed = DatasetCollection.from_files([str(path) for path in paths])
-        result = (backed, spill_dir)
-    return result
 
 
 def _declaring(reader: Any, nodata: float | int) -> Any:
@@ -4035,24 +3993,16 @@ class GEE(LazyClientMixin, AbstractDataSource):
             collection_kwargs["property_filter"] = filter_expression
         stack = reader.collection_from_earthengine(var_info.id, **collection_kwargs)
         times = list(stack.time)
-        backed, spill_dir = _as_file_backed_stack(stack)
         try:
-            return reducer.reduce_stack(backed, times)
+            # pyramids-core >=0.73.0 reduces an in-memory (`datasets=`-backed)
+            # collection directly, so the scene stack the reader returns is
+            # reduced as-is — no spill to COGs first (#1336, pyramids-core #1349).
+            return reducer.reduce_stack(stack, times)
         finally:
             # The reduced dataset is materialised in memory, independent of the
-            # stack's per-scene handles, so the stacks can be released now —
-            # which matters on Windows, where an open scene handle locks its
-            # file. `backed` may be `stack` itself (already file-backed) or the
-            # spilled copy; closing both is safe and releases either.
+            # stack's per-scene handles, so the stack can be released now — which
+            # matters on Windows, where an open scene handle locks its file.
             close_quietly(stack)
-            if backed is not stack:
-                close_quietly(backed)
-            if spill_dir is not None:
-                # Drop the scene handles before removing the spill, so Windows
-                # does not keep the COGs locked; `ignore_errors` still tolerates
-                # a handle that outlives this, leaving the OS to sweep the temp.
-                gc.collect()
-                shutil.rmtree(spill_dir, ignore_errors=True)
 
     def _export_via_eedai(
         self,

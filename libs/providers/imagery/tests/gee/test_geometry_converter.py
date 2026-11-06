@@ -131,6 +131,32 @@ class TestToEe:
         fc = GeometryConverter().to_ee(gdf)
         assert fc.features[0].properties is None
 
+    def test_pandas3_record_shape_still_yields_no_properties(
+        self, fake_ee, monkeypatch
+    ):
+        """A column-less frame yields no properties under pandas 3's to_dict shape.
+
+        Mirrors the create_feature guard: keying on the column set, not on
+        `to_dict` being empty, keeps the no-properties branch under pandas 3's
+        `[{}, ...]` record shape, which pandas-2 CI never produces.
+        """
+        import pandas as pd
+
+        original = pd.DataFrame.to_dict
+
+        def pandas3_records(self, orient="dict", *args, **kwargs):
+            if orient == "records" and self.columns.empty:
+                return [{} for _ in range(len(self))]
+            return original(self, orient, *args, **kwargs)
+
+        monkeypatch.setattr(pd.DataFrame, "to_dict", pandas3_records)
+        gdf = gpd.GeoDataFrame({"geometry": [_SQUARE]}, crs="EPSG:4326")
+        fc = GeometryConverter().to_ee(gdf)
+        assert fc.features[0].properties is None, (
+            f"column-less frame must yield no properties under the pandas-3 "
+            f"record shape, got {fc.features[0].properties}"
+        )
+
     def test_a_multipolygon_row_explodes(self, fake_ee):
         """A MultiPolygon row is exploded to one feature per polygon part."""
         gdf = gpd.GeoDataFrame(

@@ -187,10 +187,15 @@ class GeometryConverter:
         records_df = pd.DataFrame(gdf.drop("geometry", axis=1))
         if self._config.columns:
             records_df = records_df[list(self._config.columns)]
-        records = records_df.to_dict("records")
-        if not records:
+        # A geometry-only frame has no non-geometry columns, so each row
+        # serialises to an empty dict. pandas 2 collapses that to `[]`, pandas 3
+        # keeps it as `[{}, ...]`; key the "no properties" decision on the column
+        # set so a geometry-only frame yields features without properties, never
+        # `{}` (#1339).
+        if records_df.columns.empty:
             features = [ee.Feature(geometry) for geometry in ee_geometries]
         else:
+            records = records_df.to_dict("records")
             features = [
                 ee.Feature(geometry, record)
                 for geometry, record in zip(ee_geometries, records, strict=True)
