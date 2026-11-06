@@ -55,30 +55,18 @@ jobs:
     - name: Build docs with --strict
       run: mkdocs build --strict --site-dir /tmp/site
 
-  deploy-pr:
+    # A pull request builds the site but no longer publishes it (#1372): each PR
+    # deploy was a full site commit on the shared `gh-pages` branch, and those
+    # accounted for 85% of its 1,645 commits and ~5 GB of the repository. The
+    # --strict build above is the gate, and reviewers who want to look at the
+    # rendered pages download them from here instead of a published preview.
+    - name: Upload the built site for review
       if: github.event_name == 'pull_request'
-      needs: build-strict
-      runs-on: ubuntu-latest
-      # Serialise only the frequent PR deploys on the shared `gh-pages` branch; a
-      # newer PR deploy evicts the pending one (GitHub keeps one running + one
-      # pending per group). build-strict and the main/release deploys stay
-      # unthrottled so the gate always runs and every main/release deploy
-      # completes.
-      concurrency:
-        group: mkdocs-gh-pages-deploy
-        cancel-in-progress: false
-      steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-
-      - uses: serapeum-org/github-actions/actions/mkdocs-deploy@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # mkdocs/v1.3.1
-        with:
-          trigger: 'pull_request'
-          package-manager: 'uv'
-          package-manager-version: "0.11.29"
-          install-groups: "groups: docs"
-          deploy-token: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: site-pr-${{ github.event.pull_request.number }}
+        path: /tmp/site
+        retention-days: 7
 
   # deploy-main / deploy-release run un-serialised on purpose: mkdocs-deploy retries
   # the shared gh-pages push (mike_push.sh), so each completes. Never add workflow-
