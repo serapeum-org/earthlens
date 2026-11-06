@@ -55,30 +55,18 @@ jobs:
     - name: Build docs with --strict
       run: mkdocs build --strict --site-dir /tmp/site
 
-  deploy-pr:
+    # A pull request builds the site but no longer publishes it (#1372): each PR
+    # deploy was a full site commit on the shared `gh-pages` branch, and those
+    # accounted for 85% of its 1,645 commits and ~5 GB of the repository. The
+    # --strict build above is the gate, and reviewers who want to look at the
+    # rendered pages download them from here instead of a published preview.
+    - name: Upload the built site for review
       if: github.event_name == 'pull_request'
-      needs: build-strict
-      runs-on: ubuntu-latest
-      # Serialise only the frequent PR deploys on the shared `gh-pages` branch; a
-      # newer PR deploy evicts the pending one (GitHub keeps one running + one
-      # pending per group). build-strict and the main/release deploys stay
-      # unthrottled so the gate always runs and every main/release deploy
-      # completes.
-      concurrency:
-        group: mkdocs-gh-pages-deploy
-        cancel-in-progress: false
-      steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-
-      - uses: serapeum-org/github-actions/actions/mkdocs-deploy@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # mkdocs/v1.3.1
-        with:
-          trigger: 'pull_request'
-          package-manager: 'uv'
-          package-manager-version: "0.11.29"
-          install-groups: "groups: docs"
-          deploy-token: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: site-pr-${{ github.event.pull_request.number }}
+        path: /tmp/site
+        retention-days: 7
 
   # deploy-main / deploy-release run un-serialised on purpose: mkdocs-deploy retries
   # the shared gh-pages push (mike_push.sh), so each completes. Never add workflow-
@@ -131,3 +119,43 @@ jobs:
         deploy-token: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
         release-tag: ${{ github.event.release.tag_name || steps.version.outputs.tag }}
         mike-alias: 'latest'
+
+    # Enforce the retention policy (#1372): keep `main` plus the release just
+    # deployed, which carries the `latest` alias, and delete every other version
+    # directory. This is not housekeeping - a published GitHub Pages site may be
+    # no larger than 1 GB, each version directory is roughly 450 MB, and
+    # retaining every release took the site to 9.7 GB, at which point Pages
+    # stopped building at all and the 0.31.0 documentation was never published.
+    # Without this step the site goes back over the limit within two releases.
+    #
+    # Auth comes from the checkout above, the same way the deploy's own pushes
+    # work. mike is on PATH because mkdocs-deploy's internal python-setup/uv puts
+    # the virtualenv on GITHUB_PATH for subsequent steps in this job.
+    - name: Prune superseded documentation versions
+      env:
+        KEEP_VERSION: ${{ github.event.release.tag_name || steps.version.outputs.tag }}
+      run: |
+        if [ -z "$KEEP_VERSION" ]; then
+          echo "::error::no release version resolved; refusing to prune"
+          exit 1
+        fi
+        # Re-sync, recompute and retry as a unit: a concurrent main deploy moves
+        # gh-pages, which makes mike's fast-forward push lose the race, and the
+        # stale list computed against the old tip must not be reused.
+        for attempt in 1 2 3; do
+          git fetch origin gh-pages
+          git branch -f gh-pages FETCH_HEAD
+          stale=$(mike list | awk '{print $1}' | grep -vxF -e main -e "$KEEP_VERSION" | tr '\n' ' ')
+          if [ -z "$stale" ]; then
+            echo "nothing to prune; keeping main and $KEEP_VERSION"
+            exit 0
+          fi
+          echo "keeping main and $KEEP_VERSION; deleting: $stale"
+          if mike delete --push $stale; then
+            exit 0
+          fi
+          echo "::warning::prune lost a gh-pages push race (attempt ${attempt}/3); retrying"
+          sleep $(( attempt * 3 ))
+        done
+        echo "::error::could not prune superseded documentation versions after 3 attempts"
+        exit 1
