@@ -691,10 +691,16 @@ def _discover_release(
     # Bound before the loop: a budget of zero must still reach the raise below
     # with the documented `ValueError`, not an `UnboundLocalError`.
     chosen: tuple[str, tuple[int, int]] | None = None
-    offered: tuple[int, int] | None = None
+    # The newest release any read offered, sub-floor or not, kept across the
+    # whole budget so the terminal error reflects what was actually seen: a
+    # stale release glimpsed on read 1 must not be masked as a layout change by
+    # a linkless read 3.
+    best_offered: tuple[int, int] | None = None
     for attempt in range(INFORM_RELEASE_ATTEMPTS):
         best = _best_release_candidate(client.get(page).text)
         offered = best[1] if best is not None else None
+        if offered is not None and (best_offered is None or offered > best_offered):
+            best_offered = offered
         if best is not None and _meets_floor(offered, floor):
             chosen = best
             if attempt:
@@ -710,7 +716,7 @@ def _discover_release(
                 f"(read {attempt + 1} of {INFORM_RELEASE_ATTEMPTS}); re-reading."
             )
             _sleep(INFORM_RELEASE_BACKOFF_SECONDS * (attempt + 1))
-    if chosen is None and offered is None:
+    if chosen is None and best_offered is None:
         raise ValueError(
             f"No INFORM Risk release workbook link found on {page} after "
             f"{INFORM_RELEASE_ATTEMPTS} attempts; the page layout may have "
@@ -719,10 +725,10 @@ def _discover_release(
     if chosen is None:
         raise ValueError(
             f"INFORM results page {page} offered only release "
-            f"{_release_text(offered)} after {INFORM_RELEASE_ATTEMPTS} attempts, "
-            f"older than the {_release_text(floor)} workbook already downloaded; "
-            "refusing to serve a stale release. Delete that cached workbook if "
-            "the newer release was withdrawn upstream."
+            f"{_release_text(best_offered)} after {INFORM_RELEASE_ATTEMPTS} "
+            f"attempts, older than the {_release_text(floor)} workbook already "
+            "downloaded; refusing to serve a stale release. Delete that cached "
+            "workbook if the newer release was withdrawn upstream."
         )
     href, identity = chosen
     url = urljoin(page, href)

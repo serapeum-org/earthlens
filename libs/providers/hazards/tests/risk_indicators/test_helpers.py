@@ -864,6 +864,20 @@ class TestInformReleaseFloor:
             "a refused pick must not be memoised"
         )
 
+    def test_a_stale_release_seen_on_any_read_is_reported_as_stale(self, monkeypatch):
+        """A sub-floor read earlier in the budget is reported, not masked by a later linkless one."""
+        serve = _serve_in_order(
+            [
+                f'<a href="{RELEASE}/{ANNUAL}">annual</a>',
+                "<p>no downloads</p>",
+                "<p>no downloads</p>",
+            ]
+        )
+        monkeypatch.setattr(_helpers.HttpClient, "get", serve)
+        _record_sleeps(monkeypatch)
+        with pytest.raises(ValueError, match="refusing to serve a stale release"):
+            _helpers.inform_release_url(floor=(2026, 73))
+
     def test_the_floor_itself_is_acceptable(self, monkeypatch):
         """Re-serving the release already cached is not a regression."""
         monkeypatch.setattr(
