@@ -634,7 +634,11 @@ class CHIRPS(AbstractDataSource):
         Returns:
             str: The concrete reducer name for `reduce_time_axis`.
         """
-        return ("sum" if var.is_flux else "mean") if op == "auto" else op
+        if op == "auto":
+            result = "sum" if var.is_flux else "mean"
+        else:
+            result = op
+        return result
 
     def _aggregate_pair(
         self,
