@@ -443,8 +443,10 @@ def _resolve_server_side_ops(
         for any dataset whose op is an identity.
 
     Raises:
-        ValueError: If both flags are set (the recipe already scales), or
-            if `preprocess=True` meets a dataset with no curated recipe.
+        ValueError: If both flags are set (the recipe already scales); if
+            `preprocess=True` meets a dataset with no curated recipe; or if a
+            requested band is an `expression` index, which already scales its
+            own source bands (scaling them again here would double them).
     """
     resolved: dict[str, ImageMask] = {}
     if scaled and preprocess:
