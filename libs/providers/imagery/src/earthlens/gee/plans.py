@@ -33,7 +33,7 @@ from pydantic import ConfigDict, Field, model_validator
 
 from earthlens.base.leaves import SummarisedLeaf
 
-__all__ = ["EnginePlan", "EedaiPlan"]
+__all__ = ["EnginePlan", "EedaiPlan", "RequestPreview"]
 
 
 class EnginePlan(SummarisedLeaf):
@@ -184,3 +184,49 @@ class EnginePlan(SummarisedLeaf):
 #: it keep working; new code should use `EnginePlan`, which says which engine the
 #: verdict came from.
 EedaiPlan = EnginePlan
+
+
+class RequestPreview(SummarisedLeaf):
+    """A cheap, frozen pre-flight summary of what a GEE read would cost.
+
+    Returned by `GEE.preview()`: which engine would serve the read, how many
+    scenes and output pixels it involves (the EEDAI reader's estimate, when the
+    reader is the engine), how many tiles it is streamed in, and whether it is
+    served in a single pass or falls back to Earth Engine with a reason. The
+    budget thresholds behind `fits` stay private — this reports *whether* a
+    request fits and *why not*, never the thresholds themselves, since they are
+    current behaviour, not a contract.
+
+    Attributes:
+        engine: The engine that would serve the read (`"ee"`, `"eedai"`, ...).
+        fits: Whether the preferred engine serves it without falling back —
+            `True` for an Earth-Engine-served read (composited server-side).
+        tiles: How many tiles the read is streamed in (`1` for a single pass);
+            meaningful for the EEDAI reader, `1` otherwise.
+        scene_count: Scenes in the window (the EEDAI estimate), or `None` when
+            the reader is not the engine and no per-scene estimate is made.
+        max_width: Output width in pixels (EEDAI estimate), or `None`.
+        max_height: Output height in pixels (EEDAI estimate), or `None`.
+        total_size_bytes: Estimated materialised size (EEDAI estimate), or `None`.
+        reason: Why the preferred engine declined / fell back, or `None`.
+
+    Examples:
+        - A server-side Earth Engine read fits in one pass and has no estimate:
+            ```python
+            >>> from earthlens.gee.plans import RequestPreview
+            >>> p = RequestPreview(engine="ee", fits=True)
+            >>> (p.engine, p.fits, p.tiles, p.scene_count)
+            ('ee', True, 1, None)
+
+            ```
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+    engine: str
+    fits: bool
+    tiles: int = 1
+    scene_count: int | None = None
+    max_width: int | None = None
+    max_height: int | None = None
+    total_size_bytes: int | None = None
+    reason: str | None = None

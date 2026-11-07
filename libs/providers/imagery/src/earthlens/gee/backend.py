@@ -119,7 +119,7 @@ from earthlens.gee.grid import (
 )
 from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
 from earthlens.gee.pixels import PixelsEngine
-from earthlens.gee.plans import EedaiPlan, EnginePlan
+from earthlens.gee.plans import EedaiPlan, EnginePlan, RequestPreview
 from earthlens.gee.reader import EedaiReader
 
 # Aliased: `preprocess` is also the name of the constructor flag this module
@@ -2031,6 +2031,78 @@ class GEE(LazyClientMixin, AbstractDataSource):
             bbox=self._eedai_latlon_aoi(),
             crs=_EEDAI_NATIVE_CRS,
             property_filter=self._property_filter_expression(),
+        )
+
+    def preview(self) -> RequestPreview:
+        """Summarise what this request would cost, before downloading anything.
+
+        A cheap pre-flight check: which engine would serve the read, how many
+        scenes and output pixels it involves, how many tiles it streams in, and
+        whether it is served in a single pass or falls back to Earth Engine with
+        a reason. When the EEDAI reader is the engine it reuses `estimate_cost`
+        (the same sizing the routing uses) and `_eedai_single_image_plan`; an
+        Earth-Engine-served read is composited server-side, so it fits in one
+        pass with no per-scene estimate. The budget thresholds stay private.
+
+        Returns:
+            A `RequestPreview`. For an EEDAI-served read it carries the scene
+            count, output dimensions, size and tile count; for an
+            Earth-Engine-served one, just the engine and `fits=True`.
+
+        Raises:
+            ValueError: If the request names more than one dataset (like
+                `estimate_cost`, a preview sizes a single asset).
+            ImportError: If an EEDAI-eligible read is previewed without
+                `pyramids-eo` (the `[eedai]` extra) installed.
+        """
+        assert isinstance(self.vars, dict)  # GEE always uses {asset_id: [band]}
+        if len(self.vars) != 1:
+            raise ValueError(
+                "preview() sizes a single dataset, but this request names "
+                f"{len(self.vars)}: {sorted(self.vars)}. Build one GEE per asset "
+                "to preview each."
+            )
+        asset_id = next(iter(self.vars))
+        var_info = self._catalog.get_dataset(asset_id)
+        band_count = max(len(self.vars[asset_id]), 1)
+        uses_reader = (
+            self.export_via == "url"
+            and self.engine in ("auto", "eedai")
+            and self._eedai_eligible(var_info)
+            and eedai_available()
+        )
+        if not uses_reader:
+            # Earth Engine composites server-side: there is no client-side tiling
+            # budget to miss, so it fits in one pass with no per-scene estimate.
+            engine = self.engine if self.engine != "auto" else "ee"
+            return RequestPreview(engine=engine, fits=True)
+        plan = self._eedai_single_image_plan(var_info, band_count)
+        cost = self.estimate_cost()
+        over_scene_budget = (
+            cost.scene_count is not None and cost.scene_count > _EEDAI_MAX_SCENES
+        )
+        fits = plan.can_serve and not over_scene_budget
+        if plan.reason:
+            reason: str | None = plan.reason
+        elif over_scene_budget:
+            reason = (
+                f"{cost.scene_count} scenes exceed the reader's single-pass budget, "
+                "so Earth Engine composites this server-side"
+            )
+        else:
+            reason = None
+        return RequestPreview(
+            # What would actually serve it: the reader when it fits, else the
+            # Earth Engine fallback (for engine='auto'); a forced engine='eedai'
+            # keeps its name with fits=False so the caller sees it would decline.
+            engine="eedai" if fits or self.engine == "eedai" else "ee",
+            fits=fits,
+            tiles=plan.tiles or 1,
+            scene_count=cost.scene_count,
+            max_width=cost.max_width,
+            max_height=cost.max_height,
+            total_size_bytes=cost.total_size_bytes,
+            reason=reason,
         )
 
     def analyze(

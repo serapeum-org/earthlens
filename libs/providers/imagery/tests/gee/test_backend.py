@@ -5214,3 +5214,73 @@ class TestUnknownBandOnTheFlagPath:
         gee = self._gee(make_gee, ["B4", "B8A"], scaled=True)
         with pytest.raises(ValueError, match="is not a band of"):
             gee._download_dataset("COPERNICUS/S2_SR_HARMONIZED", ["B4", "B8A"])
+
+
+class TestPreview:
+    """`GEE.preview()` — a cheap pre-flight size / engine / fits summary (#1218)."""
+
+    def test_an_earth_engine_request_fits_in_one_pass_with_no_estimate(self, make_gee):
+        """A server-side EE read has no client tiling budget, so it fits, estimate-free."""
+        from earthlens.gee.plans import RequestPreview
+
+        gee = make_gee(engine="ee", variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0)
+        preview = gee.preview()
+        assert isinstance(preview, RequestPreview)
+        assert (preview.engine, preview.fits, preview.tiles) == ("ee", True, 1)
+        assert preview.scene_count is None and preview.reason is None
+
+    def test_an_eedai_request_reports_the_estimate_and_fits(self, make_gee, monkeypatch):
+        """When the reader serves it, preview reuses estimate_cost + the plan."""
+        from types import SimpleNamespace
+
+        from earthlens.gee.plans import EnginePlan
+
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0)
+        monkeypatch.setattr(gee, "_eedai_eligible", lambda var_info: True)
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+        monkeypatch.setattr(
+            gee, "estimate_cost",
+            lambda: SimpleNamespace(scene_count=5, max_width=1000, max_height=800, total_size_bytes=4096),
+        )
+        monkeypatch.setattr(
+            gee, "_eedai_single_image_plan",
+            lambda var_info, band_count: EnginePlan.serves(tiles=1, tile_size=1024, engine="eedai"),
+        )
+        preview = gee.preview()
+        assert preview.engine == "eedai" and preview.fits is True
+        assert (preview.scene_count, preview.max_width, preview.max_height) == (5, 1000, 800)
+        assert preview.total_size_bytes == 4096 and preview.tiles == 1 and preview.reason is None
+
+    def test_over_the_scene_budget_falls_back_to_earth_engine(self, make_gee, monkeypatch):
+        """Too many scenes for the reader → fits False, engine 'ee', a reason given."""
+        from types import SimpleNamespace
+
+        from earthlens.gee.plans import EnginePlan
+
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0)
+        monkeypatch.setattr(gee, "_eedai_eligible", lambda var_info: True)
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+        monkeypatch.setattr(
+            gee, "estimate_cost",
+            lambda: SimpleNamespace(scene_count=9999, max_width=10, max_height=10, total_size_bytes=1),
+        )
+        monkeypatch.setattr(
+            gee, "_eedai_single_image_plan",
+            lambda var_info, band_count: EnginePlan.serves(tiles=1, tile_size=1024, engine="eedai"),
+        )
+        preview = gee.preview()
+        assert preview.fits is False and preview.engine == "ee"
+        assert preview.scene_count == 9999
+        assert "scenes" in (preview.reason or "")
+
+    def test_preview_sizes_a_single_dataset(self, make_gee):
+        """Like estimate_cost, preview refuses a multi-dataset request."""
+        gee = make_gee(
+            variables={
+                "COPERNICUS/S2_SR_HARMONIZED": ["B4"],
+                "LANDSAT/LC09/C02/T1_L2": ["SR_B4"],
+            },
+            scale=10.0,
+        )
+        with pytest.raises(ValueError, match="single dataset"):
+            gee.preview()

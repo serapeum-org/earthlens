@@ -51,6 +51,15 @@ _MACHINE_FED = frozenset(
         "TaskInfo.priority",
         "EnginePlan.tile_size",
         "EnginePlan.tiles",
+        # RequestPreview is a machine-built pre-flight summary (GEE.preview()
+        # fills it from estimate_cost / the engine plan), not a hand-typed
+        # constructor surface — the same category as EnginePlan above, so its
+        # numeric fields are deliberately left coercing (#1218).
+        "RequestPreview.tiles",
+        "RequestPreview.scene_count",
+        "RequestPreview.max_width",
+        "RequestPreview.max_height",
+        "RequestPreview.total_size_bytes",
     }
 )
 

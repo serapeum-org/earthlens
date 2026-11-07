@@ -176,6 +176,9 @@ anything a string names:
 * `EnginePlan` (back-compat alias `EedaiPlan`) — the frozen
   routing verdict an engine returns, carrying the reason when a route
   is declined.
+* `RequestPreview` — the frozen pre-flight summary `GEE.preview()`
+  returns: which engine would serve the read, the scene / pixel / size
+  estimate, the tile count, and whether it fits in one pass.
 * `Sink`, with `SINKS` and `resolve_sink` — where
   the artifact goes: `UrlSink`, `DriveSink`,
   `GcsSink`, `AssetSink`, and `TableSink` (the
@@ -482,7 +485,7 @@ from earthlens.gee.joins import (
 )
 from earthlens.gee.ml import ClassifierCodec, TreeEnsemble
 from earthlens.gee.pixels import HIGH_VOLUME_ENDPOINT, PixelsEngine
-from earthlens.gee.plans import EedaiPlan, EnginePlan
+from earthlens.gee.plans import EedaiPlan, EnginePlan, RequestPreview
 from earthlens.gee.reader import EedaiReader
 from earthlens.gee.recipes import preprocess
 from earthlens.gee.reducers import (
@@ -645,6 +648,7 @@ __all__ = [
     "SimpleJoin",
     "EnginePlan",
     "EedaiPlan",
+    "RequestPreview",
     "OutputGrid",
     "ExportConfig",
     "EngineConfig",
