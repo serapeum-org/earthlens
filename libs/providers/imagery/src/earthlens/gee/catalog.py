@@ -288,6 +288,11 @@ class Cadence(SummarisedLeaf):
     unit: Literal["minute", "hour", "day", "pentad", "dekad", "month", "year"]
 
 
+#: Identifier tokens in an expression formula (band symbols, function names).
+#: A leading digit cannot start one, so numeric literals are excluded.
+_FORMULA_IDENTIFIER = re.compile(r"[A-Za-z_]\w*")
+
+
 class BandExpression(SummarisedLeaf):
     """A guarded `ee.Image.expression` formula and its band bindings.
 
@@ -314,6 +319,38 @@ class BandExpression(SummarisedLeaf):
     model_config = ConfigDict(frozen=True, extra="forbid")
     formula: str
     bands: dict[str, str] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _formula_symbols_match_bindings(self) -> BandExpression:
+        """Require the formula's symbols to be exactly the band bindings.
+
+        An identifier immediately followed by `(` is treated as a function
+        call (e.g. a future `sqrt(NIR)`), not a band symbol, so it is not
+        required to be a binding.
+
+        Returns:
+            `self` unchanged once every symbol used in `formula` is a key of
+            `bands` and every key of `bands` is used in `formula`.
+
+        Raises:
+            ValueError: If the formula uses a symbol with no binding, or binds a
+                band the formula never uses (caught at catalog load, not at
+                Earth Engine runtime).
+        """
+        symbols = {
+            match.group()
+            for match in _FORMULA_IDENTIFIER.finditer(self.formula)
+            if self.formula[match.end() : match.end() + 1] != "("
+        }
+        unbound = sorted(symbols - set(self.bands))
+        unused = sorted(set(self.bands) - symbols)
+        if unbound or unused:
+            raise ValueError(
+                "the expression formula symbols must match its band bindings: "
+                f"unbound symbol(s) {unbound}, unused binding(s) {unused} "
+                f"(formula {self.formula!r}, bindings {sorted(self.bands)})"
+            )
+        return self
 
 
 class DerivedBand(SummarisedLeaf):

@@ -347,3 +347,24 @@ class TestExpressionIndexScalingGuard:
             "NDVI has no scale factor, so a scaled= request yields no scaler op "
             "and must not raise the expression-index guard"
         )
+
+
+class TestBandExpressionSymbolValidation:
+    """A BandExpression's formula symbols must match its band bindings (M2)."""
+
+    def test_an_unbound_formula_symbol_is_refused(self):
+        """A symbol used in the formula with no binding fails catalog load."""
+        with pytest.raises(ValidationError, match="unbound symbol"):
+            BandExpression(formula="NIR - SWIR", bands={"NIR": "B8"})
+
+    def test_an_unused_binding_is_refused(self):
+        """A bound band the formula never uses fails catalog load."""
+        with pytest.raises(ValidationError, match="unused binding"):
+            BandExpression(
+                formula="NIR - RED", bands={"NIR": "B8", "RED": "B4", "BLUE": "B2"}
+            )
+
+    def test_matching_symbols_and_bindings_load(self):
+        """When the symbols are exactly the bindings, it loads."""
+        expr = BandExpression(formula="NIR - RED", bands={"NIR": "B8", "RED": "B4"})
+        assert set(expr.bands) == {"NIR", "RED"}
