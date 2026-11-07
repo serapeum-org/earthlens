@@ -1708,6 +1708,25 @@ class TestBuildCollection:
             (_identity_mask,)
         ]
 
+    def test_derived_index_band_mapped_before_select(self, make_gee):
+        """A requested derived index band is `.map`-materialised before the select."""
+        gee = make_gee(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["NDVI"]}, scale=10.0
+        )
+        ds = gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED")
+        col = gee._build_collection(
+            ds, ["NDVI"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 2)
+        )
+        assert col.method_names() == ["filterDate", "filterBounds", "map", "select"], (
+            "the derived-band materialiser must be mapped before the band select"
+        )
+        from earthlens.gee.backend import _AddDerivedBands
+
+        mapped = [args for name, args in col.calls if name == "map"]
+        assert len(mapped) == 1 and isinstance(mapped[0][0], _AddDerivedBands), (
+            "the mapped op must be the _AddDerivedBands materialiser"
+        )
+
     def test_filters_then_cloud_mask_then_select(self, make_gee, monkeypatch):
         """On a collection the order is filters → cloud_mask → select, with no warning."""
         warnings: list[str] = []
@@ -5272,6 +5291,48 @@ class TestPreview:
         assert preview.fits is False and preview.engine == "ee"
         assert preview.scene_count == 9999
         assert "scenes" in (preview.reason or "")
+
+    def test_a_declined_reader_plan_falls_back_with_its_reason(self, make_gee, monkeypatch):
+        """A declined plan (not a scene-budget miss) reports engine 'ee' and its reason."""
+        from types import SimpleNamespace
+
+        from earthlens.gee.plans import EnginePlan
+
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0)
+        monkeypatch.setattr(gee, "_eedai_eligible", lambda var_info: True)
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+        monkeypatch.setattr(
+            gee, "estimate_cost",
+            lambda: SimpleNamespace(scene_count=3, max_width=10, max_height=10, total_size_bytes=1),
+        )
+        monkeypatch.setattr(
+            gee, "_eedai_single_image_plan",
+            lambda var_info, band_count: EnginePlan.declined("the band count is unsupported"),
+        )
+        preview = gee.preview()
+        assert preview.fits is False and preview.engine == "ee"
+        assert preview.reason == "the band count is unsupported"
+
+    def test_a_forced_eedai_request_keeps_its_name_when_it_would_decline(self, make_gee, monkeypatch):
+        """engine='eedai' keeps the name with fits False so the caller sees the decline."""
+        from types import SimpleNamespace
+
+        from earthlens.gee.plans import EnginePlan
+
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0, engine="eedai")
+        monkeypatch.setattr(gee, "_eedai_eligible", lambda var_info: True)
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+        monkeypatch.setattr(
+            gee, "estimate_cost",
+            lambda: SimpleNamespace(scene_count=3, max_width=10, max_height=10, total_size_bytes=1),
+        )
+        monkeypatch.setattr(
+            gee, "_eedai_single_image_plan",
+            lambda var_info, band_count: EnginePlan.declined("too many bands"),
+        )
+        preview = gee.preview()
+        assert preview.engine == "eedai" and preview.fits is False
+        assert preview.reason == "too many bands"
 
     def test_preview_sizes_a_single_dataset(self, make_gee):
         """Like estimate_cost, preview refuses a multi-dataset request."""

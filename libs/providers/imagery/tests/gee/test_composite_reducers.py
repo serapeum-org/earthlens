@@ -112,6 +112,13 @@ class TestReduceRenameComposites:
         with pytest.raises(ValueError, match="no client-side equivalent"):
             reducer.reduce_stack(object(), ["2020-01-01"])
 
+    def test_apply_ee_is_the_composite_call(self, fake_ee):
+        """`apply_ee` dispatches to `__call__` — the same reduce-and-rename."""
+        collection = _FakeCollection()
+        assert StdDev().apply_ee(collection) == ("reduced", ["B4", "B3"]), (
+            "apply_ee must be the reduce-and-rename the reducer call does"
+        )
+
 
 class TestQualityMosaic:
     """The greenest-pixel composite picks each pixel's best quality band."""
@@ -143,6 +150,14 @@ class TestQualityMosaic:
         """There is no client-side quality mosaic over a scene stack."""
         with pytest.raises(ValueError, match="no client-side equivalent"):
             QualityMosaic(quality_band="NDVI").reduce_stack(object(), ["2020-01-01"])
+
+    def test_apply_ee_is_the_quality_mosaic_call(self, fake_ee):
+        """`apply_ee` dispatches to `__call__` — the same `qualityMosaic`."""
+        collection = _FakeCollection()
+        assert QualityMosaic(quality_band="NDVI").apply_ee(collection) == (
+            "quality-mosaic",
+            "NDVI",
+        ), "apply_ee must be the qualityMosaic call the reducer does"
 
 
 class TestEedaiDecline:

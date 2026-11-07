@@ -141,6 +141,16 @@ class TestQaBitsMaskValidation:
         with pytest.raises(ValidationError, match="non-negative"):
             QaBitsMask(band="QA_PIXEL", bits=-1, keep=(1,))
 
+    def test_empty_bits_tuple_is_refused(self):
+        """An empty bits tuple names no position, so it is refused."""
+        with pytest.raises(ValidationError, match="at least one position"):
+            QaBitsMask(band="QA_PIXEL", bits=(), keep=(0,))
+
+    def test_negative_bit_inside_a_tuple_is_refused(self):
+        """A negative position inside the tuple is refused like the single-int case."""
+        with pytest.raises(ValidationError, match="non-negative"):
+            QaBitsMask(band="QA_PIXEL", bits=(-1,), keep=(0,))
+
     def test_a_bool_bit_is_refused(self):
         """`bits=True` is not the integer 1 (NoBool guard)."""
         with pytest.raises(ValidationError, match="got the boolean"):
