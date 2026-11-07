@@ -148,10 +148,9 @@ class TestAggregate:
         )
         dataset = chirps._catalog.datasets["chpclim-v2-monthly"]
         var = dataset.variables["precipitation"]
+        config = AggregationConfig(freq="1MS")
         with pytest.raises(ValueError, match="fixed multi-year archive files"):
-            chirps._aggregate_pair(
-                "chpclim-v2-monthly", dataset, var, [], AggregationConfig(freq="1MS")
-            )
+            chirps._aggregate_pair("chpclim-v2-monthly", dataset, var, [], config)
 
     def test_rejects_mismatched_grids(self, tmp_path):
         """Per-date rasters that differ in shape cannot be stacked."""
@@ -171,10 +170,9 @@ class TestAggregate:
                 geo_ref=GeoReference(geo=geo, epsg=4326),
             ).to_file(str(target))
             paths.append(target)
+        config = AggregationConfig(freq="1MS")
         with pytest.raises(ValueError, match="differ in shape"):
-            chirps._aggregate_pair(
-                "global-daily", dataset, var, paths, AggregationConfig(freq="1MS")
-            )
+            chirps._aggregate_pair("global-daily", dataset, var, paths, config)
 
     def test_empty_paths_yields_nothing_and_creates_no_dir(self, tmp_path):
         """No written per-date rasters means no window output and no aggregated dir."""
