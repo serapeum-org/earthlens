@@ -467,11 +467,13 @@ def _resolve_server_side_ops(
             and meta.derived_from is not None
             and meta.derived_from.expression is not None
         ]
-        if expression_indices:
+        if expression_indices and (scaled or preprocess):
             # An expression index (e.g. EVI) already scales its own source
             # bands to reflectance from the catalog scale/offset, so scaling
             # them again here would apply the factor twice — the same
             # double-scale the scaled=/preprocess= pair is refused for above.
+            # Only a flag that would re-scale triggers this: without one, the
+            # index is requestable like any other band.
             raise ValueError(
                 f"{expression_indices} on {asset} are expression indices that "
                 "already compute on reflectance (their source bands are scaled "

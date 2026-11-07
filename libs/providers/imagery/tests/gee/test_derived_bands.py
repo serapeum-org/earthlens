@@ -309,6 +309,30 @@ class TestExpressionIndexScalingGuard:
                 preprocess=False,
             )
 
+    def test_preprocess_with_an_expression_index_is_refused(self):
+        """preprocess= also scales, so it double-scales an expression index too."""
+        from earthlens.gee.backend import _resolve_server_side_ops
+
+        with pytest.raises(ValueError, match="scale those inputs twice"):
+            _resolve_server_side_ops(
+                {"COPERNICUS/S2_SR_HARMONIZED": ["EVI"]},
+                Catalog(),
+                scaled=False,
+                preprocess=True,
+            )
+
+    def test_an_expression_index_with_no_flag_is_not_refused(self):
+        """With neither flag, an expression index is requestable (C1 regression guard)."""
+        from earthlens.gee.backend import _resolve_server_side_ops
+
+        resolved = _resolve_server_side_ops(
+            {"COPERNICUS/S2_SR_HARMONIZED": ["EVI"]},
+            Catalog(),
+            scaled=False,
+            preprocess=False,
+        )
+        assert resolved == {}, "no flag set, so no op resolves and nothing is refused"
+
     def test_scaled_with_a_normalized_difference_index_is_allowed(self):
         """NDVI is scale-invariant, so scaled= stays allowed with it."""
         from earthlens.gee.backend import _resolve_server_side_ops

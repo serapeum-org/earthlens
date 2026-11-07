@@ -1708,6 +1708,20 @@ class TestBuildCollection:
             (_identity_mask,)
         ]
 
+    def test_an_expression_index_is_requestable_through_the_facade(self, make_gee):
+        """EVI (an expression index) constructs and builds with default flags (C1)."""
+        gee = make_gee(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["EVI"]}, scale=10.0
+        )
+        ds = gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED")
+        col = gee._build_collection(
+            ds, ["EVI"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 2)
+        )
+        assert "map" in col.method_names(), (
+            "an expression index must construct and be materialised, not refused "
+            "at construction when no scaled=/preprocess= flag is set"
+        )
+
     def test_derived_index_band_mapped_before_select(self, make_gee):
         """A requested derived index band is `.map`-materialised before the select."""
         gee = make_gee(
