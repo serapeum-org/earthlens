@@ -1327,6 +1327,7 @@ class QaBitsMask(ImageMask):
             .bitwiseAnd((1 << self.width) - 1)
         )
         values = self.keep if self.keep is not None else self.drop
+        assert values is not None  # noqa: S101 - model_validator guarantees one
         membership = field.eq(values[0])
         for value in values[1:]:
             membership = membership.Or(field.eq(value))
