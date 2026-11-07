@@ -140,13 +140,7 @@ class TestFtpPathMigration:
     def test_no_dataset_uses_the_retired_prefix_except_gefs_v12(
         self, bundled_catalog: Catalog
     ):
-        """Only CHIRPS-GEFS v12 rows may still carry the retired prefix.
-
-        Test scenario:
-            Scanning every bundled dataset's `ftp_bases`, any path still on
-            `pub/org/chc/` must belong to a `chirps-gefs-v12-*` key; any other
-            offender means a path was missed by the #1386 migration.
-        """
+        """Only CHIRPS-GEFS v12 rows may still carry the retired prefix."""
         offenders = sorted(
             key
             for key, ds in bundled_catalog.datasets.items()
@@ -159,13 +153,7 @@ class TestFtpPathMigration:
         )
 
     def test_migrated_paths_are_rooted_at_products(self, bundled_catalog: Catalog):
-        """Every migrated ftp_base starts at `products/` with no leading slash.
-
-        Test scenario:
-            For all non-GEFS-v12 datasets, each `ftp_bases` value must begin
-            with `products/` (the new FTP root) and must not be absolute, so a
-            stray leading slash or a half-rewritten prefix is caught.
-        """
+        """Every migrated ftp_base starts at `products/` with no leading slash."""
         bad = sorted(
             (key, path)
             for key, ds in bundled_catalog.datasets.items()
@@ -178,13 +166,7 @@ class TestFtpPathMigration:
     def test_gefs_v12_rows_are_the_only_retired_exception(
         self, bundled_catalog: Catalog
     ):
-        """Lock-in: exactly the nine CHIRPS-GEFS v12 rows keep the old paths.
-
-        Test scenario:
-            The only datasets left on the retired prefix are the nine
-            `chirps-gefs-v12-*` rows. When #1387 remaps them to v3 this set
-            becomes empty and this expectation should be updated to match.
-        """
+        """Exactly the nine CHIRPS-GEFS v12 rows keep the old paths (update when #1387 lands)."""
         retired = sorted(
             key
             for key, ds in bundled_catalog.datasets.items()
