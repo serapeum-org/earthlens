@@ -454,11 +454,30 @@ def _resolve_server_side_ops(
             "preprocess=True already includes the scaling — drop scaled=."
         )
     for asset, bands in variables.items():
+        dataset = catalog.get_dataset(asset)
+        expression_indices = [
+            band
+            for band in bands
+            if (derived := dataset.get_band(band).derived_from) is not None
+            and derived.expression is not None
+        ]
+        if expression_indices:
+            # An expression index (e.g. EVI) already scales its own source
+            # bands to reflectance from the catalog scale/offset, so scaling
+            # them again here would apply the factor twice — the same
+            # double-scale the scaled=/preprocess= pair is refused for above.
+            raise ValueError(
+                f"{expression_indices} on {asset} are expression indices that "
+                "already compute on reflectance (their source bands are scaled "
+                "by the catalog scale/offset), so scaled=/preprocess= would "
+                "scale those inputs twice — drop scaled= / preprocess= when "
+                "requesting an expression index."
+            )
         op: ImageMask | None = None
         if preprocess:
             op = recipe_for(asset, bands, catalog=catalog)
         elif scaled:
-            op = BandScaler.for_dataset(catalog.get_dataset(asset), bands)
+            op = BandScaler.for_dataset(dataset, bands)
         if op is not None and not _is_identity_op(op):
             resolved[asset] = op
     return resolved
@@ -717,18 +736,55 @@ def _declaring(reader: Any, nodata: float | int) -> Any:
     )
 
 
-def _materialise_derived_band(image: Any, name: str, derived: DerivedBand) -> Any:
+def _scaled_source(image: Any, var_info: Dataset, source: str) -> Any:
+    """Read `source` from `image` scaled to its physical units.
+
+    An `expression` index (e.g. EVI) is only meaningful on reflectance, not on
+    the raw digital numbers Earth Engine serves, so each source band is scaled
+    by its catalog `scale` / `offset` before it enters the formula. A band that
+    declares neither is already in native units and is read unchanged.
+
+    Args:
+        image: The `ee.Image` to read from.
+        var_info: The dataset whose catalog carries the source band's factors.
+        source: The source band id to read and scale.
+
+    Returns:
+        A single-band `ee.Image` of `source` in physical units
+        (`raw * scale + offset`).
+    """
+    band = var_info.get_band(source)
+    pixels = image.select(source)
+    if band.scale is not None:
+        pixels = pixels.multiply(band.scale)
+    if band.offset is not None:
+        pixels = pixels.add(band.offset)
+    return pixels
+
+
+def _materialise_derived_band(
+    image: Any, name: str, derived: DerivedBand, var_info: Dataset
+) -> Any:
     """Compute one derived (index) band on `image`, server-side.
+
+    `normalized_difference` and `ratio` are scale-invariant (the scale cancels
+    in a quotient), so they read the raw bands directly; an `expression` index
+    is not — its additive constants assume physical units — so each of its
+    source bands is scaled to reflectance by `_scaled_source` first, making the
+    index correct on the raw digital numbers Earth Engine serves by default.
 
     Args:
         image: The `ee.Image` to read the source bands from.
         name: The band id to give the computed result.
         derived: The closed-vocabulary formula (`DerivedBand`).
+        var_info: The dataset whose catalog carries the source bands' scale /
+            offset (used for an `expression` index).
 
     Returns:
         A single-band `ee.Image` named `name` holding the computed index:
         `normalizedDifference` for `normalized_difference`, a band `divide`
-        for `ratio`, or `ee.Image.expression` for `expression`.
+        for `ratio`, or `ee.Image.expression` (on scaled reflectance) for
+        `expression`.
     """
     if derived.normalized_difference is not None:
         first, second = derived.normalized_difference
@@ -739,7 +795,8 @@ def _materialise_derived_band(image: Any, name: str, derived: DerivedBand) -> An
     expression = derived.expression
     assert expression is not None  # noqa: S101 - model_validator guarantees one op
     bindings = {
-        symbol: image.select(source) for symbol, source in expression.bands.items()
+        symbol: _scaled_source(image, var_info, source)
+        for symbol, source in expression.bands.items()
     }
     return image.expression(expression.formula, bindings).rename(name)
 
@@ -752,15 +809,19 @@ class _AddDerivedBands:
     source image's properties, `system:time_start` included.
     """
 
-    def __init__(self, derived: tuple[tuple[str, DerivedBand], ...]):
+    def __init__(
+        self, derived: tuple[tuple[str, DerivedBand], ...], var_info: Dataset
+    ):
         self._derived = derived
+        self._var_info = var_info
 
     def __call__(self, image: Any) -> Any:
         """Add every derived band to `image`, overwriting any name clash."""
         out = image
         for name, formula in self._derived:
             out = out.addBands(
-                _materialise_derived_band(image, name, formula), overwrite=True
+                _materialise_derived_band(image, name, formula, self._var_info),
+                overwrite=True,
             )
         return out
 
@@ -2606,7 +2667,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # already run, so the index is computed on screened source pixels.
         derived = self._derived_bands_requested(var_info, bands)
         if derived:
-            collection = collection.map(_AddDerivedBands(derived))
+            collection = collection.map(_AddDerivedBands(derived, var_info))
         return collection.select(list(bands))
 
     def _derived_bands_requested(

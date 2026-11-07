@@ -36,6 +36,14 @@ class _Node:
     def select(self, band):
         return _Node("sel", band)
 
+    def multiply(self, factor):
+        self.factor = factor
+        return self
+
+    def add(self, offset):
+        self.offset = offset
+        return self
+
     def divide(self, other):
         return _Node("ratio", (self.args, other.args))
 
@@ -130,26 +138,29 @@ class TestMaterialise:
 
     def test_normalized_difference(self):
         """`normalized_difference` -> `image.normalizedDifference([a, b]).rename(name)`."""
+        s2 = Catalog().get_dataset("COPERNICUS/S2_SR_HARMONIZED")
         out = _materialise_derived_band(
-            _Node("img"), "NDVI", DerivedBand(normalized_difference=("B8", "B4"))
+            _Node("img"), "NDVI", DerivedBand(normalized_difference=("B8", "B4")), s2
         )
         assert (out.kind, out.args, out.name) == ("nd", ("B8", "B4"), "NDVI")
 
     def test_ratio(self):
         """`ratio` -> `image.select(a).divide(image.select(b)).rename(name)`."""
+        s2 = Catalog().get_dataset("COPERNICUS/S2_SR_HARMONIZED")
         out = _materialise_derived_band(
-            _Node("img"), "SR", DerivedBand(ratio=("B8", "B4"))
+            _Node("img"), "SR", DerivedBand(ratio=("B8", "B4")), s2
         )
         assert (out.kind, out.args, out.name) == ("ratio", ("B8", "B4"), "SR")
 
     def test_expression(self):
         """`expression` -> `image.expression(formula, bindings).rename(name)`."""
+        s2 = Catalog().get_dataset("COPERNICUS/S2_SR_HARMONIZED")
         derived = DerivedBand(
             expression=BandExpression(
                 formula="NIR - RED", bands={"NIR": "B8", "RED": "B4"}
             )
         )
-        out = _materialise_derived_band(_Node("img"), "EVI", derived)
+        out = _materialise_derived_band(_Node("img"), "EVI", derived, s2)
         assert out.kind == "expr" and out.name == "EVI"
         formula, sources = out.args
         assert formula == "NIR - RED" and sources == {"NIR": "B8", "RED": "B4"}
@@ -160,11 +171,13 @@ class TestAddDerivedBands:
 
     def test_adds_each_requested_index(self):
         """Every (name, formula) pair is `addBands`-ed with overwrite=True."""
+        s2 = Catalog().get_dataset("COPERNICUS/S2_SR_HARMONIZED")
         op = _AddDerivedBands(
             (
                 ("NDVI", DerivedBand(normalized_difference=("B8", "B4"))),
                 ("NDWI", DerivedBand(normalized_difference=("B3", "B8"))),
-            )
+            ),
+            s2,
         )
         out = op(_Node("img"))
         added_names = [(name, overwrite) for name, _k, _a, overwrite in out.added]
@@ -210,3 +223,103 @@ class TestDerivedSourceValidation:
             },
         )
         assert set(row.bands) == {"B8", "B4", "NDVI"}
+
+
+def _ref_value(o):
+    """Unwrap an eager scalar to a float."""
+    return o.value if isinstance(o, _EagerScalar) else float(o)
+
+
+class _EagerScalar:
+    """A number-like that evaluates ee arithmetic eagerly, for a numeric check."""
+
+    def __init__(self, value):
+        self.value = float(value)
+
+    def multiply(self, factor):
+        return _EagerScalar(self.value * factor)
+
+    def add(self, offset):
+        return _EagerScalar(self.value + offset)
+
+    def rename(self, _name):
+        return self
+
+    def __mul__(self, other):
+        return _EagerScalar(self.value * _ref_value(other))
+
+    __rmul__ = __mul__
+
+    def __add__(self, other):
+        return _EagerScalar(self.value + _ref_value(other))
+
+    __radd__ = __add__
+
+    def __sub__(self, other):
+        return _EagerScalar(self.value - _ref_value(other))
+
+    def __rsub__(self, other):
+        return _EagerScalar(_ref_value(other) - self.value)
+
+    def __truediv__(self, other):
+        return _EagerScalar(self.value / _ref_value(other))
+
+
+class _EagerImage:
+    """An image whose `select` yields the raw DN of a band, arithmetic eager."""
+
+    def __init__(self, dn: dict[str, float]):
+        self._dn = dn
+
+    def select(self, band):
+        return _EagerScalar(self._dn[band])
+
+    def expression(self, formula, bindings):
+        return eval(formula, {"__builtins__": {}}, dict(bindings))  # noqa: S307
+
+
+class TestExpressionIndexScaling:
+    """An expression index is computed on reflectance, so it stays in range (M1)."""
+
+    def test_evi_is_computed_on_reflectance_not_raw_dn(self):
+        """EVI on raw S2 DN is scaled to reflectance, landing in [-1, 1], not ~1.67."""
+        s2 = Catalog().get_dataset("COPERNICUS/S2_SR_HARMONIZED")
+        evi = s2.get_band("EVI").derived_from
+        image = _EagerImage({"B8": 3000.0, "B4": 1000.0, "B2": 800.0})
+        out = _materialise_derived_band(image, "EVI", evi, s2)
+        assert -1.0 <= out.value <= 1.0, f"EVI left its declared range: {out.value}"
+        assert abs(out.value - 0.3846) < 1e-3, (
+            f"EVI must match the reflectance value 0.3846, got {out.value} "
+            "(the raw-DN result would be ~1.67, out of range)"
+        )
+
+
+class TestExpressionIndexScalingGuard:
+    """scaled= / preprocess= with an expression index would double-scale; refuse it."""
+
+    def test_scaled_with_an_expression_index_is_refused(self):
+        """Requesting EVI with scaled=True would scale its inputs twice."""
+        from earthlens.gee.backend import _resolve_server_side_ops
+
+        with pytest.raises(ValueError, match="scale those inputs twice"):
+            _resolve_server_side_ops(
+                {"COPERNICUS/S2_SR_HARMONIZED": ["EVI"]},
+                Catalog(),
+                scaled=True,
+                preprocess=False,
+            )
+
+    def test_scaled_with_a_normalized_difference_index_is_allowed(self):
+        """NDVI is scale-invariant, so scaled= stays allowed with it."""
+        from earthlens.gee.backend import _resolve_server_side_ops
+
+        resolved = _resolve_server_side_ops(
+            {"COPERNICUS/S2_SR_HARMONIZED": ["NDVI"]},
+            Catalog(),
+            scaled=True,
+            preprocess=False,
+        )
+        assert "COPERNICUS/S2_SR_HARMONIZED" not in resolved, (
+            "NDVI has no scale factor, so a scaled= request yields no scaler op "
+            "and must not raise the expression-index guard"
+        )
