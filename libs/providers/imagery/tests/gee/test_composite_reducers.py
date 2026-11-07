@@ -141,6 +141,11 @@ class TestQualityMosaic:
         with pytest.raises(ValueError, match="needs a quality band"):
             temporal_reducer_for("qualityMosaic:")
 
+    def test_bare_name_without_a_colon_gives_the_quality_band_hint(self):
+        """A bare `qualityMosaic` (no colon) gives the quality-band hint, not the generic error."""
+        with pytest.raises(ValueError, match="needs a quality band"):
+            temporal_reducer_for("qualityMosaic")
+
     def test_has_no_region_reducer_form(self):
         """A quality mosaic is a composite, not an `ee.Reducer` region form."""
         with pytest.raises(ValueError, match="not a region reducer"):

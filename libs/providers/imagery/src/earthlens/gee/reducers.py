@@ -1409,8 +1409,11 @@ def _temporal_reducer_from_str(spec: str) -> TemporalReducer:
         resolved = LinearTrend()
     elif spec == SensSlope.name:
         resolved = SensSlope()
-    elif spec.startswith(f"{QualityMosaic.name}:"):
-        band = spec.split(":", 1)[1]
+    elif spec == QualityMosaic.name or spec.startswith(f"{QualityMosaic.name}:"):
+        # The bare name (no colon) lands here too, so it gets the quality-band
+        # hint rather than falling through to the generic unsupported-reducer
+        # error from resolve_reducer.
+        band = spec.split(":", 1)[1] if ":" in spec else ""
         if not band:
             raise ValueError(
                 "qualityMosaic needs a quality band, e.g. 'qualityMosaic:NDVI'"
