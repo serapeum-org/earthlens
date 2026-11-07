@@ -455,11 +455,15 @@ def _resolve_server_side_ops(
         )
     for asset, bands in variables.items():
         dataset = catalog.get_dataset(asset)
+        # Skip bands this dataset does not declare: an unknown band is refused
+        # later, at download, and raising here would move that refusal ahead of
+        # the flag resolution this path deliberately runs first.
         expression_indices = [
             band
             for band in bands
-            if (derived := dataset.get_band(band).derived_from) is not None
-            and derived.expression is not None
+            if (meta := dataset.bands.get(band)) is not None
+            and meta.derived_from is not None
+            and meta.derived_from.expression is not None
         ]
         if expression_indices:
             # An expression index (e.g. EVI) already scales its own source
