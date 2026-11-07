@@ -1696,6 +1696,9 @@ class ToPower(ImageMask):
 
     Attributes:
         bands: The bands to convert; `None` (the default) converts every band.
+            For `COPERNICUS/S1_GRD`, name the backscatter bands explicitly
+            (e.g. `bands=("VV", "VH")`) so the `angle` band is left untouched —
+            the all-bands default would convert it to meaningless values.
 
     Examples:
         - Convert the VV/VH backscatter bands, leaving the rest:
@@ -1743,6 +1746,9 @@ class ToDb(ImageMask):
 
     Attributes:
         bands: The bands to convert; `None` (the default) converts every band.
+            For `COPERNICUS/S1_GRD`, name the backscatter bands explicitly
+            (e.g. `bands=("VV", "VH")`) so the `angle` band is left untouched —
+            the all-bands default would convert it to meaningless values.
 
     Examples:
         - Convert only the VV band back to dB:
@@ -1940,6 +1946,9 @@ def to_power(image: ee.Image, *, bands: Iterable[str] | None = None) -> ee.Image
     Args:
         image: An `ee.Image` whose `bands` are in decibels.
         bands: The bands to convert; `None` (the default) converts every band.
+            For `COPERNICUS/S1_GRD`, name the backscatter bands explicitly
+            (e.g. `bands=("VV", "VH")`) so the `angle` band is left untouched —
+            the all-bands default would convert it to meaningless values.
 
     Returns:
         The image with the selected bands in linear power, properties kept.
@@ -1965,6 +1974,9 @@ def to_db(image: ee.Image, *, bands: Iterable[str] | None = None) -> ee.Image:
     Args:
         image: An `ee.Image` whose `bands` are in linear power.
         bands: The bands to convert; `None` (the default) converts every band.
+            For `COPERNICUS/S1_GRD`, name the backscatter bands explicitly
+            (e.g. `bands=("VV", "VH")`) so the `angle` band is left untouched —
+            the all-bands default would convert it to meaningless values.
 
     Returns:
         The image with the selected bands in decibels, properties kept.
