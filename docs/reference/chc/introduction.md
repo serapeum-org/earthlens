@@ -140,7 +140,7 @@ bandwidth.
 - CHIRTS paper (Funk et al. 2019): <https://doi.org/10.1175/JCLI-D-18-0698.1>
 - WBGT (Spangler et al. 2024): <https://doi.org/10.1029/2023GH001003>
 - CenTrends v1 (Funk et al. 2015): <https://doi.org/10.7289/V5RX99FT>
-- CHC FTP root: <ftp://data.chc.ucsb.edu/pub/org/chc/>
+- CHC FTP root: <ftp://data.chc.ucsb.edu/products/>
 - CHC product browser (HTTPS mirror): <https://data.chc.ucsb.edu/products/>
 - earthlens CHC usage: [Usage](usage.md)
 - earthlens CHC catalog mechanics: [Catalog](catalog.md)
