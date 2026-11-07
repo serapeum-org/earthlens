@@ -2108,18 +2108,25 @@ class GEE(LazyClientMixin, AbstractDataSource):
         A cheap pre-flight check: which engine would serve the read, how many
         scenes and output pixels it involves, how many tiles it streams in, and
         whether it is served in a single pass or falls back to Earth Engine with
-        a reason. It mirrors the real routing decision in order — reader
-        eligibility, then the reducer gate — so the preview and the download
-        agree on the engine: a request whose reducer is Earth-Engine-only
-        (`stdDev` / `variance` / `count` / `qualityMosaic`), or that shapes the
-        image server-side, routes off the reader exactly as `download()` routes
-        it. When the reader does serve the read it reuses `estimate_cost` (the
-        same sizing the routing uses) and `_eedai_single_image_plan`; an
-        Earth-Engine-served read is composited server-side, so it fits in one
-        pass with no per-scene estimate. A forced `engine="eedai"` the reader
-        cannot serve previews `fits=False` with the decline reason, because that
-        download raises rather than falling back. The budget thresholds stay
-        private.
+        a reason. The **engine** mirrors the real routing decision in order —
+        reader eligibility, then the reducer gate — so a request whose reducer
+        is Earth-Engine-only (`stdDev` / `variance` / `count` / `qualityMosaic`),
+        or that shapes the image server-side, is reported as routing off the
+        reader exactly as `download()` routes it. A forced `engine="eedai"` the
+        reader cannot serve previews `fits=False` with the decline reason,
+        because that download raises rather than falling back.
+
+        The **size and `fits`** figures are a whole-window estimate: when the
+        reader is the engine, `preview()` sizes with `estimate_cost` (the whole
+        request window) and `_eedai_single_image_plan`, and applies the
+        single-pass scene cap to the aggregate scene count. This is exact for a
+        single image or a single-bucket read, but **approximate for a
+        multi-bucket collection composite**: the real router sizes each temporal
+        bucket separately and also applies a per-bucket stack-pixel budget this
+        summary does not, so for a many-bucket (or many-scene-per-bucket)
+        request the `fits` verdict can differ from what `download()` decides.
+        An Earth-Engine-served read is composited server-side, so it fits in one
+        pass with no per-scene estimate. The budget thresholds stay private.
 
         Returns:
             A `RequestPreview`. For an EEDAI-served read it carries the scene
@@ -2132,6 +2139,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
         Raises:
             ValueError: If the request names more than one dataset (like
                 `estimate_cost`, a preview sizes a single asset).
+            ImportError: Propagated from `estimate_cost` when the reader is the
+                engine but `pyramids-eo` (the `[eedai]` extra) is not installed.
+            AuthenticationError: Propagated from `estimate_cost` when the reader
+                is the engine but its credential cannot be built (or another
+                read is in flight under a different service account).
         """
         assert isinstance(self.vars, dict)  # GEE always uses {asset_id: [band]}
         if len(self.vars) != 1:
