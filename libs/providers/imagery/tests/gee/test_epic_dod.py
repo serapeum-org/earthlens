@@ -105,16 +105,21 @@ def _gee(make_gee, **overrides):
 class TestTheTwoReducerVocabularies:
     """One registry, two capabilities — because the two sets are not the same."""
 
-    def test_the_collection_set_is_the_band_preserving_seven(self):
-        """What `GEE(reducer=...)` accepts, unchanged by widening the registry."""
+    def test_the_collection_set_is_the_band_preserving_plus_dispersion(self):
+        """What `GEE(reducer=...)` accepts — the band-preserving names plus the
+        reduce-and-rename dispersion / count reducers added in #1214
+        (`percentile` / `qualityMosaic` are parameterised, reached by spec)."""
         assert sorted(collection_reducers()) == [
+            "count",
             "max",
             "mean",
             "median",
             "min",
             "mode",
             "mosaic",
+            "stdDev",
             "sum",
+            "variance",
         ]
 
     def test_the_sampling_set_is_what_ee_reducer_can_build(self):
@@ -138,11 +143,14 @@ class TestTheTwoReducerVocabularies:
         assert "mosaic" not in sampling_reducers()
 
     def test_the_region_reducers_are_the_other_difference(self):
-        """They are registry members so there is one vocabulary, not two lists."""
-        for name in ("first", "stdDev", "variance", "count"):
-            assert name in REDUCERS, name
+        """`first` is now the only region-only reducer; `stdDev` / `variance` /
+        `count` are dual — in both sets — since #1214 gave them a composite."""
+        assert "first" in REDUCERS
+        assert "first" in sampling_reducers()
+        assert "first" not in collection_reducers()
+        for name in ("stdDev", "variance", "count"):
             assert name in sampling_reducers(), name
-            assert name not in collection_reducers(), name
+            assert name in collection_reducers(), name
 
     def test_both_sets_are_derived_from_the_registry(self):
         """A reducer added to the registry cannot be forgotten by either set."""
@@ -205,24 +213,32 @@ class TestAsEeReducer:
 class TestTheRegionReducersStayOutOfTheCollectionPath:
     """`a collection-only call on a sampling-only reducer raises` — the DoD item."""
 
-    @pytest.mark.parametrize("cls", [First, StdDev, Variance, Count])
+    @pytest.mark.parametrize("cls", [First])
     def test_calling_one_on_a_collection_raises(self, cls):
-        """The backstop for reaching the object directly."""
+        """The backstop for reaching the object directly.
+
+        Only `first` is region-only now: `stdDev` / `variance` / `count` gained
+        a server-side composite form (#1214), so they no longer raise here.
+        """
         reducer = cls()
         collection = SimpleNamespace()
         with pytest.raises(ValueError, match="not images in a collection"):
             reducer(collection)
 
-    @pytest.mark.parametrize("name", ["first", "stdDev", "variance", "count"])
+    @pytest.mark.parametrize("name", ["first"])
     def test_the_constructor_refuses_one(self, make_gee, fake_reader, name):
-        """Refused where every other config error is: at construction."""
+        """Refused where every other config error is: at construction.
+
+        `stdDev` / `variance` / `count` now composite (#1214); `first` remains
+        the only region-only name the constructor rejects.
+        """
         with pytest.raises(ValueError, match="reduces pixels in a region"):
             _gee(make_gee, reducer=name)
 
     def test_the_refusal_names_the_alternatives(self, make_gee, fake_reader):
         """Including the percentile spelling, which is not a registry name."""
         with pytest.raises(ValueError, match="percentile:<q>"):
-            _gee(make_gee, reducer="stdDev")
+            _gee(make_gee, reducer="first")
 
     def test_a_collection_reducer_is_still_accepted(self, make_gee, fake_reader):
         """The check must not narrow what used to work."""
@@ -230,7 +246,7 @@ class TestTheRegionReducersStayOutOfTheCollectionPath:
 
     def test_a_reducer_object_is_checked_too(self, make_gee, fake_reader):
         """`reducer=` takes objects, so the capability check has to see them."""
-        reducer = StdDev()
+        reducer = First()
         with pytest.raises(ValueError, match="reduces pixels in a region"):
             _gee(make_gee, reducer=reducer)
 
@@ -483,9 +499,12 @@ class TestTheReducerAbcStaysOneThing:
             assert issubclass(cls, Reducer)
 
     def test_a_region_reducer_is_not_callable_as_a_composite(self):
-        """It is a `Reducer`, but calling it is the error, not the silence."""
-        reducer = StdDev()
-        collection = SimpleNamespace(stdDev=lambda: "reduced")
+        """It is a `Reducer`, but calling it is the error, not the silence.
+
+        `first` is the region-only reducer now (`stdDev` et al. composite).
+        """
+        reducer = First()
+        collection = SimpleNamespace(first=lambda: "reduced")
         with pytest.raises(ValueError):
             reducer(collection)
 

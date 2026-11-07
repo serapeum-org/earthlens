@@ -228,11 +228,16 @@ class TestReducerDispatch:
         with pytest.raises(ValueError, match="reducer"):
             reduce_collection(object(), "percentile")
 
-    def test_the_vocabulary_is_exactly_these_seven(self):
-        """Pins today's vocabulary so Task 1.2's widening is a deliberate diff."""
+    def test_the_vocabulary_is_the_seven_plus_the_dispersion_reducers(self):
+        """The band-preserving seven, widened by #1214 with the reduce-and-rename
+        dispersion / count reducers (`stdDev` / `variance` / `count`)."""
         from earthlens.gee._helpers import _COLLECTION_REDUCERS
 
-        assert set(_COLLECTION_REDUCERS) == set(REDUCERS)
+        assert set(_COLLECTION_REDUCERS) == set(REDUCERS) | {
+            "count",
+            "stdDev",
+            "variance",
+        }
 
 
 class TestCompositeReducerSelection:

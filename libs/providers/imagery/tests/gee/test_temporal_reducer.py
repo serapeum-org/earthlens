@@ -556,9 +556,9 @@ class TestPercentileRange:
         assert resolve_reducer("percentile:0").q == 0.0
 
     def test_rejects_region_only_name(self):
-        """A region-only name has no time-axis form."""
+        """A region-only name (`first`) has no time-axis form."""
         with pytest.raises(ValueError, match="region"):
-            temporal_reducer_for("stdDev")
+            temporal_reducer_for("first")
 
     def test_rejects_region_only_instance(self):
         """A region-only instance is refused with the same reason."""
@@ -579,8 +579,8 @@ class TestPercentileRange:
             temporal_reducer_for(5)
 
     def test_region_reducer_is_a_reducer_but_not_temporal(self):
-        """The refused instance really is a `Reducer`, just not a temporal one."""
-        from earthlens.gee.reducers import StdDev
+        """The refused instance (`First`) really is a `Reducer`, not a temporal one."""
+        from earthlens.gee.reducers import First
 
-        assert isinstance(StdDev(), Reducer)
-        assert not isinstance(StdDev(), TemporalReducer)
+        assert isinstance(First(), Reducer)
+        assert not isinstance(First(), TemporalReducer)

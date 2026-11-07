@@ -126,9 +126,13 @@ from earthlens.gee.reader import EedaiReader
 # resolves through it, so the two must not shadow each other.
 from earthlens.gee.recipes import preprocess as recipe_for
 from earthlens.gee.reducers import (
+    Count,
     LandsatComposite,
+    QualityMosaic,
     Reducer,
     Sentinel2Composite,
+    StdDev,
+    Variance,
     temporal_reducer_for,
 )
 from earthlens.gee.sinks import AssetSink, _BatchSink, resolve_sink
@@ -246,6 +250,22 @@ _EEDAI_UNSUPPORTED_REDUCER_REASONS: dict[str, str] = {
         f"reducer={Sentinel2Composite.name!r} runs Earth Engine's named "
         "algorithm ee.Algorithms.Sentinel2.CDI, which exists only "
         "server-side, so Earth Engine composites this instead"
+    ),
+    StdDev.name: (
+        f"reducer={StdDev.name!r} has no client-side reduce_time op, so Earth "
+        "Engine composites the per-pixel standard deviation instead"
+    ),
+    Variance.name: (
+        f"reducer={Variance.name!r} has no client-side reduce_time op, so Earth "
+        "Engine composites the per-pixel variance instead"
+    ),
+    Count.name: (
+        f"reducer={Count.name!r} has no client-side reduce_time op, so Earth "
+        "Engine composites the per-pixel observation count instead"
+    ),
+    QualityMosaic.name: (
+        f"reducer={QualityMosaic.name!r} picks each pixel's best-quality scene, "
+        "which has no client-side form, so Earth Engine composites this instead"
     ),
 }
 
