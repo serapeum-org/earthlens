@@ -148,13 +148,16 @@ class TestQualityMosaic:
 
     def test_has_no_region_reducer_form(self):
         """A quality mosaic is a composite, not an `ee.Reducer` region form."""
+        mosaic = QualityMosaic(quality_band="NDVI")
         with pytest.raises(ValueError, match="not a region reducer"):
-            QualityMosaic(quality_band="NDVI").as_ee_reducer()
+            mosaic.as_ee_reducer()
 
     def test_has_no_client_side_reduce_stack(self):
         """There is no client-side quality mosaic over a scene stack."""
+        mosaic = QualityMosaic(quality_band="NDVI")
+        marker = object()
         with pytest.raises(ValueError, match="no client-side equivalent"):
-            QualityMosaic(quality_band="NDVI").reduce_stack(object(), ["2020-01-01"])
+            mosaic.reduce_stack(marker, ["2020-01-01"])
 
     def test_apply_ee_is_the_quality_mosaic_call(self, fake_ee):
         """`apply_ee` dispatches to `__call__` — the same `qualityMosaic`."""

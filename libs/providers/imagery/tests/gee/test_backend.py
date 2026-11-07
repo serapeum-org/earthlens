@@ -1737,7 +1737,8 @@ class TestBuildCollection:
         from earthlens.gee.backend import _AddDerivedBands
 
         mapped = [args for name, args in col.calls if name == "map"]
-        assert len(mapped) == 1 and isinstance(mapped[0][0], _AddDerivedBands), (
+        assert len(mapped) == 1, "exactly one op must be mapped"
+        assert isinstance(mapped[0][0], _AddDerivedBands), (
             "the mapped op must be the _AddDerivedBands materialiser"
         )
 
@@ -5260,7 +5261,8 @@ class TestPreview:
         preview = gee.preview()
         assert isinstance(preview, RequestPreview)
         assert (preview.engine, preview.fits, preview.tiles) == ("ee", True, 1)
-        assert preview.scene_count is None and preview.reason is None
+        assert preview.scene_count is None
+        assert preview.reason is None
 
     def test_an_eedai_request_reports_the_estimate_and_fits(self, make_gee, monkeypatch):
         """When the reader serves it, preview reuses estimate_cost + the plan."""
@@ -5280,9 +5282,12 @@ class TestPreview:
             lambda var_info, band_count: EnginePlan.serves(tiles=1, tile_size=1024, engine="eedai"),
         )
         preview = gee.preview()
-        assert preview.engine == "eedai" and preview.fits is True
+        assert preview.engine == "eedai"
+        assert preview.fits is True
         assert (preview.scene_count, preview.max_width, preview.max_height) == (5, 1000, 800)
-        assert preview.total_size_bytes == 4096 and preview.tiles == 1 and preview.reason is None
+        assert preview.total_size_bytes == 4096
+        assert preview.tiles == 1
+        assert preview.reason is None
 
     def test_over_the_scene_budget_falls_back_to_earth_engine(self, make_gee, monkeypatch):
         """Too many scenes for the reader → fits False, engine 'ee', a reason given."""
@@ -5302,7 +5307,8 @@ class TestPreview:
             lambda var_info, band_count: EnginePlan.serves(tiles=1, tile_size=1024, engine="eedai"),
         )
         preview = gee.preview()
-        assert preview.fits is False and preview.engine == "ee"
+        assert preview.fits is False
+        assert preview.engine == "ee"
         assert preview.scene_count == 9999
         assert "scenes" in (preview.reason or "")
 
@@ -5324,7 +5330,8 @@ class TestPreview:
             lambda var_info, band_count: EnginePlan.declined("the band count is unsupported"),
         )
         preview = gee.preview()
-        assert preview.fits is False and preview.engine == "ee"
+        assert preview.fits is False
+        assert preview.engine == "ee"
         assert preview.reason == "the band count is unsupported"
 
     def test_a_forced_eedai_request_keeps_its_name_when_it_would_decline(self, make_gee, monkeypatch):
@@ -5345,7 +5352,8 @@ class TestPreview:
             lambda var_info, band_count: EnginePlan.declined("too many bands"),
         )
         preview = gee.preview()
-        assert preview.engine == "eedai" and preview.fits is False
+        assert preview.engine == "eedai"
+        assert preview.fits is False
         assert preview.reason == "too many bands"
 
     def test_an_unsupported_composite_reducer_routes_to_earth_engine(self, make_gee, monkeypatch):
@@ -5357,7 +5365,8 @@ class TestPreview:
             variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0, reducer="stdDev"
         )
         preview = gee.preview()
-        assert preview.engine == "ee" and preview.fits is True, (
+        assert preview.engine == "ee", "stdDev routes to Earth Engine"
+        assert preview.fits is True, (
             "stdDev routes to Earth Engine, so the preview must say engine='ee', fits=True"
         )
         assert preview.reason == _EEDAI_UNSUPPORTED_REDUCER_REASONS["stdDev"], (
@@ -5374,18 +5383,22 @@ class TestPreview:
             cloud_mask=lambda image: image,
         )
         preview = gee.preview()
-        assert preview.engine == "eedai" and preview.fits is False, (
+        assert preview.engine == "eedai", "a forced reader keeps its engine name"
+        assert preview.fits is False, (
             "a forced reader that cannot serve must preview fits=False, not a false fit"
         )
-        assert preview.reason and "server-side compute" in preview.reason
+        assert preview.reason
+        assert "server-side compute" in preview.reason
 
     def test_without_the_eedai_extra_auto_previews_earth_engine(self, make_gee, monkeypatch):
         """With pyramids-eo absent, auto falls back to Earth Engine, fits in one pass."""
         monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
         gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0)
         preview = gee.preview()
-        assert preview.engine == "ee" and preview.fits is True
-        assert preview.reason and "not installed" in preview.reason
+        assert preview.engine == "ee"
+        assert preview.fits is True
+        assert preview.reason
+        assert "not installed" in preview.reason
 
     def test_forced_eedai_without_the_extra_previews_a_decline(self, make_gee, monkeypatch):
         """A forced reader with the extra absent would error, so fits=False."""
@@ -5394,8 +5407,10 @@ class TestPreview:
             variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0, engine="eedai"
         )
         preview = gee.preview()
-        assert preview.engine == "eedai" and preview.fits is False
-        assert preview.reason and "not installed" in preview.reason
+        assert preview.engine == "eedai"
+        assert preview.fits is False
+        assert preview.reason
+        assert "not installed" in preview.reason
 
     def test_preview_sizes_a_single_dataset(self, make_gee):
         """Like estimate_cost, preview refuses a multi-dataset request."""

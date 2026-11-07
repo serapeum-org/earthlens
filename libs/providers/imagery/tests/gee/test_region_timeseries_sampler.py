@@ -180,5 +180,6 @@ def test_a_preexisting_region_id_column_is_refused():
     geometry = gpd.GeoDataFrame(
         {"geometry": [_SQUARE], "region_id": [99]}, crs="EPSG:4326"
     )
+    images = [_FakeImage(1)]
     with pytest.raises(ValueError, match="already has a 'region_id'"):
-        sampler.sample([_FakeImage(1)], geometry)
+        sampler.sample(images, geometry)

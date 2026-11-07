@@ -141,8 +141,10 @@ class TestRoundTripAndPlumbing:
     def test_free_functions_accept_a_band_subset(self):
         """The `to_power` / `to_db` functions forward a `bands=` subset."""
         out = to_power(_Img({"VV": [-10.0], "angle": [30.0]}), bands=["VV"])
-        assert out.bands["angle"] == [30.0] and out.bands["VV"] == pytest.approx([0.1])
+        assert out.bands["angle"] == [30.0]
+        assert out.bands["VV"] == pytest.approx([0.1])
 
     def test_are_image_masks(self):
         """Both are ImageMask ops, so they ride the cloud_mask= hook."""
-        assert isinstance(ToPower(), ImageMask) and isinstance(ToDb(), ImageMask)
+        assert isinstance(ToPower(), ImageMask)
+        assert isinstance(ToDb(), ImageMask)

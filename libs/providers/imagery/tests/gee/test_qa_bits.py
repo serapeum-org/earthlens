@@ -173,7 +173,8 @@ class TestQaBitsFunction:
     def test_accepts_any_iterable_for_keep(self):
         """`keep` / `bits` iterables are normalised to tuples."""
         mask = qa_bits("QA_PIXEL", bits=[8, 9], keep=[0, 1])
-        assert mask.bits == (8, 9) and mask.keep == (0, 1)
+        assert mask.bits == (8, 9)
+        assert mask.keep == (0, 1)
 
     def test_is_an_image_mask_and_composes(self):
         """The result is an `ImageMask`, so it chains with `>>`."""

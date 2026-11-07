@@ -161,9 +161,11 @@ class TestMaterialise:
             )
         )
         out = _materialise_derived_band(_Node("img"), "EVI", derived, s2)
-        assert out.kind == "expr" and out.name == "EVI"
+        assert out.kind == "expr"
+        assert out.name == "EVI"
         formula, sources = out.args
-        assert formula == "NIR - RED" and sources == {"NIR": "B8", "RED": "B4"}
+        assert formula == "NIR - RED"
+        assert sources == {"NIR": "B8", "RED": "B4"}
 
 
 class TestAddDerivedBands:
@@ -191,19 +193,16 @@ class TestDerivedSourceValidation:
         """A source band that is not a native band fails catalog load, not at runtime."""
         from earthlens.gee.catalog import Band, Dataset, Extent
 
+        extent = Extent(start_date="2020-01-01", end_date="2020-01-02")
+        bands = {
+            "B4": Band(id="B4"),
+            "NDVI": Band(
+                id="NDVI",
+                derived_from=DerivedBand(normalized_difference=("B8", "B4")),
+            ),
+        }
         with pytest.raises(ValidationError, match="not native bands"):
-            Dataset(
-                id="X/Y",
-                title="t",
-                extent=Extent(start_date="2020-01-01", end_date="2020-01-02"),
-                bands={
-                    "B4": Band(id="B4"),
-                    "NDVI": Band(
-                        id="NDVI",
-                        derived_from=DerivedBand(normalized_difference=("B8", "B4")),
-                    ),
-                },
-            )
+            Dataset(id="X/Y", title="t", extent=extent, bands=bands)
 
     def test_a_derived_band_whose_sources_are_native_loads(self):
         """When every source band exists, the dataset builds without complaint."""
@@ -301,10 +300,11 @@ class TestExpressionIndexScalingGuard:
         """Requesting EVI with scaled=True would scale its inputs twice."""
         from earthlens.gee.backend import _resolve_server_side_ops
 
+        catalog = Catalog()
         with pytest.raises(ValueError, match="scale those inputs twice"):
             _resolve_server_side_ops(
                 {"COPERNICUS/S2_SR_HARMONIZED": ["EVI"]},
-                Catalog(),
+                catalog,
                 scaled=True,
                 preprocess=False,
             )
@@ -313,10 +313,11 @@ class TestExpressionIndexScalingGuard:
         """preprocess= also scales, so it double-scales an expression index too."""
         from earthlens.gee.backend import _resolve_server_side_ops
 
+        catalog = Catalog()
         with pytest.raises(ValueError, match="scale those inputs twice"):
             _resolve_server_side_ops(
                 {"COPERNICUS/S2_SR_HARMONIZED": ["EVI"]},
-                Catalog(),
+                catalog,
                 scaled=False,
                 preprocess=True,
             )
