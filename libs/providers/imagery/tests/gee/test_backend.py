@@ -846,6 +846,23 @@ class TestInit:
         with pytest.raises(TypeError, match="must be a callable"):
             make_gee(image_op="not-callable")
 
+    def test_a_derived_band_request_is_declined_by_the_eedai_reader(self, make_gee):
+        """A computed index band needs server-side math, so it stays on EE (#1211)."""
+        from earthlens.gee.catalog import Catalog
+
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["NDVI"]}, scale=10.0)
+        var_info = Catalog().get_dataset("COPERNICUS/S2_SR_HARMONIZED")
+        assert gee._requests_derived_band(var_info) is True
+        assert gee._eedai_eligible(var_info) is False
+
+    def test_a_raw_band_request_is_not_flagged_derived(self, make_gee):
+        """A native band carries no derived formula, so the reader is not declined for it."""
+        from earthlens.gee.catalog import Catalog
+
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0)
+        var_info = Catalog().get_dataset("COPERNICUS/S2_SR_HARMONIZED")
+        assert gee._requests_derived_band(var_info) is False
+
     def test_non_callable_cloud_mask_rejected(self, make_gee):
         """A non-callable `cloud_mask` raises `TypeError` at construction."""
         with pytest.raises(TypeError, match="must be a callable"):

@@ -94,7 +94,7 @@ from earthlens.gee._helpers import (
     wait_for_task,
 )
 from earthlens.gee.auth import AuthenticationError, EarthEngineAuth, _redact
-from earthlens.gee.catalog import Catalog, Dataset
+from earthlens.gee.catalog import Catalog, Dataset, DerivedBand
 from earthlens.gee.cloud_masks import (
     BandScaler,
     ImageMask,
@@ -715,6 +715,54 @@ def _declaring(reader: Any, nodata: float | int) -> Any:
         geo_ref=GeoReference(geo=reader.geotransform, epsg=reader.epsg),
         no_data_value=nodata,
     )
+
+
+def _materialise_derived_band(image: Any, name: str, derived: DerivedBand) -> Any:
+    """Compute one derived (index) band on `image`, server-side.
+
+    Args:
+        image: The `ee.Image` to read the source bands from.
+        name: The band id to give the computed result.
+        derived: The closed-vocabulary formula (`DerivedBand`).
+
+    Returns:
+        A single-band `ee.Image` named `name` holding the computed index:
+        `normalizedDifference` for `normalized_difference`, a band `divide`
+        for `ratio`, or `ee.Image.expression` for `expression`.
+    """
+    if derived.normalized_difference is not None:
+        first, second = derived.normalized_difference
+        return image.normalizedDifference([first, second]).rename(name)
+    if derived.ratio is not None:
+        numerator, denominator = derived.ratio
+        return image.select(numerator).divide(image.select(denominator)).rename(name)
+    expression = derived.expression
+    assert expression is not None  # noqa: S101 - model_validator guarantees one op
+    bindings = {
+        symbol: image.select(source) for symbol, source in expression.bands.items()
+    }
+    return image.expression(expression.formula, bindings).rename(name)
+
+
+class _AddDerivedBands:
+    """A per-image op that adds each requested derived (index) band.
+
+    `.map`-applied to the collection before `select`, so a requested index band
+    (`NDVI`, ...) exists by the time the bands are selected. `addBands` keeps the
+    source image's properties, `system:time_start` included.
+    """
+
+    def __init__(self, derived: tuple[tuple[str, DerivedBand], ...]):
+        self._derived = derived
+
+    def __call__(self, image: Any) -> Any:
+        """Add every derived band to `image`, overwriting any name clash."""
+        out = image
+        for name, formula in self._derived:
+            out = out.addBands(
+                _materialise_derived_band(image, name, formula), overwrite=True
+            )
+        return out
 
 
 def _eedai_remedy(reason: str) -> str:
@@ -2445,7 +2493,32 @@ class GEE(LazyClientMixin, AbstractDataSource):
             collection = image_filter(collection)
         if per_image is not None:
             collection = collection.map(per_image)
+        # Materialise any requested index band from the dataset's own bands,
+        # server-side, before the select — the per-image op (cloud_mask) has
+        # already run, so the index is computed on screened source pixels.
+        derived = self._derived_bands_requested(var_info, bands)
+        if derived:
+            collection = collection.map(_AddDerivedBands(derived))
         return collection.select(list(bands))
+
+    def _derived_bands_requested(
+        self, var_info: Dataset, bands: Iterable[str]
+    ) -> tuple[tuple[str, DerivedBand], ...]:
+        """Return the `(name, formula)` of each requested band that is derived.
+
+        Args:
+            var_info: The dataset whose bands were requested.
+            bands: The requested band ids.
+
+        Returns:
+            One `(band_id, DerivedBand)` pair per requested band carrying a
+            `derived_from` formula, in request order; empty when none are.
+        """
+        return tuple(
+            (name, band.derived_from)
+            for name in bands
+            if (band := var_info.get_band(name)).derived_from is not None
+        )
 
     def _per_image_op(self, var_info: Dataset) -> CloudMask | None:
         """Return the op to `.map` for one dataset, flags composed onto the hook.
@@ -3189,6 +3262,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # question, so the reader's eligibility and the engines read one
             # definition instead of each repeating the two-term test.
             and not self._engine_config.needs_server_side_compute
+            # A derived (index) band is computed server-side from the dataset's
+            # own bands; the reader reads only raw pixels, so it cannot serve it.
+            and not self._requests_derived_band(var_info)
             and var_info.ee_type in ("image", "image_collection")
             and self._eedai_crs_supported()
             # The reader sizes its own metre grid from `scale` and takes no
@@ -3196,6 +3272,27 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # request to it would return pixels on a grid other than the one
             # the caller pinned, which is worse than not using the reader.
             and self._engine_config.crs_transform is None
+        )
+
+    def _requests_derived_band(self, var_info: Dataset) -> bool:
+        """Whether any requested band of `var_info` is a computed (derived) band.
+
+        A derived band — a spectral index declared with `derived_from` — is
+        materialised server-side from the dataset's own bands in
+        `_build_collection`, which the EEDAI reader cannot do (it reads raw
+        pixels from an asset), so such a request stays on Earth Engine.
+
+        Args:
+            var_info: The catalog entry being fetched.
+
+        Returns:
+            `True` if at least one requested band of this dataset is derived.
+        """
+        requested = (
+            self.vars.get(var_info.id) or [] if isinstance(self.vars, dict) else []
+        )
+        return any(
+            var_info.get_band(name).derived_from is not None for name in requested
         )
 
     def _eedai_crs_supported(self) -> bool:
