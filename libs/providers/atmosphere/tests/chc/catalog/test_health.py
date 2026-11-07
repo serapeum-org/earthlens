@@ -121,3 +121,79 @@ class TestHealthIndexConsistency:
         report = cat.health()
         assert report["index_missing_in_datasets"] == []
         assert report["datasets_missing_in_index"] == []
+
+
+class TestFtpPathMigration:
+    """The shipped catalog tracks CHC's reorganised FTP layout (#1386).
+
+    CHC retired the `pub/org/chc/products/...` tree in favour of a
+    `products/...` root. Every bundled dataset was migrated except the
+    CHIRPS-GEFS v12 forecast rows, whose v3 remap is a semantic change
+    (not a rename) tracked separately in #1387.
+    """
+
+    #: Key prefix of the rows deliberately left on the retired paths (#1387).
+    _GEFS_V12_PREFIX = "chirps-gefs-v12-"
+    #: The retired FTP root that no migrated path may use any more.
+    _RETIRED_PREFIX = "pub/org/chc/"
+
+    def test_no_dataset_uses_the_retired_prefix_except_gefs_v12(
+        self, bundled_catalog: Catalog
+    ):
+        """Only CHIRPS-GEFS v12 rows may still carry the retired prefix.
+
+        Test scenario:
+            Scanning every bundled dataset's `ftp_bases`, any path still on
+            `pub/org/chc/` must belong to a `chirps-gefs-v12-*` key; any other
+            offender means a path was missed by the #1386 migration.
+        """
+        offenders = sorted(
+            key
+            for key, ds in bundled_catalog.datasets.items()
+            if not key.startswith(self._GEFS_V12_PREFIX)
+            for path in ds.ftp_bases.values()
+            if path.startswith(self._RETIRED_PREFIX)
+        )
+        assert offenders == [], (
+            f"datasets still on the retired {self._RETIRED_PREFIX!r} prefix: {offenders}"
+        )
+
+    def test_migrated_paths_are_rooted_at_products(self, bundled_catalog: Catalog):
+        """Every migrated ftp_base starts at `products/` with no leading slash.
+
+        Test scenario:
+            For all non-GEFS-v12 datasets, each `ftp_bases` value must begin
+            with `products/` (the new FTP root) and must not be absolute, so a
+            stray leading slash or a half-rewritten prefix is caught.
+        """
+        bad = sorted(
+            (key, path)
+            for key, ds in bundled_catalog.datasets.items()
+            if not key.startswith(self._GEFS_V12_PREFIX)
+            for path in ds.ftp_bases.values()
+            if path.startswith("/") or not path.startswith("products/")
+        )
+        assert bad == [], f"migrated paths not cleanly rooted at 'products/': {bad}"
+
+    def test_gefs_v12_rows_are_the_only_retired_exception(
+        self, bundled_catalog: Catalog
+    ):
+        """Lock-in: exactly the nine CHIRPS-GEFS v12 rows keep the old paths.
+
+        Test scenario:
+            The only datasets left on the retired prefix are the nine
+            `chirps-gefs-v12-*` rows. When #1387 remaps them to v3 this set
+            becomes empty and this expectation should be updated to match.
+        """
+        retired = sorted(
+            key
+            for key, ds in bundled_catalog.datasets.items()
+            if any(p.startswith(self._RETIRED_PREFIX) for p in ds.ftp_bases.values())
+        )
+        assert all(k.startswith(self._GEFS_V12_PREFIX) for k in retired), (
+            f"unexpected retired-prefix rows outside CHIRPS-GEFS v12: {retired}"
+        )
+        assert len(retired) == 9, (
+            f"expected exactly 9 CHIRPS-GEFS v12 rows on the retired prefix, "
+            f"got {len(retired)}: {retired}"
+        )
