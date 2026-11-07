@@ -48,7 +48,7 @@ The CHC catalog covers 13 product families:
 | **CHIRPS v3** | 11 | `precipitation` | daily (rnl / sat / prelim) / pentadal / dekadal / monthly / 2-monthly / annual | 1981-present, ±50° |
 | **CHIRP / CHIRP v3** | 7 | `precipitation` | daily / pentadal / dekadal / monthly + v3 daily / dekadal / monthly | 1981-present, ±50° |
 | **CHIRTSdaily / CHIRTSmonthly** | 7 | `tmax`, `tmin`, `relative-humidity`, `heat-index`, `svp`, `vpd` | daily / monthly | 1983-present, ±60° land |
-| **CHIRPS-GEFS v12** | 9 | `precipitation` | daily / pentadal / dekadal / 16-day forecast | 2000-present, ±50° |
+| **CHIRPS-GEFS v12** † | 9 | `precipitation` | daily / pentadal / dekadal / 16-day forecast | 2000-present, ±50° |
 | **CHPclim v2** | 1 | `precipitation` | 12 static climatological months (no time axis) | 1981–2010 baseline |
 | **WBGT** | 2 | `wbgt` (Wet Bulb Globe Temperature) | monthly / dekadal | 1980-present, ±90° |
 | **SPI / CHIRPS3** | 9 | `spi` (standardised precipitation index) | pentadal at 1 / 2 / 5 / 6 / 9 / 12 / 15 / 18 / 21-month windows | 1981-present, ±50° |
@@ -58,7 +58,14 @@ The CHC catalog covers 13 product families:
 
 Browse the full list via `Catalog.list_datasets()` or
 `Catalog.available_datasets`. Every entry is reachable from
-`products/...` on the FTP.
+`products/...` on the FTP, except as noted below.
+
+† **CHIRPS-GEFS v12 is temporarily unavailable.** CHC retired the v12
+forecast tree and replaced it with a re-organised `CHIRPS-GEFS/v3/`
+layout whose forecast-lead directory scheme differs from v12. The 9
+rows still carry their v12 paths and a `.download()` on them currently
+fails with an FTP `550`; re-mapping them to v3 is tracked in
+[issue #1387](https://github.com/serapeum-org/earthlens/issues/1387).
 
 ## Data is shipped as files, not as a service
 
