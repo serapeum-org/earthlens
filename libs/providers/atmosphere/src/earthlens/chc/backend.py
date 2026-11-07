@@ -1263,9 +1263,9 @@ class CHIRPS(AbstractDataSource):
                 normalises to `"/<dir>"` before calling `ftp.cwd`. This
                 matters for the shared-session path (L5): the session
                 retains its working directory across calls, so a
-                relative `cwd("pub/...")` after a successful fetch into
-                `pub/.../2009/` would resolve to
-                `pub/.../2009/pub/...` and 550. Forcing absolute paths
+                relative `cwd("products/...")` after a successful fetch
+                into `products/.../2009/` would resolve to
+                `products/.../2009/products/...` and 550. Forcing absolute paths
                 makes every call independent of the previous one.
             remote_filename: File name within `remote_dir`.
             local_path: Local path to write the downloaded bytes to.
