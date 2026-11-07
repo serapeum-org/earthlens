@@ -3,6 +3,7 @@ from __future__ import annotations
 import glob
 import os
 import shutil
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -173,6 +174,30 @@ class TestAggregate:
             chirps._aggregate_pair(
                 "global-daily", dataset, var, paths, AggregationConfig(freq="1MS")
             )
+
+    def test_empty_paths_yields_nothing_and_creates_no_dir(self, tmp_path):
+        """No written per-date rasters means no window output and no aggregated dir."""
+        chirps = _build_daily_chirps(tmp_path)
+        dataset = chirps._catalog.datasets["global-daily"]
+        var = dataset.variables["precipitation"]
+        out_dir = tmp_path / "aggregated"
+        out = chirps._aggregate_pair(
+            "global-daily",
+            dataset,
+            var,
+            [],
+            AggregationConfig(freq="1MS", out_dir=out_dir),
+        )
+        assert out == []
+        assert not out_dir.exists()
+
+    def test_resolve_op_routes_by_variable_kind(self):
+        """auto sums flux and averages state; an explicit op passes through."""
+        flux = SimpleNamespace(is_flux=True)
+        state = SimpleNamespace(is_flux=False)
+        assert CHIRPS._resolve_aggregate_op("auto", flux) == "sum"
+        assert CHIRPS._resolve_aggregate_op("auto", state) == "mean"
+        assert CHIRPS._resolve_aggregate_op("min", flux) == "min"
 
 
 def test_chirps_catalog_property_aliases_private(tmp_path):
