@@ -115,8 +115,8 @@ datasets:
   <dataset_key>:                                  # one block per dataset
 
     ftp_bases:                                    # REQUIRED — format-keyed FTP dirs
-      tif: products/CHIRPS/v2.0/...    #   relative to the FTP root
-      cog: products/CHIRPS/v2.0/...    #   additional formats as available
+      tif: products/CHIRPS/v2.0/...               #   relative to the FTP root
+      cog: products/CHIRPS/v2.0/...               #   additional formats as available
       netcdf: ...
 
     file_patterns:                                # REQUIRED for per-date datasets
