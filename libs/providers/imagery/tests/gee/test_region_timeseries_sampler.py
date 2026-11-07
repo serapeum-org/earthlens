@@ -172,3 +172,13 @@ class TestRegionTimeSeriesSamplerToGdf:
         )
         assert out.loc[0, ("mean", 100)] == 1.0
         assert out.loc[0, ("mean", 200)] == 2.0
+
+
+def test_a_preexisting_region_id_column_is_refused():
+    """A caller-supplied region_id would be clobbered, so sample() refuses it."""
+    sampler = RegionTimeSeriesSampler(scale_m=10)
+    geometry = gpd.GeoDataFrame(
+        {"geometry": [_SQUARE], "region_id": [99]}, crs="EPSG:4326"
+    )
+    with pytest.raises(ValueError, match="already has a 'region_id'"):
+        sampler.sample([_FakeImage(1)], geometry)

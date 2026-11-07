@@ -166,7 +166,18 @@ class RegionTimeSeriesSampler(Sampler):
             One long `ee.FeatureCollection` of (regions x buckets), every feature
             carrying a `region_id` (its row position in `geometry`) and a
             `timestamp` property.
+
+        Raises:
+            ValueError: If `geometry` already has a `region_id` column, which
+                this sampler assigns from each row's position and would
+                otherwise silently overwrite.
         """
+        if "region_id" in geometry.columns:
+            raise ValueError(
+                "the input geometry already has a 'region_id' column; rename or "
+                "drop it — RegionTimeSeriesSampler assigns region_id from each "
+                "row's position to keep the series addressable after the merge"
+            )
         region_sampler = RegionSampler(scale_m=self.scale_m, stats=self.stats)
         indexed = geometry.assign(region_id=list(range(len(geometry))))
         merged = ee.FeatureCollection([])
