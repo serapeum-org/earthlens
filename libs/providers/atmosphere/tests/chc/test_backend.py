@@ -4,8 +4,11 @@ import glob
 import os
 import shutil
 
+import numpy as np
 import pytest
+from pyramids.dataset import Dataset, GeoReference
 
+from earthlens.aggregate import AggregationConfig
 from earthlens.chc import CHIRPS
 
 pytestmark = [pytest.mark.chc]
@@ -14,6 +17,13 @@ pytestmark = [pytest.mark.chc]
 def test_chirps_declares_raster_output_kind():
     """CHIRPS declares OUTPUT_KIND='raster' so the facade forwards aggregate=."""
     assert CHIRPS.OUTPUT_KIND == "raster"
+
+
+def test_chirps_supports_aggregate():
+    """CHIRPS now wires the raster reducer, so the gate accepts aggregate=."""
+    assert CHIRPS.SUPPORTS_AGGREGATE is True
+    # The class no longer overrides the base's (empty) refusal reason.
+    assert "AGGREGATE_REFUSAL_REASON" not in CHIRPS.__dict__
 
 
 def _raise_ftp_down(*_args, **_kwargs):
@@ -25,19 +35,144 @@ def _raise_ftp_down(*_args, **_kwargs):
     raise RuntimeError("ftp down")
 
 
-def test_chirps_download_rejects_aggregate(tmp_path):
-    """CHIRPS raises NotImplementedError for aggregate= instead of silently dropping it."""
-    chirps = CHIRPS(
-        start="2020-01-01",
-        end="2020-01-02",
+def _build_daily_chirps(tmp_path, start="2020-01-01", end="2020-01-03"):
+    """A daily CHIRPS backend over a short window and a small AOI."""
+    return CHIRPS(
+        start=start,
+        end=end,
         variables=["precipitation"],
         temporal_resolution="daily",
         lat_lim=[4.0, 5.0],
         lon_lim=[-75.0, -74.0],
         path=str(tmp_path),
     )
-    with pytest.raises(NotImplementedError, match="aggregate="):
-        chirps.download(aggregate=object())
+
+
+def _write_per_date_rasters(chirps, ds_key, values):
+    """Write one 2x2 GeoTIFF per overlapping date, each filled with `values[i]`.
+
+    Stands in for what the FTP path would leave on disk — canonical per-date
+    filenames and the -9999 nodata CHIRPS normalises to — so the aggregation
+    path can be exercised with no network.
+    """
+    dataset = chirps._catalog.datasets[ds_key]
+    var = dataset.variables["precipitation"]
+    dates = chirps._overlapping_dates(ds_key, dataset)
+    geo = (-75.0, 0.5, 0.0, 5.0, 0.0, -0.5)
+    paths = []
+    for value, date in zip(values, dates):
+        target = chirps.root_dir / chirps._output_filename(ds_key, dataset, var, date)
+        Dataset.from_array(
+            np.full((2, 2), float(value)),
+            no_data_value=-9999.0,
+            geo_ref=GeoReference(geo=geo, epsg=4326),
+        ).to_file(str(target))
+        paths.append(target)
+    return dataset, var, paths
+
+
+class TestAggregate:
+    """CHIRPS re-aggregates its per-date GeoTIFFs when aggregate= is passed."""
+
+    def test_sums_daily_flux_to_monthly(self, tmp_path):
+        """auto op on a flux variable sums the daily stack into one window."""
+        chirps = _build_daily_chirps(tmp_path)
+        dataset, var, paths = _write_per_date_rasters(
+            chirps, "global-daily", [1.0, 2.0, 3.0]
+        )
+        out = chirps._aggregate_pair(
+            "global-daily",
+            dataset,
+            var,
+            paths,
+            AggregationConfig(freq="1MS", op="auto"),
+        )
+        assert len(out) == 1
+        assert np.allclose(Dataset.read_file(str(out[0])).read_array(), 6.0)
+
+    def test_download_writes_window_rasters_to_aggregated_dir(
+        self, tmp_path, monkeypatch
+    ):
+        """download(aggregate=) lands the reduction under <root_dir>/aggregated/."""
+        chirps = _build_daily_chirps(tmp_path)
+        _, _, paths = _write_per_date_rasters(
+            chirps, "global-daily", [10.0, 20.0, 30.0]
+        )
+        monkeypatch.setattr(chirps, "_download_dataset", lambda *a, **k: paths)
+
+        out = chirps.download(
+            progress_bar=False, aggregate=AggregationConfig(freq="1MS", op="mean")
+        )
+
+        assert len(out) == 1
+        assert out[0].parent == chirps.root_dir / "aggregated"
+        assert out[0].name == "global-daily_precipitation_mean_1MS_20200101.tif"
+        assert np.allclose(Dataset.read_file(str(out[0])).read_array(), 20.0)
+
+    def test_explicit_op_overrides_auto(self, tmp_path):
+        """An explicit op is used verbatim, not the flux default."""
+        chirps = _build_daily_chirps(tmp_path)
+        dataset, var, paths = _write_per_date_rasters(
+            chirps, "global-daily", [1.0, 5.0, 3.0]
+        )
+        out = chirps._aggregate_pair(
+            "global-daily", dataset, var, paths, AggregationConfig(freq="1MS", op="max")
+        )
+        assert np.allclose(Dataset.read_file(str(out[0])).read_array(), 5.0)
+
+    def test_honours_explicit_out_dir(self, tmp_path):
+        """config.out_dir wins over the aggregated/ default."""
+        chirps = _build_daily_chirps(tmp_path)
+        dataset, var, paths = _write_per_date_rasters(
+            chirps, "global-daily", [2.0, 2.0, 2.0]
+        )
+        target_dir = tmp_path / "monthly"
+        out = chirps._aggregate_pair(
+            "global-daily",
+            dataset,
+            var,
+            paths,
+            AggregationConfig(freq="1MS", op="mean", out_dir=target_dir),
+        )
+        assert out[0].parent == target_dir
+
+    def test_rejects_discrete_dataset(self, tmp_path):
+        """A discrete multi-year archive dataset has no per-date stack to reduce."""
+        chirps = CHIRPS(
+            variables={"chpclim-v2-monthly": ["precipitation"]},
+            lat_lim=[4.0, 5.0],
+            lon_lim=[-75.0, -74.0],
+            path=str(tmp_path),
+        )
+        dataset = chirps._catalog.datasets["chpclim-v2-monthly"]
+        var = dataset.variables["precipitation"]
+        with pytest.raises(ValueError, match="fixed multi-year archive files"):
+            chirps._aggregate_pair(
+                "chpclim-v2-monthly", dataset, var, [], AggregationConfig(freq="1MS")
+            )
+
+    def test_rejects_mismatched_grids(self, tmp_path):
+        """Per-date rasters that differ in shape cannot be stacked."""
+        chirps = _build_daily_chirps(tmp_path, end="2020-01-02")
+        dataset = chirps._catalog.datasets["global-daily"]
+        var = dataset.variables["precipitation"]
+        dates = chirps._overlapping_dates("global-daily", dataset)
+        geo = (-75.0, 0.5, 0.0, 5.0, 0.0, -0.5)
+        paths = []
+        for shape, date in zip([(2, 2), (3, 3)], dates):
+            target = chirps.root_dir / chirps._output_filename(
+                "global-daily", dataset, var, date
+            )
+            Dataset.from_array(
+                np.ones(shape),
+                no_data_value=-9999.0,
+                geo_ref=GeoReference(geo=geo, epsg=4326),
+            ).to_file(str(target))
+            paths.append(target)
+        with pytest.raises(ValueError, match="differ in shape"):
+            chirps._aggregate_pair(
+                "global-daily", dataset, var, paths, AggregationConfig(freq="1MS")
+            )
 
 
 def test_chirps_catalog_property_aliases_private(tmp_path):
