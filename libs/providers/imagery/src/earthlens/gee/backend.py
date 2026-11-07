@@ -349,6 +349,39 @@ _CDI_FORBIDDEN_ASSETS: frozenset[str] = frozenset(
 )
 
 
+def _resolve_image_op(
+    image_op: PerImageOp | None, cloud_mask: CloudMask | None
+) -> CloudMask | None:
+    """Resolve the `image_op=` / `cloud_mask=` alias pair to one per-image hook.
+
+    `cloud_mask=` is the permanent backwards-compatible alias for the general
+    `image_op=` hook; they name the same `ee.Image -> ee.Image` callable.
+
+    Args:
+        image_op: The general per-image hook, or `None`.
+        cloud_mask: Its alias, or `None`.
+
+    Returns:
+        The single resolved callable, or `None` when neither was given.
+
+    Raises:
+        ValueError: If both `image_op=` and `cloud_mask=` are passed.
+        TypeError: If the resolved hook is not callable.
+    """
+    if image_op is not None and cloud_mask is not None:
+        raise ValueError(
+            "pass image_op= or its alias cloud_mask=, not both; they name "
+            "the same per-image ee.Image -> ee.Image hook"
+        )
+    resolved = image_op if image_op is not None else cloud_mask
+    if resolved is not None and not callable(resolved):
+        raise TypeError(
+            "image_op (a.k.a. cloud_mask) must be a callable "
+            f"ee.Image -> ee.Image (or None), got {type(resolved).__name__}"
+        )
+    return resolved
+
+
 def _flatten_image_ops(op: Any) -> tuple[Any, ...]:
     """Expand a `MaskChain` into its leaf ops, however deeply nested.
 
@@ -1459,18 +1492,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # masking is the common case and the name is in published docs — so
         # resolve the two into one, refusing both at once rather than silently
         # picking one.
-        if image_op is not None and cloud_mask is not None:
-            raise ValueError(
-                "pass image_op= or its alias cloud_mask=, not both; they name "
-                "the same per-image ee.Image -> ee.Image hook"
-            )
-        if image_op is not None:
-            cloud_mask = image_op
-        if cloud_mask is not None and not callable(cloud_mask):
-            raise TypeError(
-                "image_op (a.k.a. cloud_mask) must be a callable "
-                f"ee.Image -> ee.Image (or None), got {type(cloud_mask).__name__}"
-            )
+        cloud_mask = _resolve_image_op(image_op, cloud_mask)
         # The asset id and the ops are both in hand here, so the one
         # CDI/product mismatch that is detectable client-side is refused now
         # rather than returning a plausible-looking but wrong mask.
@@ -2155,72 +2177,106 @@ class GEE(LazyClientMixin, AbstractDataSource):
         asset_id = next(iter(self.vars))
         var_info = self._catalog.get_dataset(asset_id)
         band_count = max(len(self.vars[asset_id]), 1)
-        # Why the reader would not serve this read, in the order the router
-        # decides it — None means the reader would take it. Mirrors
-        # `_eedai_eligible` + the reducer gate the collection verdict applies
-        # (backend.py `_eedai_verdict`), so the preview routes as the download
-        # does rather than on eligibility alone.
         wants_reader = self.export_via == "url" and self.engine in ("auto", "eedai")
+        decline_reason = self._reader_decline_reason(var_info) if wants_reader else None
+        if wants_reader and decline_reason is None:
+            # The reader would serve it — size it the way the routing does.
+            result = self._reader_serves_preview(var_info, band_count)
+        elif self.engine == "eedai":
+            # A forced reader that cannot serve raises at download time; report
+            # the decline rather than a false fit.
+            result = RequestPreview(engine="eedai", fits=False, reason=decline_reason)
+        elif wants_reader:
+            # engine='auto' falls back to Earth Engine, which composites the read
+            # server-side — it still fits, in one pass, with the reason the reader
+            # declined.
+            result = RequestPreview(engine="ee", fits=True, reason=decline_reason)
+        else:
+            # engine='ee' / 'pixels' (or a non-url export): Earth Engine serves it.
+            engine = self.engine if self.engine != "auto" else "ee"
+            result = RequestPreview(engine=engine, fits=True)
+        return result
+
+    def _reader_decline_reason(self, var_info: Dataset) -> str | None:
+        """Why the EEDAI reader would not serve this read, or `None` if it would.
+
+        Mirrors the router's decision order — `_eedai_eligible` then the reducer
+        gate the collection verdict applies (`_eedai_verdict`) — so `preview()`
+        routes as `download()` does rather than on eligibility alone. Called
+        only when the engine could use the reader (`engine` in auto / eedai).
+
+        Args:
+            var_info: The catalog entry for the single requested dataset.
+
+        Returns:
+            The decline reason, or `None` when the reader would take the read.
+        """
         reducer_name = (
             temporal_reducer_for(self.reducer or var_info.default_reducer).name
             if var_info.ee_type == "image_collection"
             else None
         )
-        decline_reason: str | None = None
-        if not wants_reader:
-            decline_reason = None
-        elif not eedai_available():
-            decline_reason = "the pyramids-eo reader (the [eedai] extra) is not installed"
+        if not eedai_available():
+            reason: str | None = (
+                "the pyramids-eo reader (the [eedai] extra) is not installed"
+            )
         elif not self._eedai_eligible(var_info):
-            decline_reason = (
+            reason = (
                 "the request needs server-side compute the reader cannot run "
                 "(a reduced collection, cloud_mask / image_op, filters, a scaled= "
                 "flag, a derived index band, or a pinned crs_transform / CRS)"
             )
         elif reducer_name is not None and reducer_name in _EEDAI_UNSUPPORTED_REDUCERS:
-            decline_reason = _EEDAI_UNSUPPORTED_REDUCER_REASONS[reducer_name]
+            reason = _EEDAI_UNSUPPORTED_REDUCER_REASONS[reducer_name]
+        else:
+            reason = None
+        return reason
 
-        if wants_reader and decline_reason is None:
-            plan = self._eedai_single_image_plan(var_info, band_count)
-            cost = self.estimate_cost()
-            over_scene_budget = (
-                cost.scene_count is not None and cost.scene_count > _EEDAI_MAX_SCENES
+    def _reader_serves_preview(
+        self, var_info: Dataset, band_count: int
+    ) -> RequestPreview:
+        """Build the `RequestPreview` for a read the EEDAI reader would serve.
+
+        Sizes with `estimate_cost` (the whole request window) and
+        `_eedai_single_image_plan`, applying the single-pass scene cap to the
+        aggregate scene count (approximate for a multi-bucket collection — see
+        `preview`).
+
+        Args:
+            var_info: The catalog entry for the single requested dataset.
+            band_count: The number of requested bands (at least one).
+
+        Returns:
+            The `RequestPreview` with the reader's scene / pixel / size estimate
+            and the engine it resolves to (`eedai` when it fits, else the Earth
+            Engine fallback under `auto`; a forced `eedai` keeps its name with
+            `fits=False`).
+        """
+        plan = self._eedai_single_image_plan(var_info, band_count)
+        cost = self.estimate_cost()
+        over_scene_budget = (
+            cost.scene_count is not None and cost.scene_count > _EEDAI_MAX_SCENES
+        )
+        fits = plan.can_serve and not over_scene_budget
+        if plan.reason:
+            reason: str | None = plan.reason
+        elif over_scene_budget:
+            reason = (
+                f"{cost.scene_count} scenes exceed the reader's single-pass "
+                "budget, so Earth Engine composites this server-side"
             )
-            fits = plan.can_serve and not over_scene_budget
-            if plan.reason:
-                reason: str | None = plan.reason
-            elif over_scene_budget:
-                reason = (
-                    f"{cost.scene_count} scenes exceed the reader's single-pass "
-                    "budget, so Earth Engine composites this server-side"
-                )
-            else:
-                reason = None
-            return RequestPreview(
-                # The reader when it fits, else the Earth Engine fallback (for
-                # engine='auto'); a forced engine='eedai' keeps its name with
-                # fits=False so the caller sees it would decline.
-                engine="eedai" if fits or self.engine == "eedai" else "ee",
-                fits=fits,
-                tiles=plan.tiles or 1,
-                scene_count=cost.scene_count,
-                max_width=cost.max_width,
-                max_height=cost.max_height,
-                total_size_bytes=cost.total_size_bytes,
-                reason=reason,
-            )
-        if self.engine == "eedai":
-            # A forced reader that cannot serve raises at download time; report
-            # the decline rather than a false fit.
-            return RequestPreview(engine="eedai", fits=False, reason=decline_reason)
-        if wants_reader:
-            # engine='auto' falls back to Earth Engine, which composites the
-            # read server-side — it still fits, in one pass, with the reason the
-            # reader declined.
-            return RequestPreview(engine="ee", fits=True, reason=decline_reason)
-        # engine='ee' / 'pixels' (or a non-url export): Earth Engine serves it.
-        engine = self.engine if self.engine != "auto" else "ee"
-        return RequestPreview(engine=engine, fits=True)
+        else:
+            reason = None
+        return RequestPreview(
+            engine="eedai" if fits or self.engine == "eedai" else "ee",
+            fits=fits,
+            tiles=plan.tiles or 1,
+            scene_count=cost.scene_count,
+            max_width=cost.max_width,
+            max_height=cost.max_height,
+            total_size_bytes=cost.total_size_bytes,
+            reason=reason,
+        )
 
     def analyze(
         self,
