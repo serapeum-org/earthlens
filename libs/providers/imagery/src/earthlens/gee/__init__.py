@@ -56,7 +56,8 @@ Public surface (re-exported from this package):
   raster at point locations via leaf-batched `reduceRegions`; the
   `_to_gdf` variant returns a `GeoDataFrame` via `getInfo()`.
 * `Sampler` / `PointSampler` / `RegionSampler` / `RandomSampler` /
-  `StratifiedSampler` / `TransectSampler` / `TimeSeriesSampler` — the
+  `StratifiedSampler` / `TransectSampler` / `TimeSeriesSampler` /
+  `RegionTimeSeriesSampler` — the
   object-oriented sampling family: a frozen base holding `scale_m` + a
   `Reducer`, plus the point, polygon-zonal (with a `ZonalStrategy`),
   random / stratified training-point, line-transect, and per-point
@@ -507,6 +508,7 @@ from earthlens.gee.sampling import (
     PointSampler,
     RandomSampler,
     RegionSampler,
+    RegionTimeSeriesSampler,
     Sampler,
     StratifiedSampler,
     TimeSeriesSampler,
@@ -591,6 +593,7 @@ __all__ = [
     "RegionSampler",
     "RandomSampler",
     "StratifiedSampler",
+    "RegionTimeSeriesSampler",
     "TimeSeriesSampler",
     "TransectSampler",
     "ZonalHistogram",
