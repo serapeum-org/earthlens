@@ -108,9 +108,9 @@ class TestConfig:
         assert clim.reducer.q == 90.0
 
     def test_a_region_only_reducer_is_refused(self):
-        """`stdDev` has no time-axis form, so it fails closed at construction."""
+        """`first` has no time-axis form, so it fails closed at construction."""
         with pytest.raises(ValidationError):
-            Climatology(period="month", baseline=(1991, 2020), reducer="stdDev")
+            Climatology(period="month", baseline=(1991, 2020), reducer="first")
 
     def test_a_reversed_baseline_is_refused(self):
         """The reference window must be ordered."""

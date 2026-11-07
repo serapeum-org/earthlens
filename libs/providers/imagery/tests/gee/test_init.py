@@ -171,6 +171,8 @@ _EXPECTED_EXPORTS = {
     "RegionSampler",
     "RandomSampler",
     "StratifiedSampler",
+    "RegionTimeSeriesSampler",
+    "RequestPreview",
     "TimeSeriesSampler",
     "TransectSampler",
     "ZonalHistogram",

@@ -47,7 +47,7 @@ import re
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, cast
 
-from pydantic import ConfigDict, Field, ValidationError
+from pydantic import ConfigDict, Field, ValidationError, model_validator
 
 if TYPE_CHECKING:
     # `TaskInfo` is only referenced in type annotations on the
@@ -288,6 +288,113 @@ class Cadence(SummarisedLeaf):
     unit: Literal["minute", "hour", "day", "pentad", "dekad", "month", "year"]
 
 
+class BandExpression(SummarisedLeaf):
+    """A guarded `ee.Image.expression` formula and its band bindings.
+
+    Carries the `expression` form of a derived band: a formula string plus the
+    map from each symbol in it to a source band id, so the loader can validate
+    the shape while Earth Engine evaluates the arithmetic server-side.
+
+    Attributes:
+        formula: The expression, e.g. `"2.5 * ((NIR - RED) / (NIR + 6 * RED -
+            7.5 * BLUE + 1))"`. The symbols must all be keys of `bands`.
+        bands: Map from each formula symbol to the source band id it reads
+            (e.g. `{"NIR": "B8", "RED": "B4"}`).
+
+    Examples:
+        - An EVI-style formula names its inputs:
+            ```python
+            >>> e = BandExpression(formula="(NIR - RED)", bands={"NIR": "B8", "RED": "B4"})
+            >>> sorted(e.bands)
+            ['NIR', 'RED']
+
+            ```
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+    formula: str
+    bands: dict[str, str] = Field(min_length=1)
+
+
+class DerivedBand(SummarisedLeaf):
+    """A closed-vocabulary formula for a band computed from other bands.
+
+    A band declaring `derived_from` is not read from the asset: it is computed
+    server-side from the dataset's own bands before `select`, so a spectral
+    index (NDVI, NDWI, EVI, ...) is requestable through the facade like any
+    native band — the openEO-style curated recipe, no user code. Exactly one of
+    the three operations is given, so the vocabulary stays small and the loader
+    stays strict.
+
+    Attributes:
+        normalized_difference: `(a, b)` for `(a - b) / (a + b)` — NDVI, NDWI,
+            NDBI, ... computed with `ee.Image.normalizedDifference([a, b])`.
+        ratio: `(a, b)` for a simple band ratio `a / b`.
+        expression: A guarded `ee.Image.expression` for anything the two simple
+            forms cannot express (e.g. EVI).
+
+    Examples:
+        - NDVI is a normalized difference of two bands:
+            ```python
+            >>> d = DerivedBand(normalized_difference=("B8", "B4"))
+            >>> d.normalized_difference
+            ('B8', 'B4')
+
+            ```
+        - Giving more than one operation is refused:
+            ```python
+            >>> DerivedBand(normalized_difference=("B8", "B4"), ratio=("B8", "B4"))
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for DerivedBand
+            ...
+
+            ```
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+    normalized_difference: tuple[str, str] | None = None
+    ratio: tuple[str, str] | None = None
+    expression: BandExpression | None = None
+
+    @model_validator(mode="after")
+    def _exactly_one_operation(self) -> DerivedBand:
+        """Require exactly one of the three operations.
+
+        Returns:
+            `self` unchanged once exactly one operation is set.
+
+        Raises:
+            ValueError: If none, or more than one, operation is given.
+        """
+        given = [
+            name
+            for name in ("normalized_difference", "ratio", "expression")
+            if getattr(self, name) is not None
+        ]
+        if len(given) != 1:
+            raise ValueError(
+                "a derived band needs exactly one of normalized_difference / "
+                f"ratio / expression; got {given or 'none'}"
+            )
+        return self
+
+    def source_bands(self) -> tuple[str, ...]:
+        """Return the source band ids this formula reads.
+
+        Returns:
+            The band ids referenced, in a stable order. The dataset's
+            post-load validator uses these to check every source band exists
+            among the dataset's native bands.
+        """
+        if self.normalized_difference is not None:
+            return self.normalized_difference
+        if self.ratio is not None:
+            return self.ratio
+        assert self.expression is not None  # noqa: S101 - model_validator guarantees
+        return tuple(self.expression.bands.values())
+
+
 class Band(SummarisedLeaf):
     """Per-band metadata for one band of an Earth Engine dataset.
 
@@ -362,6 +469,9 @@ class Band(SummarisedLeaf):
     max: float | None = None
     estimated_range: bool = False
     classes: dict[int, str] | None = None
+    #: When set, this band is computed server-side from the dataset's own bands
+    #: (a spectral index) rather than read from the asset — see `DerivedBand`.
+    derived_from: DerivedBand | None = None
 
 
 class Extent(SummarisedLeaf):
@@ -834,6 +944,42 @@ class Dataset(SummarisedLeaf):
                 ```
         """
         return self.ee_type == "image_collection"
+
+    @model_validator(mode="after")
+    def _derived_bands_reference_native_bands(self) -> Dataset:
+        """Check every derived band reads only source bands this dataset declares.
+
+        A derived band (`derived_from`) is computed from the dataset's own
+        native bands; a typo in a source id would otherwise pass catalog load
+        and fail only at Earth Engine runtime. This catches it at load time.
+
+        Returns:
+            `self` unchanged once every derived band's source ids exist among
+            the dataset's native (non-derived) bands.
+
+        Raises:
+            ValueError: If a derived band names a source band the dataset does
+                not declare as a native band.
+        """
+        native = {
+            band_id
+            for band_id, band in self.bands.items()
+            if band.derived_from is None
+        }
+        for band_id, band in self.bands.items():
+            if band.derived_from is not None:
+                missing = [
+                    source
+                    for source in band.derived_from.source_bands()
+                    if source not in native
+                ]
+                if missing:
+                    raise ValueError(
+                        f"derived band {band_id!r} of {self.id} reads source "
+                        f"band(s) {missing} that are not native bands of the "
+                        f"dataset; native bands are {sorted(native)}"
+                    )
+        return self
 
     def get_band(self, band_id: str) -> Band:
         """Return the `Band` for `band_id`.

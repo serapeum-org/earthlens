@@ -280,9 +280,9 @@ class TestSentinel2Composite:
         assert Sentinel2Composite(reducer=inner).reducer is inner
 
     def test_region_only_inner_reducer_refused(self):
-        """A region-only inner reducer has no time-axis form."""
+        """A region-only inner reducer (`first`) has no time-axis form."""
         with pytest.raises(ValidationError, match="region"):
-            Sentinel2Composite(reducer="stdDev")
+            Sentinel2Composite(reducer="first")
 
     @pytest.mark.parametrize("value", [-2, 2])
     def test_threshold_outside_cdi_range_refused(self, value):

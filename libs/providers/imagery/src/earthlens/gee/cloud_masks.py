@@ -127,7 +127,7 @@ from typing import TYPE_CHECKING, Annotated, Literal, cast
 
 import ee
 from loguru import logger
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from earthlens.gee._helpers import NoBool, checked_cdi_threshold
 
@@ -144,13 +144,20 @@ __all__ = [
     "MaskChain",
     "ModisState1kmMask",
     "PassThrough",
+    "QaBitsMask",
+    "S2Cloudless",
     "Sensor",
     "Sentinel2Cdi",
     "Sentinel2Qa60Mask",
     "Sentinel2SclMask",
     "SpeckleFilter",
+    "ToDb",
+    "ToPower",
     "landsat_sr",
+    "qa_bits",
     "sentinel2_scl",
+    "to_db",
+    "to_power",
 ]
 
 #: A per-image Earth Engine op: what the `cloud_mask=` hook accepts, and so
@@ -174,6 +181,11 @@ _S2_SCL_MASKED_CLASSES: tuple[int, ...] = (3, 8, 9, 10)
 #: Google's Cloud Score+ collection, aligned to the harmonized Sentinel-2
 #: archive by `system:index` — the default `CloudScorePlus.cs_collection`.
 _CS_PLUS_COLLECTION: str = "GOOGLE/CLOUD_SCORE_PLUS/V1/S2_HARMONIZED"
+
+#: The s2cloudless cloud-probability collection, aligned to the harmonized S2
+#: archive by `system:index`. Its `probability` band is 0-100, higher = more
+#: likely cloud — the opposite polarity to Cloud Score+'s quality score.
+_S2_CLOUDLESS_COLLECTION: str = "COPERNICUS/S2_CLOUD_PROBABILITY"
 
 #: Bit 10 of the Sentinel-2 `QA60` bitmask: opaque clouds.
 _S2_QA60_CLOUD_BIT: int = 1 << 10
@@ -828,6 +840,99 @@ class CloudScorePlus(ImageMask):
         return linked.updateMask(linked.select(self.band).gte(self.threshold))
 
 
+class S2Cloudless(ImageMask):
+    """Mask a Sentinel-2 scene with the s2cloudless cloud-probability join.
+
+    s2cloudless was the community-standard Sentinel-2 cloud mask before Cloud
+    Score+, and is still widely used. Its per-pixel cloud probability lives in
+    a *separate* collection (`COPERNICUS/S2_CLOUD_PROBABILITY`) aligned to the
+    harmonized S2 archive, so this links each scene to its probability image
+    with `ee.Image.linkCollection` — a per-image match on `system:index` — and
+    keeps pixels whose probability is **at or below** `threshold`. The polarity
+    is the opposite of `CloudScorePlus`: `probability` runs 0-100 and *higher*
+    means *more likely cloud*, so clear pixels are the low ones. Being a
+    per-image link, it works unchanged under `collection.map(...)` and slots
+    into the `cloud_mask=` hook (which forces the request onto an Earth Engine
+    engine — reading a second collection is server-side compute the EEDAI
+    reader cannot run).
+
+    s2cloudless flags cloud only; it does not project shadows. Chain a shadow
+    step after it (`S2Cloudless() >> ...`) if shadow screening is needed.
+
+    Attributes:
+        threshold: Pixels whose cloud probability exceeds this are masked out.
+            A `[0, 100]` percentage (not a unit fraction); validated at
+            construction. Defaults to `40`, a common clear-sky cutoff.
+        probability_collection: The probability collection to link. Defaults to
+            `COPERNICUS/S2_CLOUD_PROBABILITY`.
+
+    Examples:
+        - The default keeps pixels under a 40% cloud probability:
+            ```python
+            >>> S2Cloudless().threshold
+            40.0
+
+            ```
+        - Tighten the cutoff to 20%:
+            ```python
+            >>> S2Cloudless(threshold=20).threshold
+            20.0
+
+            ```
+        - A probability outside `[0, 100]` is refused at construction:
+            ```python
+            >>> S2Cloudless(threshold=150)
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for S2Cloudless
+            ...
+
+            ```
+    """
+
+    threshold: Annotated[float, NoBool] = 40.0
+    probability_collection: str = _S2_CLOUDLESS_COLLECTION
+
+    @field_validator("threshold")
+    @classmethod
+    def _in_percentage_range(cls, value: float) -> float:
+        """Refuse a probability threshold outside the inclusive `[0, 100]` range.
+
+        Args:
+            value: The parsed `threshold` input.
+
+        Returns:
+            The value unchanged when it is in range.
+
+        Raises:
+            ValueError: If `value` is outside `[0, 100]` — `probability` is a
+                percentage, not a unit fraction.
+        """
+        if not 0 <= value <= 100:
+            raise ValueError(f"threshold must be in [0, 100], got {value!r}")
+        return value
+
+    def __call__(self, image: ee.Image) -> ee.Image:
+        """Link the probability band onto one scene and mask by the threshold.
+
+        Args:
+            image: An `ee.Image` from the harmonized Sentinel-2 archive
+                (`COPERNICUS/S2_SR_HARMONIZED` / `S2_HARMONIZED`) — the
+                collections s2cloudless shares `system:index` with.
+
+        Returns:
+            The scene, with the `probability` band added by `linkCollection`
+            and `updateMask(probability <= threshold)` applied — properties,
+            `system:time_start` included, are preserved. A scene with no
+            s2cloudless match gets a fully masked probability band, so it drops
+            out of a composite rather than passing unmasked.
+        """
+        linked = image.linkCollection(
+            ee.ImageCollection(self.probability_collection), ["probability"]
+        )
+        return linked.updateMask(linked.select("probability").lte(self.threshold))
+
+
 class Sentinel2Cdi(ImageMask):
     """Mask a Sentinel-2 TOA scene by its Cloud Displacement Index.
 
@@ -1084,6 +1189,150 @@ class LandsatQaRefinedMask(ImageMask):
             shadow_conf.lte(self.max_shadow_confidence)
         )
         return image.updateMask(keep)
+
+
+class QaBitsMask(ImageMask):
+    """Keep pixels whose packed QA-band bit field matches, by bit position.
+
+    A generic bit-unpacking mask. It reads `band`, extracts the field at
+    `bits` — a single flag bit, or a contiguous multi-bit field given as the
+    tuple of its bit positions — and keeps pixels whose extracted value is in
+    `keep` (or, with `drop`, every value except those). Most Earth Engine
+    datasets pack cloud / quality flags into one integer band, so this one
+    primitive replaces a hand-written `rightShift` / `bitwiseAnd` per product.
+
+    Exactly one of `keep` / `drop` must be given, so the polarity is never
+    ambiguous. The two existing Landsat / Sentinel-2 masks are deliberately
+    *not* rebuilt on this: `LandsatSrMask` carries validated `sensor` config
+    this primitive has no slot for, and `Sentinel2SclMask` screens categorical
+    `SCL` class codes by equality, not a packed bit field, so `qa_bits` does
+    not model it.
+
+    Attributes:
+        band: The packed QA band to read (e.g. `"QA_PIXEL"`, `"state_1km"`).
+        bits: The field's bit position(s). An `int` is a single flag bit; a
+            tuple is a contiguous multi-bit field named by every one of its
+            positions, e.g. `(8, 9)` for the 2-bit field at bits 8-9.
+        keep: Field values to keep. Exactly one of `keep` / `drop` is given.
+        drop: Field values to drop, keeping every other value. Exactly one of
+            `keep` / `drop` is given.
+
+    Examples:
+        - A single Clear bit (6), kept when set:
+            ```python
+            >>> mask = QaBitsMask(band="QA_PIXEL", bits=6, keep=(1,))
+            >>> (mask.low, mask.width)
+            (6, 1)
+
+            ```
+        - A contiguous 2-bit confidence field at bits 8-9, keeping 0/1:
+            ```python
+            >>> mask = QaBitsMask(band="QA_PIXEL", bits=(8, 9), keep=(0, 1))
+            >>> (mask.low, mask.width)
+            (8, 2)
+
+            ```
+        - Giving neither `keep` nor `drop` is refused:
+            ```python
+            >>> QaBitsMask(band="QA_PIXEL", bits=6)
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for QaBitsMask
+            ...
+
+            ```
+    """
+
+    band: str
+    bits: Annotated[int, NoBool] | tuple[Annotated[int, NoBool], ...]
+    keep: tuple[Annotated[int, NoBool], ...] | None = None
+    drop: tuple[Annotated[int, NoBool], ...] | None = None
+
+    @field_validator("bits")
+    @classmethod
+    def _bits_are_a_contiguous_field(
+        cls, value: int | tuple[int, ...]
+    ) -> int | tuple[int, ...]:
+        """Refuse a negative bit, or a tuple that is not an ascending run.
+
+        Args:
+            value: The raw `bits` input — a single bit index or a tuple of
+                positions.
+
+        Returns:
+            `value` unchanged once it is a valid single bit or a contiguous
+            ascending run of non-negative positions.
+
+        Raises:
+            ValueError: If a bit is negative, or the tuple is empty or not a
+                contiguous ascending run (e.g. `(8, 10)` or `(9, 8)`).
+        """
+        if isinstance(value, int):
+            if value < 0:
+                raise ValueError(f"bits must be non-negative, got {value}")
+            return value
+        if not value:
+            raise ValueError("bits tuple must name at least one position")
+        if any(bit < 0 for bit in value):
+            raise ValueError(f"bits must be non-negative, got {value}")
+        if list(value) != list(range(value[0], value[0] + len(value))):
+            raise ValueError(
+                f"bits must be a contiguous ascending run (e.g. (8, 9)), got {value}"
+            )
+        return value
+
+    @model_validator(mode="after")
+    def _exactly_one_polarity(self) -> QaBitsMask:
+        """Require exactly one of `keep` / `drop`, each naming a value.
+
+        Returns:
+            `self` unchanged once the polarity is unambiguous.
+
+        Raises:
+            ValueError: If neither or both of `keep` / `drop` are given, or
+                the one given is empty.
+        """
+        given = [name for name in ("keep", "drop") if getattr(self, name)]
+        if len(given) != 1:
+            raise ValueError(
+                "exactly one of keep / drop must be given (and non-empty); "
+                f"got {given or 'neither'}"
+            )
+        return self
+
+    @property
+    def low(self) -> int:
+        """The lowest bit position of the field (the right-shift amount)."""
+        return self.bits if isinstance(self.bits, int) else self.bits[0]
+
+    @property
+    def width(self) -> int:
+        """The field width in bits (1 for a single flag bit)."""
+        return 1 if isinstance(self.bits, int) else len(self.bits)
+
+    def __call__(self, image: ee.Image) -> ee.Image:
+        """Mask one image to the pixels whose QA field matches.
+
+        Args:
+            image: An `ee.Image` carrying `band` as a packed integer QA band.
+
+        Returns:
+            The input image with `updateMask(...)` applied — the mask is the
+            field at `bits` being in `keep` (or not in `drop`). Properties,
+            `system:time_start` included, are preserved by `updateMask`.
+        """
+        field = (
+            image.select(self.band)
+            .rightShift(self.low)
+            .bitwiseAnd((1 << self.width) - 1)
+        )
+        values = self.keep if self.keep is not None else self.drop
+        assert values is not None  # noqa: S101 - model_validator guarantees one
+        membership = field.eq(values[0])
+        for value in values[1:]:
+            membership = membership.Or(field.eq(value))
+        keep_mask = membership if self.keep is not None else membership.Not()
+        return image.updateMask(keep_mask)
 
 
 class ModisState1kmMask(ImageMask):
@@ -1433,6 +1682,104 @@ class SpeckleFilter(ImageMask):
         return _with_properties(smoothed, image)
 
 
+class ToPower(ImageMask):
+    """Convert a SAR backscatter band from decibels to linear power.
+
+    Applies `10 ** (dB / 10)` per band — the inverse of `ToDb`. Earth Engine's
+    `COPERNICUS/S1_GRD` arrives in dB (already thermal-noise-removed,
+    radiometrically calibrated and terrain-corrected), but a statistical
+    composite (`mean`, a percentile) should be taken in **linear power** and
+    only then converted back, since averaging decibels is not physically
+    meaningful. This is an `ImageMask`-family per-image op, so it rides the
+    `cloud_mask=` hook and composes with `>>`; it does **not** add calibration
+    or terrain correction, which S1_GRD already carries.
+
+    Attributes:
+        bands: The bands to convert; `None` (the default) converts every band.
+            For `COPERNICUS/S1_GRD`, name the backscatter bands explicitly
+            (e.g. `bands=("VV", "VH")`) so the `angle` band is left untouched —
+            the all-bands default would convert it to meaningless values.
+
+    Examples:
+        - Convert the VV/VH backscatter bands, leaving the rest:
+            ```python
+            >>> ToPower(bands=("VV", "VH")).bands
+            ('VV', 'VH')
+
+            ```
+        - The default converts every band:
+            ```python
+            >>> ToPower().bands is None
+            True
+
+            ```
+    """
+
+    bands: tuple[str, ...] | None = None
+
+    def __call__(self, image: ee.Image) -> ee.Image:
+        """Convert `image` from decibels to linear power.
+
+        Args:
+            image: An `ee.Image` whose `bands` are in decibels.
+
+        Returns:
+            The image with the selected bands replaced by `10 ** (dB / 10)`,
+            other bands and properties preserved.
+        """
+        if self.bands is None:
+            return _with_properties(ee.Image(10).pow(image.divide(10)), image)
+        converted = image
+        for band in self.bands:
+            one = ee.Image(10).pow(image.select(band).divide(10)).rename(band)
+            converted = converted.addBands(one, overwrite=True)
+        return _with_properties(converted, image)
+
+
+class ToDb(ImageMask):
+    """Convert a SAR backscatter band from linear power to decibels.
+
+    Applies `10 * log10(power)` per band — the inverse of `ToPower`. Use it to
+    return to dB after a power-domain reduction (`ToPower() >> ... >> ToDb()`).
+    An `ImageMask`-family per-image op, so it plugs into the `cloud_mask=` hook
+    and composes with `>>`.
+
+    Attributes:
+        bands: The bands to convert; `None` (the default) converts every band.
+            For `COPERNICUS/S1_GRD`, name the backscatter bands explicitly
+            (e.g. `bands=("VV", "VH")`) so the `angle` band is left untouched —
+            the all-bands default would convert it to meaningless values.
+
+    Examples:
+        - Convert only the VV band back to dB:
+            ```python
+            >>> ToDb(bands=("VV",)).bands
+            ('VV',)
+
+            ```
+    """
+
+    bands: tuple[str, ...] | None = None
+
+    def __call__(self, image: ee.Image) -> ee.Image:
+        """Convert `image` from linear power to decibels.
+
+        Args:
+            image: An `ee.Image` whose `bands` are in linear power.
+
+        Returns:
+            The image with the selected bands replaced by `10 * log10(power)`,
+            other bands and properties preserved.
+        """
+        if self.bands is None:
+            return _with_properties(image.log10().multiply(10), image)
+        converted = image
+        for band in self.bands:
+            one = image.select(band).log10().multiply(10).rename(band)
+            converted = converted.addBands(one, overwrite=True)
+        return _with_properties(converted, image)
+
+
 def landsat_sr(image: ee.Image, sensor: Sensor = "auto") -> ee.Image:
     """Mask a Landsat C2-L2 surface-reflectance image to its Clear pixels.
 
@@ -1532,3 +1879,114 @@ def sentinel2_scl(image: ee.Image) -> ee.Image:
             ```
     """
     return Sentinel2SclMask()(image)
+
+
+def qa_bits(
+    band: str,
+    *,
+    bits: int | Iterable[int],
+    keep: Iterable[int] | None = None,
+    drop: Iterable[int] | None = None,
+) -> QaBitsMask:
+    """Build a `QaBitsMask` from a band and a bit field, the concise way.
+
+    The free-function form of `QaBitsMask`: it turns "write a mask for this
+    dataset's packed QA band" from a code change into one call, so a dataset
+    whose quality flags live in bits does not need its own hand-written
+    `rightShift` / `bitwiseAnd` class.
+
+    Args:
+        band: The packed QA band to read (e.g. `"QA_PIXEL"`).
+        bits: The field's bit position(s). A single `int` is one flag bit; an
+            iterable is a contiguous multi-bit field named by every one of its
+            positions, e.g. `(8, 9)` for the 2-bit field at bits 8-9.
+        keep: Field values to keep. Give exactly one of `keep` / `drop`.
+        drop: Field values to drop, keeping every other value. Give exactly
+            one of `keep` / `drop`.
+
+    Returns:
+        A `QaBitsMask` — an `ImageMask`, so it plugs straight into the
+        `cloud_mask=` hook and composes with `>>` like the other masks.
+
+    Raises:
+        ValueError: If `bits` is not a single non-negative bit or a contiguous
+            ascending run, or if neither / both of `keep` / `drop` are given.
+
+    Examples:
+        - Keep pixels whose 2-bit Cloud Confidence field (bits 8-9) is 0 or 1:
+            ```python
+            >>> mask = qa_bits("QA_PIXEL", bits=(8, 9), keep=(0, 1))
+            >>> (mask.band, mask.low, mask.width, mask.keep)
+            ('QA_PIXEL', 8, 2, (0, 1))
+
+            ```
+        - Drop pixels whose single Cloud bit (3) is set:
+            ```python
+            >>> qa_bits("QA_PIXEL", bits=3, drop=(1,)).drop
+            (1,)
+
+            ```
+    """
+    return QaBitsMask(
+        band=band,
+        bits=bits if isinstance(bits, int) else tuple(bits),
+        keep=None if keep is None else tuple(keep),
+        drop=None if drop is None else tuple(drop),
+    )
+
+
+def to_power(image: ee.Image, *, bands: Iterable[str] | None = None) -> ee.Image:
+    """Convert a SAR image from decibels to linear power (`10 ** (dB / 10)`).
+
+    The function form of `ToPower`. Earth Engine's `COPERNICUS/S1_GRD` is in
+    dB, so a statistical composite should be taken in linear power — convert
+    with this, reduce, then `to_db` back. Calibration and terrain correction
+    are deliberately not included; S1_GRD already carries them.
+
+    Args:
+        image: An `ee.Image` whose `bands` are in decibels.
+        bands: The bands to convert; `None` (the default) converts every band.
+            For `COPERNICUS/S1_GRD`, name the backscatter bands explicitly
+            (e.g. `bands=("VV", "VH")`) so the `angle` band is left untouched —
+            the all-bands default would convert it to meaningless values.
+
+    Returns:
+        The image with the selected bands in linear power, properties kept.
+
+    Examples:
+        - Convert a scene to power before averaging:
+            ```python
+            >>> import ee  # doctest: +SKIP
+            >>> s1 = ee.ImageCollection("COPERNICUS/S1_GRD")  # doctest: +SKIP
+            >>> power_mean = s1.map(to_power).mean()  # doctest: +SKIP
+
+            ```
+    """
+    return ToPower(bands=None if bands is None else tuple(bands))(image)
+
+
+def to_db(image: ee.Image, *, bands: Iterable[str] | None = None) -> ee.Image:
+    """Convert a SAR image from linear power to decibels (`10 * log10(power)`).
+
+    The function form of `ToDb`, the inverse of `to_power`: use it to return
+    to dB after a power-domain reduction.
+
+    Args:
+        image: An `ee.Image` whose `bands` are in linear power.
+        bands: The bands to convert; `None` (the default) converts every band.
+            For `COPERNICUS/S1_GRD`, name the backscatter bands explicitly
+            (e.g. `bands=("VV", "VH")`) so the `angle` band is left untouched —
+            the all-bands default would convert it to meaningless values.
+
+    Returns:
+        The image with the selected bands in decibels, properties kept.
+
+    Examples:
+        - Round-trip: dB to power and back is the identity:
+            ```python
+            >>> import ee  # doctest: +SKIP
+            >>> back = to_db(to_power(image))  # doctest: +SKIP
+
+            ```
+    """
+    return ToDb(bands=None if bands is None else tuple(bands))(image)
