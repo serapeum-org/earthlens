@@ -130,6 +130,11 @@ class TestFtpPathMigration:
     `products/...` root. Every bundled dataset was migrated except the
     CHIRPS-GEFS v12 forecast rows, whose v3 remap is a semantic change
     (not a rename) tracked separately in #1387.
+
+    These checks are a prefix/rooting lock-in, not a reachability check:
+    they catch a revert to the retired prefix or a stray leading slash,
+    but not a `products/`-rooted path mistyped within the tree. Live
+    resolution is covered by the e2e `test_all_migrated_ftp_bases_resolve_live`.
     """
 
     #: Key prefix of the rows deliberately left on the retired paths (#1387).
@@ -179,3 +184,32 @@ class TestFtpPathMigration:
             f"expected exactly 9 CHIRPS-GEFS v12 rows on the retired prefix, "
             f"got {len(retired)}: {retired}"
         )
+
+
+@pytest.mark.e2e
+def test_all_migrated_ftp_bases_resolve_live(bundled_catalog: Catalog):
+    """Every migrated (non-GEFS-v12) ftp_base resolves on the live CHC FTP."""
+    from ftplib import FTP
+
+    from earthlens.chc import CHIRPS
+
+    unreachable: list[str] = []
+    ftp = FTP(CHIRPS.api_url, timeout=60)  # noqa: S321 - public anonymous data FTP
+    try:
+        ftp.login()
+        for key, ds in bundled_catalog.datasets.items():
+            if key.startswith("chirps-gefs-v12-"):
+                continue
+            for path in ds.ftp_bases.values():
+                try:
+                    ftp.cwd("/" + path.strip("/"))
+                except Exception as exc:  # noqa: BLE001 - collect, assert once at end
+                    unreachable.append(f"{key}: {path}: {exc}")
+    finally:
+        try:
+            ftp.quit()
+        except Exception:  # noqa: BLE001 - best-effort close
+            pass
+    assert unreachable == [], (
+        f"ftp_bases that did not resolve on the live FTP: {unreachable}"
+    )
