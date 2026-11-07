@@ -117,6 +117,14 @@ per-window rasters rather than the per-date ones. Discrete multi-year archive da
 
 Per-window filenames follow `<ds_key>_<variable>_<op>_<freq>_<window-label-as-YYYYMMDD>.tif`
 (e.g. `global-daily_precipitation_sum_1MS_20200101.tif` — the January 2020 daily-to-monthly total).
+A sub-daily `freq` (e.g. `"6h"`) additionally stamps `HHMM` so windows inside one day stay distinct.
+
+Each window is reduced on its own — only the rasters for the current window are opened, stacked
+and closed before the next — so peak memory tracks the largest window, not the whole requested
+range. Note the flux edge case: with `op="sum"` (the `auto` default for precipitation) a window
+in which **every** date is nodata reduces to `0.0`, not nodata, because a NaN-aware sum of an
+all-missing slice is zero. Set `aggregate.min_count` to require a minimum count of valid dates per
+window when you need to tell a genuine zero apart from "all missing".
 
 ## Supported reduction operators
 

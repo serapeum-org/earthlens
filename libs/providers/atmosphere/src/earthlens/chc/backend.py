@@ -589,12 +589,9 @@ class CHIRPS(AbstractDataSource):
             progress_bar=progress_bar,
             cores=cores,
         )
-        result = (
-            paths
-            if aggregate is None
-            else self._aggregate_pair(ds_key, dataset, var, paths, aggregate)
-        )
-        return result
+        if aggregate is None:
+            return paths
+        return self._aggregate_pair(ds_key, dataset, var, paths, aggregate)
 
     def _effective_aggregate(
         self, aggregate: AggregationConfig | None
@@ -647,15 +644,27 @@ class CHIRPS(AbstractDataSource):
         paths: list[Path],
         config: AggregationConfig,
     ) -> list[Path]:
-        """Reduce one pair's per-date raster stack into per-window rasters.
+        """Reduce one pair's per-date rasters into per-window rasters.
 
         Pairs each written GeoTIFF back to its date — the per-date names are
         deterministic, so a `{filename: date}` map rebuilt from
         `_overlapping_dates` recovers the alignment without threading dates
-        through the fetchers — stacks the bands with nodata read as NaN, buckets
-        the dates by `config.freq` via `window_groups`, and reduces each
-        window's slice with `reduce_time_axis`. One GeoTIFF per window lands
-        under `config.out_dir`.
+        through the fetchers — buckets the dates by `config.freq` via
+        `window_groups`, and reduces each window one at a time: only the
+        rasters in the current window are opened, read with nodata as NaN,
+        stacked and reduced with `reduce_time_axis`, then closed before the
+        next window. One GeoTIFF per window lands under `config.out_dir`.
+
+        Reducing per window — rather than stacking the whole matched range at
+        once — keeps the memory footprint bounded by the largest single window,
+        so a long daily request does not materialise every per-date array
+        simultaneously.
+
+        For a flux `op` (`"sum"`, the `auto` default for precipitation) an
+        all-nodata window reads as `0.0` rather than nodata, because the
+        NaN-aware sum of an all-NaN slice is zero; set `config.min_count` to
+        require a minimum count of valid dates per window when that distinction
+        matters.
 
         Args:
             ds_key: The catalog dataset key.
@@ -675,7 +684,7 @@ class CHIRPS(AbstractDataSource):
                 reduce), or the per-date grids differ in shape and cannot be
                 stacked.
         """
-        from earthlens.aggregate import reduce_time_axis, window_groups
+        from earthlens.aggregate import window_groups
 
         if dataset.is_discrete:
             raise ValueError(
@@ -684,12 +693,56 @@ class CHIRPS(AbstractDataSource):
                 "aggregate= for this dataset."
             )
 
+        dated = self._dated_outputs(ds_key, dataset, var, paths)
+        op = self._resolve_aggregate_op(config.op, var)
+        out_dir = Path(config.out_dir) if config.out_dir is not None else self.root_dir
+        out: list[Path] = []
+        if not dated:
+            return out
+
+        geo, epsg = self._validate_grid(ds_key, var, dated)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        time_axis = pd.DatetimeIndex([date for date, _ in dated])
+        for label, mask in window_groups(time_axis, config.freq):
+            window_paths = [path for keep, (_, path) in zip(mask, dated) if keep]
+            reduced = self._reduce_window(window_paths, op, config)
+            written = Dataset.from_array(
+                reduced,
+                no_data_value=-9999.0,
+                geo_ref=GeoReference(geo=geo, epsg=epsg),
+            )
+            target = out_dir / self._window_filename(ds_key, var, op, config, label)
+            written.to_file(str(target))
+            close_quietly(written)
+            out.append(target)
+        return out
+
+    def _dated_outputs(
+        self,
+        ds_key: str,
+        dataset: ChcDataset,
+        var: Variable,
+        paths: list[Path],
+    ) -> list[tuple[pd.Timestamp, Path]]:
+        """Pair each written per-date GeoTIFF with its date, sorted by date.
+
+        Args:
+            ds_key: The catalog dataset key.
+            dataset: The resolved catalog row.
+            var: The variable the per-date rasters belong to.
+            paths: The GeoTIFFs written for this pair.
+
+        Returns:
+            list[tuple[pandas.Timestamp, Path]]: `(date, path)` for every path
+                whose canonical name maps back to an overlapping date, sorted
+                ascending by date.
+        """
         dates = self._overlapping_dates(ds_key, dataset)
         name_to_date = {
             self._output_filename(ds_key, dataset, var, date): date
             for date in (dates if dates is not None else [])
         }
-        dated = sorted(
+        return sorted(
             (
                 (name_to_date[path.name], path)
                 for path in paths
@@ -698,50 +751,120 @@ class CHIRPS(AbstractDataSource):
             key=lambda item: item[0],
         )
 
-        op = self._resolve_aggregate_op(config.op, var)
-        out_dir = Path(config.out_dir) if config.out_dir is not None else self.root_dir
+    def _validate_grid(
+        self,
+        ds_key: str,
+        var: Variable,
+        dated: list[tuple[pd.Timestamp, Path]],
+    ) -> tuple[tuple[float, float, float, float, float, float] | None, int | None]:
+        """Confirm the per-date grids line up and capture the shared georef.
 
-        datasets = [Dataset.read_file(str(path)) for _, path in dated]
-        out: list[Path] = []
+        Opens each raster for its metadata only (no array read), so the check
+        is cheap even for a long date range, and returns the first raster's
+        geotransform and EPSG for the reduced windows to inherit.
+
+        Args:
+            ds_key: The catalog dataset key, named in the mismatch error.
+            var: The variable being reduced, named in the mismatch error.
+            dated: The non-empty `(date, path)` pairs from `_dated_outputs`.
+
+        Returns:
+            tuple: The shared `(geotransform, epsg)` for every per-date raster.
+
+        Raises:
+            ValueError: If the per-date grids differ in shape and cannot be
+                stacked.
+        """
+        shapes: set[tuple[int, int]] = set()
+        geo: tuple[float, float, float, float, float, float] | None = None
+        epsg: int | None = None
+        for _, path in dated:
+            ds = Dataset.read_file(str(path))
+            try:
+                shapes.add((ds.rows, ds.columns))
+                if geo is None:
+                    geo = ds.geotransform
+                    epsg = ds.epsg
+            finally:
+                close_quietly(ds)
+        if len(shapes) > 1:
+            raise ValueError(
+                f"cannot aggregate {ds_key}/{var.name}: its per-date grids "
+                f"differ in shape and cannot be stacked — {sorted(shapes)}. "
+                "Re-run the download, or request one consistent AOI."
+            )
+        return geo, epsg
+
+    def _reduce_window(
+        self,
+        window_paths: list[Path],
+        op: str,
+        config: AggregationConfig,
+    ) -> np.ndarray:
+        """Open one window's rasters, reduce them, and fill nodata with -9999.
+
+        Only this window's rasters are opened and closed here, so peak memory
+        tracks the largest window rather than the whole date range.
+
+        Args:
+            window_paths: The per-date GeoTIFFs falling in this window.
+            op: The concrete reducer (`"sum"`, `"mean"`, …) from
+                `_resolve_aggregate_op`.
+            config: The aggregation spec supplying `skipna` and `min_count`.
+
+        Returns:
+            numpy.ndarray: The reduced 2-D band, nodata pixels set to -9999.0.
+        """
+        from earthlens.aggregate import reduce_time_axis
+
+        datasets = [Dataset.read_file(str(path)) for path in window_paths]
         try:
-            bands = [self._band_as_nan(ds) for ds in datasets]
-            shapes = {band.shape for band in bands}
-            if len(shapes) > 1:
-                raise ValueError(
-                    f"cannot aggregate {ds_key}/{var.name}: its per-date grids "
-                    f"differ in shape and cannot be stacked — {sorted(shapes)}. "
-                    "Re-run the download, or request one consistent AOI."
-                )
-            if bands:
-                out_dir.mkdir(parents=True, exist_ok=True)
-            stack = np.stack(bands) if bands else np.empty((0, 0, 0))
-            time_axis = pd.DatetimeIndex([date for date, _ in dated])
-            geo = datasets[0].geotransform if datasets else None
-            epsg = datasets[0].epsg if datasets else None
-            for label, mask in window_groups(time_axis, config.freq):
-                reduced = reduce_time_axis(
-                    stack[mask],
-                    op,
-                    skipna=config.skipna,
-                    min_count=config.min_count,
-                )
-                reduced = np.where(np.isnan(reduced), -9999.0, reduced)
-                result = Dataset.from_array(
-                    reduced,
-                    no_data_value=-9999.0,
-                    geo_ref=GeoReference(geo=geo, epsg=epsg),
-                )
-                target = out_dir / (
-                    f"{ds_key}_{var.name}_{op}_{config.freq}_"
-                    f"{label.strftime('%Y%m%d')}.tif"
-                )
-                result.to_file(str(target))
-                close_quietly(result)
-                out.append(target)
+            stack = np.stack([self._band_as_nan(ds) for ds in datasets])
         finally:
             for ds in datasets:
                 close_quietly(ds)
-        return out
+        reduced = reduce_time_axis(
+            stack,
+            op,
+            skipna=config.skipna,
+            min_count=config.min_count,
+        )
+        filled: np.ndarray = np.where(np.isnan(reduced), -9999.0, reduced)
+        return filled
+
+    @staticmethod
+    def _window_filename(
+        ds_key: str,
+        var: Variable,
+        op: str,
+        config: AggregationConfig,
+        label: pd.Timestamp,
+    ) -> str:
+        """Build the per-window output filename.
+
+        The window label is stamped as `%Y%m%d`; a sub-daily `config.freq`
+        (e.g. `"6h"`) also stamps `%H%M` so two windows inside one day do not
+        collapse to the same name and overwrite each other.
+
+        Args:
+            ds_key: The catalog dataset key.
+            var: The variable being reduced.
+            op: The concrete reducer used.
+            config: The aggregation spec (supplies `freq`).
+            label: The window's start timestamp.
+
+        Returns:
+            str: The `<ds_key>_<var>_<op>_<freq>_<stamp>.tif` filename.
+        """
+        nanos_per_day = 86_400_000_000_000
+        try:
+            is_subdaily = (
+                pd.tseries.frequencies.to_offset(config.freq).nanos < nanos_per_day
+            )
+        except (ValueError, TypeError):
+            is_subdaily = False
+        stamp = label.strftime("%Y%m%d%H%M" if is_subdaily else "%Y%m%d")
+        return f"{ds_key}_{var.name}_{op}_{config.freq}_{stamp}.tif"
 
     @staticmethod
     def _band_as_nan(ds: Dataset) -> np.ndarray:

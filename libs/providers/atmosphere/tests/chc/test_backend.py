@@ -6,6 +6,7 @@ import shutil
 from types import SimpleNamespace
 
 import numpy as np
+import pandas as pd
 import pytest
 from pyramids.dataset import Dataset, GeoReference
 
@@ -198,6 +199,49 @@ class TestAggregate:
         assert CHIRPS._resolve_aggregate_op("auto", flux) == "sum"
         assert CHIRPS._resolve_aggregate_op("auto", state) == "mean"
         assert CHIRPS._resolve_aggregate_op("min", flux) == "min"
+
+    def test_daily_freq_writes_one_window_per_day(self, tmp_path):
+        """A 1D freq streams one reduced raster per day without stacking all."""
+        chirps = _build_daily_chirps(tmp_path)
+        dataset, var, paths = _write_per_date_rasters(
+            chirps, "global-daily", [1.0, 2.0, 3.0]
+        )
+        out = chirps._aggregate_pair(
+            "global-daily", dataset, var, paths, AggregationConfig(freq="1D", op="mean")
+        )
+        assert len(out) == 3
+        values = [
+            float(Dataset.read_file(str(path)).read_array()[0, 0]) for path in out
+        ]
+        assert values == [1.0, 2.0, 3.0]
+
+    def test_all_nodata_sum_with_min_count_stays_nodata(self, tmp_path):
+        """min_count keeps an all-missing flux window as nodata, not 0.0."""
+        chirps = _build_daily_chirps(tmp_path)
+        dataset, var, paths = _write_per_date_rasters(
+            chirps, "global-daily", [-9999.0, -9999.0, -9999.0]
+        )
+        out = chirps._aggregate_pair(
+            "global-daily",
+            dataset,
+            var,
+            paths,
+            AggregationConfig(freq="1MS", op="sum", min_count=1),
+        )
+        assert np.allclose(Dataset.read_file(str(out[0])).read_array(), -9999.0)
+
+    def test_window_filename_stamps_time_only_for_subdaily_freq(self):
+        """A sub-daily freq widens the stamp to HHMM; daily-or-coarser does not."""
+        var = SimpleNamespace(name="precipitation")
+        label = pd.Timestamp("2020-01-01 06:00")
+        subdaily = CHIRPS._window_filename(
+            "global-daily", var, "mean", AggregationConfig(freq="6h"), label
+        )
+        monthly = CHIRPS._window_filename(
+            "global-daily", var, "sum", AggregationConfig(freq="1MS"), label
+        )
+        assert subdaily == "global-daily_precipitation_mean_6h_202001010600.tif"
+        assert monthly == "global-daily_precipitation_sum_1MS_20200101.tif"
 
 
 def test_chirps_catalog_property_aliases_private(tmp_path):
