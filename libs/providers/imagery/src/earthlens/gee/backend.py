@@ -328,7 +328,11 @@ _ZIP_MAGIC: bytes = b"PK\x03\x04"
 
 #: A per-image cloud/quality mask — `ee.Image -> ee.Image` — `.map`-applied
 #: to the collection before the reducer (see `earthlens.gee.cloud_masks`).
-CloudMask = Callable[[ee.Image], ee.Image]
+PerImageOp = Callable[[ee.Image], ee.Image]
+#: Permanent backwards-compatible alias: `cloud_mask=` is kept as an alias for
+#: the general `image_op=` hook (masking is the common case and the name is in
+#: published docs), so its type keeps the familiar spelling too.
+CloudMask = PerImageOp
 
 #: An `ee.ImageCollection` filter — collection in, filtered collection out —
 #: applied after `filterDate` / `filterBounds` (see `earthlens.gee.filters`).
@@ -966,17 +970,20 @@ class GEE(LazyClientMixin, AbstractDataSource):
             so the caller can track them asynchronously via
             `earthlens.gee.jobs`. Ignored for `export_via="url"`,
             which is always synchronous.
-        cloud_mask: Optional per-image mask `.map`-applied to every image
-            in the stack *before* the reducer, so the composite is built
-            from cloud-screened pixels — the usual way to get a clean
-            optical mosaic. A callable `ee.Image -> ee.Image`; see
-            `earthlens.gee.cloud_masks` (`landsat_sr` /
-            `sentinel2_scl`). It runs before the band `select`, so it may
-            read quality bands (`QA_PIXEL` / `SCL`) that are not listed in
-            `variables`. Meant for image collections; on a static
-            `ee_type="image"` dataset it is applied verbatim and a warning
-            is logged (see `_build_collection`). Defaults to `None`
-            (no masking).
+        image_op: Optional per-image hook `.map`-applied to every image in
+            the stack *before* the reducer — any `ee.Image -> ee.Image`
+            transform: a cloud mask (the common case, and the reason the
+            `cloud_mask=` alias exists), an index, a rescaling, a speckle
+            filter, or a `>>`-composed chain of them. It runs before the band
+            `select`, so it may read quality bands (`QA_PIXEL` / `SCL`) not
+            listed in `variables`. Meant for image collections; on a static
+            `ee_type="image"` dataset it is applied verbatim and a warning is
+            logged (see `_build_collection`). See `earthlens.gee.cloud_masks`
+            for the mask / op family. Defaults to `None` (no op).
+        cloud_mask: A permanent alias for `image_op`, kept because masking is
+            the common case and the name is in published docs and notebooks.
+            Pass one or the other, never both (passing both raises). Exposed
+            on the instance as both `self.image_op` and `self.cloud_mask`.
         scaled: Convert the requested bands from raw DN to physical units
             server-side, before the composite, using the `scale` /
             `offset` the catalog row already declares. Resolved inside
@@ -1279,6 +1286,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         auto_split: bool = False,
         discover_extent: bool = False,
         wait_for_export: bool = True,
+        image_op: PerImageOp | None = None,
         cloud_mask: CloudMask | None = None,
         scaled: bool = False,
         preprocess: bool = False,
@@ -1330,10 +1338,21 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 "asset_id": asset_id,
             }
         )
+        # `cloud_mask=` is a permanent alias for the general `image_op=` hook —
+        # masking is the common case and the name is in published docs — so
+        # resolve the two into one, refusing both at once rather than silently
+        # picking one.
+        if image_op is not None and cloud_mask is not None:
+            raise ValueError(
+                "pass image_op= or its alias cloud_mask=, not both; they name "
+                "the same per-image ee.Image -> ee.Image hook"
+            )
+        if image_op is not None:
+            cloud_mask = image_op
         if cloud_mask is not None and not callable(cloud_mask):
             raise TypeError(
-                "cloud_mask must be a callable ee.Image -> ee.Image (or None), "
-                f"got {type(cloud_mask).__name__}"
+                "image_op (a.k.a. cloud_mask) must be a callable "
+                f"ee.Image -> ee.Image (or None), got {type(cloud_mask).__name__}"
             )
         # The asset id and the ops are both in hand here, so the one
         # CDI/product mismatch that is detectable client-side is refused now
@@ -1451,6 +1470,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         #: The per-image `cloud_mask` hook (or `None`), `.map`-applied
         #: before the reducer in `_build_collection`.
         self.cloud_mask = cloud_mask
+        #: Alias of `cloud_mask`: the general per-image hook, whatever kwarg set it.
+        self.image_op = cloud_mask
         #: The validated `filters` as a tuple (empty when none were given),
         #: applied left to right in `_build_collection`.
         self.filters: tuple[CollectionFilter, ...] = collection_filters

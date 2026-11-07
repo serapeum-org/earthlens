@@ -811,9 +811,10 @@ class TestInit:
             make_gee(export_via="ftp")
 
     def test_cloud_mask_and_filters_default_to_none(self, make_gee):
-        """Omitting the hooks leaves `cloud_mask=None` and `filters=()`."""
+        """Omitting the hooks leaves `image_op` / `cloud_mask` None, `filters=()`."""
         gee = make_gee()
         assert gee.cloud_mask is None
+        assert gee.image_op is None
         assert gee.filters == ()
 
     def test_cloud_mask_and_filters_captured(self, make_gee):
@@ -823,9 +824,31 @@ class TestInit:
         assert gee.cloud_mask is _identity_mask
         assert gee.filters == (first, second)
 
+    def test_image_op_is_the_primary_hook(self, make_gee):
+        """`image_op=` sets the per-image hook, surfaced on both attributes."""
+        gee = make_gee(image_op=_identity_mask)
+        assert gee.image_op is _identity_mask
+        assert gee.cloud_mask is _identity_mask
+
+    def test_cloud_mask_is_a_permanent_alias_for_image_op(self, make_gee):
+        """`cloud_mask=` still works and surfaces as `image_op` too."""
+        gee = make_gee(cloud_mask=_identity_mask)
+        assert gee.image_op is _identity_mask
+        assert gee.cloud_mask is _identity_mask
+
+    def test_image_op_and_cloud_mask_together_raise(self, make_gee):
+        """Passing both names for the one hook is refused, not silently merged."""
+        with pytest.raises(ValueError, match="not both"):
+            make_gee(image_op=_identity_mask, cloud_mask=_identity_mask)
+
+    def test_non_callable_image_op_rejected(self, make_gee):
+        """A non-callable `image_op` raises `TypeError` at construction."""
+        with pytest.raises(TypeError, match="must be a callable"):
+            make_gee(image_op="not-callable")
+
     def test_non_callable_cloud_mask_rejected(self, make_gee):
         """A non-callable `cloud_mask` raises `TypeError` at construction."""
-        with pytest.raises(TypeError, match="cloud_mask must be a callable"):
+        with pytest.raises(TypeError, match="must be a callable"):
             make_gee(cloud_mask="not-callable")
 
     def test_non_iterable_filters_rejected(self, make_gee):
@@ -857,7 +880,7 @@ class TestInit:
     @pytest.mark.parametrize(
         "kwargs, match",
         [
-            ({"cloud_mask": "x"}, r"cloud_mask must be a callable"),
+            ({"cloud_mask": "x"}, r"must be a callable"),
             ({"filters": 42}, r"filters must be an iterable"),
             ({"filters": [object()]}, r"each entry in filters"),
         ],
