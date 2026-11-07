@@ -2039,21 +2039,30 @@ class GEE(LazyClientMixin, AbstractDataSource):
         A cheap pre-flight check: which engine would serve the read, how many
         scenes and output pixels it involves, how many tiles it streams in, and
         whether it is served in a single pass or falls back to Earth Engine with
-        a reason. When the EEDAI reader is the engine it reuses `estimate_cost`
-        (the same sizing the routing uses) and `_eedai_single_image_plan`; an
+        a reason. It mirrors the real routing decision in order — reader
+        eligibility, then the reducer gate — so the preview and the download
+        agree on the engine: a request whose reducer is Earth-Engine-only
+        (`stdDev` / `variance` / `count` / `qualityMosaic`), or that shapes the
+        image server-side, routes off the reader exactly as `download()` routes
+        it. When the reader does serve the read it reuses `estimate_cost` (the
+        same sizing the routing uses) and `_eedai_single_image_plan`; an
         Earth-Engine-served read is composited server-side, so it fits in one
-        pass with no per-scene estimate. The budget thresholds stay private.
+        pass with no per-scene estimate. A forced `engine="eedai"` the reader
+        cannot serve previews `fits=False` with the decline reason, because that
+        download raises rather than falling back. The budget thresholds stay
+        private.
 
         Returns:
             A `RequestPreview`. For an EEDAI-served read it carries the scene
             count, output dimensions, size and tile count; for an
-            Earth-Engine-served one, just the engine and `fits=True`.
+            Earth-Engine-served one, the engine, `fits=True`, and (when the
+            reader was the preferred engine but declined) the fallback reason;
+            for a forced `engine="eedai"` the reader cannot serve, `fits=False`
+            with the decline reason.
 
         Raises:
             ValueError: If the request names more than one dataset (like
                 `estimate_cost`, a preview sizes a single asset).
-            ImportError: If an EEDAI-eligible read is previewed without
-                `pyramids-eo` (the `[eedai]` extra) installed.
         """
         assert isinstance(self.vars, dict)  # GEE always uses {asset_id: [band]}
         if len(self.vars) != 1:
@@ -2065,45 +2074,72 @@ class GEE(LazyClientMixin, AbstractDataSource):
         asset_id = next(iter(self.vars))
         var_info = self._catalog.get_dataset(asset_id)
         band_count = max(len(self.vars[asset_id]), 1)
-        uses_reader = (
-            self.export_via == "url"
-            and self.engine in ("auto", "eedai")
-            and self._eedai_eligible(var_info)
-            and eedai_available()
+        # Why the reader would not serve this read, in the order the router
+        # decides it — None means the reader would take it. Mirrors
+        # `_eedai_eligible` + the reducer gate the collection verdict applies
+        # (backend.py `_eedai_verdict`), so the preview routes as the download
+        # does rather than on eligibility alone.
+        wants_reader = self.export_via == "url" and self.engine in ("auto", "eedai")
+        reducer_name = (
+            temporal_reducer_for(self.reducer or var_info.default_reducer).name
+            if var_info.ee_type == "image_collection"
+            else None
         )
-        if not uses_reader:
-            # Earth Engine composites server-side: there is no client-side tiling
-            # budget to miss, so it fits in one pass with no per-scene estimate.
-            engine = self.engine if self.engine != "auto" else "ee"
-            return RequestPreview(engine=engine, fits=True)
-        plan = self._eedai_single_image_plan(var_info, band_count)
-        cost = self.estimate_cost()
-        over_scene_budget = (
-            cost.scene_count is not None and cost.scene_count > _EEDAI_MAX_SCENES
-        )
-        fits = plan.can_serve and not over_scene_budget
-        if plan.reason:
-            reason: str | None = plan.reason
-        elif over_scene_budget:
-            reason = (
-                f"{cost.scene_count} scenes exceed the reader's single-pass budget, "
-                "so Earth Engine composites this server-side"
+        decline_reason: str | None = None
+        if not wants_reader:
+            decline_reason = None
+        elif not eedai_available():
+            decline_reason = "the pyramids-eo reader (the [eedai] extra) is not installed"
+        elif not self._eedai_eligible(var_info):
+            decline_reason = (
+                "the request needs server-side compute the reader cannot run "
+                "(a reduced collection, cloud_mask / image_op, filters, a scaled= "
+                "flag, a derived index band, or a pinned crs_transform / CRS)"
             )
-        else:
-            reason = None
-        return RequestPreview(
-            # What would actually serve it: the reader when it fits, else the
-            # Earth Engine fallback (for engine='auto'); a forced engine='eedai'
-            # keeps its name with fits=False so the caller sees it would decline.
-            engine="eedai" if fits or self.engine == "eedai" else "ee",
-            fits=fits,
-            tiles=plan.tiles or 1,
-            scene_count=cost.scene_count,
-            max_width=cost.max_width,
-            max_height=cost.max_height,
-            total_size_bytes=cost.total_size_bytes,
-            reason=reason,
-        )
+        elif reducer_name is not None and reducer_name in _EEDAI_UNSUPPORTED_REDUCERS:
+            decline_reason = _EEDAI_UNSUPPORTED_REDUCER_REASONS[reducer_name]
+
+        if wants_reader and decline_reason is None:
+            plan = self._eedai_single_image_plan(var_info, band_count)
+            cost = self.estimate_cost()
+            over_scene_budget = (
+                cost.scene_count is not None and cost.scene_count > _EEDAI_MAX_SCENES
+            )
+            fits = plan.can_serve and not over_scene_budget
+            if plan.reason:
+                reason: str | None = plan.reason
+            elif over_scene_budget:
+                reason = (
+                    f"{cost.scene_count} scenes exceed the reader's single-pass "
+                    "budget, so Earth Engine composites this server-side"
+                )
+            else:
+                reason = None
+            return RequestPreview(
+                # The reader when it fits, else the Earth Engine fallback (for
+                # engine='auto'); a forced engine='eedai' keeps its name with
+                # fits=False so the caller sees it would decline.
+                engine="eedai" if fits or self.engine == "eedai" else "ee",
+                fits=fits,
+                tiles=plan.tiles or 1,
+                scene_count=cost.scene_count,
+                max_width=cost.max_width,
+                max_height=cost.max_height,
+                total_size_bytes=cost.total_size_bytes,
+                reason=reason,
+            )
+        if self.engine == "eedai":
+            # A forced reader that cannot serve raises at download time; report
+            # the decline rather than a false fit.
+            return RequestPreview(engine="eedai", fits=False, reason=decline_reason)
+        if wants_reader:
+            # engine='auto' falls back to Earth Engine, which composites the
+            # read server-side — it still fits, in one pass, with the reason the
+            # reader declined.
+            return RequestPreview(engine="ee", fits=True, reason=decline_reason)
+        # engine='ee' / 'pixels' (or a non-url export): Earth Engine serves it.
+        engine = self.engine if self.engine != "auto" else "ee"
+        return RequestPreview(engine=engine, fits=True)
 
     def analyze(
         self,

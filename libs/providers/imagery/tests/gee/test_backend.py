@@ -5334,6 +5334,37 @@ class TestPreview:
         assert preview.engine == "eedai" and preview.fits is False
         assert preview.reason == "too many bands"
 
+    def test_an_unsupported_composite_reducer_routes_to_earth_engine(self, make_gee, monkeypatch):
+        """An EE-only reducer (stdDev) declines the reader, so auto previews engine 'ee'."""
+        from earthlens.gee.backend import _EEDAI_UNSUPPORTED_REDUCER_REASONS
+
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+        gee = make_gee(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0, reducer="stdDev"
+        )
+        preview = gee.preview()
+        assert preview.engine == "ee" and preview.fits is True, (
+            "stdDev routes to Earth Engine, so the preview must say engine='ee', fits=True"
+        )
+        assert preview.reason == _EEDAI_UNSUPPORTED_REDUCER_REASONS["stdDev"], (
+            "the fallback reason must be the reducer's own decline reason"
+        )
+
+    def test_a_forced_eedai_ineligible_request_previews_a_decline(self, make_gee, monkeypatch):
+        """A cloud_mask makes a forced-eedai request ineligible; it would error, so fits=False."""
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+        gee = make_gee(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+            scale=10.0,
+            engine="eedai",
+            cloud_mask=lambda image: image,
+        )
+        preview = gee.preview()
+        assert preview.engine == "eedai" and preview.fits is False, (
+            "a forced reader that cannot serve must preview fits=False, not a false fit"
+        )
+        assert preview.reason and "server-side compute" in preview.reason
+
     def test_preview_sizes_a_single_dataset(self, make_gee):
         """Like estimate_cost, preview refuses a multi-dataset request."""
         gee = make_gee(
