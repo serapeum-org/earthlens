@@ -317,6 +317,7 @@ class BandExpression(SummarisedLeaf):
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
+    _summary_fields = ("formula",)
     formula: str
     bands: dict[str, str] = Field(min_length=1)
 
@@ -430,6 +431,26 @@ class DerivedBand(SummarisedLeaf):
             return self.ratio
         assert self.expression is not None  # noqa: S101 - model_validator guarantees
         return tuple(self.expression.bands.values())
+
+    def summary_parts(self) -> list[str]:
+        """Summarise the one operation this derived band carries.
+
+        The operation fields are tuples / a nested model, so the default
+        field-rendering would leave the row blank; compose the active one into
+        a single fragment naming the operation and its source bands.
+
+        Returns:
+            A one-element list: the operation and its inputs, e.g.
+            `["normalized_difference(B8, B4)"]` or `["expression(NIR - RED)"]`.
+        """
+        if self.normalized_difference is not None:
+            fragment = f"normalized_difference({', '.join(self.normalized_difference)})"
+        elif self.ratio is not None:
+            fragment = f"ratio({', '.join(self.ratio)})"
+        else:
+            assert self.expression is not None  # noqa: S101 - validator guarantees
+            fragment = f"expression({self.expression.formula})"
+        return [fragment]
 
 
 class Band(SummarisedLeaf):
@@ -999,9 +1020,7 @@ class Dataset(SummarisedLeaf):
                 not declare as a native band.
         """
         native = {
-            band_id
-            for band_id, band in self.bands.items()
-            if band.derived_from is None
+            band_id for band_id, band in self.bands.items() if band.derived_from is None
         }
         for band_id, band in self.bands.items():
             if band.derived_from is not None:

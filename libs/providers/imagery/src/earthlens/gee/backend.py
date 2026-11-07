@@ -850,9 +850,7 @@ class _AddDerivedBands:
     source image's properties, `system:time_start` included.
     """
 
-    def __init__(
-        self, derived: tuple[tuple[str, DerivedBand], ...], var_info: Dataset
-    ):
+    def __init__(self, derived: tuple[tuple[str, DerivedBand], ...], var_info: Dataset):
         self._derived = derived
         self._var_info = var_info
 

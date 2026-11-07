@@ -1710,9 +1710,7 @@ class TestBuildCollection:
 
     def test_an_expression_index_is_requestable_through_the_facade(self, make_gee):
         """EVI (an expression index) constructs and builds with default flags (C1)."""
-        gee = make_gee(
-            variables={"COPERNICUS/S2_SR_HARMONIZED": ["EVI"]}, scale=10.0
-        )
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["EVI"]}, scale=10.0)
         ds = gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED")
         col = gee._build_collection(
             ds, ["EVI"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 2)
@@ -1724,9 +1722,7 @@ class TestBuildCollection:
 
     def test_derived_index_band_mapped_before_select(self, make_gee):
         """A requested derived index band is `.map`-materialised before the select."""
-        gee = make_gee(
-            variables={"COPERNICUS/S2_SR_HARMONIZED": ["NDVI"]}, scale=10.0
-        )
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["NDVI"]}, scale=10.0)
         ds = gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED")
         col = gee._build_collection(
             ds, ["NDVI"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 2)
@@ -5257,14 +5253,18 @@ class TestPreview:
         """A server-side EE read has no client tiling budget, so it fits, estimate-free."""
         from earthlens.gee.plans import RequestPreview
 
-        gee = make_gee(engine="ee", variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0)
+        gee = make_gee(
+            engine="ee", variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0
+        )
         preview = gee.preview()
         assert isinstance(preview, RequestPreview)
         assert (preview.engine, preview.fits, preview.tiles) == ("ee", True, 1)
         assert preview.scene_count is None
         assert preview.reason is None
 
-    def test_an_eedai_request_reports_the_estimate_and_fits(self, make_gee, monkeypatch):
+    def test_an_eedai_request_reports_the_estimate_and_fits(
+        self, make_gee, monkeypatch
+    ):
         """When the reader serves it, preview reuses estimate_cost + the plan."""
         from types import SimpleNamespace
 
@@ -5274,22 +5274,34 @@ class TestPreview:
         monkeypatch.setattr(gee, "_eedai_eligible", lambda var_info: True)
         monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
         monkeypatch.setattr(
-            gee, "estimate_cost",
-            lambda: SimpleNamespace(scene_count=5, max_width=1000, max_height=800, total_size_bytes=4096),
+            gee,
+            "estimate_cost",
+            lambda: SimpleNamespace(
+                scene_count=5, max_width=1000, max_height=800, total_size_bytes=4096
+            ),
         )
         monkeypatch.setattr(
-            gee, "_eedai_single_image_plan",
-            lambda var_info, band_count: EnginePlan.serves(tiles=1, tile_size=1024, engine="eedai"),
+            gee,
+            "_eedai_single_image_plan",
+            lambda var_info, band_count: EnginePlan.serves(
+                tiles=1, tile_size=1024, engine="eedai"
+            ),
         )
         preview = gee.preview()
         assert preview.engine == "eedai"
         assert preview.fits is True
-        assert (preview.scene_count, preview.max_width, preview.max_height) == (5, 1000, 800)
+        assert (preview.scene_count, preview.max_width, preview.max_height) == (
+            5,
+            1000,
+            800,
+        )
         assert preview.total_size_bytes == 4096
         assert preview.tiles == 1
         assert preview.reason is None
 
-    def test_over_the_scene_budget_falls_back_to_earth_engine(self, make_gee, monkeypatch):
+    def test_over_the_scene_budget_falls_back_to_earth_engine(
+        self, make_gee, monkeypatch
+    ):
         """Too many scenes for the reader → fits False, engine 'ee', a reason given."""
         from types import SimpleNamespace
 
@@ -5299,12 +5311,18 @@ class TestPreview:
         monkeypatch.setattr(gee, "_eedai_eligible", lambda var_info: True)
         monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
         monkeypatch.setattr(
-            gee, "estimate_cost",
-            lambda: SimpleNamespace(scene_count=9999, max_width=10, max_height=10, total_size_bytes=1),
+            gee,
+            "estimate_cost",
+            lambda: SimpleNamespace(
+                scene_count=9999, max_width=10, max_height=10, total_size_bytes=1
+            ),
         )
         monkeypatch.setattr(
-            gee, "_eedai_single_image_plan",
-            lambda var_info, band_count: EnginePlan.serves(tiles=1, tile_size=1024, engine="eedai"),
+            gee,
+            "_eedai_single_image_plan",
+            lambda var_info, band_count: EnginePlan.serves(
+                tiles=1, tile_size=1024, engine="eedai"
+            ),
         )
         preview = gee.preview()
         assert preview.fits is False
@@ -5312,7 +5330,9 @@ class TestPreview:
         assert preview.scene_count == 9999
         assert "scenes" in (preview.reason or "")
 
-    def test_a_declined_reader_plan_falls_back_with_its_reason(self, make_gee, monkeypatch):
+    def test_a_declined_reader_plan_falls_back_with_its_reason(
+        self, make_gee, monkeypatch
+    ):
         """A declined plan (not a scene-budget miss) reports engine 'ee' and its reason."""
         from types import SimpleNamespace
 
@@ -5322,33 +5342,49 @@ class TestPreview:
         monkeypatch.setattr(gee, "_eedai_eligible", lambda var_info: True)
         monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
         monkeypatch.setattr(
-            gee, "estimate_cost",
-            lambda: SimpleNamespace(scene_count=3, max_width=10, max_height=10, total_size_bytes=1),
+            gee,
+            "estimate_cost",
+            lambda: SimpleNamespace(
+                scene_count=3, max_width=10, max_height=10, total_size_bytes=1
+            ),
         )
         monkeypatch.setattr(
-            gee, "_eedai_single_image_plan",
-            lambda var_info, band_count: EnginePlan.declined("the band count is unsupported"),
+            gee,
+            "_eedai_single_image_plan",
+            lambda var_info, band_count: EnginePlan.declined(
+                "the band count is unsupported"
+            ),
         )
         preview = gee.preview()
         assert preview.fits is False
         assert preview.engine == "ee"
         assert preview.reason == "the band count is unsupported"
 
-    def test_a_forced_eedai_request_keeps_its_name_when_it_would_decline(self, make_gee, monkeypatch):
+    def test_a_forced_eedai_request_keeps_its_name_when_it_would_decline(
+        self, make_gee, monkeypatch
+    ):
         """engine='eedai' keeps the name with fits False so the caller sees the decline."""
         from types import SimpleNamespace
 
         from earthlens.gee.plans import EnginePlan
 
-        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0, engine="eedai")
+        gee = make_gee(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+            scale=10.0,
+            engine="eedai",
+        )
         monkeypatch.setattr(gee, "_eedai_eligible", lambda var_info: True)
         monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
         monkeypatch.setattr(
-            gee, "estimate_cost",
-            lambda: SimpleNamespace(scene_count=3, max_width=10, max_height=10, total_size_bytes=1),
+            gee,
+            "estimate_cost",
+            lambda: SimpleNamespace(
+                scene_count=3, max_width=10, max_height=10, total_size_bytes=1
+            ),
         )
         monkeypatch.setattr(
-            gee, "_eedai_single_image_plan",
+            gee,
+            "_eedai_single_image_plan",
             lambda var_info, band_count: EnginePlan.declined("too many bands"),
         )
         preview = gee.preview()
@@ -5356,13 +5392,17 @@ class TestPreview:
         assert preview.fits is False
         assert preview.reason == "too many bands"
 
-    def test_an_unsupported_composite_reducer_routes_to_earth_engine(self, make_gee, monkeypatch):
+    def test_an_unsupported_composite_reducer_routes_to_earth_engine(
+        self, make_gee, monkeypatch
+    ):
         """An EE-only reducer (stdDev) declines the reader, so auto previews engine 'ee'."""
         from earthlens.gee.backend import _EEDAI_UNSUPPORTED_REDUCER_REASONS
 
         monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
         gee = make_gee(
-            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0, reducer="stdDev"
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+            scale=10.0,
+            reducer="stdDev",
         )
         preview = gee.preview()
         assert preview.engine == "ee", "stdDev routes to Earth Engine"
@@ -5373,7 +5413,9 @@ class TestPreview:
             "the fallback reason must be the reducer's own decline reason"
         )
 
-    def test_a_forced_eedai_ineligible_request_previews_a_decline(self, make_gee, monkeypatch):
+    def test_a_forced_eedai_ineligible_request_previews_a_decline(
+        self, make_gee, monkeypatch
+    ):
         """A cloud_mask makes a forced-eedai request ineligible; it would error, so fits=False."""
         monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
         gee = make_gee(
@@ -5390,7 +5432,9 @@ class TestPreview:
         assert preview.reason
         assert "server-side compute" in preview.reason
 
-    def test_without_the_eedai_extra_auto_previews_earth_engine(self, make_gee, monkeypatch):
+    def test_without_the_eedai_extra_auto_previews_earth_engine(
+        self, make_gee, monkeypatch
+    ):
         """With pyramids-eo absent, auto falls back to Earth Engine, fits in one pass."""
         monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
         gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0)
@@ -5400,11 +5444,15 @@ class TestPreview:
         assert preview.reason
         assert "not installed" in preview.reason
 
-    def test_forced_eedai_without_the_extra_previews_a_decline(self, make_gee, monkeypatch):
+    def test_forced_eedai_without_the_extra_previews_a_decline(
+        self, make_gee, monkeypatch
+    ):
         """A forced reader with the extra absent would error, so fits=False."""
         monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
         gee = make_gee(
-            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0, engine="eedai"
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+            scale=10.0,
+            engine="eedai",
         )
         preview = gee.preview()
         assert preview.engine == "eedai"
