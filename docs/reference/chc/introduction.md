@@ -28,7 +28,7 @@ different in two ways:
   socket, log in as `anonymous`, walk the tree. The earthlens
   backend wraps `ftplib` (stdlib) and that's all that's required.
 - **Catalog-driven, not provider-driven.** The CHC FTP layout is
-  per-product-family (`pub/org/chc/products/CHIRPS-2.0/global_daily/...`,
+  per-product-family (`products/CHIRPS/v2.0/global_daily/...`,
   `.../WBGT/wbgt_global_dekad_data/...`) with per-family filename
   conventions. The backend doesn't hardcode any of that — it
   consults `earthlens.chc.Catalog` and substitutes per-date
@@ -58,7 +58,7 @@ The CHC catalog covers 13 product families:
 
 Browse the full list via `Catalog.list_datasets()` or
 `Catalog.available_datasets`. Every entry is reachable from
-`pub/org/chc/products/...` on the FTP.
+`products/...` on the FTP.
 
 ## Data is shipped as files, not as a service
 

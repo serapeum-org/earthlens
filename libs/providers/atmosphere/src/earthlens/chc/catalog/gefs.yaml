@@ -18,6 +18,16 @@
 # the backend grows the placeholder vocabulary to address the
 # subdir split. Re-run the probe to confirm the layout and resurrect
 # the rows in `_index.yaml`'s `available_datasets:` once verified.
+#
+# NOTE (issue #1386): CHC reorganised its FTP tree (the `pub/org/chc/`
+# prefix is gone; `products/` now sits at the root, and the old
+# `CHIRPS-GEFS_precip_v12/` product became `CHIRPS-GEFS/v3/` with a
+# different forecast-lead scheme: `05day`->`05_day`,
+# `{dekad,pentad}_{first,last,second}` -> `*_lead_{0,1,2}`). Every
+# other CHC catalog file was migrated to the new root; the v12 rows
+# below are left on the old (now-404) paths deliberately, because the
+# lead-scheme remap is a semantic change, not a rename, and needs a
+# maintainer decision. See #1386.
 
 datasets:
 

@@ -16,7 +16,7 @@ from earthlens.cli.toolkit import HTTP_TIMEOUT, lint, require
 
 #: CHC anonymous-FTP host and the products root walked for coverage.
 _CHC_FTP_HOST = "data.chc.ucsb.edu"
-_CHC_ROOT = "pub/org/chc/products"
+_CHC_ROOT = "products"
 #: How far the BFS descends below the root before giving up on a branch.
 _CHC_MAX_DEPTH = 6
 #: Suffixes that mark a leaf "data file" (so its directory is a product dir).

@@ -5,7 +5,7 @@
 datasets:
   chirp-daily:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRP/daily/
+      tif: products/CHIRP/v2.0/daily/
     region: global
     temporal_resolution: daily
     pandas_freq: D
@@ -21,7 +21,7 @@ datasets:
         types: flux
   chirp-monthly:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRP/monthly/
+      tif: products/CHIRP/v2.0/monthly/
     region: global
     temporal_resolution: monthly
     pandas_freq: MS
@@ -37,7 +37,7 @@ datasets:
         types: flux
   chirp-dekad:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRP/dekads/
+      tif: products/CHIRP/v2.0/dekads/
     region: global
     temporal_resolution: dekadal
     pandas_freq: 10D
@@ -53,7 +53,7 @@ datasets:
         types: flux
   chirp-pentad:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRP/pentads/
+      tif: products/CHIRP/v2.0/pentads/
     region: global
     temporal_resolution: pentadal
     pandas_freq: 5D
@@ -69,7 +69,7 @@ datasets:
         types: flux
   chirp-v3-global-daily:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRP-v3.0/daily/global/tifs/
+      tif: products/CHIRP/v3.0/daily/global/tifs/
     region: global
     temporal_resolution: daily
     pandas_freq: D
@@ -85,7 +85,7 @@ datasets:
         types: flux
   chirp-v3-global-monthly:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRP-v3.0/monthly/global/tifs/
+      tif: products/CHIRP/v3.0/monthly/global/tifs/
     region: global
     temporal_resolution: monthly
     pandas_freq: MS
@@ -101,7 +101,7 @@ datasets:
         types: flux
   chirp-v3-global-dekad:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRP-v3.0/dekads/global/tifs/
+      tif: products/CHIRP/v3.0/dekads/global/tifs/
     region: global
     temporal_resolution: dekadal
     pandas_freq: 10D
