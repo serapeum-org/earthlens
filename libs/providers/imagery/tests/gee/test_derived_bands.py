@@ -169,3 +169,44 @@ class TestAddDerivedBands:
         out = op(_Node("img"))
         added_names = [(name, overwrite) for name, _k, _a, overwrite in out.added]
         assert added_names == [("NDVI", True), ("NDWI", True)]
+
+
+class TestDerivedSourceValidation:
+    """A derived band's source bands must exist among the dataset's native bands."""
+
+    def test_a_derived_band_naming_a_missing_source_is_refused(self):
+        """A source band that is not a native band fails catalog load, not at runtime."""
+        from earthlens.gee.catalog import Band, Dataset, Extent
+
+        with pytest.raises(ValidationError, match="not native bands"):
+            Dataset(
+                id="X/Y",
+                title="t",
+                extent=Extent(start_date="2020-01-01", end_date="2020-01-02"),
+                bands={
+                    "B4": Band(id="B4"),
+                    "NDVI": Band(
+                        id="NDVI",
+                        derived_from=DerivedBand(normalized_difference=("B8", "B4")),
+                    ),
+                },
+            )
+
+    def test_a_derived_band_whose_sources_are_native_loads(self):
+        """When every source band exists, the dataset builds without complaint."""
+        from earthlens.gee.catalog import Band, Dataset, Extent
+
+        row = Dataset(
+            id="X/Y",
+            title="t",
+            extent=Extent(start_date="2020-01-01", end_date="2020-01-02"),
+            bands={
+                "B8": Band(id="B8"),
+                "B4": Band(id="B4"),
+                "NDVI": Band(
+                    id="NDVI",
+                    derived_from=DerivedBand(normalized_difference=("B8", "B4")),
+                ),
+            },
+        )
+        assert set(row.bands) == {"B8", "B4", "NDVI"}

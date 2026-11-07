@@ -383,8 +383,9 @@ class DerivedBand(SummarisedLeaf):
         """Return the source band ids this formula reads.
 
         Returns:
-            The band ids referenced, in a stable order — used to check that the
-            inputs exist and to route a derived request off the EEDAI reader.
+            The band ids referenced, in a stable order. The dataset's
+            post-load validator uses these to check every source band exists
+            among the dataset's native bands.
         """
         if self.normalized_difference is not None:
             return self.normalized_difference
@@ -943,6 +944,42 @@ class Dataset(SummarisedLeaf):
                 ```
         """
         return self.ee_type == "image_collection"
+
+    @model_validator(mode="after")
+    def _derived_bands_reference_native_bands(self) -> Dataset:
+        """Check every derived band reads only source bands this dataset declares.
+
+        A derived band (`derived_from`) is computed from the dataset's own
+        native bands; a typo in a source id would otherwise pass catalog load
+        and fail only at Earth Engine runtime. This catches it at load time.
+
+        Returns:
+            `self` unchanged once every derived band's source ids exist among
+            the dataset's native (non-derived) bands.
+
+        Raises:
+            ValueError: If a derived band names a source band the dataset does
+                not declare as a native band.
+        """
+        native = {
+            band_id
+            for band_id, band in self.bands.items()
+            if band.derived_from is None
+        }
+        for band_id, band in self.bands.items():
+            if band.derived_from is not None:
+                missing = [
+                    source
+                    for source in band.derived_from.source_bands()
+                    if source not in native
+                ]
+                if missing:
+                    raise ValueError(
+                        f"derived band {band_id!r} of {self.id} reads source "
+                        f"band(s) {missing} that are not native bands of the "
+                        f"dataset; native bands are {sorted(native)}"
+                    )
+        return self
 
     def get_band(self, band_id: str) -> Band:
         """Return the `Band` for `band_id`.
