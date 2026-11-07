@@ -5365,6 +5365,24 @@ class TestPreview:
         )
         assert preview.reason and "server-side compute" in preview.reason
 
+    def test_without_the_eedai_extra_auto_previews_earth_engine(self, make_gee, monkeypatch):
+        """With pyramids-eo absent, auto falls back to Earth Engine, fits in one pass."""
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0)
+        preview = gee.preview()
+        assert preview.engine == "ee" and preview.fits is True
+        assert preview.reason and "not installed" in preview.reason
+
+    def test_forced_eedai_without_the_extra_previews_a_decline(self, make_gee, monkeypatch):
+        """A forced reader with the extra absent would error, so fits=False."""
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
+        gee = make_gee(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0, engine="eedai"
+        )
+        preview = gee.preview()
+        assert preview.engine == "eedai" and preview.fits is False
+        assert preview.reason and "not installed" in preview.reason
+
     def test_preview_sizes_a_single_dataset(self, make_gee):
         """Like estimate_cost, preview refuses a multi-dataset request."""
         gee = make_gee(
