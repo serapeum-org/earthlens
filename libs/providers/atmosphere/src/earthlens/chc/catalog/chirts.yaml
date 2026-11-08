@@ -5,7 +5,7 @@
 datasets:
   chirtsdaily-tmax:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRTSdaily/v1.0/global_tifs_p05/Tmax/
+      tif: products/CHIRTS/daily/v1.0/global_tifs_p05/Tmax/
     region: global-land
     temporal_resolution: daily
     pandas_freq: D
@@ -22,7 +22,7 @@ datasets:
         types: state
   chirtsdaily-tmin:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRTSdaily/v1.0/global_tifs_p05/Tmin/
+      tif: products/CHIRTS/daily/v1.0/global_tifs_p05/Tmin/
     region: global-land
     temporal_resolution: daily
     pandas_freq: D
@@ -39,7 +39,7 @@ datasets:
         types: state
   chirtsdaily-heat-index:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRTSdaily/v1.0/global_tifs_p05/HeatIndex/
+      tif: products/CHIRTS/daily/v1.0/global_tifs_p05/HeatIndex/
     region: global-land
     temporal_resolution: daily
     pandas_freq: D
@@ -56,7 +56,7 @@ datasets:
         types: state
   chirtsdaily-relative-humidity:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRTSdaily/v1.0/global_tifs_p05/RHum/
+      tif: products/CHIRTS/daily/v1.0/global_tifs_p05/RHum/
     region: global-land
     temporal_resolution: daily
     pandas_freq: D
@@ -73,7 +73,7 @@ datasets:
         types: state
   chirtsdaily-svp:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRTSdaily/v1.0/global_tifs_p05/svp/
+      tif: products/CHIRTS/daily/v1.0/global_tifs_p05/svp/
     region: global-land
     temporal_resolution: daily
     pandas_freq: D
@@ -90,7 +90,7 @@ datasets:
         types: state
   chirtsdaily-vpd:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRTSdaily/v1.0/global_tifs_p05/vpd/
+      tif: products/CHIRTS/daily/v1.0/global_tifs_p05/vpd/
     region: global-land
     temporal_resolution: daily
     pandas_freq: D
@@ -107,7 +107,7 @@ datasets:
         types: state
   chirtsmonthly-tmax:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRTSmonthly/CHIRTSmax.CDR/
+      tif: products/CHIRTS/monthly/CHIRTSmax.CDR/
     region: global-land
     temporal_resolution: monthly
     pandas_freq: MS

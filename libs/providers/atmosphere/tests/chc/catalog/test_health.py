@@ -121,3 +121,95 @@ class TestHealthIndexConsistency:
         report = cat.health()
         assert report["index_missing_in_datasets"] == []
         assert report["datasets_missing_in_index"] == []
+
+
+class TestFtpPathMigration:
+    """The shipped catalog tracks CHC's reorganised FTP layout (#1386).
+
+    CHC retired the `pub/org/chc/products/...` tree in favour of a
+    `products/...` root. Every bundled dataset was migrated except the
+    CHIRPS-GEFS v12 forecast rows, whose v3 remap is a semantic change
+    (not a rename) tracked separately in #1387.
+
+    These checks are a prefix/rooting lock-in, not a reachability check:
+    they catch a revert to the retired prefix or a stray leading slash,
+    but not a `products/`-rooted path mistyped within the tree. Live
+    resolution is covered by the e2e `test_all_migrated_ftp_bases_resolve_live`.
+    """
+
+    #: Key prefix of the rows deliberately left on the retired paths (#1387).
+    _GEFS_V12_PREFIX = "chirps-gefs-v12-"
+    #: The retired FTP root that no migrated path may use any more.
+    _RETIRED_PREFIX = "pub/org/chc/"
+
+    def test_no_dataset_uses_the_retired_prefix_except_gefs_v12(
+        self, bundled_catalog: Catalog
+    ):
+        """Only CHIRPS-GEFS v12 rows may still carry the retired prefix."""
+        offenders = sorted(
+            key
+            for key, ds in bundled_catalog.datasets.items()
+            if not key.startswith(self._GEFS_V12_PREFIX)
+            for path in ds.ftp_bases.values()
+            if path.startswith(self._RETIRED_PREFIX)
+        )
+        assert offenders == [], (
+            f"datasets still on the retired {self._RETIRED_PREFIX!r} prefix: {offenders}"
+        )
+
+    def test_migrated_paths_are_rooted_at_products(self, bundled_catalog: Catalog):
+        """Every migrated ftp_base starts at `products/` with no leading slash."""
+        bad = sorted(
+            (key, path)
+            for key, ds in bundled_catalog.datasets.items()
+            if not key.startswith(self._GEFS_V12_PREFIX)
+            for path in ds.ftp_bases.values()
+            if path.startswith("/") or not path.startswith("products/")
+        )
+        assert bad == [], f"migrated paths not cleanly rooted at 'products/': {bad}"
+
+    def test_gefs_v12_rows_are_the_only_retired_exception(
+        self, bundled_catalog: Catalog
+    ):
+        """Exactly the nine CHIRPS-GEFS v12 rows keep the old paths (update when #1387 lands)."""
+        retired = sorted(
+            key
+            for key, ds in bundled_catalog.datasets.items()
+            if any(p.startswith(self._RETIRED_PREFIX) for p in ds.ftp_bases.values())
+        )
+        assert all(k.startswith(self._GEFS_V12_PREFIX) for k in retired), (
+            f"unexpected retired-prefix rows outside CHIRPS-GEFS v12: {retired}"
+        )
+        assert len(retired) == 9, (
+            f"expected exactly 9 CHIRPS-GEFS v12 rows on the retired prefix, "
+            f"got {len(retired)}: {retired}"
+        )
+
+
+@pytest.mark.e2e
+def test_all_migrated_ftp_bases_resolve_live(bundled_catalog: Catalog):
+    """Every migrated (non-GEFS-v12) ftp_base resolves on the live CHC FTP."""
+    from ftplib import FTP
+
+    from earthlens.chc import CHIRPS
+
+    unreachable: list[str] = []
+    ftp = FTP(CHIRPS.api_url, timeout=60)  # noqa: S321 - public anonymous data FTP
+    try:
+        ftp.login()
+        for key, ds in bundled_catalog.datasets.items():
+            if key.startswith("chirps-gefs-v12-"):
+                continue
+            for path in ds.ftp_bases.values():
+                try:
+                    ftp.cwd("/" + path.strip("/"))
+                except Exception as exc:  # noqa: BLE001 - collect, assert once at end
+                    unreachable.append(f"{key}: {path}: {exc}")
+    finally:
+        try:
+            ftp.quit()
+        except Exception:  # noqa: BLE001 - best-effort close
+            pass
+    assert unreachable == [], (
+        f"ftp_bases that did not resolve on the live FTP: {unreachable}"
+    )

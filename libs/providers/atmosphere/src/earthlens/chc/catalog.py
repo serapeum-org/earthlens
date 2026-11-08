@@ -212,7 +212,7 @@ class Dataset(SummarisedLeaf):
             >>> from earthlens.chc import Catalog
             >>> ds = Catalog().get_dataset("global-daily")
             >>> ds.ftp_base   # default (first) path
-            'pub/org/chc/products/CHIRPS-2.0/global_daily/tifs/p05/'
+            'products/CHIRPS/v2.0/global_daily/tifs/p05/'
             >>> "tif" in ds.ftp_bases
             True
 

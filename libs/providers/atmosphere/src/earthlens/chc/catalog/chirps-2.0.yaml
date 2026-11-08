@@ -5,7 +5,7 @@
 datasets:
   global-daily:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/global_daily/tifs/p05/
+      tif: products/CHIRPS/v2.0/global_daily/tifs/p05/
     region: global
     temporal_resolution: daily
     pandas_freq: D
@@ -26,7 +26,7 @@ datasets:
         types: flux
   global-monthly:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/global_monthly/tifs/
+      tif: products/CHIRPS/v2.0/global_monthly/tifs/
     region: global
     temporal_resolution: monthly
     pandas_freq: MS
@@ -42,7 +42,7 @@ datasets:
         types: flux
   global-annual:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/global_annual/tifs/
+      tif: products/CHIRPS/v2.0/global_annual/tifs/
     region: global
     temporal_resolution: annual
     pandas_freq: YS
@@ -58,7 +58,7 @@ datasets:
         types: flux
   global-dekad:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/global_dekad/tifs/
+      tif: products/CHIRPS/v2.0/global_dekad/tifs/
     region: global
     temporal_resolution: dekadal
     pandas_freq: 10D
@@ -74,7 +74,7 @@ datasets:
         types: flux
   global-pentad:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/global_pentad/tifs/
+      tif: products/CHIRPS/v2.0/global_pentad/tifs/
     region: global
     temporal_resolution: pentadal
     pandas_freq: 5D
@@ -90,7 +90,7 @@ datasets:
         types: flux
   global-2-monthly:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/global_2-monthly/tifs/
+      tif: products/CHIRPS/v2.0/global_2-monthly/tifs/
     region: global
     temporal_resolution: 2-monthly
     pandas_freq: 2MS
@@ -106,7 +106,7 @@ datasets:
         types: flux
   global-3-monthly:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/global_3-monthly/tifs/
+      tif: products/CHIRPS/v2.0/global_3-monthly/tifs/
     region: global
     temporal_resolution: 3-monthly
     pandas_freq: QS
@@ -122,7 +122,7 @@ datasets:
         types: flux
   africa-daily:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/africa_daily/tifs/p05/
+      tif: products/CHIRPS/v2.0/africa_daily/tifs/p05/
     region: africa
     temporal_resolution: daily
     pandas_freq: D
@@ -138,7 +138,7 @@ datasets:
         types: flux
   africa-monthly:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/africa_monthly/tifs/
+      tif: products/CHIRPS/v2.0/africa_monthly/tifs/
     region: africa
     temporal_resolution: monthly
     pandas_freq: MS
@@ -154,7 +154,7 @@ datasets:
         types: flux
   africa-dekad:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/africa_dekad/tifs/
+      tif: products/CHIRPS/v2.0/africa_dekad/tifs/
     region: africa
     temporal_resolution: dekadal
     pandas_freq: 10D
@@ -170,7 +170,7 @@ datasets:
         types: flux
   africa-pentad:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/africa_pentad/tifs/
+      tif: products/CHIRPS/v2.0/africa_pentad/tifs/
     region: africa
     temporal_resolution: pentadal
     pandas_freq: 5D
@@ -186,7 +186,7 @@ datasets:
         types: flux
   africa-6-hourly:
     ftp_bases:
-      bin: pub/org/chc/products/CHIRPS-2.0/africa_6-hourly/p1_bin/
+      bin: products/CHIRPS/v2.0/africa_6-hourly/p1_bin/
     region: africa
     temporal_resolution: 6-hourly
     pandas_freq: 6h
@@ -202,7 +202,7 @@ datasets:
         types: flux
   africa-2-monthly:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/africa_2-monthly/tifs/
+      tif: products/CHIRPS/v2.0/africa_2-monthly/tifs/
     region: africa
     temporal_resolution: 2-monthly
     pandas_freq: 2MS
@@ -218,7 +218,7 @@ datasets:
         types: flux
   africa-3-monthly:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/africa_3-monthly/tifs/
+      tif: products/CHIRPS/v2.0/africa_3-monthly/tifs/
     region: africa
     temporal_resolution: 3-monthly
     pandas_freq: QS
@@ -234,7 +234,7 @@ datasets:
         types: flux
   central-america-caribbean-dekad:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/camer-carib_dekad/tifs/
+      tif: products/CHIRPS/v2.0/camer-carib_dekad/tifs/
     region: central-america-caribbean
     temporal_resolution: dekadal
     pandas_freq: 10D
@@ -250,7 +250,7 @@ datasets:
         types: flux
   central-america-caribbean-monthly:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/camer-carib_monthly/tifs/
+      tif: products/CHIRPS/v2.0/camer-carib_monthly/tifs/
     region: central-america-caribbean
     temporal_resolution: monthly
     pandas_freq: MS
@@ -266,7 +266,7 @@ datasets:
         types: flux
   central-america-caribbean-pentad:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/camer-carib_pentad/tifs/
+      tif: products/CHIRPS/v2.0/camer-carib_pentad/tifs/
     region: central-america-caribbean
     temporal_resolution: pentadal
     pandas_freq: 5D
@@ -282,7 +282,7 @@ datasets:
         types: flux
   east-africa-monthly:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/EAC_monthly/tifs/
+      tif: products/CHIRPS/v2.0/EAC_monthly/tifs/
     region: east-africa
     temporal_resolution: monthly
     pandas_freq: MS
@@ -298,7 +298,7 @@ datasets:
         types: flux
   indonesia-dekad:
     ftp_bases:
-      bil: pub/org/chc/products/CHIRPS-2.0/indonesia_dekad/bils/
+      bil: products/CHIRPS/v2.0/indonesia_dekad/bils/
     region: indonesia
     temporal_resolution: dekadal
     pandas_freq: 10D
@@ -314,7 +314,7 @@ datasets:
         types: flux
   indonesia-monthly:
     ftp_bases:
-      bil: pub/org/chc/products/CHIRPS-2.0/indonesia_monthly/bils/
+      bil: products/CHIRPS/v2.0/indonesia_monthly/bils/
     region: indonesia
     temporal_resolution: monthly
     pandas_freq: MS
@@ -330,7 +330,7 @@ datasets:
         types: flux
   western-hemisphere-daily:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/whem_daily/tifs/p05/
+      tif: products/CHIRPS/v2.0/whem_daily/tifs/p05/
     region: western-hemisphere
     temporal_resolution: daily
     pandas_freq: D
@@ -346,7 +346,7 @@ datasets:
         types: flux
   prelim-global-daily:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/prelim/global_daily/tifs/p05/
+      tif: products/CHIRPS/v2.0/prelim/global_daily/tifs/p05/
     region: global
     temporal_resolution: daily
     pandas_freq: D
@@ -363,7 +363,7 @@ datasets:
         types: flux
   prelim-global-monthly:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/prelim/global_monthly/tifs/
+      tif: products/CHIRPS/v2.0/prelim/global_monthly/tifs/
     region: global
     temporal_resolution: monthly
     pandas_freq: MS
@@ -380,7 +380,7 @@ datasets:
         types: flux
   prelim-global-dekad:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/prelim/global_dekad/tifs/
+      tif: products/CHIRPS/v2.0/prelim/global_dekad/tifs/
     region: global
     temporal_resolution: dekadal
     pandas_freq: 10D
@@ -397,7 +397,7 @@ datasets:
         types: flux
   prelim-global-pentad:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/prelim/global_pentad/tifs/
+      tif: products/CHIRPS/v2.0/prelim/global_pentad/tifs/
     region: global
     temporal_resolution: pentadal
     pandas_freq: 5D
@@ -414,7 +414,7 @@ datasets:
         types: flux
   prelim-global-2-monthly:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/prelim/global_2-monthly/tifs/
+      tif: products/CHIRPS/v2.0/prelim/global_2-monthly/tifs/
     region: global
     temporal_resolution: 2-monthly
     pandas_freq: 2MS
@@ -431,7 +431,7 @@ datasets:
         types: flux
   prelim-global-3-monthly:
     ftp_bases:
-      tif: pub/org/chc/products/CHIRPS-2.0/prelim/global_3-monthly/tifs/
+      tif: products/CHIRPS/v2.0/prelim/global_3-monthly/tifs/
     region: global
     temporal_resolution: 3-monthly
     pandas_freq: QS

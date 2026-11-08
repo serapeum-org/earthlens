@@ -5,7 +5,7 @@
 datasets:
   chc-cmip6-precip-daily-delta-2030-ssp245:
     ftp_bases:
-      tif: pub/org/chc/products/CHC_CMIP6/daily_deltas/precip/2030_SSP245/
+      tif: products/CHC_CMIP6/daily_deltas/precip/2030_SSP245/
     region: global-extended
     temporal_resolution: daily-delta
     pandas_freq: D
@@ -22,7 +22,7 @@ datasets:
         types: flux
   chc-cmip6-precip-daily-delta-2030-ssp585:
     ftp_bases:
-      tif: pub/org/chc/products/CHC_CMIP6/daily_deltas/precip/2030_SSP585/
+      tif: products/CHC_CMIP6/daily_deltas/precip/2030_SSP585/
     region: global-extended
     temporal_resolution: daily-delta
     pandas_freq: D
@@ -39,7 +39,7 @@ datasets:
         types: flux
   chc-cmip6-precip-daily-delta-2050-ssp245:
     ftp_bases:
-      tif: pub/org/chc/products/CHC_CMIP6/daily_deltas/precip/2050_SSP245/
+      tif: products/CHC_CMIP6/daily_deltas/precip/2050_SSP245/
     region: global-extended
     temporal_resolution: daily-delta
     pandas_freq: D
@@ -56,7 +56,7 @@ datasets:
         types: flux
   chc-cmip6-precip-daily-delta-2050-ssp585:
     ftp_bases:
-      tif: pub/org/chc/products/CHC_CMIP6/daily_deltas/precip/2050_SSP585/
+      tif: products/CHC_CMIP6/daily_deltas/precip/2050_SSP585/
     region: global-extended
     temporal_resolution: daily-delta
     pandas_freq: D
@@ -73,7 +73,7 @@ datasets:
         types: flux
   chc-cmip6-rh-daily-delta-2030-ssp245:
     ftp_bases:
-      tif: pub/org/chc/products/CHC_CMIP6/daily_deltas/rh/2030_SSP245/
+      tif: products/CHC_CMIP6/daily_deltas/rh/2030_SSP245/
     region: global-extended
     temporal_resolution: daily-delta
     pandas_freq: D
@@ -90,7 +90,7 @@ datasets:
         types: state
   chc-cmip6-rh-daily-delta-2030-ssp585:
     ftp_bases:
-      tif: pub/org/chc/products/CHC_CMIP6/daily_deltas/rh/2030_SSP585/
+      tif: products/CHC_CMIP6/daily_deltas/rh/2030_SSP585/
     region: global-extended
     temporal_resolution: daily-delta
     pandas_freq: D
@@ -107,7 +107,7 @@ datasets:
         types: state
   chc-cmip6-rh-daily-delta-2050-ssp245:
     ftp_bases:
-      tif: pub/org/chc/products/CHC_CMIP6/daily_deltas/rh/2050_SSP245/
+      tif: products/CHC_CMIP6/daily_deltas/rh/2050_SSP245/
     region: global-extended
     temporal_resolution: daily-delta
     pandas_freq: D
@@ -124,7 +124,7 @@ datasets:
         types: state
   chc-cmip6-rh-daily-delta-2050-ssp585:
     ftp_bases:
-      tif: pub/org/chc/products/CHC_CMIP6/daily_deltas/rh/2050_SSP585/
+      tif: products/CHC_CMIP6/daily_deltas/rh/2050_SSP585/
     region: global-extended
     temporal_resolution: daily-delta
     pandas_freq: D
@@ -141,7 +141,7 @@ datasets:
         types: state
   chc-cmip6-tmax-daily-delta-2030-ssp245:
     ftp_bases:
-      tif: pub/org/chc/products/CHC_CMIP6/daily_deltas/tmax/2030_SSP245/
+      tif: products/CHC_CMIP6/daily_deltas/tmax/2030_SSP245/
     region: global-extended
     temporal_resolution: daily-delta
     pandas_freq: D
@@ -158,7 +158,7 @@ datasets:
         types: state
   chc-cmip6-tmax-daily-delta-2030-ssp585:
     ftp_bases:
-      tif: pub/org/chc/products/CHC_CMIP6/daily_deltas/tmax/2030_SSP585/
+      tif: products/CHC_CMIP6/daily_deltas/tmax/2030_SSP585/
     region: global-extended
     temporal_resolution: daily-delta
     pandas_freq: D
@@ -175,7 +175,7 @@ datasets:
         types: state
   chc-cmip6-tmax-daily-delta-2050-ssp245:
     ftp_bases:
-      tif: pub/org/chc/products/CHC_CMIP6/daily_deltas/tmax/2050_SSP245/
+      tif: products/CHC_CMIP6/daily_deltas/tmax/2050_SSP245/
     region: global-extended
     temporal_resolution: daily-delta
     pandas_freq: D
@@ -192,7 +192,7 @@ datasets:
         types: state
   chc-cmip6-tmax-daily-delta-2050-ssp585:
     ftp_bases:
-      tif: pub/org/chc/products/CHC_CMIP6/daily_deltas/tmax/2050_SSP585/
+      tif: products/CHC_CMIP6/daily_deltas/tmax/2050_SSP585/
     region: global-extended
     temporal_resolution: daily-delta
     pandas_freq: D
@@ -209,7 +209,7 @@ datasets:
         types: state
   chc-cmip6-tmin-daily-delta-2030-ssp245:
     ftp_bases:
-      tif: pub/org/chc/products/CHC_CMIP6/daily_deltas/tmin/2030_SSP245/
+      tif: products/CHC_CMIP6/daily_deltas/tmin/2030_SSP245/
     region: global-extended
     temporal_resolution: daily-delta
     pandas_freq: D
@@ -226,7 +226,7 @@ datasets:
         types: state
   chc-cmip6-tmin-daily-delta-2030-ssp585:
     ftp_bases:
-      tif: pub/org/chc/products/CHC_CMIP6/daily_deltas/tmin/2030_SSP585/
+      tif: products/CHC_CMIP6/daily_deltas/tmin/2030_SSP585/
     region: global-extended
     temporal_resolution: daily-delta
     pandas_freq: D
@@ -243,7 +243,7 @@ datasets:
         types: state
   chc-cmip6-tmin-daily-delta-2050-ssp245:
     ftp_bases:
-      tif: pub/org/chc/products/CHC_CMIP6/daily_deltas/tmin/2050_SSP245/
+      tif: products/CHC_CMIP6/daily_deltas/tmin/2050_SSP245/
     region: global-extended
     temporal_resolution: daily-delta
     pandas_freq: D
@@ -260,7 +260,7 @@ datasets:
         types: state
   chc-cmip6-tmin-daily-delta-2050-ssp585:
     ftp_bases:
-      tif: pub/org/chc/products/CHC_CMIP6/daily_deltas/tmin/2050_SSP585/
+      tif: products/CHC_CMIP6/daily_deltas/tmin/2050_SSP585/
     region: global-extended
     temporal_resolution: daily-delta
     pandas_freq: D

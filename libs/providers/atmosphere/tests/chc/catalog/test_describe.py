@@ -55,7 +55,7 @@ class TestDescribePerDate:
         # file_patterns entries exist.
         assert info["formats"] == ["tif"]
         assert info["ftp_bases"] == {
-            "tif": "pub/org/chc/products/CHIRPS-2.0/global_daily/tifs/p05/"
+            "tif": "products/CHIRPS/v2.0/global_daily/tifs/p05/"
         }
         assert info["file_patterns"] == {
             "tif": "{year}/chirps-v2.0.{year}.{month}.{day}.tif.gz"
