@@ -78,6 +78,7 @@ datasets:
         description: Wet Bulb Globe Temperature (WBGT)
         units: degC
         types: state
+        signed: true
 
   wbgt-dekad:
     ftp_bases:
@@ -95,6 +96,7 @@ datasets:
         description: Wet Bulb Globe Temperature (WBGT)
         units: degC
         types: state
+        signed: true
 
   centennial-trends-v1-monthly:
     ftp_bases:
