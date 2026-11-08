@@ -19,7 +19,7 @@ flowchart LR
     registry -->|"imports on demand"| backend["Concrete backend<br/>(AbstractDataSource subclass)"]
     backend --> catalog["Catalog<br/>(pydantic + YAML)"]
     backend --> remote[("Provider<br/>FTP · S3 · HTTP · SDK")]
-    backend --> pyramids["pyramids-gis<br/>clip · convert · write"]
+    backend --> pyramids["pyramids-core<br/>clip · convert · write"]
 ```
 
 The registry is **lazy** and **discovered**, not hard-coded. `earthlens._backends.discover_backends()` merges the
@@ -170,7 +170,7 @@ sequenceDiagram
     participant Registry as _LazyRegistry
     participant DS as Backend
     participant Server as Provider
-    participant Pyramids as pyramids-gis
+    participant Pyramids as pyramids-core
 
     User->>Facade: EarthLens(data_source, start, end, ...)
     Facade->>Registry: resolve key
@@ -293,7 +293,7 @@ shared `earthlens.base.yaml_loader.load_yaml_strict`.
 When a provider needs credentials the auth surface lives in `auth.py` as a
 `<Provider>Auth` + `<Provider>Credentials` pair with env-var fallbacks, raising
 `AuthenticationError` on failure. Sanctioned exceptions: a multi-endpoint
-backend may use a signer model instead (stac: `signers.py` + `auth_cdse.py`),
+backend may use a signer model instead (stac: `signers.py`),
 and a backend whose SDK owns auth (ecmwf via `~/.cdsapirc`) may keep its
 `AuthenticationError` in `backend.py`. Public/anonymous backends (chc, gdacs,
 hdx, overture, tropycal) have no auth module.

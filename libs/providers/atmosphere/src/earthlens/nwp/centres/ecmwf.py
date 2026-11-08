@@ -2,13 +2,13 @@
 
 ECMWF publishes IFS HRES / ENS / AIFS forecasts as open data (CC-BY-4.0,
 no auth) and ships the `ecmwf-opendata` client, which does its own
-index-based parameter subsetting. :class:`ECMWFCentre` maps the
+index-based parameter subsetting. `ECMWFCentre` maps the
 requested earthlens params to the client's `param` tokens (`"2t"`,
 `"tp"`, …), selects the mirror `source`, and returns the local GRIB2
 the client wrote.
 
 `ecmwf-opendata` is imported lazily inside
-:meth:`ECMWFCentre.fetch_one` so the package imports without the
+`ECMWFCentre.fetch_one` so the package imports without the
 `[nwp]` extra.
 """
 

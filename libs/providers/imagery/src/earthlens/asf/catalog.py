@@ -10,15 +10,15 @@ bridge: each curated row maps one user-facing product key
 product supports `ASFProduct.stack()` (only the SAR-image classes
 do; processed-RTC outputs do not).
 
-:class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog`
+`Catalog` is a thin `earthlens.base.AbstractCatalog`
 subclass that loads the bundled `asf_data_catalog.yaml`. Resolve a
-key with :meth:`Catalog.resolve` (which accepts a curated key or
+key with `Catalog.resolve` (which accepts a curated key or
 one of its aliases, with a did-you-mean hint on an unknown name),
-and read the row with :meth:`Catalog.get_product`. The catalog is
+and read the row with `Catalog.get_product`. The catalog is
 **hand-curated** — the ASF universe is small enough that a refresh
 tool would not pay for itself (mirrors the fdsn / openaq pattern).
 
-:data:`CATALOG_PATH` is the path to the bundled YAML.
+`CATALOG_PATH` is the path to the bundled YAML.
 """
 
 from __future__ import annotations
@@ -56,14 +56,14 @@ def _load_catalog_data(path: Path) -> dict[str, Product]:
     """Parse, validate, and cache the product catalog at `path`.
 
     Args:
-        path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
+        path: Path to the catalog YAML (default `CATALOG_PATH`).
 
     Returns:
-        Mapping from friendly product key to its :class:`Product`.
+        Mapping from friendly product key to its `Product`.
 
     Raises:
         ValueError: If the file has no `products:` block, or a row
-            fails :class:`Product` validation.
+            fails `Product` validation.
     """
     key = catalog_cache_key(path, [path])
     cached = _CATALOG_CACHE.get(key)
@@ -111,10 +111,10 @@ class Product(SummarisedLeaf):
     Each row maps a friendly product key (`"sentinel-1-slc"`) to the
     raw `asf_search` enum members needed to issue a search:
 
-    * either a :attr:`platform` (a `PLATFORM` member name like
+    * either a `platform` (a `PLATFORM` member name like
       `"SENTINEL1"`) — used for the Sentinel-1, ALOS, ERS, JERS,
       RADARSAT, SEASAT, NISAR families;
-    * or a :attr:`dataset` (a `DATASET` member name like
+    * or a `dataset` (a `DATASET` member name like
       `"OPERA_S1"`) — used for the processed-product families
       (OPERA-S1, ARIA S1 GUNW, SLC-BURST) whose `asf_search` query
       key is `dataset=` rather than `platform=`.
@@ -211,12 +211,12 @@ class Catalog(AbstractCatalog[Product]):
 
     Reads the bundled `asf_data_catalog.yaml` (shipped as package
     data) and exposes its `products:` block as a map of
-    :class:`Product` rows keyed by friendly product key.
+    `Product` rows keyed by friendly product key.
     Instantiate with no arguments (`Catalog()`).
 
     Attributes:
         products: Map from the friendly product key to its
-            :class:`Product` row. Alias for the base `datasets`
+            `Product` row. Alias for the base `datasets`
             field; the inherited dict surface (`len`, `in`, `[]`,
             iteration) and the did-you-mean error message work
             against the same store.
@@ -271,11 +271,11 @@ class Catalog(AbstractCatalog[Product]):
 
     @property
     def products(self) -> dict[str, Product]:
-        """The product map — alias for the base :attr:`datasets` field.
+        """The product map — alias for the base `datasets` field.
 
         Returns:
             dict[str, Product]: The same mapping stored in
-                :attr:`datasets`.
+                `datasets`.
 
         Examples:
             - The alias and the base field are the same object:
@@ -293,12 +293,12 @@ class Catalog(AbstractCatalog[Product]):
         """Auto-load the bundled catalog and verify alias uniqueness.
 
         An alias that appears on more than one row would silently
-        shadow the later row in :meth:`resolve` (the loop returns
+        shadow the later row in `resolve` (the loop returns
         the first match). Catch the typo at construction so the
         broken catalog fails fast.
 
         Raises:
-            ValueError: Propagated from :meth:`load` when the YAML
+            ValueError: Propagated from `load` when the YAML
                 is missing, empty, or has a malformed row; or when
                 an alias is reused across two product rows.
         """
@@ -323,14 +323,14 @@ class Catalog(AbstractCatalog[Product]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to
-                :data:`CATALOG_PATH`.
+                `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If the file has no `products:` block, or a
-                row fails :class:`Product` validation.
+                row fails `Product` validation.
 
         Examples:
             - Load the bundled catalog and inspect a curated row:
@@ -369,9 +369,9 @@ class Catalog(AbstractCatalog[Product]):
         return sorted(self.datasets)
 
     def get_product(self, key: str) -> Product:
-        """Resolve a friendly key to its :class:`Product` row.
+        """Resolve a friendly key to its `Product` row.
 
-        Thin wrapper over the inherited :meth:`get_dataset`, which
+        Thin wrapper over the inherited `get_dataset`, which
         raises a `ValueError` with a did-you-mean hint on an unknown
         key.
 
@@ -424,7 +424,7 @@ class Catalog(AbstractCatalog[Product]):
 
         Returns:
             list[str]: Every curated key where
-                :attr:`Product.stackable` is `True`, sorted.
+                `Product.stackable` is `True`, sorted.
 
         Examples:
             - Inspect the InSAR-ready subset:

@@ -3,7 +3,7 @@
 The Pangeo CMIP6 ARCO index is a single flat CSV — one row per Zarr store,
 keyed by the CMIP6 facets (`source_id`, `experiment_id`, `variable_id`,
 `table_id`, `member_id`, `grid_label`, `version`, ...) with the store URI in the
-`zstore` column. :class:`StoreResolver` fetches and caches that CSV (with
+`zstore` column. `StoreResolver` fetches and caches that CSV (with
 `requests`, read with `pandas` — both core), then filters it by a requested
 facet tuple to the matching `zstore` URI(s).
 
@@ -15,7 +15,7 @@ fix.
 
 No `intake-esm` (it would drag in `xarray`); no `xarray` / `zarr` / `gcsfs`
 here — this module only resolves URIs. Opening the store is
-:mod:`earthlens.cmip6.accessor`'s job (pyramids).
+`earthlens.cmip6.accessor`'s job (pyramids).
 """
 
 from __future__ import annotations
@@ -145,10 +145,10 @@ class StoreResolver:
     Args:
         csv_url: URL of the consolidated-stores CSV.
         facet_columns: The CSV facet column names (from the catalog), kept as
-            schema documentation; `resolve()` filters on :data:`_FILTER_FACETS`,
+            schema documentation; `resolve()` filters on `_FILTER_FACETS`,
             not on this list.
         cache_path: Where to cache the downloaded CSV. Defaults to
-            :func:`default_cache_path`.
+            `default_cache_path`.
         frame: A pre-loaded `DataFrame` to use verbatim, skipping all I/O.
         timeout: Per-request network timeout, in seconds.
     """
@@ -195,7 +195,7 @@ class StoreResolver:
     def _ensure_csv(self) -> Path:
         """Return the cached CSV path, downloading it once if absent.
 
-        Streams through :class:`~earthlens.base.http.HttpClient`'s atomic
+        Streams through `HttpClient`'s atomic
         `download` (temp `.part` file + rename, cleanup on failure), then
         enforces the non-empty invariant: a zero-byte transfer unlinks the
         cache and raises rather than caching a useless file.
@@ -250,7 +250,7 @@ class StoreResolver:
 
         Filters the CSV by every pinned facet (unset facets fan out), then
         reduces `version="latest"` to the newest publication per store. Returns
-        one :class:`ResolvedStore` per surviving row.
+        one `ResolvedStore` per surviving row.
 
         Args:
             source_id: Model (required).
@@ -332,7 +332,7 @@ class StoreResolver:
 
     @staticmethod
     def _row_to_store(row: Any) -> ResolvedStore:
-        """Build a :class:`ResolvedStore` from one CSV row.
+        """Build a `ResolvedStore` from one CSV row.
 
         Args:
             row: A `pandas.Series` for one store.

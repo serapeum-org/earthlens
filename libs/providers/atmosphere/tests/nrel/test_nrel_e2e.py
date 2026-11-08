@@ -15,7 +15,6 @@ Run with (credentials exported):
 from __future__ import annotations
 
 import os
-import socket
 from pathlib import Path
 
 import pandas as pd
@@ -30,24 +29,15 @@ _LAT = 39.74
 _LON = -105.18
 
 
-def _network_ok() -> bool:
-    """Return True when the NREL/NLR host is reachable on 443."""
-    try:
-        socket.create_connection(("developer.nlr.gov", 443), timeout=5).close()
-        return True
-    except OSError:
-        return False
-
-
-_ONLINE = _network_ok()
 _HAVE_CREDS = bool(os.environ.get("NREL_API_KEY") and os.environ.get("NREL_EMAIL"))
-_gate = pytest.mark.skipif(
-    not (_ONLINE and _HAVE_CREDS),
-    reason="NREL host unreachable or NREL_API_KEY / NREL_EMAIL not set",
-)
+#: Reachability and credentials are separate gates: an unreachable host is an
+#: availability skip the masked-lane guards must see as one, while a missing
+#: credential is a configuration skip they must not.
+_gate = pytest.mark.skipif(not _HAVE_CREDS, reason="NREL_API_KEY / NREL_EMAIL not set")
 
 
 @_gate
+@pytest.mark.requires_host("developer.nlr.gov")
 def test_nsrdb_point(tmp_path: Path):
     """A live one-year NSRDB point returns a non-empty hourly solar frame."""
     df = EarthLens(
@@ -67,6 +57,7 @@ def test_nsrdb_point(tmp_path: Path):
 
 
 @_gate
+@pytest.mark.requires_host("developer.nlr.gov")
 def test_wind_toolkit_point(tmp_path: Path):
     """A live one-year WIND Toolkit point returns a non-empty hourly wind frame."""
     df = EarthLens(

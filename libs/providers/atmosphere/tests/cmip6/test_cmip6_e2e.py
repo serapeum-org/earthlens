@@ -17,6 +17,7 @@ import pytest
 
 from earthlens.cmip6 import Catalog, StoreResolver
 from earthlens.core import EarthLens
+from earthlens.testing import skip_live_unavailable
 
 pytestmark = [pytest.mark.e2e, pytest.mark.cmip6]
 
@@ -43,9 +44,9 @@ def _require_csv() -> None:
 
         resp = requests.head(Catalog().csv_url, timeout=15, allow_redirects=True)
         if resp.status_code != 200:
-            pytest.skip("gs://cmip6 CSV unreachable")
+            skip_live_unavailable("gs://cmip6 CSV unreachable")
     except Exception:
-        pytest.skip("gs://cmip6 CSV unreachable")
+        skip_live_unavailable("gs://cmip6 CSV unreachable")
 
 
 def test_resolve_live_store(tmp_path):

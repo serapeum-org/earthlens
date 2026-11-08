@@ -52,7 +52,7 @@ analysis-ready GeoTIFFs, GeoDataFrames, or tables.
 
 It is part of the [serapeum-org](https://github.com/serapeum-org)
 open-source ecosystem and is built on top of
-[`pyramids-gis`](https://github.com/serapeum-org/pyramids) for raster I/O.
+[`pyramids-core`](https://github.com/serapeum-org/pyramids) for raster I/O.
 
 
 Why earthlens?
@@ -119,7 +119,7 @@ Features
   metadata.
 - **Pressure-level support.** ERA5 pressure-level fields (4-D NetCDFs) can be
   sliced to a specific level on download.
-- **Bbox cropping & NetCDF→GeoTIFF conversion** are handled by `pyramids-gis`
+- **Bbox cropping & NetCDF→GeoTIFF conversion** are handled by `pyramids-core`
   under the hood.
 - **Modular install extras** — only install the SDK for the backend you need
   (`pip install earthlens[ecmwf]`, `[s3]`, `[gee]`).

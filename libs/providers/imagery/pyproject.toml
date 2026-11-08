@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earthlens-imagery"
-version = "0.27.0"
+version = "0.31.0"
 description = "satellite platform, SAR and EO catalog backends for earthlens"
 readme = { file = "README.md", content-type = "text/markdown" }
 authors = [
@@ -33,24 +33,74 @@ requires-python = ">=3.11,<4"
 # this distribution brings the backends' code without their dependencies —
 # `pip install earthlens-imagery[<backend>]` adds exactly one backend's SDK.
 dependencies = [
-    "earthlens-core ==0.27.0",
+    "earthlens-core ==0.31.0",
     # Reprojects the lat/lon AOI when a projected output `crs` is requested. Not
     # behind the `[eedai]` extra: the CRS-support check runs from the eligibility
     # gate before the extra is consulted, so a projected request imports pyproj
     # whether or not the reader is installed.
     "pyproj >=3.7.0",
+    # pyramids-eo: the EO tier on top of pyramids. A base dependency, not an
+    # extra, because `earthlens.gee.analysis.TasseledCap` ships in the analysis
+    # surface and applies pyramids-eo's per-sensor tasseled-cap coefficients
+    # (`pyramids_eo.spectral.tasseled_cap`, added in pyramids-eo#117 / 0.9.0).
+    # The floor is 0.11.0: that release pins pyramids-core >=0.71.0
+    # (pyramids-eo#127/#128), the version whose #1348 routes a custom S3 endpoint
+    # to GDAL's multi-threaded read workers -- which is what lets the CDSE signer
+    # read eodata without the GDAL_NUM_THREADS=1 stopgap. One consequence of
+    # pyramids-eo always being present: `engine="auto"` now prefers the EEDAI
+    # reader whenever it can serve a raw fetch -- previously that preference was
+    # gated on the (now redundant) `[eedai]` extra being installed, which was how
+    # the reader stayed opt-in. The reader is still only *reachable* through
+    # `engine=`, so `engine="ee"` keeps Earth Engine's exact semantics.
+    "pyramids-eo >=0.11.0,<0.12",
+    # pyramids-core is imported directly here (earthlens.gee.reducers /
+    # backend.py: `DatasetCollection`, `Dataset`, `merge_rasters`,
+    # `reduce_time`), so it is a declared direct dependency, not left to arrive
+    # transitively. Floor 0.73.0: the first release whose
+    # `DatasetCollection.reduce_time` / `.data` work on an in-memory
+    # (`datasets=`-backed) collection, not only a file-backed one
+    # (pyramids-core #1349 / #1412). The GEE EEDAI client-side composite reduces
+    # exactly such an in-memory stack; below this release it had to spill the
+    # scenes to COGs first (#1336).
+    "pyramids-core >=0.73.0",
 ]
 
 [project.optional-dependencies]
 earthdata = ["earthaccess >=0.18.0; python_version >= '3.12'"]
 asf = ["asf_search >=12.2.2", "earthlens-imagery[earthdata]"]
-eedai = ["pyramids-eo >=0.8.1,<0.9"]
+# pyramids-eo (the EEDAI reader) is now a base dependency, so this extra no
+# longer carries it alone. What it adds is `pyramids-core[lazy]`: the EEDAI
+# client-side collection reduce (median / percentile / trend / sens_slope over a
+# scene stack) runs through pyramids' `reduce_time`, whose `DatasetCollection.data`
+# needs the `lazy` stack (dask, ...). So the full client-side-composite capability
+# lives behind `earthlens-imagery[eedai]`; a bare `[gee]` install stays lean and a
+# client-side reduce there raises pyramids-core's `OptionalPackageDoesNotExist`
+# naming `pyramids-core[lazy]`. Floor kept in step with the base pyramids-core pin.
+eedai = ["pyramids-eo >=0.11.0,<0.12", "pyramids-core[lazy] >=0.73.0"]
 eumetsat = ["eumdac >=3.1"]
-gee = ["earthengine-api >=1.7.26", "google-api-python-client >=2.0", "google-cloud-storage >=2.0", "Rtree >=1.0.0", "urllib3 >=1.26"]
+# scikit-learn drives the two client-side learning operations in
+# `earthlens.gee.analysis` (k-means clustering and the supervised classifier).
+# It is imported lazily through `analysis/_sklearn.py`, the same guarded shape
+# `_eedai.py` uses, so the import cost is paid only by a request that asks for
+# one of those operations - but it is declared here because the code imports it.
+gee = ["earthengine-api >=1.7.26", "google-api-python-client >=2.0", "google-cloud-storage >=2.0", "Rtree >=1.0.0", "scikit-learn >=1.5", "urllib3 >=1.26"]
 jaxa = ["jaxa.earth >=0.1.6,<0.2", "gportal >=0.4,<0.5"]
 openeo = ["openeo >=0.47,<0.52"]
 sentinel-hub = ["sentinelhub >=3.11.5"]
-stac = ["pyramids-gis[stac] >=0.65.0"]
+stac = ["pyramids-core[stac] >=0.71.0"]
+# digitalearth is the visualization ORCHESTRATOR for the whole stack: it reads
+# pyramids objects and composes the render across its four backend tiers
+# (matplotlib / HoloViz / PyVista / MapLibre), delegating the drawing itself to
+# cleopatra. earthlens deliberately owns NO plotting layer -- `earthlens.gee.viz`
+# only resolves style hints from the catalog and the two Earth-Engine-side
+# preview URLs, then calls a digitalearth verb. The import is lazy (inside the
+# `Visualizer` method that needs it), so a bare install pulls no plotting stack
+# at all and `import earthlens.gee` never reaches digitalearth -- a boundary
+# test in `libs/core/tests/test_distribution_boundaries.py` holds that line.
+# The floor is 0.13.0: that release has `quickmap(backend=)`, the
+# `DatasetCollection`-aware `Map.animate`, and `tiles(url=)` on both WebMap and
+# InteractiveMap, which are the three verbs this package calls.
+viz = ["digitalearth >=0.13.0"]
 
 # This distribution's slice of the facade's data-source table.
 [project.entry-points."earthlens.backends"]
@@ -92,19 +142,4 @@ earthlens-core = { workspace = true }
 [tool.pytest.ini_options]
 testpaths = "tests"
 consider_namespace_packages = true
-addopts = "--import-mode=importlib"
-markers = [
-    "asf: tests for the ASF InSAR backend (requires the `asf` extra: asf_search; reuses EDL auth from `earthdata`).",
-    "e2e: end-to-end test against a live external service (e.g. CDS); select with `-m e2e`.",
-    "earthdata: tests for the NASA Earthdata backend (requires the `earthdata` extra: earthaccess; Python >=3.12).",
-    "eumetsat: tests for the EUMETSAT Data Store backend (requires the `eumetsat` extra: eumdac).",
-    "gee: tests for the Google Earth Engine backend (requires the `gee` extra: earthengine-api).",
-    "integration: exercises multiple modules together with mocked I/O.",
-    "jaxa: tests for the JAXA backend (three protocols — authless STAC/COG via jaxa.earth, credentialed SFTP via gportal, credentialed FTP via P-Tree/Himawari; the jaxa-earth and gportal branches need the `jaxa` extra, the ptree branch uses stdlib `ftplib` only).",
-    "openeo: tests for the openEO server-side-processing backend (requires the `openeo` extra: openeo).",
-    "ptree: e2e-only selector for the live P-Tree Himawari HSD FTP fetch (needs $JAXA_PTREE_USERNAME + $JAXA_PTREE_PASSWORD; 30-day rolling archive; the no-network ptree unit tests carry `@pytest.mark.jaxa + @pytest.mark.unit` instead so `-m ptree` does not pick them up).",
-    "sentinel_hub: tests for the Sentinel Hub server-side-render backend (requires the `sentinel-hub` extra: sentinelhub).",
-    "slow: mark test as slow.",
-    "stac: tests for the STAC backend (requires the `stac` extra: pyramids-gis[stac] → pystac-client + stac-asset).",
-    "unit: in-process unit test, no network or filesystem outside tmp_path.",
-]
+addopts = "--import-mode=importlib --strict-markers"

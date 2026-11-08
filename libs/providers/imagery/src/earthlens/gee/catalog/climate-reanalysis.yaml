@@ -15,6 +15,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "SPEI"
+        bands: ["SPEI_24_month"]
+        vmin: [-2.33]
+        vmax: [2.33]
+        palette: ["8b1a1a", "de2929", "f3641d", "fdc404", "9afa94", "03f2fd", "12adf3", "1771de", "00008b"]
     bands:
       SPEI_01_month:
         description: SPEI accumulated over 1 month
@@ -35,6 +41,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "SPEI"
+        bands: ["SPEI_24_month"]
+        vmin: [-2.33]
+        vmax: [2.33]
+        palette: ["8b1a1a", "de2929", "f3641d", "fdc404", "9afa94", "03f2fd", "12adf3", "1771de", "00008b"]
     bands:
       SPEI_01_month:
         description: SPEI accumulated over 1 month
@@ -55,6 +67,27 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Copernicus C3S/CAMS licence — free with attribution.'
+    visualizations:
+      - name: "Daily average air temperature [K] at 2m height"
+        bands: ["mean_2m_air_temperature"]
+        vmin: [250]
+        vmax: [320]
+        palette: ["000080", "0000d9", "4000ff", "8000ff", "0080ff", "00ffff", "00ff80", "80ff00", "daff00", "ffff00", "fff500", "ffda00", "ffb000", "ffa400", "ff4f00", "ff2500", "ff0a00", "ff00ff"]
+      - name: "Daily sums of total precipitation in m"
+        bands: ["total_precipitation"]
+        vmin: [0]
+        vmax: [0.1]
+        palette: ["ffffff", "00ffff", "0080ff", "da00ff", "ffa400", "ff0000"]
+      - name: "Daily mean surface pressure"
+        bands: ["surface_pressure"]
+        vmin: [500]
+        vmax: [1150]
+        palette: ["01ffff", "058bff", "0600ff", "df00ff", "ff00ff", "ff8c00", "ff8c00"]
+      - name: "Daily mean u-component of wind at 10m"
+        bands: ["u_component_of_wind_10m"]
+        vmin: [0]
+        vmax: [30]
+        palette: ["ffffff", "ffff71", "deff00", "9eff00", "77b038", "007e55", "005f51", "004b51", "013a7b", "023aad"]
     bands:
       mean_2m_air_temperature:
         description: Daily mean 2 m air temperature
@@ -96,6 +129,22 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Copernicus C3S/CAMS licence — free with attribution.'
+    visualizations:
+      - name: "Air temperature [K] at 2m height"
+        bands: ["temperature_2m"]
+        vmin: [250]
+        vmax: [320]
+        palette: ["000080", "0000d9", "4000ff", "8000ff", "0080ff", "00ffff", "00ff80", "80ff00", "daff00", "ffff00", "fff500", "ffda00", "ffb000", "ffa400", "ff4f00", "ff2500", "ff0a00", "ff00ff"]
+      - name: "Mean Sea Level Pressure"
+        bands: ["mean_sea_level_pressure"]
+        vmin: [95000]
+        vmax: [105000]
+        palette: ["01ffff", "058bff", "0600ff", "df00ff", "ff00ff", "ff8c00", "ff8c00"]
+      - name: "Total Precipitation"
+        bands: ["total_precipitation"]
+        vmin: [0]
+        vmax: [0.01]
+        palette: ["ffffff", "00ffff", "0080ff", "da00ff", "ffa400", "ff0000"]
     bands:
       temperature_2m:
         description: 2 m air temperature
@@ -137,6 +186,27 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Copernicus C3S/CAMS licence — free with attribution.'
+    visualizations:
+      - name: "Monthly average air temperature [K] at 2m height"
+        bands: ["mean_2m_air_temperature"]
+        vmin: [250]
+        vmax: [320]
+        palette: ["000080", "0000d9", "4000ff", "8000ff", "0080ff", "00ffff", "00ff80", "80ff00", "daff00", "ffff00", "fff500", "ffda00", "ffb000", "ffa400", "ff4f00", "ff2500", "ff0a00", "ff00ff"]
+      - name: "Monthly sums of total precipitation in m"
+        bands: ["total_precipitation"]
+        vmin: [0]
+        vmax: [0.5]
+        palette: ["ffffff", "00ffff", "0080ff", "da00ff", "ffa400", "ff0000"]
+      - name: "Monthly mean surface pressure"
+        bands: ["surface_pressure"]
+        vmin: [500]
+        vmax: [1150]
+        palette: ["01ffff", "058bff", "0600ff", "df00ff", "ff00ff", "ff8c00", "ff8c00"]
+      - name: "Monthly mean u-component of wind at 10m"
+        bands: ["u_component_of_wind_10m"]
+        vmin: [0]
+        vmax: [30]
+        palette: ["ffffff", "ffff71", "deff00", "9eff00", "77b038", "007e55", "005f51", "004b51", "013a7b", "023aad"]
     bands:
       mean_2m_air_temperature:
         description: Average 2m air temperature (monthly average)
@@ -183,6 +253,27 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Copernicus C3S/CAMS licence — acknowledge ERA5-Land.'
+    visualizations:
+      - name: "Air temperature [K] at 2m height"
+        bands: ["temperature_2m"]
+        vmin: [250]
+        vmax: [320]
+        palette: ["000080", "0000d9", "4000ff", "8000ff", "0080ff", "00ffff", "00ff80", "80ff00", "daff00", "ffff00", "fff500", "ffda00", "ffb000", "ffa400", "ff4f00", "ff2500", "ff0a00", "ff00ff"]
+      - name: "Surface pressure"
+        bands: ["surface_pressure"]
+        vmin: [500]
+        vmax: [1150]
+        palette: ["01ffff", "058bff", "0600ff", "df00ff", "ff00ff", "ff8c00", "ff8c00"]
+      - name: "u-component of wind at 10m"
+        bands: ["u_component_of_wind_10m"]
+        vmin: [0]
+        vmax: [30]
+        palette: ["ffffff", "ffff71", "deff00", "9eff00", "77b038", "007e55", "005f51", "004b51", "013a7b", "023aad"]
+      - name: "Total precipitation in m"
+        bands: ["total_precipitation_sum"]
+        vmin: [0]
+        vmax: [0.1]
+        palette: ["ffffff", "00ffff", "0080ff", "da00ff", "ffa400", "ff0000"]
     bands:
       temperature_2m:
         description: 2 m air temperature
@@ -224,6 +315,27 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Copernicus C3S/CAMS licence — free with attribution.'
+    visualizations:
+      - name: "Air temperature [K] at 2m height"
+        bands: ["temperature_2m"]
+        vmin: [250]
+        vmax: [320]
+        palette: ["000080", "0000d9", "4000ff", "8000ff", "0080ff", "00ffff", "00ff80", "80ff00", "daff00", "ffff00", "fff500", "ffda00", "ffb000", "ffa400", "ff4f00", "ff2500", "ff0a00", "ff00ff"]
+      - name: "Surface pressure"
+        bands: ["surface_pressure"]
+        vmin: [500]
+        vmax: [1150]
+        palette: ["01ffff", "058bff", "0600ff", "df00ff", "ff00ff", "ff8c00", "ff8c00"]
+      - name: "u-component of wind at 10m"
+        bands: ["u_component_of_wind_10m"]
+        vmin: [0]
+        vmax: [30]
+        palette: ["ffffff", "ffff71", "deff00", "9eff00", "77b038", "007e55", "005f51", "004b51", "013a7b", "023aad"]
+      - name: "Total precipitation in m"
+        bands: ["total_precipitation"]
+        vmin: [0]
+        vmax: [0.1]
+        palette: ["ffffff", "00ffff", "0080ff", "da00ff", "ffa400", "ff0000"]
     bands:
       temperature_2m:
         description: 2 m air temperature
@@ -277,6 +389,27 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Copernicus C3S/CAMS licence — free with attribution.'
+    visualizations:
+      - name: "Air temperature [K] at 2m height"
+        bands: ["temperature_2m"]
+        vmin: [250]
+        vmax: [320]
+        palette: ["000080", "0000d9", "4000ff", "8000ff", "0080ff", "00ffff", "00ff80", "80ff00", "daff00", "ffff00", "fff500", "ffda00", "ffb000", "ffa400", "ff4f00", "ff2500", "ff0a00", "ff00ff"]
+      - name: "Surface pressure"
+        bands: ["surface_pressure"]
+        vmin: [500]
+        vmax: [1150]
+        palette: ["01ffff", "058bff", "0600ff", "df00ff", "ff00ff", "ff8c00", "ff8c00"]
+      - name: "u-component of wind at 10m"
+        bands: ["u_component_of_wind_10m"]
+        vmin: [0]
+        vmax: [30]
+        palette: ["ffffff", "ffff71", "deff00", "9eff00", "77b038", "007e55", "005f51", "004b51", "013a7b", "023aad"]
+      - name: "Total precipitation in m"
+        bands: ["total_precipitation"]
+        vmin: [0]
+        vmax: [0.1]
+        palette: ["ffffff", "00ffff", "0080ff", "da00ff", "ffa400", "ff0000"]
     bands:
       temperature_2m:
         description: 2 m air temperature (monthly mean)
@@ -309,6 +442,27 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Copernicus C3S/CAMS licence — free with attribution.'
+    visualizations:
+      - name: "Air temperature [K] at 2m height"
+        bands: ["temperature_2m"]
+        vmin: [250]
+        vmax: [320]
+        palette: ["000080", "0000d9", "4000ff", "8000ff", "0080ff", "00ffff", "00ff80", "80ff00", "daff00", "ffff00", "fff500", "ffda00", "ffb000", "ffa400", "ff4f00", "ff2500", "ff0a00", "ff00ff"]
+      - name: "Surface pressure"
+        bands: ["surface_pressure"]
+        vmin: [500]
+        vmax: [1150]
+        palette: ["01ffff", "058bff", "0600ff", "df00ff", "ff00ff", "ff8c00", "ff8c00"]
+      - name: "u-component of wind at 10m"
+        bands: ["u_component_of_wind_10m"]
+        vmin: [0]
+        vmax: [30]
+        palette: ["ffffff", "ffff71", "deff00", "9eff00", "77b038", "007e55", "005f51", "004b51", "013a7b", "023aad"]
+      - name: "Total precipitation in m"
+        bands: ["total_precipitation_sum"]
+        vmin: [0]
+        vmax: [0.1]
+        palette: ["ffffff", "00ffff", "0080ff", "da00ff", "ffa400", "ff0000"]
     bands:
       temperature_2m:
         description: 2 m air temperature (monthly mean)
@@ -356,6 +510,27 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Copernicus C3S/CAMS licence — free with attribution.'
+    visualizations:
+      - name: "Air temperature [K] at 2m height"
+        bands: ["temperature_2m"]
+        vmin: [250]
+        vmax: [320]
+        palette: ["000080", "0000d9", "4000ff", "8000ff", "0080ff", "00ffff", "00ff80", "80ff00", "daff00", "ffff00", "fff500", "ffda00", "ffb000", "ffa400", "ff4f00", "ff2500", "ff0a00", "ff00ff"]
+      - name: "Total precipitation in m"
+        bands: ["total_precipitation"]
+        vmin: [0]
+        vmax: [0.1]
+        palette: ["ffffff", "00ffff", "0080ff", "da00ff", "ffa400", "ff0000"]
+      - name: "Surface pressure"
+        bands: ["surface_pressure"]
+        vmin: [500]
+        vmax: [1150]
+        palette: ["01ffff", "058bff", "0600ff", "df00ff", "ff00ff", "ff8c00", "ff8c00"]
+      - name: "u-component of wind at 10m"
+        bands: ["u_component_of_wind_10m"]
+        vmin: [0]
+        vmax: [30]
+        palette: ["ffffff", "ffff71", "deff00", "9eff00", "77b038", "007e55", "005f51", "004b51", "013a7b", "023aad"]
     bands:
       temperature_2m:
         description: 2 m air temperature (monthly mean by hour-of-day)
@@ -387,6 +562,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: CC-BY-4.0
+    visualizations:
+      - name: "Temperature 2m above the surface (Celsius)"
+        bands: ["temperature_2m_sfc"]
+        vmin: [-20]
+        vmax: [40]
+        palette: ["purple", "blue", "green", "yellow", "orange", "red"]
     bands:
       u_component_of_wind_100m_sfc:
         description: The horizontal speed of air moving towards the east, at a height of
@@ -1199,6 +1380,11 @@ datasets:
       end_date: null
     default_reducer: mean
     license: CC-BY-4.0
+    visualizations:
+      - name: "Significant height of combined wind waves and swell"
+        bands: ["significant_height_of_combined_wind_waves_and_swell_sfc"]
+        vmin: [0]
+        vmax: [5]
     bands:
       mean_zero_crossing_wave_period_sfc:
         description: The mean length of time between occasions where the sea/ocean surface
@@ -1237,6 +1423,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: CC-BY-4.0
+    visualizations:
+      - name: "Significant height of combined wind waves and swell"
+        bands: ["significant_height_of_combined_wind_waves_and_swell_sfc"]
+        vmin: [0]
+        vmax: [5]
+        palette: ["000080", "0000ff", "00ffff", "00ff00", "ffff00", "ff7800", "ff0000"]
     bands:
       mean_zero_crossing_wave_period_sfc:
         description: The mean length of time between occasions where the sea/ocean surface
@@ -1277,6 +1469,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'This work (METDATA, by John Abatzoglou) is in the public'
+    visualizations:
+      - name: "PDSI"
+        bands: ["pdsi"]
+        vmin: [-5]
+        vmax: [10]
+        palette: ["red", "yellow", "green", "cyan", "blue"]
     bands:
       spi14d:
         description: Standardized Precipitation Index (SPI) where precipitation was aggregated
@@ -1395,6 +1593,12 @@ datasets:
       bbox: [-124.9, 24.9, -66.8, 49.6]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Maximum Temperature"
+        bands: ["tmmx"]
+        vmin: [290]
+        vmax: [314]
+        palette: ["d8d8d8", "4addff", "5affa3", "f2ff89", "ff725c"]
     bands:
       pr:
         description: Precipitation amount (daily total)
@@ -1445,6 +1649,12 @@ datasets:
       bbox: [-124.9, 24.9, -67, 49.6]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Maximum Temperature"
+        bands: ["tasmax"]
+        vmin: [290]
+        vmax: [314]
+        palette: ["d8d8d8", "4addff", "5affa3", "f2ff89", "ff725c"]
     bands:
       tasmax:
         description: Daily maximum near-surface air temperature
@@ -1486,6 +1696,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'The MACA datasets were created with funding from the'
+    visualizations:
+      - name: "Maximum Temperature"
+        bands: ["tasmax"]
+        vmin: [290]
+        vmax: [314]
+        palette: ["d8d8d8", "4addff", "5affa3", "f2ff89", "ff725c"]
     bands:
       tasmax:
         description: Monthly average of maximum daily temperature near surface
@@ -1530,6 +1746,12 @@ datasets:
       bbox: [-124.9, 24.9, -66.8, 49.6]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "PDSI"
+        bands: ["pdsi"]
+        vmin: [-5]
+        vmax: [10]
+        palette: ["red", "yellow", "green", "cyan", "blue"]
     bands:
       pdsi:
         description: Palmer Drought Severity Index (>4 extremely wet, <-4 extreme drought)
@@ -1545,6 +1767,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: CC0-1.0
+    visualizations:
+      - name: "Maximum Temperature"
+        bands: ["tmmx"]
+        vmin: [-300]
+        vmax: [300]
+        palette: ["1a3678", "2955bc", "5699ff", "8dbae9", "acd1ff", "caebff", "e5f9ff", "fdffb4", "ffe6a2", "ffc969", "ffa12d", "ff7c1f", "ca531a", "ff0000", "ab0000"]
     bands:
       aet:
         description: Actual evapotranspiration (one-D water-balance model)
@@ -1611,6 +1839,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-SA-4.0
     terms_note: 'This dataset is made available publicly under the Creative Commons by'
+    visualizations:
+      - name: "Total values quantile 0.5"
+        bands: ["total_values_quantile_0_5"]
+        vmin: [10]
+        vmax: [150]
+        palette: ["0000FF", "00FFFF", "FFFF00", "FF0000"]
     bands:
       total_rates_quantile_0:
         description: Total rates for the quantile 0
@@ -6119,6 +6353,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "Land Surface Temperature"
+        bands: ["LST"]
+        vmin: [273.15]
+        vmax: [323.15]
+        palette: ["00008B", "0000FF", "00FFFF", "00FF00", "FFFF00", "FF0000", "8B0000"]
     bands:
       LST:
         description: Land Surface Temperature
@@ -6153,6 +6393,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "NDVI"
+        bands: ["NDVI"]
+        vmin: [-1]
+        vmax: [1]
+        palette: ["00008B", "A9A9A9", "CD853F", "FFFF00", "90EE90", "006400"]
     bands:
       NDVI:
         description: Normalized Difference Vegetation Index (NDVI)
@@ -6175,6 +6421,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for use; cite the underlying CMIP6 GCM.'
+    visualizations:
+      - name: "Minimum Air Temperature (K)"
+        bands: ["tasmin"]
+        vmin: [240]
+        vmax: [300]
+        palette: ["blue", "purple", "cyan", "green", "yellow", "red"]
     bands:
       tas:
         description: Daily mean near-surface air temperature
@@ -6214,6 +6466,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Surface buoyancy scale"
+        bands: ["BSTAR"]
+        vmin: [-0.00998]
+        vmax: [0.01174]
+        palette: ["001137", "01abab", "e7eb05", "620500"]
     bands:
       EFLUX:
         description: Total latent heat flux
@@ -6254,6 +6512,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Baseflow flux"
+        bands: ["BASEFLOW"]
+        vmin: [-9.13e-06]
+        vmax: [1.076e-05]
+        palette: ["001137", "01abab", "e7eb05", "620500"]
     bands:
       PRECTOTLAND:
         description: Total precipitation rate over land
@@ -6299,6 +6563,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Surface albedo"
+        bands: ["ALBEDO"]
+        vmin: [-0.428147]
+        vmax: [0.83335]
+        palette: ["001137", "01abab", "e7eb05", "620500"]
     bands:
       ALBEDO:
         description: Surface albedo
@@ -6335,6 +6605,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Surface Pressure"
+        bands: ["PS"]
+        vmin: [81189.96666965343]
+        vmax: [116812.8627263942]
+        palette: ["001137", "01abab", "e7eb05", "620500"]
     bands:
       T2M:
         description: 2 m air temperature
@@ -6377,6 +6653,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'This dataset is in the public domain and is available'
+    visualizations:
+      - name: "Minimum Air Temperature"
+        bands: ["tasmin"]
+        vmin: [265]
+        vmax: [285]
+        palette: ["blue", "purple", "cyan", "green", "yellow", "red"]
     bands:
       pr:
         description: Monthly mean of the daily precipitation rate at surface;
@@ -6407,6 +6689,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'This dataset is in the public domain and is available'
+    visualizations:
+      - name: "Monthly Mean Minimum Air Temperature"
+        bands: ["tasmin_mean"]
+        vmin: [247]
+        vmax: [311]
+        palette: ["blue", "purple", "cyan", "green", "yellow", "red"]
     bands:
       pr_mean:
         description: Monthly mean of the daily precipitation rate at surface;
@@ -6481,6 +6769,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'This dataset is in the public domain and is available'
+    visualizations:
+      - name: "Minimum Air Temperature"
+        bands: ["tasmin"]
+        vmin: [240]
+        vmax: [300]
+        palette: ["blue", "purple", "cyan", "green", "yellow", "red"]
     bands:
       pr:
         description: Daily mean of precipitation at surface; includes both
@@ -6510,6 +6804,12 @@ datasets:
       bbox: [-150.8, 1.6, -1.1, 84]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Maximum Temperature"
+        bands: ["tmax"]
+        vmin: [-40]
+        vmax: [30]
+        palette: ["blue", "white", "cyan", "green", "yellow", "orange", "red"]
     bands:
       dayl:
         description: Duration of the daylight period
@@ -6545,6 +6845,12 @@ datasets:
       bbox: [-150.8, 1.6, -1.1, 84]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Maximum Temperature"
+        bands: ["tmax"]
+        vmin: [-40]
+        vmax: [30]
+        palette: ["blue", "white", "cyan", "green", "yellow", "orange", "red"]
     bands:
       dayl:
         description: Duration of the daylight period
@@ -6579,6 +6885,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Sea Level Pressure"
+        bands: ["slp"]
+        vmin: [96500]
+        vmax: [104500]
+        palette: ["800080", "0000ab", "008000", "ffff00", "ffa500", "ff0000"]
     bands:
       slp:
         description: Sea-level pressure
@@ -6596,6 +6908,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Surface Air Temperature"
+        bands: ["air"]
+        vmin: [230]
+        vmax: [308]
+        palette: ["800080", "0000ab", "0000ff", "008000", "19ff2b", "a8f7ff", "ffff00", "d6d600", "ffa500", "ff6b01", "ff0000"]
     bands:
       air:
         description: Surface air temperature
@@ -6612,6 +6930,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Total Column Water Vapor"
+        bands: ["pr_wtr"]
+        vmin: [0]
+        vmax: [60]
+        palette: ["0000ff", "00ffff", "008000", "ffff00", "ff0000"]
     bands:
       pr_wtr:
         description: Total-column precipitable water vapour
@@ -6629,6 +6953,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'The NOAA CDR Program''s official distribution point for CDRs is NOAA''s'
+    visualizations:
+      - name: "Air Temperature"
+        bands: ["air_temperature"]
+        vmin: [0]
+        vmax: [30]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       air_temperature:
         description: Air temperature at 10m
@@ -6659,6 +6989,11 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Brightness Temperature / Visible Reflectance"
+        bands: ["irwin_cdr", "vschn", "irwvp"]
+        vmin: [500]
+        vmax: [10000]
     bands:
       irwin_cdr:
         description: Brightness temperature near 11 µm (nadir-most observation)
@@ -6689,6 +7024,11 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Heat Flux"
+        bands: ["surface_upward_sensible_heat_flux", "surface_upward_sensible_heat_flux", "surface_upward_latent_heat_flux"]
+        vmin: [-50]
+        vmax: [500]
     bands:
       surface_upward_latent_heat_flux:
         description: Latent heat flux from the ocean surface (positive upward)
@@ -6710,6 +7050,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Temperature at surface (K)"
+        bands: ["Temperature_surface"]
+        vmin: [192]
+        vmax: [339]
+        palette: ["blue", "purple", "cyan", "green", "yellow", "red"]
     bands:
       Temperature_height_above_ground:
         description: 2 m air temperature
@@ -6743,6 +7089,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Temperature Above Ground"
+        bands: ["Temperature_height_above_ground"]
+        vmin: [220]
+        vmax: [310]
+        palette: ["blue", "purple", "cyan", "green", "yellow", "red"]
     bands:
       Temperature_height_above_ground:
         description: 2 m air temperature
@@ -6796,6 +7148,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Temperature Above Ground"
+        bands: ["Temperature_height_above_ground"]
+        vmin: [220]
+        vmax: [310]
+        palette: ["blue", "purple", "cyan", "green", "yellow", "red"]
     bands:
       Downward_Long-Wave_Radp_Flux_surface_6_Hour_Average:
         description: Downward long-wave radiation flux at surface, 6-hour average
@@ -6919,6 +7277,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Temperature Above Ground"
+        bands: ["temperature_2m_above_ground"]
+        vmin: [-40]
+        vmax: [35]
+        palette: ["blue", "purple", "cyan", "green", "yellow", "red"]
     bands:
       temperature_2m_above_ground:
         description: 2 m air temperature
@@ -6956,6 +7320,11 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Blue band"
+        bands: ["CMI_C01"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       CMI_C01:
         description: Visible - Blue
@@ -7130,6 +7499,11 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Blue band"
+        bands: ["CMI_C01"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       CMI_C01:
         description: Visible - Blue
@@ -7304,6 +7678,11 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Blue band"
+        bands: ["CMI_C01"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       CMI_C01:
         description: Visible - Blue
@@ -7478,6 +7857,11 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Blue band"
+        bands: ["CMI_C01"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       CMI_C01:
         description: Visible - Blue
@@ -7653,6 +8037,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Blue band"
+        bands: ["CMI_C01"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       CMI_C01:
         description: Visible - Blue
@@ -7827,6 +8216,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Blue band"
+        bands: ["CMI_C01"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       CMI_C01:
         description: Visible - Blue
@@ -8001,6 +8395,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Blue band"
+        bands: ["CMI_C01"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       CMI_C01:
         description: Visible - Blue
@@ -8176,6 +8575,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Blue band"
+        bands: ["CMI_C01"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       CMI_C01:
         description: Visible - Blue
@@ -8350,6 +8754,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Blue band"
+        bands: ["CMI_C01"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       CMI_C01:
         description: Visible - Blue
@@ -8524,6 +8933,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Blue band"
+        bands: ["CMI_C01"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       CMI_C01:
         description: Visible - Blue
@@ -8697,6 +9111,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Total Cloud Coverage"
+        bands: ["tcdc"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["black", "blue", "purple", "cyan", "green", "yellow", "red"]
     bands:
       tcdc:
         description: Total cloud cover
@@ -8717,6 +9137,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'These PRISM datasets are available without restriction'
+    visualizations:
+      - name: "Precipitation"
+        bands: ["ppt"]
+        vmin: [0]
+        vmax: [50]
+        palette: ["red", "yellow", "green", "cyan", "purple"]
     bands:
       ppt:
         description: Daily total precipitation (including rain and melted snow)
@@ -8767,6 +9193,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (PRISM Climate Group).'
+    visualizations:
+      - name: "Precipitation"
+        bands: ["ppt"]
+        vmin: [0]
+        vmax: [300]
+        palette: ["red", "yellow", "green", "cyan", "purple"]
     bands:
       ppt:
         description: Monthly total precipitation (rain + melted snow)
@@ -8803,6 +9235,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (PRISM Climate Group).'
+    visualizations:
+      - name: "Precipitation"
+        bands: ["ppt"]
+        vmin: [0]
+        vmax: [50]
+        palette: ["red", "yellow", "green", "cyan", "purple"]
     bands:
       ppt:
         description: Daily total precipitation (rain + melted snow)
@@ -8839,6 +9277,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (PRISM Climate Group).'
+    visualizations:
+      - name: "Precipitation"
+        bands: ["ppt"]
+        vmin: [0]
+        vmax: [300]
+        palette: ["red", "yellow", "green", "cyan", "purple"]
     bands:
       ppt:
         description: Monthly total precipitation
@@ -8875,6 +9319,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (PRISM Climate Group).'
+    visualizations:
+      - name: "Precipitation"
+        bands: ["ppt"]
+        vmin: [0]
+        vmax: [300]
+        palette: ["red", "yellow", "green", "cyan", "purple"]
     bands:
       ppt:
         description: 30-year average of monthly total precipitation
@@ -8905,6 +9355,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (PRISM Climate Group).'
+    visualizations:
+      - name: "Precipitation"
+        bands: ["ppt"]
+        vmin: [0]
+        vmax: [300]
+        palette: ["red", "yellow", "green", "cyan", "purple"]
     bands:
       ppt:
         description: 30-year average of monthly total precipitation
@@ -8933,6 +9389,12 @@ datasets:
     default_reducer: median
     license: CC-BY-SA-4.0
     source: republished
+    visualizations:
+      - name: "Long-term Land Surface Temperature monthly day-night difference"
+        bands: ["jan"]
+        vmin: [-40.5137]
+        vmax: [1336.09]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000"]
     bands:
       jan:
         description: Long-term Land Surface Temperature monthly day-night difference
@@ -9018,6 +9480,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-SA-4.0
     source: republished
+    visualizations:
+      - name: "Long-term Land Surface Temperature daytime monthly mean"
+        bands: ["jan"]
+        vmin: [11989]
+        vmax: [16700]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000"]
     bands:
       jan:
         description: Long-term Land Surface Temperature daytime monthly mean, January
@@ -9103,6 +9571,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-SA-4.0
     source: republished
+    visualizations:
+      - name: "Long-term Land Surface Temperature daytime monthly sd"
+        bands: ["jan"]
+        vmin: [25]
+        vmax: [390]
+        palette: ["2828ff", "2828ff", "6666ff", "8989ff", "a1a1ff", "b2b2ff", "c0c0ff", "cbcbff", "d5d5ff", "dedeff", "e6e6ff", "ededff", "f5f5ff", "ffffff", "fcfcff", "fffbfb", "fff4f4", "ffeded", "ffe5e5", "ffdddd", "ffd4d4", "ffcbcb", "ffbfbf", "ffb2b2", "ffa1a1", "ff8a8a", "ff6767", "ff2929"]
     bands:
       jan:
         description: Long-term Land Surface Temperature daytime monthly stddev, January
@@ -9189,6 +9663,11 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Surface downwelling photosynthetic radiative flux (W/m^2)"
+        bands: ["PAR_Daily"]
+        vmin: [0]
+        vmax: [70]
     bands:
       PAR_Daily:
         description: Surface downwelling photosynthetic radiative flux in air
@@ -9212,6 +9691,12 @@ datasets:
       bbox: [-180, -60, 180, 70]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "CHIRTS-daily 2m Maximum Temperature"
+        bands: ["maximum_temperature"]
+        vmin: [10]
+        vmax: [40]
+        palette: ["00008B", "0000FF", "00FFFF", "008000", "FFFF00", "FFA500", "FF0000", "8B0000"]
     bands:
       minimum_temperature:
         description: Daily minimum 2 m air temperature
@@ -9245,6 +9730,12 @@ datasets:
     default_reducer: median
     license: CC-BY-4.0
     terms_note: 'The dataset is under a Creative Commons Attribution 4.0 International'
+    visualizations:
+      - name: "CHC CMIP6"
+        bands: ["CHIRPS"]
+        vmin: [1]
+        vmax: [100]
+        palette: ["d7191c", "fdae61", "ffffbf", "abd9e9", "2c7bb6"]
     bands:
       CHIRPS:
         description: Daily total precipitation.
@@ -9309,6 +9800,12 @@ datasets:
       bbox: [60, -60, 180, 60]
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "KBDI"
+        bands: ["KBDI"]
+        vmin: [0]
+        vmax: [800]
+        palette: ["0000ff", "33ccff", "339933", "ffff00", "cc9900", "cc6600", "ff0000"]
     bands:
       KBDI:
         description: Keetch-Byram Drought Index
@@ -9325,6 +9822,13 @@ datasets:
       end_date: "1990-12-31"
     default_reducer: mosaic
     license: CC-BY-SA-4.0
+    visualizations:
+      - name: "Annual Mean Temperature (C)"
+        bands: ["bio01"]
+        vmin: [-23]
+        vmax: [30]
+        gain: [0.1]
+        palette: ["blue", "purple", "cyan", "green", "yellow", "red"]
     bands:
       bio01:
         description: Annual mean temperature
@@ -9404,6 +9908,13 @@ datasets:
       end_date: "1990-12-31"
     default_reducer: mean
     license: CC-BY-SA-4.0
+    visualizations:
+      - name: "Mean Temperature (C)"
+        bands: ["tavg"]
+        vmin: [-40]
+        vmax: [30]
+        gain: [0.1]
+        palette: ["blue", "purple", "cyan", "green", "yellow", "red"]
     bands:
       tavg:
         description: Mean monthly temperature climatology

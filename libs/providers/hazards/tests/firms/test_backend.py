@@ -10,8 +10,9 @@ from geopandas import GeoDataFrame
 
 from earthlens.base import SpatialExtent, TemporalExtent
 from earthlens.firms import FIRMS, AuthenticationError
+from earthlens.testing import FakeResponse
 
-from .conftest import EMPTY_CSV, VIIRS_CSV, _FakeFirms, _FakeResponse
+from .conftest import EMPTY_CSV, VIIRS_CSV, _FakeFirms
 
 
 def _unauthed_backend(tmp_path: Path, **overrides) -> FIRMS:
@@ -189,8 +190,8 @@ class TestFetch:
     ):
         """A 429 once backs off then returns the CSV (no exception)."""
         fake_firms.responses = [
-            _FakeResponse("rate limit reached", 429),
-            _FakeResponse(VIIRS_CSV),
+            FakeResponse(text="rate limit reached", status_code=429),
+            FakeResponse(text=VIIRS_CSV),
         ]
         backend = _make_backend(tmp_path)
         result = backend.download(progress_bar=False)
@@ -206,7 +207,7 @@ class TestFetch:
 
     def test_http_500_propagates(self, tmp_path: Path, fake_firms: _FakeFirms):
         """A 5xx status propagates as HTTPError."""
-        fake_firms.responses = [_FakeResponse("server error", 500)]
+        fake_firms.responses = [FakeResponse(text="server error", status_code=500)]
         backend = _make_backend(tmp_path)
         with pytest.raises(requests.HTTPError):
             backend.download(progress_bar=False)
@@ -215,7 +216,7 @@ class TestFetch:
         self, tmp_path: Path, fake_firms: _FakeFirms
     ):
         """An HTTP error must not echo the MAP_KEY (it rides in the URL)."""
-        fake_firms.responses = [_FakeResponse("bad request", 400)]
+        fake_firms.responses = [FakeResponse(text="bad request", status_code=400)]
         backend = _make_backend(tmp_path, api_key="SUPERSECRETKEY123")
         with pytest.raises(requests.HTTPError) as exc:
             backend.download(progress_bar=False)

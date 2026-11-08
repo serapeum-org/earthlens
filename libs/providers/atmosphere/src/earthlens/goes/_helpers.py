@@ -33,7 +33,7 @@ def unsigned_s3_client(region: str = BUCKET_REGION) -> Any:
 
     Args:
         region: AWS region to build the client in. Defaults to
-            :data:`BUCKET_REGION`.
+            `BUCKET_REGION`.
 
     Returns:
         An unsigned `boto3` S3 client.

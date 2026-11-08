@@ -17,16 +17,16 @@ multidim driver, read anonymously; no gcsfs needed).
 
 Public surface (re-exported from this package):
 
-* :class:`CMIP6` — the backend; instantiate with a date window, a bbox, and a
+* `CMIP6` — the backend; instantiate with a date window, a bbox, and a
   facet tuple (`source_id` / `experiment_id` / `variable_id` / `table_id`), then
-  call :meth:`CMIP6.download`.
-* :class:`Catalog` — loader for the bundled `cmip6_data_catalog.yaml` (config +
+  call `CMIP6.download`.
+* `Catalog` — loader for the bundled `cmip6_data_catalog.yaml` (config +
   curated vocabulary).
-* :class:`Cmip6Variable` / :class:`Experiment` / :class:`Table` / :class:`Source`
+* `Cmip6Variable` / `Experiment` / `Table` / `Source`
   — one curated variable / experiment / table / source row.
-* :data:`CATALOG_PATH` — path to the bundled YAML; monkey-patchable in tests.
-* :func:`clear_catalog_cache` — empty the catalog parse cache.
-* :class:`StoreResolver` / :class:`ResolvedStore` — facet -> `zstore` resolution
+* `CATALOG_PATH` — path to the bundled YAML; monkey-patchable in tests.
+* `clear_catalog_cache` — empty the catalog parse cache.
+* `StoreResolver` / `ResolvedStore` — facet -> `zstore` resolution
   over the consolidated-stores CSV.
 
 Examples:

@@ -6,11 +6,11 @@ parameters). This module is the curated vocabulary of the canonical Argo
 parameter names per family, used to validate a request's `variables=`
 against the chosen `dataset=` family with a did-you-mean hint.
 
-:class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog`
+`Catalog` is a thin `earthlens.base.AbstractCatalog`
 subclass that loads the bundled `argo_data_catalog.yaml` and exposes each
-family as a :class:`Family` row (keyed by family name under the inherited
+family as a `Family` row (keyed by family name under the inherited
 `datasets` field, which gives it the `cat["phy"]` / `"phy" in cat` /
-`len(cat)` dict-like surface). :data:`CATALOG_PATH` is the path to the
+`len(cat)` dict-like surface). `CATALOG_PATH` is the path to the
 bundled YAML and is monkey-patchable in tests.
 """
 
@@ -43,8 +43,8 @@ class Family(SummarisedLeaf):
     """One Argo dataset family's parameter vocabulary.
 
     The family key (`"phy"` / `"bgc"`) is the parent key in
-    :attr:`Catalog.datasets`; the loader copies it onto the row as
-    :attr:`name` so a resolved family is self-describing.
+    `Catalog.datasets`; the loader copies it onto the row as
+    `name` so a resolved family is self-describing.
 
     Attributes:
         name: The family's catalog key, injected by the loader; the row
@@ -120,14 +120,14 @@ class Catalog(AbstractCatalog[Family]):
     """Parameter-family catalog for the Argo backend.
 
     Reads the bundled `argo_data_catalog.yaml` (shipped as package data)
-    and exposes its `families:` block as a map of :class:`Family` rows
-    keyed by family name under the inherited :attr:`datasets` field.
-    Instantiate with no arguments (`Catalog()`); :func:`model_post_init`
+    and exposes its `families:` block as a map of `Family` rows
+    keyed by family name under the inherited `datasets` field.
+    Instantiate with no arguments (`Catalog()`); `model_post_init`
     loads and validates the YAML in one pass.
 
     Attributes:
         datasets: Map from the family name (`"phy"` / `"bgc"`) to its
-            :class:`Family` row.
+            `Family` row.
 
     Examples:
         - List families and a family's parameters:
@@ -172,14 +172,14 @@ class Catalog(AbstractCatalog[Family]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the
-                module-level :data:`CATALOG_PATH`.
+                module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If `catalog_path` does not exist, or if the file has no
-                `families:` block, or a row fails :class:`Family` validation.
+                `families:` block, or a row fails `Family` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         cached = load_catalog(
@@ -188,10 +188,10 @@ class Catalog(AbstractCatalog[Family]):
         return cls(datasets=dict(cached))
 
     def get_family(self, name: str) -> Family:
-        """Return the :class:`Family` for `name`, with a did-you-mean hint.
+        """Return the `Family` for `name`, with a did-you-mean hint.
 
         Thin alias over
-        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.
+        `get_dataset`.
 
         Args:
             name: A family name (`"phy"` / `"bgc"`).

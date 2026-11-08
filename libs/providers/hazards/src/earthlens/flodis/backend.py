@@ -4,7 +4,7 @@
 (EM-DAT fatalities + economic damages) or `displacement` (IDMC displacements),
 each matched to Global Flood Database satellite footprints — from its pinned
 static Zenodo record, filters it, and returns the per-event impact records as a
-:class:`pandas.DataFrame`. It is the observed hazard-footprint -> impact bridge:
+`pandas.DataFrame`. It is the observed hazard-footprint -> impact bridge:
 the global companion to the European `hanze` backend, and to the raw impact
 tables in `emdat`.
 
@@ -195,7 +195,7 @@ class FLODIS(AbstractDataSource):
 
     Downloads the selected FLODIS table from its pinned Zenodo release, filters
     it by country / GADM code / date window, and returns a
-    :class:`pandas.DataFrame` carrying the join keys (`disasterno` for `damages`,
+    `pandas.DataFrame` carrying the join keys (`disasterno` for `damages`,
     `GID_1` / `GID_2` for `displacement`) so a caller can join to the shipped
     `emdat` (GDIS) footprints and `gee` (Global Flood Database) extents.
 
@@ -325,7 +325,7 @@ class FLODIS(AbstractDataSource):
         )
 
     def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
-        """Capture the requested bounds as a :class:`SpatialExtent`.
+        """Capture the requested bounds as a `SpatialExtent`.
 
         Args:
             lat_lim: `[min_lat, max_lat]`.
@@ -343,7 +343,7 @@ class FLODIS(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse the optional `[start, end]` window into a :class:`TemporalExtent`.
+        """Parse the optional `[start, end]` window into a `TemporalExtent`.
 
         FLODIS covers a whole record and is indexed by event year, so `None`
         bounds are legal and yield a `None`-dated extent.
@@ -445,7 +445,7 @@ class FLODIS(AbstractDataSource):
 
         Kept in a dedicated `flodis_source/` sub-directory so it cannot collide
         with the filtered CSV `download()` writes into `root_dir` (see
-        :meth:`_load_table`).
+        `_load_table`).
 
         Returns:
             Path: `root_dir/flodis_source/<file>`.
@@ -505,10 +505,10 @@ class FLODIS(AbstractDataSource):
         """Download and filter the one product.
 
         Args:
-            products: The single-element list from :meth:`_search`.
+            products: The single-element list from `_search`.
 
         Returns:
-            list[Any]: One element — the filtered :class:`pandas.DataFrame`.
+            list[Any]: One element — the filtered `pandas.DataFrame`.
         """
         # Single-product backend: the one table is re-derived from instance state
         # (`dataset` + filters), so `products` is accepted for the base
@@ -516,7 +516,7 @@ class FLODIS(AbstractDataSource):
         return [self._filter_table(self._load_table())]
 
     def _api(self) -> list[Any]:
-        """Compose :meth:`_search` and :meth:`_fetch`.
+        """Compose `_search` and `_fetch`.
 
         Returns:
             list[Any]: The fetched result (one element).

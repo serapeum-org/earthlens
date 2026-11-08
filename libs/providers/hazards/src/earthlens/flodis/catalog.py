@@ -10,21 +10,21 @@ pinned record, the per-dataset file names and join keys, and the friendly-name
 
 Three shapes are modelled, all frozen:
 
-* :class:`ZenodoRecord` — the pinned record, its DOI, `data_period`, licence and
+* `ZenodoRecord` — the pinned record, its DOI, `data_period`, licence and
   attribution. Pinning a record id rather than a moving branch is what makes a
   request reproducible.
-* :class:`FlodisDataset` — one selectable table (its Zenodo file name, a
+* `FlodisDataset` — one selectable table (its Zenodo file name, a
   description, and its join-key columns). These are the catalog's dict-surface
   rows, keyed by `dataset` name (`"damages"` / `"displacement"`) under the
-  inherited :attr:`datasets` field.
+  inherited `datasets` field.
 * the `columns` map — friendly name -> exact FLODIS CSV header, so the backend
   locates the selector / join-key / impact columns without hard-coding spellings.
 
-:class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog` subclass that
+`Catalog` is a thin `earthlens.base.AbstractCatalog` subclass that
 loads the bundled `flodis_data_catalog.yaml` (shipped as package data) through
-the shared :func:`~earthlens.base.catalog_source.load_catalog` (with a
-:class:`~earthlens.base.yaml_loader.CatalogParseCache`), mirroring
-`hanze/catalog.py`. :data:`CATALOG_PATH` is the path to the bundled YAML and is
+the shared `load_catalog` (with a
+`CatalogParseCache`), mirroring
+`hanze/catalog.py`. `CATALOG_PATH` is the path to the bundled YAML and is
 monkey-patchable in tests.
 """
 
@@ -100,7 +100,7 @@ class FlodisDataset(SummarisedLeaf):
     """One selectable FLODIS table (a row of the catalog's dict surface).
 
     The `dataset` string (`"damages"`, `"displacement"`) is the parent key in
-    :attr:`Catalog.datasets` and is not stored on the row.
+    `Catalog.datasets` and is not stored on the row.
 
     Attributes:
         file: The file name on the Zenodo record
@@ -157,13 +157,13 @@ class FlodisDataset(SummarisedLeaf):
 
 
 def _parse_catalog(files: list[Path]) -> dict[str, Any]:
-    """Parse the FLODIS catalog YAML into the :class:`Catalog` field payload.
+    """Parse the FLODIS catalog YAML into the `Catalog` field payload.
 
     Args:
         files: The contributing YAML files (FLODIS ships a single file).
 
     Returns:
-        dict[str, Any]: The keyword payload for :class:`Catalog` — `record`,
+        dict[str, Any]: The keyword payload for `Catalog` — `record`,
             `datasets` (the two tables) and `columns`.
 
     Raises:
@@ -216,14 +216,14 @@ class Catalog(AbstractCatalog[FlodisDataset]):
 
     Reads the bundled `flodis_data_catalog.yaml` (shipped as package data) and
     exposes the pinned Zenodo record, the two selectable tables (as
-    :class:`FlodisDataset` rows keyed by `dataset` under the inherited
-    :attr:`datasets` field — the `cat["damages"]` / `"damages" in cat` /
+    `FlodisDataset` rows keyed by `dataset` under the inherited
+    `datasets` field — the `cat["damages"]` / `"damages" in cat` /
     `len(cat)` dict surface), and the friendly-name -> CSV-header map.
     Instantiate with no arguments (`Catalog()`).
 
     Attributes:
-        datasets: Map from a `dataset` string to its :class:`FlodisDataset` row.
-        record: The pinned :class:`ZenodoRecord`.
+        datasets: Map from a `dataset` string to its `FlodisDataset` row.
+        record: The pinned `ZenodoRecord`.
         columns: Friendly name -> exact FLODIS CSV header.
 
     Examples:
@@ -257,7 +257,7 @@ class Catalog(AbstractCatalog[FlodisDataset]):
 
     datasets: dict[str, FlodisDataset] = Field(default_factory=dict)
     #: `record` defaults to `None` rather than a placeholder model: the base
-    #: :meth:`model_post_init` autoload fills a field only when its current value
+    #: `model_post_init` autoload fills a field only when its current value
     #: is falsy, and a placeholder model instance is truthy, so it would be
     #: skipped. `None` is falsy, so the bundled record loads as intended.
     record: ZenodoRecord | None = Field(default=None, repr=False)
@@ -278,10 +278,10 @@ class Catalog(AbstractCatalog[FlodisDataset]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the module-level
-                :data:`CATALOG_PATH`.
+                `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If `catalog_path` does not exist, a required block is
@@ -306,9 +306,9 @@ class Catalog(AbstractCatalog[FlodisDataset]):
         return cls(**parsed)
 
     def dataset(self, name: str) -> FlodisDataset:
-        """Return the :class:`FlodisDataset` for `name`, with a did-you-mean hint.
+        """Return the `FlodisDataset` for `name`, with a did-you-mean hint.
 
-        Thin typed alias over :meth:`~earthlens.base.AbstractCatalog.get_dataset`.
+        Thin typed alias over `get_dataset`.
 
         Args:
             name: A FLODIS table name (`"damages"` or `"displacement"`).

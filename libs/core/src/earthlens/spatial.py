@@ -39,13 +39,13 @@ should keep that wrapper next to their Earth Engine code (see
 
 Public surface:
 
-* :func:`grid_polygon` — tile a polygon's bbox into adjacent blocks.
-* :func:`count_cells_polygon` — pixel count for a polygon at `cell_size`.
-* :func:`convex_hull_from_points` — `(hull_gdf, hull_geometry)` for a points GDF.
-* :func:`count_cells_convex_hull_from_points` — pixel count for a points convex hull.
-* :func:`union_of_convex_hulls` — single-geometry union of per-row convex hulls.
-* :func:`split_polygon` — split-if-too-big work-horse.
-* :func:`split_points` — partition a points GDF into spatially-coherent chunks.
+* `grid_polygon` — tile a polygon's bbox into adjacent blocks.
+* `count_cells_polygon` — pixel count for a polygon at `cell_size`.
+* `convex_hull_from_points` — `(hull_gdf, hull_geometry)` for a points GDF.
+* `count_cells_convex_hull_from_points` — pixel count for a points convex hull.
+* `union_of_convex_hulls` — single-geometry union of per-row convex hulls.
+* `split_polygon` — split-if-too-big work-horse.
+* `split_points` — partition a points GDF into spatially-coherent chunks.
 
 Examples:
     - Decide a polygon fits at 30 m / 1e7-cell cap (no split needed):
@@ -176,13 +176,13 @@ def count_cells_polygon(
 ) -> tuple[int, GeoDataFrame]:
     """Estimate the pixel count for a polygon at a given `cell_size`.
 
-    Projects the input to its UTM zone (via :func:`pyramids.utm.project_to_utm`)
+    Projects the input to its UTM zone (via `pyramids.utm.project_to_utm`)
     so `cell_size` can be interpreted in metres, then computes
     `ceil((bbox_area * area_factor) / cell_size**2)`.
 
     Args:
         poly_gdf: A `GeoDataFrame` in WGS84 (`EPSG:4326`) or any CRS
-            that :func:`pyramids.utm.project_to_utm` accepts.
+            that `pyramids.utm.project_to_utm` accepts.
         cell_size: Pixel size in metres.
         area_factor: Multiplier applied to the bbox area before
             dividing by `cell_size**2`. Defaults to `1.0`.
@@ -269,8 +269,8 @@ def count_cells_convex_hull_from_points(
 ) -> int:
     """Estimate the pixel count for the convex hull of a points GDF.
 
-    Convenience: composes :func:`convex_hull_from_points` and
-    :func:`count_cells_polygon`.
+    Convenience: composes `convex_hull_from_points` and
+    `count_cells_polygon`.
 
     Args:
         geo_df: A `GeoDataFrame` of point geometries.
@@ -420,7 +420,7 @@ def split_points(
     """Partition a points `GeoDataFrame` into spatially-coherent chunks.
 
     Computes the convex hull of the points, splits that hull into a
-    grid via :func:`split_polygon`, and for each grid block claims all
+    grid via `split_polygon`, and for each grid block claims all
     input points whose geometry it `covers`. Points on shared edges are
     dropped from later blocks so the returned chunks are disjoint.
     When `len(samples) < min_points`, falls back to a single chunk.

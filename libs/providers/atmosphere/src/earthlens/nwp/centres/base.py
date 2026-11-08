@@ -7,10 +7,10 @@ or a plain per-variable HTTPS `.bz2` fetch. The `NWP` backend owns the
 provider-agnostic half (the cycle-grid walk, the GRIB2→cropped-COG
 pipeline); the per-centre half — "given a model, cycle, step, the
 requested params, and a mirror, put a GRIB2 file on disk" — lives
-behind the :class:`_NWPCentre` interface implemented by the sibling
+behind the `_NWPCentre` interface implemented by the sibling
 `centres/*.py` modules.
 
-:func:`resolve_centre` maps a model's catalog `backend:` value to the
+`resolve_centre` maps a model's catalog `backend:` value to the
 concrete centre class, importing it lazily so the optional SDK for a
 centre you do not use never has to be installed.
 """
@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from earthlens.nwp.catalog import NWPModel
 
 #: Maps a catalog `backend:` value to the `(module, class)` that
-#: implements it. Imported lazily by :func:`resolve_centre` so the
+#: implements it. Imported lazily by `resolve_centre` so the
 #: per-centre SDKs (`herbie`, `ecmwf-opendata`) load only on use.
 CENTRE_REGISTRY: dict[str, tuple[str, str]] = {
     "herbie": ("earthlens.nwp.centres.noaa", "NOAACentre"),
@@ -111,7 +111,7 @@ class _NWPCentre(ABC):
 
 
 def resolve_centre(backend: str, save_dir: Path | str) -> _NWPCentre:
-    """Construct the :class:`_NWPCentre` for a catalog `backend:` value.
+    """Construct the `_NWPCentre` for a catalog `backend:` value.
 
     Args:
         backend: The model's `backend:` value (e.g. `"herbie"`,

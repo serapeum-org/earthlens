@@ -6,20 +6,20 @@ IBTrACS (global) or HURDAT2 (North Atlantic / East Pacific reanalysis) —
 through the same `download()` shape every other earthlens backend uses.
 Each basin code in `variables` becomes one `TrackDataset` load; the
 storms in the requested seasons are mapped to a pyramids
-:class:`~pyramids.feature.collection.FeatureCollection` by
-:mod:`earthlens.tropycal.events`.
+`pyramids.feature.collection.FeatureCollection` by
+`earthlens.tropycal.events`.
 
 This is a `vector` backend: the result is a table of track features
 (per-fix `Point`s by default, or one `LineString` per storm with
 `geometry="track"`), not a gridded array, so `OUTPUT_KIND = "vector"` and
-the :class:`earthlens.earthlens.EarthLens` facade rejects an `aggregate=`
+the `earthlens.earthlens.EarthLens` facade rejects an `aggregate=`
 argument. `download()` returns the in-memory FeatureCollection (the union
 across requested basins) and writes one vector file per basin to `path`.
 
 tropycal needs **no credentials** — it fetches best-track files from
 NCEI / NHC over HTTPS itself — so there is no `auth.py`. It is an
 optional dependency (the `[tropycal]` extra), imported lazily inside
-:meth:`_get_track_dataset` so the package imports without it.
+`_get_track_dataset` so the package imports without it.
 
 Basin selection follows the vector-backend reading of `variables`: it is
 a `list[str]` of basin codes (`["north_atlantic"]`,
@@ -93,7 +93,7 @@ class TropicalCyclone(AbstractDataSource):
     `download()` shape every other earthlens backend uses. Each basin
     code in `variables` becomes one (slow, cached) `TrackDataset` load;
     the storms in the requested seasons are filtered to the window + bbox
-    and mapped to a :class:`~pyramids.feature.collection.FeatureCollection`,
+    and mapped to a `pyramids.feature.collection.FeatureCollection`,
     and the basins' results are unioned into the single FeatureCollection
     `download()` returns.
 
@@ -280,7 +280,7 @@ class TropicalCyclone(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse the `[start, end]` window into a :class:`TemporalExtent`.
+        """Parse the `[start, end]` window into a `TemporalExtent`.
 
         tropycal is queried per season (calendar year) and filtered at the
         fix level, so there is no per-date loop. The resolution is kept as
@@ -304,7 +304,7 @@ class TropicalCyclone(AbstractDataSource):
         return self._whole_window_extent(start, end, fmt=fmt, resolution="all")
 
     def _search(self) -> list[RemoteProduct]:
-        """One :class:`RemoteProduct` per requested unit.
+        """One `RemoteProduct` per requested unit.
 
         For `product="besttrack"` that is one product per basin (each
         basin/source pair validated against the catalog). For
@@ -348,11 +348,11 @@ class TropicalCyclone(AbstractDataSource):
         """Load each basin's TrackDataset and map it to a FeatureCollection.
 
         Widens the inherited `-> list[Path]` contract: a vector backend
-        returns in-memory :class:`FeatureCollection`s, not file paths. One
+        returns in-memory `FeatureCollection`s, not file paths. One
         collection per product, in request order.
 
         Args:
-            products: The list returned by :meth:`_search`.
+            products: The list returned by `_search`.
 
         Returns:
             list[FeatureCollection]: One collection per basin, same order.
@@ -371,11 +371,11 @@ class TropicalCyclone(AbstractDataSource):
         Iterates the requested seasons (`start.year .. end.year`), pulls
         each storm's `to_dataframe(attrs_as_columns=True)`, applies the
         optional `storm_type` / `min_category` fix filters, and hands the
-        per-storm frames to :func:`earthlens.tropycal.events.frame_to_fc`
+        per-storm frames to `earthlens.tropycal.events.frame_to_fc`
         for the window + bbox filter and geometry mapping.
 
         Args:
-            product: One :class:`RemoteProduct` from :meth:`_search`;
+            product: One `RemoteProduct` from `_search`;
                 `product.id` is the basin code.
 
         Returns:
@@ -416,10 +416,10 @@ class TropicalCyclone(AbstractDataSource):
         recon sub-product (`hdobs` / `dropsondes` / `vdms`) for it, and maps
         the observation DataFrame to a window+bbox-filtered point
         FeatureCollection via
-        :func:`earthlens.tropycal.events.recon_to_fc`.
+        `earthlens.tropycal.events.recon_to_fc`.
 
         Args:
-            product: A :class:`RemoteProduct` from :meth:`_search`;
+            product: A `RemoteProduct` from `_search`;
                 `product.id` is the storm identifier.
 
         Returns:
@@ -612,7 +612,7 @@ class TropicalCyclone(AbstractDataSource):
         Each basin in `self.vars` is loaded once; its matched features are
         written to one vector file under `path` (named after the basin),
         and the per-basin results are concatenated into the single
-        :class:`FeatureCollection` returned. An all-empty result returns a
+        `FeatureCollection` returned. An all-empty result returns a
         schema-correct empty FeatureCollection and writes nothing.
 
         Args:

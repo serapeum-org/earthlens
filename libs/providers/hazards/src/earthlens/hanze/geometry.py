@@ -8,11 +8,11 @@ module splits that list, counts how many of the (already-filtered) events touch
 each region, joins those codes to the NUTS-3 boundary polygons on the shapefile's
 `Code` field, reprojects the result from the shapefile's stored ETRS89-LAEA CRS
 (`EPSG:3035`) to WGS84, and returns a pyramids
-:class:`~pyramids.feature.collection.FeatureCollection` of one polygon per
+`pyramids.feature.collection.FeatureCollection` of one polygon per
 affected region.
 
-The output schema is the same on the populated path (:func:`join_events_to_regions`)
-and the empty path (:func:`empty_region_fc`) — `nuts3_code`, `region_name`,
+The output schema is the same on the populated path (`join_events_to_regions`)
+and the empty path (`empty_region_fc`) — `nuts3_code`, `region_name`,
 `n_events`, and `geometry` — so a downstream `to_file` never chokes on a schema
 mismatch between a hit and a miss.
 
@@ -120,7 +120,7 @@ def empty_region_fc() -> FeatureCollection:
     count.
 
     Returns:
-        FeatureCollection: Zero rows, the :data:`REGION_COLUMNS` columns with
+        FeatureCollection: Zero rows, the `REGION_COLUMNS` columns with
             their dtypes, an empty `geometry` column, CRS `EPSG:4326`.
 
     Examples:

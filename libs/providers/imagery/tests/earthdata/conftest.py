@@ -1,7 +1,7 @@
 """Shared fakes and fixtures for the Earthdata backend tests.
 
 The whole suite runs without `earthaccess` installed or any network:
-:class:`_FakeEarthaccess` is injected into `sys.modules` so the lazy
+`_FakeEarthaccess` is injected into `sys.modules` so the lazy
 `import earthaccess` inside the backend / auth resolves to the fake.
 """
 

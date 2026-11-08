@@ -10,9 +10,10 @@ import requests
 from pyramids.dataset import Dataset
 
 from earthlens.aggregate import AggregationConfig
+from earthlens.testing import FakeResponse
 from earthlens.worldpop import WorldPop
 
-from .conftest import _FakeResponse, age_records, pop_records
+from .conftest import age_records, pop_records
 
 pytestmark = pytest.mark.worldpop
 
@@ -94,13 +95,11 @@ def _patch_archive_http(monkeypatch, title, archive_url, archive_bytes):
 
     def fake_get(url, params=None, timeout=None, **kwargs):
         if url.endswith((".7z", ".zip")):
-            return _FakeResponse(content=archive_bytes)
+            return FakeResponse(content=archive_bytes)
         if params and "id" in params:
-            return _FakeResponse(
-                json_data={"data": {"id": "1", "files": [archive_url]}}
-            )
+            return FakeResponse(json={"data": {"id": "1", "files": [archive_url]}})
         if "/rest/data/" in url:
-            return _FakeResponse(json_data={"data": [{"id": "1", "title": title}]})
+            return FakeResponse(json={"data": [{"id": "1", "title": title}]})
         raise AssertionError(f"unexpected URL: {url}")
 
     monkeypatch.setattr(requests, "get", fake_get)
@@ -249,11 +248,11 @@ def _patch_global_http(monkeypatch, tiny_tif_bytes, files):
 
     def fake_get(url, params=None, timeout=None, **kwargs):
         if url.endswith(".tif"):
-            return _FakeResponse(content=tiny_tif_bytes)
+            return FakeResponse(content=tiny_tif_bytes)
         if params and "id" in params:
-            return _FakeResponse(json_data={"data": {"id": "1", "files": files}})
+            return FakeResponse(json={"data": {"id": "1", "files": files}})
         if "/rest/data/" in url:
-            return _FakeResponse(json_data={"data": [{"id": "1", "popyear": "2000"}]})
+            return FakeResponse(json={"data": [{"id": "1", "popyear": "2000"}]})
         raise AssertionError(f"unexpected URL: {url}")
 
     monkeypatch.setattr(requests, "get", fake_get)
@@ -402,13 +401,12 @@ def test_404_propagates(wp_kwargs, monkeypatch):
     """A 404 on a file download surfaces as an error."""
     import requests as _rq
 
-    from .conftest import _FakeResponse
     from .conftest import pop_records as _pr
 
     def fake_get(url, params=None, timeout=None, **kwargs):
         if "/rest/data/" in url:
-            return _FakeResponse(json_data={"data": _pr()})
-        return _FakeResponse()  # 404 for the .tif
+            return FakeResponse(json={"data": _pr()})
+        return FakeResponse(status_code=404)  # 404 for the .tif
 
     monkeypatch.setattr(_rq, "get", fake_get)
     backend = WorldPop(**wp_kwargs(year=2020))
@@ -429,7 +427,7 @@ def test_http_get_retries_transient_then_succeeds(
         calls["n"] += 1
         if calls["n"] < 3:
             raise requests.ConnectionError("dropped")
-        return _FakeResponse(content=tiny_tif_bytes)
+        return FakeResponse(content=tiny_tif_bytes)
 
     monkeypatch.setattr(requests, "get", flaky_get)
     backend = WorldPop(**wp_kwargs(year=2020))
@@ -490,7 +488,7 @@ def test_http_get_does_not_retry_http_error(wp_kwargs, monkeypatch):
 
     def not_found(url, timeout=None, **kwargs):
         calls["n"] += 1
-        return _FakeResponse()  # raise_for_status -> HTTPError
+        return FakeResponse(status_code=404)  # raise_for_status -> HTTPError
 
     monkeypatch.setattr(requests, "get", not_found)
     backend = WorldPop(**wp_kwargs(year=2020))
@@ -606,7 +604,7 @@ class TestWorldPopStreams:
 
         def fake_get(url, params=None, timeout=None, **kwargs):
             if "/rest/data/" in url:
-                return _FakeResponse(json_data={"data": records})
+                return FakeResponse(json={"data": records})
             if url.endswith(".tif"):
                 seen.append(kwargs)
                 return _NoBufferResponse(tif_bytes)

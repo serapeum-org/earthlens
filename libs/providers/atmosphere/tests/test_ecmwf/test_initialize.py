@@ -1,4 +1,4 @@
-"""Unit tests for :meth:`ECMWF._open_client` and the credentials heuristic.
+"""Unit tests for `ECMWF._open_client` and the credentials heuristic.
 
 Covers H3 (the rewritten error message), C2 (only wrap credential-
 shaped errors as `AuthenticationError`), and the contract that
@@ -7,18 +7,21 @@ otherwise-valid errors propagate untouched.
 
 from __future__ import annotations
 
-import cdsapi
 import pytest
 
 from earthlens.ecmwf import ECMWF, AuthenticationError
 
 from ._fakes import _SentinelClient
 
+#: The `ecmwf` extra is optional, so a missing `cdsapi` skips this module
+#: rather than erroring the whole directory's collection.
+cdsapi = pytest.importorskip("cdsapi")
+
 pytestmark = [pytest.mark.unit]
 
 
 class TestInitialize:
-    """Tests for :meth:`ECMWF._open_client` (H3, C2)."""
+    """Tests for `ECMWF._open_client` (H3, C2)."""
 
     def test_returns_constructed_client_when_credentials_valid(self, monkeypatch):
         """`_open_client()` returns whatever `cdsapi.Client()` returns."""

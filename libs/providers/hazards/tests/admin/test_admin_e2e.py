@@ -19,6 +19,7 @@ import urllib.request
 import pytest
 
 from earthlens.earthlens import EarthLens
+from earthlens.testing import skip_live_unavailable
 
 pytestmark = [pytest.mark.e2e, pytest.mark.admin]
 
@@ -37,7 +38,7 @@ def _reachable(url: str) -> bool:
 def _skip_when_offline() -> None:
     """Skip the live tests cleanly when the source hosts are unreachable."""
     if not _reachable("https://www.geoboundaries.org/api/current/gbOpen/KEN/ADM1/"):
-        pytest.skip("geoBoundaries / public sources unreachable (offline)")
+        skip_live_unavailable("geoBoundaries / public sources unreachable (offline)")
 
 
 def _assert_polygons_4326(fc) -> None:

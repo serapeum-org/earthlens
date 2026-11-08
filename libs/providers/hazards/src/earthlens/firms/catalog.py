@@ -5,8 +5,8 @@ endpoint, not a curated dataset catalogue, so this "catalog" is small: a
 handful of rows mapping a FIRMS source code (`"VIIRS_SNPP_NRT"`,
 `"MODIS_NRT"`, …) to a little metadata. It follows the ECMWF / GEE
 convention where a **sensor plays the "dataset" role and its CSV columns
-play the "variable" role** — a :class:`Sensor` nests a `columns:` map of
-:class:`SensorColumn` rows.
+play the "variable" role** — a `Sensor` nests a `columns:` map of
+`SensorColumn` rows.
 
 Like `gdacs_data_catalog.yaml` / `fdsn_data_catalog.yaml` there is no
 `available_*` index: the listed sensors *are* the whole FIRMS universe,
@@ -16,12 +16,12 @@ because the per-sensor CSV column schema varies by sensor family (MODIS
 reports a numeric `confidence`; VIIRS reports a categorical `l`/`n`/`h`),
 which is exactly the kind of drift a probe pins down.
 
-:class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog`
+`Catalog` is a thin `earthlens.base.AbstractCatalog`
 subclass that loads the bundled `firms_data_catalog.yaml` and exposes
-each row as a :class:`Sensor`, keyed by code under the inherited
+each row as a `Sensor`, keyed by code under the inherited
 `datasets` field — which is what gives it the `cat["MODIS_NRT"]` /
 `"MODIS_NRT" in cat` / `len(cat)` dict-like surface and the did-you-mean
-error for free. :data:`CATALOG_PATH` is the path to the bundled YAML and
+error for free. `CATALOG_PATH` is the path to the bundled YAML and
 is monkey-patchable in tests.
 """
 
@@ -93,7 +93,7 @@ class Temporal(SummarisedLeaf):
         end: Last date covered, or `None` for an ongoing sensor.
         quality: `"NRT"` (near-real-time, last ~2 months) or `"SP"`
             (standard-quality archive). Drives the
-            :class:`~earthlens.firms.FIRMS` out-of-coverage warning: a
+            `FIRMS` out-of-coverage warning: a
             request for an old window against an `*_NRT` sensor is
             silently empty upstream, so the backend warns and names the
             `*_SP` variant.
@@ -124,8 +124,8 @@ class Temporal(SummarisedLeaf):
 class Sensor(SummarisedLeaf):
     """One FIRMS sensor's dispatch row (the "dataset" analog).
 
-    The FIRMS source code is the parent key in :attr:`Catalog.datasets`
-    and is repeated here as :attr:`code` so a :class:`Sensor` carries its
+    The FIRMS source code is the parent key in `Catalog.datasets`
+    and is repeated here as `code` so a `Sensor` carries its
     own identity when passed around outside the catalog.
 
     Attributes:
@@ -135,7 +135,7 @@ class Sensor(SummarisedLeaf):
         name: Human-readable sensor name used in logs and docs.
         family: `"MODIS"`, `"VIIRS"`, `"GOES"`, or `"LANDSAT"` — selects
             the confidence / brightness schema handling in
-            :mod:`earthlens.firms.events`. MODIS and GOES report numeric
+            `earthlens.firms.events`. MODIS and GOES report numeric
             confidence; VIIRS reports the categorical token `l`/`n`/`h`
             and LANDSAT reports `l`/`m`/`h`. Brightness comes from
             `brightness` (MODIS), `bright_ti4` (VIIRS / GOES), or is
@@ -200,7 +200,7 @@ def _parse_sensors(files: list[Path]) -> dict[str, Sensor]:
 
     Raises:
         ValueError: If the `sensors:` block is missing or empty, or a row
-            fails :class:`Sensor` validation.
+            fails `Sensor` validation.
     """
     catalog_path = files[0]
     data = load_yaml_strict(catalog_path) or {}
@@ -225,20 +225,20 @@ class Catalog(AbstractCatalog[Sensor]):
     """Sensor catalog for the NASA FIRMS backend.
 
     Reads the bundled `firms_data_catalog.yaml` (shipped as package
-    data) and exposes its `sensors:` block as a map of :class:`Sensor`
-    rows, keyed by FIRMS source code under the inherited :attr:`datasets`
+    data) and exposes its `sensors:` block as a map of `Sensor`
+    rows, keyed by FIRMS source code under the inherited `datasets`
     field. Instantiate with no arguments (`Catalog()`);
-    :func:`model_post_init` loads and validates the YAML in one pass.
-    Resolve a sensor with :meth:`get_sensor` (a thin alias over
-    :meth:`~earthlens.base.AbstractCatalog.get_dataset`) and a single
-    column with :meth:`get_column`.
+    `model_post_init` loads and validates the YAML in one pass.
+    Resolve a sensor with `get_sensor` (a thin alias over
+    `get_dataset`) and a single
+    column with `get_column`.
 
     There is no `available_*` index — the listed sensors are the whole
     FIRMS universe (a deliberate deviation from the ECMWF/GEE catalogs,
     shared with GDACS/FDSN).
 
     Attributes:
-        datasets: Map from the FIRMS source code to its :class:`Sensor`
+        datasets: Map from the FIRMS source code to its `Sensor`
             row.
 
     Examples:
@@ -289,14 +289,14 @@ class Catalog(AbstractCatalog[Sensor]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the
-                module-level :data:`CATALOG_PATH`.
+                module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If `catalog_path` does not exist, or if the file has no
-                `sensors:` block, or a row fails :class:`Sensor` validation.
+                `sensors:` block, or a row fails `Sensor` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         sensors = load_catalog(
@@ -305,10 +305,10 @@ class Catalog(AbstractCatalog[Sensor]):
         return cls(datasets=dict(sensors))
 
     def get_sensor(self, code: str) -> Sensor:
-        """Return the :class:`Sensor` for `code`, with a did-you-mean hint.
+        """Return the `Sensor` for `code`, with a did-you-mean hint.
 
         Thin alias over
-        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.
+        `get_dataset`.
 
         Args:
             code: A FIRMS source code (`"VIIRS_SNPP_NRT"`, `"MODIS_NRT"`,
@@ -326,7 +326,7 @@ class Catalog(AbstractCatalog[Sensor]):
         """Return one column's metadata for a `(sensor, column)` pair.
 
         Args:
-            code: A FIRMS source code as it appears in :attr:`datasets`.
+            code: A FIRMS source code as it appears in `datasets`.
             column: A CSV column name declared under that sensor.
 
         Returns:
@@ -350,7 +350,7 @@ class Catalog(AbstractCatalog[Sensor]):
     def get_variable(self, code: str, column: str) -> SensorColumn:
         """Leaf accessor for the shared two-arg get_variable contract.
 
-        Alias of :meth:`get_column` so the FIRMS leaf is reachable under
+        Alias of `get_column` so the FIRMS leaf is reachable under
         the same `get_variable(dataset_key, variable_name)` verb the
         other two-level catalogs use.
 

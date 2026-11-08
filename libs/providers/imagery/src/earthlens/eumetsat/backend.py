@@ -356,7 +356,7 @@ class EUMETSAT(AbstractDataSource):
         instance, so the parent class binds no opaque `self.client`. The
         token minting (`EumetsatAuth.configure`, which contacts the auth
         server) is deferred out of construction: it runs on the first
-        :meth:`_search` (the `eumdac` collection search authenticates via
+        `_search` (the `eumdac` collection search authenticates via
         the idempotent `configure()`), so constructing the backend never
         authenticates — but note that a dry-run `search()` does, since the
         `eumdac` data store needs a token.

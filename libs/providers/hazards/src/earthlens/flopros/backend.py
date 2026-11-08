@@ -6,8 +6,8 @@ et al., 2016) from the NHESS-2016 paper's public supplement zip
 selects the requested protection layer(s), filters by unit name and/or bbox,
 and returns the ~4650 subnational polygons carrying the selected
 protection-standard columns as a
-:class:`~pyramids.feature.collection.FeatureCollection` (or, with
-`geometry=False`, a geometry-dropped :class:`pandas.DataFrame`).
+`pyramids.feature.collection.FeatureCollection` (or, with
+`geometry=False`, a geometry-dropped `pandas.DataFrame`).
 
 Each polygon's protection standard is a return period in years across the
 FLOPROS layers — Modelled (riverine), Merged (the recommended combined riverine
@@ -17,7 +17,7 @@ protection standard to separate protected from exposed areas.
 
 This is a static product with no time axis, so a missing `start` / `end` is
 legal (`REQUIRES_TIME_WINDOW = False`). It is a `vector` backend: the
-:class:`earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument —
+`earthlens.earthlens.EarthLens` facade rejects an `aggregate=` argument —
 there is no meaningful gridded reduction of an admin-aggregated protection
 table. The downloaded zip is cached under `cache_dir`, so repeated requests
 reuse it.
@@ -190,11 +190,11 @@ class FLOPROS(AbstractDataSource):
         """Download + read the shapefile and build the filtered collection.
 
         Widens the inherited `-> list[Path]` contract: a vector backend returns
-        an in-memory :class:`FeatureCollection`. The download is cached under
-        :attr:`_cache_root`, so a repeat request reuses the zip.
+        an in-memory `FeatureCollection`. The download is cached under
+        `_cache_root`, so a repeat request reuses the zip.
 
         Args:
-            products: The single-element list from :meth:`_search`.
+            products: The single-element list from `_search`.
 
         Returns:
             list[FeatureCollection]: One trimmed, filtered collection.
@@ -235,7 +235,7 @@ class FLOPROS(AbstractDataSource):
         """Return the local zip path, downloading it on a cache miss.
 
         Args:
-            product: The product from :meth:`_search` (carries the download URL
+            product: The product from `_search` (carries the download URL
                 in `href`).
 
         Returns:
@@ -280,9 +280,9 @@ class FLOPROS(AbstractDataSource):
                 this is a no-op.
 
         Returns:
-            A :class:`~pyramids.feature.collection.FeatureCollection` (also
+            A `pyramids.feature.collection.FeatureCollection` (also
             written to `root_dir`) or, when `geometry=False`, a
-            :class:`pandas.DataFrame` of the units and their protection-standard
+            `pandas.DataFrame` of the units and their protection-standard
             columns.
 
         Raises:

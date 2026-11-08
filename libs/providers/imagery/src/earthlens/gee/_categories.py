@@ -1,7 +1,7 @@
 """Auto-categorise a GEE asset id into its per-family catalog file.
 
 The category rules ported from the retired `tools/gee/_recategorize_catalog.py`.
-`curate gee --write` uses :func:`categorise_asset` to pick which per-family
+`curate gee --write` uses `categorise_asset` to pick which per-family
 `catalog/<category>.yaml` file a freshly seeded row belongs in, so the
 maintainer no longer has to pass `--target` for the common case. The rule
 table is keyword/prefix-driven and is a *seed* — the maintainer can still

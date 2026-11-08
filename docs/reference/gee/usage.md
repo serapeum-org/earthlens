@@ -168,19 +168,24 @@ gee = GEE(
 
 A request qualifies when nothing server-side has to shape the image: no
 `cloud_mask`, no `filters`, and `export_via="url"`. That covers both a
-single `ee_type="image"` asset and an `ee_type="image_collection"`, which
-the reader composites client-side per time bucket with the same reducer
-Earth Engine would have used. The output CRS may be `"EPSG:4326"` or any
-metre-based projected CRS. Everything else stays on Earth Engine, which is
-the only engine that can run a computation graph or export to Drive / GCS /
-an asset.
+single `ee_type="image"` asset and an `ee_type="image_collection"`. For a
+collection the reader fetches the bucket's scene stack and the composite is
+computed **client-side by pyramids' own `reduce_time`** — so `median` is a
+true per-pixel median (not an approximation), matching Earth Engine's within
+numerical tolerance where the scenes carry no fill over the AOI. The output
+CRS may be `"EPSG:4326"` or any metre-based projected CRS. Everything else
+stays on Earth Engine, which is the only engine that can run a computation
+graph or export to Drive / GCS / an asset.
 
 A collection is sized before it is served, because the reader downloads
 every scene in the bucket and holds them to reduce. It goes back to Earth
 Engine's server-side reduce when the bucket has too many scenes, when the
-scene stack would not fit one pass, or when the reducer is `mosaic` — Earth
-Engine's is last-wins, while the reader returns the first scene of the
-stack, so they are not the same composite.
+scene stack would not fit one pass, or when the reducer is `mosaic` —
+mosaic is last-wins in Earth Engine's collection order, which has no
+client-side equivalent over a scene stack without per-scene masks the reader
+does not expose, so **mosaic stays on Earth Engine**. Every other reducer —
+including a percentile (`"p90"`), `"trend"` and `"sens_slope"` — is computed
+client-side by pyramids' `reduce_time`, the same path as `median`.
 
 With a collection you can also narrow which scenes are read:
 
@@ -207,6 +212,24 @@ reducers fold a scene's fill pixels into the result where Earth Engine would
 mask them. The two agree wherever the scenes carry no fill over the AOI. There
 is no way to supply the fill from here — the composite read takes no `nodata`
 argument — so pass `engine="ee"` when you need Earth Engine's masking exactly.
+
+The client-side reduction — the true per-pixel `median`, and the `"p90"` /
+`"trend"` / `"sens_slope"` reducers — needs **pyramids-core >= 0.73.0** (the
+distribution formerly published as `pyramids-gis`; the import name stays
+`pyramids`). `reduce_time`'s percentile / linear-trend / Theil-Sen operations
+themselves shipped earlier (0.70.0); the `>= 0.73.0` floor is specifically for
+reducing an *in-memory* collection, which is what
+`pyramids_eo.collection_from_earthengine` hands back (a `datasets=`-backed
+`DatasetCollection`). So a live `engine="eedai"` collection composite reduces
+the scene stack directly — no spill to disk — and runs end to end
+(pyramids-core #1349).
+
+The reduce reads the stack through `DatasetCollection.data`, which needs
+pyramids-core's `lazy` extra (dask). Install it with the `eedai` extra —
+`pip install earthlens[gee,eedai]` pulls `pyramids-core[lazy]` — so the full
+client-side-composite capability is present. A bare `earthlens[gee]` stays
+lean; a client-side reduce there raises pyramids-core's
+`OptionalPackageDoesNotExist` naming `pyramids-core[lazy]`.
 
 What you gain: no 32768-px synchronous cap and no HTTP/zip round-trip,
 so `auto_split` is unnecessary. What to know before switching:
@@ -237,9 +260,587 @@ so `auto_split` is unnecessary. What to know before switching:
 - **`cog=True` applies to this path only.** A request served by Earth
   Engine writes a plain GeoTIFF (and logs that it did).
 
-## 5. Via the `EarthLens` facade
+## 5. The object API
+
+Every knob above is a string, and every string still works — that is the contract. Behind them the backend now
+resolves each one to a strategy object, and you can pass the object instead wherever you want something the string
+cannot express.
+
+```python
+from earthlens.gee import GEE, Percentile
+
+# The string form, unchanged.
+GEE(..., reducer="median", engine="auto", export_via="url")
+
+# The object form, for a reducer no name can express.
+GEE(..., reducer=Percentile(q=90))
+
+# Or the parameterised spelling, if you prefer strings.
+GEE(..., reducer="percentile:90")
+```
+
+**Reducers.** `mean`, `median`, `min`, `max`, `mode`, `mosaic` and `sum` dispatch to Earth Engine's convenience
+methods, which preserve band names. A percentile and a per-pixel trend are first-class too: pass
+`reducer="p90"` (or `"percentile:90"`, or `Percentile(q=90)`), `reducer="trend"` (ordinary least-squares slope),
+or `reducer="sens_slope"` (the robust Theil-Sen slope). `Percentile` and the two trend reducers have to use
+`reduce`, which suffixes the bands, so they rename them back — making them interchangeable with the rest. On
+`engine="ee"`, `trend` / `sens_slope` stamp a `system:time_start` time band (in days) and fit `[time, value]`
+with `ee.Reducer.linearFit` / `sensSlope`, so the slope is per-pixel *over time* (value-units per day), while
+`percentile` uses `ee.Reducer.percentile`; on the client-side EEDAI path all three go through `reduce_time`, and
+both paths yield the same per-pixel result. The `reducer=` string is validated at construction, so a bad percentile (`"p150"`) or
+an unknown name fails before any bucket exports rather than part-way through.
+
+**Compositing.** `CompositeEngine` is the object that pairs a reducer with a cadence: it holds a `TemporalReducer`
+and a `Cadence` bucketer, splits the request window into buckets, and reduces each one to a single image. It is what
+`temporal_resolution=` resolves to, and the two special cases live in it rather than in the backend —
+`temporal_resolution="raw"` and a static (non-collection) dataset are both one whole-window bucket reducing the
+collection once. Reach for it directly when you want a bucketing the string cannot express; otherwise the string is
+the same thing.
+
+**Engines.** `engine=` resolves to an `Engine`, and there are four:
+
+| `engine=` | Transport | Runs a computation graph? | Per-axis cap |
+|---|---|---|---|
+| `"auto"` (default) | the reader when the request qualifies, else Earth Engine | only on the Earth Engine side | 32768 px |
+| `"ee"` | `ee.Image.getDownloadURL` | yes | 32768 px |
+| `"eedai"` | the pyramids-eo EEDAI reader, forced | no — raises if the request needs one | none |
+| `"pixels"` | `ee.data.computePixels` | yes | 32768 px (`auto_split=True` tiles it) |
+
+`"pixels"` is the one to reach for when a request needs **both** server-side compute and the modern extraction
+API: it evaluates the graph, so a `cloud_mask` or `filters` survives, and it returns the GeoTIFF bytes directly, so
+there is no URL to expire and no zip to unpack. It applies to `export_via="url"` only — it is a pull, so it has
+nothing to say about a queued export, and a batch sink ignores it.
+
+**It is capped per axis like the thumbnail path**, which the Earth Engine guide's "can scale to larger workloads"
+framing does not say: a 39,479 × 12 px request is refused with `Pixel grid dimensions (39479x12) must be
+less than or equal to 32768`. So `auto_split=True` means the same thing here as on the `"ee"` path — tile the
+AOI, fetch each tile, mosaic — and without it an oversize request is refused up front, naming that remedy.
+Each tile is sized through the engine, so a grid pinned with `crs_transform=` stays on its lattice across tiles,
+and the split is computed from the pinned pixel rather than from `scale` - otherwise a transform finer than `scale`
+would be split as though it were coarse, and each tile would still be over the cap. Every tile is checked against
+the cap before it is requested, so an AOI that cannot be brought under it is refused here rather than by Earth
+Engine.
+
+`"eedai"` remains the fastest path for a *raw* read of a stored asset, because it streams the pixels without
+evaluating anything. `"auto"` prefers it and falls back to Earth Engine on any decline.
+
+**Grids.** `OutputGrid` is where the AOI, `crs` and `scale` become a pixel grid, with one constructor per
+convention: `for_metre_grid` sizes for square metres on the ground (the reader's rule, shortening longitude by
+`cos(latitude)`), `for_earth_engine` reads `scale` as a uniform degree-equivalent (Earth Engine's rule), and
+`from_crs_transform` pins the grid origin so stacked dates align without a resample. Away from the equator the first
+two disagree on the column count — that is real, documented, and now visible in one place rather than implied by two
+method families.
+
+The third one is what `crs_transform=` selects:
+
+```python
+# A 10 m grid in UTM 36N, pinned to a round origin rather than to the AOI.
+GEE(..., crs="EPSG:32636", crs_transform=(10, 0, 300_000, 0, -10, 3_400_000))
+```
+
+Six terms, `(x_scale, x_shear, x_origin, y_shear, y_scale, y_origin)`, in the units of `crs` — the order
+Earth Engine's own `crsTransform` uses. It pins the pixel size **and** the origin, so two downloads over different
+AOIs land on the same pixel boundaries and differencing them needs no resample. Earth Engine treats it as an
+alternative to `scale`, not an addition, so a pinned request sends the transform and no scale: `getDownloadURL` and
+the batch sinks take it directly, and `engine="pixels"` sends it as the request's `affineTransform`. The EEDAI reader
+sizes its own metre grid and takes no transform, so a pinned request is never routed to it and `engine="eedai"`
+raises. You still need a resolvable `scale` (from `scale=` or the catalog row), because the routing and naming
+decisions are made on it — it simply is not sent. The per-axis cap is checked against the pinned grid,
+so a transform finer than `scale` cannot slip an oversized request past it.
+
+**In-memory results.** `materialize=True` returns a `DownloadResult` carrying the pyramids object alongside each
+written path, instead of only the paths:
+
+```python
+result = GEE(..., engine="ee").download(materialize=True)
+result.paths     # the written files
+result.objects   # the in-memory pyramids Datasets
+result.data      # one Dataset for a single bucket, a DatasetCollection for a time stack
+list(result)     # the objects - materialising is what you asked for
+```
+
+`result.data` is the single-vs-stack convenience: a one-bucket request (a single image, or a collection that
+reduced to one bucket) hands back a bare pyramids `Dataset`, while a multi-bucket time series hands back a
+`DatasetCollection` — ready for `reduce_time` / `groupby` / `plot` / `to_netcdf` without globbing the output
+directory back.
+
+Note the one place the stand-in is not transparent: when you materialise, each artifact's value *is* the object, so
+`result` iterates and compares as the list of **objects**, not of paths. `result.paths` is how you get the files.
+Without `materialize=` nothing changes — `download()` returns the same plain list of paths it always did.
+
+It needs pixels on disk, so it is only meaningful for `export_via="url"`; a batch sink raises rather than handing
+back destinations with no objects.
+
+**The pixel API's own two knobs.** Both are honoured by `engine="pixels"` and by nothing else, because the
+`computePixels` request body and its endpoint are the only places they can be expressed. Passing either to another
+engine logs a warning at construction and changes nothing — an argument that quietly does nothing is worse than
+one that says so.
+
+```python
+# Masked pixels come back as -9999 and the raster declares it; the high-volume
+# host serves the request.
+GEE(..., engine="pixels", nodata=-9999, high_volume=True)
+
+# Or let Earth Engine declare it on a queued export instead.
+GEE(..., export_via="drive", drive_folder="out", nodata=-9999)
+```
+
+`nodata=` is the fill value for pixels Earth Engine masked. It is worth knowing what happens without it:
+a masked composite comes back with those pixels as **0** and no no-data declared — measured on a CHIRPS window over
+the Arabian Sea, where the sea read as 0 mm of rain rather than as absent. Setting `nodata=-9999` unmasks the
+image with that value server-side and declares it on the written raster, so a reader honours it.
+
+It is *not* a field on the pixel API's request. Earth Engine's `PixelGrid` is `dimensions` / `affineTransform` /
+`crsCode` / `crsWkt`, and a body carrying a `nodata` is refused outright with
+`Unknown name "nodata" at 'grid'`. The one place the API takes a fill value directly is
+`GeoTiffImageExportOptions.noData`, so `export_via="drive"` / `"gcs"` pass it there. `export_via="asset"` creates
+an asset with no file format, and `getDownloadURL` has no such argument, so both of those ignore it and say so. `high_volume=True` initialises Earth Engine against the
+[high-volume endpoint](https://developers.google.com/earth-engine/cloud/highvolume), documented for many parallel
+requests; its trade-off is real (less caching, and complex queries cost more EECU-time there), which is why it is
+per-backend rather than global. `ee` keeps one session per process, so the last backend to open its connection
+decides the host for the others too. `ExportConfig.dtype` is still unreachable on purpose: `computePixels` takes a
+`dataType`, but the dtype a caller asks for and the dtype pyramids writes have to agree, and that pairing is not
+built.
+
+## 6. Via the `EarthLens` facade
 
 Once the GEE backend is registered in the facade you'll also be able to
 do `EarthLens(data_source="gee", variables={...}, ...).download()`; until
 then use `earthlens.gee.GEE` directly as above. (Tracking: plan task
 `H9`.)
+
+## 7. Client-side raster analysis
+
+The operations in `earthlens.gee.analysis` run **after** the fetch, on the
+in-memory pyramids `Dataset`. Nothing in them builds, maps over or composites
+an `ee.Image`, so they are invisible to the engine-eligibility gate described
+in [Server-side computation](server-side-compute.md): a raw EEDAI download
+stays eligible and the analysis happens locally.
+
+Every operation has one shape — `Dataset -> Dataset` — and is a frozen value
+object you can keep, compare and reuse:
+
+```python
+from earthlens.gee import GEE, Ndvi, Reclassify, Sieve
+
+gee = GEE(
+    start="2020-06-01",
+    end="2020-06-30",
+    request={"COPERNICUS/S2_SR_HARMONIZED": ["B8", "B4"]},
+    lat_lim=[30.0, 31.0],
+    lon_lim=[31.0, 32.0],
+    scale=20,
+    project="my-ee-project",
+)
+
+# Download, then analyse what came back. `analyze` forces materialize=True,
+# because an analysis needs the object rather than the path.
+ndvi = gee.analyze(Ndvi(nir=0, red=1))
+```
+
+### Chaining with `>>`
+
+`>>` composes operations into an `OperationChain`, which is itself an
+operation — so anything that takes one operation takes a chain. Composition
+flattens, so grouping does not change the result:
+
+```python
+vegetation = Ndvi(nir=0, red=1) >> Reclassify(bins=((0.3, 1.0, 1),)) >> Sieve(
+    min_patch_cells=25
+)
+patches = gee.analyze(vegetation)
+```
+
+Writing the results to disk names each file after its source granule and the
+chain that produced it, and refuses to replace an existing one unless asked:
+
+```python
+paths = gee.analyze(vegetation, write_to="data/vegetation")
+# -> [PosixPath('data/vegetation/COPERNICUS_S2_SR_HARMONIZED_B8_B4_20200601_ndvi_reclassify_sieve.tif')]
+```
+
+### Band expressions: the allowed grammar
+
+`BandExpression` is the general case — an arbitrary formula over the raster's
+bands, addressed either positionally (`b0`, `b1`, …) or by the names the raster
+carries:
+
+```python
+from earthlens.gee import BandExpression
+
+evi = BandExpression(
+    formula="2.5 * (b0 - b1) / (b0 + 6 * b1 - 7.5 * b2 + 1)"
+)
+```
+
+**There is no `eval` anywhere in it.** The formula is parsed with `ast` and
+walked against an allow-list, and anything outside that list is refused **at
+construction** rather than when the raster arrives:
+
+| Allowed | |
+|---|---|
+| Arithmetic | `+` `-` `*` `/` `//` `%` `**`, unary `+` / `-` |
+| Comparison | `<` `<=` `>` `>=` `==` `!=` |
+| Mask algebra | `&` `|` `^` |
+| Names | `b0`, `b1`, … and the raster's own band names |
+| Numbers | integer and float literals |
+| Functions | `abs` `clip` `exp` `log` `log10` `maximum` `minimum` `sqrt` `where` (`ALLOWED_FUNCTIONS`) |
+
+Everything else raises at construction: attribute access (`b0.min()`), calls to
+anything not on the list, `__import__`, `open`, comprehensions, lambdas,
+conditionals, `and` / `or`, string literals, subscripts, keyword arguments and
+starred arguments. Calls are also arity-checked against `FUNCTION_ARITY`,
+because a numpy ufunc's second positional argument is `out=` — `abs(b0, b1)`
+would otherwise write into band 1 and return it.
+
+A result that is not finite becomes no-data rather than travelling downstream:
+`1 / 0`, `log(0)` and `sqrt(-1)` all produce no-data cells, and no warning
+escapes, so a caller running under `-W error` is unaffected.
+
+### Terrain derivatives
+
+`Slope`, `Aspect` and `Hillshade` take an elevation band. Slope reports
+`degrees` (the default), `radians` or `percent`:
+
+```python
+from earthlens.gee import Aspect, Hillshade, Slope
+
+dem = GEE(
+    start="2000-01-01",
+    end="2000-12-31",
+    request={"USGS/SRTMGL1_003": ["elevation"]},
+    lat_lim=[30.0, 31.0],
+    lon_lim=[31.0, 32.0],
+    scale=30,
+    project="my-ee-project",
+)
+
+steepness = dem.analyze(Slope(units="degrees"))
+in_percent = dem.analyze(Slope(units="percent"))   # rise over run * 100
+direction = dem.analyze(Aspect())                  # clockwise from north
+relief = dem.analyze(Hillshade(azimuth=315, altitude=45))
+```
+
+The units matter: pyramids' `slope` understands `degrees` and `radians` and
+falls through to radians for anything else, so `percent` is computed here as
+`tan(radians) * 100` rather than passed down. A 45° slope therefore reads 45.0,
+π/4 and 100.0 in the three units.
+
+### Windowed texture
+
+`Texture` reports a grey-level co-occurrence measure per window, which is how a
+smooth surface is told from a rough one when both have the same mean value —
+urban against bare soil, say, or calm water against wind-roughened water:
+
+```python
+from earthlens.gee import Texture
+
+contrast = gee.analyze(Texture(measure="contrast", radius=2, levels=16))
+```
+
+`radius` is the window half-width in cells and `levels` the number of grey
+levels the band is quantised into before the co-occurrence matrix is built —
+fewer levels means a coarser, cheaper measure. A constant field has no texture
+at all, which is the useful sanity check: `contrast` reads 0.0 and
+`homogeneity` reads 1.0 everywhere on it.
+
+### Distance to a target
+
+`Proximity` replaces each cell with its distance to the nearest target cell.
+With `target_values` left unset every non-zero cell is a target, which is GDAL's
+own default and the right one for a mask raster:
+
+```python
+from earthlens.gee import Proximity
+
+# Distance from every cell to the nearest water pixel.
+distance = gee.analyze(Proximity(band=0))
+
+# Only classes 3 and 4 count as targets, and cap the search.
+to_roads = gee.analyze(Proximity(target_values=(3, 4), max_distance=5000))
+```
+
+Distances come out in the **CRS's own units**, so a geographic raster reports
+degrees, not metres — worth knowing before comparing a result against a
+distance in metres. Pass `distance_units="PIXEL"` to count cells instead.
+
+### Unit conversion
+
+`ConvertUnits` applies the affine conversion between two physical units, reading
+the band's current unit from the raster's own `band_units` and declaring the
+target on the result:
+
+```python
+from earthlens.gee import ConvertUnits
+
+celsius = gee.analyze(ConvertUnits(target="celsius"))
+```
+
+Converting to the unit a band already carries is a no-op rather than an error.
+No-data stays no-data: a sentinel is a number, and `-9999 K` would otherwise
+become a plausible-looking `-10272.15 °C`.
+
+This operation owns its arithmetic deliberately. pyramids has the same table
+behind `Dataset.convert_units` but deprecated it for removal, on the grounds
+that physical unit conversion is domain logic rather than a GIS primitive — to
+be done in the downstream science-domain consumer, which is this package.
+
+### Patches: labelling and sieving
+
+Two operations treat contiguous runs of cells as objects rather than as pixels.
+`ConnectedComponents` labels each patch with its own number, so counting patches
+is reading the maximum and selecting one is comparing against its label:
+
+```python
+from earthlens.gee import ConnectedComponents, Sieve
+
+labels = gee.analyze(ConnectedComponents(lower_bound=1.0, upper_bound=1.0))
+```
+
+Cells outside `[lower_bound, upper_bound]` become 0. A no-data cell is outside
+any finite range, so a void becomes background too — which is the right default,
+since a void is not a patch, but it means the label raster cannot tell "not in a
+patch" from "no data here". Read that back from the source raster if it matters.
+
+`Sieve` drops patches smaller than `min_patch_cells`, which is the clean-up step
+a classification needs before anything downstream treats its patches as real:
+
+```python
+# Classify, then drop the salt-and-pepper, then vectorise what survived.
+cleaned = gee.analyze(Reclassify(bins=((0.3, 1.0, 1),)) >> Sieve(min_patch_cells=25))
+```
+
+`Sieve` takes a `connectedness` of 4 or 8, deciding whether diagonal neighbours
+join a patch; `ConnectedComponents` labels with its own fixed rule and exposes
+`dtype` instead, for when the label count outgrows `int32`. Pairing `Sieve` with
+`Vectorize` is the intended route from a classification to polygons — see
+[Sampling and vector interop](sampling-and-vector.md#rasters-to-polygons).
+
+### No-data, once
+
+Every operation reads its input through one seam that turns the declared
+sentinel into `NaN`, and writes its output through one that declares a
+sentinel appropriate to the result's own dtype. So a `-9999` in the input is
+never arithmetic: it does not shift an index, pull a focal mean, enter a
+co-occurrence matrix, match an open-ended reclassification bin, or become a
+cluster of its own. The output declares what *its* voids are, which is not
+necessarily the input's sentinel — a class raster's unmatched cells, a
+`Cluster`'s `no_data_label`, an index's undefined cells.
+
+### Learning operations need the `[gee]` extra
+
+`Cluster` and `Classify` reach scikit-learn, which ships with the `[gee]`
+extra. A missing install is reported with the extra to install rather than a
+`ModuleNotFoundError` from four frames deep.
+
+```python
+from earthlens.gee import Classify, Cluster, TrainingExtractor
+
+classes = gee.analyze(Cluster(n_clusters=5))
+
+# Supervised, from a label raster on the same grid:
+training = TrainingExtractor().extract(source_raster, label_raster)
+mapped = Classify(training=training).apply(source_raster)
+```
+
+A `Classify` is tied to the bands it was trained on, so applying it to a
+different band set is refused rather than predicted from the wrong features,
+and the forest is fitted once and reused across applications.
+
+### Combining a raster with a companion raster
+
+Two operations take a second raster, supplied at construction and used by
+`apply`. Both are thin, client-side wrappers over pyramids 0.69.0 — pyramids
+owns the GDAL pan-sharpener and the histogram-matching arithmetic.
+
+`PanSharpen` injects the spatial detail of a high-resolution panchromatic band
+into a coarser multispectral raster (Landsat's 15 m B8 against its 30 m
+multispectral bands, say), producing a fused raster at the pan resolution:
+
+```python
+from earthlens.gee import PanSharpen
+
+fused = PanSharpen(pan=pan_raster)(multispectral_raster)
+# or a subset, with explicit Brovey weights:
+fused = PanSharpen(pan=pan_raster, bands=(0, 1, 2), weights=(0.3, 0.4, 0.3))(ms)
+```
+
+`MatchHistogram` remaps a band so its distribution matches a reference
+acquisition's — the usual way to make two scenes of one area radiometrically
+comparable before differencing. No-data is excluded from both distributions
+and written back as the source's sentinel:
+
+```python
+from earthlens.gee import MatchHistogram
+
+comparable = MatchHistogram(reference=july_scene)(june_scene)
+```
+
+### Sensor-specific spectral transforms
+
+`TasseledCap` rotates a multi-band reflectance stack into the Kauth-Thomas
+brightness / greenness / wetness components. Unlike the operations above it is
+tied to a *sensor*: the coefficients are a fixed linear combination over a
+specific band order, which is why they live upstream in pyramids-eo's sensor
+registry rather than here. Because the band order matters, name the input's
+bands and the transform reorders them to the sensor's roles; leave them unnamed
+and it assumes the documented order and only checks the band count.
+
+```python
+from earthlens.gee import TasseledCap
+
+# a 6-band Landsat 8 OLI reflectance stack (blue, green, red, nir, swir1, swir2)
+components = TasseledCap(sensor="landsat8_oli")(reflectance_raster)
+# or a subset, in the order you ask for:
+wetness = TasseledCap(sensor="landsat8_oli", components=("wetness",))(reflectance_raster)
+```
+
+The bundled sensors are `landsat5_tm`, `landsat7_etm` and `landsat8_oli`; the
+input must be a reflectance factor (a DN stack is warned about, not rejected),
+and voids are carried through as NaN in every component.
+
+## 8. Visualization
+
+earthlens draws nothing. Every figure, map, animation and chart is produced by
+[**digitalearth**](https://github.com/serapeum-org/Digital-Earth), which reads
+the pyramids objects a download returns and renders them through cleopatra
+across four backend tiers. earthlens contributes only the two things that are
+genuinely Earth Engine's — the publisher's style metadata, and the two
+server-side preview URLs — and then delegates.
+
+That means the plotting stack is **optional**:
+
+```bash
+pip install earthlens[viz]        # or: uv sync --extra viz
+```
+
+A bare install pulls no digitalearth, no cleopatra and no matplotlib, and
+`import earthlens.gee` does not reach any of them. The import happens inside
+the `Visualizer` method that needs it, and a boundary test holds that line.
+
+### Style hints come from the catalog
+
+`earthlens.gee.viz.style_for` answers "how should this dataset be drawn?" from
+the catalog rather than from a guess:
+
+```python
+from earthlens.gee.viz import style_for
+
+hints = style_for("COPERNICUS/S2_SR_HARMONIZED", ("B4", "B3", "B2"))
+hints.limits          # ((0.0, 3000.0), (0.0, 3000.0), (0.0, 3000.0))
+hints.source          # 'catalog'
+hints.digitalearth_kwargs()
+```
+
+There are two sources, and `source` says which one answered:
+
+- **`'catalog'`** — the publisher's own rendering, captured on the catalog row
+  as `Dataset.visualizations` from the asset's STAC `gee:visualizations`. This
+  is what Earth Engine's own catalog page draws: the band triple, the stretch
+  and the palette the data's publisher chose. **894 of the 1104 curated
+  datasets carry one** (111 are served by the STAC with no rendering declared,
+  and 99 are community `projects/...` assets the public STAC does not serve).
+- **`'heuristic'`** — derived from `Band.min` / `Band.max` plus a colour-map
+  match table that deliberately mirrors digitalearth's own
+  `base/autostyle/library/variables.yml`, so a fallback agrees with what
+  digitalearth would have picked rather than inventing a second opinion.
+
+The distinction matters: "the publisher says 0–3000" and "we read the band's
+declared range" are different claims, and `source` lets you treat them
+differently. A dataset offering several renderings can be asked for one by
+name:
+
+```python
+style_for("LANDSAT/LC09/C02/T1_L2", name="Near Infrared (543)")
+```
+
+### Rendering a download
+
+`GEE.visualize(result)` returns a `Visualizer` bound to the result and its
+hints. Each method resolves the hints, builds the keyword arguments and calls
+one digitalearth verb — nothing is composed here:
+
+```python
+from earthlens.gee import GEE
+
+gee = GEE(
+    start="2020-06-01",
+    end="2020-08-31",
+    variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4", "B3", "B2"]},
+    lat_lim=[30.0, 31.0],
+    lon_lim=[31.0, 32.0],
+    temporal_resolution="monthly",
+    scale=100,
+)
+result = gee.download(materialize=True)
+viz = gee.visualize(result)
+
+still = viz.still()                       # digitalearth.quickmap
+web = viz.still(backend="web")            # the MapLibre tier
+viz.timelapse("out/summer.gif")           # Map.animate over the collection
+viz.chart("line", series)                 # digitalearth.line
+```
+
+`backend=` takes digitalearth's own four names — `"matplotlib"` (the default),
+`"interactive"`, `"web"` and `"3d"`. Anything you pass as a keyword argument
+overrides the catalog's hint, so the catalog sets the default and you keep the
+last word:
+
+```python
+viz.still(cmap="magma", limits=(0, 2000))
+```
+
+`timelapse` hands the **whole** `DatasetCollection` to digitalearth in one
+call, because its animation builder is already collection-aware; emitting
+frames here would be exactly the rendering logic this layer must not contain.
+It needs a time series, so request several dates and `materialize=True`.
+
+### Server-side previews: no download at all
+
+Two previews are rendered by Earth Engine itself, before any pixels move.
+These are the genuinely GEE-specific part of visualization, and they need no
+digitalearth:
+
+```python
+viz = gee.visualize()                     # no result needed
+url = viz.thumbnail(image, dimensions=512)   # ee.Image.getThumbURL
+source = viz.tiles(image)                    # ee.Image.getMapId
+source.url                                   # '.../tiles/{z}/{x}/{y}'
+```
+
+A thumbnail is the cheapest possible look at a request: Earth Engine
+rasterises the PNG on demand when the URL is fetched, so it is not subject to
+the 32768-px download cap. Its own cap is 4096 px per axis, which earthlens
+checks at construction and names the remedy for rather than letting the SDK
+raise from inside.
+
+Both previews honour the style hints, so a preview is stretched the way the
+publisher intended rather than across the full dynamic range of the data type,
+which is Earth Engine's unhelpful default.
+
+### An Earth Engine tile layer on a slippy map
+
+This is the whole seam between the two packages: earthlens resolves the tile
+template inside Earth Engine, digitalearth draws it.
+
+```python
+viz.tile_map(image, backend="web", name="True colour")
+```
+
+The map is built **empty** — nothing local is drawn or downloaded — and the
+viewport decides which tiles Earth Engine renders. `backend=` is `"web"` or
+`"interactive"`; the matplotlib tier draws no slippy map, and the 3-D tier's
+`tiles_3d` has different semantics, so neither is offered here. The layer
+carries Earth Engine attribution, which its terms require on a published map.
+
+### What lives where
+
+| Concern | Package |
+|---|---|
+| Fetching, catalogs, request shaping | earthlens |
+| `getThumbURL` / `getMapId`, catalog style hints | earthlens (`earthlens.gee.viz`) |
+| Maps, animations, charts, layout, basemaps | digitalearth |
+| Colour ramps, glyphs, the actual drawing | cleopatra |
+
+If a figure cannot be expressed, the fix belongs in digitalearth or cleopatra —
+not in a renderer added here.

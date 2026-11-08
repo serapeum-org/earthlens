@@ -1,0 +1,87 @@
+# Codecov configuration.
+#
+# The six member flags were already being uploaded by tests.yml but gated
+# nothing: without this file Codecov applies its defaults, so a PR that dropped
+# a member's coverage reported the drop and passed anyway.
+#
+# `threshold` rather than a fixed target: the absolute number differs per
+# member (core is pure Python; a provider's coverage moves with whichever
+# backend changed), and what matters on a PR is that it does not slide. 1% of
+# slack absorbs the ordinary noise of moving a test between files.
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+        if_ci_failed: error
+      # One check per distribution, so a drop names the member that caused it
+      # instead of averaging it away across ~9,400 tests.
+      core:
+        flags: [core]
+        target: auto
+        threshold: 1%
+      atmosphere:
+        flags: [atmosphere]
+        target: auto
+        threshold: 1%
+      hazards:
+        flags: [hazards]
+        target: auto
+        threshold: 1%
+      imagery:
+        flags: [imagery]
+        target: auto
+        threshold: 1%
+      land:
+        flags: [land]
+        target: auto
+        threshold: 1%
+      ocean:
+        flags: [ocean]
+        target: auto
+        threshold: 1%
+    patch:
+      default:
+        # New lines are where a regression is cheapest to catch, so hold them
+        # to a real number rather than `auto`.
+        target: 80%
+        threshold: 0%
+        if_ci_failed: error
+
+flag_management:
+  individual_flags:
+    - name: core
+      paths: [libs/core/src/]
+    - name: atmosphere
+      paths: [libs/providers/atmosphere/src/]
+    - name: hazards
+      paths: [libs/providers/hazards/src/]
+    - name: imagery
+      paths: [libs/providers/imagery/src/]
+    - name: land
+      paths: [libs/providers/land/src/]
+    - name: ocean
+      paths: [libs/providers/ocean/src/]
+
+# The tests themselves are not the thing being measured.
+ignore:
+  - "libs/*/tests/**"
+  - "libs/providers/*/tests/**"
+  # `earthlens.testing` is the test harness. It lives under core's `src` (so a
+  # member run on its own can import it, and so it ships for downstream code
+  # testing its own backend), which means its lines are *attributed* to the
+  # `core` flag — but most of them execute in the five provider lanes, which
+  # upload under their own flags. Measuring it therefore reports a drop in
+  # core's coverage every time the shared test infrastructure grows, which is
+  # the opposite of the incentive this repo wants. Its own behaviour is
+  # covered by real tests in libs/core/tests either way.
+  - "libs/core/src/earthlens/testing/**"
+  - "tools/**"
+  - "docs/**"
+  - "examples/**"
+
+comment:
+  layout: "condensed_header, flags, condensed_files"
+  require_changes: true

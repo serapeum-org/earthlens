@@ -10,7 +10,7 @@ consults it only when a provider row declares `needs_token: true`,
 which none of the bundled public networks do.
 
 There is deliberately no credentialed-login class here (unlike
-:class:`earthlens.cmems.CmemsAuth` / `earthlens.gee.EarthEngineAuth`)
+`earthlens.cmems.CmemsAuth` / `earthlens.gee.EarthEngineAuth`)
 — event queries do not authenticate.
 """
 

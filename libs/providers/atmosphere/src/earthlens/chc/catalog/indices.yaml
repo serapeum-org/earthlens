@@ -5,7 +5,7 @@
 datasets:
   spi-chirps3-01-pentad:
     ftp_bases:
-      tif: pub/org/chc/products/SPI/CHIRPS3/01_pentad/
+      tif: products/SPI/CHIRPS3/01_pentad/
     region: global
     temporal_resolution: pentadal
     pandas_freq: 5D
@@ -21,7 +21,7 @@ datasets:
         types: index
   spi-chirps3-02-pentad:
     ftp_bases:
-      tif: pub/org/chc/products/SPI/CHIRPS3/02_pentad/
+      tif: products/SPI/CHIRPS3/02_pentad/
     region: global
     temporal_resolution: pentadal
     pandas_freq: 5D
@@ -37,7 +37,7 @@ datasets:
         types: index
   spi-chirps3-05-pentad:
     ftp_bases:
-      tif: pub/org/chc/products/SPI/CHIRPS3/05_pentad/
+      tif: products/SPI/CHIRPS3/05_pentad/
     region: global
     temporal_resolution: pentadal
     pandas_freq: 5D
@@ -53,7 +53,7 @@ datasets:
         types: index
   spi-chirps3-06-pentad:
     ftp_bases:
-      tif: pub/org/chc/products/SPI/CHIRPS3/06_pentad/
+      tif: products/SPI/CHIRPS3/06_pentad/
     region: global
     temporal_resolution: pentadal
     pandas_freq: 5D
@@ -69,7 +69,7 @@ datasets:
         types: index
   spi-chirps3-09-pentad:
     ftp_bases:
-      tif: pub/org/chc/products/SPI/CHIRPS3/09_pentad/
+      tif: products/SPI/CHIRPS3/09_pentad/
     region: global
     temporal_resolution: pentadal
     pandas_freq: 5D
@@ -85,7 +85,7 @@ datasets:
         types: index
   spi-chirps3-12-pentad:
     ftp_bases:
-      tif: pub/org/chc/products/SPI/CHIRPS3/12_pentad/
+      tif: products/SPI/CHIRPS3/12_pentad/
     region: global
     temporal_resolution: pentadal
     pandas_freq: 5D
@@ -101,7 +101,7 @@ datasets:
         types: index
   spi-chirps3-15-pentad:
     ftp_bases:
-      tif: pub/org/chc/products/SPI/CHIRPS3/15_pentad/
+      tif: products/SPI/CHIRPS3/15_pentad/
     region: global
     temporal_resolution: pentadal
     pandas_freq: 5D
@@ -117,7 +117,7 @@ datasets:
         types: index
   spi-chirps3-18-pentad:
     ftp_bases:
-      tif: pub/org/chc/products/SPI/CHIRPS3/18_pentad/
+      tif: products/SPI/CHIRPS3/18_pentad/
     region: global
     temporal_resolution: pentadal
     pandas_freq: 5D
@@ -133,7 +133,7 @@ datasets:
         types: index
   spi-chirps3-21-pentad:
     ftp_bases:
-      tif: pub/org/chc/products/SPI/CHIRPS3/21_pentad/
+      tif: products/SPI/CHIRPS3/21_pentad/
     region: global
     temporal_resolution: pentadal
     pandas_freq: 5D
@@ -149,7 +149,7 @@ datasets:
         types: index
   spei-v1-01-month:
     ftp_bases:
-      netcdf: pub/org/chc/products/SPEI/v1/01_month/
+      netcdf: products/SPEI/v1/01_month/
     region: global
     temporal_resolution: monthly
     pandas_freq: MS
@@ -165,7 +165,7 @@ datasets:
         types: index
   spei-v1-02-month:
     ftp_bases:
-      netcdf: pub/org/chc/products/SPEI/v1/02_month/
+      netcdf: products/SPEI/v1/02_month/
     region: global
     temporal_resolution: monthly
     pandas_freq: MS
@@ -181,7 +181,7 @@ datasets:
         types: index
   spei-v1-03-month:
     ftp_bases:
-      netcdf: pub/org/chc/products/SPEI/v1/03_month/
+      netcdf: products/SPEI/v1/03_month/
     region: global
     temporal_resolution: monthly
     pandas_freq: MS
@@ -197,7 +197,7 @@ datasets:
         types: index
   spei-v1-06-month:
     ftp_bases:
-      netcdf: pub/org/chc/products/SPEI/v1/06_month/
+      netcdf: products/SPEI/v1/06_month/
     region: global
     temporal_resolution: monthly
     pandas_freq: MS
@@ -213,7 +213,7 @@ datasets:
         types: index
   spei-v1-09-month:
     ftp_bases:
-      netcdf: pub/org/chc/products/SPEI/v1/09_month/
+      netcdf: products/SPEI/v1/09_month/
     region: global
     temporal_resolution: monthly
     pandas_freq: MS
@@ -229,7 +229,7 @@ datasets:
         types: index
   spei-v1-12-month:
     ftp_bases:
-      netcdf: pub/org/chc/products/SPEI/v1/12_month/
+      netcdf: products/SPEI/v1/12_month/
     region: global
     temporal_resolution: monthly
     pandas_freq: MS

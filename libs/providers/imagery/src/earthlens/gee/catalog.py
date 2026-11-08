@@ -1,6 +1,6 @@
 """Dataset/band catalog loader for the Google Earth Engine backend.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for the bundled GEE
+Hosts `Catalog`, the pydantic-backed reader for the bundled GEE
 catalog — the analogue of `earthlens.ecmwf.Catalog` /
 `cds_data_catalog.yaml`. The catalog ships as a directory of
 per-category YAML files at `src/earthlens/gee/catalog/`
@@ -9,21 +9,21 @@ per-category YAML files at `src/earthlens/gee/catalog/`
 `community.yaml` for `projects/...` user-contributed assets, …),
 plus a single `_index.yaml` carrying the merged
 `available_datasets:` list. Per-file sections each map to a typed
-field on :class:`Catalog` once merged:
+field on `Catalog` once merged:
 
 * `available_datasets` (informational list of Earth Engine asset ids)
-  → :attr:`Catalog.available_datasets`
+  → `Catalog.available_datasets`
 * `datasets` (curated map of collections, each with band + aggregation
-  metadata) → :attr:`Catalog.datasets`, with each value a
-  :class:`Dataset` and each band a :class:`Band`.
+  metadata) → `Catalog.datasets`, with each value a
+  `Dataset` and each band a `Band`.
 
 Datasets are addressed by their Earth Engine asset id (e.g.
 `"USGS/SRTMGL1_003"`, `"COPERNICUS/S2_SR_HARMONIZED"`); bands by
-`(asset_id, band_id)` via :meth:`Catalog.get_band` (aliased as
-:meth:`Catalog.get_variable` for parity with the ECMWF catalog).
+`(asset_id, band_id)` via `Catalog.get_band` (aliased as
+`Catalog.get_variable` for parity with the ECMWF catalog).
 
 The path to the bundled catalog directory lives at
-:data:`CATALOG_PATH`; tests can monkey-patch that module attribute to
+`CATALOG_PATH`; tests can monkey-patch that module attribute to
 redirect the loader at a temporary directory or single YAML file.
 
 Examples:
@@ -47,7 +47,7 @@ import re
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, cast
 
-from pydantic import ConfigDict, Field, ValidationError
+from pydantic import ConfigDict, Field, ValidationError, model_validator
 
 if TYPE_CHECKING:
     # `TaskInfo` is only referenced in type annotations on the
@@ -81,7 +81,7 @@ PROVIDERS_PATH: Path = Path(__file__).parent / "providers.yaml"
 # 11k+ band entries is ~5 s on the bundled catalog; a second `Catalog()`
 # call on an unchanged tree should be ~1 ms. `_PROVIDERS_CACHE` below
 # applies the same pattern to `providers.yaml`; both are cleared
-# together by :func:`clear_catalog_cache`.
+# together by `clear_catalog_cache`.
 _CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
@@ -89,7 +89,7 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
     """Return the catalog at `path`, memoised on the contributing files.
 
     Returns a `(available_datasets, datasets)` tuple of the same shape
-    the :class:`Catalog` model exposes. The result is cached on the
+    the `Catalog` model exposes. The result is cached on the
     resolved path + every contributing file's stamp, so a fresh
     `Catalog()` on an unchanged tree skips YAML parsing and pydantic
     validation.
@@ -281,8 +281,176 @@ class Cadence(SummarisedLeaf):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
+    # Parsed from gee_data_catalog.yaml, not a hand-typed constructor, so this
+    # numeric field is left coercing a bool rather than guarded with NoBool: a
+    # bool here is a catalog-authoring surprise to catch upstream (#1355).
     interval: int = Field(gt=0)
     unit: Literal["minute", "hour", "day", "pentad", "dekad", "month", "year"]
+
+
+#: Identifier tokens in an expression formula (band symbols, function names).
+#: A leading digit cannot start one, so numeric literals are excluded.
+_FORMULA_IDENTIFIER = re.compile(r"[A-Za-z_]\w*")
+
+
+class BandExpression(SummarisedLeaf):
+    """A guarded `ee.Image.expression` formula and its band bindings.
+
+    Carries the `expression` form of a derived band: a formula string plus the
+    map from each symbol in it to a source band id, so the loader can validate
+    the shape while Earth Engine evaluates the arithmetic server-side.
+
+    Attributes:
+        formula: The expression, e.g. `"2.5 * ((NIR - RED) / (NIR + 6 * RED -
+            7.5 * BLUE + 1))"`. The symbols must all be keys of `bands`.
+        bands: Map from each formula symbol to the source band id it reads
+            (e.g. `{"NIR": "B8", "RED": "B4"}`).
+
+    Examples:
+        - An EVI-style formula names its inputs:
+            ```python
+            >>> e = BandExpression(formula="(NIR - RED)", bands={"NIR": "B8", "RED": "B4"})
+            >>> sorted(e.bands)
+            ['NIR', 'RED']
+
+            ```
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+    _summary_fields = ("formula",)
+    formula: str
+    bands: dict[str, str] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _formula_symbols_match_bindings(self) -> BandExpression:
+        """Require the formula's symbols to be exactly the band bindings.
+
+        An identifier immediately followed by `(` is treated as a function
+        call (e.g. a future `sqrt(NIR)`), not a band symbol, so it is not
+        required to be a binding.
+
+        Returns:
+            `self` unchanged once every symbol used in `formula` is a key of
+            `bands` and every key of `bands` is used in `formula`.
+
+        Raises:
+            ValueError: If the formula uses a symbol with no binding, or binds a
+                band the formula never uses (caught at catalog load, not at
+                Earth Engine runtime).
+        """
+        symbols = {
+            match.group()
+            for match in _FORMULA_IDENTIFIER.finditer(self.formula)
+            if self.formula[match.end() : match.end() + 1] != "("
+        }
+        unbound = sorted(symbols - set(self.bands))
+        unused = sorted(set(self.bands) - symbols)
+        if unbound or unused:
+            raise ValueError(
+                "the expression formula symbols must match its band bindings: "
+                f"unbound symbol(s) {unbound}, unused binding(s) {unused} "
+                f"(formula {self.formula!r}, bindings {sorted(self.bands)})"
+            )
+        return self
+
+
+class DerivedBand(SummarisedLeaf):
+    """A closed-vocabulary formula for a band computed from other bands.
+
+    A band declaring `derived_from` is not read from the asset: it is computed
+    server-side from the dataset's own bands before `select`, so a spectral
+    index (NDVI, NDWI, EVI, ...) is requestable through the facade like any
+    native band — the openEO-style curated recipe, no user code. Exactly one of
+    the three operations is given, so the vocabulary stays small and the loader
+    stays strict.
+
+    Attributes:
+        normalized_difference: `(a, b)` for `(a - b) / (a + b)` — NDVI, NDWI,
+            NDBI, ... computed with `ee.Image.normalizedDifference([a, b])`.
+        ratio: `(a, b)` for a simple band ratio `a / b`.
+        expression: A guarded `ee.Image.expression` for anything the two simple
+            forms cannot express (e.g. EVI).
+
+    Examples:
+        - NDVI is a normalized difference of two bands:
+            ```python
+            >>> d = DerivedBand(normalized_difference=("B8", "B4"))
+            >>> d.normalized_difference
+            ('B8', 'B4')
+
+            ```
+        - Giving more than one operation is refused:
+            ```python
+            >>> DerivedBand(normalized_difference=("B8", "B4"), ratio=("B8", "B4"))
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for DerivedBand
+            ...
+
+            ```
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+    normalized_difference: tuple[str, str] | None = None
+    ratio: tuple[str, str] | None = None
+    expression: BandExpression | None = None
+
+    @model_validator(mode="after")
+    def _exactly_one_operation(self) -> DerivedBand:
+        """Require exactly one of the three operations.
+
+        Returns:
+            `self` unchanged once exactly one operation is set.
+
+        Raises:
+            ValueError: If none, or more than one, operation is given.
+        """
+        given = [
+            name
+            for name in ("normalized_difference", "ratio", "expression")
+            if getattr(self, name) is not None
+        ]
+        if len(given) != 1:
+            raise ValueError(
+                "a derived band needs exactly one of normalized_difference / "
+                f"ratio / expression; got {given or 'none'}"
+            )
+        return self
+
+    def source_bands(self) -> tuple[str, ...]:
+        """Return the source band ids this formula reads.
+
+        Returns:
+            The band ids referenced, in a stable order. The dataset's
+            post-load validator uses these to check every source band exists
+            among the dataset's native bands.
+        """
+        if self.normalized_difference is not None:
+            return self.normalized_difference
+        if self.ratio is not None:
+            return self.ratio
+        assert self.expression is not None  # noqa: S101 - model_validator guarantees
+        return tuple(self.expression.bands.values())
+
+    def summary_parts(self) -> list[str]:
+        """Summarise the one operation this derived band carries.
+
+        The operation fields are tuples / a nested model, so the default
+        field-rendering would leave the row blank; compose the active one into
+        a single fragment naming the operation and its source bands.
+
+        Returns:
+            A one-element list: the operation and its inputs, e.g.
+            `["normalized_difference(B8, B4)"]` or `["expression(NIR - RED)"]`.
+        """
+        if self.normalized_difference is not None:
+            fragment = f"normalized_difference({', '.join(self.normalized_difference)})"
+        elif self.ratio is not None:
+            fragment = f"ratio({', '.join(self.ratio)})"
+        else:
+            assert self.expression is not None  # noqa: S101 - validator guarantees
+            fragment = f"expression({self.expression.formula})"
+        return [fragment]
 
 
 class Band(SummarisedLeaf):
@@ -310,6 +478,9 @@ class Band(SummarisedLeaf):
         max: Typical / valid maximum DN, or `None`.
         estimated_range: `True` if `min`/`max` are sample-based
             estimates rather than hard bounds.
+        classes: For a categorical band, the integer pixel value to
+            class-name legend from the dataset's STAC `gee:classes`,
+            or `None` for a continuous band.
 
     Examples:
         - Build a reflectance band and read its scaling:
@@ -346,12 +517,19 @@ class Band(SummarisedLeaf):
     id: str
     description: str | None = None
     units: str | None = None
+    # Parsed from gee_data_catalog.yaml, not a hand-typed constructor, so these
+    # numeric fields are left coercing a bool rather than guarded with NoBool: a
+    # bool here is a catalog-authoring surprise to catch upstream (#1355).
     scale: float | None = None
     offset: float | None = None
     wavelength: float | None = None
     min: float | None = None
     max: float | None = None
     estimated_range: bool = False
+    classes: dict[int, str] | None = None
+    #: When set, this band is computed server-side from the dataset's own bands
+    #: (a spectral index) rather than read from the asset — see `DerivedBand`.
+    derived_from: DerivedBand | None = None
 
 
 class Extent(SummarisedLeaf):
@@ -425,6 +603,202 @@ class Extent(SummarisedLeaf):
         return [f"{self.start_date}..{self.end_date or 'present'}"]
 
 
+#: The per-image masks a `preprocess:` recipe may name, as
+#: `earthlens.gee.preprocess` resolves them. A `Literal` rather than a free
+#: string so a typo in the YAML fails at load time; `earthlens.gee.preprocess`
+#: holds the matching name-to-class map.
+MaskRecipe = Literal[
+    "landsat_sr",
+    "landsat_qa_refined",
+    "sentinel2_scl",
+    "sentinel2_qa60",
+    "sentinel2_cdi",
+    "cloud_score_plus",
+    "modis_state_1km",
+]
+
+
+class Preprocess(SummarisedLeaf):
+    """A dataset's curated "analysis-ready pixels" recipe.
+
+    The data behind `earthlens.gee.preprocess(asset_id)`: which per-image
+    mask the sensor wants, whether the band `scale` / `offset` should be
+    applied, and a note for whatever the recipe cannot express. Keeping
+    it on the catalog row is the point — the alternative is an
+    `if/elif` over asset ids in Python, which drifts from the catalog the
+    moment a dataset is added.
+
+    It is declared as an explicit typed field because `Dataset` sets
+    `frozen=True` but **not** `extra="forbid"`: an unknown `preprocess:`
+    key would otherwise be dropped in silence, so a typo'd recipe would
+    read as "this dataset has none". With the field declared, the
+    loader validates it, and `extra="forbid"` here rejects a typo
+    *inside* the recipe too.
+
+    Attributes:
+        mask: The per-image mask to apply, by recipe name, or `None`
+            when the dataset needs none (the Sentinel-1 case: Earth
+            Engine's GRD product is already corrected, so the recipe is
+            an honest no-op plus a `note`).
+        scale: Whether to apply the row's band `scale` / `offset` after
+            the mask, via `BandScaler.for_dataset`. Defaults to `False`.
+        note: What the recipe cannot express — preprocessing the
+            provider already applied, or a step earthlens cannot do
+            server-side. Surfaced by `preprocess` so the user reads it.
+
+    Examples:
+        - The Sentinel-2 L2A recipe: mask on the scene classification,
+          then scale to reflectance:
+            ```python
+            >>> recipe = Preprocess(mask="sentinel2_scl", scale=True)
+            >>> print(recipe)
+            Preprocess(sentinel2_scl, scale)
+
+            ```
+        - A documented no-op carries only the note:
+            ```python
+            >>> Preprocess(note="already terrain-corrected").mask is None
+            True
+
+            ```
+        - An unknown mask name is refused at load time:
+            ```python
+            >>> Preprocess(mask="sentinel2_scll")  # doctest: +IGNORE_EXCEPTION_DETAIL
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for Preprocess
+
+            ```
+    """
+
+    _summary_fields = ("mask", "scale", "note")
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    mask: MaskRecipe | None = None
+    scale: bool = False
+    note: str | None = None
+
+
+class Visualization(SummarisedLeaf):
+    """One of a dataset's publisher-authored default renderings.
+
+    Captured from the asset's STAC `gee:visualizations`, the same way
+    `Band.classes` is captured from `gee:classes`. This is what Earth
+    Engine's own catalog page draws, so it is the right default for a
+    preview: the publisher chose the band triple, the stretch and the
+    palette, and guessing them from band ids cannot do better.
+
+    Every field but `name` and `bands` is optional, because the upstream
+    entries genuinely vary — `ESA/WorldCover/v200` carries only `bands`,
+    `USGS/SRTMGL1_003` adds `gamma`, `UCSB-CHG/CHIRPS/DAILY` a `palette`,
+    and `MODIS/061/MOD13Q1` a `gain`.
+
+    `vmin` / `vmax` mirror upstream's `min` / `max`, which arrive as
+    **lists** that are allowed to be shorter than `bands`: a 3-band RGB
+    usually carries one `min` and one `max` for all three. `limits`
+    resolves that broadcast rather than making every caller do it.
+
+    Attributes:
+        name: The upstream `display_name` (`"RGB"`, `"True Color (432)"`,
+            `"Landcover"`), used to pick between several renderings.
+        bands: The band ids this rendering draws, in order — three for an
+            RGB composite, one for a single-band stretch.
+        vmin: Lower end of the stretch, per band or broadcast.
+        vmax: Upper end of the stretch, per band or broadcast.
+        palette: Colour ramp as upstream spells it, and it spells it two
+            ways: usually hex digits with no leading `#` (`"ffffff"`),
+            but a CSS colour name (`"blue"`) in a minority of rows — both
+            are what Earth Engine accepts, so neither is normalised here.
+            Empty for an RGB composite.
+        gamma: Gamma correction per band, or empty.
+        gain: Multiplier applied before the stretch, or empty.
+
+    Examples:
+        - The Sentinel-2 RGB entry, with one stretch broadcast over three
+          bands:
+            ```python
+            >>> rgb = Visualization(
+            ...     name="RGB", bands=("B4", "B3", "B2"), vmin=(0.0,), vmax=(3000.0,)
+            ... )
+            >>> rgb.limits
+            ((0.0, 3000.0), (0.0, 3000.0), (0.0, 3000.0))
+            >>> rgb.is_rgb
+            True
+
+            ```
+        - A single-band palette rendering is not an RGB composite:
+            ```python
+            >>> ndvi = Visualization(
+            ...     name="NDVI", bands=("NDVI",), vmin=(0.0,), vmax=(8000.0,),
+            ...     palette=("ffffff", "004c00"),
+            ... )
+            >>> ndvi.is_rgb
+            False
+            >>> ndvi.limits
+            ((0.0, 8000.0),)
+
+            ```
+        - A rendering with no stretch at all resolves to no limits, which
+          is the `ESA/WorldCover` case:
+            ```python
+            >>> Visualization(name="Landcover", bands=("Map",)).limits
+            ()
+
+            ```
+        - An unknown field is refused, so a typo cannot read as absent:
+            ```python
+            >>> Visualization(name="x", bands=("b",), pallete=())  # doctest: +IGNORE_EXCEPTION_DETAIL
+            Traceback (most recent call last):
+                ...
+            pydantic_core._pydantic_core.ValidationError: 1 validation error for Visualization
+
+            ```
+    """
+
+    _summary_fields = ("name", "bands")
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    name: str
+    bands: tuple[str, ...]
+    vmin: tuple[float, ...] = ()
+    vmax: tuple[float, ...] = ()
+    palette: tuple[str, ...] = ()
+    gamma: tuple[float, ...] = ()
+    gain: tuple[float, ...] = ()
+
+    @property
+    def is_rgb(self) -> bool:
+        """Whether this rendering is a three-band colour composite.
+
+        Returns:
+            `True` for exactly three bands, `False` otherwise.
+        """
+        return len(self.bands) == 3
+
+    @property
+    def limits(self) -> tuple[tuple[float, float], ...]:
+        """The per-band `(min, max)` stretch, with upstream's broadcast resolved.
+
+        Upstream may give one `min` / `max` for every band, one per band,
+        or none at all. A single value is repeated across the bands; a
+        per-band list is zipped; a missing side yields no limits, since
+        half a stretch is not usable as one.
+
+        Returns:
+            One `(min, max)` pair per band, or `()` when either side is
+            absent.
+        """
+        if not self.vmin or not self.vmax:
+            result: tuple[tuple[float, float], ...] = ()
+        else:
+            lows = self.vmin * len(self.bands) if len(self.vmin) == 1 else self.vmin
+            highs = self.vmax * len(self.bands) if len(self.vmax) == 1 else self.vmax
+            result = tuple(zip(lows, highs, strict=False))
+        return result
+
+
 class Dataset(SummarisedLeaf):
     """One Earth Engine collection/image with curated metadata.
 
@@ -476,7 +850,17 @@ class Dataset(SummarisedLeaf):
               than the first two.
 
             Replaces the older ambiguous `user_uploaded: bool` flag.
-        bands: Band id → :class:`Band`.
+        bands: Band id → `Band`.
+        preprocess: The curated "analysis-ready pixels" recipe — which
+            per-image mask the sensor wants and whether to apply the
+            band `scale` / `offset` — or `None` for a dataset with no
+            curated recipe. Read by `earthlens.gee.preprocess`.
+        visualizations: The publisher's own default renderings, from the
+            asset's STAC `gee:visualizations`, or `()` for a row the
+            upstream catalog gives none (every community `projects/...`
+            asset, which the public STAC tree does not serve). Read by
+            `earthlens.gee.viz.style_for`, which falls back to band
+            metadata and name heuristics when this is empty.
     """
 
     model_config = ConfigDict(frozen=True)
@@ -488,6 +872,8 @@ class Dataset(SummarisedLeaf):
         "image", "image_collection", "table", "table_collection", "bigquery_table"
     ] = "image_collection"
     cadence: Cadence | None = None
+    # Parsed from gee_data_catalog.yaml (see Band.scale) - left coercing a bool
+    # rather than guarded with NoBool (#1355).
     spatial_resolution: float | None = None
     extent: Extent
     default_reducer: Literal[
@@ -497,6 +883,8 @@ class Dataset(SummarisedLeaf):
     terms_note: str | None = None
     source: Literal["ee_native", "republished", "community"] = "ee_native"
     bands: dict[str, Band] = Field(default_factory=dict)
+    preprocess: Preprocess | None = None
+    visualizations: tuple[Visualization, ...] = ()
 
     def summary_parts(self) -> list[str]:
         """Return id, title, provider, resolution, period and band count.
@@ -557,9 +945,9 @@ class Dataset(SummarisedLeaf):
         """Whether the asset is a raster (image or image_collection).
 
         Returns:
-            `True` if :attr:`ee_type` is `"image"` or `"image_collection"`,
+            `True` if `ee_type` is `"image"` or `"image_collection"`,
             else `False`. Use this to gate "can the backend download
-            this?" decisions — :attr:`is_image_collection` excludes
+            this?" decisions — `is_image_collection` excludes
             static `Image` assets (e.g. SRTM) and is therefore misleading
             for that question.
 
@@ -582,7 +970,7 @@ class Dataset(SummarisedLeaf):
         """Whether the asset is tabular (FeatureCollection / table / BigQuery).
 
         Returns:
-            `True` if :attr:`ee_type` is `"table"`, `"table_collection"`,
+            `True` if `ee_type` is `"table"`, `"table_collection"`,
             or `"bigquery_table"`, else `False`. Tabular assets are out
             of scope for the raster backend.
         """
@@ -593,10 +981,10 @@ class Dataset(SummarisedLeaf):
         """Whether the asset is an `ImageCollection` (vs. a single `Image`).
 
         Returns:
-            `True` if :attr:`ee_type` is `"image_collection"`, else `False`.
+            `True` if `ee_type` is `"image_collection"`, else `False`.
 
         .. deprecated::
-            Prefer :attr:`is_raster` for the "can the backend download
+            Prefer `is_raster` for the "can the backend download
             this?" question — it correctly includes static `image`
             assets like SRTM. This narrower property is kept for
             back-compat with older callers.
@@ -615,14 +1003,48 @@ class Dataset(SummarisedLeaf):
         """
         return self.ee_type == "image_collection"
 
+    @model_validator(mode="after")
+    def _derived_bands_reference_native_bands(self) -> Dataset:
+        """Check every derived band reads only source bands this dataset declares.
+
+        A derived band (`derived_from`) is computed from the dataset's own
+        native bands; a typo in a source id would otherwise pass catalog load
+        and fail only at Earth Engine runtime. This catches it at load time.
+
+        Returns:
+            `self` unchanged once every derived band's source ids exist among
+            the dataset's native (non-derived) bands.
+
+        Raises:
+            ValueError: If a derived band names a source band the dataset does
+                not declare as a native band.
+        """
+        native = {
+            band_id for band_id, band in self.bands.items() if band.derived_from is None
+        }
+        for band_id, band in self.bands.items():
+            if band.derived_from is not None:
+                missing = [
+                    source
+                    for source in band.derived_from.source_bands()
+                    if source not in native
+                ]
+                if missing:
+                    raise ValueError(
+                        f"derived band {band_id!r} of {self.id} reads source "
+                        f"band(s) {missing} that are not native bands of the "
+                        f"dataset; native bands are {sorted(native)}"
+                    )
+        return self
+
     def get_band(self, band_id: str) -> Band:
-        """Return the :class:`Band` for `band_id`.
+        """Return the `Band` for `band_id`.
 
         Args:
             band_id: The Earth Engine band id.
 
         Returns:
-            The matching :class:`Band`.
+            The matching `Band`.
 
         Raises:
             ValueError: If `band_id` is not a band of this dataset; the
@@ -671,12 +1093,12 @@ _load_providers = _load_providers_base
 class Catalog(AbstractCatalog[Dataset]):
     """YAML-backed catalog of Earth Engine datasets for the GEE backend.
 
-    Reads every `*.yaml` file under :data:`CATALOG_PATH` (the
+    Reads every `*.yaml` file under `CATALOG_PATH` (the
     per-category `catalog/` directory shipped with the package) on
     construction plus the canonical provider registry at
-    :data:`PROVIDERS_PATH`, merging them into one logical catalog and
-    validating every entry into typed :class:`Dataset` / :class:`Band`
-    / :class:`Provider` models. A duplicate dataset/band key in the
+    `PROVIDERS_PATH`, merging them into one logical catalog and
+    validating every entry into typed `Dataset` / `Band`
+    / `Provider` models. A duplicate dataset/band key in the
     YAML (within a file or across files), an unknown band field, a
     curated dataset not listed in `available_datasets`, or a
     `provider:` slug that is missing from `providers.yaml` is a
@@ -685,8 +1107,8 @@ class Catalog(AbstractCatalog[Dataset]):
     Attributes:
         available_datasets: Informational list of every Earth Engine
             asset id the package knows about.
-        datasets: Curated asset id → :class:`Dataset`.
-        providers: Canonical provider slug → :class:`Provider`.
+        datasets: Curated asset id → `Dataset`.
+        providers: Canonical provider slug → `Provider`.
 
     Examples:
         - Construct the catalog and look at what it holds:
@@ -723,12 +1145,12 @@ class Catalog(AbstractCatalog[Dataset]):
         reads the bundled `catalog/*.yaml` and `providers.yaml`. If
         the caller passed `datasets=...` (or any non-empty field),
         the disk read is skipped: that path is for tests and ad-hoc
-        in-memory catalogs (see :meth:`load` for the heavy-lifting
+        in-memory catalogs (see `load` for the heavy-lifting
         classmethod).
 
         Raises:
             ValueError: When auto-loading, propagates the same errors
-                as :meth:`load` (missing YAML, duplicate key, unknown
+                as `load` (missing YAML, duplicate key, unknown
                 band field, unregistered provider slug, …).
         """
         if self.datasets:
@@ -759,13 +1181,13 @@ class Catalog(AbstractCatalog[Dataset]):
         Args:
             catalog_path: Per-category catalog directory (or a single
                 `*.yaml` file for tests). Defaults to module-level
-                :data:`CATALOG_PATH` at call time (so test
+                `CATALOG_PATH` at call time (so test
                 monkey-patches take effect).
             providers_path: Path to `providers.yaml`. Defaults to
-                module-level :data:`PROVIDERS_PATH` at call time.
+                module-level `PROVIDERS_PATH` at call time.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If a YAML is missing, declares the same key
@@ -850,17 +1272,17 @@ class Catalog(AbstractCatalog[Dataset]):
         }
 
     # `get_provider(slug)` (with did-you-mean hint) lifted to
-    # :class:`earthlens.base.AbstractCatalog`.
+    # `earthlens.base.AbstractCatalog`.
 
     def get_band(self, dataset_id: str, band_id: str) -> Band:
-        """Return the :class:`Band` for `(dataset_id, band_id)`.
+        """Return the `Band` for `(dataset_id, band_id)`.
 
         Args:
             dataset_id: The Earth Engine asset id.
             band_id: The band id within that dataset.
 
         Returns:
-            The matching :class:`Band`.
+            The matching `Band`.
 
         Raises:
             ValueError: If the dataset or the band is unknown.
@@ -886,17 +1308,17 @@ class Catalog(AbstractCatalog[Dataset]):
         return cast("Band", self.get_dataset(dataset_id).get_band(band_id))
 
     def get_variable(self, dataset_id: str, band_id: str) -> Band:
-        """Alias of :meth:`get_band` (name parity with the ECMWF catalog).
+        """Alias of `get_band` (name parity with the ECMWF catalog).
 
         Args:
             dataset_id: The Earth Engine asset id.
             band_id: The band id within that dataset.
 
         Returns:
-            The matching :class:`Band`.
+            The matching `Band`.
 
         Examples:
-            - Same result as :meth:`get_band`:
+            - Same result as `get_band`:
                 ```python
                 >>> Catalog().get_variable("USGS/SRTMGL1_003", "elevation").units
                 'm'
@@ -915,12 +1337,12 @@ class Catalog(AbstractCatalog[Dataset]):
 
         Args:
             **kwargs: Forwarded verbatim to
-                :func:`earthlens.gee.jobs.list_recent_tasks` —
+                `earthlens.gee.jobs.list_recent_tasks` —
                 `state` / `max_age_min` / `task_type` /
                 `description_prefix` / `project` / `limit`.
 
         Returns:
-            A list of :class:`earthlens.gee.jobs.TaskInfo`, newest first.
+            A list of `earthlens.gee.jobs.TaskInfo`, newest first.
         """
         from earthlens.gee.jobs import list_recent_tasks
 
@@ -932,11 +1354,11 @@ class Catalog(AbstractCatalog[Dataset]):
         Args:
             task_id: Bare task id or full operation name.
             **kwargs: Forwarded to
-                :func:`earthlens.gee.jobs.get_task_status` —
+                `earthlens.gee.jobs.get_task_status` —
                 currently just `project`.
 
         Returns:
-            A :class:`earthlens.gee.jobs.TaskInfo`.
+            A `earthlens.gee.jobs.TaskInfo`.
         """
         from earthlens.gee.jobs import get_task_status
 
@@ -949,7 +1371,7 @@ class Catalog(AbstractCatalog[Dataset]):
     ) -> dict[str, list[TaskInfo]]:
         """Group recent batch tasks by state — the task-side `health()`.
 
-        Walks :func:`earthlens.gee.jobs.list_recent_tasks` with the
+        Walks `earthlens.gee.jobs.list_recent_tasks` with the
         given `max_age_min` (default: 7 days) and any extra filters
         from `**kwargs`, then groups the results by `TaskInfo.state`.
         Useful for "are any of yesterday's exports stuck or failed?"
@@ -959,7 +1381,7 @@ class Catalog(AbstractCatalog[Dataset]):
             max_age_min: Window length in minutes. Defaults to 7 days
                 — long enough to cover a typical weekly batch.
             **kwargs: Forwarded to
-                :func:`earthlens.gee.jobs.list_recent_tasks` —
+                `earthlens.gee.jobs.list_recent_tasks` —
                 `task_type` / `description_prefix` / `project` / `limit`.
                 Do not pass `state` here (the helper groups by state
                 itself); a `state` kwarg would silently narrow the
@@ -995,7 +1417,7 @@ class Catalog(AbstractCatalog[Dataset]):
 
     # dict-like surface (`__repr__` / `__str__` / `__getitem__` / `__contains__`
     # / `__iter__` / `__len__`) and the `get_dataset(name)`-with-hint helper
-    # are inherited from :class:`earthlens.base.AbstractCatalog`. Cost note
+    # are inherited from `earthlens.base.AbstractCatalog`. Cost note
     # for `__str__`:
     # with the shipped 1104-dataset catalog the YAML round-trip serialises
     # ~2.3 MB and takes ~3 s — fine for one-off `print(cat)` but don't drop

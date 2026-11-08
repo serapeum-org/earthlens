@@ -1,7 +1,7 @@
 """Internal helpers for the HDX backend.
 
-Currently just :func:`match_resource`, the resource-filter matcher
-shared by :meth:`earthlens.hdx.backend.HDX._search` and the catalog's
+Currently just `match_resource`, the resource-filter matcher
+shared by `earthlens.hdx.backend.HDX._search` and the catalog's
 default `resource_filter`. Kept out of `backend.py` so the matching
 rule can be unit-tested in isolation.
 """

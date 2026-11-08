@@ -13,18 +13,18 @@ the `fdsn_id` values curated here, so a centre obspy gains or drops
 surfaces instead of going unnoticed. `audit` works too, derived from
 the refresher's drift axis rather than from a handler of its own.
 
-:class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog`
+`Catalog` is a thin `earthlens.base.AbstractCatalog`
 subclass. To stay consistent with the other backends (GEE / ECMWF /
 CMEMS), the network rows are stored in the framework's
-:attr:`~earthlens.base.AbstractCatalog.datasets` field — so the
+`datasets` field — so the
 inherited dict-like surface works (`len(cat)`, `name in cat`,
-`cat[name]`, `iter(cat)`, `str(cat)`, :meth:`get_dataset`). Because
+`cat[name]`, `iter(cat)`, `str(cat)`, `get_dataset`). Because
 the FDSN domain term for a row is a *network* / *provider*, the same
-map is mirrored onto :attr:`~earthlens.base.AbstractCatalog.providers`
-and :meth:`get_provider` works too — they are aliases of the same
+map is mirrored onto `providers`
+and `get_provider` works too — they are aliases of the same
 rows. Parsing is cached on `(path, mtime)` exactly like the other
-backends (see :data:`_CATALOG_CACHE` / :func:`clear_catalog_cache`).
-:data:`CATALOG_PATH` is the path to the bundled YAML and is
+backends (see `_CATALOG_CACHE` / `clear_catalog_cache`).
+`CATALOG_PATH` is the path to the bundled YAML and is
 monkey-patchable in tests.
 """
 
@@ -63,14 +63,14 @@ def _load_catalog_data(path: Path) -> dict[str, Provider]:
     """Parse, validate, and cache the FDSN provider catalog at `path`.
 
     Args:
-        path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
+        path: Path to the catalog YAML (default `CATALOG_PATH`).
 
     Returns:
-        Mapping from network name to its :class:`Provider` row.
+        Mapping from network name to its `Provider` row.
 
     Raises:
         ValueError: If the file has no `providers:` block, or a row
-            fails :class:`Provider` validation.
+            fails `Provider` validation.
     """
     key = catalog_cache_key(path, [path])
     cached = _CATALOG_CACHE.get(key)
@@ -101,7 +101,7 @@ class Provider(SummarisedLeaf):
     """One FDSN-event network's dispatch row.
 
     The user-facing name is the parent key in
-    :attr:`Catalog.providers` (and :attr:`Catalog.datasets`) and is not
+    `Catalog.providers` (and `Catalog.datasets`) and is not
     stored on the row.
 
     Attributes:
@@ -151,21 +151,21 @@ class Catalog(AbstractCatalog[Provider]):
 
     Reads the bundled `fdsn_data_catalog.yaml` (shipped as package
     data) and exposes its `providers:` block as a map of
-    :class:`Provider` rows. Instantiate with no arguments
-    (`Catalog()`); :func:`model_post_init` loads and validates the YAML
+    `Provider` rows. Instantiate with no arguments
+    (`Catalog()`); `model_post_init` loads and validates the YAML
     (cached) in one pass.
 
-    The rows live in the framework's :attr:`datasets` field so the
+    The rows live in the framework's `datasets` field so the
     inherited dict-like surface behaves like every other backend's
     catalog — `len(cat)`, `name in cat`, `cat[name]`, `iter(cat)` and
-    :meth:`get_dataset` all work. The same rows are mirrored onto
-    :attr:`providers`, so the domain-friendly :meth:`get_provider` and
+    `get_dataset` all work. The same rows are mirrored onto
+    `providers`, so the domain-friendly `get_provider` and
     `cat.providers` work too; the two are aliases of one another.
 
     Attributes:
         datasets: Map from the user-facing network name to its
-            :class:`Provider` dispatch row (the framework field).
-        providers: Alias of :attr:`datasets` — same rows, kept for the
+            `Provider` dispatch row (the framework field).
+        providers: Alias of `datasets` — same rows, kept for the
             FDSN "network / provider" vocabulary.
 
     Examples:
@@ -214,13 +214,13 @@ class Catalog(AbstractCatalog[Provider]):
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog and keep `datasets`/`providers` in sync.
 
-        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached).
+        `Catalog()` with no args reads `CATALOG_PATH` (cached).
         Passing either `datasets=...` or `providers=...` skips the disk
         read (used in tests); whichever was supplied is mirrored onto
         the other so both accessors stay consistent.
 
         Raises:
-            ValueError: Propagated from :func:`_load_catalog_data` when
+            ValueError: Propagated from `_load_catalog_data` when
                 the YAML is missing, empty, or has a malformed row.
         """
         if self.datasets or self.providers:
@@ -240,14 +240,14 @@ class Catalog(AbstractCatalog[Provider]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the
-                module-level :data:`CATALOG_PATH`.
+                module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If the file has no `providers:` block, or a row
-                fails :class:`Provider` validation.
+                fails `Provider` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         rows = _load_catalog_data(catalog_path)

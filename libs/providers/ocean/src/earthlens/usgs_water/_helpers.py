@@ -2,11 +2,11 @@
 
 This module is the correctness core of the multi-service USGS Water
 backend: it maps the `service=` selector to the per-module
-`dataretrieval` function (:data:`_SERVICE_FN`), builds the per-module
-query keyword arguments (:func:`query_kwargs`), and folds every
+`dataretrieval` function (`_SERVICE_FN`), builds the per-module
+query keyword arguments (`query_kwargs`), and folds every
 service's return frame — the modern `waterdata` **long/tidy** shape and
 the legacy `nwis` **wide** shape — into one canonical long schema
-(:func:`normalize`).
+(`normalize`).
 
 The two endpoint flavours differ in both kwargs and return shape:
 
@@ -20,7 +20,7 @@ The two endpoint flavours differ in both kwargs and return shape:
   columns + `<code>_<stat>_cd` qualifier columns + a `site_no` column
   and a `datetime` index.
 
-The canonical output columns are :data:`CANONICAL_COLUMNS`.
+The canonical output columns are `CANONICAL_COLUMNS`.
 """
 
 from __future__ import annotations
@@ -78,7 +78,7 @@ def service_function(service: str, flavour: str) -> str | None:
     """Return the `dataretrieval` function name for a service + flavour.
 
     Args:
-        service: One of the keys of :data:`_SERVICE_FN`.
+        service: One of the keys of `_SERVICE_FN`.
         flavour: `"waterdata"` (modern) or `"nwis"` (legacy).
 
     Returns:
@@ -92,7 +92,7 @@ def modern_supports_bbox(service: str) -> bool:
     """Whether the modern function for `service` accepts a `bbox=` filter.
 
     Args:
-        service: One of the keys of :data:`_SERVICE_FN`.
+        service: One of the keys of `_SERVICE_FN`.
 
     Returns:
         bool: `True` when the modern endpoint can be queried by bbox.
@@ -335,7 +335,7 @@ def normalize_modern_long(
             fill `parameter_name` (and `unit` when the frame omits it).
 
     Returns:
-        pd.DataFrame: A frame with the :data:`CANONICAL_COLUMNS`.
+        pd.DataFrame: A frame with the `CANONICAL_COLUMNS`.
     """
     if df is None or df.empty:
         return empty_canonical()
@@ -370,7 +370,7 @@ def normalize_legacy_wide(
             fill `parameter_name` and `unit` (absent from legacy frames).
 
     Returns:
-        pd.DataFrame: A frame with the :data:`CANONICAL_COLUMNS`.
+        pd.DataFrame: A frame with the `CANONICAL_COLUMNS`.
     """
     if df is None or df.empty:
         return empty_canonical()
@@ -533,7 +533,7 @@ def normalize_samples(
 
     Maps the WQP result-level columns (`Result_Measure`,
     `Result_MeasureQualifierCode`, `DetectionLimit_MeasureA`,
-    `ResultAnalyticalMethod_Name`, …) onto :data:`SAMPLES_COLUMNS`.
+    `ResultAnalyticalMethod_Name`, …) onto `SAMPLES_COLUMNS`.
 
     Args:
         df: The modern `get_samples` frame (the WQP profile).
@@ -542,7 +542,7 @@ def normalize_samples(
             kept for signature symmetry).
 
     Returns:
-        pd.DataFrame: A frame with the :data:`SAMPLES_COLUMNS`.
+        pd.DataFrame: A frame with the `SAMPLES_COLUMNS`.
     """
     if df is None or df.empty:
         return pd.DataFrame({column: [] for column in SAMPLES_COLUMNS})
@@ -587,7 +587,7 @@ def normalize_statistics(
         code_meta: Map from parameter code to `(name, units)`.
 
     Returns:
-        pd.DataFrame: A frame with the :data:`STATS_COLUMNS`.
+        pd.DataFrame: A frame with the `STATS_COLUMNS`.
     """
     if df is None or df.empty:
         return pd.DataFrame({column: [] for column in STATS_COLUMNS})
@@ -648,7 +648,7 @@ def normalize_sites(df: pd.DataFrame, flavour: str) -> pd.DataFrame:
         flavour: `"waterdata"` or `"nwis"`.
 
     Returns:
-        pd.DataFrame: A frame with the :data:`SITE_COLUMNS`.
+        pd.DataFrame: A frame with the `SITE_COLUMNS`.
     """
     if df is None or df.empty:
         return pd.DataFrame({column: [] for column in SITE_COLUMNS})
@@ -688,7 +688,7 @@ def normalize_peaks(df: pd.DataFrame, flavour: str) -> pd.DataFrame:
         flavour: `"waterdata"` or `"nwis"`.
 
     Returns:
-        pd.DataFrame: A frame with the :data:`PEAKS_COLUMNS`.
+        pd.DataFrame: A frame with the `PEAKS_COLUMNS`.
     """
     if df is None or df.empty:
         return pd.DataFrame({column: [] for column in PEAKS_COLUMNS})
@@ -730,7 +730,7 @@ def normalize_ratings(df: pd.DataFrame, flavour: str) -> pd.DataFrame:
         flavour: `"waterdata"` or `"nwis"`.
 
     Returns:
-        pd.DataFrame: A frame with the :data:`RATINGS_COLUMNS`.
+        pd.DataFrame: A frame with the `RATINGS_COLUMNS`.
     """
     if df is None or df.empty:
         return pd.DataFrame({column: [] for column in RATINGS_COLUMNS})
@@ -749,6 +749,6 @@ def empty_canonical() -> pd.DataFrame:
     """Return a zero-row frame with the canonical value-service columns.
 
     Returns:
-        pd.DataFrame: Empty frame, :data:`CANONICAL_COLUMNS` columns.
+        pd.DataFrame: Empty frame, `CANONICAL_COLUMNS` columns.
     """
     return pd.DataFrame({column: [] for column in CANONICAL_COLUMNS})

@@ -9,13 +9,13 @@ Three design points carry this backend:
 
 * **Per-instance `OUTPUT_KIND`.** The resolved dataset's `output_kind` is copied
   onto `self.OUTPUT_KIND` in `__init__`: `emdat:events` is `tabular` and returns
-  a :class:`pandas.DataFrame`, both `gdis:*` rows are `vector` and return a
-  pyramids :class:`~pyramids.feature.collection.FeatureCollection`. The
-  :class:`earthlens.earthlens.EarthLens` facade reads the instance attribute to
+  a `pandas.DataFrame`, both `gdis:*` rows are `vector` and return a
+  pyramids `pyramids.feature.collection.FeatureCollection`. The
+  `earthlens.earthlens.EarthLens` facade reads the instance attribute to
   know the return shape.
 * **Conditional auth.** `emdat:events` comes from the UCLouvain Dataverse and
   is anonymous. The `gdis:*` sources moved into NASA Earthdata Cloud when their
-  old SEDAC host went away, so they build an :class:`EmdatAuth` and need an
+  old SEDAC host went away, so they build an `EmdatAuth` and need an
   Earthdata Login.
 * **Size asymmetry.** `gdis:points` is a 1 MB CSV; `gdis:polygons` is a 2.2 GB
   GeoPackage. The polygons are never fetched implicitly — the request warns
@@ -125,12 +125,12 @@ class EMDAT(AbstractDataSource):
     """EM-DAT disaster event / location backend (per-instance output kind).
 
     Resolves one dataset id to its catalog row, fetches it from that row's
-    provider, and returns a :class:`pandas.DataFrame` (`tabular`) or a
-    :class:`~pyramids.feature.collection.FeatureCollection` (`vector`) per the
+    provider, and returns a `pandas.DataFrame` (`tabular`) or a
+    `pyramids.feature.collection.FeatureCollection` (`vector`) per the
     row's `output_kind`.
 
     Attributes:
-        OUTPUT_KIND: Set **per instance** in :meth:`__init__` from the resolved
+        OUTPUT_KIND: Set **per instance** in `__init__` from the resolved
             dataset's `output_kind`. The facade reads it to know the return
             shape.
     """
@@ -240,7 +240,7 @@ class EMDAT(AbstractDataSource):
         )
 
     def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
-        """Capture the requested bounds as a :class:`SpatialExtent`.
+        """Capture the requested bounds as a `SpatialExtent`.
 
         Args:
             lat_lim: `[min_lat, max_lat]`.
@@ -258,7 +258,7 @@ class EMDAT(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse the optional `[start, end]` window into a :class:`TemporalExtent`.
+        """Parse the optional `[start, end]` window into a `TemporalExtent`.
 
         Both routes are indexed by event year and cover a whole archive, so
         `None` bounds are legal and yield a `None`-dated extent.
@@ -383,12 +383,12 @@ class EMDAT(AbstractDataSource):
         """Fetch each product from its provider and parse it.
 
         Args:
-            products: The list from :meth:`_search` (one product).
+            products: The list from `_search` (one product).
 
         Returns:
-            list[Any]: One element per product — a :class:`pandas.DataFrame` for a
+            list[Any]: One element per product — a `pandas.DataFrame` for a
                 `tabular` dataset, a
-                :class:`~pyramids.feature.collection.FeatureCollection` for a
+                `pyramids.feature.collection.FeatureCollection` for a
                 `vector` one.
         """
         return [self._fetch_one(product) for product in products]
@@ -397,7 +397,7 @@ class EMDAT(AbstractDataSource):
         """Fetch and parse one product per its provider.
 
         Args:
-            product: One :class:`RemoteProduct` from :meth:`_search`.
+            product: One `RemoteProduct` from `_search`.
 
         Returns:
             A `DataFrame` (tabular) or `FeatureCollection` (vector).
@@ -407,7 +407,7 @@ class EMDAT(AbstractDataSource):
         return self._fetch_gdis()
 
     def _api(self) -> list[Any]:
-        """Compose :meth:`_search` and :meth:`_fetch`.
+        """Compose `_search` and `_fetch`.
 
         Returns:
             list[Any]: The fetched results.
@@ -643,9 +643,9 @@ class EMDAT(AbstractDataSource):
                 through to the transport, so `False` really does silence it.
 
         Returns:
-            A :class:`pandas.DataFrame` for `emdat:events` (also written to
+            A `pandas.DataFrame` for `emdat:events` (also written to
             `root_dir`), or an in-memory
-            :class:`~pyramids.feature.collection.FeatureCollection` for a
+            `pyramids.feature.collection.FeatureCollection` for a
             `gdis:*` dataset.
 
         Raises:
@@ -716,7 +716,7 @@ class EMDAT(AbstractDataSource):
         return f"{stem}-{digest}.csv"
 
     def _warn_license(self) -> None:
-        """Emit a :class:`LicenseWarning` when the dataset's use is restricted.
+        """Emit a `LicenseWarning` when the dataset's use is restricted.
 
         GDIS is CC-BY-4.0 and needs only attribution, so it warns about
         nothing. The EM-DAT archive is CC-BY-NC-ND under terms that also limit
@@ -724,7 +724,7 @@ class EMDAT(AbstractDataSource):
         miss.
 
         The `stacklevel` targets a call through
-        :class:`earthlens.earthlens.EarthLens`, which is what every doc
+        `earthlens.earthlens.EarthLens`, which is what every doc
         example, both notebooks and the e2e tests use: `_warn_license` ->
         `download` -> the `_wrap_download` wrapper -> the facade -> the caller.
         A direct `EMDAT(...).download()` is one frame shorter, so the warning

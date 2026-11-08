@@ -5,12 +5,12 @@ vector container, so per the pyramids policy it keeps all geometry/CRS
 handling inside pyramids primitives: earthlens assembles the normalised
 attribute rows, builds a `Point` geometry column from `longitude` /
 `latitude`, and hands the whole thing to
-:class:`pyramids.feature.collection.FeatureCollection` (a
+`pyramids.feature.collection.FeatureCollection` (a
 `geopandas.GeoDataFrame` subclass) tagged `EPSG:4326`.
 
-The canonical detection schema lives here as :data:`ATTRIBUTE_COLUMNS`
+The canonical detection schema lives here as `ATTRIBUTE_COLUMNS`
 (attribute columns + dtypes) plus the `geometry` column. Both the
-populated path (:func:`csv_to_fc`) and the empty path (:func:`empty_fc`)
+populated path (`csv_to_fc`) and the empty path (`empty_fc`)
 produce a FeatureCollection with exactly these columns and dtypes, so a
 downstream `to_file` never chokes on a schema mismatch between a hit and
 a miss.
@@ -79,7 +79,7 @@ _BRIGHTNESS_SOURCE: dict[str, str | None] = {
 PERCENT_CONFIDENCE_FAMILIES: frozenset[str] = frozenset({"MODIS", "VIIRS", "LANDSAT"})
 
 #: Ordered attribute columns and their pandas dtypes. The `geometry`
-#: column is added separately by :func:`csv_to_fc` / :func:`empty_fc`.
+#: column is added separately by `csv_to_fc` / `empty_fc`.
 ATTRIBUTE_COLUMNS: dict[str, str] = {
     "latitude": "float64",
     "longitude": "float64",
@@ -103,14 +103,14 @@ def csv_to_fc(
 ) -> FeatureCollection:
     """Normalise one sensor's FIRMS CSV frame into a `FeatureCollection`.
 
-    One row per detection, columns per :data:`ATTRIBUTE_COLUMNS` plus a
+    One row per detection, columns per `ATTRIBUTE_COLUMNS` plus a
     `geometry` column of `Point(longitude, latitude)`. The MODIS/VIIRS
     confidence and brightness schemas are unified (`G4`), `acq_date` +
     integer-HHMM `acq_time` are combined into a tz-aware UTC
     `acq_datetime`, and the optional `min_confidence` / `day_night`
     filters are applied client-side (FIRMS offers no server-side
     equivalent). An empty input frame returns an empty FeatureCollection
-    with the same columns/dtypes (see :func:`empty_fc`).
+    with the same columns/dtypes (see `empty_fc`).
 
     Args:
         df: The decoded FIRMS area CSV for one sensor/chunk.
@@ -241,7 +241,7 @@ def empty_fc() -> FeatureCollection:
     and dtypes back regardless of hit count.
 
     Returns:
-        FeatureCollection: Zero rows, the :data:`ATTRIBUTE_COLUMNS`
+        FeatureCollection: Zero rows, the `ATTRIBUTE_COLUMNS`
             columns with their declared dtypes, an empty `geometry`
             column, CRS `EPSG:4326`.
 
@@ -295,7 +295,7 @@ def _confidence_pct(raw: pd.Series | None, family: str) -> pd.Series:
     """Derive a uniform 0-100 confidence from the raw column.
 
     Categorical families map their tokens via
-    :data:`_CATEGORICAL_CONFIDENCE` (VIIRS `l`/`n`/`h` → 25/60/90,
+    `_CATEGORICAL_CONFIDENCE` (VIIRS `l`/`n`/`h` → 25/60/90,
     LANDSAT `l`/`m`/`h` → 25/60/90); numeric families (MODIS, GOES) pass
     through coerced to float. An unknown token / value becomes `NaN`.
     GOES reports a provider-defined numeric confidence (not a 0-100

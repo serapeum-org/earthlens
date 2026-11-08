@@ -10,11 +10,11 @@ backend exposes.
 
 A request is a CMIP6 **facet tuple** — `source_id` (model), `experiment_id`
 (scenario), `variable_id`, `table_id` (+ optional `member_id` / `grid_label` /
-`version`). :meth:`_search` resolves it against the CSV
-(:class:`~earthlens.cmip6.resolver.StoreResolver`) to the matching `zstore`
+`version`). `_search` resolves it against the CSV
+(`StoreResolver`) to the matching `zstore`
 URI(s) — a tuple that pins fewer facets **fans out**, one output per store.
-:meth:`_fetch` then has pyramids open each store and write a **bbox/time NetCDF
-subset** (:mod:`earthlens.cmip6.accessor`): the `[start, end]` window maps to an
+`_fetch` then has pyramids open each store and write a **bbox/time NetCDF
+subset** (`earthlens.cmip6.accessor`): the `[start, end]` window maps to an
 integer time-index range, the `lat_lim`/`lon_lim` box crops the grid, and only
 the requested cells are fetched. earthlens never imports `xarray` / `zarr` /
 `gcsfs` — pyramids owns the read (GDAL `/vsigs/`, anonymous).
@@ -107,10 +107,10 @@ class CMIP6(AbstractDataSource):
             temporal_resolution: Advisory cadence label (fixed by `table_id`).
             path: Output directory for the written NetCDFs.
             fmt: `strptime` format for `start` / `end`.
-            catalog: Optional pre-built :class:`Catalog`; defaults to the
+            catalog: Optional pre-built `Catalog`; defaults to the
                 bundled catalog.
             resolver: Optional pre-built
-                :class:`~earthlens.cmip6.resolver.StoreResolver`; defaults to one
+                `StoreResolver`; defaults to one
                 built from the catalog's CSV URL and facet columns.
 
         Raises:
@@ -169,7 +169,7 @@ class CMIP6(AbstractDataSource):
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
-        """Parse the `[start, end]` window into a :class:`TemporalExtent`.
+        """Parse the `[start, end]` window into a `TemporalExtent`.
 
         Args:
             start: Inclusive window start.
@@ -245,7 +245,7 @@ class CMIP6(AbstractDataSource):
         bbox)` window through pyramids and write it to NetCDF.
 
         Args:
-            products: The products from :meth:`_search`.
+            products: The products from `_search`.
 
         Returns:
             list[Path]: One written NetCDF path per store, in order.
@@ -287,7 +287,7 @@ class CMIP6(AbstractDataSource):
             store: The resolved store to read.
 
         Returns:
-            The integer time selector for :func:`accessor.write_subset` — a
+            The integer time selector for `accessor.write_subset` — a
             `(i0, i1)` index range for the date window, or `slice(None)` for a
             `whole_time` request.
         """
@@ -314,8 +314,8 @@ class CMIP6(AbstractDataSource):
     ) -> list[Path]:
         """Fetch the requested CMIP6 subset(s) and return the written paths.
 
-        Runs the cheap :meth:`_search` (facet -> `zstore` resolution) then
-        :meth:`_fetch`, which writes one bbox/time NetCDF subset per resolved
+        Runs the cheap `_search` (facet -> `zstore` resolution) then
+        `_fetch`, which writes one bbox/time NetCDF subset per resolved
         store.
 
         Args:

@@ -9,9 +9,9 @@ Two design points carry this backend:
 
 * **Per-instance `OUTPUT_KIND` (`G1`).** The resolved source's `output_kind` is
   copied onto `self.OUTPUT_KIND` in `__init__`: `structures`/`nfhl` return a
-  pyramids :class:`~pyramids.feature.collection.FeatureCollection` (`vector`),
-  `nfip` returns a :class:`pandas.DataFrame` (`tabular`). The
-  :class:`earthlens.earthlens.EarthLens` facade reads the instance attribute to
+  pyramids `pyramids.feature.collection.FeatureCollection` (`vector`),
+  `nfip` returns a `pandas.DataFrame` (`tabular`). The
+  `earthlens.earthlens.EarthLens` facade reads the instance attribute to
   gate `aggregate=` and to know the return shape.
 * **Bounded requests, required (`G3`).** No unbounded national pull: `structures`
   needs a `fips=` or a `[lat_lim, lon_lim]` box, `nfhl` needs the box, and `nfip`
@@ -76,12 +76,12 @@ class NSI(AbstractDataSource):
 
     Resolves `source=` to its catalog row, issues the one bounded request that
     source needs, and returns a
-    :class:`~pyramids.feature.collection.FeatureCollection` (`structures`/`nfhl`)
-    or a :class:`pandas.DataFrame` (`nfip`). US-only: a non-US box returns an
+    `pyramids.feature.collection.FeatureCollection` (`structures`/`nfhl`)
+    or a `pandas.DataFrame` (`nfip`). US-only: a non-US box returns an
     empty result, not an error (`G4`).
 
     Attributes:
-        OUTPUT_KIND: Set **per instance** in :meth:`__init__` from the resolved
+        OUTPUT_KIND: Set **per instance** in `__init__` from the resolved
             source's `output_kind`. The facade reads it to gate `aggregate=` and
             to know the return shape.
     """
@@ -264,7 +264,7 @@ class NSI(AbstractDataSource):
             )
 
     def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
-        """Return the request's :class:`SpatialExtent`.
+        """Return the request's `SpatialExtent`.
 
         Args:
             lat_lim: `[min_lat, max_lat]` (global sentinel when unbounded).
@@ -282,7 +282,7 @@ class NSI(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse the optional `[start, end]` window into a :class:`TemporalExtent`.
+        """Parse the optional `[start, end]` window into a `TemporalExtent`.
 
         Dates are not part of the request (these sources are snapshots), so
         `None` bounds are allowed and yield a `None`-dated extent.
@@ -322,7 +322,7 @@ class NSI(AbstractDataSource):
         """Route the product to its source and parse the response.
 
         Args:
-            products: The list from :meth:`_search` (one product).
+            products: The list from `_search` (one product).
 
         Returns:
             list: One element — a `FeatureCollection` (`structures`/`nfhl`) or a
@@ -413,8 +413,8 @@ class NSI(AbstractDataSource):
                 issued (paged for `nfip`), so this is a no-op.
 
         Returns:
-            A :class:`~pyramids.feature.collection.FeatureCollection` for
-            `structures`/`nfhl`, or a :class:`pandas.DataFrame` (also written to
+            A `pyramids.feature.collection.FeatureCollection` for
+            `structures`/`nfhl`, or a `pandas.DataFrame` (also written to
             `root_dir`) for `nfip`.
 
         Raises:

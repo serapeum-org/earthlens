@@ -22,25 +22,7 @@ from earthlens.cli.validate import validate_one
 pytestmark = [pytest.mark.e2e, pytest.mark.cli, pytest.mark.nwm]
 
 
-def _network_available() -> bool:
-    """Return whether the public NWM bucket is reachable (unsigned)."""
-    try:
-        import boto3
-        from botocore import UNSIGNED
-        from botocore.client import Config
-
-        client = boto3.client(
-            "s3", region_name="us-east-1", config=Config(signature_version=UNSIGNED)
-        )
-        client.list_objects_v2(Bucket="noaa-nwm-pds", MaxKeys=1, Delimiter="/")
-        return True
-    except Exception:
-        return False
-
-
-pytestmark.append(
-    pytest.mark.skipif(not _network_available(), reason="NWM bucket unreachable")
-)
+pytestmark.append(pytest.mark.requires_host("noaa-nwm-pds.s3.amazonaws.com"))
 
 
 def _nwm_info():

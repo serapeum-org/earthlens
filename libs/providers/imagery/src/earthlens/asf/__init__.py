@@ -10,7 +10,7 @@ coregistered set used for interferometry — that capability is what
 this backend adds.
 
 Search calls run anonymously; only the download step authenticates.
-:class:`ASFAuth` composes the shipped :class:`EarthdataAuth` to mint
+`ASFAuth` composes the shipped `EarthdataAuth` to mint
 an EDL bearer token and hands it to `asf_search.ASFSession()` —
 there is no second credential system. Set `EARTHDATA_TOKEN` /
 `EARTHDATA_USERNAME` + `EARTHDATA_PASSWORD`, or a

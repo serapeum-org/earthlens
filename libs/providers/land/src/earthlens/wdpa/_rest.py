@@ -9,10 +9,10 @@ down on 2026-05-01; v4 is current and requires a personal token passed as a
 This module exposes two fetches that return a polygon `GeoDataFrame` in
 `EPSG:4326`:
 
-* :func:`fetch_country` loops `GET /v4/protected_areas/search` by ISO3
+* `fetch_country` loops `GET /v4/protected_areas/search` by ISO3
   country code (`per_page` max 50) until a short page, with
   `with_geometry=true` so each area carries its GeoJSON geometry.
-* :func:`fetch_by_id` fetches one protected area by its WDPA id.
+* `fetch_by_id` fetches one protected area by its WDPA id.
 
 Point-only protected areas (a `Point` geometry rather than a polygon) are
 dropped — the backend's contract is protected-area polygons. All geometry
@@ -86,21 +86,21 @@ _parse_retry_after = parse_retry_after
 def _get(session: requests.Session, path: str, params: dict[str, Any]) -> dict:
     """GET a v4 endpoint and return the parsed JSON, with retries on transient failure.
 
-    Transport is the shared :class:`~earthlens.base.http.HttpClient`, configured
+    Transport is the shared `HttpClient`, configured
     to retry `429` (honouring `Retry-After`) and `500`/`502`/`503`/`504` with
     exponential back-off (`BACKOFF_FACTOR * 2**attempt`, uncapped) and to retry
     transport-layer `requests.RequestException`s the same way. The client is run
     with `raise_for_status=False` — it **never** calls `raise_for_status`, so the
     token-bearing URL is never echoed by a `requests.HTTPError`. `_get` keeps its
-    own terminal handling: a `401` maps to :class:`AuthenticationError`
+    own terminal handling: a `401` maps to `AuthenticationError`
     immediately; any other non-2xx status — or a transport error that exhausts
-    the retry budget (re-raised by the client) — becomes a :class:`RuntimeError`
+    the retry budget (re-raised by the client) — becomes a `RuntimeError`
     whose message names the path and status but **never** the URL or query
     parameters, because the WDPA token rides as a `?token=` query param.
 
     Args:
         session: The HTTP session.
-        path: Endpoint path under :data:`BASE_URL` (e.g.
+        path: Endpoint path under `BASE_URL` (e.g.
             `"protected_areas/search"`).
         params: Query parameters (must include `token`).
 
@@ -156,7 +156,7 @@ def _row(area: dict) -> dict[str, Any] | None:
             `geojson.geometry`.
 
     Returns:
-        A row dict (the :data:`WDPA_COLUMNS` plus `geometry`), or `None`
+        A row dict (the `WDPA_COLUMNS` plus `geometry`), or `None`
         when the area has no geometry or a point-only geometry.
     """
     geojson = area.get("geojson") or {}
@@ -189,11 +189,11 @@ def _to_gdf(rows: list[dict]) -> gpd.GeoDataFrame:
     """Assemble protected-area rows into a typed polygon GeoDataFrame.
 
     Args:
-        rows: Row dicts from :func:`_row` (already polygon-filtered).
+        rows: Row dicts from `_row` (already polygon-filtered).
 
     Returns:
         gpd.GeoDataFrame: One row per protected area, CRS `EPSG:4326`,
-            carrying exactly :data:`WDPA_COLUMNS` plus `geometry`. Empty
+            carrying exactly `WDPA_COLUMNS` plus `geometry`. Empty
             input yields a schema-correct empty frame.
     """
     if not rows:

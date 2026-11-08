@@ -8,7 +8,12 @@ from earthlens.base.abstractdatasource import (
     _ERGONOMIC_ANNOTATIONS,
     AbstractDataSource,
 )
-from earthlens.chc import CHIRPS
+
+#: Core's tests sweep the backend registry, so a handful of them need a
+#: real provider. The providers are separate distributions, so the import
+#: is soft: `cd libs/core && pytest` with only earthlens-core installed
+#: skips these rather than erroring the whole module.
+CHIRPS = pytest.importorskip("earthlens.chc").CHIRPS
 
 
 class TestBackendDirectErgonomics:
@@ -190,7 +195,8 @@ class TestBackendDirectDatasetSplit:
 
     def test_dataset_composes_variables_dict(self, tmp_path):
         """ECMWF(dataset=, variables=[...]) composes the {dataset: [...]} dict."""
-        from earthlens.ecmwf import ECMWF
+        _earthlens_ecmwf = pytest.importorskip("earthlens.ecmwf")
+        ECMWF = _earthlens_ecmwf.ECMWF
 
         backend = ECMWF(
             dataset="reanalysis-era5-single-levels",
@@ -207,7 +213,8 @@ class TestBackendDirectDatasetSplit:
 
     def test_dataset_with_dict_variables_raises(self, tmp_path):
         """dataset= with a dict variables on the backend is rejected."""
-        from earthlens.ecmwf import ECMWF
+        _earthlens_ecmwf = pytest.importorskip("earthlens.ecmwf")
+        ECMWF = _earthlens_ecmwf.ECMWF
 
         with pytest.raises(ValueError, match="pass variables= as a list"):
             ECMWF(
@@ -241,8 +248,11 @@ class TestAuthenticate:
     def test_authentication_errors_share_a_base(self):
         """Every backend's AuthenticationError subclasses the shared base."""
         from earthlens.base import AuthenticationError as BaseAuthError
-        from earthlens.ecmwf import AuthenticationError as EcmwfAuthError
-        from earthlens.gee import AuthenticationError as GeeAuthError
+
+        _earthlens_ecmwf = pytest.importorskip("earthlens.ecmwf")
+        EcmwfAuthError = _earthlens_ecmwf.AuthenticationError
+        _earthlens_gee = pytest.importorskip("earthlens.gee")
+        GeeAuthError = _earthlens_gee.AuthenticationError
 
         assert issubclass(EcmwfAuthError, BaseAuthError), "ECMWF must subclass base"
         assert issubclass(GeeAuthError, BaseAuthError), "GEE must subclass base"
@@ -268,7 +278,8 @@ class TestNativeAoiBackendUnaffected:
     def test_worldpop_native_aoi(self, tmp_path):
         """WorldPop(aoi='COM') passes the ISO3 through, not normalize_aoi."""
         pytest.importorskip("earthlens.worldpop")
-        from earthlens.worldpop import WorldPop
+        _earthlens_worldpop = pytest.importorskip("earthlens.worldpop")
+        WorldPop = _earthlens_worldpop.WorldPop
 
         backend = WorldPop(
             variables=["pop"],

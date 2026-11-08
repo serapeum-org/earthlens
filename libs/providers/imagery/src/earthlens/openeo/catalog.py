@@ -16,10 +16,10 @@ The catalog ships as a directory of YAML files at
 `_index.yaml` carrying the informational `available_collections:` /
 `available_processes:` index rebuilt by `tools/openeo/refresh_openeo_catalog.py`).
 The loader unions the per-file `collections:` / `recipes:` blocks into one
-:class:`Catalog` (a key declared in two files is a load-time error), the same way
+`Catalog` (a key declared in two files is a load-time error), the same way
 the GEE / STAC / CMEMS catalogs merge, and caches on `(path, mtime_ns)`.
 
-The bundled catalog directory lives at :data:`CATALOG_PATH`; tests can
+The bundled catalog directory lives at `CATALOG_PATH`; tests can
 monkey-patch that attribute to redirect the loader at a temporary directory or a
 single YAML file.
 """
@@ -137,7 +137,7 @@ class Collection(SummarisedLeaf):
     Attributes:
         collection_id: The UPPERCASE openEO collection id this key loads
             (`"SENTINEL2_L2A"`, `"SENTINEL_5P_L2"`, …).
-        bands: Band name → :class:`Band` metadata for every band the collection
+        bands: Band name → `Band` metadata for every band the collection
             exposes (the full set from `describe_collection`).
         default_bands: Bands pulled when the request names none. Falls back to
             every key of `bands` when empty.
@@ -378,15 +378,15 @@ def _load_catalog_data(
 class Catalog(AbstractCatalog[Collection]):
     """YAML-backed catalog of openEO collections and curated recipes.
 
-    Reads every `*.yaml` under :data:`CATALOG_PATH` on construction and merges
-    them into typed :class:`Collection` / :class:`Recipe` models. Collections are
-    stored under the inherited :attr:`datasets` field (keyed by logical key);
-    recipes live in :attr:`recipes`; the informational indexes live in
-    :attr:`available_collections` / :attr:`available_processes`.
+    Reads every `*.yaml` under `CATALOG_PATH` on construction and merges
+    them into typed `Collection` / `Recipe` models. Collections are
+    stored under the inherited `datasets` field (keyed by logical key);
+    recipes live in `recipes`; the informational indexes live in
+    `available_collections` / `available_processes`.
 
     Attributes:
-        datasets: Logical collection key → :class:`Collection`.
-        recipes: Recipe key → :class:`Recipe`.
+        datasets: Logical collection key → `Collection`.
+        recipes: Recipe key → `Recipe`.
         available_collections: Every collection id the backend serves
             (refreshed index; informational).
         available_processes: Every process id the backend advertises (refreshed
@@ -452,10 +452,10 @@ class Catalog(AbstractCatalog[Collection]):
 
         Args:
             catalog_path: Catalog directory or single `*.yaml` file. Defaults to
-                module-level :data:`CATALOG_PATH`.
+                module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: Propagated from the loader.
@@ -470,15 +470,15 @@ class Catalog(AbstractCatalog[Collection]):
         )
 
     def get_collection(self, collection_key: str) -> Collection:
-        """Return the :class:`Collection` for `collection_key` (did-you-mean on miss).
+        """Return the `Collection` for `collection_key` (did-you-mean on miss).
 
-        Alias of the inherited :meth:`get_dataset`, named for clarity.
+        Alias of the inherited `get_dataset`, named for clarity.
 
         Args:
             collection_key: Logical collection key.
 
         Returns:
-            The matching :class:`Collection`.
+            The matching `Collection`.
 
         Raises:
             ValueError: If the key is unknown (message suggests the closest key).
@@ -486,13 +486,13 @@ class Catalog(AbstractCatalog[Collection]):
         return cast("Collection", self.get_dataset(collection_key))
 
     def get_recipe(self, recipe_key: str) -> Recipe:
-        """Return the :class:`Recipe` for `recipe_key` (did-you-mean on miss).
+        """Return the `Recipe` for `recipe_key` (did-you-mean on miss).
 
         Args:
             recipe_key: Recipe key.
 
         Returns:
-            The matching :class:`Recipe`.
+            The matching `Recipe`.
 
         Raises:
             ValueError: If the key is unknown (message suggests the closest key).
@@ -539,7 +539,7 @@ class Catalog(AbstractCatalog[Collection]):
         return key in self.recipes
 
     def resolve(self, key: str) -> ResolvedGraph:
-        """Resolve a collection-or-recipe key to a uniform :class:`ResolvedGraph`.
+        """Resolve a collection-or-recipe key to a uniform `ResolvedGraph`.
 
         A recipe resolves to its fixed graph + bands + output format; a plain
         collection resolves to an empty graph (a bare load → clip → save) with
@@ -549,7 +549,7 @@ class Catalog(AbstractCatalog[Collection]):
             key: A logical collection or recipe key.
 
         Returns:
-            The normalised :class:`ResolvedGraph` the backend builds from.
+            The normalised `ResolvedGraph` the backend builds from.
 
         Raises:
             ValueError: If `key` is neither a known recipe nor collection

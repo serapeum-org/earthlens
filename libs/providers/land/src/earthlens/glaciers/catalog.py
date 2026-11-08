@@ -8,17 +8,17 @@ the bridge from a dataset id (`"rgi:outlines"`, `"glims:outlines"`,
 `"wgms:mass_balance"`, …) to its source, output kind, and the source-specific
 request detail needed to fetch it.
 
-:class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog` subclass that
+`Catalog` is a thin `earthlens.base.AbstractCatalog` subclass that
 loads the bundled sharded `catalog/` directory (`rgi.yaml` / `glims.yaml` /
-`wgms.yaml` + `_index.yaml`) and exposes each row as a :class:`Dataset`. The
+`wgms.yaml` + `_index.yaml`) and exposes each row as a `Dataset`. The
 `rgi.yaml` file also ships a `regions:` block — the GTN-G first-order region
 table (id → name + bbox(es) + per-region download URL) that drives the
-bbox → region(s) mapping — exposed as :attr:`Catalog.regions` of
-:class:`Region` rows. Resolve one dataset with :meth:`Catalog.get` (a
+bbox → region(s) mapping — exposed as `Catalog.regions` of
+`Region` rows. Resolve one dataset with `Catalog.get` (a
 did-you-mean hint on an unknown id); list the shipped ids with
-:meth:`Catalog.available`.
+`Catalog.available`.
 
-:data:`CATALOG_PATH` is the path to the bundled `catalog/` directory; tests may
+`CATALOG_PATH` is the path to the bundled `catalog/` directory; tests may
 monkey-patch it at a temporary directory or a single YAML file.
 """
 
@@ -51,7 +51,7 @@ _CATALOG_CACHE: dict[Any, tuple[dict[str, Dataset], dict[str, Region], list[str]
     CatalogParseCache()
 )
 
-#: The three glacier sources a :class:`Dataset` row can name.
+#: The three glacier sources a `Dataset` row can name.
 Source = Literal["rgi", "glims", "wgms"]
 
 #: The two output shapes a glacier dataset can emit (vector -> FeatureCollection
@@ -93,7 +93,7 @@ def _load_catalog_data(
     skips both YAML parsing and pydantic validation.
 
     Args:
-        path: Catalog directory (default :data:`CATALOG_PATH`) or a single
+        path: Catalog directory (default `CATALOG_PATH`) or a single
             `*.yaml`.
 
     Returns:
@@ -171,10 +171,10 @@ def _load_catalog_data(
 class Dataset(SummarisedLeaf):
     """One glaciers catalog row.
 
-    The dataset id is the parent key in :attr:`Catalog.datasets` and is also
-    stored on the row as :attr:`id` so a resolved :class:`Dataset` is
+    The dataset id is the parent key in `Catalog.datasets` and is also
+    stored on the row as `id` so a resolved `Dataset` is
     self-describing. Which source-specific fields are populated depends on
-    :attr:`source`; a cross-field validator enforces that the right ones are
+    `source`; a cross-field validator enforces that the right ones are
     present.
 
     Attributes:
@@ -319,15 +319,15 @@ class Catalog(AbstractCatalog[Dataset]):
     """Dataset + region catalog for the glaciers backend.
 
     Reads the bundled sharded `catalog/` directory (shipped as package data) and
-    exposes its `datasets:` blocks as a map of :class:`Dataset` rows keyed by id,
-    plus the GTN-G `regions:` table as a map of :class:`Region` rows.
+    exposes its `datasets:` blocks as a map of `Dataset` rows keyed by id,
+    plus the GTN-G `regions:` table as a map of `Region` rows.
     Instantiate with no arguments (`Catalog()`). Resolve one row with
-    :meth:`get`, list the shipped ids with :meth:`available`, and read the region
-    table via :attr:`regions`.
+    `get`, list the shipped ids with `available`, and read the region
+    table via `regions`.
 
     Attributes:
-        datasets: Map from dataset id to its :class:`Dataset` row.
-        regions: Map from GTN-G region id to its :class:`Region` row.
+        datasets: Map from dataset id to its `Dataset` row.
+        regions: Map from GTN-G region id to its `Region` row.
 
     Examples:
         - Resolve rows and a region:
@@ -356,12 +356,12 @@ class Catalog(AbstractCatalog[Dataset]):
     _catalog_kind: str = "glaciers catalog"
     _entry_noun: str = "datasets"
 
-    #: The dataset rows live in the base :attr:`datasets` field so the inherited
-    #: dict surface (`len`, `in`, `[]`, iteration) and :meth:`get_dataset`'s
+    #: The dataset rows live in the base `datasets` field so the inherited
+    #: dict surface (`len`, `in`, `[]`, iteration) and `get_dataset`'s
     #: did-you-mean hint work unchanged.
     datasets: dict[str, Dataset] = Field(default_factory=dict)
 
-    #: GTN-G first-order region id -> :class:`Region` (RGI download metadata).
+    #: GTN-G first-order region id -> `Region` (RGI download metadata).
     regions: dict[str, Region] = Field(default_factory=dict)
 
     @classmethod
@@ -385,10 +385,10 @@ class Catalog(AbstractCatalog[Dataset]):
 
         Args:
             catalog_path: Path to the catalog directory or a single YAML.
-                Defaults to the module-level :data:`CATALOG_PATH`.
+                Defaults to the module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If the catalog has no `datasets:` block, or a row fails
@@ -403,9 +403,9 @@ class Catalog(AbstractCatalog[Dataset]):
         )
 
     def get(self, dataset_id: str) -> Dataset:
-        """Resolve a dataset id to its :class:`Dataset` row.
+        """Resolve a dataset id to its `Dataset` row.
 
-        Thin wrapper over the inherited :meth:`get_dataset`, which raises a
+        Thin wrapper over the inherited `get_dataset`, which raises a
         `ValueError` with a did-you-mean hint on an unknown id.
 
         Args:

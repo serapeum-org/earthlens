@@ -11,7 +11,7 @@ pip install earthlens[nwp]      # herbie-data + ecmwf-opendata
 That is the whole install — there is nothing to fetch from conda-forge.
 
 The GRIB **read** path is pyramids': `pyramids.grib.open_grib` uses the driver
-bundled in the `pyramids-gis` wheel, so nothing has to be installed alongside
+bundled in the `pyramids-core` wheel, so nothing has to be installed alongside
 it.
 
 The **decode** libraries Herbie needs (`cfgrib`, `eccodes`) come in as ordinary

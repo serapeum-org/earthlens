@@ -219,7 +219,7 @@ class TestFetch:
         assert v100.name == "KTLX_20240601_120000.ar2v"
         assert v100.read_bytes() == b"AR2V0006.100<S><I2><E>"
 
-    def test_fetch_skips_failed_volume(self, tmp_path, fake_s3):
+    def test_fetch_skips_failed_volume(self, tmp_path, fake_s3, pin_client):
         """A volume whose chunk download raises is skipped, not fatal."""
         b = _make(tmp_path)
         products = b._search()
@@ -230,13 +230,17 @@ class TestFetch:
             return {"Body": type("B", (), {"read": lambda self: b"x"})()}
 
         fake_s3.get_object = boom
+        pin_client(fake_s3)
         paths = b._fetch(products)
         assert len(paths) == 1  # the 100 volume survives, 101 skipped
 
-    def test_errors_raise_propagates_the_failed_volume(self, tmp_path, fake_s3):
+    def test_errors_raise_propagates_the_failed_volume(
+        self, tmp_path, fake_s3, pin_client
+    ):
         """download(errors="raise") surfaces the assembly error instead of skipping."""
         b = _make(tmp_path)
         fake_s3.get_object = _boom_on_101
+        pin_client(fake_s3)
         with pytest.raises(RuntimeError, match="s3 down"):
             b.download(errors="raise")
 

@@ -7,12 +7,17 @@ from typing import Callable
 
 import pytest
 from geopandas import GeoDataFrame
-from obspy.clients.fdsn.header import FDSNNoDataException
 
 from earthlens.base import RemoteProduct, SpatialExtent, TemporalExtent
 from earthlens.fdsn import FDSN, Catalog, Provider
 
 from .conftest import _FakeFdsn
+
+#: The `fdsn` extra is optional, so a missing `obspy` skips this module
+#: rather than erroring the whole directory's collection.
+FDSNNoDataException = pytest.importorskip(
+    "obspy.clients.fdsn.header"
+).FDSNNoDataException
 
 
 def _make_backend(tmp_path: Path, **overrides) -> FDSN:

@@ -163,7 +163,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
         Eager, network-free setup: validate the request, load the catalog,
         resolve the endpoint, and build the signer. Returns `None` — the
         STAC client itself is opened lazily on first access to
-        `self.client` (see :meth:`_open_client`), so constructing the
+        `self.client` (see `_open_client`), so constructing the
         backend never opens a connection.
 
         Raises:
@@ -207,7 +207,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
     def _open_client(self) -> Any:
         """Open the STAC API client for the resolved endpoint (lazily).
 
-        Called by :attr:`~earthlens.base.LazyClientMixin.client` on first
+        Called by `client` on first
         use, so the network round-trip `open_client` makes (reading the
         API's landing page) happens at `search()` / `download()` time
         rather than at construction.
@@ -255,7 +255,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
-        """Parse the date window into a :class:`TemporalExtent`."""
+        """Parse the date window into a `TemporalExtent`."""
         return self._cadence_extent(
             start,
             end,
@@ -272,7 +272,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
         """Search every requested collection for the bbox + window.
 
         Returns:
-            One :class:`RemoteProduct` per matched item; the pystac item, its
+            One `RemoteProduct` per matched item; the pystac item, its
             acquisition date, the logical collection key, and the requested
             asset list ride on `metadata`.
         """
@@ -319,7 +319,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
         directly and have no signer hook.
 
         Args:
-            products: The list returned by :meth:`_search`.
+            products: The list returned by `_search`.
 
         Returns:
             The written COG paths, one per `(collection, date)` group.
@@ -514,7 +514,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
             assets: The requested asset keys (used as band names); the first
                 also defines the output grid for mixed-resolution stacks.
             nodata: The no-data marker: a catalog value, or the inherit
-                sentinel from :meth:`_nodata_for`.
+                sentinel from `_nodata_for`.
 
         Returns:
             A pyramids `Dataset` with one band per `band_paths` entry.
@@ -540,7 +540,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
             aggregate: Optional aggregation request. Accepted (not rejected)
                 because `OUTPUT_KIND` is `"raster"`, so the facade forwards it.
                 When set, the per-date COGs are reduced per time window into
-                per-window COGs (see :meth:`_aggregate_cogs`) and the per-date
+                per-window COGs (see `_aggregate_cogs`) and the per-date
                 intermediates are removed.
 
         Returns:

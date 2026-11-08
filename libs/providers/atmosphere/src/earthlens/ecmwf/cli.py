@@ -467,7 +467,7 @@ def _retrieve_probe(dataset: str, request: dict[str, Any]) -> dict[str, dict[str
     """Retrieve one tiny slice and read each NetCDF variable's metadata.
 
     The retrieve goes to the dataset's **own** store, resolved from the catalog
-    the same way :func:`_ecmwf_constraints` resolves it: a bare client would
+    the same way `_ecmwf_constraints` resolves it: a bare client would
     always talk to CDS and every ADS / EWDS / ECDS / XDS dataset would 404 with
     `process not found`. A zip-of-NetCDF response (satellite CDRs deliver one)
     is unwrapped to its first member before the metadata is read via GDAL.
@@ -537,7 +537,7 @@ def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
     Probes the dataset's first usable constraints entry, asking for one value
     per selector. What comes back describes whichever variable that entry lists
     first, so this cannot finish a multi-variable dataset on its own — see
-    :func:`_ecmwf_deep_sample_variable` for the per-variable form the catalog
+    `_ecmwf_deep_sample_variable` for the per-variable form the catalog
     hydrator uses.
 
     Args:
@@ -611,7 +611,7 @@ def _ecmwf_deep_sample_variable(
     Returns:
         A `(metadata, selectors)` pair. `metadata` maps NetCDF short name to
         `{long_name, units}`; `selectors` is what the variable is *only ever*
-        served under (see :func:`_required_selectors`), not the combination this
+        served under (see `_required_selectors`), not the combination this
         one probe happened to sample. Both are empty when no constraints block
         serves `cds_variable`.
         prefer: Selectors the row already carries, so the probe reads its name

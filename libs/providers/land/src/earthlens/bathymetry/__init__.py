@@ -8,8 +8,8 @@ as GeoTIFF. Every shipped DEM is reached through one uniform NOAA ERDDAP
 backend reads with `pyramids.netcdf.NetCDF` and writes to GeoTIFF — earthlens
 never imports a competing array stack to touch the NetCDF.
 
-The public surface is the :class:`~earthlens.bathymetry.backend.Bathymetry`
-backend and the :class:`~earthlens.bathymetry.catalog.Catalog` of DEM rows.
+The public surface is the `Bathymetry`
+backend and the `Catalog` of DEM rows.
 """
 
 from __future__ import annotations

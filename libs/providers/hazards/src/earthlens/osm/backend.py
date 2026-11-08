@@ -138,7 +138,7 @@ _MAX_BBOX_SPAN_DEG = 90.0
 class _RequestsHttp:
     """Session-like adapter routing GET/POST through the module `requests`.
 
-    Keeps :class:`~earthlens.base.http.HttpClient` pointed at the module-level
+    Keeps `HttpClient` pointed at the module-level
     `requests.get` / `requests.post` (rather than a private session) so this
     single-shot Overpass POST stays a fresh connection per call, and so tests
     that monkeypatch `earthlens.osm.backend.requests.post` still drive the
@@ -546,7 +546,7 @@ class OSM(AbstractDataSource):
     def _pbf_client(self) -> HttpClient:
         """Return this instance's PBF-download client, built once.
 
-        Memoised for the same reason as :meth:`_overpass_client`: the pacing
+        Memoised for the same reason as `_overpass_client`: the pacing
         state lives on the client.
 
         Returns:
@@ -569,7 +569,7 @@ class OSM(AbstractDataSource):
         """Fetch one Overpass query: POST the QL (with UA), parse, build geometry.
 
         POSTs the resolved Overpass QL to `self._endpoint` through the shared
-        :class:`~earthlens.base.http.HttpClient` (a descriptive
+        `HttpClient` (a descriptive
         `User-Agent` — required to avoid the overpass-api.de 406 — applied at
         the client level via `default_headers`, and `self._timeout`), parses
         the JSON with `overpy.Overpass().parse_json(...)`, and converts the
@@ -826,7 +826,7 @@ class OSM(AbstractDataSource):
         """Fetch one `bulk` layer: resolve region, fetch-cache, read, bbox-clip.
 
         Resolves `self._region` to a Geofabrik path, downloads the extract
-        (cached, via :func:`~earthlens.osm._pbf.download_extract`), and reads
+        (cached, via `download_extract`), and reads
         the row's `pyrosm_method` layer into a `FeatureCollection` with the
         selected engine (`self._engine`), clipping to the request bbox (`G12`,
         `G13`, `G14`). The read stays `xarray`-free (`G7`).

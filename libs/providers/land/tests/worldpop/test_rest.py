@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 import requests
 
+from earthlens.testing import FakeResponse
 from earthlens.worldpop.rest import (
     BASE_URL,
     files_for_year,
@@ -15,7 +16,7 @@ from earthlens.worldpop.rest import (
     rest_records,
 )
 
-from .conftest import _FakeResponse, pop_records
+from .conftest import pop_records
 
 pytestmark = pytest.mark.worldpop
 
@@ -27,7 +28,7 @@ def test_rest_records_hits_alias_subalias_iso3(monkeypatch):
     def fake_get(url, params=None, timeout=None, **kwargs):
         seen["url"] = url
         seen["params"] = params
-        return _FakeResponse(json_data={"data": pop_records()})
+        return FakeResponse(json={"data": pop_records()})
 
     monkeypatch.setattr(requests, "get", fake_get)
     records = rest_records("pop", "wpgp", "KEN")
@@ -38,7 +39,7 @@ def test_rest_records_hits_alias_subalias_iso3(monkeypatch):
 
 def test_rest_records_raises_on_http_error(monkeypatch):
     """A non-2xx response propagates as HTTPError."""
-    monkeypatch.setattr(requests, "get", lambda *a, **k: _FakeResponse())
+    monkeypatch.setattr(requests, "get", lambda *a, **k: FakeResponse(status_code=404))
     with pytest.raises(requests.HTTPError):
         rest_records("pop", "wpgp", "KEN")
 
@@ -97,10 +98,10 @@ def _fake_global(monkeypatch, summary, detail_files):
 
     def fake_get(url, params=None, timeout=None, **kwargs):
         if params and "id" in params:
-            return _FakeResponse(
-                json_data={"data": {"id": params["id"], "files": detail_files}}
+            return FakeResponse(
+                json={"data": {"id": params["id"], "files": detail_files}}
             )
-        return _FakeResponse(json_data={"data": summary})
+        return FakeResponse(json={"data": summary})
 
     monkeypatch.setattr(requests, "get", fake_get)
 
@@ -163,7 +164,7 @@ def test_rest_records_uses_session_when_given(monkeypatch):
     class _Session:
         def get(self, url, params=None, timeout=None, **kwargs):
             calls["n"] += 1
-            return _FakeResponse(json_data={"data": pop_records()})
+            return FakeResponse(json={"data": pop_records()})
 
     rest_records("pop", "wpgp", "KEN", session=_Session())
     assert calls["n"] == 1

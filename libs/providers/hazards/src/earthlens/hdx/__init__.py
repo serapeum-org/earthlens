@@ -7,7 +7,7 @@ id), filters its resources, and downloads the matching files to disk.
 HDX is a public catalogue, so there is no authentication.
 
 Unlike every gridded earthlens backend, the output shape is the fixed
-value `"mixed"` — :class:`HDX` is the first mixed backend: one dataset
+value `"mixed"` — `HDX` is the first mixed backend: one dataset
 can carry raster, vector and tabular resources at once. The MVP
 downloads each resource file in its native format and records its CKAN
 format label; reading / converting it into a pyramids type is the
@@ -15,14 +15,14 @@ deferred `PY-D` work item.
 
 Public surface (re-exported from this package):
 
-* :class:`HDX` — the backend itself; instantiate with a
+* `HDX` — the backend itself; instantiate with a
   `{dataset_key: [resource_filter, ...]}` mapping (or the `hdx_id=`
-  escape hatch), then call :meth:`HDX.download`.
-* :class:`Catalog` — pydantic-backed loader for the bundled per-theme
+  escape hatch), then call `HDX.download`.
+* `Catalog` — pydantic-backed loader for the bundled per-theme
   `catalog/` directory.
-* :class:`HdxDataset` — one curated dataset row (`hdx_id`, `org`,
+* `HdxDataset` — one curated dataset row (`hdx_id`, `org`,
   `title`, `themes`, `formats`, `resource_filter`, `output_kinds`).
-* :data:`CATALOG_PATH` — absolute path to the bundled `catalog/`
+* `CATALOG_PATH` — absolute path to the bundled `catalog/`
   directory; monkey-patchable to redirect the loader.
 
 The `[hdx]` extra pulls `hdx-python-api>=6,<7`. The import is lazy, so

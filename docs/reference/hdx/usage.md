@@ -122,7 +122,7 @@ objs = EarthLens(
 # objs[0] is a pyramids FeatureCollection (a GeoJSON resource)
 ```
 
-`read=True` uses `pyramids.read_resource`, available in **`pyramids-gis
+`read=True` uses `pyramids.read_resource`, available in **`pyramids-core
 >= 0.29.0`** — which is the package floor, so it works out of the box.
 (On a partial / source pyramids install that predates the reader,
 `read=True` raises `NotImplementedError` with an upgrade hint; the reader

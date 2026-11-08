@@ -5,13 +5,13 @@ earthquakes, tropical cyclones, floods, volcanoes, wildfires, and
 droughts, each with a green/orange/red impact score — from the Global
 Disaster Alert and Coordination System (JRC / UN OCHA) SEARCH feed. The
 whole event list for a `[start, end]` window comes back in a single
-HTTPS GET, which :mod:`earthlens.gdacs.events` maps to a pyramids
-:class:`~pyramids.feature.collection.FeatureCollection` of alert
+HTTPS GET, which `earthlens.gdacs.events` maps to a pyramids
+`pyramids.feature.collection.FeatureCollection` of alert
 features.
 
 This is a `vector` backend: the on-the-wire result is a table of
 geolocated alerts, not a gridded array, so `OUTPUT_KIND = "vector"` and
-the :class:`earthlens.earthlens.EarthLens` facade rejects an
+the `earthlens.earthlens.EarthLens` facade rejects an
 `aggregate=` argument (there is no meaningful gridded reduction of an
 alert table). `download()` returns the in-memory FeatureCollection and,
 as a side effect, writes it to one vector file under `path`.
@@ -94,7 +94,7 @@ class GDACS(AbstractDataSource):
     space/time/hazard window of disaster alerts through the same
     `download()` shape every other earthlens backend uses. All requested
     hazard types come back in one combined GET; the GeoJSON is mapped to
-    a :class:`~pyramids.feature.collection.FeatureCollection` and, if the
+    a `pyramids.feature.collection.FeatureCollection` and, if the
     feed did not honour a bbox, clipped to the requested box
     client-side.
 
@@ -190,7 +190,7 @@ class GDACS(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse the `[start, end]` window into a :class:`TemporalExtent`.
+        """Parse the `[start, end]` window into a `TemporalExtent`.
 
         GDACS issues a single SEARCH call spanning the whole window, so
         there is no per-date loop. The resolution is kept as the
@@ -216,7 +216,7 @@ class GDACS(AbstractDataSource):
         return self._whole_window_extent(start, end, fmt=fmt, resolution="all")
 
     def _search(self) -> list[RemoteProduct]:
-        """One :class:`RemoteProduct` carrying the whole combined query.
+        """One `RemoteProduct` carrying the whole combined query.
 
         Resolves every hazard code in `self.vars` against the bundled
         catalog (raising with a did-you-mean hint on an unknown code)
@@ -251,7 +251,7 @@ class GDACS(AbstractDataSource):
         """Issue the one combined GET and map the GeoJSON to a FeatureCollection.
 
         Widens the inherited `-> list[Path]` contract: a vector backend
-        returns in-memory :class:`FeatureCollection`s, not file paths. A
+        returns in-memory `FeatureCollection`s, not file paths. A
         service-availability failure (a connection/timeout error or a
         retry-worthy status) that outlives the retries is re-raised as
         `GdacsUnavailableError`; a genuine request error (`403` / `404`)
@@ -261,14 +261,14 @@ class GDACS(AbstractDataSource):
         alerts are clipped to `self.space` client-side.
 
         When the response hits the endpoint's
-        :data:`MAX_EVENTS_PER_RESPONSE` cap (100), the result is almost
+        `MAX_EVENTS_PER_RESPONSE` cap (100), the result is almost
         certainly truncated to the most-recent matches; a warning is
         logged so the truncation is never silent (the endpoint offers no
         pagination — narrow the window to retrieve more).
 
         Args:
             products: The single-element list returned by
-                :meth:`_search`.
+                `_search`.
 
         Returns:
             list[FeatureCollection]: A single-element list with the
@@ -371,7 +371,7 @@ class GDACS(AbstractDataSource):
 
         Issues the single combined SEARCH GET, maps and clips the
         result, writes it to one vector file under `path`, and returns
-        the in-memory :class:`FeatureCollection`. An empty result
+        the in-memory `FeatureCollection`. An empty result
         returns a schema-correct empty FeatureCollection and writes
         nothing.
 

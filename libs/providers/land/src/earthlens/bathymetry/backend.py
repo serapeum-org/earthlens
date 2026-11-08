@@ -1,7 +1,7 @@
 """Global topography / bathymetry DEM backend — `Bathymetry(AbstractDataSource)`.
 
 `Bathymetry` is a download-and-localise raster backend (`OUTPUT_KIND="raster"`).
-A `dataset=<id>` selects a curated :class:`~earthlens.bathymetry.catalog.Dataset`
+A `dataset=<id>` selects a curated `Dataset`
 row and `download()` subsets that DEM to the request bbox, returning the list of
 written GeoTIFF paths. Two transports ship, chosen per row: an ERDDAP `griddap`
 endpoint (GEBCO / ETOPO — subset to a NetCDF read back with
@@ -15,7 +15,7 @@ stack to touch it. On the griddap path an out-of-coverage / oversize request
 surfaces as a clear `ValueError` (ERDDAP rejects it or returns an HTML error
 body, never data), so the user never sees a bare HTTP error or a corrupt file.
 The WCS path instead guards the request bbox against the coverage's
-`native_bbox` (:meth:`Bathymetry._guard_wcs_domain`) — a fully out-of-coverage
+`native_bbox` (`Bathymetry._guard_wcs_domain`) — a fully out-of-coverage
 AOI raises, a partial overlap is allowed through with a warning (its
 out-of-coverage cells come back as `0.0` fill) — because the WCS server returns
 a zero-filled grid, not an error, outside coverage.
@@ -66,8 +66,8 @@ class Bathymetry(AbstractDataSource):
 
     Fetches a curated static DEM (GEBCO 2020, ETOPO1 ice / bedrock via ERDDAP
     `griddap`; EMODnet Bathymetry via OGC WCS) subset to the request bbox and
-    written as GeoTIFF. The request is a search/fetch split: :meth:`_search`
-    names the single resolved product and :meth:`_fetch` realises it (download
+    written as GeoTIFF. The request is a search/fetch split: `_search`
+    names the single resolved product and `_fetch` realises it (download
     → pyramids → GeoTIFF), dispatching on the row's `transport`.
 
     Attributes:
@@ -228,7 +228,7 @@ class Bathymetry(AbstractDataSource):
 
         Returns:
             list[RemoteProduct]: One product carrying the resolved
-                :class:`Dataset` row in its `metadata`.
+                `Dataset` row in its `metadata`.
         """
         return [
             RemoteProduct(
@@ -241,7 +241,7 @@ class Bathymetry(AbstractDataSource):
         """Download each DEM subset and write it as a GeoTIFF.
 
         Args:
-            products: The single-element list from :meth:`_search`.
+            products: The single-element list from `_search`.
 
         Returns:
             list[Path]: The written GeoTIFF path(s).
@@ -252,8 +252,8 @@ class Bathymetry(AbstractDataSource):
         """Subset one DEM to a GeoTIFF via the row's transport.
 
         Dispatches on the resolved row's `transport`: `"wcs"` rows are read
-        over OGC WCS through pyramids `Dataset.from_wcs` (:meth:`_fetch_wcs`),
-        every other row over ERDDAP `griddap` (:meth:`_fetch_griddap`).
+        over OGC WCS through pyramids `Dataset.from_wcs` (`_fetch_wcs`),
+        every other row over ERDDAP `griddap` (`_fetch_griddap`).
 
         Args:
             product: The `RemoteProduct` whose `metadata["dataset"]` is the
@@ -562,6 +562,6 @@ class Bathymetry(AbstractDataSource):
 
         Raises:
             ValueError: If a request is outside the DEM's coverage / oversize
-                (from :meth:`_download`).
+                (from `_download`).
         """
         return cast("list[Path]", self._api())

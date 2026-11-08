@@ -13,7 +13,8 @@ class TestNativeParameters:
 
     def test_returns_declared_names_without_the_synthesised_ones(self):
         """A wrapper-provided `aoi` is excluded; the backend's own names remain."""
-        from earthlens.chc import CHIRPS
+        _earthlens_chc = pytest.importorskip("earthlens.chc")
+        CHIRPS = _earthlens_chc.CHIRPS
 
         declared = native_parameters(CHIRPS)
         assert "lat_lim" in declared, (

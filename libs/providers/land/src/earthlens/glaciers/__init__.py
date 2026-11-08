@@ -13,16 +13,16 @@ One mixed backend over three open glacier sources:
   length change, glacier state) as tabular CSV tables; `tabular`.
 
 Output is **per instance**: a dataset's `output_kind` decides whether
-:meth:`~earthlens.glaciers.backend.Glaciers.download` returns a pyramids
-:class:`~pyramids.feature.collection.FeatureCollection` (`vector`, rgi/glims) or
-a :class:`pandas.DataFrame` (`tabular`, wgms). All three sources are open, so the
+`download` returns a pyramids
+`pyramids.feature.collection.FeatureCollection` (`vector`, rgi/glims) or
+a `pandas.DataFrame` (`tabular`, wgms). All three sources are open, so the
 backend ships **no auth**. Vector file I/O always goes through pyramids
 `FeatureCollection.read_file` — never a bare geopandas file read — and the WGMS
 path is pure pandas with no array/NetCDF stack.
 
-The public surface is the :class:`Catalog` (dataset id -> source + output kind +
-request detail, plus the GTN-G :class:`Region` table) and its :class:`Dataset`
-rows, the backend :class:`Glaciers`, and the stateless query/read helpers.
+The public surface is the `Catalog` (dataset id -> source + output kind +
+request detail, plus the GTN-G `Region` table) and its `Dataset`
+rows, the backend `Glaciers`, and the stateless query/read helpers.
 """
 
 from __future__ import annotations

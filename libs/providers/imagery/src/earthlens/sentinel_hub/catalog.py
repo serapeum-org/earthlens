@@ -17,13 +17,13 @@ The catalog ships as a directory of YAML files at
 `src/earthlens/sentinel_hub/catalog/` (`collections.yaml`, `recipes.yaml`, plus
 `_index.yaml` carrying the informational `available_collections:` index rebuilt
 by `tools/sentinel_hub/refresh_sh_catalog.py`). The loader unions the per-file
-`collections:` / `recipes:` blocks into one :class:`Catalog` (a key declared in
+`collections:` / `recipes:` blocks into one `Catalog` (a key declared in
 two files is a load-time error) and caches on `(path, mtime_ns)`, the same way
 the openEO / GEE / STAC catalogs do. The evalscript `.js` files live alongside
 under `evalscripts/` and are read at request time (not parsed here).
 
-The bundled catalog directory lives at :data:`CATALOG_PATH` and the evalscript
-directory at :data:`EVALSCRIPTS_PATH`; tests can monkey-patch either to redirect
+The bundled catalog directory lives at `CATALOG_PATH` and the evalscript
+directory at `EVALSCRIPTS_PATH`; tests can monkey-patch either to redirect
 the loader at a temporary directory.
 """
 
@@ -147,7 +147,7 @@ class Collection(SummarisedLeaf):
     Attributes:
         sh_collection: The `sentinelhub.DataCollection` member name this key
             binds to (`"SENTINEL2_L2A"`, `"SENTINEL1_IW"`, …).
-        bands: Band name → :class:`Band` metadata for the bands the collection
+        bands: Band name → `Band` metadata for the bands the collection
             exposes.
         default_bands: Bands used when the request names none. Falls back to
             every key of `bands` when empty.
@@ -287,7 +287,7 @@ def read_evalscript(filename: str) -> str:
 
     Args:
         filename: The `.js` filename (e.g. `"ndvi.js"`) under
-            :data:`EVALSCRIPTS_PATH`.
+            `EVALSCRIPTS_PATH`.
 
     Returns:
         The evalscript source.
@@ -395,15 +395,15 @@ def _load_catalog_data(
 class Catalog(AbstractCatalog[Collection]):
     """YAML-backed catalog of Sentinel Hub collections and evalscript recipes.
 
-    Reads every `*.yaml` under :data:`CATALOG_PATH` on construction and merges
-    them into typed :class:`Collection` / :class:`EvalscriptRecipe` models.
-    Collections are stored under the inherited :attr:`datasets` field (keyed by
-    logical key); recipes live in :attr:`recipes`; the informational index lives
-    in :attr:`available_collections`.
+    Reads every `*.yaml` under `CATALOG_PATH` on construction and merges
+    them into typed `Collection` / `EvalscriptRecipe` models.
+    Collections are stored under the inherited `datasets` field (keyed by
+    logical key); recipes live in `recipes`; the informational index lives
+    in `available_collections`.
 
     Attributes:
-        datasets: Logical collection key → :class:`Collection`.
-        recipes: Recipe key → :class:`EvalscriptRecipe`.
+        datasets: Logical collection key → `Collection`.
+        recipes: Recipe key → `EvalscriptRecipe`.
         available_collections: Every collection the backend can render
             (refreshed index; informational).
 
@@ -465,10 +465,10 @@ class Catalog(AbstractCatalog[Collection]):
 
         Args:
             catalog_path: Catalog directory or single `*.yaml` file. Defaults to
-                module-level :data:`CATALOG_PATH`.
+                module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: Propagated from the loader.
@@ -482,15 +482,15 @@ class Catalog(AbstractCatalog[Collection]):
         )
 
     def get_collection(self, collection_key: str) -> Collection:
-        """Return the :class:`Collection` for `collection_key` (did-you-mean on miss).
+        """Return the `Collection` for `collection_key` (did-you-mean on miss).
 
-        Alias of the inherited :meth:`get_dataset`, named for clarity.
+        Alias of the inherited `get_dataset`, named for clarity.
 
         Args:
             collection_key: Logical collection key.
 
         Returns:
-            The matching :class:`Collection`.
+            The matching `Collection`.
 
         Raises:
             ValueError: If the key is unknown (message suggests the closest key).
@@ -498,13 +498,13 @@ class Catalog(AbstractCatalog[Collection]):
         return cast("Collection", self.get_dataset(collection_key))
 
     def get_recipe(self, recipe_key: str) -> EvalscriptRecipe:
-        """Return the :class:`EvalscriptRecipe` for `recipe_key` (did-you-mean on miss).
+        """Return the `EvalscriptRecipe` for `recipe_key` (did-you-mean on miss).
 
         Args:
             recipe_key: Recipe key.
 
         Returns:
-            The matching :class:`EvalscriptRecipe`.
+            The matching `EvalscriptRecipe`.
 
         Raises:
             ValueError: If the key is unknown (message suggests the closest key).
@@ -533,7 +533,7 @@ class Catalog(AbstractCatalog[Collection]):
         return key in self.recipes
 
     def resolve(self, key: str) -> ResolvedRequest:
-        """Resolve a collection-or-recipe key to a uniform :class:`ResolvedRequest`.
+        """Resolve a collection-or-recipe key to a uniform `ResolvedRequest`.
 
         A recipe resolves to its bundled evalscript + bands + kind; a plain
         collection resolves with `evalscript=None` and its default bands (the
@@ -543,7 +543,7 @@ class Catalog(AbstractCatalog[Collection]):
             key: A logical collection or recipe key.
 
         Returns:
-            The normalised :class:`ResolvedRequest` the backend builds from.
+            The normalised `ResolvedRequest` the backend builds from.
 
         Raises:
             ValueError: If `key` is neither a known recipe nor collection

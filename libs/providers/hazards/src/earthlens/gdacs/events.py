@@ -6,13 +6,13 @@ geometry/CRS handling inside pyramids primitives: earthlens assembles
 the plain attribute rows, builds the geometry column from each
 feature's GeoJSON `geometry` via `shapely.geometry.shape`, and hands
 the whole thing to
-:class:`pyramids.feature.collection.FeatureCollection` (a
+`pyramids.feature.collection.FeatureCollection` (a
 `geopandas.GeoDataFrame` subclass) tagged `EPSG:4326`.
 
-The canonical alert schema lives here as :data:`ATTRIBUTE_COLUMNS`
+The canonical alert schema lives here as `ATTRIBUTE_COLUMNS`
 (attribute columns + dtypes) plus the `geometry` column. Both the
-populated path (:func:`geojson_to_fc`) and the empty path
-(:func:`empty_fc`) produce a FeatureCollection with exactly these
+populated path (`geojson_to_fc`) and the empty path
+(`empty_fc`) produce a FeatureCollection with exactly these
 columns and dtypes, so a downstream `to_file` never chokes on a schema
 mismatch between a hit and a miss.
 
@@ -43,7 +43,7 @@ from shapely.geometry import shape
 EVENT_CRS = "EPSG:4326"
 
 #: Ordered attribute columns and their pandas dtypes. The `geometry`
-#: column is added separately by :func:`geojson_to_fc` / :func:`empty_fc`
+#: column is added separately by `geojson_to_fc` / `empty_fc`
 #: and is not listed here.
 ATTRIBUTE_COLUMNS: dict[str, str] = {
     "event_id": "string",
@@ -69,7 +69,7 @@ _DATE_COLUMNS = ("from_date", "to_date")
 def geojson_to_fc(payload: dict[str, Any]) -> FeatureCollection:
     """Convert a GDACS GeoJSON FeatureCollection into a `FeatureCollection`.
 
-    One row per feature, columns per :data:`ATTRIBUTE_COLUMNS` plus a
+    One row per feature, columns per `ATTRIBUTE_COLUMNS` plus a
     `geometry` column built from each feature's GeoJSON `geometry`
     (`Point` for most alerts; floods / cyclone tracks may carry
     polygons or lines, which are preserved as-is). A feature with no
@@ -77,7 +77,7 @@ def geojson_to_fc(payload: dict[str, Any]) -> FeatureCollection:
     `None` rather than an invalid value that would corrupt a written
     GeoPackage/GeoJSON. An empty (or geometry-less) payload returns an
     empty FeatureCollection with the same columns/dtypes (see
-    :func:`empty_fc`). The numeric columns (`alert_score`, `severity`)
+    `empty_fc`). The numeric columns (`alert_score`, `severity`)
     are coerced with `pandas.to_numeric(errors="coerce")`, so a
     non-numeric value degrades to `NaN` rather than raising.
 
@@ -169,7 +169,7 @@ def empty_fc() -> FeatureCollection:
     count — an empty result is a legitimate answer, not an error.
 
     Returns:
-        FeatureCollection: Zero rows, the :data:`ATTRIBUTE_COLUMNS`
+        FeatureCollection: Zero rows, the `ATTRIBUTE_COLUMNS`
             columns with their declared dtypes, an empty `geometry`
             column, CRS `EPSG:4326`.
 
@@ -253,7 +253,7 @@ def _feature_to_row(feature: dict[str, Any]) -> tuple[dict[str, object], object]
 
     Returns:
         A `(row, geometry)` pair: `row` is a dict keyed by
-        :data:`ATTRIBUTE_COLUMNS` (no `geometry`); `geometry` is a
+        `ATTRIBUTE_COLUMNS` (no `geometry`); `geometry` is a
         shapely geometry or `None`.
     """
     properties = feature.get("properties") or {}

@@ -112,7 +112,7 @@ class AbstractAuth(ABC, Generic[CredentialsT]):
     `close` to release it.
 
     This class fixes **no** credential-resolution precedence in code, but
-    the package convention is the one :class:`SingleSecretAuth` implements
+    the package convention is the one `SingleSecretAuth` implements
     and every backend now follows: **an explicit argument wins over the
     environment, which wins over any credentials file**. Subclass
     `SingleSecretAuth` when a single secret is involved and get that for
@@ -176,8 +176,8 @@ class AbstractAuth(ABC, Generic[CredentialsT]):
             ```
     """
 
-    #: Set to `True` by :meth:`mark_configured`; read by the default
-    #: :meth:`is_authenticated`. Class-level so an instance that never
+    #: Set to `True` by `mark_configured`; read by the default
+    #: `is_authenticated`. Class-level so an instance that never
     #: configured still answers `False` without an `__init__` of its own.
     _configured: bool = False
 
@@ -199,7 +199,7 @@ class AbstractAuth(ABC, Generic[CredentialsT]):
 
         Subclasses implement this to (e.g.) call `ee.Initialize`,
         write a credentials file, or mint an OAuth bearer. Must be
-        idempotent: a second call after :meth:`is_authenticated`
+        idempotent: a second call after `is_authenticated`
         returns `True` is a no-op (typical implementation is an
         early-return guarded by `if self.is_authenticated(): return`).
 
@@ -209,10 +209,10 @@ class AbstractAuth(ABC, Generic[CredentialsT]):
         """
 
     def mark_configured(self) -> None:
-        """Record that :meth:`configure` completed, for the default predicate.
+        """Record that `configure` completed, for the default predicate.
 
         Call this at the end of a successful `configure()` so the inherited
-        :meth:`is_authenticated` starts returning `True` and the next
+        `is_authenticated` starts returning `True` and the next
         `configure()` short-circuits.
         """
         self._configured = True
@@ -221,10 +221,10 @@ class AbstractAuth(ABC, Generic[CredentialsT]):
         """Return `True` when the in-process state has working credentials.
 
         Cheap predicate — must not call the network. Used by
-        :meth:`configure` for idempotency and by callers that want to
+        `configure` for idempotency and by callers that want to
         skip a redundant setup pass.
 
-        The default reports whether :meth:`mark_configured` has run, which is
+        The default reports whether `mark_configured` has run, which is
         the "did `configure()` succeed?" flag the majority of the auth classes
         each declared by hand. Override it when the real answer lives elsewhere
         — an SDK's own session object (asf), a token expiry, or a backend whose
@@ -233,7 +233,7 @@ class AbstractAuth(ABC, Generic[CredentialsT]):
         return self._configured
 
     def close(self) -> None:
-        """Release any resource held by :meth:`configure`.
+        """Release any resource held by `configure`.
 
         Default: no-op. Backends whose `configure()` opens a
         long-lived HTTP session, boto3 client, or background thread
@@ -265,14 +265,14 @@ class SingleSecretAuth(AbstractAuth[CredentialsT]):
     with the resolved secret differ. This class carries the ceremony so each
     single-secret backend supplies only the parts that differ:
 
-    * set :attr:`ENV_VARS` and :attr:`PROVIDER` (and optionally
-      :attr:`CREDENTIAL_HINT` / :attr:`AUTH_ERROR`),
-    * override :meth:`_explicit_credential` to read the explicit secret off its
+    * set `ENV_VARS` and `PROVIDER` (and optionally
+      `CREDENTIAL_HINT` / `AUTH_ERROR`),
+    * override `_explicit_credential` to read the explicit secret off its
       credentials value object,
-    * implement :meth:`_connect` to apply the resolved secret.
+    * implement `_connect` to apply the resolved secret.
 
     A multi-field / OAuth / username+password backend does not fit this shape and
-    should extend :class:`AbstractAuth` directly with its own `configure`.
+    should extend `AbstractAuth` directly with its own `configure`.
 
     Examples:
         - A minimal single-secret auth resolving from the environment:
@@ -347,9 +347,9 @@ class SingleSecretAuth(AbstractAuth[CredentialsT]):
     def configure(self) -> None:
         """Resolve and apply the secret once; idempotent.
 
-        Short-circuits when :meth:`is_authenticated` is already `True`; otherwise
-        resolves the credential (:meth:`_resolve_credential`), applies it
-        (:meth:`_connect`), and records success (:meth:`mark_configured`).
+        Short-circuits when `is_authenticated` is already `True`; otherwise
+        resolves the credential (`_resolve_credential`), applies it
+        (`_connect`), and records success (`mark_configured`).
 
         Raises:
             AuthenticationError: When no credential can be resolved.
@@ -360,10 +360,10 @@ class SingleSecretAuth(AbstractAuth[CredentialsT]):
         self.mark_configured()
 
     def _resolve_credential(self) -> str:
-        """Return the secret: explicit argument, else :attr:`ENV_VARS`, else raise.
+        """Return the secret: explicit argument, else `ENV_VARS`, else raise.
 
         The environment is consulted only when no explicit credential was
-        supplied — i.e. :meth:`_explicit_credential` returns `None`. An explicit
+        supplied — i.e. `_explicit_credential` returns `None`. An explicit
         credential that is present but empty is treated as an error and does not
         fall back to the environment, matching each backend's original behaviour.
 
@@ -372,9 +372,9 @@ class SingleSecretAuth(AbstractAuth[CredentialsT]):
 
         Raises:
             AuthenticationError: When no explicit credential was supplied and
-                none of :attr:`ENV_VARS` is set, or when an explicit credential
-                was supplied but is empty. The message names :attr:`PROVIDER` and
-                the variables, plus :attr:`CREDENTIAL_HINT`.
+                none of `ENV_VARS` is set, or when an explicit credential
+                was supplied but is empty. The message names `PROVIDER` and
+                the variables, plus `CREDENTIAL_HINT`.
         """
         explicit = self._explicit_credential()
         if explicit:
@@ -404,7 +404,7 @@ class SingleSecretAuth(AbstractAuth[CredentialsT]):
     def _explicit_credential(self) -> str | None:
         """Return the explicit secret off the bound credentials, or `None`.
 
-        Default: `None` (rely on :attr:`ENV_VARS`). A subclass whose credentials
+        Default: `None` (rely on `ENV_VARS`). A subclass whose credentials
         carry an explicit secret overrides this to extract it — typically
         unwrapping a `pydantic.SecretStr`.
         """
@@ -415,5 +415,5 @@ class SingleSecretAuth(AbstractAuth[CredentialsT]):
         """Apply the resolved secret (store it, build a client, …).
 
         Args:
-            credential: The secret resolved by :meth:`_resolve_credential`.
+            credential: The secret resolved by `_resolve_credential`.
         """

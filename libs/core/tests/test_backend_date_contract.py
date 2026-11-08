@@ -5,29 +5,31 @@ the lenient ISO fallback, but each backend does its own parsing in
 `_check_input_dates`. These tests pin that contract for **every** registered
 backend at once, so a new backend cannot reintroduce a raw `strptime` that
 rejects a `datetime` or a `"…T06:00:00"` string.
+
+The assertions themselves live in `earthlens.testing` so a provider's own test
+directory — or a backend shipped outside this repo — can subclass
+`BaseBackendDateContract` and get exactly these checks, attributed to its own
+lane. This module is the registry sweep over them: it cannot be forgotten when
+a backend is added, which the per-provider subclass can.
 """
 
 from __future__ import annotations
 
-import ast
-import datetime as dt
-import inspect
-
 import pytest
 
 from earthlens.earthlens import EarthLens
+from earthlens.testing import (
+    EQUIVALENT_DATE_FORMS,
+    assert_capability_flags_are_bools,
+    assert_equivalent_date_forms_agree,
+    assert_iso_datetime_string_accepted,
+    assert_no_raw_date_parsing,
+)
 
 #: One canonical key per distinct backend module (aliases collapse).
 _BACKENDS = sorted(
     {module: key for key, module, _ in EarthLens.DataSources.entries()}.items()
 )
-
-#: The date forms the facade promises to accept, all denoting 2024-01-05.
-_EQUIVALENT_FORMS = {
-    "iso-date-string": "2024-01-05",
-    "datetime": dt.datetime(2024, 1, 5),
-    "date": dt.date(2024, 1, 5),
-}
 
 
 def _backend_classes():
@@ -53,61 +55,29 @@ class TestNoRawDateParsing:
     @pytest.mark.parametrize("key,backend", _CASES, ids=_IDS)
     def test_hook_delegates_to_to_datetime(self, key, backend):
         """`_check_input_dates` must not call strptime or pd.to_datetime directly."""
-        hook = backend._check_input_dates
-        source = inspect.getsource(hook)
-        tree = ast.parse(source.lstrip())
-        body = [
-            node
-            for node in tree.body[0].body
-            if not (isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant))
-        ]
-        code = "\n".join(ast.unparse(node) for node in body)
-        assert "strptime(" not in code, f"{key} still parses dates with strptime"
-        assert "pd.to_datetime(" not in code, f"{key} still parses dates with pandas"
+        assert_no_raw_date_parsing(backend, key)
 
 
 class TestFlexibleDateForms:
     """Every backend accepts a string, a `datetime`, and a `date` alike."""
 
-    @staticmethod
-    def _extent(backend, value):
-        """Parse dates on an uninitialised instance, or None if state is needed.
-
-        `object.__new__` skips `__init__` (no network, no catalog load) while
-        still giving real bound methods, so the hook can reach the inherited
-        `_whole_window_extent` / `_cadence_extent` factories. A backend whose
-        hook also reads constructor-set state (s3 and drought read the resolved
-        dataset row) raises `AttributeError` and is covered by the static guard.
-        """
-        instance = object.__new__(backend)
-        try:
-            return instance._check_input_dates(value, value, "daily", "%Y-%m-%d")
-        except AttributeError:
-            return None
-
     @pytest.mark.parametrize("key,backend", _CASES, ids=_IDS)
     def test_equivalent_forms_agree(self, key, backend):
         """A string, datetime, and date for the same day give the same extent."""
-        results = {
-            name: self._extent(backend, value)
-            for name, value in _EQUIVALENT_FORMS.items()
-        }
-        if any(extent is None for extent in results.values()):
-            pytest.skip(f"{key} needs instance state to resolve its cadence")
-        starts = {name: extent.start_date for name, extent in results.items()}
-        assert len(set(starts.values())) == 1, (
-            f"{key} parses the forms differently: {starts}"
-        )
+        assert_equivalent_date_forms_agree(backend, key)
 
     @pytest.mark.parametrize("key,backend", _CASES, ids=_IDS)
     def test_iso_datetime_string_accepted(self, key, backend):
         """A sub-daily `YYYY-MM-DDTHH:MM:SS` string parses despite a date-only fmt."""
-        extent = self._extent(backend, "2024-01-05T06:30:00")
-        if extent is None:
-            pytest.skip(f"{key} needs instance state to resolve its cadence")
-        if extent.start_date is None:
-            pytest.skip(f"{key} has no time axis")
-        assert extent.start_date == dt.datetime(2024, 1, 5, 6, 30)
+        assert_iso_datetime_string_accepted(backend, key)
+
+    def test_the_shared_forms_are_the_ones_documented(self):
+        """The subclassable contract and this sweep agree on what is equivalent."""
+        assert set(EQUIVALENT_DATE_FORMS) == {
+            "iso-date-string",
+            "datetime",
+            "date",
+        }
 
 
 #: The backends with no per-step time axis, which accept a missing `start` /
@@ -151,4 +121,4 @@ class TestRequiresTimeWindowDeclared:
     @pytest.mark.parametrize("key,backend", _CASES, ids=_IDS)
     def test_flag_is_a_bool(self, key, backend):
         """Every backend resolves the flag to a real bool, not a truthy stand-in."""
-        assert isinstance(backend.REQUIRES_TIME_WINDOW, bool)
+        assert_capability_flags_are_bools(backend, key)

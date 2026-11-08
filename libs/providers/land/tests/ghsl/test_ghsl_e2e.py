@@ -19,6 +19,7 @@ import pytest
 
 from earthlens.aggregate import AggregationConfig
 from earthlens.earthlens import EarthLens
+from earthlens.testing import skip_live_unavailable
 
 #: The JRC host every GHSL fetch talks to.
 _GHSL_HOST = "jeodpp.jrc.ec.europa.eu"
@@ -62,7 +63,7 @@ class TestGhslLiveFetch:
         exhaust every download's retries on connect timeouts; issue #932).
         """
         if not _host_ok(_GHSL_HOST):
-            pytest.skip(f"JRC GHSL host {_GHSL_HOST} unreachable")
+            skip_live_unavailable(f"JRC GHSL host {_GHSL_HOST} unreachable")
 
     def test_population_100m_lands_cropped_geotiff(self, tmp_path: Path):
         """A small GHS-POP 2020 100 m pull lands one cropped EPSG:4326 GeoTIFF."""

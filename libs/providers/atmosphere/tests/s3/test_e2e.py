@@ -12,6 +12,8 @@ from pathlib import Path
 
 import pytest
 
+from earthlens.testing import skip_live_unavailable
+
 pytestmark = [pytest.mark.s3, pytest.mark.e2e]
 
 
@@ -35,7 +37,7 @@ def _require_network():
             Bucket="esa-worldcover", Prefix="v200/2021/map/", MaxKeys=1
         )
     except Exception as exc:  # noqa: BLE001
-        pytest.skip(f"S3 unreachable: {exc}")
+        skip_live_unavailable(f"S3 unreachable: {exc}")
 
 
 def _assert_cropped(path, max_px=2000):

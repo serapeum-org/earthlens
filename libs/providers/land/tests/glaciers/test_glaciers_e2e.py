@@ -12,7 +12,6 @@ Run with:
 
 from __future__ import annotations
 
-import socket
 from pathlib import Path
 
 import pandas as pd
@@ -24,22 +23,9 @@ from earthlens.earthlens import EarthLens
 pytestmark = [pytest.mark.e2e, pytest.mark.glaciers]
 
 
-def _host_ok(host: str) -> bool:
-    """Return True when `host` is reachable on port 443."""
-    try:
-        socket.create_connection((host, 443), timeout=5).close()
-        return True
-    except OSError:
-        return False
-
-
-_rgi_skip = pytest.mark.skipif(
-    not _host_ok("ihp-wins.unesco.org"), reason="IHP-WINS host unreachable"
-)
-_glims_skip = pytest.mark.skipif(
-    not _host_ok("www.glims.org"), reason="GLIMS host unreachable"
-)
-_wgms_skip = pytest.mark.skipif(not _host_ok("wgms.ch"), reason="WGMS host unreachable")
+_rgi_skip = pytest.mark.requires_host("ihp-wins.unesco.org")
+_glims_skip = pytest.mark.requires_host("www.glims.org")
+_wgms_skip = pytest.mark.requires_host("wgms.ch")
 
 # A small bbox over the French Alps (region 11, Central Europe).
 ALPS_LAT = [45.8, 46.0]

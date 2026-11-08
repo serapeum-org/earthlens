@@ -17,15 +17,36 @@ import zipfile
 from pathlib import Path
 from types import SimpleNamespace
 
+import numpy as np
 import pandas as pd
 import pytest
 import requests
 
 from earthlens.base import SpatialExtent, TemporalExtent
+from earthlens.gee import ExtentDiscovery
 from earthlens.gee import backend as backend_module
 from earthlens.gee.backend import GEE
-from earthlens.gee.catalog import Dataset, Extent
-from earthlens.gee.cloud_masks import sentinel2_scl
+from earthlens.gee.catalog import Dataset, Extent, Preprocess
+from earthlens.gee.cloud_masks import (
+    BandFactor,
+    BandScaler,
+    CloudScorePlus,
+    LandsatSrMask,
+    Sentinel2Cdi,
+    Sentinel2Qa60Mask,
+    Sentinel2SclMask,
+    SpeckleFilter,
+    sentinel2_scl,
+)
+from earthlens.gee.filters import ByYear
+from earthlens.gee.recipes import preprocess as recipe_for
+from earthlens.gee.reducers import (
+    First,
+    LandsatComposite,
+    Percentile,
+    Sentinel2Composite,
+    temporal_reducer_for,
+)
 
 # -- fakes ------------------------------------------------------------------
 
@@ -48,6 +69,10 @@ class _FakeImage:
         self.calls.append(("clip", (geom,)))
         return self
 
+    def unmask(self, value):
+        self.calls.append(("unmask", (value,)))
+        return self
+
     def getDownloadURL(self, params):  # noqa: N802 - mirrors the ee API
         self.download_params = dict(params)
         self.download_params_list.append(dict(params))
@@ -59,7 +84,7 @@ class _FakeImageCollection:
 
     Chain methods (`filterDate`, `filterBounds`, `select`) return a new
     instance carrying the accumulated call log; the reducer convenience
-    methods (`mean`/`median`/`mosaic`/...) return a :class:`_FakeImage`.
+    methods (`mean`/`median`/`mosaic`/...) return a `_FakeImage`.
     """
 
     def __init__(self, source, calls: list | None = None):
@@ -132,6 +157,8 @@ class _FakeTask:
         self._error = error
         self.started = False
         self.poll_count = 0
+        self.task_id = "FAKETASK000000000000001"
+        self.operation_name = f"projects/earth-engine-415620/operations/{self.task_id}"
 
     def start(self):
         self.started = True
@@ -139,7 +166,11 @@ class _FakeTask:
     def status(self) -> dict:
         self.poll_count += 1
         state = self._states[min(self.poll_count - 1, len(self._states) - 1)]
-        out = {"state": state}
+        # `_cloud_api_utils.convert_operation_to_task` sets `id` and `name` on
+        # every submitted task, so a status carrying neither is not a shape the
+        # SDK produces — bar `{"state": "UNSUBMITTED"}`, which it answers for a
+        # task that was never started.
+        out = {"state": state, "id": self.task_id, "name": self.operation_name}
         if state == "FAILED" and self._error:
             out["error_message"] = self._error
         return out
@@ -180,8 +211,25 @@ class _FakeEE:
         self.image_log: list = []
         self.export_image = _FakeExportImage()
         self.batch = SimpleNamespace(Export=SimpleNamespace(image=self.export_image))
+        #: Records every `ee.data.computePixels` body and returns GeoTIFF bytes.
+        self.compute_pixels_calls: list[dict] = []
+        self.data = SimpleNamespace(computePixels=self._compute_pixels)
         self.authenticate_calls = 0
         self.initialize_calls: list[dict] = []
+        #: Records every stubbed `EarthEngineAuth.initialize`, host included.
+        self.auth_calls: list[dict] = []
+
+    def _compute_pixels(self, body):
+        """Record the request and return the bytes of a tiny real GeoTIFF."""
+        self.compute_pixels_calls.append(body)
+        return _TINY_GEOTIFF
+
+    def initialize_auth(self, service_account, service_key, project=None, host=None):
+        """Stand in for `EarthEngineAuth.initialize`, recording the host."""
+        self.auth_calls.append(
+            {"service_account": service_account, "project": project, "host": host}
+        )
+        return project or "fake-project"
 
     def Authenticate(self):  # noqa: N802 - mirrors the ee API
         self.authenticate_calls += 1
@@ -232,11 +280,23 @@ class _FakePyramidsHandle:
         # Real getDownloadURL tiles declare no no-data; the backend reads this
         # to inherit it rather than letting merge_rasters stamp its 0 default.
         self.no_data_value = no_data_value
+        # Enough of a raster for the declaring copy the nodata path builds.
+        self.geotransform = (31.2, 0.001, 0.0, 30.0, 0.0, -0.001)
+        self.epsg = 4326
+
+    def read_array(self, *args, **kwargs):
+        """Stand in for the pixel array; its identity is what is asserted."""
+        return [[1.0]]
 
     def to_file(self, path: str) -> None:
         from pathlib import Path as _Path
 
         _Path(path).write_bytes(self._body)
+
+    @property
+    def cog(self):
+        """Stand in for `Dataset.cog`, which the pixel path writes through."""
+        return _FakeCogWriter(self)
 
     opened_handles: list[_FakePyramidsHandle] = []
     closed_handles: list[_FakePyramidsHandle] = []
@@ -252,6 +312,11 @@ class _FakePyramidsHandle:
         _FakePyramidsHandle.closed_handles.append(self)
 
 
+#: Stand-in body for an `ee.data.computePixels` response. The pyramids reader is
+#: faked in these tests, so only its identity matters, not its format.
+_TINY_GEOTIFF = b"computepixels-geotiff-body"
+
+
 class _FakePyramidsDataset:
     """Stand-in for `pyramids.dataset.Dataset` — captures `from_*` calls."""
 
@@ -264,12 +329,24 @@ class _FakePyramidsDataset:
         cls.from_bytes_calls = []
         cls.from_archive_calls = []
         cls.read_file_calls = []
+        cls.from_array_calls = []
 
     @classmethod
     def read_file(cls, path, **kwargs):
         """Record the staged path and hand back a handle over its bytes."""
         cls.read_file_calls.append(str(path))
         return _FakePyramidsHandle(Path(path).read_bytes())
+
+    from_array_calls: list[dict] = []
+
+    @classmethod
+    def from_array(cls, arr, *, geo_ref=None, no_data_value=None, path=None):
+        """Record the declared no-data and hand back a handle carrying it."""
+        cls.from_array_calls.append({"no_data_value": no_data_value, "path": path})
+        handle = _FakePyramidsHandle(b"declared", no_data_value=(no_data_value,))
+        if path is not None:
+            Path(path).write_bytes(b"declared")
+        return handle
 
     @classmethod
     def from_bytes(
@@ -441,9 +518,7 @@ def fake_ee(monkeypatch) -> _FakeEE:
     monkeypatch.setattr(
         backend_module.EarthEngineAuth,
         "initialize",
-        staticmethod(
-            lambda service_account, service_key, project=None: project or "fake-project"
-        ),
+        staticmethod(fake.initialize_auth),
     )
     return fake
 
@@ -479,6 +554,235 @@ def make_gee(fake_ee, tmp_path):
 # -- tests ------------------------------------------------------------------
 
 
+class _PercentileReadyCollection:
+    """A fake collection supporting the `reduce` / `first` percentile chain."""
+
+    def __init__(self, band_names=("precipitation",)):
+        self.reduced_with = None
+        self._band_names = list(band_names)
+
+    def first(self):
+        return self
+
+    def bandNames(self):  # noqa: N802 - mirrors the Earth Engine method name
+        return self._band_names
+
+    def reduce(self, reducer):
+        self.reduced_with = reducer
+        return SimpleNamespace(rename=lambda names: ("renamed", reducer, tuple(names)))
+
+
+class TestReducerStringWidening:
+    """Task 4.6: percentile / trend are first-class `reducer=` strings."""
+
+    def _chirps(self, make_gee, **overrides):
+        """A GEE over a CHIRPS collection, the reducer under test applied."""
+        params = dict(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            start="2020-06-01",
+            end="2020-06-30",
+            scale=5566.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    def test_percentile_shorthand_is_accepted_at_construction(self, make_gee):
+        """`reducer="p90"` constructs and carries the string verbatim."""
+        gee = self._chirps(make_gee, reducer="p90")
+        assert gee.reducer == "p90"
+        assert temporal_reducer_for(gee.reducer).q == 90.0
+
+    def test_trend_is_accepted_at_construction(self, make_gee):
+        """`reducer="trend"` constructs and resolves to the linear-fit reducer."""
+        gee = self._chirps(make_gee, reducer="trend")
+        assert temporal_reducer_for(gee.reducer).name == "trend"
+
+    def test_sens_slope_is_accepted_at_construction(self, make_gee):
+        """`reducer="sens_slope"` constructs and resolves to the Theil-Sen reducer."""
+        gee = self._chirps(make_gee, reducer="sens_slope")
+        assert temporal_reducer_for(gee.reducer).name == "sens_slope"
+
+    @pytest.mark.parametrize("spec", ["p0", "p150", "percentile:0"])
+    def test_out_of_range_percentile_is_refused_at_construction(self, make_gee, spec):
+        """An out-of-range `p<q>` or `percentile:0` fails fast, not mid-download.
+
+        `percentile:0` is a valid region reducer but not a valid temporal one,
+        so `GEE(reducer=...)` — which validates through the temporal resolver —
+        refuses it at construction.
+        """
+        with pytest.raises(ValueError, match="0 < q <= 100"):
+            self._chirps(make_gee, reducer=spec)
+
+    def test_an_unknown_reducer_is_refused_at_construction(self, make_gee):
+        """An unparseable name is a construction error."""
+        with pytest.raises(ValueError, match="unsupported reducer"):
+            self._chirps(make_gee, reducer="average")
+
+    def test_the_ee_path_composites_with_the_percentile_reducer(
+        self, make_gee, monkeypatch
+    ):
+        """`reducer="p90"` reaches `ee.Reducer.percentile` on the Earth Engine path."""
+        from earthlens.gee import reducers as reducers_module
+
+        monkeypatch.setattr(
+            reducers_module,
+            "ee",
+            SimpleNamespace(
+                Reducer=SimpleNamespace(percentile=lambda qs: ("percentile", tuple(qs)))
+            ),
+        )
+        gee = self._chirps(make_gee, reducer="p90", temporal_resolution="raw")
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        collection = _PercentileReadyCollection()
+        units = list(
+            gee._composite(
+                collection, var_info, dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
+            )
+        )
+        assert len(units) == 1
+        assert collection.reduced_with == ("percentile", (90.0,))
+        assert units[0].image[0] == "renamed"
+
+
+class TestReducerInstanceWidening:
+    """Task 6.2: `reducer=` accepts a `TemporalReducer` instance."""
+
+    def _chirps(self, make_gee, **overrides):
+        """A GEE over a CHIRPS collection, the reducer under test applied."""
+        params = dict(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            start="2020-06-01",
+            end="2020-06-30",
+            scale=5566.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    def test_a_temporal_reducer_instance_is_accepted(self, make_gee):
+        """An already-built reducer constructs and is carried verbatim."""
+        reducer = Percentile(q=90)
+        gee = self._chirps(make_gee, reducer=reducer)
+        assert gee.reducer is reducer
+        assert temporal_reducer_for(gee.reducer) is reducer
+
+    @pytest.mark.parametrize(
+        "composite", [LandsatComposite(), Sentinel2Composite()], ids=type
+    )
+    def test_a_named_composite_instance_is_accepted(self, make_gee, composite):
+        """The named-algorithm composites pass construction-time validation."""
+        gee = self._chirps(make_gee, reducer=composite)
+        assert gee.reducer is composite
+
+    def test_a_region_only_instance_is_refused(self, make_gee):
+        """A region-only reducer instance fails fast at construction."""
+        reducer = First()
+        with pytest.raises(ValueError, match="region"):
+            self._chirps(make_gee, reducer=reducer)
+
+    def test_a_zero_percentile_instance_is_refused(self, make_gee):
+        """`Percentile(q=0)` is a region minimum, not a temporal reducer."""
+        reducer = Percentile(q=0)
+        with pytest.raises(ValueError, match="0 < q <= 100"):
+            self._chirps(make_gee, reducer=reducer)
+
+    def test_the_composite_engine_runs_the_named_algorithm(self, make_gee, monkeypatch):
+        """`reducer=LandsatComposite()` reaches `simpleComposite` per bucket."""
+        from earthlens.gee import reducers as reducers_module
+
+        recorded = {}
+        monkeypatch.setattr(
+            reducers_module,
+            "ee",
+            SimpleNamespace(
+                Algorithms=SimpleNamespace(
+                    Landsat=SimpleNamespace(
+                        simpleComposite=lambda **kwargs: (
+                            recorded.update(kwargs) or "landsat-composite-image"
+                        )
+                    )
+                )
+            ),
+        )
+        gee = self._chirps(
+            make_gee,
+            reducer=LandsatComposite(as_float=True),
+            temporal_resolution="raw",
+        )
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        units = list(
+            gee._composite(
+                "the-collection",
+                var_info,
+                dt.datetime(2020, 6, 1),
+                dt.datetime(2020, 7, 1),
+            )
+        )
+        assert len(units) == 1
+        assert units[0].image == "landsat-composite-image"
+        assert recorded["collection"] == "the-collection"
+        assert recorded["asFloat"] is True
+
+
+class TestCdiNeedsTheToaProduct:
+    """M1: CDI computes on L2A rather than failing, so the request is refused."""
+
+    def _s2(self, make_gee, asset, **overrides):
+        """A GEE over one Sentinel-2 row, the CDI op under test applied."""
+        params = dict(
+            variables={asset: ["B4"]},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    @pytest.mark.parametrize(
+        "asset", ["COPERNICUS/S2_SR_HARMONIZED", "COPERNICUS/S2_SR"]
+    )
+    def test_the_mask_is_refused_on_a_surface_reflectance_row(self, make_gee, asset):
+        """`cloud_mask=Sentinel2Cdi()` on L2A raises instead of masking wrongly."""
+        mask = Sentinel2Cdi()
+        with pytest.raises(ValueError, match="only valid on the Sentinel-2 TOA"):
+            self._s2(make_gee, asset, cloud_mask=mask)
+
+    def test_the_composite_is_refused_on_a_surface_reflectance_row(self, make_gee):
+        """`reducer=Sentinel2Composite()` maps the CDI mask, so it is refused too."""
+        reducer = Sentinel2Composite()
+        with pytest.raises(ValueError, match="sentinel2_composite"):
+            self._s2(make_gee, "COPERNICUS/S2_SR_HARMONIZED", reducer=reducer)
+
+    def test_a_chained_cdi_mask_is_found(self, make_gee):
+        """The walk reaches a CDI op nested inside a mask chain."""
+        chain = Sentinel2Qa60Mask() >> Sentinel2Cdi()
+        with pytest.raises(ValueError, match="Sentinel2Cdi"):
+            self._s2(make_gee, "COPERNICUS/S2_SR_HARMONIZED", cloud_mask=chain)
+
+    def test_the_toa_row_is_accepted(self, make_gee):
+        """The TOA product is what CDI is defined on, so it constructs."""
+        gee = self._s2(make_gee, "COPERNICUS/S2_HARMONIZED", cloud_mask=Sentinel2Cdi())
+        assert isinstance(gee.cloud_mask, Sentinel2Cdi)
+
+    def test_the_legacy_toa_row_is_accepted(self, make_gee):
+        """`COPERNICUS/S2` is the pre-harmonization TOA archive."""
+        gee = self._s2(make_gee, "COPERNICUS/S2", reducer=Sentinel2Composite())
+        assert isinstance(gee.reducer, Sentinel2Composite)
+
+    def test_a_non_sentinel2_row_is_left_to_earth_engine(self, make_gee):
+        """Only the detectable L2A case is refused; anything else is EE's call."""
+        gee = self._s2(
+            make_gee, "UCSB-CHG/CHIRPS/DAILY", cloud_mask=Sentinel2Cdi(), scale=5566.0
+        )
+        assert isinstance(gee.cloud_mask, Sentinel2Cdi)
+
+    def test_a_mask_without_cdi_is_unaffected(self, make_gee):
+        """An L2A request with an ordinary mask still constructs."""
+        gee = self._s2(
+            make_gee, "COPERNICUS/S2_SR_HARMONIZED", cloud_mask=Sentinel2SclMask()
+        )
+        assert isinstance(gee.cloud_mask, Sentinel2SclMask)
+
+
 class TestInit:
     """Tests for `GEE.__init__` and the captured attributes."""
 
@@ -507,9 +811,10 @@ class TestInit:
             make_gee(export_via="ftp")
 
     def test_cloud_mask_and_filters_default_to_none(self, make_gee):
-        """Omitting the hooks leaves `cloud_mask=None` and `filters=()`."""
+        """Omitting the hooks leaves `image_op` / `cloud_mask` None, `filters=()`."""
         gee = make_gee()
         assert gee.cloud_mask is None
+        assert gee.image_op is None
         assert gee.filters == ()
 
     def test_cloud_mask_and_filters_captured(self, make_gee):
@@ -519,9 +824,48 @@ class TestInit:
         assert gee.cloud_mask is _identity_mask
         assert gee.filters == (first, second)
 
+    def test_image_op_is_the_primary_hook(self, make_gee):
+        """`image_op=` sets the per-image hook, surfaced on both attributes."""
+        gee = make_gee(image_op=_identity_mask)
+        assert gee.image_op is _identity_mask
+        assert gee.cloud_mask is _identity_mask
+
+    def test_cloud_mask_is_a_permanent_alias_for_image_op(self, make_gee):
+        """`cloud_mask=` still works and surfaces as `image_op` too."""
+        gee = make_gee(cloud_mask=_identity_mask)
+        assert gee.image_op is _identity_mask
+        assert gee.cloud_mask is _identity_mask
+
+    def test_image_op_and_cloud_mask_together_raise(self, make_gee):
+        """Passing both names for the one hook is refused, not silently merged."""
+        with pytest.raises(ValueError, match="not both"):
+            make_gee(image_op=_identity_mask, cloud_mask=_identity_mask)
+
+    def test_non_callable_image_op_rejected(self, make_gee):
+        """A non-callable `image_op` raises `TypeError` at construction."""
+        with pytest.raises(TypeError, match="must be a callable"):
+            make_gee(image_op="not-callable")
+
+    def test_a_derived_band_request_is_declined_by_the_eedai_reader(self, make_gee):
+        """A computed index band needs server-side math, so it stays on EE (#1211)."""
+        from earthlens.gee.catalog import Catalog
+
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["NDVI"]}, scale=10.0)
+        var_info = Catalog().get_dataset("COPERNICUS/S2_SR_HARMONIZED")
+        assert gee._requests_derived_band(var_info) is True
+        assert gee._eedai_eligible(var_info) is False
+
+    def test_a_raw_band_request_is_not_flagged_derived(self, make_gee):
+        """A native band carries no derived formula, so the reader is not declined for it."""
+        from earthlens.gee.catalog import Catalog
+
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0)
+        var_info = Catalog().get_dataset("COPERNICUS/S2_SR_HARMONIZED")
+        assert gee._requests_derived_band(var_info) is False
+
     def test_non_callable_cloud_mask_rejected(self, make_gee):
         """A non-callable `cloud_mask` raises `TypeError` at construction."""
-        with pytest.raises(TypeError, match="cloud_mask must be a callable"):
+        with pytest.raises(TypeError, match="must be a callable"):
             make_gee(cloud_mask="not-callable")
 
     def test_non_iterable_filters_rejected(self, make_gee):
@@ -553,7 +897,7 @@ class TestInit:
     @pytest.mark.parametrize(
         "kwargs, match",
         [
-            ({"cloud_mask": "x"}, r"cloud_mask must be a callable"),
+            ({"cloud_mask": "x"}, r"must be a callable"),
             ({"filters": 42}, r"filters must be an iterable"),
             ({"filters": [object()]}, r"each entry in filters"),
         ],
@@ -877,12 +1221,12 @@ class TestDiscoverExtent:
     """Tests for the EE-side extent-discovery fallback (L3)."""
 
     def test_default_does_not_query_ee(self, make_gee, monkeypatch):
-        """`discover_extent=False` (the default) never calls `_discover_ee_extent`."""
+        """`discover_extent=False` (the default) never calls `ExtentDiscovery.discover`."""
         calls: list[str] = []
         monkeypatch.setattr(
-            GEE,
-            "_discover_ee_extent",
-            lambda self, var_info: calls.append(var_info.id) or (None, None),
+            ExtentDiscovery,
+            "discover",
+            lambda self, asset_id: calls.append(asset_id) or (None, None),
         )
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
@@ -903,11 +1247,11 @@ class TestDiscoverExtent:
         ee_max = dt.datetime(2025, 12, 15)
         calls: list[str] = []
 
-        def _fake_discover(self, var_info):
-            calls.append(var_info.id)
+        def _fake_discover(self, asset_id):
+            calls.append(asset_id)
             return dt.datetime(1981, 1, 1), ee_max
 
-        monkeypatch.setattr(GEE, "_discover_ee_extent", _fake_discover)
+        monkeypatch.setattr(ExtentDiscovery, "discover", _fake_discover)
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
             scale=5566.0,
@@ -925,7 +1269,7 @@ class TestDiscoverExtent:
         assert calls == ["UCSB-CHG/CHIRPS/DAILY"]
 
     def test_discover_extent_falls_back_to_now_on_failure(self, make_gee, monkeypatch):
-        """If `_discover_ee_extent` returns `(None, None)`, fall back to `now()`."""
+        """If `ExtentDiscovery.discover` returns `(None, None)`, fall back to `now()`."""
         fixed_now = dt.datetime(2026, 5, 13)
 
         class _FixedDatetime(dt.datetime):
@@ -935,9 +1279,9 @@ class TestDiscoverExtent:
 
         monkeypatch.setattr(backend_module.dt, "datetime", _FixedDatetime)
         monkeypatch.setattr(
-            GEE,
-            "_discover_ee_extent",
-            lambda self, var_info: (None, None),
+            ExtentDiscovery,
+            "discover",
+            lambda self, asset_id: (None, None),
         )
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
@@ -950,8 +1294,8 @@ class TestDiscoverExtent:
         _, end_excl = gee._clamp_window_to_extent(ds)
         assert end_excl == fixed_now + dt.timedelta(days=1)
 
-    def test_real_discover_queries_reduce_columns(self, make_gee, monkeypatch):
-        """`_discover_ee_extent` issues `reduceColumns(minMax, system:time_start)`."""
+    def test_real_discover_queries_reduce_columns(self):
+        """`ExtentDiscovery.discover` issues `reduceColumns(minMax, system:time_start)`."""
         captured: dict = {}
 
         class _FakeReducer:
@@ -973,14 +1317,10 @@ class TestDiscoverExtent:
                 captured["properties"] = properties
                 return _FakeReducedFC()
 
-        gee = make_gee(discover_extent=True)
-        monkeypatch.setattr(
-            backend_module.ee, "ImageCollection", _FakeCollection, raising=False
+        fake_ee = SimpleNamespace(ImageCollection=_FakeCollection, Reducer=_FakeReducer)
+        min_dt, max_dt = ExtentDiscovery(ee_module=fake_ee).discover(
+            "UCSB-CHG/CHIRPS/DAILY"
         )
-        monkeypatch.setattr(backend_module.ee, "Reducer", _FakeReducer, raising=False)
-
-        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        min_dt, max_dt = gee._discover_ee_extent(ds)
         assert captured["asset"] == "UCSB-CHG/CHIRPS/DAILY"
         assert captured["reducer"] == "REDUCER:minMax"
         assert captured["properties"] == ["system:time_start"]
@@ -991,8 +1331,8 @@ class TestDiscoverExtent:
             1750000000, tz=dt.timezone.utc
         ).replace(tzinfo=None)
 
-    def test_real_discover_swallows_ee_errors(self, make_gee, monkeypatch):
-        """Network / EE failures inside `_discover_ee_extent` return `(None, None)`."""
+    def test_real_discover_swallows_ee_errors(self):
+        """Network / EE failures inside `discover` return `(None, None)`."""
 
         class _ExplodingCollection:
             def __init__(self, asset_id):
@@ -1001,21 +1341,16 @@ class TestDiscoverExtent:
             def reduceColumns(self, reducer, properties):  # noqa: N802
                 raise RuntimeError("network down")
 
-        gee = make_gee(discover_extent=True)
-        monkeypatch.setattr(
-            backend_module.ee, "ImageCollection", _ExplodingCollection, raising=False
+        fake_ee = SimpleNamespace(
+            ImageCollection=_ExplodingCollection,
+            Reducer=SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
         )
-        monkeypatch.setattr(
-            backend_module.ee,
-            "Reducer",
-            SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
-            raising=False,
+        assert ExtentDiscovery(ee_module=fake_ee).discover("UCSB-CHG/CHIRPS/DAILY") == (
+            None,
+            None,
         )
 
-        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        assert gee._discover_ee_extent(ds) == (None, None)
-
-    def test_real_discover_returns_none_on_empty_minmax(self, make_gee, monkeypatch):
+    def test_real_discover_returns_none_on_empty_minmax(self):
         """An empty collection (no `min`/`max` keys) yields `(None, None)`."""
 
         class _EmptyReducedFC:
@@ -1029,28 +1364,68 @@ class TestDiscoverExtent:
             def reduceColumns(self, reducer, properties):  # noqa: N802
                 return _EmptyReducedFC()
 
-        gee = make_gee(discover_extent=True)
-        monkeypatch.setattr(
-            backend_module.ee, "ImageCollection", _EmptyCollection, raising=False
+        fake_ee = SimpleNamespace(
+            ImageCollection=_EmptyCollection,
+            Reducer=SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
         )
-        monkeypatch.setattr(
-            backend_module.ee,
-            "Reducer",
-            SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
-            raising=False,
+        assert ExtentDiscovery(ee_module=fake_ee).discover("UCSB-CHG/CHIRPS/DAILY") == (
+            None,
+            None,
         )
-        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        assert gee._discover_ee_extent(ds) == (None, None)
+
+    def test_cached_counts_one_query_then_reuses_it(self):
+        """`cached` queries once per asset, including a `(None, None)` result."""
+
+        class _Collection:
+            count = 0
+
+            def __init__(self, asset_id):
+                type(self).count += 1
+
+            def reduceColumns(self, reducer, properties):  # noqa: N802
+                return SimpleNamespace(getInfo=lambda: {})
+
+        fake_ee = SimpleNamespace(
+            ImageCollection=_Collection,
+            Reducer=SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
+        )
+        disc = ExtentDiscovery(ee_module=fake_ee)
+        assert disc.cached("A/B", enabled=True) == (None, None)
+        assert disc.cached("A/B", enabled=True) == (None, None)
+        assert _Collection.count == 1
+        disc.clear()
+        disc.cached("A/B", enabled=True)
+        assert _Collection.count == 2
+
+    def test_cached_disabled_never_queries(self):
+        """`cached(enabled=False)` returns `(None, None)` without a round trip."""
+
+        class _Collection:
+            count = 0
+
+            def __init__(self, asset_id):
+                type(self).count += 1
+
+            def reduceColumns(self, reducer, properties):  # noqa: N802
+                return SimpleNamespace(getInfo=lambda: {"min": 0, "max": 0})
+
+        fake_ee = SimpleNamespace(
+            ImageCollection=_Collection,
+            Reducer=SimpleNamespace(minMax=lambda: "REDUCER:minMax"),
+        )
+        disc = ExtentDiscovery(ee_module=fake_ee)
+        assert disc.cached("A/B", enabled=False) == (None, None)
+        assert _Collection.count == 0
 
     def test_extent_cache_survives_a_none_result(self, make_gee, monkeypatch):
         """A `(None, None)` result still populates the cache (no repeat queries)."""
         calls: list[str] = []
 
-        def _fake_discover(self, var_info):
-            calls.append(var_info.id)
+        def _fake_discover(self, asset_id):
+            calls.append(asset_id)
             return None, None
 
-        monkeypatch.setattr(GEE, "_discover_ee_extent", _fake_discover)
+        monkeypatch.setattr(ExtentDiscovery, "discover", _fake_discover)
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
             scale=5566.0,
@@ -1059,8 +1434,8 @@ class TestDiscoverExtent:
             discover_extent=True,
         )
         ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        gee._maybe_discover_ee_extent(ds)
-        gee._maybe_discover_ee_extent(ds)
+        gee._clamp_window_to_extent(ds)
+        gee._clamp_window_to_extent(ds)
         assert calls == ["UCSB-CHG/CHIRPS/DAILY"]
 
     def test_extent_cache_is_shared_across_gee_instances(
@@ -1071,14 +1446,14 @@ class TestDiscoverExtent:
         """L5: a second `GEE(...)` reuses the cached extent — no extra round trip."""
         calls: list[str] = []
 
-        def _fake_discover(self, var_info):
-            calls.append(var_info.id)
+        def _fake_discover(self, asset_id):
+            calls.append(asset_id)
             return (
                 dt.datetime(2020, 1, 1),
                 dt.datetime(2024, 12, 31),
             )
 
-        monkeypatch.setattr(GEE, "_discover_ee_extent", _fake_discover)
+        monkeypatch.setattr(ExtentDiscovery, "discover", _fake_discover)
 
         gee_a = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
@@ -1088,9 +1463,9 @@ class TestDiscoverExtent:
             discover_extent=True,
         )
         ds = gee_a.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        gee_a._maybe_discover_ee_extent(ds)
+        gee_a._clamp_window_to_extent(ds)
 
-        # Fresh instance — should hit the module-level cache, not re-query EE.
+        # Fresh instance — should hit the shared singleton cache, not re-query EE.
         gee_b = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
             scale=5566.0,
@@ -1098,7 +1473,7 @@ class TestDiscoverExtent:
             end="2099-01-01",
             discover_extent=True,
         )
-        gee_b._maybe_discover_ee_extent(ds)
+        gee_b._clamp_window_to_extent(ds)
 
         assert calls == ["UCSB-CHG/CHIRPS/DAILY"], (
             f"second instance should hit the shared cache; got {calls}"
@@ -1110,11 +1485,11 @@ class TestDiscoverExtent:
 
         calls: list[str] = []
 
-        def _fake_discover(self, var_info):
-            calls.append(var_info.id)
+        def _fake_discover(self, asset_id):
+            calls.append(asset_id)
             return (None, None)
 
-        monkeypatch.setattr(GEE, "_discover_ee_extent", _fake_discover)
+        monkeypatch.setattr(ExtentDiscovery, "discover", _fake_discover)
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
             scale=5566.0,
@@ -1123,9 +1498,9 @@ class TestDiscoverExtent:
             discover_extent=True,
         )
         ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
-        gee._maybe_discover_ee_extent(ds)
+        gee._clamp_window_to_extent(ds)
         clear_extent_cache()
-        gee._maybe_discover_ee_extent(ds)
+        gee._clamp_window_to_extent(ds)
         assert calls == ["UCSB-CHG/CHIRPS/DAILY", "UCSB-CHG/CHIRPS/DAILY"]
 
 
@@ -1231,10 +1606,12 @@ class TestExportViaAsset:
         with pytest.raises(ValueError, match="export_via='asset' requires asset_id"):
             make_gee(export_via="asset")
 
-    def test_unknown_export_via_lists_asset_too(self, make_gee):
-        """The updated ValueError message advertises `'asset'` as a valid sink."""
-        with pytest.raises(ValueError, match="'url', 'drive', 'gcs', or 'asset'"):
+    def test_unknown_export_via_lists_every_sink(self, make_gee):
+        """The message names all four sinks, derived from the registry."""
+        with pytest.raises(ValueError) as caught:
             make_gee(export_via="ftp")
+        message = str(caught.value)
+        assert all(name in message for name in ("url", "drive", "gcs", "asset"))
 
     def test_asset_export_queues_to_asset_and_returns_ee_uri(self, make_gee):
         """An Asset export queues a `toAsset` task and returns `ee://<asset>/<prefix>`."""
@@ -1331,6 +1708,36 @@ class TestBuildCollection:
             (_identity_mask,)
         ]
 
+    def test_an_expression_index_is_requestable_through_the_facade(self, make_gee):
+        """EVI (an expression index) constructs and builds with default flags (C1)."""
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["EVI"]}, scale=10.0)
+        ds = gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED")
+        col = gee._build_collection(
+            ds, ["EVI"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 2)
+        )
+        assert "map" in col.method_names(), (
+            "an expression index must construct and be materialised, not refused "
+            "at construction when no scaled=/preprocess= flag is set"
+        )
+
+    def test_derived_index_band_mapped_before_select(self, make_gee):
+        """A requested derived index band is `.map`-materialised before the select."""
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["NDVI"]}, scale=10.0)
+        ds = gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED")
+        col = gee._build_collection(
+            ds, ["NDVI"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 2)
+        )
+        assert col.method_names() == ["filterDate", "filterBounds", "map", "select"], (
+            "the derived-band materialiser must be mapped before the band select"
+        )
+        from earthlens.gee.backend import _AddDerivedBands
+
+        mapped = [args for name, args in col.calls if name == "map"]
+        assert len(mapped) == 1, "exactly one op must be mapped"
+        assert isinstance(mapped[0][0], _AddDerivedBands), (
+            "the mapped op must be the _AddDerivedBands materialiser"
+        )
+
     def test_filters_then_cloud_mask_then_select(self, make_gee, monkeypatch):
         """On a collection the order is filters → cloud_mask → select, with no warning."""
         warnings: list[str] = []
@@ -1405,6 +1812,51 @@ class TestBuildCollection:
             ds, ["elevation"], dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13)
         )
         assert any("static single-image" in w for w in warnings), warnings
+
+
+_JUNE_TIMES = ["2021-06-01", "2021-06-11", "2021-06-21"]
+
+
+class TestInMemoryStackReduces:
+    """The reader's in-memory scene stack reduces directly, with no spill.
+
+    `pyramids_eo.collection_from_earthengine` returns an in-memory
+    `DatasetCollection` (`.files is None`). Since pyramids-core 0.73.0 its
+    `reduce_time` consumes that in-memory collection directly, so the backend
+    reduces the stack as-is rather than spilling it to COGs first (#1336).
+    """
+
+    def test_an_in_memory_stack_reduces_without_spilling(self):
+        """An in-memory stack reduces straight through `reduce_stack`."""
+        stack = _build_fake_stack([10.0, 20.0, 30.0], _JUNE_TIMES)
+        assert stack.files is None  # the reader's real shape: in-memory
+        reduced = temporal_reducer_for("median").reduce_stack(stack, _JUNE_TIMES)
+        median = np.asarray(reduced.read_array()).ravel()[0]
+        assert median == 20.0, f"median of 10/20/30 should be 20, got {median}"
+
+    def test_a_percentile_also_reduces_an_in_memory_stack(self):
+        """A parameterised reducer consumes the in-memory stack too."""
+        stack = _build_fake_stack([10.0, 20.0, 30.0], _JUNE_TIMES)
+        assert stack.files is None
+        reduced = temporal_reducer_for("p90").reduce_stack(stack, _JUNE_TIMES)
+        value = np.asarray(reduced.read_array()).ravel()[0]
+        assert value == 28.0, f"p90 of 10/20/30 should be 28, got {value}"
+
+    def test_the_reduced_dataset_survives_closing_the_stack(self):
+        """The reduced Dataset outlives `close_quietly(stack)` — it is buffer-independent.
+
+        The backend closes the in-memory scene stack in a `finally` immediately
+        after `reduce_stack` returns, before the caller reads the result; this
+        pins that the reduced Dataset copies its values rather than lazily
+        viewing the stack's buffers, so closing the stack cannot corrupt it.
+        """
+        stack = _build_fake_stack([10.0, 20.0, 30.0], _JUNE_TIMES)
+        reduced = temporal_reducer_for("median").reduce_stack(stack, _JUNE_TIMES)
+        backend_module.close_quietly(stack)
+        median = np.asarray(reduced.read_array()).ravel()[0]
+        assert median == 20.0, (
+            f"reduced dataset must survive the stack being closed, got {median}"
+        )
 
 
 class TestComposite:
@@ -1522,8 +1974,14 @@ class TestApi:
             lon_lim=[0.0, 40.0],
             scale=30.0,
         )
-        with pytest.raises(ValueError, match="32768-px"):
+        with pytest.raises(ValueError, match=r"32,?768-px") as caught:
             gee.download(progress_bar=False)
+        message = str(caught.value)
+        # The message names the estimated dimensions and the per-axis cap the
+        # request tripped, and offers a way out rather than only refusing.
+        assert "148427x148427" in message
+        assert "32,768-px per-axis cap" in message
+        assert "auto_split=True" in message
 
     def test_missing_scale_raises(self, make_gee):
         """`_api` raises when there is no `scale` and no dataset `spatial_resolution`."""
@@ -1959,7 +2417,9 @@ class _FakeCogWriter:
     def to_cog(self, path, **kwargs):
         self._dataset.written = str(path)
         self._dataset.wrote_cog = True
-        Path(path).write_bytes(b"eedai-cog")
+        # The pixel path's handle carries the fetched bytes, so write those when
+        # there are any; the EEDAI dataset has none and keeps its marker.
+        Path(path).write_bytes(getattr(self._dataset, "_body", b"eedai-cog"))
         return Path(path)
 
 
@@ -2044,19 +2504,65 @@ def _bind_to_real_signature(name: str, asset_id: str, kwargs: dict) -> None:
         ) from exc
 
 
+def _build_fake_stack(values, times):
+    """Build an **in-memory** `DatasetCollection` of constant scenes with times.
+
+    Mirrors what `pyramids_eo.collection_from_earthengine` actually returns: an
+    in-memory `DatasetCollection(datasets=...)` of warped scenes, one per
+    timestep. It used to be built file-backed here so pyramids `reduce_time`
+    (which `reduce_stack` uses) could read it — but that diverged from the real
+    reader and hid the defect where a `median` / `percentile` / `trend` EEDAI
+    composite failed with `DatasetCollection.data requires a file-backed
+    collection`. Since pyramids-core 0.73.0 `reduce_time` consumes an in-memory
+    collection directly, so the backend reduces this stack as-is and the fake is
+    realistic again (#1336). Each scene is a constant 2x2 raster, so the
+    per-pixel reduction has a value the parity test can predict.
+    """
+    from pyramids.dataset import Dataset, DatasetCollection
+    from pyramids.dataset.dataset import GeoReference
+
+    geo = GeoReference(top_left_corner=(31.2, 30.0), cell_size=0.05, epsg=4326)
+    scenes = [
+        Dataset.from_array(
+            np.full((2, 2), float(value)), geo_ref=geo, no_data_value=-9999.0
+        )
+        for value in values
+    ]
+    return DatasetCollection(
+        scenes[0], time_length=len(scenes), datasets=scenes, time=list(times)
+    )
+
+
 class _FakeReaderModule:
-    """Stand-in for `pyramids_eo.earthengine`; records `from_earthengine`."""
+    """Stand-in for `pyramids_eo.earthengine`; records the reader calls."""
 
     Window = _FakeWindow
 
     def __init__(self):
         self.calls: list[tuple[str, dict]] = []
         self.cost_calls: list[tuple[str, dict]] = []
+        self.collection_calls: list[tuple[str, dict]] = []
         self.dataset = _FakeEedaiDataset()
         # A small, servable collection by default; tests override per case.
         self.cost = SimpleNamespace(scene_count=3, min_pixel_size=5566.0)
         self.cost_error: Exception | None = None
         self.read_error: Exception | None = None
+        #: Per-scene constant values and acquisition times for the stack the
+        #: fake `collection_from_earthengine` hands back; the parity test
+        #: overrides them to a known distribution.
+        self.collection_values: list[float] = [1.0, 5.0, 9.0]
+        self.collection_times: list[str] = [
+            "2020-06-01",
+            "2020-06-02",
+            "2020-06-03",
+        ]
+
+    def collection_from_earthengine(self, asset_id, **kwargs):
+        _bind_to_real_signature("collection_from_earthengine", asset_id, kwargs)
+        self.collection_calls.append((asset_id, kwargs))
+        if self.read_error is not None:
+            raise self.read_error
+        return _build_fake_stack(self.collection_values, self.collection_times)
 
     def estimate_earthengine_cost(self, asset_id, **kwargs):
         _bind_to_real_signature("estimate_earthengine_cost", asset_id, kwargs)
@@ -2092,7 +2598,18 @@ class _FakeReaderModule:
 def fake_reader(monkeypatch):
     """Patch the guarded pyramids-eo loader with an in-memory fake reader."""
     reader = _FakeReaderModule()
-    monkeypatch.setattr(backend_module, "import_earthengine_reader", lambda: reader)
+    # Patched on the reader module, which is where the import now happens: the
+    # backend reaches pyramids-eo through `EedaiReader`, so that adapter owns
+    # the lock and the identity check around every call.
+    from earthlens.gee import reader as reader_module
+
+    monkeypatch.setattr(reader_module, "import_earthengine_reader", lambda: reader)
+    # `engines.reader_refusal_types()` deliberately runs for real here, rather
+    # than against this fake. It is total since it learned to catch the loader's
+    # ImportError, so it resolves with or without the `[eedai]` extra, and
+    # leaving it unpatched means these tests exercise the production refusal
+    # types instead of a stand-in — the expression whose breakage started this
+    # branch is then covered by every test that reaches a late refusal.
     reader.credential_builds = []
     monkeypatch.setattr(
         backend_module,
@@ -2170,7 +2687,11 @@ class TestPropertyFilter:
     )
     def test_well_formed_filters_are_accepted(self, make_gee, good):
         """Legitimate expressions, including quoted separators, pass."""
-        assert make_gee(property_filter=good).property_filter == good
+        from earthlens.gee import PropertyFilter
+
+        gee = make_gee(property_filter=good)
+        assert gee.property_filter == PropertyFilter(expression=good)
+        assert gee.property_filter.to_ogr() == good
 
     def test_property_filter_warns_when_earth_engine_serves_the_request(
         self, make_gee, fake_reader, monkeypatch
@@ -2271,8 +2792,15 @@ class TestEedaiCollections:
         params.update(overrides)
         return make_gee(**params)
 
-    def test_composite_kwargs_are_forwarded_to_the_reader(self, make_gee, fake_reader):
-        """The reader is asked to composite the bucket's window with the reducer."""
+    def test_the_scene_stack_is_fetched_for_the_bucket_window(
+        self, make_gee, fake_reader
+    ):
+        """The collection read asks for the bucket's scene stack, reduced client-side.
+
+        The reducer is applied by pyramids' `reduce_time` on the returned stack,
+        not handed to the reader, so the collection call carries the window and
+        bands but no `reducer=` keyword.
+        """
         gee = self._collection_gee(make_gee)
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
@@ -2280,12 +2808,47 @@ class TestEedaiCollections:
         gee._export_via_eedai(
             var_info, ["precipitation"], 5566.0, "chirps", plan, self.START, self.END
         )
-        _asset_id, kwargs = fake_reader.calls[0]
+        assert fake_reader.calls == [], "a collection must not use from_earthengine"
+        _asset_id, kwargs = fake_reader.collection_calls[0]
         assert kwargs["start"] == "2020-06-01"
         # The reader's `end` is inclusive while this backend's bucket end is
         # exclusive, so the last covered day is what must be sent.
         assert kwargs["end"] == "2020-06-30"
-        assert kwargs["reducer"] == var_info.default_reducer
+        assert kwargs["bands"] == ["precipitation"]
+        assert "reducer" not in kwargs
+
+    def test_median_composite_equals_the_numpy_median(self, make_gee, fake_reader):
+        """An EEDAI median equals `np.nanmedian` over the scene stack.
+
+        The fix this proves: the composite is pyramids' true per-pixel median of
+        the fetched stack, not whatever the reader's own `reducer=` returned.
+        """
+        from pyramids.dataset import Dataset as _PyramidsDataset
+
+        gee = self._collection_gee(make_gee, reducer="median")
+        fake_reader.collection_values = [2.0, 4.0, 9.0, 11.0]
+        fake_reader.collection_times = [
+            "2020-06-01",
+            "2020-06-08",
+            "2020-06-15",
+            "2020-06-22",
+        ]
+        fake_reader.cost = SimpleNamespace(scene_count=4, min_pixel_size=5566.0)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert plan.can_serve, plan.reason
+        target = gee._export_via_eedai(
+            var_info,
+            ["precipitation"],
+            5566.0,
+            "chirps_med",
+            plan,
+            self.START,
+            self.END,
+        )
+        written = _PyramidsDataset.read_file(str(target))
+        expected = float(np.nanmedian(np.array([2.0, 4.0, 9.0, 11.0])))
+        assert np.asarray(written.read_array()).ravel()[0] == pytest.approx(expected)
 
     def test_single_image_read_sends_no_composite_kwargs(self, make_gee, fake_reader):
         """A static image is read directly, with no start/end/reducer."""
@@ -2441,14 +3004,14 @@ class TestEedaiCollections:
         written = gee.download(progress_bar=False)
         assert len(written) == 3, f"one file per month expected, got {written}"
         assert all(Path(p).is_file() for p in written), written
-        assert len(fake_reader.calls) == 3, (
+        assert len(fake_reader.collection_calls) == 3, (
             "each month must be composited by the reader, not by Earth Engine"
         )
         assert len(fake_reader.cost_calls) == 3, (
             "scene discovery costs one query per bucket, no more and no fewer: "
             f"{len(fake_reader.cost_calls)}"
         )
-        windows = [(k["start"], k["end"]) for _asset, k in fake_reader.calls]
+        windows = [(k["start"], k["end"]) for _asset, k in fake_reader.collection_calls]
         assert windows == [
             ("2020-06-01", "2020-06-30"),
             ("2020-07-01", "2020-07-31"),
@@ -2468,7 +3031,9 @@ class TestEedaiCollections:
         )
         written = gee.download(progress_bar=False)
         assert len(written) == 3, f"the fallback dropped buckets: {written}"
-        assert fake_reader.calls == [], "the declined reducer still reached the reader"
+        assert fake_reader.collection_calls == [], (
+            "the declined reducer still reached the reader"
+        )
 
     def test_the_region_is_reprojected_once_across_buckets(self, make_gee, fake_reader):
         """A many-bucket run must not warp the same region once per bucket.
@@ -2532,11 +3097,62 @@ class TestEedaiCollections:
         assert not plan.can_serve
         assert "last-wins" in plan.reason
 
+    @pytest.mark.parametrize(
+        "composite", [LandsatComposite(), Sentinel2Composite()], ids=type
+    )
+    def test_named_composites_are_declined_before_any_network_call(
+        self, make_gee, fake_reader, composite
+    ):
+        """The named algorithms exist only server-side, so the reader declines."""
+        gee = self._collection_gee(make_gee, reducer=composite)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert not plan.can_serve
+        assert "named algorithm" in plan.reason
+        assert fake_reader.cost_calls == [], (
+            "the unsupported reducer should be caught before scene discovery"
+        )
+
     def test_a_supported_reducer_still_serves(self, make_gee, fake_reader):
         """A statistical reducer is unaffected by the mosaic decline."""
         gee = self._collection_gee(make_gee, reducer="median")
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         assert gee._eedai_collection_fits(var_info, 1, self.START, self.END).can_serve
+
+    @pytest.mark.parametrize("reducer", ["percentile:90", "p90", "trend", "sens_slope"])
+    def test_epic4_reducers_reach_the_client_path(self, make_gee, fake_reader, reducer):
+        """percentile / trend / sens_slope are admitted: reduce_stack expresses them."""
+        gee = self._collection_gee(make_gee, reducer=reducer)
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert plan.can_serve, plan.reason
+
+    def test_a_percentile_collection_is_composited_client_side(
+        self, make_gee, fake_reader
+    ):
+        """A percentile collection reduces through reduce_stack, not forced to EE."""
+        from pyramids.dataset import Dataset as _PyramidsDataset
+
+        gee = self._collection_gee(make_gee, reducer="p90")
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = gee._eedai_collection_fits(var_info, 1, self.START, self.END)
+        assert plan.can_serve, plan.reason
+        target = gee._export_via_eedai(
+            var_info,
+            ["precipitation"],
+            5566.0,
+            "chirps_p90",
+            plan,
+            self.START,
+            self.END,
+        )
+        assert fake_reader.calls == [], (
+            "a client composite must not use from_earthengine"
+        )
+        assert fake_reader.collection_calls, "the reader must fetch the scene stack"
+        written = _PyramidsDataset.read_file(str(target))
+        expected = float(np.nanpercentile(np.array([1.0, 5.0, 9.0]), 90))
+        assert np.asarray(written.read_array()).ravel()[0] == pytest.approx(expected)
 
     def test_discovery_uses_the_regions_bounds_not_the_bbox(
         self, make_gee, fake_reader
@@ -2787,7 +3403,7 @@ class TestEedaiCollections:
         )
         _cid, cost_kwargs = fake_reader.cost_calls[0]
         assert cost_kwargs["property_filter"] == "CLOUDY_PIXEL_PERCENTAGE < 20"
-        _rid, read_kwargs = fake_reader.calls[0]
+        _rid, read_kwargs = fake_reader.collection_calls[0]
         assert read_kwargs["property_filter"] == "CLOUDY_PIXEL_PERCENTAGE < 20"
 
     def test_no_property_filter_sends_none_to_the_reader(self, make_gee, fake_reader):
@@ -2798,8 +3414,43 @@ class TestEedaiCollections:
         gee._export_via_eedai(
             var_info, ["precipitation"], 5566.0, "chirps", plan, self.START, self.END
         )
-        _rid, read_kwargs = fake_reader.calls[0]
+        _rid, read_kwargs = fake_reader.collection_calls[0]
         assert "property_filter" not in read_kwargs
+
+    def test_estimate_cost_returns_the_reader_readcost(self, make_gee, fake_reader):
+        """`estimate_cost()` surfaces the reader's `ReadCost` for the request."""
+        gee = self._collection_gee(make_gee)
+        fake_reader.cost = SimpleNamespace(
+            scene_count=12, max_width=4096, max_height=2048, min_pixel_size=5566.0
+        )
+        cost = gee.estimate_cost()
+        assert cost is fake_reader.cost
+        asset_id, kwargs = fake_reader.cost_calls[0]
+        assert asset_id == "UCSB-CHG/CHIRPS/DAILY"
+        assert (kwargs["start"], kwargs["end"]) == ("2020-06-01", "2020-06-30")
+        assert kwargs["crs"] == "EPSG:4326"
+        assert kwargs["bbox"] == (31.2, 29.9, 31.3, 30.0)
+
+    def test_estimate_cost_passes_the_property_filter(self, make_gee, fake_reader):
+        """`estimate_cost()` forwards the validated filter as its OGR string."""
+        gee = self._collection_gee(
+            make_gee, property_filter="CLOUDY_PIXEL_PERCENTAGE < 20"
+        )
+        gee.estimate_cost()
+        _asset, kwargs = fake_reader.cost_calls[0]
+        assert kwargs["property_filter"] == "CLOUDY_PIXEL_PERCENTAGE < 20"
+
+    def test_estimate_cost_rejects_a_multi_dataset_request(self, make_gee, fake_reader):
+        """A multi-dataset request cannot yield one `ReadCost`, so it is refused."""
+        gee = self._collection_gee(
+            make_gee,
+            variables={
+                "UCSB-CHG/CHIRPS/DAILY": ["precipitation"],
+                "USGS/SRTMGL1_003": ["elevation"],
+            },
+        )
+        with pytest.raises(ValueError, match="sizes a single dataset"):
+            gee.estimate_cost()
 
 
 class TestEedaiProjectedCrs:
@@ -3172,6 +3823,11 @@ class TestForcedEngineRemedies:
         ("reason", "expected"),
         [
             ("the reducer 'mosaic' is last-wins upstream", "statistical reducer"),
+            (
+                "reducer='landsat_composite' runs Earth Engine's named algorithm "
+                "ee.Algorithms.Landsat.simpleComposite",
+                "only on Earth Engine",
+            ),
             ("the EEDAI credential could not be built", "service key"),
             ("X has no native resolution to size the read", "spatial_resolution"),
             (
@@ -3750,7 +4406,7 @@ class TestExportViaEedai:
         """
         gee = make_gee()
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        declined = backend_module.EedaiPlan(False, None, 0, "nope")
+        declined = backend_module.EnginePlan.declined("nope")
         with pytest.raises(ValueError, match="cannot serve"):
             gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev", declined)
         assert not fake_reader.calls
@@ -3799,7 +4455,11 @@ class TestExportViaEedai:
         pixel count modest while splitting into thousands of tiles, each its
         own fetch, all opened together to mosaic.
         """
-        gee = make_gee(lat_lim=[0.0, 89.0], lon_lim=[0.0, 0.1], scale=1.0)
+        # Off the equator and very narrow, so the strip stays well inside the
+        # total-work budget (1.4e9 px of 4e9) while splitting into 1223 tiles.
+        # The old AOI reached from the equator to 89 deg, which now sizes its
+        # full equatorial width and trips the work budget first instead.
+        gee = make_gee(lat_lim=[60.0, 82.5], lon_lim=[0.0, 0.01], scale=1.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003").model_copy(
             update={"spatial_resolution": 1.0}
         )
@@ -3989,3 +4649,825 @@ class TestExportViaEedai:
         )
         assert not fake_reader.calls
         assert image.download_params is not None
+
+
+class TestCallableHookInstances:
+    """Task 6.1: frozen mask/filter instances are drop-ins for the hooks."""
+
+    def test_instances_flow_through_build_collection(self, make_gee):
+        """Class instances pass validation and run through `_build_collection`."""
+        mask = LandsatSrMask()
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+            cloud_mask=mask,
+            filters=[ByYear(year=2020)],
+        )
+        assert gee.cloud_mask is mask
+        assert gee.filters == (ByYear(year=2020),)
+        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        col = gee._build_collection(
+            ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 7, 1)
+        )
+        assert col.method_names() == [
+            "filterDate",
+            "filterBounds",
+            "filterDate",
+            "map",
+            "select",
+        ]
+        # The second filterDate is ByYear(2020) executing through the hook.
+        assert [args for name, args in col.calls if name == "filterDate"][1] == (
+            "2020-01-01",
+            "2021-01-01",
+        )
+        assert [args for name, args in col.calls if name == "map"] == [(mask,)]
+
+
+class TestWorkloadTagMethod:
+    """Task 6.9: `GEE.workload_tag` hands out the nest-safe billing scope."""
+
+    def test_it_returns_a_validated_workload_tag(self, make_gee):
+        """The method wraps the tag in a `WorkloadTag` value object."""
+        from earthlens.gee.workload import WorkloadTag
+
+        scope = make_gee().workload_tag("run-42")
+        assert isinstance(scope, WorkloadTag)
+        assert scope.tag == "run-42"
+
+    def test_an_illegal_tag_is_refused(self, make_gee):
+        """Validation happens here, not mid-download inside the SDK."""
+        from pydantic import ValidationError
+
+        gee = make_gee()
+        with pytest.raises(ValidationError, match="1-63 characters"):
+            gee.workload_tag("-bad-")
+
+
+@pytest.fixture
+def warnings_buffer():
+    """Collect loguru's WARNING output, which pytest's `caplog` never sees.
+
+    loguru writes through its own handler set, bound to the original stderr at
+    registration time, so a dedicated sink is the only way to read it back.
+    """
+    from loguru import logger
+
+    buffer: list[str] = []
+    sink_id = logger.add(buffer.append, level="WARNING")
+    yield buffer
+    logger.remove(sink_id)
+
+
+class TestServerSideFlags:
+    """Tasks 6.12 / 6.13: `scaled=` and `preprocess=` as constructor flags."""
+
+    def _gee(self, make_gee, **overrides):
+        """A GEE over one Sentinel-2 row, the flag under test applied."""
+        params = dict(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4", "B3"]},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    def _op(self, gee, asset="COPERNICUS/S2_SR_HARMONIZED"):
+        """The op `_build_collection` would `.map` for one dataset."""
+        return gee._per_image_op(gee.catalog.get_dataset(asset))
+
+    def test_the_defaults_are_off(self, make_gee):
+        """Neither flag is on by default, so no existing request changes."""
+        gee = self._gee(make_gee)
+        assert (gee.scaled, gee.preprocess) == (False, False)
+        assert self._op(gee) is None
+        assert gee._engine_config.needs_server_side_compute is False
+
+    def test_scaled_resolves_the_rows_factors_for_the_requested_bands(self, make_gee):
+        """The backend reads the asset id and the bands from `variables`."""
+        scaler = self._op(self._gee(make_gee, scaled=True))
+        assert isinstance(scaler, BandScaler)
+        assert scaler.dataset == "COPERNICUS/S2_SR_HARMONIZED"
+        assert [factor.band for factor in scaler.factors] == ["B4", "B3"]
+        assert scaler.factors[0].scale == 0.0001
+
+    def test_preprocess_resolves_the_curated_recipe(self, make_gee):
+        """`preprocess=True` is the one-argument form of the recipe chain."""
+        chain = self._op(self._gee(make_gee, preprocess=True))
+        assert chain.name == "Sentinel2SclMask >> BandScaler"
+        assert [factor.band for factor in chain.masks[1].factors] == ["B4", "B3"]
+
+    @pytest.mark.parametrize("flag", ["scaled", "preprocess"])
+    def test_a_flag_forces_server_side_compute(self, make_gee, flag):
+        """Both flags decline the EEDAI fast path, as a `cloud_mask` does."""
+        gee = self._gee(make_gee, **{flag: True})
+        assert gee._engine_config.needs_server_side_compute is True
+
+    def test_both_flags_together_are_refused(self, make_gee):
+        """The recipe already scales, so the pair would scale twice."""
+        with pytest.raises(ValueError, match="scale the pixels twice"):
+            self._gee(make_gee, scaled=True, preprocess=True)
+
+    def test_preprocess_on_an_uncovered_dataset_is_refused(self, make_gee):
+        """A dataset with no curated recipe says so, at construction."""
+        with pytest.raises(ValueError, match="no curated preprocessing recipe"):
+            self._gee(
+                make_gee,
+                variables={"USGS/SRTMGL1_003": ["elevation"]},
+                preprocess=True,
+                scale=90.0,
+            )
+
+    def test_scaled_on_a_factorless_dataset_warns(self, make_gee, warnings_buffer):
+        """`scaled=True` is never a silent no-op; it reports and stays raw."""
+        gee = self._gee(
+            make_gee,
+            variables={"USGS/SRTMGL1_003": ["elevation"]},
+            scaled=True,
+            scale=90.0,
+        )
+        # The identity scaler is dropped rather than mapped, so nothing
+        # reaches `.map` and the EEDAI reader is still available.
+        assert self._op(gee, "USGS/SRTMGL1_003") is None
+        assert "declares no band scale/offset" in "".join(warnings_buffer)
+
+    def test_each_dataset_gets_its_own_op(self, make_gee):
+        """A two-dataset request resolves one recipe per asset, not one shared."""
+        gee = self._gee(
+            make_gee,
+            variables={
+                "COPERNICUS/S2_SR_HARMONIZED": ["B4"],
+                "LANDSAT/LC08/C02/T1_L2": ["SR_B4"],
+            },
+            preprocess=True,
+            scale=30.0,
+        )
+        assert self._op(gee).name == "Sentinel2SclMask >> BandScaler"
+        assert (
+            self._op(gee, "LANDSAT/LC08/C02/T1_L2").name
+            == "LandsatSrMask >> BandScaler"
+        )
+
+    def test_an_explicit_mask_runs_before_the_flags_chain(self, make_gee):
+        """The explicit op is run first, verbatim; the flag's op follows."""
+        gee = self._gee(make_gee, preprocess=True, cloud_mask=CloudScorePlus())
+        assert self._op(gee).name == "CloudScorePlus >> Sentinel2SclMask >> BandScaler"
+
+    def test_an_explicit_mask_composes_with_scaled(self, make_gee):
+        """`scaled=True` beside a mask gives mask-then-scale, not either alone."""
+        gee = self._gee(make_gee, scaled=True, cloud_mask=Sentinel2SclMask())
+        assert self._op(gee).name == "Sentinel2SclMask >> BandScaler"
+
+    def test_an_explicit_mask_alone_is_untouched(self, make_gee):
+        """With no flag the hook reaches `.map` exactly as it was given."""
+        mask = Sentinel2SclMask()
+        assert self._op(self._gee(make_gee, cloud_mask=mask)) is mask
+
+    def test_the_explicit_one_argument_form_still_works(self, make_gee):
+        """`cloud_mask=preprocess(...)` is unchanged by the new flags."""
+        chain = recipe_for("COPERNICUS/S2_SR_HARMONIZED", ["B4", "B3"])
+        gee = self._gee(make_gee, cloud_mask=chain)
+        assert self._op(gee) is chain
+        assert gee._engine_config.needs_server_side_compute is True
+
+
+class TestExplicitScalerCrossCheck:
+    """M4: the explicit `BandScaler` / `preprocess()` forms are cross-checked."""
+
+    def _gee(self, make_gee, bands, **overrides):
+        """A Sentinel-2 L2A request over `bands`, the chain under test applied."""
+        params = dict(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": list(bands)},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    def test_a_mismatched_asset_id_is_refused(self, make_gee):
+        """Another row's recipe computes silently, so the pairing is refused."""
+        chain = recipe_for("COPERNICUS/S2_HARMONIZED", ["B4"])
+        with pytest.raises(ValueError, match="was resolved for"):
+            self._gee(make_gee, ["B4"], cloud_mask=chain)
+
+    def test_a_narrower_band_list_warns_and_names_the_raw_bands(
+        self, make_gee, warnings_buffer
+    ):
+        """The uncovered bands stay raw DN in the same raster, so say which."""
+        chain = recipe_for("COPERNICUS/S2_SR_HARMONIZED", ["B4"])
+        self._gee(make_gee, ["B4", "B3", "B2"], cloud_mask=chain)
+        logged = "".join(warnings_buffer)
+        assert "declares scale/offset for ['B2', 'B3']" in logged
+        assert "stay raw DN" in logged
+
+    def test_a_covering_band_list_is_silent(self, make_gee, warnings_buffer):
+        """A chain covering every requested scalable band warns about nothing."""
+        chain = recipe_for("COPERNICUS/S2_SR_HARMONIZED", ["B4", "B3"])
+        self._gee(make_gee, ["B4", "B3"], cloud_mask=chain)
+        assert "stay raw DN" not in "".join(warnings_buffer)
+
+    def test_an_unresolved_scaler_is_not_cross_checked(self, make_gee, warnings_buffer):
+        """A hand-built `BandScaler` names no row, so there is nothing to check."""
+        scaler = BandScaler(factors=(BandFactor(band="B4", scale=0.0001),))
+        gee = self._gee(make_gee, ["B4", "B3"], cloud_mask=scaler)
+        assert gee.cloud_mask is scaler
+        assert "stay raw DN" not in "".join(warnings_buffer)
+
+    def test_a_band_with_no_factor_is_not_reported(self, make_gee, warnings_buffer):
+        """`SCL` declares no scale, so it is not an uncovered scalable band."""
+        chain = recipe_for("COPERNICUS/S2_SR_HARMONIZED", ["B4"])
+        self._gee(make_gee, ["B4", "SCL"], cloud_mask=chain)
+        assert "stay raw DN" not in "".join(warnings_buffer)
+
+
+class TestDoubleScalerRefusal:
+    """H1: a flag beside an explicit `BandScaler` would scale twice."""
+
+    def _gee(self, make_gee, bands, **overrides):
+        """A Sentinel-2 L2A request over `bands`, the pairing under test applied."""
+        params = dict(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": list(bands)},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    def _row(self, make_gee):
+        """The Sentinel-2 L2A catalog row the scalers are resolved from."""
+        return self._gee(make_gee, ["B4"]).catalog.get_dataset(
+            "COPERNICUS/S2_SR_HARMONIZED"
+        )
+
+    def test_scaled_beside_an_explicit_scaler_is_refused(self, make_gee):
+        """Two scalers on one image apply the row's factors twice."""
+        scaler = BandScaler.for_dataset(self._row(make_gee), ["B4"])
+        with pytest.raises(ValueError, match="scale the pixels twice"):
+            self._gee(make_gee, ["B4"], scaled=True, cloud_mask=scaler)
+
+    def test_preprocess_beside_an_explicit_recipe_is_refused(self, make_gee):
+        """`cloud_mask=preprocess(...)` already ends in a `BandScaler`."""
+        chain = recipe_for("COPERNICUS/S2_SR_HARMONIZED", ["B4"])
+        with pytest.raises(ValueError, match="scale the pixels twice"):
+            self._gee(make_gee, ["B4"], preprocess=True, cloud_mask=chain)
+
+    def test_a_nested_explicit_chain_is_seen(self, make_gee):
+        """The scaler is found however the explicit chain was grouped."""
+        chain = recipe_for("COPERNICUS/S2_SR_HARMONIZED", ["B4"]) >> Sentinel2Qa60Mask()
+        with pytest.raises(ValueError, match="scale the pixels twice"):
+            self._gee(make_gee, ["B4"], scaled=True, cloud_mask=chain)
+
+    def test_the_refusal_names_the_remedy(self, make_gee):
+        """The message says which of the two to drop."""
+        scaler = BandScaler.for_dataset(self._row(make_gee), ["B4"])
+        with pytest.raises(ValueError) as caught:
+            self._gee(make_gee, ["B4"], scaled=True, cloud_mask=scaler)
+        assert "Drop scaled=, or drop the BandScaler" in str(caught.value)
+        assert "COPERNICUS/S2_SR_HARMONIZED" in str(caught.value)
+
+    def test_an_identity_explicit_scaler_is_allowed(self, make_gee):
+        """An empty-factor scaler scales nothing, so there is nothing to double."""
+        gee = self._gee(
+            make_gee, ["B4"], scaled=True, cloud_mask=BandScaler(factors=())
+        )
+        op = gee._per_image_op(gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED"))
+        assert op.name == "BandScaler >> BandScaler"
+
+    def test_a_non_scaling_mask_beside_a_flag_still_composes(self, make_gee):
+        """The refusal is about scalers only; a mask plus a flag is the point."""
+        gee = self._gee(make_gee, ["B4"], scaled=True, cloud_mask=Sentinel2SclMask())
+        op = gee._per_image_op(gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED"))
+        assert op.name == "Sentinel2SclMask >> BandScaler"
+
+    def test_another_rows_scaler_still_reports_the_mismatch_first(self, make_gee):
+        """A scaler for a row the request does not ask for is the older refusal."""
+        chain = recipe_for("COPERNICUS/S2_HARMONIZED", ["B4"])
+        with pytest.raises(ValueError, match="was resolved for"):
+            self._gee(make_gee, ["B4"], scaled=True, cloud_mask=chain)
+
+
+class TestFlagCompositionOrdering:
+    """M2: what the explicit-op-first composition does and does not guarantee."""
+
+    def _op(self, make_gee, **overrides):
+        """The composed op for one Sentinel-2 L2A request."""
+        params = dict(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        gee = make_gee(**params)
+        return gee._per_image_op(gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED"))
+
+    def _names(self, op):
+        """The composed op's leaf names, in run order."""
+        return [type(leaf).__name__ for leaf in backend_module._flatten_image_ops(op)]
+
+    def test_the_explicit_op_leads_the_chain_verbatim(self, make_gee):
+        """Every leaf of the hook comes first, in the order it was given."""
+        chain = CloudScorePlus() >> Sentinel2Qa60Mask()
+        names = self._names(self._op(make_gee, preprocess=True, cloud_mask=chain))
+        assert names[:2] == ["CloudScorePlus", "Sentinel2Qa60Mask"]
+        assert names == [
+            "CloudScorePlus",
+            "Sentinel2Qa60Mask",
+            "Sentinel2SclMask",
+            "BandScaler",
+        ]
+
+    def test_the_flags_own_mask_precedes_its_own_scaler(self, make_gee):
+        """The guarantee that does hold: inside the flag's op, mask then scale."""
+        names = self._names(
+            self._op(make_gee, preprocess=True, cloud_mask=CloudScorePlus())
+        )
+        assert names.index("Sentinel2SclMask") < names.index("BandScaler")
+
+    def test_explicit_arithmetic_is_not_hoisted_behind_the_flags_mask(self, make_gee):
+        """The claim that does NOT hold, pinned so it is not re-asserted."""
+        names = self._names(
+            self._op(make_gee, preprocess=True, cloud_mask=SpeckleFilter())
+        )
+        assert names == ["SpeckleFilter", "Sentinel2SclMask", "BandScaler"]
+
+
+class TestCdiThroughThePreprocessFlag:
+    """L2: the CDI guard must also see what `preprocess=` resolves."""
+
+    def _patch_recipe(self, monkeypatch, asset, recipe):
+        """Give one catalog row a `preprocess:` recipe the shipped YAML lacks."""
+        from earthlens.gee.catalog import Catalog as RealCatalog
+
+        original = RealCatalog.get_dataset
+
+        def _patched(self, dataset_id, *args, **kwargs):
+            row = original(self, dataset_id, *args, **kwargs)
+            return (
+                row.model_copy(update={"preprocess": recipe})
+                if dataset_id == asset
+                else row
+            )
+
+        monkeypatch.setattr(RealCatalog, "get_dataset", _patched)
+
+    def _gee(self, make_gee, asset, **overrides):
+        """A request over one asset, the flag under test applied."""
+        params = dict(
+            variables={asset: ["B4"]},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    @pytest.mark.parametrize("asset", sorted(backend_module._CDI_FORBIDDEN_ASSETS))
+    def test_a_cdi_recipe_on_a_forbidden_row_is_refused(
+        self, make_gee, monkeypatch, asset
+    ):
+        """The catalog-driven route reaches the same refusal as `cloud_mask=`."""
+        self._patch_recipe(
+            monkeypatch, asset, Preprocess(mask="sentinel2_cdi", scale=True)
+        )
+        with pytest.raises(ValueError, match="only valid on the Sentinel-2 TOA"):
+            self._gee(make_gee, asset, preprocess=True)
+
+    def test_a_cdi_recipe_on_the_toa_row_still_constructs(self, make_gee, monkeypatch):
+        """The guard is about the product, not about CDI, so TOA is fine."""
+        asset = "COPERNICUS/S2_HARMONIZED"
+        self._patch_recipe(
+            monkeypatch, asset, Preprocess(mask="sentinel2_cdi", scale=True)
+        )
+        gee = self._gee(make_gee, asset, preprocess=True)
+        op = gee._per_image_op(gee.catalog.get_dataset(asset))
+        assert op.name == "Sentinel2Cdi >> BandScaler"
+
+    def test_the_explicit_route_is_still_refused(self, make_gee):
+        """The pre-catalog check on `cloud_mask=` is unchanged."""
+        mask = Sentinel2Cdi()
+        with pytest.raises(ValueError, match="only valid on the Sentinel-2 TOA"):
+            self._gee(make_gee, "COPERNICUS/S2_SR_HARMONIZED", cloud_mask=mask)
+
+    def test_no_shipped_row_names_a_cdi_recipe_on_a_forbidden_asset(self):
+        """Belt and braces: the data must not need the guard in the first place."""
+        from earthlens.gee.catalog import Catalog as RealCatalog
+
+        catalog = RealCatalog()
+        offenders = [
+            asset
+            for asset in backend_module._CDI_FORBIDDEN_ASSETS
+            if asset in catalog.datasets
+            and catalog.datasets[asset].preprocess is not None
+            and catalog.datasets[asset].preprocess.mask == "sentinel2_cdi"
+        ]
+        assert offenders == []
+
+
+#: A static (`ee_type="image"`) catalog row that declares band scale factors,
+#: so `scaled=True` resolves a real scaler rather than an identity.
+_STATIC_SCALED = "OpenLandMap/CLM/CLM_LST_MOD11A2-DAYNIGHT_M/v01"
+
+
+class TestStaticImageWarning:
+    """L4: the warning must name what the caller actually passed."""
+
+    def _warnings(self, monkeypatch):
+        """Capture `_build_collection`'s warnings."""
+        captured: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger,
+            "warning",
+            lambda msg, *a, **k: captured.append(msg),
+        )
+        return captured
+
+    def _build(self, make_gee, **overrides):
+        """Build the one-image collection for the static scaled row."""
+        params = dict(
+            variables={_STATIC_SCALED: ["jan"]},
+            start="2010-01-01",
+            end="2010-01-31",
+            scale=1000.0,
+        )
+        params.update(overrides)
+        gee = make_gee(**params)
+        gee._build_collection(
+            gee.catalog.get_dataset(_STATIC_SCALED),
+            ["jan"],
+            dt.datetime(2010, 1, 1),
+            dt.datetime(2010, 2, 1),
+        )
+        return gee
+
+    def test_the_row_is_static_and_declares_factors(self, make_gee):
+        """The fixture row is the shape the finding needs, not an invented one."""
+        gee = make_gee(variables={_STATIC_SCALED: ["jan"]}, scale=1000.0)
+        row = gee.catalog.get_dataset(_STATIC_SCALED)
+        assert row.is_image_collection is False
+        assert row.bands["jan"].scale is not None
+
+    @pytest.mark.parametrize("flag", ["scaled"])
+    def test_a_flag_only_request_is_not_warned_about(self, make_gee, monkeypatch, flag):
+        """`scaled=True` on a static image is a valid, working request."""
+        captured = self._warnings(monkeypatch)
+        self._build(make_gee, **{flag: True})
+        assert [w for w in captured if "static single-image" in w] == []
+
+    @pytest.mark.parametrize(
+        "hooks",
+        [
+            {"filters": [lambda c: c.filter("cc")]},
+            {"cloud_mask": _identity_mask},
+            {"cloud_mask": _identity_mask, "scaled": True},
+        ],
+        ids=["filters", "cloud_mask", "cloud_mask-and-flag"],
+    )
+    def test_a_hook_is_still_warned_about(self, make_gee, monkeypatch, hooks):
+        """The arguments the message names are the ones that still trigger it."""
+        captured = self._warnings(monkeypatch)
+        self._build(make_gee, **hooks)
+        assert any("static single-image" in w for w in captured), captured
+
+    def test_the_per_image_op_is_built_once(self, make_gee, monkeypatch):
+        """The warning branch must not rebuild the MaskChain for nothing."""
+        calls: list[object] = []
+        original = backend_module.GEE._per_image_op
+
+        def _counted(self, var_info):
+            calls.append(var_info.id)
+            return original(self, var_info)
+
+        monkeypatch.setattr(backend_module.GEE, "_per_image_op", _counted)
+        self._warnings(monkeypatch)
+        self._build(make_gee, scaled=True)
+        assert calls == [_STATIC_SCALED]
+
+
+class TestIdentityOpsDoNotForceServerSide:
+    """L5: an op that provably does nothing must not cost the EEDAI reader."""
+
+    def _gee(self, make_gee, **overrides):
+        """A GEE over one dataset, the flag under test applied."""
+        params = dict(start="2024-05-01", end="2024-05-10", scale=90.0)
+        params.update(overrides)
+        return make_gee(**params)
+
+    def test_scaled_on_a_factorless_row_keeps_the_reader(
+        self, make_gee, warnings_buffer
+    ):
+        """An identity `BandScaler` changes nothing, so it changes no routing."""
+        gee = self._gee(
+            make_gee, variables={"USGS/SRTMGL1_003": ["elevation"]}, scaled=True
+        )
+        assert gee._server_side_ops == {}
+        assert gee._per_image_op(gee.catalog.get_dataset("USGS/SRTMGL1_003")) is None
+        assert gee._engine_config.needs_server_side_compute is False
+        assert "declares no band scale/offset" in "".join(warnings_buffer)
+
+    def test_preprocess_on_a_pass_through_recipe_keeps_the_reader(self, make_gee):
+        """Sentinel-1's recipe is a documented `PassThrough`: nothing to apply."""
+        gee = self._gee(
+            make_gee,
+            variables={"COPERNICUS/S1_GRD": ["VV"]},
+            preprocess=True,
+            scale=10.0,
+        )
+        assert gee._server_side_ops == {}
+        assert gee._engine_config.needs_server_side_compute is False
+
+    def test_a_real_scaler_still_declines_the_reader(self, make_gee):
+        """The routing change is only for identities, not for the flags."""
+        gee = self._gee(
+            make_gee,
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+            scaled=True,
+            scale=10.0,
+        )
+        assert set(gee._server_side_ops) == {"COPERNICUS/S2_SR_HARMONIZED"}
+        assert gee._engine_config.needs_server_side_compute is True
+
+    def test_only_the_identity_dataset_is_dropped(self, make_gee):
+        """A mixed request keeps the op for the row that has factors."""
+        gee = self._gee(
+            make_gee,
+            variables={
+                "COPERNICUS/S2_SR_HARMONIZED": ["B4"],
+                "USGS/SRTMGL1_003": ["elevation"],
+            },
+            scaled=True,
+            scale=10.0,
+        )
+        assert set(gee._server_side_ops) == {"COPERNICUS/S2_SR_HARMONIZED"}
+        assert gee._engine_config.needs_server_side_compute is True
+
+    def test_a_masking_recipe_is_never_an_identity(self, make_gee):
+        """A recipe whose mask is real is kept even if its scaler is empty."""
+        gee = self._gee(
+            make_gee,
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["SCL"]},
+            preprocess=True,
+            scale=10.0,
+        )
+        op = gee._per_image_op(gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED"))
+        assert op.name == "Sentinel2SclMask >> BandScaler"
+        assert gee._engine_config.needs_server_side_compute is True
+
+
+class TestUnknownBandOnTheFlagPath:
+    """N2: the band check runs at download, not before the flags resolve."""
+
+    def _gee(self, make_gee, bands, **overrides):
+        """A Sentinel-2 L2A request over `bands`."""
+        params = dict(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": list(bands)},
+            start="2024-05-01",
+            end="2024-05-10",
+            scale=10.0,
+        )
+        params.update(overrides)
+        return make_gee(**params)
+
+    def test_the_flag_resolves_before_the_band_is_refused(self, make_gee):
+        """Construction succeeds, so the scaler cannot rely on a prior check."""
+        gee = self._gee(make_gee, ["B4", "B8A"], scaled=True)
+        scaler = gee._per_image_op(
+            gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED")
+        )
+        assert [factor.band for factor in scaler.factors] == ["B4"]
+
+    def test_the_band_is_refused_at_download(self, make_gee):
+        """The refusal the docstring points at happens in `_download_dataset`."""
+        gee = self._gee(make_gee, ["B4", "B8A"], scaled=True)
+        with pytest.raises(ValueError, match="is not a band of"):
+            gee._download_dataset("COPERNICUS/S2_SR_HARMONIZED", ["B4", "B8A"])
+
+
+class TestPreview:
+    """`GEE.preview()` — a cheap pre-flight size / engine / fits summary (#1218)."""
+
+    def test_an_earth_engine_request_fits_in_one_pass_with_no_estimate(self, make_gee):
+        """A server-side EE read has no client tiling budget, so it fits, estimate-free."""
+        from earthlens.gee.plans import RequestPreview
+
+        gee = make_gee(
+            engine="ee", variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0
+        )
+        preview = gee.preview()
+        assert isinstance(preview, RequestPreview)
+        assert (preview.engine, preview.fits, preview.tiles) == ("ee", True, 1)
+        assert preview.scene_count is None
+        assert preview.reason is None
+
+    def test_an_eedai_request_reports_the_estimate_and_fits(
+        self, make_gee, monkeypatch
+    ):
+        """When the reader serves it, preview reuses estimate_cost + the plan."""
+        from types import SimpleNamespace
+
+        from earthlens.gee.plans import EnginePlan
+
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0)
+        monkeypatch.setattr(gee, "_eedai_eligible", lambda var_info: True)
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+        monkeypatch.setattr(
+            gee,
+            "estimate_cost",
+            lambda: SimpleNamespace(
+                scene_count=5, max_width=1000, max_height=800, total_size_bytes=4096
+            ),
+        )
+        monkeypatch.setattr(
+            gee,
+            "_eedai_single_image_plan",
+            lambda var_info, band_count: EnginePlan.serves(
+                tiles=1, tile_size=1024, engine="eedai"
+            ),
+        )
+        preview = gee.preview()
+        assert preview.engine == "eedai"
+        assert preview.fits is True
+        assert (preview.scene_count, preview.max_width, preview.max_height) == (
+            5,
+            1000,
+            800,
+        )
+        assert preview.total_size_bytes == 4096
+        assert preview.tiles == 1
+        assert preview.reason is None
+
+    def test_over_the_scene_budget_falls_back_to_earth_engine(
+        self, make_gee, monkeypatch
+    ):
+        """Too many scenes for the reader → fits False, engine 'ee', a reason given."""
+        from types import SimpleNamespace
+
+        from earthlens.gee.plans import EnginePlan
+
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0)
+        monkeypatch.setattr(gee, "_eedai_eligible", lambda var_info: True)
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+        monkeypatch.setattr(
+            gee,
+            "estimate_cost",
+            lambda: SimpleNamespace(
+                scene_count=9999, max_width=10, max_height=10, total_size_bytes=1
+            ),
+        )
+        monkeypatch.setattr(
+            gee,
+            "_eedai_single_image_plan",
+            lambda var_info, band_count: EnginePlan.serves(
+                tiles=1, tile_size=1024, engine="eedai"
+            ),
+        )
+        preview = gee.preview()
+        assert preview.fits is False
+        assert preview.engine == "ee"
+        assert preview.scene_count == 9999
+        assert "scenes" in (preview.reason or "")
+
+    def test_a_declined_reader_plan_falls_back_with_its_reason(
+        self, make_gee, monkeypatch
+    ):
+        """A declined plan (not a scene-budget miss) reports engine 'ee' and its reason."""
+        from types import SimpleNamespace
+
+        from earthlens.gee.plans import EnginePlan
+
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0)
+        monkeypatch.setattr(gee, "_eedai_eligible", lambda var_info: True)
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+        monkeypatch.setattr(
+            gee,
+            "estimate_cost",
+            lambda: SimpleNamespace(
+                scene_count=3, max_width=10, max_height=10, total_size_bytes=1
+            ),
+        )
+        monkeypatch.setattr(
+            gee,
+            "_eedai_single_image_plan",
+            lambda var_info, band_count: EnginePlan.declined(
+                "the band count is unsupported"
+            ),
+        )
+        preview = gee.preview()
+        assert preview.fits is False
+        assert preview.engine == "ee"
+        assert preview.reason == "the band count is unsupported"
+
+    def test_a_forced_eedai_request_keeps_its_name_when_it_would_decline(
+        self, make_gee, monkeypatch
+    ):
+        """engine='eedai' keeps the name with fits False so the caller sees the decline."""
+        from types import SimpleNamespace
+
+        from earthlens.gee.plans import EnginePlan
+
+        gee = make_gee(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+            scale=10.0,
+            engine="eedai",
+        )
+        monkeypatch.setattr(gee, "_eedai_eligible", lambda var_info: True)
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+        monkeypatch.setattr(
+            gee,
+            "estimate_cost",
+            lambda: SimpleNamespace(
+                scene_count=3, max_width=10, max_height=10, total_size_bytes=1
+            ),
+        )
+        monkeypatch.setattr(
+            gee,
+            "_eedai_single_image_plan",
+            lambda var_info, band_count: EnginePlan.declined("too many bands"),
+        )
+        preview = gee.preview()
+        assert preview.engine == "eedai"
+        assert preview.fits is False
+        assert preview.reason == "too many bands"
+
+    def test_an_unsupported_composite_reducer_routes_to_earth_engine(
+        self, make_gee, monkeypatch
+    ):
+        """An EE-only reducer (stdDev) declines the reader, so auto previews engine 'ee'."""
+        from earthlens.gee.backend import _EEDAI_UNSUPPORTED_REDUCER_REASONS
+
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+        gee = make_gee(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+            scale=10.0,
+            reducer="stdDev",
+        )
+        preview = gee.preview()
+        assert preview.engine == "ee", "stdDev routes to Earth Engine"
+        assert preview.fits is True, (
+            "stdDev routes to Earth Engine, so the preview must say engine='ee', fits=True"
+        )
+        assert preview.reason == _EEDAI_UNSUPPORTED_REDUCER_REASONS["stdDev"], (
+            "the fallback reason must be the reducer's own decline reason"
+        )
+
+    def test_a_forced_eedai_ineligible_request_previews_a_decline(
+        self, make_gee, monkeypatch
+    ):
+        """A cloud_mask makes a forced-eedai request ineligible; it would error, so fits=False."""
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+        gee = make_gee(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+            scale=10.0,
+            engine="eedai",
+            cloud_mask=lambda image: image,
+        )
+        preview = gee.preview()
+        assert preview.engine == "eedai", "a forced reader keeps its engine name"
+        assert preview.fits is False, (
+            "a forced reader that cannot serve must preview fits=False, not a false fit"
+        )
+        assert preview.reason
+        assert "server-side compute" in preview.reason
+
+    def test_without_the_eedai_extra_auto_previews_earth_engine(
+        self, make_gee, monkeypatch
+    ):
+        """With pyramids-eo absent, auto falls back to Earth Engine, fits in one pass."""
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0)
+        preview = gee.preview()
+        assert preview.engine == "ee"
+        assert preview.fits is True
+        assert preview.reason
+        assert "not installed" in preview.reason
+
+    def test_forced_eedai_without_the_extra_previews_a_decline(
+        self, make_gee, monkeypatch
+    ):
+        """A forced reader with the extra absent would error, so fits=False."""
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
+        gee = make_gee(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+            scale=10.0,
+            engine="eedai",
+        )
+        preview = gee.preview()
+        assert preview.engine == "eedai"
+        assert preview.fits is False
+        assert preview.reason
+        assert "not installed" in preview.reason
+
+    def test_preview_sizes_a_single_dataset(self, make_gee):
+        """Like estimate_cost, preview refuses a multi-dataset request."""
+        gee = make_gee(
+            variables={
+                "COPERNICUS/S2_SR_HARMONIZED": ["B4"],
+                "LANDSAT/LC09/C02/T1_L2": ["SR_B4"],
+            },
+            scale=10.0,
+        )
+        with pytest.raises(ValueError, match="single dataset"):
+            gee.preview()

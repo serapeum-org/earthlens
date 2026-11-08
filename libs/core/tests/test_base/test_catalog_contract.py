@@ -371,7 +371,8 @@ def test_get_variable_default_raises(module_name: str):
 
 def test_firms_get_variable_aliases_get_column():
     """firms.get_variable returns the same leaf as get_column."""
-    from earthlens.firms import Catalog
+    _earthlens_firms = pytest.importorskip("earthlens.firms")
+    Catalog = _earthlens_firms.Catalog
 
     cat = Catalog()
     assert cat.get_variable("MODIS_NRT", "confidence") is cat.get_column(
@@ -381,7 +382,8 @@ def test_firms_get_variable_aliases_get_column():
 
 def test_tropycal_get_variable_aliases_get_field():
     """tropycal.get_variable returns the same leaf as get_field."""
-    from earthlens.tropycal import Catalog
+    _earthlens_tropycal = pytest.importorskip("earthlens.tropycal")
+    Catalog = _earthlens_tropycal.Catalog
 
     cat = Catalog()
     assert cat.get_variable("north_atlantic", "mslp") is cat.get_field(
@@ -391,7 +393,8 @@ def test_tropycal_get_variable_aliases_get_field():
 
 def test_earthdata_providers_is_a_copy_of_daacs():
     """earthdata providers mirrors daacs by content but is a distinct dict."""
-    from earthlens.earthdata import Catalog
+    _earthlens_earthdata = pytest.importorskip("earthlens.earthdata")
+    Catalog = _earthlens_earthdata.Catalog
 
     cat = Catalog()
     assert cat.providers == cat.daacs
@@ -400,7 +403,8 @@ def test_earthdata_providers_is_a_copy_of_daacs():
 
 def test_stac_providers_is_a_copy_of_endpoints():
     """stac providers mirrors endpoints by content but is a distinct dict."""
-    from earthlens.stac import Catalog
+    _earthlens_stac = pytest.importorskip("earthlens.stac")
+    Catalog = _earthlens_stac.Catalog
 
     cat = Catalog()
     assert cat.providers == cat.endpoints

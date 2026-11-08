@@ -11,10 +11,10 @@ Two routes, selected by the dataset id passed in `variables`:
   (DOI `10.14428/DVN/I0LTPH`). Anonymous, no credentials, and the full public
   table: every disaster from 1900 onwards, natural *and* technological, with
   the human and economic impact columns. EM-DAT's own documentation calls this
-  the preferred route for research. Returns a :class:`pandas.DataFrame`.
+  the preferred route for research. Returns a `pandas.DataFrame`.
 * **`gdis:points`** / **`gdis:polygons`** — **GDIS** (Geocoded Disasters), the
   CC-BY-4.0 geocoded derivative of EM-DAT *natural* disasters, 1960-2018, as a
-  pyramids :class:`~pyramids.feature.collection.FeatureCollection`.
+  pyramids `pyramids.feature.collection.FeatureCollection`.
   `gdis:points` is the centroid CSV (about 1 MB, and the only distribution
   carrying `year` / `latitude` / `longitude`); `gdis:polygons` is the
   admin-unit footprint GeoPackage, which is a **2.2 GB** download and is
@@ -23,7 +23,7 @@ Two routes, selected by the dataset id passed in `variables`:
 Because the two routes emit different shapes, `OUTPUT_KIND` is set **per
 instance** from the resolved catalog row rather than fixed on the class:
 `emdat:events` is `"tabular"`, both `gdis:*` rows are `"vector"`. The
-:class:`earthlens.earthlens.EarthLens` facade reads the instance attribute to
+`earthlens.earthlens.EarthLens` facade reads the instance attribute to
 know the return shape and to reject `aggregate=` (these are event records, not
 gridded rasters).
 
@@ -47,18 +47,18 @@ once, or the download returns a `401`.
 
 Public surface (re-exported from this package):
 
-* :class:`EMDAT` — the backend; instantiate with a dataset id in `variables`,
-  then call :meth:`EMDAT.download`.
-* :class:`Catalog` — pydantic-backed loader for the bundled
+* `EMDAT` — the backend; instantiate with a dataset id in `variables`,
+  then call `EMDAT.download`.
+* `Catalog` — pydantic-backed loader for the bundled
   `emdat_data_catalog.yaml`.
-* :class:`Dataset` — one catalog row (provider, output kind, transport detail,
+* `Dataset` — one catalog row (provider, output kind, transport detail,
   licence).
-* :class:`EmdatAuth` / :class:`EmdatCredentials` — Earthdata Login for the
+* `EmdatAuth` / `EmdatCredentials` — Earthdata Login for the
   `gdis:*` sources.
-* :class:`LicenseWarning` — re-exported from core so callers can filter the
+* `LicenseWarning` — re-exported from core so callers can filter the
   `emdat:events` restricted-use warning without importing another module.
-* :func:`clear_catalog_cache` — drop the module-level parse cache.
-* :data:`CATALOG_PATH` — path to the bundled catalog YAML.
+* `clear_catalog_cache` — drop the module-level parse cache.
+* `CATALOG_PATH` — path to the bundled catalog YAML.
 """
 
 from __future__ import annotations

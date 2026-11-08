@@ -43,7 +43,7 @@ def create_geometry(
         NotImplementedError: If `shapely_geometry` is any geometry type
             other than `Polygon` or `Point` (e.g. `LineString`,
             `MultiPoint`, `GeometryCollection`). Use
-            :func:`create_feature` for `MultiPolygon` inputs — it
+            `create_feature` for `MultiPolygon` inputs — it
             explodes them into per-polygon rows before calling this.
 
     Examples:
@@ -100,7 +100,7 @@ def create_feature(
     """Build an `ee.FeatureCollection` from a `GeoDataFrame`.
 
     Each row becomes an `ee.Feature` whose geometry is the converted
-    Shapely geometry (via :func:`create_geometry`) and whose properties
+    Shapely geometry (via `create_geometry`) and whose properties
     are that row's non-geometry columns (optionally narrowed to
     `columns`). A row holding a `MultiPolygon` is exploded into one
     feature per constituent polygon.
@@ -182,11 +182,16 @@ def create_feature(
     records_df = pd.DataFrame(gdf.drop("geometry", axis=1))
     if columns:
         records_df = records_df[columns]
-    records = records_df.to_dict("records")
-    if not records:
+    # A geometry-only frame has no non-geometry columns, so each row serialises
+    # to an empty dict. pandas 2 collapses that to `[]`, pandas 3 keeps it as
+    # `[{}, ...]`; key the "no properties" decision on the column set so a
+    # geometry-only frame yields features without properties, never `{}` (#1339).
+    if records_df.columns.empty:
         ee_feature_list = [ee.Feature(geom) for geom in ee_geom_list]
     else:
+        records = records_df.to_dict("records")
         ee_feature_list = [
-            ee.Feature(geom, record) for geom, record in zip(ee_geom_list, records)
+            ee.Feature(geom, record)
+            for geom, record in zip(ee_geom_list, records, strict=True)
         ]
     return cast("FeatureCollection", ee.FeatureCollection(ee_feature_list))

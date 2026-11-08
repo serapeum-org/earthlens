@@ -20,6 +20,7 @@ import numpy as np
 import pytest
 
 from earthlens.earthlens import EarthLens
+from earthlens.testing import skip_live_unavailable
 
 pytestmark = [pytest.mark.e2e, pytest.mark.soilgrids]
 
@@ -62,7 +63,7 @@ class TestSoilGridsLiveFetch:
             "&SERVICE=WCS&VERSION=2.0.0&REQUEST=GetCapabilities"
         )
         if not _reachable(url):
-            pytest.skip("maps.isric.org unreachable (offline)")
+            skip_live_unavailable("maps.isric.org unreachable (offline)")
 
     def test_phh2o_topsoil_subset(self, tmp_path: Path) -> None:
         """A small phh2o 0-5cm mean window lands one GeoTIFF of plausible pH."""

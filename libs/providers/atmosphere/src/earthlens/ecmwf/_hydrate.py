@@ -341,7 +341,7 @@ def _retrieve_into(dataset_id: str, box: dict[str, Any]) -> None:
     """Thread body: run the retrieve, storing its result or error in `box`.
 
     Stores the variable-metadata mapping under `box["meta"]` on success, or the
-    raised exception under `box["error"]` — read back by :func:`_retrieve_with_timeout`
+    raised exception under `box["error"]` — read back by `_retrieve_with_timeout`
     on the calling thread. Kept module-level (no closure) so the worker is
     picklable-simple and the no-nested-functions rule holds.
 
@@ -481,8 +481,8 @@ def _is_auxiliary(name: str) -> bool:
 
     These are never a data variable, so they must not be matched to a catalog
     slug (a wrong `nc_variable` silently mis-extracts at `aggregate=` time).
-    Covers the explicit :data:`_COORD_NAMES` and :data:`_AUXILIARY_NAMES`, the
-    observation-count prefix `nobs` / `n_obs`, and every :data:`_AUXILIARY_SUFFIXES`
+    Covers the explicit `_COORD_NAMES` and `_AUXILIARY_NAMES`, the
+    observation-count prefix `nobs` / `n_obs`, and every `_AUXILIARY_SUFFIXES`
     tail — cell bounds (`lat_bnds`), counts (`pixel_count`), status and quality
     flags in both spellings (`quality_flag`, `FAPAR_QFLAG`), uncertainty and
     spread bands (`FAPAR_ERR`, `swe_unc`, `ice_conc_stddev`), and solar/sensor
@@ -648,7 +648,7 @@ def _is_initialism(name: str, tokens: set[str]) -> bool:
     On its own this says nothing about how many tokens are worth compressing.
     Given one token it reduces to "is `name` a prefix of that word", which
     reads `co` as an abbreviation of `co2`; the two-token minimum that makes
-    the arm meaningful is applied by :func:`_pair_is_evidenced`, not here.
+    the arm meaningful is applied by `_pair_is_evidenced`, not here.
 
     Args:
         name: The NetCDF short name.
@@ -699,7 +699,7 @@ def _pair_is_evidenced(slug: str, name: str, meta: dict[str, Any]) -> bool:
 
     Rule 4's guard: being the only two left over is arity, not evidence. A pair
     qualifies on either of two signals — the tokens it shares with the short
-    name and `long_name` covering at least :data:`_MIN_TOKEN_COVERAGE` of the
+    name and `long_name` covering at least `_MIN_TOKEN_COVERAGE` of the
     slug, or `name` being an initialism of the slug. Slugs reduced to nothing
     but stopwords never qualify.
 
@@ -976,7 +976,7 @@ def _existing_override(
 
     Args:
         lines: One variable sub-block's lines.
-        span: The `(start, stop)` range :func:`_extras_span` found.
+        span: The `(start, stop)` range `_extras_span` found.
 
     Returns:
         The parsed override, or `None` when the value is not a mapping at all
@@ -1163,7 +1163,7 @@ def _hydrate_stanza_per_variable(
         dataset_id: The dataset id whose stanza to hydrate.
         probe: Callable taking a `cds_variable` and the selectors the row will
             send, returning the `(metadata, selectors)` pair
-            :func:`_retrieve_variable_meta` returns.
+            `_retrieve_variable_meta` returns.
         serving: Callable taking a `cds_variable` and returning the constraints
             blocks that serve it. `None` skips the serveability check, which is what a
             dataset publishing no constraints gets.
@@ -1240,7 +1240,7 @@ def _retrieve_variable_meta(
 ) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
     """Probe one variable of a dataset; the second credentialed seam.
 
-    Mirrors :func:`_retrieve_netcdf_vars` but asks for a named variable, so a
+    Mirrors `_retrieve_netcdf_vars` but asks for a named variable, so a
     dataset with several placeholders can be finished one row at a time instead
     of only ever revealing whichever variable its constraints list first.
 
@@ -1252,7 +1252,7 @@ def _retrieve_variable_meta(
             happen to list first.
 
     Returns:
-        A `(metadata, selectors)` pair as :func:`_ecmwf_deep_sample_variable`
+        A `(metadata, selectors)` pair as `_ecmwf_deep_sample_variable`
         returns them.
     """
     from earthlens.ecmwf.cli import _ecmwf_deep_sample_variable
@@ -1494,7 +1494,7 @@ def _block_satisfies(
         block: One constraints block serving the row's variable.
         not_required: Block keys this row is not expected to carry, since the
             backend fills them in. Varies by request kind - see
-            :func:`_keys_the_backend_supplies`.
+            `_keys_the_backend_supplies`.
 
     Returns:
         True when this single block can serve the request.
@@ -1765,7 +1765,7 @@ def _match_variables(
     a wrong `nc_variable` is worse than the `unknown` placeholder (it silently
     mis-extracts at `aggregate=` time). In order:
 
-    1. Coordinate / bounds / auxiliary variables (see :func:`_is_auxiliary`) are
+    1. Coordinate / bounds / auxiliary variables (see `_is_auxiliary`) are
        dropped from the candidate set.
     2. Exact short-name equality — the slug's `cds_variable` form
        (`-`→`_`) equals a NetCDF variable name.
@@ -2053,7 +2053,7 @@ def _hydrate_stanza_whole(
 
     Returns:
         A `(text, filled, declined)` triple, as
-        :func:`_hydrate_stanza_per_variable` returns.
+        `_hydrate_stanza_per_variable` returns.
     """
     try:
         nc_meta = _retrieve_with_timeout(dataset_id, session.timeout)
@@ -2146,7 +2146,7 @@ def _parses_as_yaml(text: str) -> bool:
 def _written_rows_survive(text: str, dataset_id: str, filled: list[str]) -> bool:
     """Return True when every row this pass filled reads back as it was written.
 
-    :func:`_parses_as_yaml` proves the shard still loads, which is a weaker claim
+    `_parses_as_yaml` proves the shard still loads, which is a weaker claim
     than it looks: a hydrated value can be perfectly valid YAML and still be the
     wrong *type* coming back. Nitrogen monoxide's short name is `no`, which YAML
     1.1 resolves to the boolean `False` — the file parses, and the catalog then

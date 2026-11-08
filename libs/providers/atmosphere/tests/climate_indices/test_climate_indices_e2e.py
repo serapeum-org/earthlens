@@ -11,7 +11,6 @@ Run with:
 
 from __future__ import annotations
 
-import socket
 from pathlib import Path
 
 import pandas as pd
@@ -22,21 +21,8 @@ from earthlens.earthlens import EarthLens
 pytestmark = [pytest.mark.e2e, pytest.mark.climate_indices]
 
 
-def _host_ok(host: str) -> bool:
-    """Return True when `host` is reachable on port 443."""
-    try:
-        socket.create_connection((host, 443), timeout=5).close()
-        return True
-    except OSError:
-        return False
-
-
-_psl_skip = pytest.mark.skipif(
-    not _host_ok("psl.noaa.gov"), reason="NOAA PSL host unreachable"
-)
-_climexp_skip = pytest.mark.skipif(
-    not _host_ok("climexp.knmi.nl"), reason="KNMI climexp host unreachable"
-)
+_psl_skip = pytest.mark.requires_host("psl.noaa.gov")
+_climexp_skip = pytest.mark.requires_host("climexp.knmi.nl")
 
 
 @_psl_skip

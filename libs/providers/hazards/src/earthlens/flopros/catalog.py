@@ -2,13 +2,13 @@
 
 The FLOPROS backend fetches one shapefile — the global FLOPROS database of
 flood-protection standards (Scussolini et al., 2016) — so the catalog is a
-single :class:`FloprosDataset` row under the inherited :attr:`datasets` map,
+single `FloprosDataset` row under the inherited `datasets` map,
 keyed `"flopros"`. The row carries the supplement-zip `url`, the
 `shapefile_stem` inside it, the `identity_columns` kept on every polygon, and
 the `layers:` map from a public layer name (`"merged_riverine"`) to its source
 `.dbf` column (`"MerL_Riv"`), plus the top-level `license` / `attribution`.
 
-:data:`CATALOG_PATH` is the path to the bundled YAML; it is monkey-patchable in
+`CATALOG_PATH` is the path to the bundled YAML; it is monkey-patchable in
 tests.
 """
 
@@ -39,7 +39,7 @@ class FloprosDataset(SummarisedLeaf):
     """The FLOPROS shapefile's download + column spec.
 
     The dataset name (`"flopros"`) is the parent key in
-    :attr:`Catalog.datasets`, not stored on the row.
+    `Catalog.datasets`, not stored on the row.
 
     Attributes:
         url: Download URL of the NHESS supplement zip the shapefile lives in.
@@ -80,10 +80,10 @@ def _load_catalog_data(path: Path) -> dict[str, Any]:
     """Parse, validate, and cache the catalog at `path`.
 
     Args:
-        path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
+        path: Path to the catalog YAML (default `CATALOG_PATH`).
 
     Returns:
-        dict[str, Any]: Every field a :class:`Catalog` is built from.
+        dict[str, Any]: Every field a `Catalog` is built from.
 
     Raises:
         ValueError: If the file has no `datasets:` block or the row fails
@@ -123,12 +123,12 @@ class Catalog(AbstractCatalog[FloprosDataset]):
     """Catalog for the FLOPROS flood-protection-standard backend.
 
     Reads the bundled `flopros_data_catalog.yaml` (shipped as package data) and
-    exposes its single `flopros` row under the inherited :attr:`datasets` map,
+    exposes its single `flopros` row under the inherited `datasets` map,
     plus the `license` / `attribution`. Instantiate with no arguments
-    (`Catalog()`); resolve the row with :meth:`get`.
+    (`Catalog()`); resolve the row with `get`.
 
     Attributes:
-        datasets: Map with the single `"flopros"` -> :class:`FloprosDataset`
+        datasets: Map with the single `"flopros"` -> `FloprosDataset`
             row.
         license: SPDX-style redistribution licence (`"CC-BY-3.0"`).
         attribution: Required citation string.
@@ -173,10 +173,10 @@ class Catalog(AbstractCatalog[FloprosDataset]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the module-level
-                :data:`CATALOG_PATH`.
+                `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If the file has no `datasets:` block or the row fails
@@ -186,9 +186,9 @@ class Catalog(AbstractCatalog[FloprosDataset]):
         return cls(**_load_catalog_data(catalog_path))
 
     def get(self, dataset: str = "flopros") -> FloprosDataset:
-        """Resolve a dataset name to its :class:`FloprosDataset` row.
+        """Resolve a dataset name to its `FloprosDataset` row.
 
-        Thin wrapper over the inherited :meth:`get_dataset`, which raises a
+        Thin wrapper over the inherited `get_dataset`, which raises a
         `ValueError` with a did-you-mean hint on an unknown name.
 
         Args:

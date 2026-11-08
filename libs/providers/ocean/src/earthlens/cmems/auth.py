@@ -1,7 +1,7 @@
 """Credentials and authentication for the Copernicus Marine backend.
 
-Hosts :class:`CmemsAuth`, an :class:`earthlens.base.AbstractAuth`
-subclass that wraps :func:`copernicusmarine.login`. The toolbox stores
+Hosts `CmemsAuth`, an `earthlens.base.AbstractAuth`
+subclass that wraps `copernicusmarine.login`. The toolbox stores
 credentials in a per-user configuration directory (default
 `~/.copernicusmarine/`); after a successful `login()` every
 subsequent `subset()` / `open_dataset()` call in the same process
@@ -10,7 +10,7 @@ authenticated automatically.
 
 The auth wrapper exists so that:
 
-* The facade can build a :class:`CmemsCredentials` value object up
+* The facade can build a `CmemsCredentials` value object up
   front, validate it with pydantic, and pass it through
   `super().__init__(creds)` — consistent with `EarthEngineAuth`
   (C2's reference shape).
@@ -21,7 +21,7 @@ The auth wrapper exists so that:
 * Toolbox errors (`InvalidUsernameOrPassword`,
   `CouldNotConnectToAuthenticationSystem`,
   `CredentialsCannotBeNone`) are re-raised as the cross-backend
-  :class:`AuthenticationError`, so a caller can write one
+  `AuthenticationError`, so a caller can write one
   `except AuthenticationError` clause across CMEMS / GEE / future
   backends.
 
@@ -36,7 +36,7 @@ The credentials source-of-truth priority used by `configure()` is:
 4. An explicit `credentials_file=` path.
 
 If none of the above resolve, `configure()` raises
-:class:`AuthenticationError` rather than blocking on the toolbox's
+`AuthenticationError` rather than blocking on the toolbox's
 interactive prompt.
 """
 
@@ -72,7 +72,7 @@ class AuthenticationError(_BaseAuthenticationError):
     `COPERNICUSMARINE_SERVICE_PASSWORD` environment variables.
 
     A subclass of the cross-backend
-    :class:`earthlens.base.AuthenticationError` so callers can catch
+    `earthlens.base.AuthenticationError` so callers can catch
     every backend's auth failure with one `except` clause.
     """
 
@@ -85,14 +85,14 @@ class CmemsCredentials(BaseModel):
     username/password, a path to a pre-existing credentials file, or
     no fields at all (and rely on env vars / a saved configuration
     directory). Validation is intentionally permissive — the real
-    "do these creds work?" gate is :meth:`CmemsAuth.configure`,
+    "do these creds work?" gate is `CmemsAuth.configure`,
     which talks to the auth server.
 
     Attributes:
         username: Copernicus Marine portal account email or username.
             `None` means "look at the environment / saved config".
         password: Account password. Stored as
-            :class:`pydantic.SecretStr` so it is never echoed by
+            `pydantic.SecretStr` so it is never echoed by
             `repr(creds)` or in logs. `None` means same as
             `username`.
         credentials_file: Optional path to a
@@ -140,9 +140,9 @@ class CmemsCredentials(BaseModel):
 class CmemsAuth(AbstractAuth[CmemsCredentials]):
     """Authenticate the Copernicus Marine toolbox.
 
-    Wraps :func:`copernicusmarine.login` in the
-    :class:`earthlens.base.AbstractAuth` contract (C2). Calling
-    :meth:`configure` once on a process is enough: the toolbox
+    Wraps `copernicusmarine.login` in the
+    `earthlens.base.AbstractAuth` contract (C2). Calling
+    `configure` once on a process is enough: the toolbox
     writes a credentials file under
     `~/.copernicusmarine/` (overridable via
     `configuration_file_directory`) and every subsequent
@@ -151,14 +151,14 @@ class CmemsAuth(AbstractAuth[CmemsCredentials]):
     is authenticated automatically.
 
     The class is a context manager (inherited from
-    :class:`AbstractAuth`): `with CmemsAuth(creds) as auth: ...`
+    `AbstractAuth`): `with CmemsAuth(creds) as auth: ...`
     calls `configure()` on enter and the default no-op `close()` on
     exit (the toolbox has no per-instance handle to release; the
     credentials are file-backed).
 
     Attributes:
-        _creds: The :class:`CmemsCredentials` passed at
-            construction. Read by :meth:`configure` to resolve
+        _creds: The `CmemsCredentials` passed at
+            construction. Read by `configure` to resolve
             username/password/credentials-file. Treated as
             write-once.
 
@@ -181,15 +181,15 @@ class CmemsAuth(AbstractAuth[CmemsCredentials]):
     def __init__(self, credentials: CmemsCredentials) -> None:
         """Store credentials; does not authenticate.
 
-        Unlike :class:`earthlens.gee.EarthEngineAuth`, construction
+        Unlike `earthlens.gee.EarthEngineAuth`, construction
         does not call the network — the user must call
-        :meth:`configure` (or use the context-manager form). This
+        `configure` (or use the context-manager form). This
         keeps `CMEMS(...)` construction side-effect-free for
         callers who only want to inspect `space` / `time` without
         actually downloading.
 
         Args:
-            credentials: The :class:`CmemsCredentials` value object
+            credentials: The `CmemsCredentials` value object
                 carrying the username/password/credentials-file
                 resolution rules.
         """
@@ -199,7 +199,7 @@ class CmemsAuth(AbstractAuth[CmemsCredentials]):
     def configure(self) -> None:
         """Authenticate against the Copernicus Marine portal.
 
-        Idempotent — short-circuits when :meth:`is_authenticated`
+        Idempotent — short-circuits when `is_authenticated`
         already returns `True`. On the first call, resolves
         credentials in the order documented at the module level:
         explicit credentials passed in, then env vars, then a saved

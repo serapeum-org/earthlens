@@ -1,12 +1,12 @@
 """OIDC authentication for the openEO backend (CDSE / openEO Platform).
 
-Hosts :class:`OpeneoAuth`, a thin wrapper over the `openeo` client's OpenID
+Hosts `OpeneoAuth`, a thin wrapper over the `openeo` client's OpenID
 Connect entry points. Unlike the static-key backends (a `~/.cdsapirc`, an AWS
 key, a service-account JSON), openEO authenticates against an OIDC provider —
 on CDSE that is the same account as the STAC `cdse` endpoint, but a different
 auth plane (OIDC tokens here vs S3 keys there).
 
-The resolution order in :meth:`OpeneoAuth.configure` mirrors the openEO client's
+The resolution order in `OpeneoAuth.configure` mirrors the openEO client's
 own ergonomics:
 
 1. **client-credentials** — when a `client_id` (+ `client_secret`) is supplied
@@ -18,7 +18,7 @@ own ergonomics:
    reuses a refresh token cached on disk (`~/.openeo/`) from an earlier login,
    or prints a URL + code for a human to complete the device flow.
 
-Any failure is wrapped as :class:`AuthenticationError` with a pointer at the
+Any failure is wrapped as `AuthenticationError` with a pointer at the
 CDSE account URL, never a raw `openeo` exception.
 """
 
@@ -46,7 +46,7 @@ class AuthenticationError(_BaseAuthenticationError):
     Wraps the underlying `openeo` / OIDC errors with an actionable message —
     most commonly no cached refresh token in a headless run, missing client
     credentials, or a rejected token. A subclass of the cross-backend
-    :class:`earthlens.base.AuthenticationError` so callers can catch every
+    `earthlens.base.AuthenticationError` so callers can catch every
     backend's auth failure with one `except` clause.
     """
 
@@ -120,18 +120,18 @@ class OpeneoCredentials(BaseModel):
 
 
 class OpeneoAuth(AbstractAuth[OpeneoCredentials]):
-    """Authenticate and hold an openEO :class:`Connection`.
+    """Authenticate and hold an openEO `Connection`.
 
-    Conforms to the cross-backend :class:`earthlens.base.AbstractAuth` contract:
-    :meth:`configure` opens the connection and runs the OIDC flow lazily and
-    idempotently; :meth:`is_authenticated` is the cheap predicate; and
-    :meth:`connection` returns the configured connection (configuring on first
+    Conforms to the cross-backend `earthlens.base.AbstractAuth` contract:
+    `configure` opens the connection and runs the OIDC flow lazily and
+    idempotently; `is_authenticated` is the cheap predicate; and
+    `connection` returns the configured connection (configuring on first
     use). The connection is built once and reused for every download in the
     session.
 
     Args:
         credentials: The OIDC credentials. Defaults to an empty
-            :class:`OpeneoCredentials` (interactive / cached-token flow).
+            `OpeneoCredentials` (interactive / cached-token flow).
         endpoint: A named endpoint alias (`"cdse"`, `"cdse-federation"`,
             `"openeo-platform"`) or a full URL. Defaults to CDSE core.
 
@@ -173,7 +173,7 @@ class OpeneoAuth(AbstractAuth[OpeneoCredentials]):
 
         Selects the flow by which credentials are present: client-credentials
         (a `client_id`), then refresh-token, then the interactive device flow.
-        A second call after :meth:`is_authenticated` returns `True` is a no-op.
+        A second call after `is_authenticated` returns `True` is a no-op.
 
         Raises:
             ImportError: When the `openeo` extra is not installed.
@@ -214,7 +214,7 @@ class OpeneoAuth(AbstractAuth[OpeneoCredentials]):
         self._conn = conn
 
     def is_authenticated(self) -> bool:
-        """`True` once :meth:`configure` has opened an authenticated connection.
+        """`True` once `configure` has opened an authenticated connection.
 
         Cheap predicate — does not call the network. Returns `True` exactly when
         a connection object has been stored.

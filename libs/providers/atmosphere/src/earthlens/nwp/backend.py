@@ -14,7 +14,7 @@ The request shape is `variables = {model_key: [param, ...]}` (mirrors
 the GEE / STAC backends). Each `param` resolves through the catalog to
 the centre's selector — a Herbie `search` regex or a DWD variable
 token. The download path per model is the catalog `backend:` value,
-dispatched to a sibling :mod:`earthlens.nwp.centres` module.
+dispatched to a sibling `earthlens.nwp.centres` module.
 
 `OUTPUT_KIND` is fixed `"raster"`: every centre yields a GRIB2 file
 that the shared pipeline reads with `pyramids.grib.open_grib`, crops
@@ -105,7 +105,7 @@ class NWP(AbstractDataSource):
 
         Resolves every requested model key against the catalog
         **before** the parent constructor runs, because the parent
-        calls :meth:`_initialize` first and `self.vars` is not yet set
+        calls `_initialize` first and `self.vars` is not yet set
         there.
 
         Args:
@@ -145,7 +145,7 @@ class NWP(AbstractDataSource):
                 whole-per-variable, so `mode` is a no-op there.
                 `"zarr"` is rejected (no `nwp` catalog row carries a
                 `zarr_url`).
-            catalog: Optional pre-built :class:`Catalog` (tests inject
+            catalog: Optional pre-built `Catalog` (tests inject
                 a faked one); defaults to the bundled catalog.
 
         Raises:
@@ -248,7 +248,7 @@ class NWP(AbstractDataSource):
 
         Stacklevel attribution: 3 frames is correct for a direct
         `NWP(...)` call (1=this method, 2=`__init__`, 3=caller). The
-        :class:`~earthlens.core.EarthLens` facade adds one frame, so a
+        `EarthLens` facade adds one frame, so a
         facade-route warning is attributed to `earthlens.py`; users
         wanting a precise call-site should filter on
         `category=RetentionWarning` rather than module.
@@ -277,11 +277,11 @@ class NWP(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse the cycle-date range into a :class:`TemporalExtent`.
+        """Parse the cycle-date range into a `TemporalExtent`.
 
         For NWP the `dates` index is the requested **cycle date**
         range; the per-cycle / per-step expansion happens in
-        :meth:`_search` (`C3`).
+        `_search` (`C3`).
 
         Args:
             start: Inclusive start of the cycle-date range.
@@ -378,7 +378,7 @@ class NWP(AbstractDataSource):
         return [model.members[0]]
 
     def _centre_for(self, backend: str) -> _NWPCentre:
-        """Return the cached :class:`_NWPCentre` for a catalog `backend:`.
+        """Return the cached `_NWPCentre` for a catalog `backend:`.
 
         Args:
             backend: The model's `backend:` value (e.g. `"herbie"`).
@@ -452,12 +452,12 @@ class NWP(AbstractDataSource):
         A single `(cycle, step)` can legitimately be unavailable — the
         latest cycle may not be published yet, or a model may not carry
         a step on every cycle (`M2`/`M4`). The `errors` policy (set by
-        :meth:`download`, default `"warn"`) governs that: `"warn"` logs
+        `download`, default `"warn"`) governs that: `"warn"` logs
         the miss and keeps the COGs already produced, `"skip"` drops it
         silently, and `"raise"` aborts the whole fetch.
 
         Args:
-            products: The products from :meth:`_search`.
+            products: The products from `_search`.
 
         Returns:
             list[Path]: One cropped COG path per successfully fetched
@@ -502,11 +502,11 @@ class NWP(AbstractDataSource):
     def _fetch_one(self, product: RemoteProduct) -> Path:
         """Fetch + crop + write the COG for one product (no error handling).
 
-        Reads the batch context :meth:`_fetch` set up — the crop box and the
+        Reads the batch context `_fetch` set up — the crop box and the
         two pyramids entry points it imported once — from the instance.
 
         Args:
-            product: One product from :meth:`_search`.
+            product: One product from `_search`.
 
         Returns:
             pathlib.Path: The written COG path.
@@ -584,7 +584,7 @@ class NWP(AbstractDataSource):
             progress_bar: Whether the centres show per-download progress
                 (threaded into Herbie's `verbose`).
             aggregate: Optional
-                :class:`earthlens.aggregate.AggregationConfig`; reduces
+                `earthlens.aggregate.AggregationConfig`; reduces
                 the `(cycle, step)` COG stack (`C6`).
             errors: How to treat a `(cycle, step)` that fails to fetch or
                 crop (an unpublished cycle, a step the model does not
@@ -633,7 +633,7 @@ class NWP(AbstractDataSource):
         mixes its step-dependent windows and can mislead (`M3`).
 
         Args:
-            paths: The per-`(cycle, step)` COGs from :meth:`_fetch`.
+            paths: The per-`(cycle, step)` COGs from `_fetch`.
             config: The aggregation request (`freq` window, `op`
                 reducer, `out_dir`, `skipna`).
 

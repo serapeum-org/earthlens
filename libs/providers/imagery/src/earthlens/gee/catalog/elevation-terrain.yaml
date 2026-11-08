@@ -15,6 +15,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Open Data (AHN).'
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [-5]
+        vmax: [30]
     bands:
       elevation:
         description: Interpolated lidar elevation
@@ -32,6 +37,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Open Data (AHN).'
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [-5]
+        vmax: [30]
     bands:
       elevation:
         description: Lidar elevation, non-interpolated cells only
@@ -49,6 +59,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Open Data (AHN).'
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [-5]
+        vmax: [30]
     bands:
       elevation:
         description: Raw lidar elevation samples
@@ -66,6 +81,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Open Data (AHN).'
+    visualizations:
+      - name: "AHN Netherlands"
+        bands: ["dsm"]
+        vmin: [0]
+        vmax: [30]
     bands:
       dtm:
         description: Digital Terrain Model (bare-earth elevation)
@@ -86,6 +106,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Open Data (AHN).'
+    visualizations:
+      - name: "AHN Netherlands"
+        bands: ["dsm"]
+        vmin: [0]
+        vmax: [30]
     bands:
       dtm:
         description: Digital Terrain Model (bare-earth elevation)
@@ -105,6 +130,12 @@ datasets:
       bbox: [114.09, -43.45, 153.64, -9.88]
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [0]
+        vmax: [150]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000", "ffffff"]
     bands:
       elevation:
         description: Bare-earth elevation
@@ -121,6 +152,12 @@ datasets:
       bbox: [112.99, -44.06, 154, -9.99]
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [-10]
+        vmax: [1300]
+        palette: ["3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f"]
     bands:
       elevation:
         description: Hydrologically enforced bare-earth elevation
@@ -137,6 +174,12 @@ datasets:
       bbox: [112.99, -44.06, 154, -9.99]
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [-10]
+        vmax: [1300]
+        palette: ["3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f"]
     bands:
       elevation:
         description: Smoothed bare-earth elevation
@@ -154,6 +197,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free for non-commercial use; commercial requires attribution (CGIAR-CSI).'
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [-100]
+        vmax: [8000]
     bands:
       elevation:
         description: Bare-earth elevation (void-filled)
@@ -170,6 +218,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free for any use under the Copernicus DEM licence.'
+    visualizations:
+      - name: "Elevation"
+        bands: ["DEM"]
+        vmin: [0]
+        vmax: [1000]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000", "ffffff"]
     bands:
       DEM:
         description: Digital Surface Model elevation
@@ -194,6 +248,12 @@ datasets:
     default_reducer: mosaic
     license: unknown
     terms_note: 'Free for use with citation (CPOM).'
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [0]
+        vmax: [4000]
+        palette: ["001fff", "00ffff", "fbff00", "ff0000"]
     bands:
       elevation:
         description: Antarctic ice-sheet and ice-shelf elevation
@@ -212,6 +272,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-NC-SA-4.0
     source: republished
+    visualizations:
+      - name: "ALOS CHILI"
+        bands: ["constant"]
+        vmin: [0]
+        vmax: [255]
     bands:
       constant:
         description: ALOS-derived CHILI index (0=very cool ... 255=very warm)
@@ -229,6 +294,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-NC-SA-4.0
     source: republished
+    visualizations:
+      - name: "Landforms"
+        bands: ["constant"]
+        vmin: [11]
+        vmax: [42]
+        palette: ["141414", "383838", "808080", "ebeb8f", "f7d311", "aa0000", "d89382", "ddc9c9", "dccdce", "1c6330", "68aa63", "b5c98e", "e1f0e5", "a975ba", "6f198c"]
     bands:
       constant:
         description: ALOS-derived landform classes
@@ -244,6 +315,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-NC-SA-4.0
     source: republished
+    visualizations:
+      - name: "ALOS mTPI"
+        bands: ["AVE"]
+        vmin: [-200]
+        vmax: [200]
+        palette: ["0b1eff", "4be450", "fffca4", "ffa011", "ff0000"]
     bands:
       AVE:
         description: ALOS-derived mTPI (negative=valleys, positive=ridges)
@@ -260,6 +337,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-NC-SA-4.0
     source: republished
+    visualizations:
+      - name: "ALOS Topographic Diversity"
+        bands: ["constant"]
+        vmin: [0]
+        vmax: [1]
     bands:
       constant:
         description: ALOS-derived topographic diversity
@@ -277,6 +359,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-NC-SA-4.0
     source: republished
+    visualizations:
+      - name: "SRTM CHILI"
+        bands: ["constant"]
+        vmin: [0]
+        vmax: [255]
     bands:
       constant:
         description: SRTM-derived CHILI index (0=very cool ... 255=very warm)
@@ -294,6 +381,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-NC-SA-4.0
     source: republished
+    visualizations:
+      - name: "Landforms"
+        bands: ["constant"]
+        vmin: [11]
+        vmax: [42]
+        palette: ["141414", "383838", "808080", "ebeb8f", "f7d311", "aa0000", "d89382", "ddc9c9", "dccdce", "1c6330", "68aa63", "b5c98e", "e1f0e5", "a975ba", "6f198c"]
     bands:
       constant:
         description: SRTM-derived landform class
@@ -309,6 +402,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-NC-SA-4.0
     source: republished
+    visualizations:
+      - name: "SRTM mTPI"
+        bands: ["elevation"]
+        vmin: [-200]
+        vmax: [200]
+        palette: ["0b1eff", "4be450", "fffca4", "ffa011", "ff0000"]
     bands:
       elevation:
         description: SRTM-derived mTPI (negative=valleys, positive=ridges)
@@ -325,6 +424,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-NC-SA-4.0
     source: republished
+    visualizations:
+      - name: "SRTM Topographic Diversity"
+        bands: ["constant"]
+        vmin: [0]
+        vmax: [1]
     bands:
       constant:
         description: SRTM-derived topographic-diversity index
@@ -341,6 +445,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-NC-SA-4.0
     source: republished
+    visualizations:
+      - name: "US CHILI"
+        bands: ["constant"]
+        vmin: [0]
+        vmax: [255]
     bands:
       constant:
         description: NED-derived CHILI index (0=very cool ... 255=very warm)
@@ -359,6 +468,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-NC-SA-4.0
     source: republished
+    visualizations:
+      - name: "Landforms"
+        bands: ["constant"]
+        vmin: [11]
+        vmax: [42]
+        palette: ["141414", "383838", "808080", "ebeb8f", "f7d311", "aa0000", "d89382", "ddc9c9", "dccdce", "1c6330", "68aa63", "b5c98e", "e1f0e5", "a975ba", "6f198c"]
     bands:
       constant:
         description: NED-derived landform classes
@@ -375,6 +490,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-NC-SA-4.0
     source: republished
+    visualizations:
+      - name: "Lithology"
+        bands: ["b1"]
+        vmin: [0]
+        vmax: [20]
+        palette: ["356eff", "acb6da", "d6b879", "313131", "eda800", "616161", "d6d6d6", "d0ddae", "b8d279", "d5d378", "141414", "6db155", "9b6d55", "feeec9", "d6b879", "00b7ec", "ffda90", "f8b28c"]
     bands:
       b1:
         description: Lithology classes
@@ -391,6 +512,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-NC-SA-4.0
     source: republished
+    visualizations:
+      - name: "US mTPI"
+        bands: ["elevation"]
+        vmin: [-200]
+        vmax: [200]
+        palette: ["0b1eff", "4be450", "fffca4", "ffa011", "ff0000"]
     bands:
       elevation:
         description: NED-derived mTPI (negative=valleys, positive=ridges)
@@ -408,6 +535,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-NC-SA-4.0
     source: republished
+    visualizations:
+      - name: "Physiographic Diversity"
+        bands: ["b1"]
+        vmin: [0]
+        vmax: [1]
     bands:
       b1:
         description: Physiographic diversity
@@ -426,6 +558,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-NC-SA-4.0
     source: republished
+    visualizations:
+      - name: "Physiography"
+        bands: ["constant"]
+        vmin: [1100]
+        vmax: [4220]
     bands:
       constant:
         description: Landforms and lithology intersection
@@ -444,6 +581,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-NC-SA-4.0
     source: republished
+    visualizations:
+      - name: "US Topographic Diversity"
+        bands: ["constant"]
+        vmin: [0]
+        vmax: [1]
     bands:
       constant:
         description: NED-derived topographic diversity
@@ -461,6 +603,12 @@ datasets:
       bbox: [-5.2, 41.35, 9.85, 51.14]
     default_reducer: mosaic
     license: etalab-2.0
+    visualizations:
+      - name: "MNT (elevation)"
+        bands: ["MNT"]
+        vmin: [1]
+        vmax: [1000]
+        palette: ["006600", "002200", "fff700", "ab7634", "c4d0ff", "ffffff"]
     bands:
       MNT:
         description: Terrain elevation in meters.
@@ -486,6 +634,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free for any use, attribution required (JAXA AW3D30 terms).'
+    visualizations:
+      - name: "Elevation"
+        bands: ["AVE"]
+        vmin: [0]
+        vmax: [4000]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000", "ffffff"]
     bands:
       AVE:
         description: Height above sea level (averaged DSM)
@@ -505,6 +659,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free for any use, attribution required (JAXA AW3D30 terms).'
+    visualizations:
+      - name: "Elevation"
+        bands: ["AVE_DSM"]
+        vmin: [0]
+        vmax: [15369]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000", "ffffff"]
     bands:
       AVE_DSM:
         description: Height above sea level (averaged DSM)
@@ -525,6 +685,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free for any use, attribution required (JAXA AW3D30 terms).'
+    visualizations:
+      - name: "Elevation"
+        bands: ["AVE_DSM"]
+        vmin: [0]
+        vmax: [15355]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000", "ffffff"]
     bands:
       AVE_DSM:
         description: Height above sea level (averaged DSM)
@@ -545,6 +711,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free for any use, attribution required (JAXA AW3D30 terms).'
+    visualizations:
+      - name: "Elevation"
+        bands: ["DSM"]
+        vmin: [0]
+        vmax: [5000]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000", "ffffff"]
     bands:
       DSM:
         description: Height above sea level
@@ -571,6 +743,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free for any use, attribution required (JAXA AW3D30 terms).'
+    visualizations:
+      - name: "Elevation"
+        bands: ["DSM"]
+        vmin: [0]
+        vmax: [5000]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000", "ffffff"]
     bands:
       DSM:
         description: Height above sea level
@@ -621,6 +799,12 @@ datasets:
       bbox: [-180, -51.6, 180, 51.6]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Relative height"
+        bands: ["rh98"]
+        vmin: [1]
+        vmax: [60]
+        palette: ["darkred", "red", "orange", "green", "darkgreen"]
     bands:
       elev_highestreturn:
         description: Elevation of the highest detected return
@@ -693,6 +877,12 @@ datasets:
       bbox: [-180, -51.6, 180, 51.6]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Solar Elevation"
+        bands: ["solar_elevation"]
+        vmin: [1]
+        vmax: [60]
+        palette: ["darkred", "red", "orange", "green", "darkgreen"]
     bands:
       cover:
         description: Total canopy cover
@@ -756,6 +946,12 @@ datasets:
       bbox: [-180, -51.6, 180, 51.6]
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Relative height"
+        bands: ["agbd"]
+        vmin: [1]
+        vmax: [60]
+        palette: ["darkred", "red", "orange", "green", "darkgreen"]
     bands:
       agbd:
         description: Predicted above-ground biomass density
@@ -783,6 +979,12 @@ datasets:
       bbox: [-180, -52, 180, 52]
     default_reducer: mosaic
     license: public-domain
+    visualizations:
+      - name: "Mean biomass"
+        bands: ["MU"]
+        vmin: [1]
+        vmax: [60]
+        palette: ["darkred", "red", "orange", "green", "darkgreen"]
     bands:
       MU:
         description: Mean above-ground biomass density
@@ -817,6 +1019,12 @@ datasets:
     license: public-domain
     terms_note: 'This dataset is in the public domain and is available'
     source: republished
+    visualizations:
+      - name: "shots_count"
+        bands: ["shots_count"]
+        vmin: [1]
+        vmax: [60]
+        palette: ["darkred", "red", "orange", "green", "darkgreen"]
     bands:
       shots_count:
         description: The number of shots. For a shot to be counted in this layer the
@@ -840,6 +1048,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     source: republished
+    visualizations:
+      - name: "shots_count"
+        bands: ["shots_count"]
+        vmin: [1]
+        vmax: [60]
+        palette: ["darkred", "red", "orange", "green", "darkgreen"]
     bands:
       shots_count:
         description: Number of GEDI shots contributing to the pixel
@@ -863,6 +1077,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     source: republished
+    visualizations:
+      - name: "shots_count"
+        bands: ["shots_count"]
+        vmin: [1]
+        vmax: [60]
+        palette: ["darkred", "red", "orange", "green", "darkgreen"]
     bands:
       shots_count:
         description: Number of GEDI shots contributing to the pixel
@@ -886,6 +1106,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     source: republished
+    visualizations:
+      - name: "p95"
+        bands: ["p95"]
+        vmin: [1]
+        vmax: [60]
+        palette: ["darkred", "red", "orange", "green", "darkgreen"]
     bands:
       mean:
         description: Mean of GEDI shot-metric values within the pixel
@@ -915,6 +1141,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     source: republished
+    visualizations:
+      - name: "p95"
+        bands: ["p95"]
+        vmin: [1]
+        vmax: [60]
+        palette: ["darkred", "red", "orange", "green", "darkgreen"]
     bands:
       mean:
         description: Mean of GEDI shot-metric values within the pixel
@@ -946,6 +1178,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     source: republished
+    visualizations:
+      - name: "p95"
+        bands: ["p95"]
+        vmin: [1]
+        vmax: [60]
+        palette: ["darkred", "red", "orange", "green", "darkgreen"]
     bands:
       mean:
         description: Mean of GEDI shot-metric values within the pixel
@@ -975,6 +1213,12 @@ datasets:
     license: proprietary
     terms_note: 'Free with citation (Yamazaki et al., 2017).'
     source: republished
+    visualizations:
+      - name: "Elevation"
+        bands: ["dem"]
+        vmin: [-3]
+        vmax: [18]
+        palette: ["000000", "478fcd", "86c58e", "afc35e", "8f7131", "b78d4f", "e2b8a6", "ffffff"]
     bands:
       dem:
         description: Elevation referenced to the EGM96 geoid
@@ -992,6 +1236,9 @@ datasets:
     license: proprietary
     terms_note: 'Free with citation (Yamazaki et al., 2019).'
     source: republished
+    visualizations:
+      - name: "River width"
+        bands: ["viswth"]
     bands:
       elv:
         description: Elevation (referenced to EGM96 geoid)
@@ -1024,6 +1271,11 @@ datasets:
     license: proprietary
     terms_note: 'Citation to the paper is adequate if you simply use MERIT Hydro. If you'
     source: republished
+    visualizations:
+      - name: "River width"
+        bands: ["wth"]
+        vmin: [0]
+        vmax: [400]
     bands:
       wth:
         description: River channel width at the channel centerlines. River channel width is
@@ -1042,6 +1294,12 @@ datasets:
       bbox: [-180, -59, 180, 80]
     default_reducer: mosaic
     license: public-domain
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [-15]
+        vmax: [5000]
+        palette: ["0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301"]
     bands:
       emissivity_band10:
         description: ASTER band 10 mean emissivity
@@ -1084,6 +1342,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'Most materials published on the Earth Observatory, including images, are'
+    visualizations:
+      - name: "Forest Canopy Height"
+        bands: ["1"]
+        vmin: [0]
+        vmax: [30]
+        palette: ["ffffff", "fcd163", "99b718", "66a000", "3e8601", "207401", "056201", "004c00", "011301"]
     bands:
       "1":
         description: Tree heights
@@ -1103,6 +1367,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Tree Canopy Cover"
+        bands: ["tree_canopy_cover"]
+        vmin: [0]
+        vmax: [100]
+        palette: ["ffffff", "afce56", "5f9c00", "0e6a00", "003800"]
     bands:
       tree_canopy_cover:
         description: Per-pixel tree-canopy cover
@@ -1125,6 +1395,12 @@ datasets:
       bbox: [-180, -56, 180, 60]
     default_reducer: mosaic
     license: public-domain
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [0]
+        vmax: [6000]
+        gamma: [1.6]
     bands:
       elevation:
         description: Void-filled merged DEM elevation
@@ -1151,6 +1427,12 @@ datasets:
       end_date: "2008-08-01"
     default_reducer: mosaic
     license: public-domain
+    visualizations:
+      - name: "Elevation"
+        bands: ["bedrock"]
+        vmin: [-7000]
+        vmax: [3000]
+        palette: ["011de2", "afafaf", "3603ff", "fff477", "b42109"]
     bands:
       bedrock:
         description: Elevation at ground level / base of Antarctic and Greenland ice sheets
@@ -1171,6 +1453,12 @@ datasets:
     default_reducer: median
     license: unknown
     terms_note: 'Licensed under the'
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [-50]
+        vmax: [1500]
+        palette: ["0905ff", "ffefc4", "ffffff"]
     bands:
       elevation:
         description: Elevation
@@ -1190,6 +1478,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free with citation (OSU Greenland Mapping Project).'
+    visualizations:
+      - name: "Ocean and Ice Mask"
+        bands: ["ice_mask", "ice_mask", "ocean_mask"]
+        vmin: [0]
+        vmax: [1]
     bands:
       ocean_mask:
         description: Ocean mask (binary)
@@ -1208,6 +1501,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free with citation (OSU Greenland Mapping Project).'
+    visualizations:
+      - name: "Greenland Pansharpened Image Mosaic RGB"
+        bands: ["B3", "B2", "B1"]
+        vmin: [0]
+        vmax: [255]
     bands:
       B1:
         description: Landsat-7 ETM+ blue
@@ -1232,6 +1530,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free with citation (OSU Greenland Mapping Project).'
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [0]
+        vmax: [2000]
     bands:
       elevation:
         description: Bare-earth elevation
@@ -1250,6 +1553,11 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free with citation (NASA NSIDC).'
+    visualizations:
+      - name: "Ice Velocity"
+        bands: ["velocity_x"]
+        vmin: [-1000]
+        vmax: [1000]
     bands:
       velocity_x:
         description: Ice flow X-component velocity
@@ -1275,6 +1583,11 @@ datasets:
     default_reducer: median
     license: proprietary
     terms_note: 'You are free to: copy, publish, distribute and transmit the Information;'
+    visualizations:
+      - name: "DEM of Manchester, England"
+        bands: ["dtm", "dsm_first", "dsm_last"]
+        vmin: [-142]
+        vmax: [313]
     bands:
       dtm:
         description: Digital Terrain Model
@@ -1298,6 +1611,12 @@ datasets:
     default_reducer: median
     license: proprietary
     terms_note: 'National Science Foundation (PGC''s primary funding source) policy requires'
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [-50]
+        vmax: [1000]
+        palette: ["0d13d8", "60e1ff", "ffffff"]
     bands:
       elevation:
         description: Elevation
@@ -1317,6 +1636,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'National Science Foundation (PGC''s primary funding source) policy requires'
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [-50]
+        vmax: [1000]
+        palette: ["0d13d8", "60e1ff", "ffffff"]
     bands:
       elevation:
         description: Elevation
@@ -1338,6 +1663,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'National Science Foundation (PGC''s primary funding source) policy requires'
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [-50]
+        vmax: [1000]
+        palette: ["0d13d8", "60e1ff", "ffffff"]
     bands:
       elevation:
         description: Elevation
@@ -1357,6 +1688,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'National Science Foundation (PGC''s primary funding source) policy requires'
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [-50]
+        vmax: [1000]
+        palette: ["0d13d8", "60e1ff", "ffffff"]
     bands:
       elevation:
         description: Elevation
@@ -1376,6 +1713,27 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'National Science Foundation (PGC''s primary funding source) policy requires'
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [-50]
+        vmax: [1000]
+        palette: ["0d13d8", "60e1ff", "ffffff"]
+      - name: "Data Count"
+        bands: ["count"]
+        vmin: [0]
+        vmax: [10]
+        palette: ["black", "blue", "purple", "cyan", "green", "yellow", "red"]
+      - name: "MAD"
+        bands: ["mad"]
+        vmin: [0]
+        vmax: [50]
+        palette: ["006633", "E69800", "D4E157", "FFF59D"]
+      - name: "Data Mask"
+        bands: ["datamask"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["black", "white"]
     bands:
       elevation:
         description: Elevation
@@ -1406,6 +1764,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'National Science Foundation (PGC''s primary funding source) policy requires'
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [-50]
+        vmax: [1000]
+        palette: ["0d13d8", "60e1ff", "ffffff"]
     bands:
       elevation:
         description: Elevation
@@ -1425,6 +1789,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'National Science Foundation (PGC''s primary funding source) policy requires'
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [-50]
+        vmax: [1000]
+        palette: ["0d13d8", "60e1ff", "ffffff"]
     bands:
       elevation:
         description: Elevation
@@ -1444,6 +1814,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'National Science Foundation (PGC''s primary funding source) policy requires'
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [-50]
+        vmax: [1000]
+        palette: ["0d13d8", "60e1ff", "ffffff"]
     bands:
       elevation:
         description: Elevation
@@ -1461,6 +1837,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     source: republished
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [0]
+        vmax: [4000]
+        gamma: [1.6]
     bands:
       elevation:
         description: Bare-earth elevation
@@ -1479,6 +1861,12 @@ datasets:
     license: public-domain
     terms_note: 'Most U.S. Geological Survey (USGS) information resides'
     source: republished
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [0]
+        vmax: [4000]
+        gamma: [1.6]
     bands:
       elevation:
         description: Elevation
@@ -1510,6 +1898,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'Most U.S. Geological Survey (USGS) information resides'
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [0]
+        vmax: [3000]
+        palette: ["3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f"]
     bands:
       elevation:
         description: Elevation (NAVD88)
@@ -1526,6 +1920,12 @@ datasets:
       bbox: [-180, -56, 180, 84]
     default_reducer: mosaic
     license: public-domain
+    visualizations:
+      - name: "Elevation"
+        bands: ["be75"]
+        vmin: [-100]
+        vmax: [6500]
+        gamma: [3.5]
     bands:
       be75:
         description: Breakline-emphasis elevation
@@ -1542,6 +1942,12 @@ datasets:
       bbox: [-180, -56, 180, 84]
     default_reducer: mosaic
     license: public-domain
+    visualizations:
+      - name: "Minimum Elevation"
+        bands: ["min"]
+        vmin: [-100]
+        vmax: [6500]
+        gamma: [3.5]
     bands:
       be75:
         description: Breakline emphasis elevation
@@ -1575,6 +1981,12 @@ datasets:
       end_date: "1996-12-31"
     default_reducer: mosaic
     license: public-domain
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [-10]
+        vmax: [8000]
+        gamma: [1.6]
     bands:
       elevation:
         description: Bare-earth elevation
@@ -1592,6 +2004,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'Most U.S. Geological Survey (USGS) information resides'
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [0]
+        vmax: [4000]
+        gamma: [1.6]
     bands:
       elevation:
         description: Elevation
@@ -1609,6 +2027,12 @@ datasets:
       end_date: "2000-02-22"
     default_reducer: mosaic
     license: public-domain
+    visualizations:
+      - name: "Elevation"
+        bands: ["elevation"]
+        vmin: [0]
+        vmax: [6000]
+        gamma: [1.6]
     bands:
       elevation:
         description: Elevation above sea level
@@ -1629,6 +2053,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free for non-commercial and commercial use.'
+    visualizations:
+      - name: "Elevation"
+        bands: ["b1"]
+        vmin: [-50]
+        vmax: [3000]
+        gamma: [2]
     bands:
       b1:
         description: Hydrologically conditioned elevation
@@ -1646,6 +2076,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free for non-commercial and commercial use.'
+    visualizations:
+      - name: "Elevation"
+        bands: ["b1"]
+        vmin: [-50]
+        vmax: [3000]
+        gamma: [2]
     bands:
       b1:
         description: Hydrologically conditioned elevation

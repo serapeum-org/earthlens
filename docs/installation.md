@@ -92,7 +92,7 @@ you install the meta-package or a thematic distribution directly:
 | `cmems` | [Copernicus Marine Service](https://serapeum-org.github.io/earthlens/reference/cmems/introduction/) | `copernicusmarine >=2.0.0,<3` |
 | `cmip6` | [WCRP CMIP6](https://serapeum-org.github.io/earthlens/reference/cmip6/introduction/) | *(none — no SDK needed)* |
 | `fdsn` | [FDSN](https://serapeum-org.github.io/earthlens/reference/fdsn/introduction/) | `obspy >=1.5.0` |
-| `nwm` | [NOAA National Water Model](https://serapeum-org.github.io/earthlens/reference/nwm/introduction/) | `earthlens[s3]`, `pyramids-gis[parquet] >=0.46.0` |
+| `nwm` | [NOAA National Water Model](https://serapeum-org.github.io/earthlens/reference/nwm/introduction/) | `earthlens[s3]`, `pyramids-core[parquet] >=0.46.0` |
 | `earthdata` | [NASA Earthdata](https://serapeum-org.github.io/earthlens/reference/earthdata/introduction/) | `earthaccess >=0.18.0; python_version >= '3.12'` |
 | `asf` | [Alaska Satellite Facility (ASF)](https://serapeum-org.github.io/earthlens/reference/asf/introduction/) | `asf_search >=12.2.2`, `earthlens[earthdata]` |
 | `eea_aq` | [European Environment Agency](https://serapeum-org.github.io/earthlens/reference/eea-aq/introduction/) | `airbase >=1.0`, `nest_asyncio >=1.5` |
@@ -102,7 +102,7 @@ you install the meta-package or a thematic distribution directly:
 | `radar` | [NOAA NEXRAD](https://serapeum-org.github.io/earthlens/reference/radar/introduction/) | `earthlens[s3]` |
 | `dem` | [Copernicus DEM (ESA)](https://serapeum-org.github.io/earthlens/reference/dem/introduction/) | `earthlens[s3]` |
 | `goes` | [NOAA GOES-R](https://serapeum-org.github.io/earthlens/reference/goes/introduction/) | `earthlens[s3]` |
-| `stac` | [STAC (SpatioTemporal Asset Catalog)](https://serapeum-org.github.io/earthlens/reference/stac/introduction/) | `pyramids-gis[stac] >=0.46.0` |
+| `stac` | [STAC (SpatioTemporal Asset Catalog)](https://serapeum-org.github.io/earthlens/reference/stac/introduction/) | `pyramids-core[stac] >=0.46.0` |
 | `openeo` | [openEO](https://serapeum-org.github.io/earthlens/reference/openeo/introduction/) | `openeo >=0.47,<0.52` |
 | `sentinel-hub` | [Sentinel Hub](https://serapeum-org.github.io/earthlens/reference/sentinel-hub/introduction/) | `sentinelhub >=3.11.5` |
 | `tropycal` | [Tropycal](https://serapeum-org.github.io/earthlens/reference/tropycal/introduction/) | `tropycal >=1.4`, `cartopy >=0.22` |
@@ -119,7 +119,7 @@ you install the meta-package or a thematic distribution directly:
 | `all` | every backend above except `argo` (see [What `earthlens[all]` excludes](#what-earthlensall-excludes-and-why)) | — |
 
 
-A bare `pip install earthlens` installs only the core dependencies (numpy, pandas, pyramids-gis,
+A bare `pip install earthlens` installs only the core dependencies (numpy, pandas, pyramids-core,
 requests, …), which is enough for every backend with no extra SDK of its own: **geoBoundaries**, **AirNow**, **GEBCO/ETOPO bathymetry**, **CHC/CHIRPS**, **climate teleconnection indices**, **USDM/EDO/GDO/SPEIbase**, **NASA FIRMS**, **GDACS**, **RGI/GLIMS/WGMS glaciers**, **IUCN Red List**, **NREL/National Laboratory of the Rockies**, **OpenAQ**, **PVGIS**, **ThinkHazard!/INFORM**, **Sensor.Community**, **SoilGrids**, **Global Solar/Wind Atlas**, **Protected Planet**.
 Asking the facade for a backend whose extra is missing (e.g. `data_source="ecmwf"` without
 `earthlens[ecmwf]`) raises a clear `ImportError` naming the extra to install.

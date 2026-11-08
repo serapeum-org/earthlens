@@ -1,6 +1,6 @@
 """Credentials and token resolution for the WDPA / Protected Planet backend.
 
-Hosts :class:`WdpaAuth`, an :class:`earthlens.base.SingleSecretAuth` subclass
+Hosts `WdpaAuth`, an `earthlens.base.SingleSecretAuth` subclass
 that resolves the Protected Planet **personal API token** from, in priority
 order, an explicit `token=` argument or the `WDPA_TOKEN` environment
 variable. The Protected Planet v4 API requires a token on every request,
@@ -11,15 +11,15 @@ none can be resolved.
 
 The shape:
 
-* :class:`WdpaCredentials` is a frozen pydantic value object carrying the
-  optional token as a :class:`pydantic.SecretStr`.
-* :class:`WdpaAuth` binds those credentials and lets the shared
-  :meth:`earthlens.base.SingleSecretAuth.configure` resolve the token —
+* `WdpaCredentials` is a frozen pydantic value object carrying the
+  optional token as a `pydantic.SecretStr`.
+* `WdpaAuth` binds those credentials and lets the shared
+  `earthlens.base.SingleSecretAuth.configure` resolve the token —
   explicit token first, then the `WDPA_TOKEN` env var, then a clear
-  :class:`AuthenticationError` naming the token-request URL (never an
+  `AuthenticationError` naming the token-request URL (never an
   interactive prompt).
 
-The resolved token is read back via the :attr:`WdpaAuth.token` property and
+The resolved token is read back via the `WdpaAuth.token` property and
 attached as the `token=` query parameter by `earthlens.wdpa._rest`.
 """
 
@@ -40,7 +40,7 @@ class AuthenticationError(_BaseAuthenticationError):
     Carries a message that names a fix: pass `token=` to `WDPA(...)`, set
     the `WDPA_TOKEN` environment variable, or request a token at
     `api.protectedplanet.net/request`. A subclass of the cross-backend
-    :class:`earthlens.base.AuthenticationError` so callers can catch every
+    `earthlens.base.AuthenticationError` so callers can catch every
     backend's auth failure with one `except` clause.
     """
 
@@ -49,13 +49,13 @@ class WdpaCredentials(BaseModel):
     """Frozen value object holding the Protected Planet API token.
 
     The token is optional at construction time: `None` means "resolve from
-    the `WDPA_TOKEN` environment variable at :meth:`WdpaAuth.configure`
+    the `WDPA_TOKEN` environment variable at `WdpaAuth.configure`
     time". The real "is there a usable token?" gate is
-    :meth:`WdpaAuth.configure`, not this model.
+    `WdpaAuth.configure`, not this model.
 
     Attributes:
         token: The Protected Planet API token, stored as a
-            :class:`pydantic.SecretStr` so it is never echoed by
+            `pydantic.SecretStr` so it is never echoed by
             `repr(creds)` or in logs. `None` defers resolution to the
             environment variable.
 
@@ -80,16 +80,16 @@ class WdpaCredentials(BaseModel):
 class WdpaAuth(SingleSecretAuth[WdpaCredentials]):
     """Resolve and hold the Protected Planet API token (mandatory).
 
-    Implements the :class:`earthlens.base.SingleSecretAuth` contract for a
+    Implements the `earthlens.base.SingleSecretAuth` contract for a
     single-secret backend: it declares its env var and provider name and
     supplies `_explicit_credential` / `_connect`, while the inherited
-    :meth:`configure` performs the resolution and is idempotent. After a
+    `configure` performs the resolution and is idempotent. After a
     successful `configure()`, the token is available via the
-    :attr:`token` property for `_rest` to attach as the `token=` query
+    `token` property for `_rest` to attach as the `token=` query
     parameter.
 
     Attributes:
-        _creds: The :class:`WdpaCredentials` passed at construction.
+        _creds: The `WdpaCredentials` passed at construction.
 
     Examples:
         - Resolve an explicit token:
@@ -125,13 +125,13 @@ class WdpaAuth(SingleSecretAuth[WdpaCredentials]):
 
     @property
     def token(self) -> str:
-        """The resolved token; valid only after :meth:`configure`.
+        """The resolved token; valid only after `configure`.
 
         Returns:
             str: The Protected Planet API token string.
 
         Raises:
-            AuthenticationError: When read before :meth:`configure` has
+            AuthenticationError: When read before `configure` has
                 resolved a token.
         """
         if self._token is None:

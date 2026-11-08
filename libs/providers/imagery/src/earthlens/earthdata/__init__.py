@@ -8,26 +8,26 @@ disk (HTTPS `download`, or in-region S3 `open`); server-side subsetting
 (Harmony) and ASF's richer search are deferred.
 
 Unlike every other earthlens backend, the output shape is
-**per-dataset, not fixed** — :class:`EarthData` sets `OUTPUT_KIND` from
+**per-dataset, not fixed** — `EarthData` sets `OUTPUT_KIND` from
 the resolved catalog row (`raster` / `vector` / `tabular`).
 
 Public surface (re-exported from this package):
 
-* :class:`EarthData` — the backend itself; instantiate with a date
+* `EarthData` — the backend itself; instantiate with a date
   range, a bbox, and a `{dataset_key: [band, ...]}` mapping, then call
-  :meth:`EarthData.download`.
-* :class:`Catalog` — pydantic-backed loader for the bundled per-DAAC
+  `EarthData.download`.
+* `Catalog` — pydantic-backed loader for the bundled per-DAAC
   `catalog/` directory.
-* :class:`EarthdataDataset` — one curated dataset row (short_name,
+* `EarthdataDataset` — one curated dataset row (short_name,
   version, provider, output_kind, format, cloud-hosting flags, bands).
-* :class:`Band` — one band's metadata row (informational).
-* :class:`EarthdataAuth` — `AbstractAuth` wrapper over
+* `Band` — one band's metadata row (informational).
+* `EarthdataAuth` — `AbstractAuth` wrapper over
   `earthaccess.login`. Idempotent; safe to call repeatedly.
-* :class:`EarthdataCredentials` — frozen value object the auth class
+* `EarthdataCredentials` — frozen value object the auth class
   binds to.
-* :class:`AuthenticationError` — raised when EDL login fails; subclass
-  of :class:`earthlens.base.AuthenticationError`.
-* :data:`CATALOG_PATH` — absolute path to the bundled `catalog/`
+* `AuthenticationError` — raised when EDL login fails; subclass
+  of `earthlens.base.AuthenticationError`.
+* `CATALOG_PATH` — absolute path to the bundled `catalog/`
   directory; monkey-patchable to redirect the loader.
 
 The `[earthdata]` extra pulls `earthaccess>=0.18`, which requires

@@ -3,11 +3,11 @@
 Powers `curate ecmwf --all --write`: for every dataset in the per-store
 `available_datasets:` index that has no curated row yet, fetch its live
 `form.json`, emit a loader-valid row, and splice it into the right per-family
-shard (auto-categorised by :func:`earthlens.ecmwf._categories.categorise_dataset`).
+shard (auto-categorised by `earthlens.ecmwf._categories.categorise_dataset`).
 A seed only — `nc_variable` / `units` are placeholders the `--fill-empty`
 hydrate step fills from a live retrieve.
 
-The live `form.json` fetch sits behind :func:`earthlens.cli.stanza.emit_stanza`,
+The live `form.json` fetch sits behind `earthlens.cli.stanza.emit_stanza`,
 so the driver itself performs no I/O.
 """
 

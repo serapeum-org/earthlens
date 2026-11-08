@@ -209,7 +209,7 @@ class JAXA(AbstractDataSource):
 
     @property
     def auth(self) -> JaxaAuth:
-        """The :class:`JaxaAuth` bound to this request.
+        """The `JaxaAuth` bound to this request.
 
         Returns:
             JaxaAuth: The optional-credentials auth object. `configure()`

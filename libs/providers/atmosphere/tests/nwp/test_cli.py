@@ -20,6 +20,7 @@ from earthlens.cli.adapter import list_backends, load_catalog
 from earthlens.cli.curate import probe_dataset
 from earthlens.cli.validate import validate_one
 from earthlens.nwp.catalog import NWPModel
+from earthlens.testing import seed_s3
 
 pytestmark = pytest.mark.cli
 
@@ -139,27 +140,25 @@ class TestAvailability:
         out = nwp_cli._nwp_availability(model, dt.datetime(2024, 1, 1), 0)
         assert "no live availability probe" in out, "unknown backend reported"
 
-    def test_direct_boto3_head_object(self, monkeypatch):
+    def test_direct_boto3_head_object(self, s3_emulator):
         """A direct-boto3 model HEADs the object and reports its size."""
-        boto3 = types.ModuleType("boto3")
-        botocore = types.ModuleType("botocore")
-        botocore_client = types.ModuleType("botocore.client")
-        botocore.UNSIGNED = object()
-        botocore_client.Config = lambda **kw: None
-
-        class FakeS3:
-            def head_object(self, Bucket, Key):
-                return {"ContentLength": 1234}
-
-        boto3.client = lambda *a, **kw: FakeS3()
-        monkeypatch.setitem(sys.modules, "boto3", boto3)
-        monkeypatch.setitem(sys.modules, "botocore", botocore)
-        monkeypatch.setitem(sys.modules, "botocore.client", botocore_client)
+        # The size comes from a real `head_object` against a real object, so
+        # `ContentLength` is S3's own count of the bytes rather than a number
+        # the test and the fake agreed on between themselves.
+        # A real bucket name, because a real S3 enforces the naming rules the
+        # old module fake did not: "b" is rejected as too short.
+        # `{var}` interpolates the band's *value* (`T`), not its name — the
+        # old fake answered any key with 1234 bytes, so the key the probe
+        # actually asks for was never checked.
+        seed_s3(s3_emulator, "nwp-probe-bucket", {"T.grib": b"x" * 1234})
         model = NWPModel(
             provider="p",
             backend="direct-boto3",
             bands={"t": "T"},
-            request_options={"bucket": "b", "key_template": "{var}.grib"},
+            request_options={
+                "bucket": "nwp-probe-bucket",
+                "key_template": "{var}.grib",
+            },
         )
         out = nwp_cli._nwp_availability(model, dt.datetime(2024, 1, 1), 0)
         assert "1234 bytes" in out, "head_object size reported"

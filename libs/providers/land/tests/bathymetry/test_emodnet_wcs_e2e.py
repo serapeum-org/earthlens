@@ -14,14 +14,12 @@ from __future__ import annotations
 import urllib.error
 import urllib.request
 from pathlib import Path
-from typing import NoReturn
 
 import numpy as np
 import pytest
-import requests
 
-from earthlens.bathymetry import WcsServiceUnavailableError
 from earthlens.earthlens import EarthLens
+from earthlens.testing import skip_live_unavailable, skip_on_upstream
 
 pytestmark = [pytest.mark.e2e, pytest.mark.bathymetry]
 
@@ -48,7 +46,7 @@ def _wcs_reachable() -> bool:
 def _skip_when_offline() -> None:
     """Skip the live test cleanly when the EMODnet WCS host is unreachable."""
     if not _wcs_reachable():
-        pytest.skip("EMODnet Bathymetry WCS unreachable (offline)")
+        skip_live_unavailable("EMODnet Bathymetry WCS unreachable (offline)")
 
 
 def _elevation_stats(path: Path) -> tuple[float, float]:
@@ -59,23 +57,6 @@ def _elevation_stats(path: Path) -> tuple[float, float]:
     array = dataset.read_array()
     finite = array[np.isfinite(array)]
     return float(finite.min()), float(finite.max())
-
-
-def _skip_on_service(exc: Exception) -> NoReturn:
-    """Skip (not fail) when the failure is a transport / WCS-service problem.
-
-    The `_skip_when_offline` guard only catches a total outage (the reachability
-    GET failing). A service that answers the probe but then returns a non-XML
-    error page or drops the connection mid-request surfaces as the backend's
-    typed `WcsServiceUnavailableError` (or a bare `requests` transport error),
-    which should skip the lane rather than redden it. Anything else re-raises.
-    """
-    if isinstance(
-        exc,
-        (requests.ConnectionError, requests.Timeout, WcsServiceUnavailableError),
-    ):
-        pytest.skip(f"EMODnet WCS unavailable: {exc}")
-    raise exc
 
 
 class TestEmodnetLiveFetch:
@@ -92,7 +73,7 @@ class TestEmodnetLiveFetch:
                 path=str(tmp_path),
             ).download(progress_bar=False)
         except Exception as exc:  # noqa: BLE001 - service -> skip, else re-raise
-            _skip_on_service(exc)
+            skip_on_upstream(exc)
 
         assert len(paths) == 1, f"expected one GeoTIFF, got {paths}"
         assert paths[0].suffix == ".tif", f"expected a .tif, got {paths[0]}"

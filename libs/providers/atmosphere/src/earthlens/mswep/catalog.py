@@ -1,11 +1,11 @@
 """Product catalog for the GloH2O MSWEP / MSWX backend.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
+Hosts `Catalog`, the pydantic-backed reader for the bundled
 `mswep_data_catalog.yaml`. A concrete Drive path needs four coordinates
 — product, version (which fixes the **root folder**), variant, and
 temporal resolution — plus, for MSWX only, a **variable** level MSWEP
 does not have. The catalog therefore keeps a per-product
-:attr:`MswepProduct.path_template` rather than one shared template, so
+`MswepProduct.path_template` rather than one shared template, so
 the two shapes stay explicit:
 
 * MSWEP — `{root}/{variant}/{temporal}/{stem}.nc`
@@ -13,18 +13,18 @@ the two shapes stay explicit:
 
 **Provisional rows.** The `provisional` flag guards a value that could
 not be verified without an approved GloH2O Drive share. A flagged row
-surfaces as :attr:`MswepVersion.provisional` /
-:attr:`MswepVariable.provisional` / :attr:`MswepVariant.provisional` /
-:attr:`MswepResolution.provisional`, and
-:meth:`Catalog.check_not_provisional` refuses it, so a request built on
+surfaces as `MswepVersion.provisional` /
+`MswepVariable.provisional` / `MswepVariant.provisional` /
+`MswepResolution.provisional`, and
+`Catalog.check_not_provisional` refuses it, so a request built on
 an unverified constant fails loudly instead of resolving to a Drive path
 that does not exist and degrading into an empty download. The share has
 since been walked, so the shipped `mswep_data_catalog.yaml` currently
 marks **nothing** provisional; the guard stays in place for any value
 added unverified in future.
 
-:data:`CATALOG_PATH` is the path to the bundled YAML;
-:func:`clear_catalog_cache` empties the `(path, mtime)` parse cache.
+`CATALOG_PATH` is the path to the bundled YAML;
+`clear_catalog_cache` empties the `(path, mtime)` parse cache.
 """
 
 from __future__ import annotations
@@ -115,8 +115,8 @@ class MswepVariant(SummarisedLeaf):
     identified by an initialisation time, a lead time **and** an
     ensemble member, none of which the analysis template carries. Those
     variants therefore record what is known about the stream —
-    :attr:`members`, :attr:`horizon`, :attr:`base_model`,
-    :attr:`update_cadence` — and stay `provisional` until the real
+    `members`, `horizon`, `base_model`,
+    `update_cadence` — and stay `provisional` until the real
     layout is read off an approved share, rather than shipping a guessed
     path shape that would resolve to nothing.
 
@@ -313,7 +313,7 @@ class GaugeMetadata(SummarisedLeaf):
 
     Attributes:
         folder: The folder name (`"Gauge_metadata"`).
-        files: File name to its :class:`GaugeMetadataFile` row.
+        files: File name to its `GaugeMetadataFile` row.
 
     Examples:
         - The five documented files are registered:
@@ -347,10 +347,10 @@ class MswepProduct(SummarisedLeaf):
             initialisation time and ensemble member as well as
             variable / temporal / valid-time.
         default_version: Version used when the caller names none.
-        versions: Version key to :class:`MswepVersion`.
-        variants: Variant key to :class:`MswepVariant`.
-        resolutions: Resolution key to :class:`MswepResolution`.
-        variables: Variable key to :class:`MswepVariable`.
+        versions: Version key to `MswepVersion`.
+        variants: Variant key to `MswepVariant`.
+        resolutions: Resolution key to `MswepResolution`.
+        variables: Variable key to `MswepVariable`.
 
     Examples:
         - MSWX's analysis path shape has the extra variable level:
@@ -516,15 +516,15 @@ class Catalog(AbstractCatalog[MswepProduct]):
     """Product catalog for the MSWEP / MSWX backend.
 
     Reads the bundled `mswep_data_catalog.yaml` (shipped as package
-    data) and exposes its `products:` block as :class:`MswepProduct`
-    rows under the inherited :attr:`datasets` field — which supplies the
+    data) and exposes its `products:` block as `MswepProduct`
+    rows under the inherited `datasets` field — which supplies the
     `cat["mswep"]` / `"mswep" in cat` / `len(cat)` surface and the
     did-you-mean error for free. Instantiate with no arguments;
     `model_post_init` loads and validates the YAML once, cached by
     `(path, mtime)`.
 
     Attributes:
-        datasets: Product key to its :class:`MswepProduct` row.
+        datasets: Product key to its `MswepProduct` row.
         available_datasets: Sorted product keys.
         license_id: SPDX-ish licence label (`"CC-BY-NC"`), fed to
             `warn_license`.
@@ -571,11 +571,11 @@ class Catalog(AbstractCatalog[MswepProduct]):
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no products were supplied.
 
-        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by
+        `Catalog()` with no args reads `CATALOG_PATH` (cached by
         `(path, mtime)`); passing `datasets=...` skips the disk read.
 
         Raises:
-            ValueError: Propagated from :meth:`load` when the YAML is
+            ValueError: Propagated from `load` when the YAML is
                 missing, empty, or has a malformed row.
         """
         if not self.datasets:
@@ -594,7 +594,7 @@ class Catalog(AbstractCatalog[MswepProduct]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the
-                module-level :data:`CATALOG_PATH`.
+                module-level `CATALOG_PATH`.
 
         Returns:
             Catalog: A fully-populated catalog.
@@ -608,7 +608,7 @@ class Catalog(AbstractCatalog[MswepProduct]):
         return cls(**payload)
 
     def get_product(self, key: str) -> MswepProduct:
-        """Return the :class:`MswepProduct` for `key`, with a did-you-mean hint.
+        """Return the `MswepProduct` for `key`, with a did-you-mean hint.
 
         Args:
             key: A product key (`"mswep"`, `"mswx"`).

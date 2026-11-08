@@ -200,7 +200,7 @@ def tile_bbox(
         bbox: The `(west, south, east, north)` envelope in degrees.
         width_px: The full render width in pixels (at the target resolution).
         height_px: The full render height in pixels.
-        max_dim: The per-tile pixel ceiling (defaults to :data:`SH_MAX_DIMENSION`).
+        max_dim: The per-tile pixel ceiling (defaults to `SH_MAX_DIMENSION`).
 
     Returns:
         The list of `(west, south, east, north)` sub-bboxes (one per tile).

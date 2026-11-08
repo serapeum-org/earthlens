@@ -1,8 +1,8 @@
-"""Unit tests for :class:`earthlens.ecmwf.Catalog`.
+"""Unit tests for `earthlens.ecmwf.Catalog`.
 
 Covers the H2 / H5 rewiring (the catalog reads
 `cds_data_catalog.yaml` and exposes per-variable
-:class:`Variable` instances), the M2 fail-loud behaviour on
+`Variable` instances), the M2 fail-loud behaviour on
 malformed YAML, and the no-MARS-keys invariant on the schema.
 """
 
@@ -21,7 +21,7 @@ pytestmark = [pytest.mark.unit]
 
 
 class TestCatalog:
-    """Tests for :class:`Catalog` after the H2 / H5 / M1 / M2 work."""
+    """Tests for `Catalog` after the H2 / H5 / M1 / M2 work."""
 
     @pytest.mark.parametrize(
         "dataset_name, var_code, expected_variable",
@@ -88,7 +88,7 @@ class TestCatalog:
 
         T, Q, R live on reanalysis-era5-pressure-levels; their
         catalog entries must carry the `cds_pressure_level`
-        attribute so :meth:`ECMWF._api` can forward it to CDS.
+        attribute so `ECMWF._api` can forward it to CDS.
         """
         spec = Catalog().get_variable("reanalysis-era5-pressure-levels", "temperature")
         assert spec.cds_pressure_level == ["1000"]
@@ -115,7 +115,7 @@ class TestCatalog:
         assert single is not land
 
     def test_get_dataset_returns_dataset_object(self):
-        """`get_dataset(name)` returns the structural :class:`Dataset`."""
+        """`get_dataset(name)` returns the structural `Dataset`."""
         cat = Catalog()
         ds = cat.get_dataset("reanalysis-era5-pressure-levels")
         assert ds.monthly == "reanalysis-era5-pressure-levels-monthly-means"
@@ -1289,7 +1289,7 @@ class TestShippedCatalogInvariants:
 
 
 class TestVariableSummary:
-    """Tests for the one-line `__str__` on :class:`Variable`."""
+    """Tests for the one-line `__str__` on `Variable`."""
 
     def test_summary_pairs_the_cds_name_with_the_netcdf_name(self):
         """The request is written against one name and the file keyed by the other."""

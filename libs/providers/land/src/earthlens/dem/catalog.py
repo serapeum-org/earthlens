@@ -1,6 +1,6 @@
 """Dataset catalog for the Copernicus DEM backend.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
+Hosts `Catalog`, the pydantic-backed reader for the bundled
 `dem_data_catalog.yaml`. The catalog is a small single-family map from a
 dataset key (`cop-dem-glo-30`, `cop-dem-glo-90`) to the anonymous S3
 bucket, region, and the resolution token that appears in the tile key.
@@ -10,8 +10,8 @@ the tile enumeration is arithmetic on the integer-degree grid. There are
 no variables (a Copernicus DEM tile is one elevation band), so the
 catalog has no per-variable sub-block.
 
-:data:`CATALOG_PATH` is the path to the bundled YAML;
-:func:`clear_catalog_cache` empties the `(path, mtime)` parse cache.
+`CATALOG_PATH` is the path to the bundled YAML;
+`clear_catalog_cache` empties the `(path, mtime)` parse cache.
 """
 
 from __future__ import annotations
@@ -125,7 +125,7 @@ def _parse_datasets(files: list[Path]) -> dict[str, DEMDataset]:
 
     Raises:
         ValueError: If the `datasets:` block is missing or empty, or a row
-            fails :class:`DEMDataset` validation.
+            fails `DEMDataset` validation.
     """
     path = files[0]
     data = load_yaml_strict(path) or {}
@@ -150,16 +150,16 @@ class Catalog(AbstractCatalog[DEMDataset]):
     """Dataset catalog for the DEM backend.
 
     Reads the bundled `dem_data_catalog.yaml` (shipped as package data)
-    and exposes its `datasets:` block as a map of :class:`DEMDataset`
-    rows keyed by dataset key under the inherited :attr:`datasets`
+    and exposes its `datasets:` block as a map of `DEMDataset`
+    rows keyed by dataset key under the inherited `datasets`
     field, which supplies the `cat["cop-dem-glo-30"]` /
     `"cop-dem-glo-30" in cat` / `len(cat)` dict-like surface and the
     did-you-mean error for free. Instantiate with no arguments
-    (`Catalog()`); :func:`model_post_init` loads and validates the YAML
+    (`Catalog()`); `model_post_init` loads and validates the YAML
     in one pass and caches it by `(path, mtime)`.
 
     Attributes:
-        datasets: Map from dataset key to its :class:`DEMDataset` row.
+        datasets: Map from dataset key to its `DEMDataset` row.
         available_datasets: Sorted dataset keys — the curated datasets
             are the whole dataset universe for this backend.
 
@@ -192,13 +192,13 @@ class Catalog(AbstractCatalog[DEMDataset]):
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no datasets were supplied.
 
-        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by
+        `Catalog()` with no args reads `CATALOG_PATH` (cached by
         `(path, mtime)`); passing `datasets=...` skips the disk read
         (used in tests). Either way the `available_datasets` index is
         derived from the loaded map.
 
         Raises:
-            ValueError: Propagated from :meth:`load` when the YAML is
+            ValueError: Propagated from `load` when the YAML is
                 missing, empty, or has a malformed row.
         """
         if not self.datasets:
@@ -212,10 +212,10 @@ class Catalog(AbstractCatalog[DEMDataset]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the
-                module-level :data:`CATALOG_PATH`.
+                module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If `catalog_path` does not exist, or if the file has no

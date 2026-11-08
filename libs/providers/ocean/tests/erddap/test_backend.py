@@ -272,7 +272,7 @@ class TestGriddap:
 
         def _get(url, **kwargs):
             return FakeResponse(
-                error=requests.exceptions.HTTPError("Error 404: out of range")
+                raises=requests.exceptions.HTTPError("Error 404: out of range")
             )
 
         monkeypatch.setattr("earthlens.erddap.backend.requests.get", _get)

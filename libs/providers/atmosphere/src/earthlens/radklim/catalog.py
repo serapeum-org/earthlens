@@ -1,18 +1,18 @@
 """Product catalog for the DWD RADKLIM / RADOLAN radar-precipitation backend.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
+Hosts `Catalog`, the pydantic-backed reader for the bundled
 `radklim_data_catalog.yaml`. RADKLIM is two-stream: the reprocessed
 climatology (`reproc`, one yearly NetCDF archive) and the operational
 near-real-time stream (`operational`, per-timestamp HDF5 / binary granules),
 each in an hourly (`RW`) and a 5-min (`YW`) product. The four products are the
 "dataset" role — the key the user names in `dataset=` / `variables={dataset:
 [...]}` — so they live under the inherited
-:attr:`~earthlens.base.AbstractCatalog.datasets` field, which gives the
+`datasets` field, which gives the
 catalog its `cat["radklim-yw"]` / `"radklim-yw" in cat` / `len(cat)` dict-like
 surface and the did-you-mean error for free.
 
-:data:`CATALOG_PATH` is the path to the bundled YAML;
-:func:`clear_catalog_cache` empties the `(path, mtime)` parse cache.
+`CATALOG_PATH` is the path to the bundled YAML;
+`clear_catalog_cache` empties the `(path, mtime)` parse cache.
 """
 
 from __future__ import annotations
@@ -40,7 +40,7 @@ class RadklimProduct(SummarisedLeaf):
     """One RADKLIM / RADOLAN product row (the "dataset" analog).
 
     The product key (`"radklim-yw"`) is the parent key in
-    :attr:`Catalog.datasets` and is repeated here as :attr:`product` so a row
+    `Catalog.datasets` and is repeated here as `product` so a row
     carries its own identity when passed around outside the catalog.
 
     Attributes:
@@ -141,13 +141,13 @@ class Catalog(AbstractCatalog[RadklimProduct]):
     """Catalog of DWD RADKLIM / RADOLAN products.
 
     Reads the bundled `radklim_data_catalog.yaml` (shipped as package data) and
-    exposes its `products:` block as a map of :class:`RadklimProduct` rows keyed
-    by product key under the inherited :attr:`datasets` field. Instantiate with
-    no arguments (`Catalog()`); :func:`model_post_init` loads and validates the
+    exposes its `products:` block as a map of `RadklimProduct` rows keyed
+    by product key under the inherited `datasets` field. Instantiate with
+    no arguments (`Catalog()`); `model_post_init` loads and validates the
     YAML in one pass and caches it by `(path, mtime)`.
 
     Attributes:
-        datasets: Map from product key to its :class:`RadklimProduct` row.
+        datasets: Map from product key to its `RadklimProduct` row.
         license: The DWD open-data licence string (`CC-BY-4.0/GeoNutzV`).
         grid: The fixed RADOLAN grid descriptor (`id` / `description`).
         available_datasets: Sorted product keys.
@@ -185,13 +185,13 @@ class Catalog(AbstractCatalog[RadklimProduct]):
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no products were supplied.
 
-        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by
+        `Catalog()` with no args reads `CATALOG_PATH` (cached by
         `(path, mtime)`); passing `datasets=...` skips the disk read (used in
         tests). Either way the `available_datasets` index is derived from the
         loaded map.
 
         Raises:
-            ValueError: Propagated from :meth:`load` when the YAML is missing,
+            ValueError: Propagated from `load` when the YAML is missing,
                 empty, or has a malformed row.
         """
         if not self.datasets:
@@ -207,10 +207,10 @@ class Catalog(AbstractCatalog[RadklimProduct]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the module-level
-                :data:`CATALOG_PATH`.
+                `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If `catalog_path` does not exist, or if the file has no
@@ -221,9 +221,9 @@ class Catalog(AbstractCatalog[RadklimProduct]):
         return cls(**payload)
 
     def get_product(self, key: str) -> RadklimProduct:
-        """Return the :class:`RadklimProduct` for `key`, with a did-you-mean hint.
+        """Return the `RadklimProduct` for `key`, with a did-you-mean hint.
 
-        Thin alias over :meth:`~earthlens.base.AbstractCatalog.get_dataset`.
+        Thin alias over `get_dataset`.
 
         Args:
             key: A product key (`"radklim-yw"`, `"radolan-rw"`).

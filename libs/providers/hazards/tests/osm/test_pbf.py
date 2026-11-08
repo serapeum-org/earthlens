@@ -44,7 +44,7 @@ class FakeResponse:
 class FakeHttp:
     """Records GET / HEAD / download calls and serves canned responses.
 
-    Drives :func:`download_extract` without a network: `get` returns the md5
+    Drives `download_extract` without a network: `get` returns the md5
     sidecar body, `request("HEAD", ...)` returns a `Content-Length`, and
     `download` writes `_PAYLOAD` to the destination.
     """

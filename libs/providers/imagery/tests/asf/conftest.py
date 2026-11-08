@@ -1,7 +1,7 @@
 """Shared fakes and fixtures for the ASF backend tests.
 
 The whole suite runs without `asf_search` installed or any network:
-:class:`_FakeAsfSearch` is injected into `sys.modules` so the lazy
+`_FakeAsfSearch` is injected into `sys.modules` so the lazy
 `import asf_search` inside `earthlens.asf` resolves to the fake.
 
 The fake records every search/granule/stack/download call so tests

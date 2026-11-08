@@ -67,9 +67,7 @@ class TestSinglePoint:
             email="me@example.com",
             path=tmp_path,
         ).download(progress_bar=False)
-        bind_session(
-            FakeResponse(text="x", status_code=400, payload={"errors": ["nope"]})
-        )
+        bind_session(FakeResponse(text="x", status_code=400, json={"errors": ["nope"]}))
         empty = NREL(
             start="2020-01-01",
             end="2020-01-01",
@@ -199,7 +197,7 @@ class TestCoverage:
             FakeResponse(
                 text='{"errors":["bad coords"]}',
                 status_code=400,
-                payload={"errors": ["bad coords"]},
+                json={"errors": ["bad coords"]},
             )
         )
 
@@ -245,7 +243,7 @@ class TestErrorMessage:
 
     def test_extracts_json_errors(self):
         """A JSON error body surfaces its `errors` list."""
-        resp = FakeResponse(text="x", status_code=400, payload={"errors": ["nope"]})
+        resp = FakeResponse(text="x", status_code=400, json={"errors": ["nope"]})
         assert "nope" in NREL._error_message(resp)
 
     def test_falls_back_to_text(self):
@@ -255,12 +253,12 @@ class TestErrorMessage:
 
     def test_dict_without_errors_key_stringifies(self):
         """A JSON dict with no errors/error key stringifies the payload."""
-        resp = FakeResponse(text="x", status_code=400, payload={"foo": "bar"})
+        resp = FakeResponse(text="x", status_code=400, json={"foo": "bar"})
         assert "foo" in NREL._error_message(resp)
 
     def test_non_dict_json_stringifies(self):
         """A non-dict JSON body (e.g. a list) stringifies the payload."""
-        resp = FakeResponse(text="x", status_code=400, payload=["boom"])
+        resp = FakeResponse(text="x", status_code=400, json=["boom"])
         assert "boom" in NREL._error_message(resp)
 
 

@@ -1,6 +1,6 @@
 """Product + configuration catalog for the National Water Model backend.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
+Hosts `Catalog`, the pydantic-backed reader for the bundled
 `nwm_data_catalog.yaml`. NWM is two-axis: a **product** (what the file
 contains — `chrtout` channel routing, `ldasout` land surface) crossed
 with a **configuration** (which operational run produced it —
@@ -11,13 +11,13 @@ the key from a `(configuration, product, cycle, step)` tuple.
 
 The product is the "dataset" role (the key the user names in
 `variables={product: [variable, ...]}`), so it lives under the inherited
-:attr:`~earthlens.base.AbstractCatalog.datasets` field — which is what
+`datasets` field — which is what
 gives the catalog its `cat["chrtout"]` / `"chrtout" in cat` / `len(cat)`
 dict-like surface and the did-you-mean error for free. Configurations
-hang off a parallel :attr:`Catalog.configurations` map.
+hang off a parallel `Catalog.configurations` map.
 
-:data:`CATALOG_PATH` is the path to the bundled YAML;
-:func:`clear_catalog_cache` empties the `(path, mtime)` parse cache.
+`CATALOG_PATH` is the path to the bundled YAML;
+`clear_catalog_cache` empties the `(path, mtime)` parse cache.
 """
 
 from __future__ import annotations
@@ -81,7 +81,7 @@ class NWMProduct(SummarisedLeaf):
     """One NWM product's row (the "dataset" analog).
 
     The product key (`"chrtout"`) is the parent key in
-    :attr:`Catalog.datasets` and is repeated here as :attr:`product` so a
+    `Catalog.datasets` and is repeated here as `product` so a
     row carries its own identity when passed around outside the catalog.
 
     Attributes:
@@ -161,7 +161,7 @@ class NWMConfig(SummarisedLeaf):
     """One NWM operational configuration's row.
 
     The configuration key (`"short_range"`) is the parent key in
-    :attr:`Catalog.configurations` and is repeated here as :attr:`key`.
+    `Catalog.configurations` and is repeated here as `key`.
 
     Attributes:
         key: Configuration key (`"short_range"`, `"analysis_assim"`,
@@ -193,7 +193,7 @@ class NWMConfig(SummarisedLeaf):
             whose directory is `{family}_mem{N}` and whose product token
             carries the member (`channel_rt_1`).
         products: The product keys this configuration publishes (a subset
-            of :attr:`Catalog.datasets`), e.g. `["chrtout", "ldasout",
+            of `Catalog.datasets`), e.g. `["chrtout", "ldasout",
             "lakeout", "rtout"]` for `short_range`.
 
     Examples:
@@ -229,7 +229,7 @@ class NWMConfig(SummarisedLeaf):
 
 
 def _parse_catalog(files: list[Path]) -> dict[str, Any]:
-    """Parse the NWM catalog YAML into a populated :class:`Catalog`.
+    """Parse the NWM catalog YAML into a populated `Catalog`.
 
     Args:
         files: The contributing YAML files (NWM ships a single file).
@@ -279,21 +279,21 @@ class Catalog(AbstractCatalog[NWMProduct]):
     """Product + configuration catalog for the NWM backend.
 
     Reads the bundled `nwm_data_catalog.yaml` (shipped as package data)
-    and exposes its `products:` block as a map of :class:`NWMProduct`
-    rows keyed by product key under the inherited :attr:`datasets` field,
+    and exposes its `products:` block as a map of `NWMProduct`
+    rows keyed by product key under the inherited `datasets` field,
     and its `configurations:` block as a parallel
-    :attr:`configurations` map of :class:`NWMConfig` rows. Instantiate
-    with no arguments (`Catalog()`); :func:`model_post_init` loads and
+    `configurations` map of `NWMConfig` rows. Instantiate
+    with no arguments (`Catalog()`); `model_post_init` loads and
     validates the YAML in one pass and caches it by `(path, mtime)`.
 
-    Resolve a product with :meth:`get_product` (a thin alias over
-    :meth:`~earthlens.base.AbstractCatalog.get_dataset`) and a
-    configuration with :meth:`get_config`.
+    Resolve a product with `get_product` (a thin alias over
+    `get_dataset`) and a
+    configuration with `get_config`.
 
     Attributes:
-        datasets: Map from product key to its :class:`NWMProduct` row.
+        datasets: Map from product key to its `NWMProduct` row.
         configurations: Map from configuration key to its
-            :class:`NWMConfig` row.
+            `NWMConfig` row.
         available_datasets: Sorted product keys (the curated products are
             the whole product universe, so this equals `products()`).
         available_configurations: Sorted configuration keys — the full
@@ -332,13 +332,13 @@ class Catalog(AbstractCatalog[NWMProduct]):
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no products were supplied.
 
-        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached by
+        `Catalog()` with no args reads `CATALOG_PATH` (cached by
         `(path, mtime)`); passing `datasets=...` skips the disk read
         (used in tests). Either way the `available_*` indices are
         derived from the loaded maps.
 
         Raises:
-            ValueError: Propagated from :meth:`load` when the YAML is
+            ValueError: Propagated from `load` when the YAML is
                 missing, empty, or has a malformed row.
         """
         if not self.datasets:
@@ -354,10 +354,10 @@ class Catalog(AbstractCatalog[NWMProduct]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the
-                module-level :data:`CATALOG_PATH`.
+                module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If `catalog_path` does not exist, or if the file has no
@@ -369,10 +369,10 @@ class Catalog(AbstractCatalog[NWMProduct]):
         return cls(**payload)
 
     def get_product(self, key: str) -> NWMProduct:
-        """Return the :class:`NWMProduct` for `key`, with a did-you-mean hint.
+        """Return the `NWMProduct` for `key`, with a did-you-mean hint.
 
         Thin alias over
-        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.
+        `get_dataset`.
 
         Args:
             key: A product key (`"chrtout"`, `"ldasout"`).
@@ -386,7 +386,7 @@ class Catalog(AbstractCatalog[NWMProduct]):
         return cast("NWMProduct", self.get_dataset(key))
 
     def get_config(self, key: str) -> NWMConfig:
-        """Return the :class:`NWMConfig` for `key`, with a did-you-mean hint.
+        """Return the `NWMConfig` for `key`, with a did-you-mean hint.
 
         Args:
             key: A configuration key (`"short_range"`,

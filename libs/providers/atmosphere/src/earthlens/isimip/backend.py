@@ -8,11 +8,11 @@ bias-corrected against W5E5 and formatted for impact models.
 
 A request is a *facet set* — `dataset` (the `simulation_round`, e.g.
 `"ISIMIP3b"`), `gcm` (the `climate_forcing`), `scenario` (`climate_scenario`),
-`variables` (`climate_variable`s), `time_step` (+ `product`). :meth:`_search`
+`variables` (`climate_variable`s), `time_step` (+ `product`). `_search`
 queries the ISIMIP REST API for the matching datasets and resolves each to its
 per-decade NetCDF granule `path`s (filtered to the requested date window).
 Because a single granule is ~1-2 GB (a whole global-daily dataset is ~18 GB),
-:meth:`_fetch` never pulls them whole: it submits a **server-side cutout job**
+`_fetch` never pulls them whole: it submits a **server-side cutout job**
 (`isimip-client.cutout_bbox`: submit bbox -> poll -> download the cut zip),
 extracts the cut NetCDF granules, and returns their `list[Path]`. earthlens never
 imports `xarray` / `netCDF4` — reading the NetCDF is pyramids'.
@@ -106,9 +106,9 @@ class ISIMIP(AbstractDataSource):
             poll: Seconds between cutout-job status polls. Defaults to `4.0`.
             path: Output directory for the written NetCDFs.
             fmt: `strptime` format for `start` / `end`.
-            catalog: Optional pre-built :class:`Catalog`; defaults to the bundled
+            catalog: Optional pre-built `Catalog`; defaults to the bundled
                 catalog.
-            client: Optional pre-built :class:`IsimipClient`; defaults to a
+            client: Optional pre-built `IsimipClient`; defaults to a
                 lazily-built `isimip-client` client (needs the `[isimip]` extra).
 
         Raises:
@@ -196,7 +196,7 @@ class ISIMIP(AbstractDataSource):
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
-        """Parse the `[start, end]` window into a :class:`TemporalExtent`.
+        """Parse the `[start, end]` window into a `TemporalExtent`.
 
         Args:
             start: Inclusive window start.
@@ -347,7 +347,7 @@ class ISIMIP(AbstractDataSource):
         `whole_globe` request: download the raw granules directly.
 
         Args:
-            products: The products from :meth:`_search`.
+            products: The products from `_search`.
 
         Returns:
             list[Path]: The written NetCDF paths, in product order.
@@ -389,7 +389,7 @@ class ISIMIP(AbstractDataSource):
 
         Each resolved dataset writes into its own subdirectory keyed by the
         dataset id, the requested `[start, end]` window, and the bbox region
-        (`global` for a whole-globe request). :meth:`_download_extract` returns
+        (`global` for a whole-globe request). `_download_extract` returns
         every `*.nc` it finds in that directory, so keying on all three means
         concurrent products never collide, re-running the same request just
         overwrites in place, and re-running the same dataset/window with a
@@ -480,7 +480,7 @@ class ISIMIP(AbstractDataSource):
         return found
 
     def _warn_license(self, product: RemoteProduct) -> None:
-        """Emit a :class:`LicenseWarning` for a restricted, non-open, or unknown-licence dataset.
+        """Emit a `LicenseWarning` for a restricted, non-open, or unknown-licence dataset.
 
         A dataset whose `rights` are empty is treated as unknown (warned), so a
         licence the API does not report is surfaced rather than assumed open.
@@ -504,15 +504,15 @@ class ISIMIP(AbstractDataSource):
 
         Returns:
             str: The round's `default_license` (the authoritative per-dataset
-                licence is surfaced live via :meth:`_warn_license`).
+                licence is surfaced live via `_warn_license`).
         """
         return self._catalog.get_round(self._round).default_license
 
     def download(self, progress_bar: bool = True) -> list[Path]:
         """Fetch the requested bias-adjusted granules and return the written paths.
 
-        Runs the cheap :meth:`_search` (facet -> dataset resolution) then
-        :meth:`_fetch`, which submits the cutout job(s) and writes one cut NetCDF
+        Runs the cheap `_search` (facet -> dataset resolution) then
+        `_fetch`, which submits the cutout job(s) and writes one cut NetCDF
         per resolved granule.
 
         Args:

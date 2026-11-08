@@ -3,8 +3,8 @@
 The OpenFEMA NFIP v3 endpoint speaks OData: a `$filter` expression plus
 `$top`/`$skip` paging over a `{"metadata": ..., "NfipClaims": [...]}` envelope.
 These helpers build the filter, page through the result via an injected
-:class:`~earthlens.base.http.HttpClient`, and flatten the records into a
-:class:`pandas.DataFrame`. No state; the client is passed in so the whole path
+`HttpClient`, and flatten the records into a
+`pandas.DataFrame`. No state; the client is passed in so the whole path
 is unit-testable with a fake transport.
 """
 
@@ -54,7 +54,7 @@ def odata_filter(filters: dict[str, str | int] | None) -> str | None:
     """Build an OData `$filter` string from an NFIP filter mapping.
 
     Recognised keys are `state` / `county` / `year` / `flood_event` (see
-    :data:`_NFIP_FILTER_FIELDS`). Clauses join with `and` in the canonical field
+    `_NFIP_FILTER_FIELDS`). Clauses join with `and` in the canonical field
     order; string values are quoted (OData-escaped), `year` is emitted bare.
 
     Args:
@@ -280,10 +280,10 @@ def paginate_arcgis(
 def records_to_frame(
     records: list[dict], field_map: dict[str, str] | None = None
 ) -> pd.DataFrame:
-    """Flatten NFIP records into a :class:`pandas.DataFrame`.
+    """Flatten NFIP records into a `pandas.DataFrame`.
 
     Args:
-        records: The list of record dicts from :func:`paginate_nfip`.
+        records: The list of record dicts from `paginate_nfip`.
         field_map: Optional friendly -> provider map; when given, only these
             columns are kept and renamed friendly, in map order.
 

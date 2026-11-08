@@ -55,30 +55,18 @@ jobs:
     - name: Build docs with --strict
       run: mkdocs build --strict --site-dir /tmp/site
 
-  deploy-pr:
+    # A pull request builds the site but no longer publishes it (#1372): each PR
+    # deploy was a full site commit on the shared `gh-pages` branch, and those
+    # accounted for 85% of its 1,645 commits and ~5 GB of the repository. The
+    # --strict build above is the gate, and reviewers who want to look at the
+    # rendered pages download them from here instead of a published preview.
+    - name: Upload the built site for review
       if: github.event_name == 'pull_request'
-      needs: build-strict
-      runs-on: ubuntu-latest
-      # Serialise only the frequent PR deploys on the shared `gh-pages` branch; a
-      # newer PR deploy evicts the pending one (GitHub keeps one running + one
-      # pending per group). build-strict and the main/release deploys stay
-      # unthrottled so the gate always runs and every main/release deploy
-      # completes.
-      concurrency:
-        group: mkdocs-gh-pages-deploy
-        cancel-in-progress: false
-      steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-
-      - uses: serapeum-org/github-actions/actions/mkdocs-deploy@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # mkdocs/v1.3.1
-        with:
-          trigger: 'pull_request'
-          package-manager: 'uv'
-          package-manager-version: "0.11.29"
-          install-groups: "groups: docs"
-          deploy-token: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: site-pr-${{ github.event.pull_request.number }}
+        path: /tmp/site
+        retention-days: 7
 
   # deploy-main / deploy-release run un-serialised on purpose: mkdocs-deploy retries
   # the shared gh-pages push (mike_push.sh), so each completes. Never add workflow-
@@ -131,3 +119,68 @@ jobs:
         deploy-token: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
         release-tag: ${{ github.event.release.tag_name || steps.version.outputs.tag }}
         mike-alias: 'latest'
+
+    # Retain `main` plus the RETAIN_RELEASES most recent releases, and delete
+    # anything else - older releases, and the now-frozen `develop` that the
+    # removed deploy-pr job used to publish.
+    #
+    # Why a cap at all: each version directory is a full copy of the site at
+    # ~464 MB, so retaining every release took gh-pages to 9.7 GB, at which
+    # point GitHub Pages stopped building entirely and the 0.31.0 documentation
+    # was never published despite being on the branch. GitHub documents a 1 GB
+    # published-site limit, but that is not the observed threshold: 1.39 GB
+    # builds fine today. The two real data points are 1.39 GB good, 9.7 GB bad.
+    # Five releases plus main is ~2.78 GB, between the two - comfortably below
+    # what is known to break, above what is known to work. If a release ever
+    # fails to publish, lower RETAIN_RELEASES before anything else.
+    #
+    # `main` is always retained: deploy-main republishes it on every push, so
+    # deleting it here would only have it return minutes later.
+    #
+    # Auth comes from the checkout above, the same way the deploy's own pushes
+    # work. mike is on PATH because mkdocs-deploy's internal python-setup/uv puts
+    # the virtualenv on GITHUB_PATH for subsequent steps in this job.
+    - name: Prune superseded documentation versions
+      env:
+        KEEP_VERSION: ${{ github.event.release.tag_name || steps.version.outputs.tag }}
+        RETAIN_RELEASES: '5'
+      run: |
+        if [ -z "$KEEP_VERSION" ]; then
+          echo "::error::no release version resolved; refusing to prune"
+          exit 1
+        fi
+        # Re-sync, recompute and retry as a unit: a concurrent main deploy moves
+        # gh-pages, which makes mike's fast-forward push lose the race, and the
+        # stale list computed against the old tip must not be reused.
+        for attempt in 1 2 3; do
+          git fetch origin gh-pages
+          git branch -f gh-pages FETCH_HEAD
+
+          mike list | awk '{print $1}' | sort -u > /tmp/mike-all
+          # `sort -V` is load-bearing: a lexical sort ranks 0.9.0 above 0.11.0
+          # and would retain the wrong five. Only X.Y.Z entries count as
+          # releases, so `develop` and any alias-only row fall through to the
+          # delete set rather than consuming a retention slot.
+          grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' /tmp/mike-all \
+            | sort -rV | head -n "$RETAIN_RELEASES" > /tmp/mike-keep-releases
+          # KEEP_VERSION is listed explicitly as a floor: the release that was
+          # just deployed must survive even if it somehow sorts outside the top
+          # RETAIN_RELEASES.
+          { echo main; echo "$KEEP_VERSION"; cat /tmp/mike-keep-releases; } \
+            | grep -v '^$' | sort -u > /tmp/mike-keep
+          stale=$(comm -23 /tmp/mike-all /tmp/mike-keep | tr '\n' ' ')
+
+          if [ -z "$stale" ]; then
+            echo "nothing to prune; retaining $(tr '\n' ' ' < /tmp/mike-keep)"
+            exit 0
+          fi
+          echo "retaining $(tr '\n' ' ' < /tmp/mike-keep)"
+          echo "deleting: $stale"
+          if mike delete --push $stale; then
+            exit 0
+          fi
+          echo "::warning::prune lost a gh-pages push race (attempt ${attempt}/3); retrying"
+          sleep $(( attempt * 3 ))
+        done
+        echo "::error::could not prune superseded documentation versions after 3 attempts"
+        exit 1

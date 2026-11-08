@@ -5,7 +5,7 @@ be unit-tested without importing pyramids: the ≤5-day window chunking
 (`G1`), the reactive quota back-off (`G2`), and the
 error-as-HTTP-200-text-body classification (`G6`). Keeping these here
 (rather than inline in `backend.py`, which imports
-:mod:`earthlens.firms.events` and therefore pyramids) mirrors the GEE
+`earthlens.firms.events` and therefore pyramids) mirrors the GEE
 backend's `_helpers.py` split and makes the trickiest FIRMS behaviour
 directly testable.
 
@@ -13,12 +13,12 @@ FIRMS has two engineering wrinkles these helpers absorb:
 
 * The area endpoint caps `day_range` at 5 days and serves one sensor
   per request, so a long window is walked in ≤5-day steps
-  (:func:`chunk_windows`).
+  (`chunk_windows`).
 * FIRMS frequently returns *errors* with HTTP status 200 and a
   plain-text body (`Invalid MAP_KEY.`, a transaction-limit message, an
-  `Invalid ...` parameter message). :func:`classify_body` sniffs the
+  `Invalid ...` parameter message). `classify_body` sniffs the
   body so such a response is never fed to `pandas.read_csv`, and
-  :func:`firms_get` retries the quota case with a capped back-off.
+  `firms_get` retries the quota case with a capped back-off.
 """
 
 from __future__ import annotations
@@ -37,7 +37,7 @@ if TYPE_CHECKING:
 #: against the area CSV API, which rejects >5 with "Expects [1..5]").
 MAX_DAY_RANGE = 5
 
-#: Body kinds :func:`classify_body` distinguishes.
+#: Body kinds `classify_body` distinguishes.
 BodyKind = Literal["csv", "auth", "quota", "error"]
 
 
@@ -152,8 +152,8 @@ def classify_body(text: str) -> BodyKind:
 class _RequestsGet:
     """Session-like GET adapter routing through an injected getter.
 
-    Wraps the `get` callable handed to :func:`firms_get` in the
-    `session.get(url, **kwargs)` shape :class:`~earthlens.base.http.HttpClient`
+    Wraps the `get` callable handed to `firms_get` in the
+    `session.get(url, **kwargs)` shape `HttpClient`
     expects, so the client drives the exact transport the caller supplied
     (`requests.get` in production, a fake in tests) rather than a private
     session.
@@ -175,13 +175,13 @@ def _is_quota_body(response: Any) -> bool:
     arrives as HTTP 200 with a plain-text body. `.text` is read
     defensively (a non-200 response may not carry one), mirroring the
     guard the reactive back-off loop used before it moved onto
-    :class:`~earthlens.base.http.HttpClient`.
+    `HttpClient`.
 
     Args:
         response: A response object exposing `text`.
 
     Returns:
-        bool: `True` when :func:`classify_body` flags the body as
+        bool: `True` when `classify_body` flags the body as
             `"quota"`.
     """
     text = getattr(response, "text", "") or ""
@@ -199,11 +199,11 @@ def firms_get(
 ) -> Any:
     """GET a FIRMS URL, retrying the quota case with capped back-off.
 
-    Delegates the retry loop to :class:`~earthlens.base.http.HttpClient`:
+    Delegates the retry loop to `HttpClient`:
     the injected `get` is wrapped as the client's session so the same
     transport (`requests.get` in production) is used, HTTP 429 is made
     retryable via `status_forcelist=(429,)`, and an HTTP-200 body that
-    :func:`classify_body` flags as `"quota"` is made retryable via a
+    `classify_body` flags as `"quota"` is made retryable via a
     `retry_predicate`. Each retry waits `backoff_factor · 2**attempt`
     seconds — or the server's `Retry-After` when it sends one on a 429,
     which the client now honours (bounded by the default back-off

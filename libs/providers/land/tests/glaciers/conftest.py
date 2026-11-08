@@ -15,6 +15,8 @@ from typing import Any
 
 import pytest
 
+from earthlens.testing import FakeResponse
+
 DATA = Path(__file__).parent / "data"
 
 
@@ -44,17 +46,6 @@ class _FakeStreamResponse:
 
     def close(self) -> None:
         """No-op: the fake holds no socket."""
-
-
-class _FakeTextResponse:
-    """A non-streaming `requests.Response` stand-in over a text payload."""
-
-    def __init__(self, text: str, status_code: int = 200) -> None:
-        self.text = text
-        self.status_code = status_code
-
-    def raise_for_status(self) -> None:
-        """No-op: the captured WFS response is always 200."""
 
 
 class FakeHttp:
@@ -93,7 +84,7 @@ class FakeHttp:
             assert self._zip_payload is not None, "no zip payload configured"
             return _FakeStreamResponse(self._zip_payload)
         assert self._wfs_text is not None, "no WFS text configured"
-        return _FakeTextResponse(self._wfs_text)
+        return FakeResponse(text=self._wfs_text)
 
 
 @pytest.fixture

@@ -7,12 +7,19 @@ repos:
         name: "[py -  check] check toml"
       - id: end-of-file-fixer
         name: "[file - format] end of file"
+        # Recorded provider responses, served verbatim by the in-process
+        # S3. Appending a newline or reindenting changes the bytes the
+        # emulator returns, so the fixture would no longer be what the
+        # service actually sent.
+        exclude: (^|/)s3_store/
       - id: no-commit-to-branch
         name: "[git -  check] no commit to branch"
         args: [ --branch=main ]
       - id: trailing-whitespace
         name: "[file - format] trim trailing whitespace"
         args: [ --markdown-linebreak-ext=md ]
+        # Recorded responses: see `end of file` above.
+        exclude: (^|/)s3_store/
       - id: check-added-large-files
         name: "[file -  check] large file"
         args: [ --maxkb=2000 ]
@@ -31,13 +38,15 @@ repos:
       - id: mixed-line-ending
         name: "[file - format] mixed line ending"
         args: [ --fix=auto ]
+        # Recorded responses: see `end of file` above.
+        exclude: (^|/)s3_store/
       - id: pretty-format-json
         name: "[json - format] pretty json"
         # Exclude notebooks: .ipynb is JSON, but jupyter/nbformat owns its serialization
         # (indent=1, ensure_ascii=False). pretty-format-json's --indent=4 + ascii escapes
         # rewrite every notebook into a huge spurious diff on each run (and re-break the
         # code cells' unicode). Notebook code is already handled by ruff.
-        exclude: \.ipynb$
+        exclude: (\.ipynb$|(^|/)s3_store/)
         args: [ --autofix,
                 --indent=4,
                 --no-sort-keys ]
@@ -135,7 +144,7 @@ repos:
     hooks:
       - id: pytest-check
         name: "[py   -  test] pytest"
-        entry: uv run --active pytest -v --cov=libs --cov-report=term-missing -m "not slow and not e2e" -p no:cacheprovider
+        entry: uv run --active pytest -v --cov=libs --cov-report=term-missing -m "not e2e" --disable-socket --allow-unix-socket --allow-hosts=127.0.0.1,::1 -p no:cacheprovider
         language: system
         pass_filenames: false
         always_run: true

@@ -3,10 +3,10 @@
 Fetches Red List assessment records (category, criteria, population trend)
 from the IUCN Red List v4 API through a thin direct `requests` shim — there
 is no mature Python v4 client. Authenticated with a v4 token sent as an
-`Authorization: Bearer` header (resolved by :class:`IucnAuth`); the cluster's
+`Authorization: Bearer` header (resolved by `IucnAuth`); the cluster's
 only tabular backend, returning a `pandas.DataFrame`. Every fetch raises a
 `LicenseWarning` (CC-BY-NC; redistribution needs a written IUCN waiver). See
-:class:`earthlens.iucn.backend.IUCN`.
+`earthlens.iucn.backend.IUCN`.
 """
 
 from __future__ import annotations

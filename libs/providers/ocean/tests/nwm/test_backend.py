@@ -18,8 +18,6 @@ from earthlens.nwm.backend import (
     enumerate_cycles,
 )
 
-from .conftest import FakeS3
-
 pytestmark = [pytest.mark.nwm]
 
 _SRC = Path(earthlens.nwm.__file__).parent
@@ -283,17 +281,19 @@ def test_sites_is_a_subset(make_nwm):
 # -- download (faked S3) ----------------------------------------------------
 
 
-def test_download_writes_whole_files(make_nwm, patch_client):
+def test_download_writes_whole_files(make_nwm, seed_nwm):
     """A no-subset operational download writes one NetCDF per key."""
     nwm = make_nwm(cycles=[0, 12], steps=[1])
-    fake = patch_client(nwm, FakeS3(available=None))
+    seed_nwm(nwm)
     paths = nwm.download(progress_bar=False)
     assert len(paths) == 2
     assert all(p.exists() and p.read_bytes().startswith(b"netcdf:") for p in paths)
-    assert all(bucket == BUCKET for bucket, _ in fake.requested)
+    # The old double logged every (bucket, key) so the test could assert the
+    # bucket. Only `BUCKET` is seeded now, so reading the bytes back at all
+    # already proves the request went there.
 
 
-def test_download_multi_day_writes_distinct_files(make_nwm, patch_client):
+def test_download_multi_day_writes_distinct_files(make_nwm, seed_nwm):
     """A multi-day window with the same cycle/step writes one file per day.
 
     The NWM basename omits the date (it lives in the S3 key prefix), so the
@@ -307,7 +307,7 @@ def test_download_multi_day_writes_distinct_files(make_nwm, patch_client):
         cycles=[0],
         steps=[0],
     )
-    patch_client(nwm, FakeS3(available=None))
+    seed_nwm(nwm)
     paths = nwm.download(progress_bar=False)
     assert len(paths) == 3
     # distinct on-disk files (no overwrite), each carrying its day's bytes
@@ -317,11 +317,11 @@ def test_download_multi_day_writes_distinct_files(make_nwm, patch_client):
     }
 
 
-def test_download_skips_unpublished_keys(make_nwm, patch_client):
+def test_download_skips_unpublished_keys(make_nwm, seed_nwm):
     """A key that is not published is skipped, not fatal."""
     nwm = make_nwm(cycles=[0, 12], steps=[1])
     published = {nwm._search()[0].href}
-    patch_client(nwm, FakeS3(available=published))
+    seed_nwm(nwm, available=published)
     paths = nwm.download(progress_bar=False)
     assert len(paths) == 1
 
@@ -384,10 +384,10 @@ def test_retrospective_gridded_rejected(make_nwm):
         nwm.download(progress_bar=False)
 
 
-def test_operational_subset_downloads_then_reads(make_nwm, fake_reader, patch_client):
+def test_operational_subset_downloads_then_reads(make_nwm, fake_reader, seed_nwm):
     """An operational sites= subset downloads the file then reads + writes Parquet."""
     nwm = make_nwm(cycles=[0], steps=[1], sites=[101])
-    patch_client(nwm, FakeS3(available=None))
+    seed_nwm(nwm)
     reader = fake_reader(nwm)
     paths = nwm.download(progress_bar=False)
     assert len(paths) == 1 and paths[0].suffix == ".parquet"
@@ -398,7 +398,7 @@ def test_operational_subset_downloads_then_reads(make_nwm, fake_reader, patch_cl
     assert reader.calls[0][1]["anon"] is False  # local downloaded file
 
 
-def test_operational_gridded_bbox_writes_geotiff(make_nwm, fake_netcdf, patch_client):
+def test_operational_gridded_bbox_writes_geotiff(make_nwm, fake_netcdf, seed_nwm):
     """An operational gridded bbox subset reads + crops each variable to GeoTIFF."""
     nwm = make_nwm(
         variables={"ldasout": ["SNEQV", "SNOWH"]},
@@ -408,7 +408,7 @@ def test_operational_gridded_bbox_writes_geotiff(make_nwm, fake_netcdf, patch_cl
         lat_lim=[39, 40],
         lon_lim=[-78, -75],
     )
-    patch_client(nwm, FakeS3(available=None))
+    seed_nwm(nwm)
     netcdf = fake_netcdf(nwm)
     paths = nwm.download(progress_bar=False)
     # one GeoTIFF per requested variable
@@ -420,7 +420,7 @@ def test_operational_gridded_bbox_writes_geotiff(make_nwm, fake_netcdf, patch_cl
     assert subsets[0][1]["bbox"] == (-78.0, 39.0, -75.0, 40.0)
 
 
-def test_operational_gridded_sites_rejected(make_nwm, patch_client):
+def test_operational_gridded_sites_rejected(make_nwm, seed_nwm):
     """sites= does not apply to a gridded product (raises ValueError)."""
     nwm = make_nwm(
         variables={"ldasout": ["SNEQV"]},
@@ -429,13 +429,13 @@ def test_operational_gridded_sites_rejected(make_nwm, patch_client):
         steps=[1],
         sites=[101],
     )
-    patch_client(nwm, FakeS3(available=None))
+    seed_nwm(nwm)
     with pytest.raises(ValueError, match="does not apply to the gridded"):
         nwm.download(progress_bar=False)
 
 
 def test_operational_gridded_interleaved_layer_var_rejected(
-    make_nwm, monkeypatch, patch_client
+    make_nwm, monkeypatch, seed_nwm
 ):
     """A multi-layer (interleaved) variable raises a clear NotImplementedError."""
     nwm = make_nwm(
@@ -446,7 +446,7 @@ def test_operational_gridded_interleaved_layer_var_rejected(
         lat_lim=[39, 40],
         lon_lim=[-78, -75],
     )
-    patch_client(nwm, FakeS3(available=None))
+    seed_nwm(nwm)
 
     class _Interleaved:
         dataset = None
@@ -483,10 +483,10 @@ def test_feature_ids_and_gage_ids_split(make_nwm):
     assert make_nwm()._feature_ids() is None and make_nwm()._gage_ids() is None
 
 
-def test_operational_subset_skips_unpublished(make_nwm, fake_reader, patch_client):
+def test_operational_subset_skips_unpublished(make_nwm, fake_reader, seed_nwm):
     """An unpublished key in an operational subset is skipped, not read."""
     nwm = make_nwm(cycles=[0], steps=[1], sites=[101])
-    patch_client(nwm, FakeS3(available=set()))  # nothing published
+    seed_nwm(nwm, available=set())  # nothing published
     reader = fake_reader(nwm)
     paths = nwm.download(progress_bar=False)
     assert paths == []
@@ -505,10 +505,10 @@ def test_close_quietly_swallows_errors():
     close_quietly(_Bad())  # must not raise
 
 
-def test_api_composes_search_fetch(make_nwm, patch_client):
+def test_api_composes_search_fetch(make_nwm, seed_nwm):
     """_api returns the fetched paths via the search/fetch composition."""
     nwm = make_nwm(cycles=[0], steps=[1])
-    patch_client(nwm, FakeS3(available=None))
+    seed_nwm(nwm)
     paths = nwm._api()
     assert len(paths) == 1 and paths[0].exists()
 
@@ -600,7 +600,7 @@ def test_readers_resolve_pyramids_classes(make_nwm):
     assert nwm._netcdf_reader().__name__ == "NetCDF"
 
 
-def test_gridded_other_value_error_propagates(make_nwm, monkeypatch, patch_client):
+def test_gridded_other_value_error_propagates(make_nwm, monkeypatch, seed_nwm):
     """A non-interleaved ValueError from subset propagates unchanged (not wrapped)."""
     nwm = make_nwm(
         variables={"ldasout": ["SNEQV"]},
@@ -610,7 +610,7 @@ def test_gridded_other_value_error_propagates(make_nwm, monkeypatch, patch_clien
         lat_lim=[39, 40],
         lon_lim=[-78, -75],
     )
-    patch_client(nwm, FakeS3(available=None))
+    seed_nwm(nwm)
 
     class _Boom:
         dataset = None

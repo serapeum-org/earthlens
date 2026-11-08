@@ -21,22 +21,6 @@ from earthlens.goes import GOES
 pytestmark = [pytest.mark.e2e, pytest.mark.goes]
 
 
-def _network_available() -> bool:
-    """Return whether the public GOES bucket is reachable (unsigned)."""
-    try:
-        import boto3
-        from botocore import UNSIGNED
-        from botocore.client import Config
-
-        client = boto3.client(
-            "s3", region_name="us-east-1", config=Config(signature_version=UNSIGNED)
-        )
-        client.list_objects_v2(Bucket="noaa-goes19", MaxKeys=1, Delimiter="/")
-        return True
-    except Exception:
-        return False
-
-
 def _recent_window(minutes: int = 6) -> tuple[str, str]:
     """Return a `(start, end)` window a few hours back (safely published)."""
     now = dt.datetime.now(dt.timezone.utc).replace(tzinfo=None)
@@ -45,7 +29,7 @@ def _recent_window(minutes: int = 6) -> tuple[str, str]:
     return base.strftime("%Y-%m-%d %H:%M"), end.strftime("%Y-%m-%d %H:%M")
 
 
-@pytest.mark.skipif(not _network_available(), reason="noaa-goes19 unreachable")
+@pytest.mark.requires_host("noaa-goes19.s3.amazonaws.com")
 def test_download_one_recent_mcmipc_granule(tmp_path):
     """Fetch a recent CONUS MCMIP granule from noaa-goes19 and confirm it lands."""
     start, end = _recent_window()
@@ -69,7 +53,7 @@ def test_download_one_recent_mcmipc_granule(tmp_path):
     assert written.stat().st_size > 1_000_000, "a real granule, not a truncated body"
 
 
-@pytest.mark.skipif(not _network_available(), reason="noaa-goes19 unreachable")
+@pytest.mark.requires_host("noaa-goes19.s3.amazonaws.com")
 def test_channel_filter_fetches_only_requested_band(tmp_path):
     """A band-split radiance request fetches only the requested ABI channel."""
     start, end = _recent_window(minutes=6)

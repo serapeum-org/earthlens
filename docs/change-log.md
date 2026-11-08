@@ -1,5 +1,55 @@
 # Change Log
 
+## 0.31.0 (2026-10-25)
+
+### Feat
+
+- **gee**: add Epic 6 server-side compute, exports and asset management (#1341)
+
+## 0.30.0 (2026-10-22)
+
+### Fix
+
+- **stac**: read CDSE on pyramids-core 0.71.0, consolidate signers onto pyramids-eo, and make the live e2e honest (#1320)
+
+## 0.29.0 (2026-10-20)
+
+### Feat
+
+- **gee**: add Epic 4 temporal reduction, collections and composite refactor (#1321)
+- **gee**: add Epic 3 sampling, zonal statistics and vector interop (#1303)
+
+### Fix
+
+- **deps**: adopt the pyramids-core rename and raise the aiohttp security floor (#1318)
+- **e2e**: keep transient upstream failures from reddening the live lanes (#1285)
+
+## 0.28.0 (2026-10-18)
+
+### BREAKING CHANGE
+
+- with pyramids-eo always installed, engine="auto" now
+prefers the EEDAI reader for any raw fetch it can serve, where that
+preference was previously gated on the optional [eedai] extra. The
+reader samples and grids differently from Earth Engine; pass
+engine="ee" to force Earth Engine's exact sampling.
+
+### Feat
+
+- **gee**: add the client-side raster-analysis subpackage (#1287)
+- **gee**: Epic 1 - architectural seams and OOP foundation (#1249)
+
+### Fix
+
+- **gee**: make reader_refusal_types() total, and strip the rST roles repo-wide (#1274)
+
+## 0.27.1 (2026-10-10)
+
+### Fix
+
+- **e2e**: spare a reachable-but-down backend in the masked-lane guard (#1247)
+- **deps**: upgrade to pyramids 0.66 and cleopatra 0.42 (#1244)
+
 ## 0.27.0 (2026-10-08)
 
 ### Feat

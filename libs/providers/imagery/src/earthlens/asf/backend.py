@@ -47,8 +47,8 @@ class ASF(AbstractDataSource):
     SAR-catalog search or an InSAR baseline stack from a reference
     granule through the standard earthlens `download()` shape.
     Search calls run anonymously; only the download step
-    authenticates, via :class:`ASFAuth` (which reuses
-    :class:`EarthdataAuth` — no second credential system).
+    authenticates, via `ASFAuth` (which reuses
+    `EarthdataAuth` — no second credential system).
 
     Attributes:
         OUTPUT_KIND: `"raster"` — SAR products are gridded files
@@ -61,10 +61,10 @@ class ASF(AbstractDataSource):
 
     Note:
         ASF ships every product as a SAFE `.zip` archive (not a
-        bare GeoTIFF / NetCDF), so :meth:`earthlens.earthlens.EarthLens.load`
+        bare GeoTIFF / NetCDF), so `earthlens.earthlens.EarthLens.load`
         — which calls `pyramids` on `.tif` / `.nc` / `.cog` /
         `.zarr` extensions — returns the downloaded `.zip` path as
-        a plain :class:`pathlib.Path` rather than a pyramids object.
+        a plain `pathlib.Path` rather than a pyramids object.
         Use a dedicated SAR reader (`asf_search.export.read`, ISCE,
         SNAP, `sarsen`, …) to open the archive.
 
@@ -162,7 +162,7 @@ class ASF(AbstractDataSource):
             processes: Worker count for the parallel ASF download.
                 Forwarded to
                 `ASFSearchResults.download(processes=…)`.
-            credentials: Optional :class:`ASFCredentials`. `None`
+            credentials: Optional `ASFCredentials`. `None`
                 builds a default `ASFCredentials()` that defers
                 to the EDL env vars / `~/.netrc`.
         """
@@ -226,11 +226,11 @@ class ASF(AbstractDataSource):
         )
 
     def _initialize(self) -> None:
-        """Build the (lazy) :class:`ASFAuth`; defer the EDL login.
+        """Build the (lazy) `ASFAuth`; defer the EDL login.
 
         `asf_search` is imported lazily inside `_search` / `_fetch` /
         `ASFAuth`, so neither this method nor the constructor pulls
-        the SDK. The :class:`ASFAuth` is built but **not**
+        the SDK. The `ASFAuth` is built but **not**
         configured here — search runs anonymously; `_fetch` calls
         `configure()` on first use. Catalog resolution and mode
         validation happen in `__init__` before `super().__init__()`
@@ -250,7 +250,7 @@ class ASF(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse the `[start, end]` window into a :class:`TemporalExtent`.
+        """Parse the `[start, end]` window into a `TemporalExtent`.
 
         ASF issues a single query spanning the whole window (no
         per-date loop), so the resolution is always coerced to the
@@ -295,7 +295,7 @@ class ASF(AbstractDataSource):
         parameters". The reliable contract is: hand `.stack()` an
         empty options bundle, let it return the full reference-frame
         stack, and apply the perpendicular- / temporal-baseline
-        windows client-side via :func:`apply_baseline_windows`.
+        windows client-side via `apply_baseline_windows`.
 
         Args:
             asf_search_module: The `asf_search` module.
@@ -315,9 +315,9 @@ class ASF(AbstractDataSource):
         end=..., …)`. In stack mode: `granule_search([reference])`
         → `ref.stack(opts=…)`, then the perpendicular- /
         temporal-baseline windows are applied client-side via
-        :func:`apply_baseline_windows` (the SDK's
+        `apply_baseline_windows` (the SDK's
         `ASFSearchOptions` baseline fields break `.stack()` and
-        are not used; see :meth:`_stack_opts`).
+        are not used; see `_stack_opts`).
 
         Returns:
             list[RemoteProduct]: One product per matching ASF
@@ -424,7 +424,7 @@ class ASF(AbstractDataSource):
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
         """Download every product to `self.path` and return the written paths.
 
-        Calls :meth:`ASFAuth.session` once **if any product needs to
+        Calls `ASFAuth.session` once **if any product needs to
         be fetched** (which runs the EDL login on first access) and
         reuses the same authenticated session for the whole batch.
         The download is idempotent — products whose target file
@@ -434,7 +434,7 @@ class ASF(AbstractDataSource):
         with nothing missing therefore does not authenticate.
 
         Args:
-            products: The list returned by :meth:`_search`.
+            products: The list returned by `_search`.
 
         Returns:
             list[Path]: The on-disk file paths, in `products`

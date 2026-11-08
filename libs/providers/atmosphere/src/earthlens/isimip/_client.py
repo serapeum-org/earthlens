@@ -5,7 +5,7 @@ search) and the files API v2 (the async server-side cutout job). Both are
 wrapped by the `isimip-client` SDK's `ISIMIPClient`, which this module builds
 **lazily** so `isimip-client` stays a per-backend extra (`pip install
 earthlens[isimip]`) that is never imported until an ISIMIP download actually
-runs. :class:`IsimipClient` is the structural type the backend depends on, so a
+runs. `IsimipClient` is the structural type the backend depends on, so a
 test can inject a fake with the same three methods instead of the real SDK.
 """
 

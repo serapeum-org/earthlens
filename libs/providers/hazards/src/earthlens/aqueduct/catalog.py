@@ -11,15 +11,15 @@ column-grammar vocabularies (`indicators` / `years` / `scenarios` /
 `f"{indicator}{year}_{scenario}_{return_period}"`, e.g. `"P30_28_100"` for
 population affected, 2030, SSP2-RCP8.5, 100-year flood.
 
-:class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog` subclass that
+`Catalog` is a thin `earthlens.base.AbstractCatalog` subclass that
 loads the bundled `aqueduct_data_catalog.yaml` and exposes its `admin_levels:`
-block as a map of :class:`AdminLevel` rows under the inherited :attr:`datasets`
+block as a map of `AdminLevel` rows under the inherited `datasets`
 field (so `cat["country"]` / `"country" in cat` / `len(cat)` and the
 did-you-mean error come for free), alongside the `base_url`, `license`,
 `attribution`, and the three code-map vocabularies. Resolve one admin level with
-:meth:`get`, list them with :meth:`available`.
+`get`, list them with `available`.
 
-:data:`CATALOG_PATH` is the path to the bundled YAML; it is monkey-patchable in
+`CATALOG_PATH` is the path to the bundled YAML; it is monkey-patchable in
 tests.
 """
 
@@ -51,8 +51,8 @@ class AdminLevel(SummarisedLeaf):
     """One admin level's download + shapefile spec.
 
     The admin-level name (`"country"` / `"state"` / `"basin"`) is the parent key
-    in :attr:`Catalog.datasets`; the loader copies it onto the row as
-    :attr:`level` so a resolved level is self-describing.
+    in `Catalog.datasets`; the loader copies it onto the row as
+    `level` so a resolved level is self-describing.
 
     Attributes:
         level: The admin-level name, taken from the catalog key. Empty only
@@ -61,12 +61,12 @@ class AdminLevel(SummarisedLeaf):
             rejected at load time, and the field is excluded from
             `model_dump()` so it does not repeat the row's own key.
         zip: The zip file name the shapefile lives in — a direct download under
-            `base_url` when :attr:`container_zip` is `None`, otherwise the entry
+            `base_url` when `container_zip` is `None`, otherwise the entry
             to extract from that outer bundle first.
         shapefile_stem: The shapefile name (without extension) inside `zip`; the
             `.shp` and its sidecars (`.dbf` / `.shx` / `.prj`) all share it.
         container_zip: For an admin level with no standalone URL (`state`), the
-            outer bundle to download; :attr:`zip` is then extracted from it. `None`
+            outer bundle to download; `zip` is then extracted from it. `None`
             for a directly-downloadable level (`country`, `basin`).
 
     Examples:
@@ -178,10 +178,10 @@ def _load_catalog_data(path: Path) -> dict[str, Any]:
     `return_periods:` vocabularies.
 
     Args:
-        path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
+        path: Path to the catalog YAML (default `CATALOG_PATH`).
 
     Returns:
-        dict[str, Any]: Every field a :class:`Catalog` is built from.
+        dict[str, Any]: Every field a `Catalog` is built from.
 
     Raises:
         ValueError: If the file has no `admin_levels:` block, or a row / scenario
@@ -226,23 +226,23 @@ class Catalog(AbstractCatalog[AdminLevel]):
     """Catalog for the Aqueduct riverine flood-risk backend.
 
     Reads the bundled `aqueduct_data_catalog.yaml` (shipped as package data) and
-    exposes its `admin_levels:` block as a map of :class:`AdminLevel` rows keyed
-    by name under the inherited :attr:`datasets` field, plus the `base_url`,
+    exposes its `admin_levels:` block as a map of `AdminLevel` rows keyed
+    by name under the inherited `datasets` field, plus the `base_url`,
     `license`, `attribution`, and the `indicators` / `years` / `scenarios` /
     `return_periods` vocabularies. Instantiate with no arguments (`Catalog()`);
-    resolve one admin level with :meth:`get`, list them with :meth:`available`,
-    and build the download URL for a level with :meth:`download_url`.
+    resolve one admin level with `get`, list them with `available`,
+    and build the download URL for a level with `download_url`.
 
     Attributes:
         datasets: Map from admin-level name (`"country"` / `"state"` / `"basin"`)
-            to its :class:`AdminLevel` row.
+            to its `AdminLevel` row.
         base_url: Host prefix every download URL is built on.
         license: SPDX-style redistribution licence (`"CC-BY-4.0"`).
         attribution: Required attribution string.
         indicators: Public metric name -> `.dbf` column prefix (`gdp_affected`
             -> `G`).
         years: Year -> column code (`"2010"` -> `"10"`).
-        scenarios: Scenario name -> its :class:`Scenario` (code + valid years).
+        scenarios: Scenario name -> its `Scenario` (code + valid years).
         return_periods: Return period (years, int) -> column code (`1000` ->
             `"1T"`).
 
@@ -309,10 +309,10 @@ class Catalog(AbstractCatalog[AdminLevel]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the module-level
-                :data:`CATALOG_PATH`.
+                `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If the file has no `admin_levels:` block, or a row /
@@ -322,9 +322,9 @@ class Catalog(AbstractCatalog[AdminLevel]):
         return cls(**_load_catalog_data(catalog_path))
 
     def get(self, admin_level: str) -> AdminLevel:
-        """Resolve an admin-level name to its :class:`AdminLevel` row.
+        """Resolve an admin-level name to its `AdminLevel` row.
 
-        Thin wrapper over the inherited :meth:`get_dataset`, which raises a
+        Thin wrapper over the inherited `get_dataset`, which raises a
         `ValueError` with a did-you-mean hint on an unknown name.
 
         Args:

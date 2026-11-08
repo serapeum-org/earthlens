@@ -3,7 +3,7 @@
 Environment & Climate Change Canada publishes its operational NWP
 forecasts (GDPS, RDPS, HRDPS, GEPS) on the MSC Datamart under the WMO
 WIS2 date-partitioned layout: one uncompressed GRIB2 file per
-`(cycle, step, variable, level)`, no `.idx`, no SDK. :class:`ECCCCentre`
+`(cycle, step, variable, level)`, no `.idx`, no SDK. `ECCCCentre`
 builds each variable's URL from the catalog `url_template`, downloads
 it directly from `dd.weather.gc.ca`, and concatenates the requested
 bands' GRIB messages into a single per-`(cycle, step)` file — valid

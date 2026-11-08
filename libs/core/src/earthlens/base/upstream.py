@@ -4,20 +4,20 @@ One typed error and one set of status helpers, so the provider backends (gdacs,
 osm, ecmwf, bathymetry) and the `earthlens.testing` skip classifier stop each
 re-implementing the exception-chain walk, the `bool`-is-`int` guard, and the
 `NNN Server/Client Error` message parse. Each provider raises the shared
-:class:`UpstreamUnavailableError` (subclassing only where the provider name aids
+`UpstreamUnavailableError` (subclassing only where the provider name aids
 the traceback) and composes these helpers rather than restating them.
 
 The split mirrors how a status is actually recovered:
 
-* :func:`exception_chain` walks `__cause__` / `__context__` (an SDK usually
+* `exception_chain` walks `__cause__` / `__context__` (an SDK usually
   buries the `requests` error that carries the status);
-* :func:`response_status` reads one exception structurally (a
+* `response_status` reads one exception structurally (a
   `urllib.error.HTTPError.code` or a `requests` `.response.status_code`);
-* :func:`status_in_message` is the text fallback for a `raise_for_status`
+* `status_in_message` is the text fallback for a `raise_for_status`
   message before a response is attached, with an `anchored` switch so a caller
   that also sees response-body echoes (a pytest-rewritten `AssertionError`) can
   refuse a status buried mid-string;
-* :func:`http_status` composes the three into the common "status behind a
+* `http_status` composes the three into the common "status behind a
   failure" one-liner.
 """
 
@@ -165,7 +165,7 @@ def response_status(exc: BaseException) -> int | None:
     `requests`-style `.response.status_code` (a `bool` is rejected, since it is
     an `int` subclass) — so a status is taken from structure rather than parsed
     out of free text (which a URL or a pixel count could spoof). Inspects only
-    `exc` itself; use :func:`http_status` to walk a chain.
+    `exc` itself; use `http_status` to walk a chain.
 
     Args:
         exc: A single exception to inspect.
@@ -243,9 +243,9 @@ def http_status(exc: BaseException) -> int | None:
     """Best-effort HTTP status behind a failure, walking the exception chain.
 
     Walks `exc` and its `__cause__` / `__context__` predecessors and returns the
-    first status found — read structurally by :func:`response_status`, or failing
+    first status found — read structurally by `response_status`, or failing
     that from a `NNN Server/Client Error` anywhere in a link's message
-    (:func:`status_in_message`). A wrapped error — an SDK burying the `requests`
+    (`status_in_message`). A wrapped error — an SDK burying the `requests`
     failure that carries the response — still yields its status.
 
     Args:

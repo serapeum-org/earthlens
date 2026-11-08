@@ -1,6 +1,6 @@
 """Integration test for ECMWF polygon masking through real pyramids.
 
-Exercises :meth:`ECMWF._mask_netcdf_to_geometry` end-to-end against an
+Exercises `ECMWF._mask_netcdf_to_geometry` end-to-end against an
 ERA5-like NetCDF that carries a non-spatial `expver` string aux variable —
 the cube shape that used to trip pyramids' crop (serapeum-org/pyramids#513,
 fixed in pyramids 0.34.0 / #514). Unlike the fake-backed unit tests, this

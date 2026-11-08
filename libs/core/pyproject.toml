@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earthlens-core"
-version = "0.27.0"
+version = "0.31.0"
 description = "Core abstractions, facade and CLI for earthlens — no provider SDKs"
 readme = { file = "README.md", content-type = "text/markdown" }
 authors = [
@@ -34,11 +34,17 @@ requires-python = ">=3.11,<4"
 # unconditionally-registered console script. No provider SDK belongs here —
 # those live in the thematic provider distributions' own dependencies.
 dependencies = [
-    "pyramids-gis >=0.65.0",
+    "pyramids-core >=0.71.0",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",
     "numpy >=2.0.0",
+    # The `<3` cap was lifted once the gee GeoDataFrame -> ee.Feature conversion
+    # was made pandas-3 correct (#1339). `openeo` and `ohsome` still pin
+    # `pandas<3`, so `earthlens[all]` and the workspace lock still resolve
+    # pandas 2; only a lean install (e.g. `earthlens[gee]`) pulls pandas 3. The
+    # pandas-3 path is verified out of band (the gee conversion tests run under
+    # pandas 3) rather than by a CI leg, since no default resolve selects it.
     "pandas >=2.0.0",
     "platformdirs >=3.0.0",
     "pydantic >=2.0",
@@ -101,18 +107,4 @@ include = ["earthlens*"]
 [tool.pytest.ini_options]
 testpaths = "tests"
 consider_namespace_packages = true
-addopts = "--import-mode=importlib"
-markers = [
-    "biodiversity: tests for the shared biodiversity-cluster helpers (`wkt_from_bbox`, `occurrences_to_fc`, `LicenseWarning`; no extra SDK).",
-    "chc: tests for the Climate Hazards Center (CHC) FTP backend (no extra SDK; covers CHIRPS / CHIRP / CHIRTS / WBGT / SPI / SPEI / CHC_CMIP6 etc.).",
-    "cli: tests for the `earthlens` console script / federated catalog-query CLI (typer and rich are core dependencies; no extra needed).",
-    "e2e: end-to-end test against a live external service (e.g. CDS); select with `-m e2e`.",
-    "ecmwf: tests for the ECMWF/CDS backend (requires the `ecmwf` extra: cdsapi).",
-    "gee: tests for the Google Earth Engine backend (requires the `gee` extra: earthengine-api).",
-    "integration: exercises multiple modules together with mocked I/O.",
-    "jrc: tests for the JRC hazards backend (European Flood Hazard Map + the probabilistic sea-level forecasts; open HTTPS, no extra SDK).",
-    "nwm: tests for the NOAA National Water Model backend (requires the `nwm` extra: boto3; unsigned noaa-nwm-pds bucket).",
-    "s3: tests for the S3 backend (requires the `s3` extra: boto3).",
-    "slow: mark test as slow.",
-    "unit: in-process unit test, no network or filesystem outside tmp_path.",
-]
+addopts = "--import-mode=importlib --strict-markers"

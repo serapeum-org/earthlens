@@ -1,11 +1,23 @@
-name: Tests - E2E (live CDS + GEE + STAC)
+name: Tests - E2E (full live sweep on merge)
 
-# Live e2e against external, rate/quota-limited services (CDS, GEE, EUMETSAT,
-# STAC, …). This is the full cross-provider sweep; per-PR e2e on a changed
-# provider's files lives in the tests-e2e-<theme>.yml callers, so this workflow
-# only needs to run the whole matrix on merges. Triggers: every non-docs merge to
-# `main` (docs-only merges skipped below) and manual dispatch. Jobs run only on
-# the main repo (forks have no secrets) and self-skip when a credential is absent.
+# The full cross-provider live sweep. Per-PR e2e on a changed provider's files
+# lives in the tests-e2e-<theme>.yml callers; this workflow runs every lane of
+# every theme on a merge to `main`, plus core's own.
+#
+# It used to be 13 hand-written jobs restating what tests-e2e-reusable.yml
+# already expresses as a lane table, and the copy had drifted into the weaker
+# of the two: no `timeout-minutes` (so a hung provider held a runner for the
+# 6-hour default), no `-rs` (so a skip's reason was illegible in the one log
+# where it matters most), and marker-only selection with no path scope (so each
+# dedicated job collected all six members — ~9,400 tests — to execute about
+# seven). Delegating removes the second definition rather than re-syncing it:
+# the lanes, their extras, their timeouts, the `--junitxml` + assert_tests_ran
+# guard and the `allow_empty` / `allow_all_skipped` declarations now have one
+# home, and `run_all: true` is the only thing this file says that a PR run
+# does not.
+#
+# Jobs run only on the main repo (forks have no secrets) and self-skip when a
+# credential is absent — both enforced inside the reusable workflow.
 
 permissions:
   contents: read
@@ -28,41 +40,71 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Every suite without a dedicated lane below, CDS included - but split one
-  # job per distribution instead of one job for all of them.
-  #
-  # Why: pytest runs a suite in ONE process, and a native crash kills that
-  # process rather than failing a test. Until 2026-08-02 this was a single job
-  # covering ~38 suites, and it had been dying since at least 2026-07-19 on a
-  # segfault in `hazards/tests/admin` (issue #925). `hazards` sorts 16th of 47,
-  # so the 23 suites behind it silently never ran while the job reported one
-  # generic failure that read like ordinary live-service flakiness.
-  #
-  # Splitting bounds the blast radius to one distribution, and `fail-fast:
-  # false` stops one crash cancelling the others mid-flight.
-  e2e-shared:
+  # One call per theme, each running every lane in that theme's table
+  # regardless of what the merge touched. Split per theme for the same reason
+  # the old `e2e-shared` matrix was split per distribution: pytest runs a suite
+  # in ONE process and a native crash kills the process rather than failing a
+  # test, so a segfault in `hazards/tests/admin` used to take the 23 suites
+  # collected behind it down with it, silently (#925). Lane-level splitting
+  # inside each theme bounds the blast radius further still.
+  core:
+    uses: ./.github/workflows/tests-e2e-core.yml
+    with:
+      run_all: true
+    secrets: inherit
+
+  atmosphere:
+    uses: ./.github/workflows/tests-e2e-reusable.yml
+    with:
+      theme: atmosphere
+      run_all: true
+    secrets: inherit
+
+  ocean:
+    uses: ./.github/workflows/tests-e2e-reusable.yml
+    with:
+      theme: ocean
+      run_all: true
+    secrets: inherit
+
+  imagery:
+    uses: ./.github/workflows/tests-e2e-reusable.yml
+    with:
+      theme: imagery
+      # Imagery's lanes talk to the slowest hosts in the repo (EUMETSAT Data
+      # Store, ASF, CDSE), which is why its caller raises the cap too.
+      timeout_minutes: 60
+      run_all: true
+    secrets: inherit
+
+  land:
+    uses: ./.github/workflows/tests-e2e-reusable.yml
+    with:
+      theme: land
+      run_all: true
+    secrets: inherit
+
+  hazards:
+    uses: ./.github/workflows/tests-e2e-reusable.yml
+    with:
+      theme: hazards
+      run_all: true
+    secrets: inherit
+
+  # A lane whose upstream is chronically unreliable is marked `quarantined`
+  # rather than deleted or left to redden its neighbours, which means nothing
+  # runs it by default. This job does, after the sweep, and never gates: its
+  # job is to say whether a quarantined backend has recovered enough to come
+  # back, not to fail a merge that was already green.
+  quarantined:
+    needs: [core, atmosphere, ocean, imagery, land, hazards]
+    if: always() && github.repository == 'serapeum-org/earthlens'
+    continue-on-error: true
     runs-on: ubuntu-latest
-    # Only run when credentials are available (the main repo). Forks
-    # have no secrets and would 401 immediately.
-    if: github.repository == 'serapeum-org/earthlens'
-
-    strategy:
-      fail-fast: false
-      matrix:
-        package:
-          - libs/core
-          - libs/providers/atmosphere
-          - libs/providers/hazards
-          - libs/providers/imagery
-          - libs/providers/land
-          - libs/providers/ocean
-
-    name: e2e-shared (${{ matrix.package }})
+    timeout-minutes: 45
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
 
       - name: Set up Python
         uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
@@ -72,462 +114,37 @@ jobs:
           verify-lock: true
           version: "0.11.29"
 
-      - name: Run live e2e tests
+      - name: Run the quarantined live tests
         env:
           CDSAPI_URL: ${{ secrets.CDSAPI_URL }}
           CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
-          # These backends have no dedicated lane below, so this catch-all is the
-          # only job that collects them. Without their credentials they self-skip
-          # and the job still reports success - the suites were never exercised.
-          COPERNICUSMARINE_SERVICE_USERNAME: ${{ secrets.COPERNICUSMARINE_SERVICE_USERNAME }}
-          COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
+          GEE_SERVICE_ACCOUNT: ${{ secrets.GEE_SERVICE_ACCOUNT }}
+          GEE_SERVICE_KEY: ${{ secrets.GEE_SERVICE_KEY }}
+          EARTHDATA_USERNAME: ${{ secrets.EARTHDATA_USERNAME }}
+          EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
+          EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
+          IUCN_TOKEN: ${{ secrets.IUCN_TOKEN }}
+          WDPA_TOKEN: ${{ secrets.WDPA_TOKEN }}
           API_USGS_PAT: ${{ secrets.API_USGS_PAT }}
-          GPORTAL_USERNAME: ${{ secrets.GPORTAL_USERNAME }}
-          GPORTAL_PASSWORD: ${{ secrets.GPORTAL_PASSWORD }}
-          JAXA_PTREE_USERNAME: ${{ secrets.JAXA_PTREE_USERNAME }}
-          JAXA_PTREE_PASSWORD: ${{ secrets.JAXA_PTREE_PASSWORD }}
           OPENAQ_API_KEY: ${{ secrets.OPENAQ_API_KEY }}
           FIRMS_MAP_KEY: ${{ secrets.FIRMS_MAP_KEY }}
           NREL_API_KEY: ${{ secrets.NREL_API_KEY }}
           NREL_EMAIL: ${{ secrets.NREL_EMAIL }}
-          OPENEO_CLIENT_ID: ${{ secrets.OPENEO_CLIENT_ID }}
-          OPENEO_CLIENT_SECRET: ${{ secrets.OPENEO_CLIENT_SECRET }}
           GFW_API_KEY: ${{ secrets.GFW_API_KEY }}
+        # Naming the marker in `-m` is what un-holds them (see
+        # earthlens.testing.pytest_collection_modifyitems). Exit 5 (nothing
+        # quarantined right now) is the healthy state, so treat it as a pass.
         run: |
-          # The marker exclusions drop the suites that have their own lane below.
-          # The geoBoundaries ADM1 test that segfaults GDAL (#925) skips itself
-          # in the test file now, so no --deselect is needed here.
-          #
-          # ONE rule: exclude exactly the backends that have a dedicated job in
-          # THIS file, so every backend runs in exactly one lane. Do not sync
-          # this list with tests-e2e-reusable.yml's per-theme catchall_marker -
-          # that file has its own lanes (ecmwf and osm among them) and copying
-          # its exclusions here would drop those backends from the cron
-          # entirely, since this workflow has no dedicated job for them.
-          #
-          # The list had drifted: earthdata, eumetsat and asf gained jobs here
-          # but were never excluded, so the catch-all collected their tests a
-          # second time - and, before their credentials were wired, only to skip
-          # them (one run reported 2 passed, 14 skipped). Running them twice also
-          # doubled the concurrent Earthdata Login token mints, the call that
-          # intermittently times out from CI.
-          report="$RUNNER_TEMP/e2e-shared.xml"
-          uv run --locked pytest ${{ matrix.package }} -v \
-            --junitxml="$report" \
-            -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not emdat and not caravan and not earthdata and not eumetsat and not asf and not iucn and not wdpa"
-          # Complements earthlens.testing's in-process guard, which already fails
-          # a lane masked by *upstream* outages. That one counts only skips
-          # carrying its availability prefix, so a lane skipped for missing
-          # credentials still exits 0 and reports green. Catch that here.
-          python .github/scripts/assert_tests_ran.py "$report" "e2e-shared (${{ matrix.package }})"
-
-  e2e-caravan:
-    runs-on: ubuntu-latest
-    if: github.repository == 'serapeum-org/earthlens'
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
-        with:
-          python-version: "3.12"
-          install-groups: "groups: dev, extras: all"
-          verify-lock: true
-          version: "0.11.29"
-
-      - name: Run live Caravan e2e tests
-        # Anonymous static Zenodo archives, so no secrets and nothing to skip.
-        # The suite asserts a transferred-byte budget - that one catchment
-        # costs ~3 MB out of an 8.84 GB archive - so it is the regression gate
-        # for the range-read design, not a smoke test.
-        #
-        # `--locked` makes the run fail rather than silently re-resolve if
-        # uv.lock has drifted, so the versions under test are the locked ones.
-        run: |
-          report="$RUNNER_TEMP/e2e-caravan.xml"
-          uv run --locked pytest -m "e2e and caravan" -v --junitxml="$report"
-          # Complements earthlens.testing's in-process guard, which already fails
-          # a lane masked by *upstream* outages. That one counts only skips
-          # carrying its availability prefix, so a lane skipped for missing
-          # credentials still exits 0 and reports green. Catch that here.
-          python .github/scripts/assert_tests_ran.py "$report" "e2e-caravan"
-
-  e2e-gee:
-    runs-on: ubuntu-latest
-    if: github.repository == 'serapeum-org/earthlens'
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
-        with:
-          python-version: "3.12"
-          install-groups: "groups: dev, extras: all"
-          verify-lock: true
-          version: "0.11.29"
-
-      - name: Run live Google Earth Engine e2e tests
-        # The GEE e2e test skips itself when these are unset, so this
-        # job is harmless if the secrets are not configured yet.
-        env:
-          GEE_SERVICE_ACCOUNT: ${{ secrets.GEE_SERVICE_ACCOUNT }}
-          GEE_SERVICE_KEY: ${{ secrets.GEE_SERVICE_KEY }}
-        run: |
-          # The key reaches CI as JSON, but `ee.ServiceAccountCredentials` takes a
-          # *filename*. Passing the content where a path belongs is what put a
-          # private key into a public log: `open()` failed and the traceback
-          # printed the whole key. Write it to the runner's temp dir (wiped when
-          # the job ends) and hand the code a path, which every call site accepts.
-          # Only when the secret actually holds JSON. Materialising it
-          # unconditionally turns an *absent* secret into a non-empty path
-          # pointing at an empty file, which defeats the suite's own
-          # `skipif not GEE_SERVICE_KEY` guard: the lane would run against an
-          # empty key instead of skipping. Matches the reusable workflow.
-          case "$GEE_SERVICE_KEY" in
-            \{*) printf "%s" "$GEE_SERVICE_KEY" > "$RUNNER_TEMP/gee-key.json"
-                 GEE_SERVICE_KEY="$RUNNER_TEMP/gee-key.json"
-                 export GEE_SERVICE_KEY ;;
-          esac
-          report="$RUNNER_TEMP/e2e-gee.xml"
-          uv run --locked pytest -m "e2e and gee" -v --junitxml="$report"
-          # Complements earthlens.testing's in-process guard, which already fails
-          # a lane masked by *upstream* outages. That one counts only skips
-          # carrying its availability prefix, so a lane skipped for missing
-          # credentials still exits 0 and reports green. Catch that here.
-          python .github/scripts/assert_tests_ran.py "$report" "e2e-gee"
-
-  e2e-earthdata:
-    runs-on: ubuntu-latest
-    if: github.repository == 'serapeum-org/earthlens'
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
-        with:
-          # earthaccess >=0.18 requires Python >=3.12, so the Earthdata
-          # extra is exercised under the py312 environment.
-          python-version: "3.12"
-          install-groups: "groups: dev, extras: all"
-          verify-lock: true
-          version: "0.11.29"
-
-      - name: Run live NASA Earthdata e2e tests
-        # The Earthdata e2e test skips itself when these are unset, so
-        # this job is harmless if the secrets are not configured yet.
-        env:
-          EARTHDATA_USERNAME: ${{ secrets.EARTHDATA_USERNAME }}
-          EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
-          # Alternative to username/password: a single EDL bearer token.
-          EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
-        run: |
-          report="$RUNNER_TEMP/e2e-earthdata.xml"
-          uv run --locked pytest -m "e2e and earthdata" -v --junitxml="$report"
-          # Complements earthlens.testing's in-process guard, which already fails
-          # a lane masked by *upstream* outages. That one counts only skips
-          # carrying its availability prefix, so a lane skipped for missing
-          # credentials still exits 0 and reports green. Catch that here.
-          python .github/scripts/assert_tests_ran.py "$report" "e2e-earthdata"
-
-  e2e-emdat:
-    runs-on: ubuntu-latest
-    if: github.repository == 'serapeum-org/earthlens'
-
-    # Job-level so the GDIS step can branch on whether a credential exists:
-    # the `secrets` context is not readable from a step's `if:`, but `env` is.
-    env:
-      EARTHDATA_USERNAME: ${{ secrets.EARTHDATA_USERNAME }}
-      EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
-      EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
-        with:
-          python-version: "3.12"
-          install-groups: "groups: dev, extras: all"
-          verify-lock: true
-          version: "0.11.29"
-
-      # dataverse.uclouvain.be is a single university host with no CDN. When it
-      # is unreachable from the runner the suite spends four 60-second connect
-      # timeouts saying nothing useful, so resolve and dial it first and print
-      # the outcome. Never fails the job: the tests below are the gate, and this
-      # only exists to tell an unreachable host apart from a real regression.
-      - name: Probe the Dataverse host
-        continue-on-error: true
-        run: |
-          getent hosts dataverse.uclouvain.be || echo "DNS: no answer"
-          curl -sS -o /dev/null --max-time 30 \
-            -w 'connect=%{time_connect}s tls=%{time_appconnect}s http=%{http_code}\n' \
-            'https://dataverse.uclouvain.be/api/info/version' \
-            || echo "unreachable from this runner"
-
-      # The EM-DAT Archive on the UCLouvain Dataverse is anonymous, so this
-      # half needs nothing but network and always runs.
-      - name: Run live EM-DAT Dataverse e2e tests
-        run: |
-          report="$RUNNER_TEMP/e2e-emdat.xml"
-          uv run --locked pytest -m "e2e and emdat and not gdis" -v --junitxml="$report"
-          # Complements earthlens.testing's in-process guard, which already fails
-          # a lane masked by *upstream* outages. That one counts only skips
-          # carrying its availability prefix, so a lane skipped for missing
-          # credentials still exits 0 and reports green. Catch that here.
-          python .github/scripts/assert_tests_ran.py "$report" "e2e-emdat"
-
-      # GDIS rides NASA Earthdata Cloud, so it needs an Earthdata Login whose
-      # account has also accepted the SEDAC data-use agreement. These tests are
-      # marker-gated rather than self-skipping (this repo selects categories
-      # with -m, never an env check), so the step itself is skipped when no
-      # credential is configured instead of failing at login.
-      - name: Run live GDIS (Earthdata Cloud) e2e tests
-        if: >-
-          env.EARTHDATA_TOKEN != '' ||
-          (env.EARTHDATA_USERNAME != '' && env.EARTHDATA_PASSWORD != '')
-        run: |
-          uv run --locked pytest -m "e2e and emdat and gdis" -v
-
-  e2e-eumetsat:
-    runs-on: ubuntu-latest
-    if: github.repository == 'serapeum-org/earthlens'
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
-        with:
-          python-version: "3.12"
-          install-groups: "groups: dev, extras: all"
-          verify-lock: true
-          version: "0.11.29"
-
-      - name: Run live EUMETSAT Data Store e2e tests
-        # The EUMETSAT e2e test skips itself when these are unset, so this
-        # job is harmless if the secrets are not configured yet. Register a
-        # consumer key/secret at https://api.eumetsat.int/api-key/.
-        env:
-          EUMETSAT_CONSUMER_KEY: ${{ secrets.EUMETSAT_CONSUMER_KEY }}
-          EUMETSAT_CONSUMER_SECRET: ${{ secrets.EUMETSAT_CONSUMER_SECRET }}
-        run: |
-          report="$RUNNER_TEMP/e2e-eumetsat.xml"
-          uv run --locked pytest -m "e2e and eumetsat" -v --junitxml="$report"
-          # Complements earthlens.testing's in-process guard, which already fails
-          # a lane masked by *upstream* outages. That one counts only skips
-          # carrying its availability prefix, so a lane skipped for missing
-          # credentials still exits 0 and reports green. Catch that here.
-          python .github/scripts/assert_tests_ran.py "$report" "e2e-eumetsat"
-
-  e2e-stac:
-    runs-on: ubuntu-latest
-    if: github.repository == 'serapeum-org/earthlens'
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
-        with:
-          python-version: "3.12"
-          install-groups: "groups: dev, extras: all"
-          verify-lock: true
-          version: "0.11.29"
-
-      - name: Run live STAC e2e tests
-        # Earth Search is anonymous (no creds); MPC runs via planetary-computer
-        # (in the [all] extra); CDSE skips itself without CDSE_S3_* secrets. So
-        # this lane exercises the real download path with no credentials.
-        env:
-          CDSE_S3_ACCESS_KEY: ${{ secrets.CDSE_S3_ACCESS_KEY }}
-          CDSE_S3_SECRET_KEY: ${{ secrets.CDSE_S3_SECRET_KEY }}
-        run: |
-          report="$RUNNER_TEMP/e2e-stac.xml"
-          uv run --locked pytest -m "stac and e2e" -v --junitxml="$report"
-          # Complements earthlens.testing's in-process guard, which already fails
-          # a lane masked by *upstream* outages. That one counts only skips
-          # carrying its availability prefix, so a lane skipped for missing
-          # credentials still exits 0 and reports green. Catch that here.
-          python .github/scripts/assert_tests_ran.py "$report" "e2e-stac"
-
-  e2e-sentinel-hub:
-    runs-on: ubuntu-latest
-    if: github.repository == 'serapeum-org/earthlens'
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
-        with:
-          python-version: "3.12"
-          install-groups: "groups: dev, extras: all"
-          verify-lock: true
-          version: "0.11.29"
-
-      - name: Run live Sentinel Hub e2e tests
-        # The Sentinel Hub e2e tests skip themselves when these are unset, so
-        # this job is harmless if the secrets are not configured yet. Batch /
-        # Batch-Statistical are not exercised live (they need a user S3 bucket).
-        env:
-          SENTINELHUB_CLIENT_ID: ${{ secrets.SENTINELHUB_CLIENT_ID }}
-          SENTINELHUB_CLIENT_SECRET: ${{ secrets.SENTINELHUB_CLIENT_SECRET }}
-        run: |
-          report="$RUNNER_TEMP/e2e-sentinel-hub.xml"
-          uv run --locked pytest -m "sentinel_hub and e2e" -v --junitxml="$report"
-          # Complements earthlens.testing's in-process guard, which already fails
-          # a lane masked by *upstream* outages. That one counts only skips
-          # carrying its availability prefix, so a lane skipped for missing
-          # credentials still exits 0 and reports green. Catch that here.
-          python .github/scripts/assert_tests_ran.py "$report" "e2e-sentinel-hub"
-
-  e2e-nwp:
-    runs-on: ubuntu-latest
-    if: github.repository == 'serapeum-org/earthlens'
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
-        with:
-          python-version: "3.12"
-          install-groups: "groups: dev, extras: all"
-          verify-lock: true
-          version: "0.11.29"
-
-      - name: Run live NWP e2e tests
-        # This lane installs the `nwp` extra (Herbie / ecmwf-opendata) via the
-        # uv sync above, so the Herbie-fetched models (GFS / NODD) import and
-        # download live here; the GRIB read path decodes through pyramids' GDAL
-        # driver, so it needs no separate eccodes binary. NODD / DWD / ECMWF
-        # Open Data are anonymous (no secrets); the suite skips anything that is
-        # transiently unavailable.
-        run: |
-          report="$RUNNER_TEMP/e2e-nwp.xml"
-          uv run --locked pytest -m "e2e and nwp" -v --junitxml="$report"
-          # Complements earthlens.testing's in-process guard, which already fails
-          # a lane masked by *upstream* outages. That one counts only skips
-          # carrying its availability prefix, so a lane skipped for missing
-          # credentials still exits 0 and reports green. Catch that here.
-          python .github/scripts/assert_tests_ran.py "$report" "e2e-nwp"
-
-  e2e-asf:
-    runs-on: ubuntu-latest
-    if: github.repository == 'serapeum-org/earthlens'
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
-        with:
-          # asf_search reuses the EDL auth from `earthdata`, which needs
-          # Python >=3.12 for earthaccess >=0.18.
-          python-version: "3.12"
-          install-groups: "groups: dev, extras: all"
-          verify-lock: true
-          version: "0.11.29"
-
-      - name: Run live ASF (InSAR) e2e tests
-        # Anonymous search and stack run with no secrets; the authed
-        # download branch skips itself when neither EARTHDATA_TOKEN nor
-        # EARTHDATA_USERNAME/PASSWORD is set, so the job is harmless if
-        # those secrets are unconfigured.
-        env:
-          EARTHDATA_USERNAME: ${{ secrets.EARTHDATA_USERNAME }}
-          EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
-          EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
-        run: |
-          report="$RUNNER_TEMP/e2e-asf.xml"
-          uv run --locked pytest -m "e2e and asf" -v --junitxml="$report"
-          # Complements earthlens.testing's in-process guard, which already fails
-          # a lane masked by *upstream* outages. That one counts only skips
-          # carrying its availability prefix, so a lane skipped for missing
-          # credentials still exits 0 and reports green. Catch that here.
-          python .github/scripts/assert_tests_ran.py "$report" "e2e-asf"
-
-  e2e-iucn:
-    runs-on: ubuntu-latest
-    if: github.repository == 'serapeum-org/earthlens'
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
-        with:
-          python-version: "3.12"
-          install-groups: "groups: dev, extras: all"
-          verify-lock: true
-          version: "0.11.29"
-
-      - name: Run live IUCN Red List e2e tests
-        # The IUCN e2e test skips itself when IUCN_TOKEN is unset, so this
-        # job is harmless if the secret is not configured yet. Sign up for a
-        # free token at https://api.iucnredlist.org/users/sign_up.
-        env:
-          IUCN_TOKEN: ${{ secrets.IUCN_TOKEN }}
-        run: |
-          report="$RUNNER_TEMP/e2e-iucn.xml"
-          uv run --locked pytest -m "e2e and iucn" -v --junitxml="$report"
-          # Complements earthlens.testing's in-process guard, which already fails
-          # a lane masked by *upstream* outages. That one counts only skips
-          # carrying its availability prefix, so a lane skipped for missing
-          # credentials still exits 0 and reports green. Catch that here.
-          python .github/scripts/assert_tests_ran.py "$report" "e2e-iucn"
-
-  e2e-wdpa:
-    runs-on: ubuntu-latest
-    if: github.repository == 'serapeum-org/earthlens'
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
-        with:
-          python-version: "3.12"
-          install-groups: "groups: dev, extras: all"
-          verify-lock: true
-          version: "0.11.29"
-
-      - name: Run live Protected Planet (WDPA) e2e tests
-        # The WDPA e2e test skips itself when WDPA_TOKEN is unset, so this
-        # job is harmless if the secret is not configured yet. Request a
-        # personal token at https://api.protectedplanet.net/request.
-        env:
-          WDPA_TOKEN: ${{ secrets.WDPA_TOKEN }}
-        run: |
-          # No junit report or masked-lane assertion here, unlike every lane above:
-          # WDPA_TOKEN has not been issued yet, so this lane is expected to skip
-          # wholesale and the guard would fail it every run for something nobody
-          # can act on. The reusable workflow records the same exemption as
-          # `allow_all_skipped: true`.
-          uv run --locked pytest -m "e2e and wdpa" -v
+          set +e
+          # --no-sync --no-build: the setup step already installed and
+          # lock-verified the env, so nothing is installed here and no
+          # dependency's setup script can run. (--no-build alone fails: it
+          # also forbids the workspace's own editable wheel.)
+          uv run --locked --no-sync --no-build pytest -m "e2e and quarantined" -rs -v
+          code=$?
+          set -e
+          if [ "$code" -eq 5 ]; then
+            echo "nothing is quarantined — the healthy state"
+            exit 0
+          fi
+          exit "$code"

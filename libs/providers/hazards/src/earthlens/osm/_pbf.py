@@ -7,7 +7,7 @@ Two concerns are factored here so `osm/backend.py` only routes:
   **cache it to disk** (`G13`). Caching is presence-based: a repeat request for
   the same region reuses the existing cached file as-is (delete it to pick up a
   newer Geofabrik `*-latest` extract). A **fresh** download is atomic (the
-  shared :class:`~earthlens.base.http.HttpClient` writes a sibling `.part` and
+  shared `HttpClient` writes a sibling `.part` and
   renames on success) and, by default, integrity-checked against Geofabrik's
   `.osm.pbf.md5` sidecar; a cache hit is trusted and not re-verified. A multi-GB
   extract logs a large-file warning before it is fetched.
@@ -204,7 +204,7 @@ def download_extract(
     and no re-hashing of a (potentially multi-GB) local file, which the download
     already verified. To pick up a newer Geofabrik extract, delete the cached
     file (it is re-fetched on the next call). A fresh download streams
-    atomically (via :class:`~earthlens.base.http.HttpClient`, which follows the
+    atomically (via `HttpClient`, which follows the
     Geofabrik `302` redirect and writes a `.part` renamed on success) and, when
     `verify_md5` is set, is checked once against the `.osm.pbf.md5` sidecar — a
     mismatch removes the file and raises. An extract larger than
@@ -214,7 +214,7 @@ def download_extract(
         region_path: The Geofabrik path segment, e.g. `"europe/malta"`.
         cache_dir: Directory the extract is cached in (created if absent).
         http: HTTP client to use. Defaults to a fresh
-            :class:`~earthlens.base.http.HttpClient` (retry/back-off on
+            `HttpClient` (retry/back-off on
             `5xx`/`429`).
         progress: Show a `tqdm` download progress bar.
         verify_md5: Verify a **freshly-downloaded** file against Geofabrik's

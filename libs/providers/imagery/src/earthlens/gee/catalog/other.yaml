@@ -13,6 +13,12 @@ datasets:
       end_date: null
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Zero Population Areas"
+        bands: ["data-context"]
+        vmin: [201]
+        vmax: [205]
+        palette: ["099506", "ff0b00", "060606", "a5a5a5", "ffe152"]
     bands:
       water-mask:
         description: Water mask
@@ -49,6 +55,12 @@ datasets:
       end_date: "2020-12-31"
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Population Count"
+        bands: ["population-count"]
+        vmin: [200]
+        vmax: [1000]
+        palette: ["ffffff", "ffcdc6", "ff0000", "950000"]
     bands:
       population-count:
         description: Estimated number of persons per 30 arc-second cell
@@ -65,6 +77,12 @@ datasets:
       end_date: "2020-12-31"
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Population Density"
+        bands: ["population-density"]
+        vmin: [200]
+        vmax: [1500]
+        palette: ["ffffff", "ffcdc6", "ff0000", "950000"]
     bands:
       population-density:
         description: Estimated number of persons per square kilometre
@@ -81,6 +99,12 @@ datasets:
       end_date: "2020-12-31"
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Population Count"
+        bands: ["population-count"]
+        vmin: [200]
+        vmax: [1000]
+        palette: ["ffffff", "ffcdc6", "ff0000", "950000"]
     bands:
       population-count:
         description: UN WPP-adjusted population count per cell
@@ -97,6 +121,12 @@ datasets:
       end_date: "2020-12-31"
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Population Density"
+        bands: ["population-density"]
+        vmin: [200]
+        vmax: [1500]
+        palette: ["ffffff", "ffcdc6", "ff0000", "950000"]
     bands:
       population-density:
         description: UN WPP-adjusted population density
@@ -114,6 +144,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Basic Demographic Characteristics"
+        bands: ["basic_demographic_characteristics"]
+        vmin: [0]
+        vmax: [1000]
+        palette: ["ffffe7", "86a192", "509791", "307296", "2c4484", "000066"]
     bands:
       basic_demographic_characteristics:
         description: Estimated number of persons by age and sex per 30 arc-second cell
@@ -130,6 +166,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Data Context"
+        bands: ["data_context"]
+        vmin: [200]
+        vmax: [207]
+        palette: ["ffffff", "099506", "f04923", "e62440", "706984", "a5a5a5", "ffe152", "d4cc11", "000000"]
     bands:
       data_context:
         description: Categorizes pixels with estimated zero population based on
@@ -147,6 +189,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Land Area"
+        bands: ["land_area"]
+        vmin: [0]
+        vmax: [0.86]
+        palette: ["ecefb7", "745638"]
     bands:
       land_area:
         description: Land area within each 30 arc-second cell
@@ -163,6 +211,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Mean Administrative Unit Area"
+        bands: ["mean_administrative_unit_area"]
+        vmin: [0]
+        vmax: [40000]
+        palette: ["e7cdff", "d5a2ee", "c480e5", "b561dd", "a042ce", "4d0072"]
     bands:
       mean_administrative_unit_area:
         description: Displays a quantitative surface that indicates the size of the
@@ -180,6 +234,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "National Identifier"
+        bands: ["national_identifier_grid"]
+        vmin: [4]
+        vmax: [999]
+        palette: ["ffffff", "000000"]
     bands:
       national_identifier_grid:
         description: An integer that represents the census data source used
@@ -198,6 +258,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Population Count"
+        bands: ["population_count"]
+        vmin: [0]
+        vmax: [1000]
+        palette: ["ffffe7", "86a192", "509791", "307296", "2c4484", "000066"]
     bands:
       population_count:
         description: Estimated population per 30 arc-second grid cell
@@ -216,6 +282,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Population Density"
+        bands: ["population_density"]
+        vmin: [200]
+        vmax: [1000]
+        palette: ["ffffe7", "ffc869", "ffac1d", "e17735", "f2552c", "9f0c21"]
     bands:
       population_density:
         description: Estimated population per square kilometre
@@ -233,6 +305,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "UN WPP-Adjusted Population Count"
+        bands: ["unwpp-adjusted_population_count"]
+        vmin: [0]
+        vmax: [1000]
+        palette: ["ffffe7", "86a192", "509791", "307296", "2c4484", "000066"]
     bands:
       unwpp-adjusted_population_count:
         description: Population count adjusted to UN WPP country totals (per 30 arc-second cell)
@@ -251,6 +329,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "UN WPP-Adjusted Population Density"
+        bands: ["unwpp-adjusted_population_density"]
+        vmin: [0]
+        vmax: [1000]
+        palette: ["ffffe7", "ffc869", "ffac1d", "e17735", "f2552c", "9f0c21"]
     bands:
       unwpp-adjusted_population_density:
         description: Population density adjusted to UN WPP country totals
@@ -268,6 +352,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Water Area"
+        bands: ["water_area"]
+        vmin: [0]
+        vmax: [0.860558]
+        palette: ["f5f6da", "180d02"]
     bands:
       water_area:
         description: Water area within each 30 arc-second cell
@@ -284,6 +374,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Water Mask"
+        bands: ["water_mask"]
+        vmin: [0]
+        vmax: [3]
+        palette: ["005ce6", "00ffc5", "bed2ff", "aed0f1"]
     bands:
       water_mask:
         description: Water-class enum (0=land ... 3=water)
@@ -303,6 +399,12 @@ datasets:
     license: proprietary
     terms_note: 'Free for use (CSIRO).'
     source: republished
+    visualizations:
+      - name: "Soil Depth"
+        bands: ["DES_000_200_EV"]
+        vmin: [0.1]
+        vmax: [1.84]
+        palette: ["8d6738", "252525"]
     bands:
       AWC_000_005_EV:
         description: Available water capacity (0-5 cm, expected value)
@@ -341,6 +443,12 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Free for use (ORNL).'
+    visualizations:
+      - name: "Population count"
+        bands: ["population"]
+        vmin: [0]
+        vmax: [10]
+        palette: ["lemonchiffon", "khaki", "orange", "orangered", "red", "maroon"]
     bands:
       population:
         description: 24-hour average population count estimate per 100m cell
@@ -490,6 +598,9 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Open Buildings Temporal V1"
+        bands: ["building_fractional_count", "building_height", "building_presence"]
     bands:
       building_fractional_count:
         description: Source data for deriving building counts for a given AOI. Please see
@@ -551,6 +662,11 @@ datasets:
       end_date: null
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Satellite Embedding V1 Annual - A03, A02, A04"
+        bands: ["A03", "A02", "A04"]
+        vmin: [-0.25]
+        vmax: [0.25]
     bands:
       A00:
         description: The 0th axis of the embedding vector.
@@ -885,6 +1001,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Aluminium, extractable, 0-20cm"
+        bands: ["mean_0_20"]
+        vmin: [3]
+        vmax: [80]
     bands:
       mean_0_20:
         description: Aluminium, extractable, predicted mean at 0-20 cm depth
@@ -919,6 +1040,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Depth to bedrock, 0-200 cm"
+        bands: ["mean_0_200"]
+        vmin: [27]
+        vmax: [200]
     bands:
       mean_0_200:
         description: Depth to bedrock, predicted mean at 0-200 cm depth
@@ -943,6 +1069,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Bulk density, <2mm fraction, predicted mean at 0-20 cm depth"
+        bands: ["mean_0_20"]
+        vmin: [1]
+        vmax: [1.5]
     bands:
       mean_0_20:
         description: Bulk density, <2mm fraction, predicted mean at 0-20 cm depth
@@ -977,6 +1108,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Calcium, extractable, predicted mean at 0-20 cm depth"
+        bands: ["mean_0_20"]
+        vmin: [100]
+        vmax: [2000]
     bands:
       mean_0_20:
         description: Calcium, extractable, predicted mean at 0-20 cm depth
@@ -1011,6 +1147,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Carbon, organic, predicted mean at 0-20 cm depth"
+        bands: ["mean_0_20"]
+        vmin: [0]
+        vmax: [20]
     bands:
       mean_0_20:
         description: Carbon, organic, predicted mean at 0-20 cm depth
@@ -1045,6 +1186,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Carbon, total, predicted mean at 0-20 cm depth"
+        bands: ["mean_0_20"]
+        vmin: [0]
+        vmax: [60]
     bands:
       mean_0_20:
         description: Carbon, total, predicted mean at 0-20 cm depth
@@ -1079,6 +1225,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Effective Cation Exchange Capacity, predicted mean at 0-20 cm depth"
+        bands: ["mean_0_20"]
+        vmin: [0]
+        vmax: [25]
     bands:
       mean_0_20:
         description: Effective Cation Exchange Capacity, predicted mean at 0-20 cm depth
@@ -1113,6 +1264,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Clay content, predicted mean at 0-20 cm depth"
+        bands: ["mean_0_20"]
+        vmin: [0]
+        vmax: [50]
     bands:
       mean_0_20:
         description: Clay content, predicted mean at 0-20 cm depth
@@ -1147,6 +1303,9 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Fertility Capability Classification"
+        bands: ["fcc"]
     bands:
       fcc:
         description: Fertility Capability Classification.
@@ -1165,6 +1324,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Iron, extractable, predicted mean at 0-20 cm depth"
+        bands: ["mean_0_20"]
+        vmin: [0]
+        vmax: [140]
     bands:
       mean_0_20:
         description: Iron, extractable, predicted mean at 0-20 cm depth
@@ -1199,6 +1363,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Magnesium, extractable, predicted mean at 0-20 cm depth"
+        bands: ["mean_0_20"]
+        vmin: [0]
+        vmax: [500]
     bands:
       mean_0_20:
         description: Magnesium, extractable, predicted mean at 0-20 cm depth
@@ -1233,6 +1402,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Nitrogen, total, predicted mean at 0-20 cm depth"
+        bands: ["mean_0_20"]
+        vmin: [0]
+        vmax: [10000]
     bands:
       mean_0_20:
         description: Nitrogen, total, predicted mean at 0-20 cm depth
@@ -1267,6 +1441,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "pH, predicted mean at 0-20 cm depth"
+        bands: ["mean_0_20"]
+        vmin: [3]
+        vmax: [8]
     bands:
       mean_0_20:
         description: pH, predicted mean at 0-20 cm depth
@@ -1297,6 +1476,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Phosphorus, extractable, predicted mean at 0-20 cm depth"
+        bands: ["mean_0_20"]
+        vmin: [0]
+        vmax: [15]
     bands:
       mean_0_20:
         description: Phosphorus, extractable, predicted mean at 0-20 cm depth
@@ -1331,6 +1515,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Potassium, extractable, predicted mean at 0-20 cm depth"
+        bands: ["mean_0_20"]
+        vmin: [0]
+        vmax: [250]
     bands:
       mean_0_20:
         description: Potassium, extractable, predicted mean at 0-20 cm depth
@@ -1365,6 +1554,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Sand content, predicted mean at 0-20 cm depth"
+        bands: ["mean_0_20"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       mean_0_20:
         description: Sand content, predicted mean at 0-20 cm depth
@@ -1399,6 +1593,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Silt content, predicted mean at 0-20 cm depth"
+        bands: ["mean_0_20"]
+        vmin: [0]
+        vmax: [15]
     bands:
       mean_0_20:
         description: Silt content, predicted mean at 0-20 cm depth
@@ -1433,6 +1632,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Stone content, predicted mean at 0-20 cm depth"
+        bands: ["mean_0_20"]
+        vmin: [0]
+        vmax: [6]
     bands:
       mean_0_20:
         description: Stone content, predicted mean at 0-20 cm depth
@@ -1467,6 +1671,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Sulfur, extractable, predicted mean at 0-20 cm depth"
+        bands: ["mean_0_20"]
+        vmin: [0]
+        vmax: [20]
     bands:
       mean_0_20:
         description: Sulfur, extractable, predicted mean at 0-20 cm depth
@@ -1501,6 +1710,9 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "USDA Texture Class at soil depths of 0-20 cm"
+        bands: ["texture_0_20"]
     bands:
       texture_0_20:
         description: USDA Texture Class at 0-20 cm depth
@@ -1519,6 +1731,11 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "inc, extractable, predicted mean at 0-20 cm depth"
+        bands: ["mean_0_20"]
+        vmin: [0]
+        vmax: [10]
     bands:
       mean_0_20:
         description: Zinc, extractable, predicted mean at 0-20 cm depth
@@ -1552,6 +1769,9 @@ datasets:
       bbox: [-180, -56, 180, 84]
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Volumetric Water Content"
+        bands: ["val_0_5cm_mean"]
     bands:
       val_0_5cm_mean:
         description: Mean volumetric water content (0-5 cm)
@@ -1660,6 +1880,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-SA-4.0
     source: republished
+    visualizations:
+      - name: "Soil bulk density in x 10 kg / m3"
+        bands: ["b0"]
+        vmin: [5]
+        vmax: [185]
+        palette: ["5e3c99", "b2abd2", "f7e0b2", "fdb863", "e63b01"]
     bands:
       b0:
         description: Fine-earth bulk density at 0 cm depth
@@ -1697,6 +1923,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-SA-4.0
     source: republished
+    visualizations:
+      - name: "Clay content in % (kg / kg)"
+        bands: ["b0"]
+        vmin: [2]
+        vmax: [100]
+        palette: ["ffff00", "f8f806", "f1f10c", "ebeb13", "e4e419", "dddd20", "d7d726", "d0d02d", "caca33", "c3c33a", "bcbc41", "b6b647", "b0b04e", "a9a954", "a3a35a", "9c9c61", "959568", "8f8f6e", "898975", "82827b", "7b7b82", "757589", "6e6e8f", "686895", "61619c", "5a5aa3", "5454a9", "4d4db0", "4747b6", "4141bc", "3a3ac3", "3333ca", "2d2dd0", "2626d7", "2020dd", "1919e4", "1212eb", "0c0cf1", "0606f8", "0000ff"]
     bands:
       b0:
         description: Clay content at 0 cm depth
@@ -1740,6 +1972,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-SA-4.0
     source: republished
+    visualizations:
+      - name: "Hapludalfs"
+        bands: ["grtgroup"]
+        vmin: [0]
+        vmax: [35]
+        palette: ["ffffb2", "fecc5c", "fd8d3c", "f03b20", "bd0026"]
     bands:
       grtgroup:
         description: Predicted Hapludalfs probability
@@ -1758,6 +1996,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-SA-4.0
     source: republished
+    visualizations:
+      - name: "USDA soil taxonomy great groups"
+        bands: ["grtgroup"]
+        vmin: [0]
+        vmax: [433]
+        palette: ["ffffff", "adff2d", "adff22", "a5ff2f", "87ff37", "baf019", "87ff19", "96f03d", "a3f52f", "aff319", "91ff37", "9cf319", "9bff37", "91ff19", "71ff37", "86ff19", "a9d42d", "aff519", "9bff19", "9af024", "a5fd2f", "88ff37", "afed19", "71ff19", "aff026", "8cf537", "b7ff19", "7177c0", "9a85ec", "f5f5e1", "52cf5a", "e42777", "4ef76d", "ff00fb", "eb05eb", "fa04fa", "fc04f5", "f50df0", "f118f1", "fa0cfa", "fc05e1", "f100d5", "eb09e6", "fa22fa", "ffdab9", "f5d2bb", "e8c9b8", "ffddc4", "e7cbc0", "ffd2c3", "f5d6bb", "d5d3b9", "e8d4b8", "e7cdc0", "f3eac8", "a0c4ba", "ffd2b9", "f5dabb", "f5d5b9", "e8ebb8", "ffddc2", "e7ffc0", "f3e6c8", "ffdab9", "f5cdb9", "a91d30", "796578", "d8ff6e", "177548", "43efd6", "8496a9", "296819", "73ffd4", "6fffc8", "75fbc9", "86f5d1", "82ffd2", "88eec8", "80ffd4", "6bffc9", "88eec8", "7fffc8", "81ffd2", "86f0d4", "67ffc8", "88eec8", "7ffbcb", "87ffd2", "8af5ce", "6bfad2", "78f0d4", "88eec8", "7ffbd4", "73f5cd", "88c8d2", "91f0cd", "73cdd2", "88eec8", "fb849b", "dd4479", "61388b", "a52a30", "722328", "d81419", "a42828", "82f5cd", "a54c2e", "c11919", "b91419", "21b199", "702028", "b41919", "b22328", "a2c7eb", "36ba79", "806797", "cb5b5f", "cd5c5c", "d94335", "d35740", "e05a5d", "cf5b5c", "ca5964", "ca5d5f", "cd5e5a", "ca5969", "d95a35", "d36240", "e05c43", "d64755", "cf595c", "ff5f5f", "cd6058", "d95f35", "d35140", "d65a55", "e05c59", "cf525e", "c65978", "f5615f", "826f9a", "cff41a", "4a6f31", "a96989", "e16438", "24f640", "88c1f9", "f5d25c", "d74322", "7f939e", "41a545", "8f8340", "09fe03", "0aff00", "0ff30f", "02f00a", "0fc903", "17f000", "0cff00", "0ac814", "0cfe00", "0aff0a", "03ff05", "1cf31c", "24f000", "00ff0c", "14c814", "00fe4c", "14ff96", "44d205", "05f305", "62f00a", "0fcd03", "00d20f", "1add11", "09ff0c", "03ff05", "05e700", "02f00a", "0fea03", "00f000", "0ccb0c", "14dd14", "6a685d", "fae6b9", "769a34", "6ff2df", "ca7fc6", "d8228f", "c01bf0", "d2bad3", "d8c3cb", "d4c6d4", "d5bed5", "ddb9dd", "d8d2d8", "d4c9d4", "d2bad5", "d5bad5", "d5b2d5", "d8c8d2", "d4cbd4", "552638", "2571eb", "ffa514", "f3a502", "fb7b00", "f0b405", "f7a80f", "fb9113", "ffa519", "f3a702", "fbba07", "f7970f", "f3a702", "fb5a00", "f0c005", "f7810f", "ff9c00", "f3b002", "f0b005", "f7980f", "4d7cfc", "ffff00", "fafa05", "ebeb22", "ffff14", "f1f10a", "fafa05", "ebeb1e", "f5eb0c", "eef506", "f1f129", "fafa05", "ebeb0c", "f5d202", "ffd700", "f1f12b", "a91fac", "2da468", "9a8b71", "76b989", "713959"]
     bands:
       grtgroup:
         description: USDA soil taxonomy great groups
@@ -1773,6 +2017,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-SA-4.0
     source: republished
+    visualizations:
+      - name: "Soil organic carbon content in x 5 g / kg"
+        bands: ["b0"]
+        vmin: [0]
+        vmax: [120]
+        palette: ["ffffa0", "f7fcb9", "d9f0a3", "addd8e", "78c679", "41ab5d", "238443", "005b29", "004b29", "012b13", "00120b"]
     bands:
       b0:
         description: Soil organic carbon content at 0 cm depth
@@ -1810,6 +2060,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-SA-4.0
     source: republished
+    visualizations:
+      - name: "Soil pH x 10 in H2O"
+        bands: ["b0"]
+        vmin: [42]
+        vmax: [110]
+        palette: ["ff0000", "ff1c00", "ff3900", "ff5500", "ff7100", "ff8e00", "ffaa00", "ffc600", "ffe200", "ffff00", "e3ff00", "c7ff00", "aaff00", "8eff00", "72ff00", "55ff00", "39ff00", "1dff00", "01ff00", "00ff1c", "00ff38", "00ff54", "00ff71", "00ff8d", "00ffa9", "00ffc6", "00ffe2", "00fffe", "00e3ff", "00c7ff", "00abff", "008fff", "0072ff", "0056ff", "003aff", "001dff", "0001ff", "1b00ff", "3800ff", "5400ff"]
     bands:
       b0:
         description: Soil pH in H2O at 0 cm depth
@@ -1853,6 +2109,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-SA-4.0
     source: republished
+    visualizations:
+      - name: "Sand content in % (kg / kg)"
+        bands: ["b0"]
+        vmin: [1]
+        vmax: [100]
+        palette: ["ffff00", "f8f806", "f1f10c", "ebeb13", "e4e419", "dddd20", "d7d726", "d0d02d", "caca33", "c3c33a", "bcbc41", "b6b647", "b0b04e", "a9a954", "a3a35a", "9c9c61", "959568", "8f8f6e", "898975", "82827b", "7b7b82", "757589", "6e6e8f", "686895", "61619c", "5a5aa3", "5454a9", "4d4db0", "4747b6", "4141bc", "3a3ac3", "3333ca", "2d2dd0", "2626d7", "2020dd", "1919e4", "1212eb", "0c0cf1", "0606f8", "0000ff"]
     bands:
       b0:
         description: Sand content at 0 cm depth
@@ -1896,6 +2158,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-SA-4.0
     source: republished
+    visualizations:
+      - name: "Soil texture class (USDA system)"
+        bands: ["b0"]
+        vmin: [1]
+        vmax: [12]
+        palette: ["d5c36b", "b96947", "9d3706", "ae868f", "f86714", "46d143", "368f20", "3e5a14", "ffd557", "fff72e", "ff5a9d", "ff005b"]
     bands:
       b0:
         description: USDA soil-texture class at 0 cm depth
@@ -1921,6 +2189,12 @@ datasets:
     default_reducer: mean
     license: CC-BY-SA-4.0
     source: republished
+    visualizations:
+      - name: "Soil water content at 33kPa (field capacity)"
+        bands: ["b0"]
+        vmin: [0]
+        vmax: [52.9740182135385]
+        palette: ["d29642", "eec764", "b4ee87", "32eeeb", "0c78ee", "2601b7", "083371"]
     bands:
       b0:
         description: Soil water content at 33kPa (field capacity) at 0 cm depth
@@ -2147,6 +2421,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'The SOLUS dataset is in the public domain and is available without'
+    visualizations:
+      - name: "Soil Organic Carbon"
+        bands: ["r_0_cm_p"]
+        vmin: [0]
+        vmax: [2000]
     bands:
       r_0_cm_p:
         description: Predicted value of soil property at 0cm depth
@@ -2355,6 +2634,12 @@ datasets:
       end_date: null
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Population"
+        bands: ["population"]
+        vmin: [0]
+        vmax: [50]
+        palette: ["24126c", "1fff4f", "d4ff50"]
     bands:
       population:
         description: Estimated number of residents per ~100m grid cell
@@ -2371,6 +2656,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Population"
+        bands: ["population"]
+        vmin: [0]
+        vmax: [50]
+        palette: ["24126c", "1fff4f", "d4ff50"]
     bands:
       population:
         description: Total residents per ~100m grid cell
@@ -2403,6 +2694,12 @@ datasets:
     default_reducer: mosaic
     license: CC-BY-4.0
     source: republished
+    visualizations:
+      - name: "Population"
+        bands: ["population"]
+        vmin: [0]
+        vmax: [50]
+        palette: ["24126c", "1fff4f", "d4ff50"]
     bands:
       population:
         description: Total residents per ~100m grid cell (constrained, unadjusted)
@@ -2431,6 +2728,12 @@ datasets:
       bbox: [-180, -59.94, 180, 54.08]
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Population"
+        bands: ["population"]
+        vmin: [0]
+        vmax: [50]
+        palette: ["24126c", "1fff4f", "d4ff50"]
     bands:
       population:
         description: Estimated number of residents per ~100m grid cell

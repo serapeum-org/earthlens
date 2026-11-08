@@ -33,6 +33,34 @@ That installs core plus the five providers as editable, every backend SDK, and t
 
 Refresh the lockfile with `uv lock`; `uv lock --check` verifies it is current (the CI `--locked` gate).
 
+### Keeping the clone small
+
+A default clone also fetches `gh-pages`, the branch the built documentation site is published from. That branch
+carries no source and nothing you need in order to develop, so you can skip it entirely:
+
+```bash
+git remote set-branches origin main
+git fetch --prune origin
+git update-ref -d refs/remotes/origin/gh-pages
+git gc --prune=now
+```
+
+The third line is not redundant. `fetch --prune` removes only refs the fetch refspec still covers, and the first
+command narrows that refspec to `main` — so `origin/gh-pages` is left behind as an orphan, and while it exists the
+objects stay reachable and `gc` reclaims nothing.
+
+Two consequences worth knowing. `git fetch origin` now updates `main` only, so another branch needs an explicit
+refspec (`git fetch origin '+refs/heads/<branch>:refs/remotes/origin/<branch>'`). And if you later need the docs
+branch itself, fetch it shallowly — `git fetch --depth=1 origin gh-pages` — since its full history is of no use to
+you.
+
+!!! note "If the repository is on a cloud-synced path"
+
+    Dropbox, OneDrive and Google Drive partial-sync `.git`, which periodically removes pack files from under git
+    and corrupts the object store — `bad object refs/tags/X`, `unable to read tree <sha>`, a `gc` that will not
+    complete. The commands above make it far less likely by shrinking what is at risk, but they are not a fix.
+    Keeping the checkout on a local disk is.
+
 ## Running the tests
 
 ```bash

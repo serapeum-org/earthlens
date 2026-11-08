@@ -2,10 +2,10 @@
 
 Holds the small stateless helpers used by `backend.py`:
 
-* :func:`wkt_from_extent` — convert a :class:`SpatialExtent` bbox
+* `wkt_from_extent` — convert a `SpatialExtent` bbox
   to the WKT polygon string `asf_search.geo_search` expects via its
   `intersectsWith=` argument.
-* :func:`apply_baseline_windows` — the **load-bearing**
+* `apply_baseline_windows` — the **load-bearing**
   client-side filter that drops stacked products whose
   `perpendicularBaseline` / `temporalBaseline` properties fall
   outside the requested windows. Passing `ASFSearchOptions(
@@ -27,7 +27,7 @@ from earthlens.base import SpatialExtent
 
 
 def wkt_from_extent(space: SpatialExtent) -> str:
-    """Convert a :class:`SpatialExtent` bbox to a WKT polygon.
+    """Convert a `SpatialExtent` bbox to a WKT polygon.
 
     `asf_search.geo_search` accepts a WKT geometry as
     `intersectsWith=`. The bbox is taken as a flat WGS84 rectangle
@@ -36,7 +36,7 @@ def wkt_from_extent(space: SpatialExtent) -> str:
     polygon and clips internally.
 
     Args:
-        space: The backend's resolved :class:`SpatialExtent`. Must
+        space: The backend's resolved `SpatialExtent`. Must
             have `latitude_min <= latitude_max` and `longitude_min
             <= longitude_max` (the model validator enforces this).
 

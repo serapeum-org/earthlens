@@ -7,12 +7,12 @@ claims v3). This module is the bridge from a `source` key to its endpoint, the
 per-instance output kind, and the friendly -> provider field map used to shape
 the response.
 
-:class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog` subclass that
+`Catalog` is a thin `earthlens.base.AbstractCatalog` subclass that
 loads the bundled `nsi_data_catalog.yaml` and exposes each row as a
-:class:`Source`. Resolve one source with :meth:`Catalog.get` (a did-you-mean
-hint on an unknown key); list the shipped keys with :meth:`Catalog.available`.
+`Source`. Resolve one source with `Catalog.get` (a did-you-mean
+hint on an unknown key); list the shipped keys with `Catalog.available`.
 
-:data:`CATALOG_PATH` is the path to the bundled YAML.
+`CATALOG_PATH` is the path to the bundled YAML.
 """
 
 from __future__ import annotations
@@ -48,14 +48,14 @@ def _load_catalog_data(path: Path) -> dict[str, Source]:
     """Parse, validate, and cache the catalog at `path`.
 
     Args:
-        path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
+        path: Path to the catalog YAML (default `CATALOG_PATH`).
 
     Returns:
         The source map keyed by `source` name.
 
     Raises:
         ValueError: If the file has no `sources:` block, or a row fails
-            :class:`Source` validation.
+            `Source` validation.
     """
     key = catalog_cache_key(path, [path])
     cached = _CATALOG_CACHE.get(key)
@@ -85,9 +85,9 @@ def _load_catalog_data(path: Path) -> dict[str, Source]:
 class Source(SummarisedLeaf):
     """One NSI catalog row (one of the three flood sources).
 
-    The source name is the parent key in :attr:`Catalog.datasets` and is stored
-    on the row as :attr:`id` so a resolved :class:`Source` is self-describing.
-    Which fields matter depends on :attr:`provider`; a cross-field validator
+    The source name is the parent key in `Catalog.datasets` and is stored
+    on the row as `id` so a resolved `Source` is self-describing.
+    Which fields matter depends on `provider`; a cross-field validator
     enforces the source-specific ones (`nfhl` needs a layer, `nfip` a records
     key).
 
@@ -193,12 +193,12 @@ class Catalog(AbstractCatalog[Source]):
     """Source catalog for the NSI backend.
 
     Reads the bundled `nsi_data_catalog.yaml` (shipped as package data) and
-    exposes its `sources:` block as a map of :class:`Source` rows keyed by
+    exposes its `sources:` block as a map of `Source` rows keyed by
     name. Instantiate with no arguments (`Catalog()`). Resolve one row with
-    :meth:`get` and list the shipped keys with :meth:`available`.
+    `get` and list the shipped keys with `available`.
 
     Attributes:
-        datasets: Map from source name to its :class:`Source` row.
+        datasets: Map from source name to its `Source` row.
 
     Examples:
         - Resolve a source and read its output kind:
@@ -218,8 +218,8 @@ class Catalog(AbstractCatalog[Source]):
     _catalog_kind: str = "NSI catalog"
     _entry_noun: str = "sources"
 
-    #: The source rows live in the base :attr:`datasets` field so the inherited
-    #: dict surface and :meth:`get_dataset`'s did-you-mean hint work unchanged.
+    #: The source rows live in the base `datasets` field so the inherited
+    #: dict surface and `get_dataset`'s did-you-mean hint work unchanged.
     datasets: dict[str, Source] = Field(default_factory=dict)
 
     @classmethod
@@ -237,10 +237,10 @@ class Catalog(AbstractCatalog[Source]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the module-level
-                :data:`CATALOG_PATH`.
+                `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If the file has no `sources:` block, or a row fails
@@ -250,9 +250,9 @@ class Catalog(AbstractCatalog[Source]):
         return cls(datasets=dict(_load_catalog_data(catalog_path)))
 
     def get(self, source_id: str) -> Source:
-        """Resolve a source name to its :class:`Source` row.
+        """Resolve a source name to its `Source` row.
 
-        Thin wrapper over the inherited :meth:`get_dataset`, which raises a
+        Thin wrapper over the inherited `get_dataset`, which raises a
         `ValueError` with a did-you-mean hint on an unknown key.
 
         Args:

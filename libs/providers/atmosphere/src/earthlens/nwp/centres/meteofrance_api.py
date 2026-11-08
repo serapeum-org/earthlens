@@ -3,11 +3,11 @@
 Météo-France serves its open NWP forecasts through the authenticated
 API portal (`portail-api.meteofrance.fr`), **not** the unsigned
 `mf-nwp-models` S3 bucket (which holds only static geometry — see
-:mod:`earthlens.nwp.centres.meteofrance`). The portal is a WSO2 gateway
+`earthlens.nwp.centres.meteofrance`). The portal is a WSO2 gateway
 fronting an OGC **WCS 2.0.1** service: a `GetCoverage` request returns a
 server-side-subset GRIB2 directly.
 
-:class:`MeteoFranceAPICentre` (`meteofrance-api` backend) builds one
+`MeteoFranceAPICentre` (`meteofrance-api` backend) builds one
 `GetCoverage` per `(cycle, step, variable)` from templates in the
 catalog row's `request_options` (`api_base`, `coverage_service`) and the
 per-band coverage-id base, subsetting to the request bbox + valid time,
@@ -16,7 +16,7 @@ and concatenates the returned GRIB messages into one `.grib2`.
 **Auth.** An application API key from the MF portal, read from the
 `METEO_FRANCE_API_KEY` (or `MF_API_KEY`) environment variable and sent
 as the `apikey` header. Without it the centre raises
-:class:`AuthenticationError`.
+`AuthenticationError`.
 
 !!! warning "Not live-validated"
     This client is built to the confirmed gateway auth scheme + OGC WCS

@@ -1,4 +1,4 @@
-"""Unit tests for :meth:`ECMWF._mask_netcdf_to_geometry`.
+"""Unit tests for `ECMWF._mask_netcdf_to_geometry`.
 
 A polygon `aoi=` trims the bbox-cropped NetCDF to the exact shape via
 `pyramids.NetCDF`; a bbox / point `aoi=` is a no-op; a genuine crop error

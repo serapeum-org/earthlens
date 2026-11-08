@@ -10,7 +10,7 @@ from __future__ import annotations
 
 
 class _SentinelClient:
-    """Stand-in for :class:`cdsapi.Client` used in initialize tests.
+    """Stand-in for `cdsapi.Client` used in initialize tests.
 
     Empty by design — tests that need to assert "the constructed
     client is exactly this one" use `is` identity comparison

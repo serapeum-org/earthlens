@@ -6,7 +6,6 @@ from typing import Callable
 
 import pytest
 from geopandas import GeoDataFrame
-from obspy.core.event import Catalog, Event
 
 from earthlens.fdsn.events import (
     ATTRIBUTE_COLUMNS,
@@ -15,6 +14,12 @@ from earthlens.fdsn.events import (
     concat_fcs,
     empty_fc,
 )
+
+#: The `fdsn` extra is optional, so a missing `obspy` skips this module
+#: rather than erroring the whole directory's collection.
+_obspy_event = pytest.importorskip("obspy.core.event")
+Catalog = _obspy_event.Catalog
+Event = _obspy_event.Event
 
 
 @pytest.mark.fdsn

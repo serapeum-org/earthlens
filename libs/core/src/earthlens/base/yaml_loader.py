@@ -93,7 +93,7 @@ class CatalogParseCache(dict):
         super().__setitem__(key, value)
 
 
-#: Base loader for :class:`_StrictSafeLoader`. `CSafeLoader` is PyYAML's
+#: Base loader for `_StrictSafeLoader`. `CSafeLoader` is PyYAML's
 #: libyaml-backed parser — same safe semantics, roughly an order of magnitude
 #: faster, and it is what makes a cold cross-catalog scan bearable (the 48
 #: bundled catalogs are ~30 s of pure-Python parsing). PyYAML only exposes it
@@ -110,7 +110,7 @@ class _StrictSafeLoader(_BaseSafeLoader):  # type: ignore[misc,valid-type]
     except that a mapping declaring the same key twice raises a `ValueError`
     pinpointing the line/column rather than silently keeping the last
     value. Subclasses the libyaml-backed `CSafeLoader` where available —
-    see :data:`_BaseSafeLoader`.
+    see `_BaseSafeLoader`.
     """
 
 
@@ -119,8 +119,8 @@ def _construct_mapping_no_duplicates(
 ) -> dict[Any, Any]:
     """Build a dict from a YAML mapping node, rejecting duplicate keys.
 
-    Replaces :meth:`yaml.SafeLoader.construct_mapping` for
-    :class:`_StrictSafeLoader` so every mapping in a catalog YAML (the
+    Replaces `yaml.SafeLoader.construct_mapping` for
+    `_StrictSafeLoader` so every mapping in a catalog YAML (the
     dataset map, each dataset's `variables:` / `bands:` block, every
     `extras:` map, ...) is required to have unique keys.
 
@@ -128,7 +128,7 @@ def _construct_mapping_no_duplicates(
         loader: The active strict loader instance.
         node: The YAML mapping node being constructed.
         deep: Whether to construct child nodes eagerly (passed through
-            to :meth:`yaml.Loader.construct_object`).
+            to `yaml.Loader.construct_object`).
 
     Returns:
         The mapping as a plain `dict`.

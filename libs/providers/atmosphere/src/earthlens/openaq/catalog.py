@@ -8,12 +8,12 @@ list, not a dataset universe — so there is no `refresh` / `probe` /
 `audit` tooling and no `tools/openaq/` directory; adding a parameter
 later is a hand-edit of one YAML row.
 
-:class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog`
+`Catalog` is a thin `earthlens.base.AbstractCatalog`
 subclass that loads the bundled `openaq_data_catalog.yaml` and exposes
-each row as a :class:`Parameter`. Resolve a single name with
-:meth:`Catalog.get_parameter` (raises with a did-you-mean hint on an
+each row as a `Parameter`. Resolve a single name with
+`Catalog.get_parameter` (raises with a did-you-mean hint on an
 unknown name) or a list of names to their ids with
-:meth:`Catalog.ids_for`. :data:`CATALOG_PATH` is the path to the
+`Catalog.ids_for`. `CATALOG_PATH` is the path to the
 bundled YAML and is monkey-patchable in tests.
 """
 
@@ -49,12 +49,12 @@ class Parameter(SummarisedLeaf):
     """One OpenAQ pollutant parameter's dispatch row.
 
     The user-facing name is the parent key in
-    :attr:`Catalog.parameters` and is also stored on the row as
-    :attr:`name` so a resolved :class:`Parameter` is self-describing.
+    `Catalog.parameters` and is also stored on the row as
+    `name` so a resolved `Parameter` is self-describing.
 
     OpenAQ assigns a **separate** `parameters_id` per reporting unit, so
     one pollutant name maps to several ids (`no2` is 5=µg/m³, 7=ppm,
-    15=ppb). :attr:`ids` holds them all; the backend matches sensors by
+    15=ppb). `ids` holds them all; the backend matches sensors by
     name (stable across units) and uses the id list only as a
     server-side narrowing hint.
 
@@ -63,7 +63,7 @@ class Parameter(SummarisedLeaf):
             catalog key.
         ids: All OpenAQ numeric `parameters_id`s that share this name —
             one per reporting unit. At least one.
-        units: The reporting units across :attr:`ids` (`["ppb", "ppm",
+        units: The reporting units across `ids` (`["ppb", "ppm",
             "µg/m³"]`). Informational — the backend reads the real
             per-sensor unit at fetch time.
         display_name: Human-readable label for docs / plots
@@ -111,7 +111,7 @@ def _parse_parameters(files: list[Path]) -> dict[str, Parameter]:
 
     Raises:
         ValueError: If the `parameters:` block is missing or empty, or a row
-            fails :class:`Parameter` validation.
+            fails `Parameter` validation.
     """
     catalog_path = files[0]
     data = load_yaml_strict(catalog_path) or {}
@@ -137,14 +137,14 @@ class Catalog(AbstractCatalog[Parameter]):
 
     Reads the bundled `openaq_data_catalog.yaml` (shipped as package
     data) and exposes its `parameters:` block as a map of
-    :class:`Parameter` rows. Instantiate with no arguments
-    (`Catalog()`); :func:`model_post_init` loads and validates the
-    YAML in one pass. Resolve a name with :meth:`get_parameter` or a
-    list of names to ids with :meth:`ids_for`.
+    `Parameter` rows. Instantiate with no arguments
+    (`Catalog()`); `model_post_init` loads and validates the
+    YAML in one pass. Resolve a name with `get_parameter` or a
+    list of names to ids with `ids_for`.
 
     Attributes:
         parameters: Map from the user-facing parameter name to its
-            :class:`Parameter` dispatch row.
+            `Parameter` dispatch row.
 
     Examples:
         - List parameters and resolve names to OpenAQ ids:
@@ -171,10 +171,10 @@ class Catalog(AbstractCatalog[Parameter]):
     _catalog_kind: str = "OpenAQ parameter catalog"
     _entry_noun: str = "parameters"
 
-    #: The parameter rows live in the base :attr:`datasets` field so the
+    #: The parameter rows live in the base `datasets` field so the
     #: inherited dict surface (`len`, `in`, `[]`, iteration) and
-    #: :meth:`get_dataset`'s did-you-mean hint work unchanged. The field
-    #: is narrowed here to :class:`Parameter` values; :attr:`parameters`
+    #: `get_dataset`'s did-you-mean hint work unchanged. The field
+    #: is narrowed here to `Parameter` values; `parameters`
     #: is the domain-named read alias.
     datasets: dict[str, Parameter] = Field(default_factory=dict)
 
@@ -202,11 +202,11 @@ class Catalog(AbstractCatalog[Parameter]):
 
     @property
     def parameters(self) -> dict[str, Parameter]:
-        """The parameter map — alias for the base :attr:`datasets` field.
+        """The parameter map — alias for the base `datasets` field.
 
         Returns:
             dict[str, Parameter]: The same mapping stored in
-                :attr:`datasets`.
+                `datasets`.
 
         Examples:
             - The alias and the base field are the same object:
@@ -238,14 +238,14 @@ class Catalog(AbstractCatalog[Parameter]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the
-                module-level :data:`CATALOG_PATH`.
+                module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: If `catalog_path` does not exist, or if the file has no
-                `parameters:` block, or a row fails :class:`Parameter`
+                `parameters:` block, or a row fails `Parameter`
                 validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
@@ -255,9 +255,9 @@ class Catalog(AbstractCatalog[Parameter]):
         return cls(datasets=dict(parameters))
 
     def get_parameter(self, name: str) -> Parameter:
-        """Resolve a pollutant name to its :class:`Parameter` row.
+        """Resolve a pollutant name to its `Parameter` row.
 
-        Thin wrapper over the inherited :meth:`get_dataset`, which raises
+        Thin wrapper over the inherited `get_dataset`, which raises
         a `ValueError` with a did-you-mean hint on an unknown name.
 
         Args:
@@ -276,7 +276,7 @@ class Catalog(AbstractCatalog[Parameter]):
     def ids_for(self, names: list[str]) -> list[int]:
         """Resolve names to the union of their OpenAQ ids (all unit variants).
 
-        Each name contributes every id in its :attr:`Parameter.ids`
+        Each name contributes every id in its `Parameter.ids`
         (one per reporting unit), so a request for `"no2"` yields all of
         `no2`'s ids regardless of the unit a station reports in. Order
         follows `names` then each parameter's own id order; duplicates
@@ -291,7 +291,7 @@ class Catalog(AbstractCatalog[Parameter]):
 
         Raises:
             ValueError: If any name is unknown (via
-                :meth:`get_parameter`).
+                `get_parameter`).
         """
         ids: list[int] = []
         for name in names:

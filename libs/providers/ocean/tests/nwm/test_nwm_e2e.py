@@ -21,28 +21,12 @@ from earthlens.nwm import NWM
 pytestmark = [pytest.mark.e2e, pytest.mark.nwm]
 
 
-def _network_available() -> bool:
-    """Return whether the public NWM bucket is reachable (unsigned)."""
-    try:
-        import boto3
-        from botocore import UNSIGNED
-        from botocore.client import Config
-
-        client = boto3.client(
-            "s3", region_name="us-east-1", config=Config(signature_version=UNSIGNED)
-        )
-        client.list_objects_v2(Bucket="noaa-nwm-pds", MaxKeys=1, Delimiter="/")
-        return True
-    except Exception:
-        return False
-
-
 # A recently completed cycle date: a few days back is safely published and
 # well inside the rolling operational retention window.
 _PROBE_DATE = (dt.datetime.now() - dt.timedelta(days=3)).strftime("%Y-%m-%d")
 
 
-@pytest.mark.skipif(not _network_available(), reason="noaa-nwm-pds unreachable")
+@pytest.mark.requires_host("noaa-nwm-pds.s3.amazonaws.com")
 def test_download_one_short_range_channel_rt(tmp_path):
     """Fetch one recent short_range channel_rt file and confirm it lands."""
     nwm = NWM(
@@ -66,7 +50,7 @@ def test_download_one_short_range_channel_rt(tmp_path):
     assert written.name.endswith(".conus.nc")
 
 
-@pytest.mark.skipif(not _network_available(), reason="noaa-nwm-pds unreachable")
+@pytest.mark.requires_host("noaa-nwm-pds.s3.amazonaws.com")
 def test_retrospective_streamflow_subset(tmp_path):
     """Subset the retrospective chrtout Zarr to a few reaches and a short window."""
     import pandas as pd
@@ -92,7 +76,7 @@ def test_retrospective_streamflow_subset(tmp_path):
     assert set(frame["feature_id"].unique()) == {101, 179, 181}
 
 
-@pytest.mark.skipif(not _network_available(), reason="noaa-nwm-pds unreachable")
+@pytest.mark.requires_host("noaa-nwm-pds.s3.amazonaws.com")
 def test_operational_gridded_bbox_to_geotiff(tmp_path):
     """Bbox-crop one recent gridded ldasout variable to a GeoTIFF."""
     nwm = NWM(

@@ -39,9 +39,9 @@ def fetch_gportal(
             G-Portal numeric dataset id passed to `gportal.search`).
         space: The validated WGS84 bbox.
         time: The validated date window.
-        auth: A configured :class:`JaxaAuth`; its
-            :attr:`~earthlens.jaxa.JaxaAuth.username` and
-            :attr:`~earthlens.jaxa.JaxaAuth.password` are passed straight
+        auth: A configured `JaxaAuth`; its
+            `username` and
+            `password` are passed straight
             to ``gportal.download(username=, password=)`` so the SDK's
             module-level credential globals stay untouched.
         out_dir: Output directory (created if missing).

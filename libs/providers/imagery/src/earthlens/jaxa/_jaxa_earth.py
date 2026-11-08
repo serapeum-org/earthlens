@@ -153,7 +153,7 @@ def fetch_jaxa_earth(
         ValueError: If `dataset.collection` is missing, neither `bands`
             nor `dataset.default_band` is set, or the API returns an
             array shape the writer cannot consume (multi-time /
-            multi-band stack, zero pixels — see :func:`_slice_to_2d`).
+            multi-band stack, zero pixels — see `_slice_to_2d`).
     """
     try:
         from jaxa.earth import je  # type: ignore[import-not-found]

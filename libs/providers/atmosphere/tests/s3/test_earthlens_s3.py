@@ -15,9 +15,9 @@ def test_amazon_s3_key_registered():
     assert "amazon-s3" in EarthLens.DataSources
 
 
-def test_amazon_s3_routes_to_the_s3_backend(fake_client_factory, patch_auth):
+def test_amazon_s3_routes_to_the_s3_backend(seed_buckets):
     """EarthLens('amazon-s3', ...) builds the S3 backend and forwards dataset=."""
-    patch_auth(fake_client_factory())
+    seed_buckets()
     facade = EarthLens(
         variables=None,
         data_source="amazon-s3",

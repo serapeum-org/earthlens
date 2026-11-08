@@ -201,7 +201,7 @@ class OpenEO(AbstractDataSource):
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
-        """Parse the date window into a :class:`TemporalExtent`.
+        """Parse the date window into a `TemporalExtent`.
 
         Args:
             start: Inclusive start date string (parsed with `fmt`).
@@ -235,7 +235,7 @@ class OpenEO(AbstractDataSource):
     def _search(self) -> list[RemoteProduct]:
         """List the planned graphs without executing anything (cheap dry-run).
 
-        Returns one :class:`RemoteProduct` per requested key; the resolved
+        Returns one `RemoteProduct` per requested key; the resolved
         collection/recipe row rides on `metadata["resolved"]`. No network call —
         inspecting the result is a "what would I build?" preview.
 
@@ -324,7 +324,7 @@ class OpenEO(AbstractDataSource):
         when set, else the backend's `output_format`.
 
         Args:
-            products: The list returned by :meth:`_search`.
+            products: The list returned by `_search`.
 
         Returns:
             The written file paths, one per product (request key order).

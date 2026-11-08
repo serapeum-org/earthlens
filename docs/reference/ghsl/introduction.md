@@ -43,7 +43,7 @@ writing **one GeoTIFF per `(product, epoch)`**. Multi-epoch requests support
 ## Install
 
 The default deterministic-HTTPS path needs only the core dependencies
-(`requests` + `pyramids-gis`), so no extra is required:
+(`requests` + `pyramids-core`), so no extra is required:
 
 ```bash
 pip install earthlens

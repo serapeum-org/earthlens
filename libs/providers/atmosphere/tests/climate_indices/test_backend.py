@@ -9,6 +9,7 @@ import pytest
 import requests
 
 from earthlens.climate_indices import ClimateIndices, backend
+from earthlens.testing import FakeResponse
 
 pytestmark = pytest.mark.climate_indices
 
@@ -24,36 +25,17 @@ _FIXTURES = {
 }
 
 
-class _FakeResponse:
-    """A minimal stand-in for `requests.Response`."""
-
-    def __init__(self, text: str, status_code: int = 200) -> None:
-        self.text = text
-        self.status_code = status_code
-        self.headers: dict[str, str] = {}
-
-    def raise_for_status(self) -> None:
-        """Raise `HTTPError` (carrying this response) for a >=400 status."""
-        if self.status_code >= 400:
-            error = requests.HTTPError(f"HTTP {self.status_code}")
-            error.response = self
-            raise error
-
-    def close(self) -> None:
-        """No-op close — the fake owns no socket."""
-
-
-def _fake_get(url: str, timeout: float | None = None, **_kwargs) -> _FakeResponse:
+def _fake_get(url: str, timeout: float | None = None, **_kwargs) -> FakeResponse:
     """Return the captured fixture body for a known index URL, else a 404."""
     name = url.rsplit("/", 1)[-1]
     if name in _FIXTURES:
-        return _FakeResponse(_FIXTURES[name].read_text())
-    return _FakeResponse("Not found", status_code=404)
+        return FakeResponse(text=_FIXTURES[name].read_text())
+    return FakeResponse(text="Not found", status_code=404)
 
 
-def _always_404(url: str, timeout: float | None = None, **_kwargs) -> _FakeResponse:
+def _always_404(url: str, timeout: float | None = None, **_kwargs) -> FakeResponse:
     """Return a 404 for every URL."""
-    return _FakeResponse("Not found", status_code=404)
+    return FakeResponse(text="Not found", status_code=404)
 
 
 class _Flaky5xxGet:
@@ -66,12 +48,12 @@ class _Flaky5xxGet:
 
     def __call__(
         self, url: str, timeout: float | None = None, **_kwargs
-    ) -> _FakeResponse:
+    ) -> FakeResponse:
         """Return a 503 for the first `fails` calls, then a 200 with the body."""
         self.calls += 1
         if self.calls <= self.fails:
-            return _FakeResponse("Service Unavailable", status_code=503)
-        return _FakeResponse(self.text)
+            return FakeResponse(text="Service Unavailable", status_code=503)
+        return FakeResponse(text=self.text)
 
 
 class _CountingGet404:
@@ -82,10 +64,10 @@ class _CountingGet404:
 
     def __call__(
         self, url: str, timeout: float | None = None, **_kwargs
-    ) -> _FakeResponse:
+    ) -> FakeResponse:
         """Count the call and return a 404 response."""
         self.calls += 1
-        return _FakeResponse("Not found", status_code=404)
+        return FakeResponse(text="Not found", status_code=404)
 
 
 class _AlwaysConnError:
@@ -96,7 +78,7 @@ class _AlwaysConnError:
 
     def __call__(
         self, url: str, timeout: float | None = None, **_kwargs
-    ) -> _FakeResponse:
+    ) -> FakeResponse:
         """Count the call and raise a transient connection error."""
         self.calls += 1
         raise requests.ConnectionError("down")
@@ -104,19 +86,19 @@ class _AlwaysConnError:
 
 def _generic_request_error(
     url: str, timeout: float | None = None, **_kwargs
-) -> _FakeResponse:
+) -> FakeResponse:
     """Raise a bare (non-connection, non-HTTP) RequestException — not transient."""
     raise requests.RequestException("weird")
 
 
-def _html_200(url: str, timeout: float | None = None, **_kwargs) -> _FakeResponse:
+def _html_200(url: str, timeout: float | None = None, **_kwargs) -> FakeResponse:
     """Return a 200 response whose body is an HTML error page."""
-    return _FakeResponse("<!DOCTYPE HTML><html>error</html>")
+    return FakeResponse(text="<!DOCTYPE HTML><html>error</html>")
 
 
-def _any_psl_get(url: str, timeout: float | None = None, **_kwargs) -> _FakeResponse:
+def _any_psl_get(url: str, timeout: float | None = None, **_kwargs) -> FakeResponse:
     """Serve the ONI (psl-dialect) fixture for any URL (for multi-PSL-index tests)."""
-    return _FakeResponse((DATA / "psl" / "oni.data").read_text())
+    return FakeResponse(text=(DATA / "psl" / "oni.data").read_text())
 
 
 class _FlakyGet:
@@ -129,12 +111,12 @@ class _FlakyGet:
 
     def __call__(
         self, url: str, timeout: float | None = None, **_kwargs
-    ) -> _FakeResponse:
+    ) -> FakeResponse:
         """Fail transiently for the first `fails` calls, then return the body."""
         self.calls += 1
         if self.calls <= self.fails:
             raise requests.ConnectionError("transient")
-        return _FakeResponse(self.text)
+        return FakeResponse(text=self.text)
 
 
 @pytest.fixture()

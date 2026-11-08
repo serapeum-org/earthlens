@@ -22,22 +22,162 @@ from earthlens.gee import (
 )
 
 _EXPECTED_EXPORTS = {
+    # Epic 2 - the client-side raster analysis subpackage. Re-exported here
+    # per the epic's per-task DoD; the operations themselves live in
+    # `earthlens.gee.analysis`, which keeps its own complete `__all__`.
+    "RasterOperation",
+    "OperationChain",
+    "RasterAnalysis",
+    "NormalizedDifference",
+    "Ndvi",
+    "Ndwi",
+    "Ndbi",
+    "BandExpression",
+    "ALLOWED_FUNCTIONS",
+    "Slope",
+    "Aspect",
+    "Hillshade",
+    "FocalMean",
+    "FocalStd",
+    "FocalMedian",
+    "FocalApply",
+    "Texture",
+    "MEASURES",
+    "Proximity",
+    "Reclassify",
+    "ConvertUnits",
+    "ConnectedComponents",
+    "Sieve",
+    "Cluster",
+    "Classify",
+    "TrainingExtractor",
+    "TrainingSet",
+    "UNIT_CONVERSIONS",
+    "supported_conversions",
+    "PanSharpen",
+    "MatchHistogram",
+    "TasseledCap",
+    # Epic 1 Task 1.1 - the reducer strategy objects and their registry.
+    "Reducer",
+    "Mean",
+    "Median",
+    "Min",
+    "Max",
+    "Mode",
+    "Mosaic",
+    "Sum",
+    "Percentile",
+    # Epic 4 Tasks 4.2 - the time-axis reducers and their resolver.
+    "LinearTrend",
+    "SensSlope",
+    "TemporalReducer",
+    "REDUCERS",
+    "resolve_reducer",
+    "temporal_reducer_for",
+    # Epic 6 Task 6.2 - the named-algorithm composites, passed as instances.
+    "LandsatComposite",
+    "Sentinel2Composite",
+    # Epic 4 Task 4.7 - the cadence bucketer.
+    "CadenceBucketer",
+    # Epic 4 Task 4.3 - the composite engine and its bucket value object.
+    "CompositeEngine",
+    "Bucket",
+    # Epic 4 Task 4.12 - the time-series segmentation configs and their result.
+    "TemporalSegmentation",
+    "LandTrendr",
+    "Ccdc",
+    "SegmentationResult",
+    # Epic 4 Task 4.13 - climatology, nearest-date selection, and gap-filling.
+    "Climatology",
+    "ClosestImage",
+    "GapFill",
+    # Epic 6 Task 6.6 - the composable ee.Join wrappers.
+    "Join",
+    "InnerJoin",
+    "SaveAllJoin",
+    "SaveBestJoin",
+    "SaveFirstJoin",
+    "SimpleJoin",
+    # Epic 1 Task 1.6 - the promoted routing verdict.
+    "EnginePlan",
+    "EedaiPlan",
+    # Epic 1 Task 1.12 - the output grid value object.
+    "OutputGrid",
+    # Epic 1 Task 1.9 - the strategy configs.
+    "ExportConfig",
+    "EngineConfig",
+    # Epic 1 Task 1.3 - the engine strategy objects.
+    "Engine",
+    "EeEngine",
+    "EedaiEngine",
+    "AutoEngine",
+    "ENGINES",
+    "resolve_engine",
+    # Epic 1 Task 1.4 - the destination strategy objects.
+    "Sink",
+    "UrlSink",
+    "DriveSink",
+    "GcsSink",
+    "AssetSink",
+    "TableSink",
+    "SINKS",
+    "resolve_sink",
+    # Epic 6 Task 6.7 - the frames-collection video export.
+    "VideoSink",
+    # Epic 1 Task 1.5 - the EEDAI reader adapter.
+    "EedaiReader",
+    # Epic 4 Task 4.8 - the validated property-filter value object.
+    "PropertyFilter",
+    # Epic 4 Task 4.10 - the extent-discovery object and its shared cache.
+    "ExtentDiscovery",
+    # Epic 1 Tasks 1.7/1.8 - the payload and return types.
+    "WorkUnit",
+    "RasterWorkUnit",
+    "FeatureWorkUnit",
+    "Artifact",
+    "DownloadResult",
+    # Epic 1 Task 1.13 - the computePixels engine.
+    "PixelsEngine",
+    "HIGH_VOLUME_ENDPOINT",
     "GEE",
     "AuthenticationError",
     "CloudMask",
     "CollectionFilter",
+    # Epic 6 Task 6.13 - the one-call analysis-ready recipe, plus the catalog
+    # model its `preprocess:` block is validated against.
+    "preprocess",
     "Catalog",
     "Dataset",
     "Band",
     "Cadence",
     "Extent",
+    "Preprocess",
     "Provider",
+    "Visualization",
     "CATALOG_PATH",
     "PROVIDERS_PATH",
     "EarthEngineAuth",
     "create_geometry",
     "create_feature",
+    "GeometryConverter",
+    "FeatureDownloader",
+    "VectorCodec",
+    "Vectorize",
+    "to_numpy",
+    "to_netcdf",
     "sample_points",
+    "Sampler",
+    "PointSampler",
+    "RegionSampler",
+    "RandomSampler",
+    "StratifiedSampler",
+    "RegionTimeSeriesSampler",
+    "RequestPreview",
+    "TimeSeriesSampler",
+    "TransectSampler",
+    "ZonalHistogram",
+    "ZonalStrategy",
+    "zonal_stats",
     "feature_collection_to_dataframe",
     "feature_collection_to_gdf",
     "feature_collections_to_dataframe",
@@ -48,6 +188,14 @@ _EXPECTED_EXPORTS = {
     "cancel_task",
     "wait_for_task_id",
     "resolve_destination",
+    # Epic 6 Task 6.9 - the nest-safe workload-tag billing scope.
+    "WorkloadTag",
+    # Epic 6 Task 6.10 - the asset-lifecycle control plane and its rows.
+    "AssetManager",
+    "AssetInfo",
+    # Epic 6 Task 6.11 - the sklearn <-> ee.Classifier tree-string bridge.
+    "ClassifierCodec",
+    "TreeEnsemble",
 }
 
 
@@ -100,3 +248,18 @@ class TestPublicSurface:
         """The package has a module docstring describing the backend."""
         doc = importlib.import_module("earthlens.gee").__doc__ or ""
         assert "Earth Engine" in doc and len(doc) > 100
+
+    def test_every_public_name_is_documented(self):
+        """Each `__all__` entry is named in the module docstring.
+
+        Epic 1 added nine modules' worth of public symbols to `__all__` while
+        the docstring's surface list went unchanged, so the whole object API
+        was importable but absent from the package's own front door. Nothing
+        caught that, which is why this holds the two together.
+        """
+        package = importlib.import_module("earthlens.gee")
+        doc = package.__doc__ or ""
+        undocumented = [name for name in package.__all__ if f"`{name}`" not in doc]
+        assert undocumented == [], (
+            f"in __all__ but not in the docstring: {undocumented}"
+        )

@@ -3,7 +3,7 @@
 Pure, network-free helpers that decide *which* request plane a download uses.
 The backend passes the resolved render size (px/side) and whether a `geometry=`
 was supplied; these functions return the plane name (one of
-:data:`earthlens.sentinel_hub._helpers.VALID_APIS`). Kept separate from
+`earthlens.sentinel_hub._helpers.VALID_APIS`). Kept separate from
 `backend.py` so the routing rules are unit-testable in isolation.
 
 The auto-routing rule (`G4` / `G5`), when `api=` is omitted:
@@ -35,7 +35,7 @@ def validate_api(api: str | None) -> None:
         api: The requested plane, or `None` for auto-selection.
 
     Raises:
-        ValueError: When `api` is a non-`None` value outside :data:`VALID_APIS`.
+        ValueError: When `api` is a non-`None` value outside `VALID_APIS`.
     """
     if api is not None and api not in VALID_APIS:
         raise ValueError(
@@ -111,7 +111,7 @@ def resolve_api(
         The resolved plane name.
 
     Raises:
-        ValueError: When `api` is a non-`None` value outside :data:`VALID_APIS`.
+        ValueError: When `api` is a non-`None` value outside `VALID_APIS`.
     """
     validate_api(api)
     if api is not None:

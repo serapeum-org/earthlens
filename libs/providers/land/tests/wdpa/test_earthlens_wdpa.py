@@ -60,7 +60,7 @@ class TestFacadeDownload:
     def test_download_returns_feature_collection(self, tmp_path: Path, fake_wdpa):
         """A facade download returns the protected-area FeatureCollection."""
         fake_wdpa.state.set_responses(
-            [fake_wdpa.response({"protected_areas": [fake_wdpa.area()]})]
+            [fake_wdpa.response(json={"protected_areas": [fake_wdpa.area()]})]
         )
         fc = _make_facade(tmp_path).download()
         assert isinstance(fc, GeoDataFrame)

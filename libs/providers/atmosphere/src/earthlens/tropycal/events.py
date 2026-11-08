@@ -6,15 +6,15 @@ handling inside pyramids primitives: earthlens assembles the plain
 attribute rows from each storm's `Storm.to_dataframe(attrs_as_columns=
 True)` frame, builds the geometry column (one `Point` per 6-hourly fix,
 or one `LineString` per storm), and hands the result to
-:class:`pyramids.feature.collection.FeatureCollection` (a
+`pyramids.feature.collection.FeatureCollection` (a
 `geopandas.GeoDataFrame` subclass) tagged `EPSG:4326`.
 
 Two output geometries are supported (the `geometry=` backend kwarg):
 
 * **point** (default) — one row per track fix, schema
-  :data:`POINT_COLUMNS`.
+  `POINT_COLUMNS`.
 * **track** — one row per storm, the whole path as a `LineString`,
-  schema :data:`TRACK_COLUMNS`, with per-storm summary attributes
+  schema `TRACK_COLUMNS`, with per-storm summary attributes
   (max wind, min pressure, max category, ACE, start/end time).
 
 Filtering is fix-level and "loose" (`G4`): a fix is kept when its time is
@@ -25,7 +25,7 @@ rendered `LineString` is built from its **in-window** fixes (so the drawn
 track is clipped to the time window, not the bbox).
 
 Tropycal's `to_dataframe()` exposes no Saffir-Simpson `category` column,
-so it is derived from `vmax` here via :func:`saffir_simpson_category`
+so it is derived from `vmax` here via `saffir_simpson_category`
 (the SSHWS wind thresholds, in knots). This keeps the module free of any
 `tropycal` import, so unit tests can drive it with hand-built frames.
 """
@@ -155,7 +155,7 @@ def frame_to_fc(
     Each input frame is one storm's `Storm.to_dataframe(attrs_as_columns=
     True)` output (so it carries `id` / `name` alongside the per-fix
     `time` / `lat` / `lon` / `vmax` / `mslp` / `type` columns). Fixes are
-    filtered to the window + bbox per :mod:`earthlens.tropycal.events`
+    filtered to the window + bbox per `earthlens.tropycal.events`
     module docs, then mapped to the chosen geometry.
 
     Args:
@@ -271,8 +271,8 @@ def empty_fc(geometry: Geometry = "point") -> FeatureCollection:
     result is a legitimate answer, not an error.
 
     Args:
-        geometry: `"point"` (:data:`POINT_COLUMNS`) or `"track"`
-            (:data:`TRACK_COLUMNS`).
+        geometry: `"point"` (`POINT_COLUMNS`) or `"track"`
+            (`TRACK_COLUMNS`).
 
     Returns:
         FeatureCollection: Zero rows, the mode's columns with their
@@ -308,13 +308,13 @@ def concat_fcs(
 ) -> FeatureCollection:
     """Concatenate per-basin FeatureCollections into one.
 
-    Skips empty inputs; returns :func:`empty_fc` when every input is
+    Skips empty inputs; returns `empty_fc` when every input is
     empty (or the list is empty) so the result is always a
     schema-correct FeatureCollection.
 
     Args:
         collections: Per-basin FeatureCollections, each produced by
-            :func:`frame_to_fc` in the same geometry mode (so all share
+            `frame_to_fc` in the same geometry mode (so all share
             the schema and CRS).
         geometry: The mode the inputs were built in, used to pick the
             empty-result schema when every input is empty.
@@ -347,8 +347,8 @@ def recon_to_fc(
     columns (`wspd`, `p_sfc`, `temp`) are read defensively since they differ
     by sub-product. Observations are filtered to the window + bbox at the
     point level (same loose rule as best-track fixes) and mapped to the
-    :data:`RECON_COLUMNS` schema. A `None`/empty frame (a storm with no recon
-    data — most storms) returns :func:`empty_recon_fc`.
+    `RECON_COLUMNS` schema. A `None`/empty frame (a storm with no recon
+    data — most storms) returns `empty_recon_fc`.
 
     Args:
         frame: The recon sub-product `.data` frame, or `None`.
@@ -423,7 +423,7 @@ def empty_recon_fc() -> FeatureCollection:
     """Return an empty recon-observation `FeatureCollection` (schema-correct).
 
     Returns:
-        FeatureCollection: Zero rows, the :data:`RECON_COLUMNS` columns with
+        FeatureCollection: Zero rows, the `RECON_COLUMNS` columns with
             their dtypes, an empty `geometry`, CRS `EPSG:4326`.
 
     Examples:
@@ -537,8 +537,8 @@ def _points_to_fc(fixes: pd.DataFrame, source: str) -> FeatureCollection:
 def _categories(vmax: pd.Series) -> pd.Series:
     """Vectorised Saffir-Simpson category for a wind Series (knots).
 
-    Same bins as :func:`saffir_simpson_category` (single source of truth via
-    :data:`_SSHWS_UPPER_KT`); missing winds map to `0`.
+    Same bins as `saffir_simpson_category` (single source of truth via
+    `_SSHWS_UPPER_KT`); missing winds map to `0`.
 
     Args:
         vmax: Maximum-sustained-wind values in knots.

@@ -51,7 +51,7 @@ def test_backend_kwargs_forwarded(tmp_path):
 
 def test_facade_download_returns_dataframe(tmp_path, bind_session, seriescalc_payload):
     """A faked backend routes through the facade and returns a DataFrame."""
-    bind_session(FakeResponse(seriescalc_payload))
+    bind_session(FakeResponse(json=seriescalc_payload))
     df = _facade(tmp_path).download(progress_bar=False)
     assert isinstance(df, pd.DataFrame), f"expected a DataFrame, got {type(df)}"
     assert not df.empty, "expected hourly rows"

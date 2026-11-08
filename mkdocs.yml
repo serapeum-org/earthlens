@@ -178,6 +178,7 @@ nav:
     - Troubleshooting: troubleshooting.md
     - Migration guide: migration.md
     - Contributing: contributing.md
+    - Testing rules: testing-rules.md
   - Installation:
     - Provider extras: reference/provider-extras.md
     - Datasets by provider: reference/provider-datasets.md
@@ -248,6 +249,7 @@ nav:
       - Registering a project: reference/gee/registering-a-project.md
       - Service account setup: reference/gee/service-account-setup.md
       - Usage: reference/gee/usage.md
+      - Sampling and vector interop: reference/gee/sampling-and-vector.md
       - Server-side computation: reference/gee/server-side-compute.md
       - Reference: reference/gee/gee.md
     - STAC (Sentinel / Landsat / cloud platforms):
@@ -623,6 +625,7 @@ nav:
       - Precipitation — CHIRPS daily: examples/gee/precipitation.ipynb
       - SAR / radar — Sentinel-1 GRD VV: examples/gee/sar-radar.ipynb
       - Tracking batch exports (end-to-end demo): examples/gee/track-batch-exports.ipynb
+      - Visualization — maps, previews, timelapse (via digitalearth): examples/gee/visualization.ipynb
     - Satellite imagery (STAC):
       - Quickstart — Sentinel-2 COGs: examples/stac/quickstart.ipynb
       - NDVI time-series — monthly Sentinel-2: examples/stac/sentinel2_ndvi_timeseries.ipynb

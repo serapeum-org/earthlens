@@ -12,28 +12,9 @@ from earthlens.sensor_community._helpers import (
     frame_from_csv,
     sensors_in_bbox,
 )
+from earthlens.testing import FakeResponse
 
 from .conftest import SDS_CSV, _record
-
-
-class _Resp:
-    """Canned requests-like response."""
-
-    def __init__(self, *, status_code=200, text="", json_body=None, headers=None):
-        self.status_code = status_code
-        self.text = text
-        self._json = json_body
-        self.headers = headers or {}
-
-    def json(self):
-        return self._json
-
-    def raise_for_status(self):
-        if self.status_code >= 400:
-            raise requests.HTTPError(f"HTTP {self.status_code}")
-
-    def close(self):
-        """No-op close so `HttpClient` can release the response on retry."""
 
 
 class _Session:
@@ -69,34 +50,43 @@ class TestClient:
 
     def test_live_snapshot(self):
         """`live_snapshot` returns the JSON array."""
-        client = SensorCommunityClient(session=_Session([_Resp(json_body=[{"a": 1}])]))
+        client = SensorCommunityClient(
+            session=_Session([FakeResponse(json=[{"a": 1}])])
+        )
         assert client.live_snapshot() == [{"a": 1}]
 
     def test_live_snapshot_non_list(self):
         """A non-list live body yields an empty list."""
-        client = SensorCommunityClient(session=_Session([_Resp(json_body={"e": 1})]))
+        client = SensorCommunityClient(session=_Session([FakeResponse(json={"e": 1})]))
         assert client.live_snapshot() == []
 
     def test_archive_csv_success(self):
         """`archive_csv` returns the CSV text on 200."""
-        client = SensorCommunityClient(session=_Session([_Resp(text=SDS_CSV)]))
+        client = SensorCommunityClient(session=_Session([FakeResponse(text=SDS_CSV)]))
         assert client.archive_csv("2026-06-30", "sds011", "140") == SDS_CSV
 
     def test_archive_csv_404_none(self):
         """A 404 archive file yields `None` (missing day)."""
-        client = SensorCommunityClient(session=_Session([_Resp(status_code=404)]))
+        client = SensorCommunityClient(
+            session=_Session([FakeResponse(status_code=404)])
+        )
         assert client.archive_csv("2026-06-30", "sds011", "999") is None
 
     def test_archive_csv_error_raises(self):
         """A non-404 archive error propagates."""
-        client = SensorCommunityClient(session=_Session([_Resp(status_code=500)]))
+        client = SensorCommunityClient(
+            session=_Session([FakeResponse(status_code=500)])
+        )
         with pytest.raises(requests.HTTPError):
             client.archive_csv("2026-06-30", "sds011", "1")
 
     def test_backoff_on_429(self):
         """A 429 is retried after a back-off sleep, then succeeds."""
         session = _Session(
-            [_Resp(status_code=429, headers={"Retry-After": "0"}), _Resp(text="ok")]
+            [
+                FakeResponse(status_code=429, headers={"Retry-After": "0"}),
+                FakeResponse(text="ok"),
+            ]
         )
         waits: list[float] = []
         client = SensorCommunityClient(session=session, sleep=waits.append)

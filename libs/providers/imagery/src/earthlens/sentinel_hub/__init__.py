@@ -10,22 +10,22 @@ given).
 
 Public surface (re-exported from this package):
 
-* :class:`SentinelHub` — the backend; instantiate with a date range, a bbox, a
+* `SentinelHub` — the backend; instantiate with a date range, a bbox, a
   `{collection_or_recipe: [band, ...]}` request, and (optionally) `evalscript`,
   `resolution`, `endpoint`, `mosaicking_order`, `api`, `geometry`, then call
-  :meth:`SentinelHub.download`.
-* :class:`Catalog` — pydantic-backed loader for the bundled two-layer catalog
+  `SentinelHub.download`.
+* `Catalog` — pydantic-backed loader for the bundled two-layer catalog
   under `src/earthlens/sentinel_hub/catalog/`, exposing `datasets`
   (collections), `recipes`, `available_collections`, and
   `get_collection` / `get_recipe` / `is_recipe` / `resolve`.
-* :class:`Collection` / :class:`EvalscriptRecipe` / :class:`Band` /
-  :class:`Extent` / :class:`ResolvedRequest` — the frozen value objects the
+* `Collection` / `EvalscriptRecipe` / `Band` /
+  `Extent` / `ResolvedRequest` — the frozen value objects the
   catalog is built from.
-* :func:`read_evalscript` — read a bundled `.js` evalscript by name.
-* :class:`SentinelHubAuth` / :class:`SentinelHubCredentials` — the OAuth2
+* `read_evalscript` — read a bundled `.js` evalscript by name.
+* `SentinelHubAuth` / `SentinelHubCredentials` — the OAuth2
   client-credentials auth wrapper and its credentials value object.
-* :class:`AuthenticationError` — raised when no credentials are resolvable.
-* :data:`CATALOG_PATH` / :data:`EVALSCRIPTS_PATH` — absolute paths to the bundled
+* `AuthenticationError` — raised when no credentials are resolvable.
+* `CATALOG_PATH` / `EVALSCRIPTS_PATH` — absolute paths to the bundled
   catalog directory and evalscript directory; monkey-patchable in tests.
 
 The Sentinel Hub client (`[sentinel-hub]` extra) is imported lazily, so the

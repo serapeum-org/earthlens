@@ -79,7 +79,7 @@ Timeout = float | tuple[float, float]
 #: successful. Raising the budget to 30s does not help that host, it makes it
 #: slower (21.7s measured), because the wait on the dead route grows with the
 #: budget. A short connect timeout is what makes dual-stack fallback quick.
-#: See also :func:`prefer_ipv4` for backends that want to skip IPv6 outright.
+#: See also `prefer_ipv4` for backends that want to skip IPv6 outright.
 DEFAULT_TIMEOUT: Timeout = (10.0, 60.0)
 
 #: Maximum retries for a retryable status before the last response's
@@ -103,7 +103,7 @@ DEFAULT_STATUS_FORCELIST: tuple[int, ...] = (429, 500, 502, 503, 504)
 #: that never reach an HTTP status — a refused or reset connection, a DNS blip,
 #: a handshake or read that timed out, a response body truncated mid-stream — so
 #: `status_forcelist` cannot describe them. Membership here only means "the loop
-#: looks at it"; :func:`classify_transport_error` then decides whether it is
+#: looks at it"; `classify_transport_error` then decides whether it is
 #: retryable at all and which budget it spends.
 #:
 #: `requests.RequestException` is deliberately NOT the entry here: it is the
@@ -129,7 +129,7 @@ NON_RETRYABLE_EXCEPTIONS: tuple[type[BaseException], ...] = (
 )
 
 #: Local-filesystem conditions that a retry cannot improve. These reach
-#: :func:`classify_transport_error` as a bare `OSError` from the streaming write
+#: `classify_transport_error` as a bare `OSError` from the streaming write
 #: rather than from the socket, and the three backends that download multi-
 #: gigabyte archives name `OSError` in their `retry_on_exceptions`, so without
 #: this a full disk re-downloads the whole object once per retry to fail at the
@@ -161,14 +161,14 @@ if sys.platform != "win32":
 
 #: Permission errnos on Windows, where one code covers both a permanent refusal
 #: and a transient sharing violation. They stay retryable there — see
-#: :data:`_DETERMINISTIC_ERRNO_NAMES` — but on the *connect* budget rather than
+#: `_DETERMINISTIC_ERRNO_NAMES` — but on the *connect* budget rather than
 #: the read one: a sharing violation clears in seconds, so a single retry
 #: separates the two cases, whereas the full read budget would re-download a
 #: multi-gigabyte object five times to fail at the same byte. That amplification
 #: is what the deterministic set exists to prevent, and honouring Windows must
 #: not reintroduce it. Empty on every other platform, where the same two errnos
 #: are a standing property of the destination and join
-#: :data:`_DETERMINISTIC_ERRNO_NAMES` instead.
+#: `_DETERMINISTIC_ERRNO_NAMES` instead.
 _TRANSIENT_PERMISSION_ERRNOS: frozenset[int] = (
     frozenset()
     if sys.platform != "win32"
@@ -179,7 +179,7 @@ _TRANSIENT_PERMISSION_ERRNOS: frozenset[int] = (
     )
 )
 
-#: The errno *values* behind :data:`_DETERMINISTIC_ERRNO_NAMES`, resolved once at
+#: The errno *values* behind `_DETERMINISTIC_ERRNO_NAMES`, resolved once at
 #: import. Built by name and filtered rather than written as literals because the
 #: set is platform-dependent — `EDQUOT` is missing from some builds, and the two
 #: permission errnos are only appended away from Windows — so a name this
@@ -228,7 +228,7 @@ def _is_local_storage_error(exc: BaseException) -> bool:
 
 
 #: Retries allowed for a failure in the *connect* phase, counted separately from
-#: :data:`DEFAULT_READ_RETRIES`. Deliberately small: a refused connection, an
+#: `DEFAULT_READ_RETRIES`. Deliberately small: a refused connection, an
 #: unresolvable name or a connect timeout almost always means the host is down
 #: or blocked, and a generous budget turns a fast, clear failure into a slow
 #: one. With the default connect timeout this bounds a dead host at about two
@@ -380,7 +380,7 @@ def classify_transport_error(exc: BaseException, *, strict: bool = True) -> str 
         exc: The exception raised by the transport.
         strict: Whether to veto failures this function considers
             never-retryable. `True` while the client is using
-            :data:`DEFAULT_RETRY_EXCEPTIONS`. `False` when the caller passed
+            `DEFAULT_RETRY_EXCEPTIONS`. `False` when the caller passed
             its own `retry_on_exceptions`, in which case naming a type *is*
             the decision to retry it and this function only chooses the
             budget — an unrecognised type then spends the read budget, the
@@ -680,7 +680,7 @@ def _content_range_refusal(
 ) -> tuple[str | None, tuple[int, int, int] | None]:
     """Check a `206`'s `Content-Range` against the window that was asked for.
 
-    The arithmetic half of :func:`_resume_refusal`, split out so each of the
+    The arithmetic half of `_resume_refusal`, split out so each of the
     three comparisons stays a statement of its own rather than a term in a
     boolean chain — none can then be short-circuited by another, and each is
     reachable from a single hand-built header.
@@ -761,7 +761,7 @@ def _resume_refusal(
     `Accept-Ranges: bytes` and a strong `ETag`, then answers a `Range` with the
     whole object under a `200`.
 
-    The three `Content-Range` comparisons live in :func:`_content_range_refusal`
+    The three `Content-Range` comparisons live in `_content_range_refusal`
     and are consulted here in sequence with the rest.
 
     Args:
@@ -803,10 +803,10 @@ def _resume_refusal(
     return None
 
 
-#: Streaming chunk size (bytes) for :meth:`HttpClient.download` — 1 MiB.
+#: Streaming chunk size (bytes) for `HttpClient.download` — 1 MiB.
 DEFAULT_CHUNK_SIZE = 1 << 20
 
-#: Buffer size (bytes) :meth:`HttpRangeFile.buffered` wraps the raw
+#: Buffer size (bytes) `HttpRangeFile.buffered` wraps the raw
 #: range reader in — 1 MiB, so a container's many small structural reads
 #: coalesce into few HTTP requests.
 DEFAULT_RANGE_BUFFER_SIZE = 1 << 20
@@ -1175,7 +1175,7 @@ def retry_login_forcing_ipv4(login: Callable[[], _LoginResult]) -> _LoginResult:
 
 
 def new_session() -> requests.Session:
-    """Return the pooled transport :class:`HttpClient` uses by default.
+    """Return the pooled transport `HttpClient` uses by default.
 
     A single indirection so the default transport is decided in one place
     rather than at 21 construction sites. A `requests.Session` keeps the
@@ -1191,7 +1191,7 @@ def new_session() -> requests.Session:
     return requests.Session()
 
 
-#: Per-thread session cache behind :func:`thread_local_session`. A plain dict
+#: Per-thread session cache behind `thread_local_session`. A plain dict
 #: on a `threading.local` so each thread gets its own sessions and never shares
 #: one, keyed by caller so two providers do not end up on the same cookie jar.
 _THREAD_SESSIONS = threading.local()
@@ -1232,7 +1232,7 @@ def reset_thread_local_sessions() -> None:
 
     The cache outlives any one request, so a caller that has swapped the
     transport underneath it needs a way to make the next
-    :func:`thread_local_session` call rebuild, rather than hand back a session
+    `thread_local_session` call rebuild, rather than hand back a session
     built against the previous one.
     """
     _THREAD_SESSIONS.cache = {}
@@ -1274,12 +1274,12 @@ class RequestsGet:
 class HttpClient:
     """Reusable HTTP transport: session, headers, timeout, retry, download.
 
-    Wraps a :class:`requests.Session`, attaching default headers (a
+    Wraps a `requests.Session`, attaching default headers (a
     non-Mozilla `User-Agent` and `Accept-Encoding: gzip, deflate`) to
     every request and applying a shared timeout. The verbs
-    (:meth:`get`, :meth:`post`, :meth:`request`) route through a
-    `Retry-After`-aware back-off loop; :meth:`get_json` decodes the JSON
-    body and :meth:`download` streams a response to disk. Both the
+    (`get`, `post`, `request`) route through a
+    `Retry-After`-aware back-off loop; `get_json` decodes the JSON
+    body and `download` streams a response to disk. Both the
     session and the sleep function are injectable so the client is fully
     unit-testable without a live network.
 
@@ -1338,12 +1338,12 @@ class HttpClient:
         """Build a client with default headers, timeout, and retry policy.
 
         Args:
-            session: An existing :class:`requests.Session` to reuse.
+            session: An existing `requests.Session` to reuse.
                 Defaults to a fresh session. Injectable so tests can
                 supply a fake transport.
             user_agent: The default `User-Agent` header value. Defaults
                 to `earthlens/{version}` (non-Mozilla by design; see
-                :func:`_default_user_agent`).
+                `_default_user_agent`).
             headers: Extra default headers merged onto every request
                 (e.g. `{"X-API-Key": ...}`). Override per call with a
                 request-level `headers=`.
@@ -1361,7 +1361,7 @@ class HttpClient:
                 `None` disables the cap.
             retry_on_exceptions: Exception types that also trigger a retry
                 when raised by the transport. `None` (the default) uses
-                :data:`DEFAULT_RETRY_EXCEPTIONS` — a refused or reset
+                `DEFAULT_RETRY_EXCEPTIONS` — a refused or reset
                 connection, a timeout, a body truncated mid-stream — and is
                 what selects the strict policy: the never-retry list applies
                 and `connect_retries` takes its small default. Passing any
@@ -1370,7 +1370,7 @@ class HttpClient:
                 `max_retries`. Pass `()` to retry on status only.
             connect_retries: Retries allowed for a failure in the connect
                 phase, counted separately from `read_retries`. `None` (the
-                default) resolves to :data:`DEFAULT_CONNECT_RETRIES` while
+                default) resolves to `DEFAULT_CONNECT_RETRIES` while
                 the client uses the default exception set — a host that will
                 not accept a connection rarely starts doing so within a
                 back-off window — and to `max_retries` when the caller
@@ -1382,7 +1382,7 @@ class HttpClient:
                 This is the transient case a retry actually helps.
             retry_unsafe_methods: Whether a *read*-phase failure may replay a
                 non-idempotent verb. `False` (the default) replays only the
-                methods in :data:`IDEMPOTENT_METHODS`, because a response
+                methods in `IDEMPOTENT_METHODS`, because a response
                 that broke after the request was delivered may already have
                 been acted on, so replaying a `POST` risks a double
                 submission. Connect-phase failures are replayed for any
@@ -1402,7 +1402,7 @@ class HttpClient:
             clock: Monotonic clock used for the `min_interval` throttle.
                 Injectable so tests drive it deterministically.
             sleep: The sleep function used between retries and for the
-                throttle. Defaults to :func:`time.sleep`; injectable so
+                throttle. Defaults to `time.sleep`; injectable so
                 tests run without real delays.
         """
         self._session = session if session is not None else new_session()
@@ -1464,7 +1464,7 @@ class HttpClient:
 
     @property
     def session(self) -> requests.Session:
-        """Return the underlying :class:`requests.Session`."""
+        """Return the underlying `requests.Session`."""
         return self._session
 
     def _merge_headers(self, headers: dict[str, str] | None) -> dict[str, str]:
@@ -1530,22 +1530,22 @@ class HttpClient:
         )
 
     def get(self, url: str, **kwargs: Any) -> requests.Response:
-        """Send a `GET` request. See :meth:`request` for arguments."""
+        """Send a `GET` request. See `request` for arguments."""
         return self.request("GET", url, **kwargs)
 
     def post(self, url: str, **kwargs: Any) -> requests.Response:
-        """Send a `POST` request. See :meth:`request` for arguments."""
+        """Send a `POST` request. See `request` for arguments."""
         return self.request("POST", url, **kwargs)
 
     def get_json(self, url: str, **kwargs: Any) -> Any:
         """Send a `GET` request and decode the JSON response body.
 
-        Convenience over :meth:`get` for the REST endpoints that return
+        Convenience over `get` for the REST endpoints that return
         JSON envelopes.
 
         Args:
             url: Absolute request URL.
-            **kwargs: Keyword arguments forwarded to :meth:`get`
+            **kwargs: Keyword arguments forwarded to `get`
                 (`params`, `headers`, `timeout`, ...).
 
         Returns:
@@ -1570,13 +1570,13 @@ class HttpClient:
         so a `ChunkedEncodingError` raised mid-stream escapes it. The
         default transport retry covers the non-streaming verbs, whose
         bodies `requests` materialises inside the loop, and
-        :meth:`download`, which owns its own. A caller streaming a large
-        body that needs the same protection should use :meth:`download`
+        `download`, which owns its own. A caller streaming a large
+        body that needs the same protection should use `download`
         or re-request on failure itself.
 
         Args:
             url: Absolute request URL.
-            **kwargs: Keyword arguments forwarded to :meth:`get`.
+            **kwargs: Keyword arguments forwarded to `get`.
 
         Returns:
             requests.Response: The open streaming response.
@@ -2662,7 +2662,7 @@ class HttpRangeFile(io.RawIOBase):
     2 requests / 2.1 MB — against 8.84 GB for the download-it-all
     alternative.
 
-    Every read goes through the supplied :class:`HttpClient`, so the
+    Every read goes through the supplied `HttpClient`, so the
     retry / back-off / throttle / `User-Agent` policy is the one the rest
     of earthlens uses, and tests inject a fake session instead of a
     network.
@@ -2733,7 +2733,7 @@ class HttpRangeFile(io.RawIOBase):
                 final URL reused for every read, so a redirecting host is
                 not re-negotiated on each range request.
             client: Transport to read through. Defaults to a fresh
-                :class:`HttpClient`. Inject one to share a session, carry
+                `HttpClient`. Inject one to share a session, carry
                 auth headers, or supply a fake transport in tests.
             size: Total object size when the caller already knows it (e.g.
                 from a catalog row). Skips the size probe entirely — one
@@ -2963,7 +2963,7 @@ class HttpRangeFile(io.RawIOBase):
     def buffered(
         self, buffer_size: int = DEFAULT_RANGE_BUFFER_SIZE
     ) -> io.BufferedReader:
-        """Wrap this file in an :class:`io.BufferedReader`.
+        """Wrap this file in an `io.BufferedReader`.
 
         A container reader walks its index in many small reads, and one
         HTTP request per read would be pathological. Buffering coalesces

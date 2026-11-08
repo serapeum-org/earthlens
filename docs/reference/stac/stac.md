@@ -8,5 +8,3 @@ covered under the other pages in this section; this page is the rendered API.
 ::: earthlens.stac.catalog
 
 ::: earthlens.stac.signers
-
-::: earthlens.stac.auth_cdse

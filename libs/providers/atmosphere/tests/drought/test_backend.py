@@ -23,6 +23,7 @@ import earthlens.drought
 from earthlens.drought import Drought
 from earthlens.drought import backend as backend_module
 from earthlens.drought.backend import SPEIBASE_EPOCH_YEAR
+from earthlens.testing import FakeResponse
 
 _USDM_PAYLOAD: dict[str, Any] = {
     "type": "FeatureCollection",
@@ -967,51 +968,6 @@ def test_drought_src_does_not_import_owslib_or_xarray():
     )
 
 
-class _FakeResponse:
-    """Minimal `requests.Response` stand-in for the HTTP helpers."""
-
-    def __init__(
-        self,
-        *,
-        status: int = 200,
-        body: bytes = b"",
-        json_body: Any | None = None,
-    ):
-        self.status_code = status
-        self._body = body
-        self._json = json_body
-        self.headers = {"content-type": "application/json"}
-
-    def raise_for_status(self) -> None:
-        if self.status_code >= 400:
-            import requests
-
-            raise requests.HTTPError(f"HTTP {self.status_code}")
-
-    def json(self) -> Any:
-        if self._json is None:
-            raise ValueError("no JSON body")
-        return self._json
-
-    @property
-    def text(self) -> str:
-        return self._body.decode("utf-8", errors="replace")
-
-    def iter_content(self, chunk_size: int = 1024):
-        view = memoryview(self._body)
-        for offset in range(0, len(view), chunk_size):
-            yield bytes(view[offset : offset + chunk_size])
-
-    def close(self) -> None:
-        """No-op — the fake holds no socket (HttpClient closes the stream)."""
-
-    def __enter__(self) -> _FakeResponse:
-        return self
-
-    def __exit__(self, *exc_info) -> None:
-        return None
-
-
 def test_http_get_json_decodes_payload(monkeypatch):
     """`_http_get_json` raises for status then returns the JSON body."""
     import requests
@@ -1020,7 +976,7 @@ def test_http_get_json_decodes_payload(monkeypatch):
 
     def _fake_get(url, timeout, headers):
         assert "User-Agent" in headers
-        return _FakeResponse(json_body=payload)
+        return FakeResponse(json=payload)
 
     monkeypatch.setattr(requests, "get", _fake_get)
     assert backend_module._http_get_json("https://example.com") == payload
@@ -1033,7 +989,7 @@ def test_http_get_json_raises_on_http_error(monkeypatch):
     monkeypatch.setattr(
         requests,
         "get",
-        lambda url, timeout, headers: _FakeResponse(status=500, json_body=None),
+        lambda url, timeout, headers: FakeResponse(status_code=500, json=None),
     )
     with pytest.raises(requests.HTTPError):
         backend_module._http_get_json("https://example.com/oops")
@@ -1047,7 +1003,7 @@ def test_http_download_streams_to_target(monkeypatch, tmp_path):
 
     def _fake_get(url, timeout, stream, headers):
         assert stream is True
-        return _FakeResponse(body=body)
+        return FakeResponse(content=body)
 
     monkeypatch.setattr(requests, "get", _fake_get)
     target = tmp_path / "nested" / "file.nc"

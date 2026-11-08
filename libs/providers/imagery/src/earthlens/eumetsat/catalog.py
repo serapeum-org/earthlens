@@ -434,7 +434,7 @@ class Catalog(AbstractCatalog[EumetsatDataset]):
         """Resolve a dataset key, optionally disambiguated by group.
 
         Most keys map one-to-one to a curated row; the inherited
-        :meth:`get_dataset` (with its did-you-mean) handles those. The
+        `get_dataset` (with its did-you-mean) handles those. The
         `group=` filter additionally asserts which Data Store group the
         resolved dataset belongs to (`G2`) — the EUMETSAT analog of the
         Earthdata backend's `daac=` filter.

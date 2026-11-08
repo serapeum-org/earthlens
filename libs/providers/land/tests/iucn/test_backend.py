@@ -280,9 +280,9 @@ class TestRestRetry:
         fake_iucn.state.route_queue(
             "countries/KE",
             [
-                fake_iucn.response({}, status_code=502),
-                fake_iucn.response({}, status_code=502),
-                fake_iucn.response({"assessments": []}),
+                fake_iucn.response(json={}, status_code=502),
+                fake_iucn.response(json={}, status_code=502),
+                fake_iucn.response(json={"assessments": []}),
             ],
         )
         _backend(tmp_path, variables=["country:KE"]).download()
@@ -296,8 +296,10 @@ class TestRestRetry:
         fake_iucn.state.route_queue(
             "countries/KE",
             [
-                fake_iucn.response({}, status_code=429, headers={"Retry-After": "11"}),
-                fake_iucn.response({"assessments": []}),
+                fake_iucn.response(
+                    json={}, status_code=429, headers={"Retry-After": "11"}
+                ),
+                fake_iucn.response(json={"assessments": []}),
             ],
         )
         _backend(tmp_path, variables=["country:KE"]).download()
@@ -320,7 +322,7 @@ class TestRestRetry:
             "countries/KE",
             [
                 fake_iucn.ConnectionError("network glitch"),
-                fake_iucn.response({"assessments": []}),
+                fake_iucn.response(json={"assessments": []}),
             ],
         )
         _backend(tmp_path, variables=["country:KE"]).download()
@@ -330,7 +332,7 @@ class TestRestRetry:
         """When every retry returns 5xx, _get raises a clear RuntimeError."""
         fake_iucn.state.route_queue(
             "countries/KE",
-            [fake_iucn.response({}, status_code=503)] * 10,
+            [fake_iucn.response(json={}, status_code=503)] * 10,
         )
         with pytest.raises(RuntimeError, match="503"):
             _backend(tmp_path, variables=["country:KE"]).download()

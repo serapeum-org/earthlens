@@ -12,8 +12,16 @@ from __future__ import annotations
 from typing import Any, Callable
 
 import pytest
-from obspy import UTCDateTime
-from obspy.core.event import Catalog, Event, Magnitude, Origin
+
+#: The `fdsn` extra is optional, so a missing `obspy` skips this module
+#: rather than erroring the whole directory's collection.
+_obspy = pytest.importorskip("obspy")
+_obspy_event = pytest.importorskip("obspy.core.event")
+UTCDateTime = _obspy.UTCDateTime
+Catalog = _obspy_event.Catalog
+Event = _obspy_event.Event
+Magnitude = _obspy_event.Magnitude
+Origin = _obspy_event.Origin
 
 
 def _make_event(

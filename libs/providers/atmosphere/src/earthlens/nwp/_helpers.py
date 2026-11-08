@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 
 #: Default `.idx` cache time-to-live in seconds (24 hours). The
 #: `EARTHLENS_NWP_IDX_TTL` environment variable overrides this;
-#: an explicit `ttl=` keyword to :func:`get_idx` wins over both.
+#: an explicit `ttl=` keyword to `get_idx` wins over both.
 _DEFAULT_IDX_TTL = 24 * 3600
 
 #: The columns every `.idx` parser returns. NOAA text and ECMWF JSON
@@ -197,13 +197,13 @@ def valid_time(cycle: dt.datetime, step: int) -> dt.datetime:
 def parse_cog_valid_time(path: Path | str) -> dt.datetime:
     """Recover a forecast's valid time from a `cog_name` filename.
 
-    Inverts :func:`cog_name`: the trailing `_{cycle}_f{step}` of the stem
+    Inverts `cog_name`: the trailing `_{cycle}_f{step}` of the stem
     gives the cycle datetime and lead time, whose sum is the valid time.
     Model keys may contain hyphens but never underscores, so the last two
     underscore-separated tokens are always the cycle stamp and the step.
 
     Args:
-        path: A COG path or filename produced by :func:`cog_name`.
+        path: A COG path or filename produced by `cog_name`.
 
     Returns:
         datetime.datetime: The instant the forecast is valid for.
@@ -321,7 +321,7 @@ def _parse_idx_noaa(text: str) -> pd.DataFrame:
 
     NOAA NODD writes one message per line: `msg : offset : date :
     abbr : level : forecast` (e.g. ` 1:0:d=2024060100:HGT:1000 mb:anl`).
-    The forecast field is parsed through :func:`_parse_noaa_step` so the
+    The forecast field is parsed through `_parse_noaa_step` so the
     `step` column is an `int` comparable with the ECMWF parser's output.
     `length` is derived from the next distinct offset; duplicate offsets
     (the same byte position appearing more than once) are dropped so a

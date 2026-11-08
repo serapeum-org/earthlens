@@ -40,7 +40,7 @@ The `gportal` SDK does **not** auto-read either variable in v0.4.0;
 module-level credential globals stay untouched between requests.
 
 If neither resolves on a `gportal` request, `JaxaAuth.configure()`
-raises :class:`earthlens.jaxa.AuthenticationError` naming both
+raises `earthlens.jaxa.AuthenticationError` naming both
 environment variables and the registration URL — it never blocks on an
 interactive prompt.
 
@@ -79,11 +79,11 @@ calls) act on the right side:
 * `JaxaAuth(creds, protocol="jaxa-earth").configure()` is a no-op.
 * `JaxaAuth(creds, protocol="gportal").configure()` resolves and caches
   the G-Portal credentials, raising
-  :class:`earthlens.jaxa.AuthenticationError` on miss.
+  `earthlens.jaxa.AuthenticationError` on miss.
 * `JaxaAuth(creds, protocol="ptree").configure()` resolves and caches
   the P-Tree credentials (from `ptree_username` / `ptree_password` or
   `$JAXA_PTREE_USERNAME` / `$JAXA_PTREE_PASSWORD`), raising
-  :class:`earthlens.jaxa.AuthenticationError` on miss.
+  `earthlens.jaxa.AuthenticationError` on miss.
 
 `EarthLens(...).authenticate()` therefore fails-fast on a `gportal`
 or `ptree` request without credentials — the SFTP download or FTP
@@ -120,7 +120,7 @@ protocol:
    `JAXA_PTREE_PASSWORD`.
 
 Missing credentials raise
-:class:`earthlens.jaxa.AuthenticationError` naming both env vars and
+`earthlens.jaxa.AuthenticationError` naming both env vars and
 the registration URL. Live probe (2026-07-04) confirmed the archive
 still serves plain FTP on `ftp.ptree.jaxa.jp:21`, so `paramiko` is
 not required.
@@ -142,7 +142,7 @@ EarthLens(
 ## 4c. P-Tree scope & licence
 
 - **Retention.** P-Tree ships the **last 30 days** of HSD granules only.
-  Requests further back raise :class:`earthlens.jaxa.RetentionError`
+  Requests further back raise `earthlens.jaxa.RetentionError`
   before the FTP call — no cryptic `450 No such file or directory`.
 - **Licence.** Since **2026-02-01** P-Tree data (including HSD) is
   available for **commercial use**; attribution per the

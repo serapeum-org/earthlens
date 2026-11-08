@@ -1,7 +1,7 @@
 """Credentials and authentication for the NASA Earthdata backend.
 
-Hosts :class:`EarthdataAuth`, an :class:`earthlens.base.AbstractAuth`
-subclass that wraps :func:`earthaccess.login`. A single Earthdata
+Hosts `EarthdataAuth`, an `earthlens.base.AbstractAuth`
+subclass that wraps `earthaccess.login`. A single Earthdata
 Login (EDL) account authenticates once and unlocks every DAAC the
 backend reaches through `earthaccess` + CMR; after a successful
 `login()` the returned `earthaccess.Auth` handle also mints the
@@ -10,15 +10,15 @@ needs.
 
 The auth wrapper exists so that:
 
-* The backend can build an :class:`EarthdataCredentials` value object
+* The backend can build an `EarthdataCredentials` value object
   up front, validate it with pydantic, and pass it through
-  `super().__init__(creds)` — consistent with :class:`CmemsAuth`.
+  `super().__init__(creds)` — consistent with `CmemsAuth`.
 * `configure()` is idempotent — a second call after
   `is_authenticated()` returns `True` short-circuits, so it is safe
   to call from long-lived workers without re-authing on every
   `download()`.
 * `earthaccess` login failures are re-raised as the cross-backend
-  :class:`earthlens.base.AuthenticationError`, so a caller can write
+  `earthlens.base.AuthenticationError`, so a caller can write
   one `except AuthenticationError` clause across CMEMS / Earthdata /
   future backends.
 
@@ -75,7 +75,7 @@ class AuthenticationError(_BaseAuthenticationError):
     or add a `urs.earthdata.nasa.gov` entry to `~/.netrc`.
 
     A subclass of the cross-backend
-    :class:`earthlens.base.AuthenticationError` so callers can catch
+    `earthlens.base.AuthenticationError` so callers can catch
     every backend's auth failure with one `except` clause.
     """
 
@@ -89,19 +89,19 @@ class EarthdataCredentials(BaseModel):
     username/password, a path to a `.netrc` file, or no fields at all
     (and rely on env vars / the default `~/.netrc` / an interactive
     prompt). Validation is intentionally permissive — the real "do these
-    creds work?" gate is :meth:`EarthdataAuth.configure`, which talks to
+    creds work?" gate is `EarthdataAuth.configure`, which talks to
     EDL.
 
     Attributes:
         username: EDL account username. `None` means "look at the
             environment / netrc / prompt".
         password: Account password. Stored as
-            :class:`pydantic.SecretStr` so it is never echoed by
+            `pydantic.SecretStr` so it is never echoed by
             `repr(creds)` or in logs. `None` means same as
             `username`.
         token: Optional EDL **bearer token** (a long-lived JSON Web
             Token generated from the EDL profile), stored as a
-            :class:`pydantic.SecretStr`. Lets the backend authenticate
+            `pydantic.SecretStr`. Lets the backend authenticate
             without a password — the token-equivalent of GEE's service
             key. `configure` exports it to `EARTHDATA_TOKEN`, which
             `earthaccess`'s environment strategy consumes. `None` defers
@@ -157,25 +157,25 @@ class EarthdataCredentials(BaseModel):
 class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
     """Authenticate against NASA Earthdata Login (EDL).
 
-    Wraps :func:`earthaccess.login` in the
-    :class:`earthlens.base.AbstractAuth` contract. Calling
-    :meth:`configure` once per process is enough: `earthaccess`
+    Wraps `earthaccess.login` in the
+    `earthlens.base.AbstractAuth` contract. Calling
+    `configure` once per process is enough: `earthaccess`
     persists the resolved token (`persist=True`), and the returned
-    `earthaccess.Auth` handle — kept on :attr:`_auth` — mints the
+    `earthaccess.Auth` handle — kept on `_auth` — mints the
     rotating per-provider S3 credentials the in-region streaming path
-    needs via :meth:`s3_credentials`.
+    needs via `s3_credentials`.
 
     The class is a context manager (inherited from
-    :class:`AbstractAuth`): `with EarthdataAuth(creds) as auth: ...`
+    `AbstractAuth`): `with EarthdataAuth(creds) as auth: ...`
     calls `configure()` on enter and the default no-op `close()` on
     exit.
 
     Attributes:
-        _creds: The :class:`EarthdataCredentials` passed at
-            construction. Read by :meth:`configure` to resolve the
+        _creds: The `EarthdataCredentials` passed at
+            construction. Read by `configure` to resolve the
             login strategy. Treated as write-once.
         _auth: The `earthaccess.Auth` handle returned by a successful
-            `login()`, or `None` before :meth:`configure` runs.
+            `login()`, or `None` before `configure` runs.
 
     Examples:
         - Build, configure, inspect — marked `# doctest: +SKIP`
@@ -195,11 +195,11 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
         """Store credentials; does not authenticate.
 
         Construction is side-effect-free — the user (or the backend's
-        :meth:`_initialize`) must call :meth:`configure` (or use the
+        `_initialize`) must call `configure` (or use the
         context-manager form) to talk to EDL.
 
         Args:
-            credentials: The :class:`EarthdataCredentials` value
+            credentials: The `EarthdataCredentials` value
                 object carrying the strategy-resolution rules.
         """
         super().__init__(credentials)
@@ -274,7 +274,7 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
     def configure(self) -> None:
         """Authenticate against EDL via `earthaccess.login`.
 
-        Idempotent — short-circuits when :meth:`is_authenticated`
+        Idempotent — short-circuits when `is_authenticated`
         already returns `True`. On the first call, resolves the login
         strategy (explicit token / creds → env → netrc → interactive).
         `earthaccess` has no direct login argument for a token or a
@@ -283,7 +283,7 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
         `EARTHDATA_TOKEN` for a bearer token, or `EARTHDATA_USERNAME` /
         `EARTHDATA_PASSWORD` for a username/password — before login. Then
         logs in with `persist=True` and keeps the returned
-        `earthaccess.Auth` handle on :attr:`_auth`.
+        `earthaccess.Auth` handle on `_auth`.
 
         An explicit credential also has to *win*. `earthaccess` prefers
         `EARTHDATA_TOKEN` over a username/password pair, so an unrelated token
@@ -389,7 +389,7 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
                 (`accessKeyId`, `secretAccessKey`, `sessionToken`, …).
 
         Raises:
-            AuthenticationError: When :meth:`configure` has not run, so
+            AuthenticationError: When `configure` has not run, so
                 no `earthaccess.Auth` handle is available.
         """
         if self._auth is None:

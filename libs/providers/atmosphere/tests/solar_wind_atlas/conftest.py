@@ -12,6 +12,7 @@ from pathlib import Path
 import pytest
 
 from earthlens.solar_wind_atlas import _helpers
+from earthlens.testing import FakeResponse
 
 
 def zip_bytes(member: str = "World_GHI.tif") -> bytes:
@@ -82,26 +83,6 @@ def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> type[FakeDataset]:
     return FakeDataset
 
 
-class FakeResponse:
-    """Stand-in for a streaming requests response (HttpClient shape)."""
-
-    status_code = 200
-    headers: dict[str, str] = {}
-
-    def __init__(self, body: bytes) -> None:
-        self._body = body
-
-    def raise_for_status(self) -> None:
-        """No-op — the fake always succeeds."""
-
-    def iter_content(self, chunk_size: int = 1) -> list[bytes]:
-        """Yield the body, plus an empty chunk to exercise the skip guard."""
-        return [self._body, b""]
-
-    def close(self) -> None:
-        """No-op — the fake holds no socket."""
-
-
 class FailingResponse:
     """A streaming response whose body iteration raises mid-download."""
 
@@ -134,7 +115,9 @@ class FakeGet:
 
     def __call__(self, url: str, **kwargs: object) -> FakeResponse:
         self.calls += 1
-        return FakeResponse(zip_bytes("World_GHI.tif"))
+        # The trailing empty chunk is deliberate: it exercises the
+        # downloader's skip-empty guard.
+        return FakeResponse(chunks=[zip_bytes("World_GHI.tif"), b""])
 
 
 @pytest.fixture

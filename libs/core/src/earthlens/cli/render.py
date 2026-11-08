@@ -21,7 +21,7 @@ from earthlens.cli.table import CatalogRow, LoadError
 if TYPE_CHECKING:
     from rich.console import JustifyMethod
 
-#: Header label for each :class:`~earthlens.cli.table.CatalogRow` column.
+#: Header label for each `CatalogRow` column.
 _COLUMN_HEADERS: dict[str, str] = {
     "provider": "PROVIDER",
     "dataset_id": "DATASET ID",
@@ -99,7 +99,7 @@ def rows_to_json(rows: Iterable[CatalogRow]) -> str:
         rows: The rows to serialise.
 
     Returns:
-        A 2-space-indented JSON array of :func:`row_to_dict` objects.
+        A 2-space-indented JSON array of `row_to_dict` objects.
 
     Examples:
         - Each row becomes one JSON object:
@@ -154,12 +154,12 @@ def rows_table(
     Args:
         rows: The rows to tabulate.
         title: Optional table title (e.g. a result summary).
-        columns: The :class:`~earthlens.cli.table.CatalogRow` attributes to
+        columns: The `CatalogRow` attributes to
             show, in order. Defaults to provider / dataset id / title; use
-            :data:`COMPACT_COLUMNS` or :data:`FULL_COLUMNS` for `list`.
+            `COMPACT_COLUMNS` or `FULL_COLUMNS` for `list`.
 
     Returns:
-        A populated :class:`rich.table.Table`.
+        A populated `rich.table.Table`.
 
     Examples:
         - The default table has one row per dataset and three columns:
@@ -208,10 +208,10 @@ def counts_table(counts_by_facet: dict[str, list[tuple[str, int]]]) -> Table:
 
     Args:
         counts_by_facet: Mapping of facet name to its `(value, count)` pairs
-            (e.g. from :func:`earthlens.cli.query.facet_counts`).
+            (e.g. from `earthlens.cli.query.facet_counts`).
 
     Returns:
-        A populated :class:`rich.table.Table`; facets with no values are
+        A populated `rich.table.Table`; facets with no values are
         skipped.
 
     Examples:
@@ -307,7 +307,7 @@ def record_table(row: CatalogRow) -> Table:
         row: The catalog row to describe.
 
     Returns:
-        A :class:`rich.table.Table` with one row per record field; nested
+        A `rich.table.Table` with one row per record field; nested
         dict / list fields are summarised by size and first members.
     """
     table = Table(header_style="bold", show_lines=False)
@@ -334,7 +334,7 @@ def kv_table(
         justify_b: Justification for the second column (e.g. `"right"`).
 
     Returns:
-        A populated :class:`rich.table.Table`.
+        A populated `rich.table.Table`.
 
     Examples:
         - Two columns, one row per pair:
@@ -365,7 +365,7 @@ def refresh_table(outcomes) -> Table:
             `status`, `live_count`, `bundled_count`, `new_ids`, `detail`).
 
     Returns:
-        A :class:`rich.table.Table`; counts show `-` for non-`ok` rows.
+        A `rich.table.Table`; counts show `-` for non-`ok` rows.
     """
     table = Table(header_style="bold", show_lines=False)
     table.add_column("PROVIDER", overflow="fold")
@@ -400,7 +400,7 @@ def probe_table(result) -> Table:
             to a `{field: value}` schema dict).
 
     Returns:
-        A :class:`rich.table.Table`; missing fields render as `-`.
+        A `rich.table.Table`; missing fields render as `-`.
     """
     field_keys: list[str] = []
     for schema in result.assets.values():
@@ -428,7 +428,7 @@ def audit_table(outcomes) -> Table:
             `status`, `live_count`, `curated_count`, `broken`, `detail`).
 
     Returns:
-        A :class:`rich.table.Table`; counts show `-` for non-`ok` rows. Variable
+        A `rich.table.Table`; counts show `-` for non-`ok` rows. Variable
         drift is not a column (it would overflow an 80-column terminal); it is
         surfaced by the `datasets audit` command's per-provider drift lines, the
         `--json` output, and the `--strict` exit code.
@@ -463,7 +463,7 @@ def coverage_table(outcomes) -> Table:
             `status`, `counts`, `todo`, `detail`).
 
     Returns:
-        A :class:`rich.table.Table` with one column per coverage bucket;
+        A `rich.table.Table` with one column per coverage bucket;
         counts show `-` for non-`ok` rows.
     """
     buckets = ("DONE", "addressable", "thin", "table", "missing")
@@ -492,7 +492,7 @@ def validate_table(results) -> Table:
             `status`, `checked`, `issues`, `detail`).
 
     Returns:
-        A :class:`rich.table.Table`; counts show `-` for non-`ok` rows.
+        A `rich.table.Table`; counts show `-` for non-`ok` rows.
     """
     table = Table(header_style="bold", show_lines=False)
     table.add_column("PROVIDER", overflow="fold")

@@ -25,7 +25,7 @@ _ISO_T_SEP = re.compile(r"\d[Tt]\d")
 def _strip_tz(value: dt.datetime) -> dt.datetime:
     """Return `value` as a naive `datetime`, converting to UTC first if aware.
 
-    Keeps :func:`to_datetime` output uniformly tz-naive: a timezone-aware
+    Keeps `to_datetime` output uniformly tz-naive: a timezone-aware
     input is converted to UTC and stripped, so mixing (for example) a naive
     `start` with an offset-bearing `end` never raises the
     "can't compare offset-naive and offset-aware datetimes" `TypeError`
@@ -122,7 +122,7 @@ def to_datetime(value: Any, fmt: str | None = None) -> dt.datetime:
 
 
 #: Sentinel alias meaning "no fixed spacing — query the window whole". Returned
-#: by :func:`resolve_cadence` for any cadence that names a release *character*
+#: by `resolve_cadence` for any cadence that names a release *character*
 #: rather than a period, and so has no pandas offset: `"irregular"`,
 #: `"climatology"`, `"subhourly"`, `"subdaily"`, `"raw"`, `"native"` and
 #: `"static"`. `AbstractDataSource._cadence_extent` turns it into a whole-window
@@ -278,12 +278,12 @@ def date_windows(
     The single home for the `pd.date_range(to_datetime(start),
     to_datetime(end), freq=...)` idiom that ~20 backends re-derive to turn a
     request window into the per-file dates they download. `start` / `end` are
-    parsed through :func:`to_datetime`, so either raw date-likes (a string, a
+    parsed through `to_datetime`, so either raw date-likes (a string, a
     `date`, a `Timestamp`) or already-parsed `datetime`s work.
 
     Args:
-        start: The window start, in any form :func:`to_datetime` accepts.
-        end: The window end, in any form :func:`to_datetime` accepts.
+        start: The window start, in any form `to_datetime` accepts.
+        end: The window end, in any form `to_datetime` accepts.
         freq: A pandas offset alias (`"D"`, `"MS"`, `"YS"`, `"6h"`, ...).
         inclusive: Which endpoints to include — `"both"` (default), `"left"`,
             `"right"`, or `"neither"`; forwarded to `pandas.date_range`.
@@ -358,7 +358,7 @@ def split_time(value: Any) -> tuple[Any, Any]:
     The ergonomic alternative to passing `start` / `end` separately, in the
     spirit of STAC's `datetime="a/b"` and earthaccess's `temporal=(a, b)`.
     The two halves keep their original types and are parsed downstream by
-    :func:`to_datetime`. Accepted forms:
+    `to_datetime`. Accepted forms:
 
     * a `"start/end"` string (STAC interval) — split on the first `/`; an
       empty half (`"a/"` / `"/b"`) becomes `None` (open-ended);
@@ -471,7 +471,7 @@ def expand_bare_date_end(end: dt.datetime, *, date_only: bool) -> dt.datetime:
     an unexpanded inclusive filter would drop the entire day. When
     `date_only` is `True` the bound is expanded to `23:59:59.999999` of the
     same day; otherwise (an explicit time, including an explicit midnight)
-    it is returned untouched. Use :func:`end_is_date_only` on the raw input
+    it is returned untouched. Use `end_is_date_only` on the raw input
     to decide `date_only`.
 
     Args:

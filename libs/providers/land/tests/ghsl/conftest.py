@@ -11,6 +11,8 @@ import pytest
 import requests
 from pyramids.dataset import Dataset, GeoReference
 
+from earthlens.testing import FakeResponse
+
 #: Mollweide (ESRI:54009) geotransform inside the verified R6_C18 tile extent
 #: ([-1041000, 3000000, -41000, 4000000]); 5x5 cells of 100 km.
 _MOLLWEIDE_GEO = (-900000.0, 100000.0, 0.0, 3900000.0, 0.0, -100000.0)
@@ -51,41 +53,11 @@ def zip_with_tif(tif_path: Path, zip_path: Path, *, sidecars: bool = True) -> Pa
     return zip_path
 
 
-class _FakeResponse:
-    """Minimal `requests.Response` stand-in for the fake session."""
-
-    def __init__(self, content: bytes = b"", text: str = "", status: int = 200):
-        self._content = content
-        self.text = text
-        self._status = status
-        self.status_code = status
-        self.headers: dict[str, str] = {}
-
-    def raise_for_status(self) -> None:
-        """Raise `HTTPError` when the route is marked as a 4xx/5xx."""
-        if self._status >= 400:
-            raise requests.HTTPError(f"{self._status} for fake url")
-
-    def iter_content(self, chunk_size: int = 1) -> Any:
-        """Yield the payload in `chunk_size` slices."""
-        for start in range(0, len(self._content), max(chunk_size, 1)):
-            yield self._content[start : start + chunk_size]
-
-    def close(self) -> None:
-        """No-op close (parity with `requests.Response`)."""
-
-    def __enter__(self) -> _FakeResponse:
-        return self
-
-    def __exit__(self, *exc: object) -> bool:
-        return False
-
-
 class FakeSession:
     """`requests.Session` stand-in routing URLs to canned responses."""
 
-    def __init__(self, routes: dict[str, _FakeResponse] | None = None):
-        self.routes: dict[str, _FakeResponse] = routes or {}
+    def __init__(self, routes: dict[str, FakeResponse] | None = None):
+        self.routes: dict[str, FakeResponse] = routes or {}
         self.requested: list[str] = []
         self.calls: list[dict[str, Any]] = []
 
@@ -93,7 +65,7 @@ class FakeSession:
         """Return the canned response for `url` (404 when unrouted)."""
         self.requested.append(url)
         self.calls.append(kwargs)
-        return self.routes.get(url, _FakeResponse(status=404))
+        return self.routes.get(url, FakeResponse(status_code=404))
 
     def close(self) -> None:
         """No-op close (parity with `requests.Session`)."""
@@ -112,12 +84,12 @@ def tiny_wgs84_tif(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def make_response() -> Callable[..., _FakeResponse]:
-    """Factory for `_FakeResponse` objects (content / text / status)."""
-    return _FakeResponse
+def make_response() -> Callable[..., FakeResponse]:
+    """Factory for `FakeResponse` objects (content / text / status)."""
+    return FakeResponse
 
 
 @pytest.fixture
-def fake_session() -> Callable[[dict[str, _FakeResponse]], FakeSession]:
+def fake_session() -> Callable[[dict[str, FakeResponse]], FakeSession]:
     """Factory building a `FakeSession` from a url→response route map."""
     return FakeSession

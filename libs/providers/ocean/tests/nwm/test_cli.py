@@ -15,6 +15,8 @@ import earthlens.nwm.cli as nwm_cli
 from earthlens.cli.adapter import list_backends, load_catalog
 from earthlens.cli.refresh import audit_one, refresh_one
 from earthlens.cli.validate import validate_one
+from earthlens.nwm.backend import BUCKET
+from earthlens.testing import seed_s3
 
 pytestmark = pytest.mark.cli
 
@@ -24,37 +26,20 @@ def _info():
     return next(b for b in list_backends() if b.provider == "nwm")
 
 
-class _FakeNwmClient:
-    """A minimal in-memory S3 stand-in for the NWM bucket-primitive tests."""
-
-    def __init__(self, date_pages=None, dir_prefixes=None):
-        self._date_pages = date_pages or []
-        self._dir_prefixes = dir_prefixes or []
-
-    def get_paginator(self, operation):
-        """Return a paginator whose `paginate` yields the canned date pages."""
-        assert operation == "list_objects_v2", operation
-        return SimpleNamespace(paginate=lambda **kw: iter(self._date_pages))
-
-    def list_objects_v2(self, **kwargs):
-        """Return the canned configuration-directory `CommonPrefixes`."""
-        return {"CommonPrefixes": self._dir_prefixes}
-
-
 def _date_page(*days):
     """Build a paginator page of `nwm.<day>/` common prefixes."""
     return {"CommonPrefixes": [{"Prefix": f"nwm.{day}/"} for day in days]}
 
 
-class _FakeSampleClient:
-    """A minimal S3 stand-in serving canned `Contents` for token sampling."""
+def _nwm_days(client, *days):
+    """Publish one object under each `nwm.<day>/` prefix and hand back the client.
 
-    def __init__(self, contents):
-        self._contents = contents
-
-    def list_objects_v2(self, **kwargs):
-        """Return the canned object `Contents` regardless of the prefix."""
-        return {"Contents": self._contents}
+    The day prefixes then come back as real `CommonPrefixes` from a real
+    delimiter listing, rather than from a paginator double that yielded a
+    canned page.
+    """
+    seed_s3(client, BUCKET, {f"nwm.{day}/placeholder": b"" for day in days})
+    return client
 
 
 def _key(directory, output):
@@ -121,34 +106,36 @@ class TestBucketPrimitives:
             "an S3 client is returned"
         )
 
-    def test_latest_complete_day_picks_day_before_latest(self):
+    def test_latest_complete_day_picks_day_before_latest(self, s3_emulator):
         """The day before the newest prefix is chosen (newest may be partial)."""
-        client = _FakeNwmClient(
-            date_pages=[_date_page("20260601", "20260603", "20260602")]
-        )
+        client = _nwm_days(s3_emulator, "20260601", "20260603", "20260602")
         assert nwm_cli._latest_complete_day(client) == "nwm.20260602", (
             "second-newest day selected"
         )
 
-    def test_latest_complete_day_single_day_uses_only_day(self):
+    def test_latest_complete_day_single_day_uses_only_day(self, s3_emulator):
         """With a single published day, that day is used as-is."""
-        client = _FakeNwmClient(date_pages=[_date_page("20260601")])
+        client = _nwm_days(s3_emulator, "20260601")
         assert nwm_cli._latest_complete_day(client) == "nwm.20260601"
 
-    def test_latest_complete_day_ignores_non_nwm_prefixes(self):
+    def test_latest_complete_day_ignores_non_nwm_prefixes(self, s3_emulator):
         """Prefixes that do not start with `nwm.` are skipped."""
-        client = _FakeNwmClient(date_pages=[{"CommonPrefixes": [{"Prefix": "index/"}]}])
+        seed_s3(s3_emulator, BUCKET, {"index/placeholder": b""})
+        client = s3_emulator
         with pytest.raises(RuntimeError, match=r"no nwm\.YYYYMMDD"):
             nwm_cli._latest_complete_day(client)
 
-    def test_config_dirs_parses_and_sorts_directory_names(self):
+    def test_config_dirs_parses_and_sorts_directory_names(self, s3_emulator):
         """Configuration directory names are parsed from the day's prefixes."""
-        client = _FakeNwmClient(
-            dir_prefixes=[
-                {"Prefix": "nwm.20260602/short_range/"},
-                {"Prefix": "nwm.20260602/medium_range_mem1/"},
-            ]
+        seed_s3(
+            s3_emulator,
+            BUCKET,
+            {
+                "nwm.20260602/short_range/f.nc": b"",
+                "nwm.20260602/medium_range_mem1/f.nc": b"",
+            },
         )
+        client = s3_emulator
         assert nwm_cli._config_dirs(client, "nwm.20260602") == [
             "medium_range_mem1",
             "short_range",
@@ -175,20 +162,24 @@ class TestBucketPrimitives:
 class TestValidateInternals:
     """Direct tests for the NWM validate helpers (network mocked)."""
 
-    def test_sample_tokens_parses_output_and_skips_short_names(self):
+    def test_sample_tokens_parses_output_and_skips_short_names(self, s3_emulator):
         """The `{output}` token is parsed; names with too few parts are skipped."""
-        client = _FakeSampleClient(
-            [
-                {"Key": _key("short_range", "channel_rt")},
-                {"Key": "nwm.20260602/short_range/nwm.t00z.land.nc"},
-            ]
+        seed_s3(
+            s3_emulator,
+            BUCKET,
+            {
+                _key("short_range", "channel_rt"): b"",
+                "nwm.20260602/short_range/nwm.t00z.land.nc": b"",
+            },
         )
+        client = s3_emulator
         tokens = nwm_cli._sample_tokens(client, "nwm.20260602", "short_range")
         assert tokens == {"channel_rt"}, f"only the well-formed token parsed: {tokens}"
 
-    def test_sample_tokens_empty_listing_returns_empty_set(self):
+    def test_sample_tokens_empty_listing_returns_empty_set(self, s3_emulator):
         """A directory with no objects samples an empty token set."""
-        tokens = nwm_cli._sample_tokens(_FakeSampleClient([]), "d", "x")
+        seed_s3(s3_emulator, BUCKET, {})
+        tokens = nwm_cli._sample_tokens(s3_emulator, "d", "x")
         assert tokens == set(), f"expected empty set, got {tokens}"
 
     def test_config_directory_appends_mem1_for_ensembles(self):

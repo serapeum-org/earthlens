@@ -6,8 +6,8 @@ and the granules now live in NASA Earthdata Cloud behind an Earthdata Login
 (EDL), so fetching them needs an EDL account. The `emdat:events` source — the
 UCLouvain Dataverse archive — is anonymous and never touches this module.
 
-:class:`EmdatAuth` wraps :func:`earthaccess.login` in the
-:class:`earthlens.base.AbstractAuth` contract, resolving credentials from an
+`EmdatAuth` wraps `earthaccess.login` in the
+`earthlens.base.AbstractAuth` contract, resolving credentials from an
 explicit token / username+password, then the `EARTHDATA_*` environment
 variables, then a `~/.netrc` entry, then an interactive prompt.
 
@@ -20,7 +20,7 @@ Note:
 
 A first download will also fail with a `401` and *"Be sure to agree to the
 EULA"* until the account has accepted the SEDAC data licence once, in the
-Earthdata profile — authentication alone is not enough. :meth:`EmdatAuth.configure`
+Earthdata profile — authentication alone is not enough. `EmdatAuth.configure`
 surfaces that in its error text.
 
 Two consequences of `earthaccess` keeping its authenticated handle in a
@@ -91,7 +91,7 @@ class EmdatCredentials(BaseModel):
     variables, then `~/.netrc`, then an interactive prompt.
 
     Attributes:
-        username: EDL username. Paired with :attr:`password`.
+        username: EDL username. Paired with `password`.
         password: EDL password, held as a `SecretStr` so it stays out of
             reprs and logs.
         token: An EDL bearer token, used in preference to a username and
@@ -129,16 +129,16 @@ class EmdatCredentials(BaseModel):
 class EmdatAuth(AbstractAuth[EmdatCredentials]):
     """Authenticate the GDIS sources against NASA Earthdata Login.
 
-    Construction is side-effect-free; :meth:`configure` performs the login and
+    Construction is side-effect-free; `configure` performs the login and
     is idempotent, so calling it repeatedly costs nothing after the first
     success. The class is a context manager via
-    :class:`earthlens.base.AbstractAuth`.
+    `earthlens.base.AbstractAuth`.
 
     Attributes:
-        _creds: The :class:`EmdatCredentials` passed at construction, read by
-            :meth:`configure` to resolve the login strategy.
+        _creds: The `EmdatCredentials` passed at construction, read by
+            `configure` to resolve the login strategy.
         _auth: The `earthaccess.Auth` handle returned by a successful login, or
-            `None` before :meth:`configure` runs.
+            `None` before `configure` runs.
 
     Examples:
         - Build, configure, inspect — marked `# doctest: +SKIP` because it
@@ -158,7 +158,7 @@ class EmdatAuth(AbstractAuth[EmdatCredentials]):
         """Store credentials; does not authenticate.
 
         Args:
-            credentials: The :class:`EmdatCredentials` carrying the
+            credentials: The `EmdatCredentials` carrying the
                 strategy-resolution rules.
         """
         super().__init__(credentials)
@@ -183,7 +183,7 @@ class EmdatAuth(AbstractAuth[EmdatCredentials]):
     def _warn_half_credential(self) -> None:
         """Warn when only one half of a username/password pair was supplied.
 
-        A lone `username=` leaves :meth:`_has_explicit_credentials` false, so
+        A lone `username=` leaves `_has_explicit_credentials` false, so
         resolution falls through to the `EARTHDATA_*` variables or `~/.netrc`
         and may authenticate as an entirely different account. Silently
         ignoring what the caller passed is the worst of the options.
@@ -323,7 +323,7 @@ class EmdatAuth(AbstractAuth[EmdatCredentials]):
     def configure(self) -> None:
         """Authenticate against EDL via `earthaccess.login`.
 
-        Idempotent — short-circuits when :meth:`is_authenticated` already
+        Idempotent — short-circuits when `is_authenticated` already
         returns `True`. On the first call, resolves the login strategy, exports
         any explicit credential to the environment variable `earthaccess`
         reads, logs in with `persist=True`, and keeps the returned handle.

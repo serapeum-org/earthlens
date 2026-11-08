@@ -6,17 +6,17 @@ YAML files at `src/earthlens/stac/catalog/` (`planetary-computer.yaml`,
 `cdse.yaml`, `earth-search.yaml`, …) plus a single `_index.yaml` carrying the
 `endpoints:` map and the per-endpoint `available_collections:` index. The
 loader unions the per-endpoint `collections:` blocks into one
-:class:`Catalog` at construction time (a collection key declared in two files
+`Catalog` at construction time (a collection key declared in two files
 is a load-time error), the same way the GEE and CMEMS catalogs merge.
 
 A collection is addressed by a single *logical* key (e.g. `"sentinel-2-l2a"`);
-:meth:`Catalog.resolve` maps that key to the actual collection id a given
+`Catalog.resolve` maps that key to the actual collection id a given
 endpoint serves (e.g. Earth Search calls it `"sentinel-2-c1-l2a"`) via the
 collection's per-endpoint `aliases`. Endpoints carry their URL + signer type +
 region, so the backend can open the right client and build the right signer
 from catalog data alone.
 
-The bundled catalog directory lives at :data:`CATALOG_PATH`; tests can
+The bundled catalog directory lives at `CATALOG_PATH`; tests can
 monkey-patch that attribute to redirect the loader at a temporary directory or
 single YAML file.
 """
@@ -181,7 +181,7 @@ class Collection(SummarisedLeaf):
         cadence: Native revisit cadence label, or `None`.
         resolution: Native ground sample distance in metres, or `None`.
         extent: Spatial/temporal coverage.
-        assets: Asset key → :class:`Asset` metadata.
+        assets: Asset key → `Asset` metadata.
         signer: Optional per-collection signer override. When set, the backend
             reads this collection's assets with this signer instead of the
             endpoint's default — e.g. `"aws-requester-pays"` for a collection
@@ -351,18 +351,18 @@ def _load_catalog_data(
 class Catalog(AbstractCatalog[Collection]):
     """YAML-backed catalog of STAC endpoints, collections, and assets.
 
-    Reads every `*.yaml` under :data:`CATALOG_PATH` on construction and merges
-    them into one catalog of typed :class:`Endpoint` / :class:`Collection` /
-    :class:`Asset` models. Collections are stored under the inherited
-    :attr:`datasets` field (keyed by logical collection key); endpoints live in
-    :attr:`endpoints`; the per-endpoint `available_collections:` index lives in
-    :attr:`available_collections`.
+    Reads every `*.yaml` under `CATALOG_PATH` on construction and merges
+    them into one catalog of typed `Endpoint` / `Collection` /
+    `Asset` models. Collections are stored under the inherited
+    `datasets` field (keyed by logical collection key); endpoints live in
+    `endpoints`; the per-endpoint `available_collections:` index lives in
+    `available_collections`.
 
     Attributes:
-        endpoints: Endpoint key → :class:`Endpoint`.
+        endpoints: Endpoint key → `Endpoint`.
         available_collections: Endpoint key → list of every collection id the
             endpoint serves (the refreshed index; informational).
-        datasets: Logical collection key → :class:`Collection`.
+        datasets: Logical collection key → `Collection`.
 
     Examples:
         - Construct the catalog and inspect the endpoints it serves:
@@ -406,7 +406,7 @@ class Catalog(AbstractCatalog[Collection]):
 
         Raises:
             ValueError: When auto-loading, propagates the same errors as
-                :meth:`load`.
+                `load`.
         """
         if not self.datasets:
             loaded = Catalog.load()
@@ -427,10 +427,10 @@ class Catalog(AbstractCatalog[Collection]):
 
         Args:
             catalog_path: Catalog directory or single `*.yaml` file. Defaults
-                to module-level :data:`CATALOG_PATH`.
+                to module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
             ValueError: Propagated from the loader.
@@ -444,15 +444,15 @@ class Catalog(AbstractCatalog[Collection]):
         )
 
     def get_collection(self, collection_key: str) -> Collection:
-        """Return the :class:`Collection` for `collection_key` (did-you-mean on miss).
+        """Return the `Collection` for `collection_key` (did-you-mean on miss).
 
-        Alias of the inherited :meth:`get_dataset`; provided for naming clarity.
+        Alias of the inherited `get_dataset`; provided for naming clarity.
 
         Args:
             collection_key: Logical collection key.
 
         Returns:
-            The matching :class:`Collection`.
+            The matching `Collection`.
 
         Raises:
             ValueError: If the key is unknown (message suggests the closest key).
@@ -469,13 +469,13 @@ class Catalog(AbstractCatalog[Collection]):
         return cast("Collection", self.get_dataset(collection_key))
 
     def get_endpoint(self, endpoint_key: str) -> Endpoint:
-        """Return the :class:`Endpoint` for `endpoint_key`.
+        """Return the `Endpoint` for `endpoint_key`.
 
         Args:
             endpoint_key: Endpoint key.
 
         Returns:
-            The matching :class:`Endpoint`.
+            The matching `Endpoint`.
 
         Raises:
             ValueError: If the endpoint is unknown.

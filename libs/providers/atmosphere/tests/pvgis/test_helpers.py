@@ -67,7 +67,7 @@ class TestThrottledGet:
     def test_sleeps_to_honour_rate_limit(self):
         """A near-zero clock forces a throttle sleep before the request."""
         slept: list[float] = []
-        session = FakeSession(FakeResponse({"ok": 1}))
+        session = FakeSession(FakeResponse(json={"ok": 1}))
         resp = h.throttled_get(
             session,
             "u",
@@ -83,7 +83,7 @@ class TestThrottledGet:
     def test_no_sleep_when_interval_elapsed(self):
         """A clock far past the last call skips the throttle sleep."""
         slept: list[float] = []
-        session = FakeSession(FakeResponse({"ok": 1}))
+        session = FakeSession(FakeResponse(json={"ok": 1}))
         h.throttled_get(
             session,
             "u",
@@ -96,7 +96,9 @@ class TestThrottledGet:
     def test_retries_429_then_succeeds(self):
         """A 429 is retried with exponential backoff until a non-429 arrives."""
         slept: list[float] = []
-        session = FakeSession([FakeResponse(None, 429), FakeResponse({"ok": 1})])
+        session = FakeSession(
+            [FakeResponse(status_code=429), FakeResponse(json={"ok": 1})]
+        )
         resp = h.throttled_get(
             session,
             "u",
@@ -110,7 +112,7 @@ class TestThrottledGet:
 
     def test_exhausts_retries_and_raises(self):
         """All-429 responses exhaust the retries and raise via raise_for_status."""
-        session = FakeSession([FakeResponse(None, 429)])
+        session = FakeSession([FakeResponse(status_code=429)])
         with pytest.raises(requests.HTTPError):
             h.throttled_get(
                 session,

@@ -64,7 +64,7 @@ cat.describe("centennial-trends-v1-monthly")
 #  'pandas_freq': 'MS',
 #  'spatial_resolution': [0.1],
 #  'formats': ['netcdf'],
-#  'ftp_bases': {'netcdf': 'pub/org/chc/products/CentennialTrends/'},
+#  'ftp_bases': {'netcdf': 'products/CentennialTrends/'},
 #  'file_patterns': None,
 #  'discrete_files': {'netcdf': ['CenTrends_v1_monthly.nc']},
 #  'is_discrete': True,

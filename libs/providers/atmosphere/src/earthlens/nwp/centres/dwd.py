@@ -2,7 +2,7 @@
 
 DWD publishes ICON forecasts as per-variable, bz2-compressed GRIB2
 files over plain HTTPS (no `.idx`, no SDK): one file per
-`(cycle, step, variable)`. :class:`DWDCentre` builds each variable's
+`(cycle, step, variable)`. `DWDCentre` builds each variable's
 URL from the catalog `url_template`, downloads and decompresses it
 in-flight, and concatenates the decompressed GRIB messages into a
 single `.grib2` — valid because GRIB is a stream of self-describing
@@ -47,7 +47,7 @@ _GRIB_MAGIC = b"GRIB"
 
 #: A bzip2 stream starts `BZh` followed by the block-size digit `1`-`9`. After
 #: one stream ends, this is what tells a genuine next stream apart from
-#: trailing padding — see :meth:`_Bz2Streams._start_next_stream`.
+#: trailing padding — see `_Bz2Streams._start_next_stream`.
 _BZ2_MAGIC = b"BZh"
 _BZ2_HEADER_LEN = 4
 
@@ -56,7 +56,7 @@ def _starts_a_bz2_stream(header: bytes) -> bool:
     """Report whether `header` opens a bzip2 stream.
 
     Args:
-        header: The first :data:`_BZ2_HEADER_LEN` bytes after a stream ended.
+        header: The first `_BZ2_HEADER_LEN` bytes after a stream ended.
 
     Returns:
         bool: `True` for `BZh1`..`BZh9`.
@@ -71,7 +71,7 @@ class _Bz2Streams:
     `bz2.decompress`: which decompressor is current, whether it has been fed
     anything, and whether what follows a finished stream is another stream or
     trailing padding. Keeping it in a small class leaves
-    :func:`_decompress_stream` a plain loop.
+    `_decompress_stream` a plain loop.
 
     After a stream ends, the next bytes are buffered until the four-byte header
     can be inspected rather than handed straight to a new decompressor. The

@@ -34,7 +34,7 @@
 datasets:
   chpclim-v2-monthly:
     ftp_bases:
-      tif: pub/org/chc/products/CHPclim/v2/monthly_9090/
+      tif: products/CHPclim/v2/monthly_9090/
     region: global-extended
     temporal_resolution: monthly-climatology
     pandas_freq: MS
@@ -64,7 +64,7 @@ datasets:
 
   wbgt-monthly:
     ftp_bases:
-      tif: pub/org/chc/products/WBGT/wbgt_global_1_monthly_data/
+      tif: products/WBGT/wbgt_global_1_monthly_data/
     region: global-extended
     temporal_resolution: monthly
     pandas_freq: MS
@@ -81,7 +81,7 @@ datasets:
 
   wbgt-dekad:
     ftp_bases:
-      tif: pub/org/chc/products/WBGT/wbgt_global_dekad_data/
+      tif: products/WBGT/wbgt_global_dekad_data/
     region: global-extended
     temporal_resolution: dekadal
     pandas_freq: 10D
@@ -98,7 +98,7 @@ datasets:
 
   centennial-trends-v1-monthly:
     ftp_bases:
-      netcdf: pub/org/chc/products/CentennialTrends/
+      netcdf: products/CentennialTrends/
     region: east-africa-centennial
     temporal_resolution: monthly
     pandas_freq: MS
@@ -116,7 +116,7 @@ datasets:
 
   centennial-trends-v1-seasonal:
     ftp_bases:
-      netcdf: pub/org/chc/products/CentennialTrends/
+      netcdf: products/CentennialTrends/
     region: east-africa-centennial
     temporal_resolution: seasonal
     pandas_freq: QS

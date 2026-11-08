@@ -1,4 +1,4 @@
-"""Tests for :mod:`earthlens.ecmwf.constraints`.
+"""Tests for `earthlens.ecmwf.constraints`.
 
 Validates the pre-flight check that catches mismatched
 request / constraints.json combinations before they hit CDS.
@@ -32,7 +32,7 @@ def _clear_cache(monkeypatch):
 
 
 def _stub_urlopen(monkeypatch, payload):
-    """Replace :func:`urllib.request.urlopen` with a static fake."""
+    """Replace `urllib.request.urlopen` with a static fake."""
     body = json.dumps(payload).encode("utf-8") if payload is not None else b"x"
 
     class _Resp:
@@ -66,7 +66,7 @@ def _stub_urlopen_raise(monkeypatch, exc):
 
 
 class TestValidateRequest:
-    """Tests for :class:`RequestValidator`."""
+    """Tests for `RequestValidator`."""
 
     def test_valid_request_passes(self, monkeypatch):
         """A request that matches a constraint entry returns silently."""
@@ -689,7 +689,7 @@ class TestRequiredFields:
 
 
 class TestFetchConstraints:
-    """Tests for :func:`fetch_constraints`."""
+    """Tests for `fetch_constraints`."""
 
     def test_returns_payload_on_success(self, monkeypatch):
         _stub_urlopen(monkeypatch, [{"variable": ["x"]}])

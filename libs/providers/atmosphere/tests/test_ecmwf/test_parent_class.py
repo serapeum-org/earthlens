@@ -1,12 +1,12 @@
 """Integration tests for the H1 parent-class wiring.
 
-After H1, :meth:`AbstractDataSource.__init__` captures the return
+After H1, `AbstractDataSource.__init__` captures the return
 values of the abstract hooks (`initialize`, `create_grid`,
 `check_input_dates`) and exposes them as `self.client` /
 `self.space` / `self.time`. It also adds `self.root_dir` and
 keeps `self.path` as a legacy alias.
 
-These tests construct a real :class:`ECMWF` instance (with cdsapi
+These tests construct a real `ECMWF` instance (with cdsapi
 mocked) and assert the wiring end-to-end across both modules — they
 are integration-level rather than narrow unit tests.
 """
@@ -15,18 +15,21 @@ from __future__ import annotations
 
 import pathlib
 
-import cdsapi
 import pytest
 
 from earthlens.ecmwf import ECMWF, Variable
 
 from ._fakes import _SentinelClient
 
+#: The `ecmwf` extra is optional, so a missing `cdsapi` skips this module
+#: rather than erroring the whole directory's collection.
+cdsapi = pytest.importorskip("cdsapi")
+
 pytestmark = [pytest.mark.integration]
 
 
 class TestParentClassWiring:
-    """Tests for the H1 parent-class wiring in :class:`AbstractDataSource`."""
+    """Tests for the H1 parent-class wiring in `AbstractDataSource`."""
 
     def test_full_construction_populates_all_expected_attributes(
         self, tmp_path, monkeypatch

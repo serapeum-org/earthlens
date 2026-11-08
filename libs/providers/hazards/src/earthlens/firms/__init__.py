@@ -4,17 +4,17 @@ Thin wrapper over the NASA FIRMS (Fire Information for Resource
 Management System) area CSV API that returns near-real-time and archival
 **active-fire detections** from MODIS (C6.1) and VIIRS (S-NPP / NOAA-20 /
 NOAA-21) as a pyramids
-:class:`~pyramids.feature.collection.FeatureCollection` of fire-pixel
+`pyramids.feature.collection.FeatureCollection` of fire-pixel
 points (CRS `EPSG:4326`).
 
 This is a `vector` backend: the result is a table of geolocated fire
-detections, not a gridded array, so :data:`FIRMS.OUTPUT_KIND` is
-`"vector"` and the :class:`earthlens.earthlens.EarthLens` facade rejects
+detections, not a gridded array, so `FIRMS.OUTPUT_KIND` is
+`"vector"` and the `earthlens.earthlens.EarthLens` facade rejects
 an `aggregate=` argument for it.
 
 FIRMS needs a free **`MAP_KEY`** (no SDK): the only dependencies are
 `requests` + `pandas`, both core, so there is **no `[firms]` extra** to
-install — the key lives in :class:`FirmsAuth`, not a dependency.
+install — the key lives in `FirmsAuth`, not a dependency.
 
 Sensor selection: for this backend `variables` is a `list[str]` of FIRMS
 sensor codes — `variables=["VIIRS_SNPP_NRT"]`,
@@ -25,17 +25,17 @@ names. This is an intentional, documented overload (the facade makes
 
 Public surface (re-exported from this package):
 
-* :class:`FIRMS` — the backend; instantiate with a date range, a bbox,
-  and `variables=[sensor_code, ...]`, then call :meth:`FIRMS.download`.
-* :class:`Catalog` — pydantic-backed loader for the bundled
+* `FIRMS` — the backend; instantiate with a date range, a bbox,
+  and `variables=[sensor_code, ...]`, then call `FIRMS.download`.
+* `Catalog` — pydantic-backed loader for the bundled
   `firms_data_catalog.yaml` sensor dispatch table.
-* :class:`Sensor` / :class:`SensorColumn` — one sensor's row and one of
+* `Sensor` / `SensorColumn` — one sensor's row and one of
   its CSV columns.
-* :class:`FirmsAuth` / :class:`FirmsCredentials` — `MAP_KEY` resolution.
-* :class:`AuthenticationError` — raised when no usable `MAP_KEY` resolves.
-* :func:`csv_to_fc` / :func:`empty_fc` — the FIRMS CSV → FeatureCollection
+* `FirmsAuth` / `FirmsCredentials` — `MAP_KEY` resolution.
+* `AuthenticationError` — raised when no usable `MAP_KEY` resolves.
+* `csv_to_fc` / `empty_fc` — the FIRMS CSV → FeatureCollection
   mapper and its empty-result counterpart.
-* :data:`CATALOG_PATH` — path to the bundled sensor YAML;
+* `CATALOG_PATH` — path to the bundled sensor YAML;
   monkey-patchable in tests.
 
 Examples:

@@ -9,11 +9,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import cdsapi
 import pytest
 
 from earthlens.ecmwf import ECMWF, AuthenticationError, Variable
 from earthlens.ecmwf import endpoints as ep
+
+#: The `ecmwf` extra is optional, so a missing `cdsapi` skips this module
+#: rather than erroring the whole directory's collection.
+cdsapi = pytest.importorskip("cdsapi")
 
 pytestmark = [pytest.mark.unit]
 

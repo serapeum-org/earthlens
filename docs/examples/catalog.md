@@ -10,7 +10,7 @@ The `earthlens.chc` package covers every CHC product on `data.chc.ucsb.edu`
 — CHIRPS / CHIRP precipitation, CHIRTS temperature & humidity, CHIRPS-GEFS
 forecasts, CHPclim climatology, WBGT, SPI / SPEI, and CHC_CMIP6 scenario
 deltas. The catalog is pydantic-backed; `datasets` is a map of dataset key
-→ :class:`Dataset` carrying FTP path, spatial / temporal extent, available
+→ `Dataset` carrying FTP path, spatial / temporal extent, available
 formats, and a per-variable map.
 
 ```python
@@ -167,7 +167,7 @@ variable, append an entry to the matching per-family file under
 `_index.yaml`'s header comment.
 
 `get_variable(dataset_name, variable_name)` is the canonical lookup;
-`get_dataset(name)` returns the structural :class:`Dataset` record,
+`get_dataset(name)` returns the structural `Dataset` record,
 and `describe(name)` is a thin serializer over it.
 
 ### Regional reanalysis families: CARRA / CERRA / PAN-CARRA
@@ -445,7 +445,7 @@ validator runs on the final request.
 
 Every CDS request passes through
 `earthlens.ecmwf.constraints.validate_request()` before
-:meth:`cdsapi.Client.retrieve` is called. The validator runs five
+`cdsapi.Client.retrieve` is called. The validator runs five
 phases (cheap → expensive); the first failure is reported, so the
 user gets the most specific error possible:
 

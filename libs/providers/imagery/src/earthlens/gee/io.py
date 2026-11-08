@@ -3,14 +3,14 @@
 Three public helpers cover the typical "I built an `ee.FeatureCollection`,
 now get me a usable frame" path:
 
-* :func:`feature_collection_to_dataframe` — synchronous, one
+* `feature_collection_to_dataframe` — synchronous, one
   `getDownloadURL("CSV")` + `pandas.read_csv`. Suited to a single FC up
   to a few MB.
-* :func:`feature_collections_to_dataframe` — the parallel variant: maps
+* `feature_collections_to_dataframe` — the parallel variant: maps
   the above over an iterable using a thread pool, with a small retry
   budget around transient network errors. Returns one frame (column-
   concatenated).
-* :func:`feature_collection_to_gdf` — synchronous, one `fc.getInfo()`
+* `feature_collection_to_gdf` — synchronous, one `fc.getInfo()`
   → `GeoDataFrame`. Suited to small FCs (`getInfo` is rate-limited and
   capped at ~5000 features / ~10 MB).
 
@@ -170,17 +170,51 @@ def feature_collection_to_dataframe(
       `getDownloadURL` and return whatever EE returns; no columns
       are dropped on the client side.
 
+    Nothing is caught on the way: an Earth Engine failure building the
+    download URL, an HTTP failure fetching it, and a parse failure reading
+    the CSV all reach the caller as whatever the underlying library raised.
+
     Args:
         fc: The Earth Engine `FeatureCollection` to download.
         selectors: Optional iterable of property names to include.
             See semantic note above. Defaults to `None`.
 
     Returns:
-        A `DataFrame` of the FC's features.
+        A `DataFrame` with one row per feature, in the order Earth Engine
+        wrote the CSV.
 
-    Raises:
-        Exceptions from the underlying Earth Engine / HTTP / CSV-parsing
-        calls propagate verbatim.
+    Examples:
+        - Download every property and inspect the frame (needs an
+          initialised `ee`):
+            ```python
+            >>> import ee  # doctest: +SKIP
+            >>> from earthlens.gee import feature_collection_to_dataframe
+            >>> fc = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017")  # doctest: +SKIP
+            >>> df = feature_collection_to_dataframe(fc.limit(3))  # doctest: +SKIP
+            >>> len(df)  # doctest: +SKIP
+            3
+            >>> "system:index" in df.columns  # doctest: +SKIP
+            False
+
+            ```
+        - Ask for two properties only, and get exactly those columns back:
+            ```python
+            >>> import ee  # doctest: +SKIP
+            >>> from earthlens.gee import feature_collection_to_dataframe
+            >>> fc = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017")  # doctest: +SKIP
+            >>> df = feature_collection_to_dataframe(  # doctest: +SKIP
+            ...     fc.limit(3), selectors=["country_na", "wld_rgn"]
+            ... )
+            >>> list(df.columns)  # doctest: +SKIP
+            ['country_na', 'wld_rgn']
+
+            ```
+
+    See Also:
+        feature_collections_to_dataframe: The same download over many
+            collections, in parallel with retries.
+        feature_collection_to_gdf: Geometry-preserving `getInfo()` variant for
+            small collections.
     """
     if selectors is None:
         url = fc.getDownloadURL(filetype="CSV", selectors=None)
@@ -199,7 +233,7 @@ def feature_collections_to_dataframe(
 ) -> pd.DataFrame:
     """Download many `ee.FeatureCollection`s in parallel and column-concat them.
 
-    Each input FC is downloaded via :func:`feature_collection_to_dataframe`
+    Each input FC is downloaded via `feature_collection_to_dataframe`
     inside a `multiprocessing.dummy.Pool` (threads, not processes — Earth
     Engine's HTTP client is I/O-bound). Per-FC calls are retried on a
     fixed tuple of transient network errors with budget `tries=5,
@@ -219,7 +253,7 @@ def feature_collections_to_dataframe(
 
     Raises:
         ValueError: If `tries < 1` (propagated from
-            :func:`_retry_on_transient_errors`).
+            `_retry_on_transient_errors`).
     """
     fcs = list(feature_collections)
     if not fcs:
@@ -243,7 +277,7 @@ def feature_collection_to_gdf(
     feature's geometry through `shapely.geometry.shape`, and returns a
     `GeoDataFrame` with the requested CRS. Note: `getInfo()` is
     rate-limited and capped at ~5000 features / ~10 MB — for larger
-    collections, prefer :func:`feature_collection_to_dataframe` (and
+    collections, prefer `feature_collection_to_dataframe` (and
     keep the geometry as a property if you need it).
 
     Args:

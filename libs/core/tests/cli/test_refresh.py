@@ -12,8 +12,6 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
-import earthlens.stac.catalog as stac_catalog
-import earthlens.stac.cli as stac_cli
 from earthlens.cli import refresh as refresh_mod
 from earthlens.cli.adapter import list_backends, load_catalog
 from earthlens.cli.refresh import (
@@ -29,6 +27,13 @@ from earthlens.cli.refresh import (
     refresh_one,
     supported_providers,
 )
+
+#: Core's tests sweep the backend registry, so a handful of them need a
+#: real provider. The providers are separate distributions, so the import
+#: is soft: `cd libs/core && pytest` with only earthlens-core installed
+#: skips these rather than erroring the whole module.
+stac_catalog = pytest.importorskip("earthlens.stac.catalog")
+stac_cli = pytest.importorskip("earthlens.stac.cli")
 
 pytestmark = pytest.mark.cli
 
@@ -369,8 +374,9 @@ class TestAuditOne:
 
     def test_variable_drift_flags_a_recased_variable(self, monkeypatch):
         """A curated variable the server re-cased (wtmp -> WTMP) is drift (#1129)."""
-        import earthlens.erddap.cli as erddap_cli
-        from earthlens.erddap.catalog import Dataset
+        erddap_cli = pytest.importorskip("earthlens.erddap.cli")
+        _earthlens_erddap_catalog = pytest.importorskip("earthlens.erddap.catalog")
+        Dataset = _earthlens_erddap_catalog.Dataset
 
         record = Dataset(
             server_url="https://x/erddap",

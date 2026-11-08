@@ -8,19 +8,19 @@ file is packaged, and the real column names inside it.
 
 Three shapes matter and are modelled separately:
 
-* :class:`Extension` — one Zenodo record set (`base`, `grdc`, `germany`,
+* `Extension` — one Zenodo record set (`base`, `grdc`, `germany`,
   `denmark`, `israel`), carrying its licence, its `sources:` map, and one or
-  more :class:`Version` entries.
-* :class:`Version` — a specific, reproducible release of an extension. Pinning
+  more `Version` entries.
+* `Version` — a specific, reproducible release of an extension. Pinning
   a version rather than the moving concept DOI is what makes a request
   repeatable, and it is what carries `data_period` / `n_catchments` /
   `column_set`. `base` has two — the current `1.6` and the range-readable
   `1.2` — so the cheap path is data, not a special case in code.
-* :class:`ArchiveFile` — one downloadable artifact with its size, md5, and
+* `ArchiveFile` — one downloadable artifact with its size, md5, and
   crucially its `archive_format`. A `zip` is read in place over HTTP Range
   requests; a `tar.gz` is a single gzip stream that must be fetched whole.
 
-:data:`CATALOG_PATH` is the path to the bundled YAML.
+`CATALOG_PATH` is the path to the bundled YAML.
 """
 
 from __future__ import annotations
@@ -78,7 +78,7 @@ def _load_catalog_data(path: Path) -> dict[str, Any]:
     """Parse, validate, and cache the Caravan catalog at `path`.
 
     Args:
-        path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
+        path: Path to the catalog YAML (default `CATALOG_PATH`).
 
     Returns:
         dict[str, Any]: `{"datasets": {key: Extension}, "variables": {name:
@@ -194,8 +194,8 @@ class Variable(SummarisedLeaf):
             column_set: The archive's column-set variant.
 
         Returns:
-            str: :attr:`legacy_column` when the archive is `legacy` and this
-                variable declares one, otherwise :attr:`column`.
+            str: `legacy_column` when the archive is `legacy` and this
+                variable declares one, otherwise `column`.
 
         Examples:
             - PET is the one variable whose name changed between eras:
@@ -336,7 +336,7 @@ class Version(SummarisedLeaf):
             and cannot be indexed without downloading it, so its count is
             arithmetic and this is `False`.
         column_set: Which timeseries column-set variant this release ships.
-        files: Per timeseries format, the :class:`ArchiveFile` to read.
+        files: Per timeseries format, the `ArchiveFile` to read.
     """
 
     _summary_fields = (
@@ -390,9 +390,9 @@ class Extension(SummarisedLeaf):
         license: SPDX-ish licence id (every current row is `CC-BY-4.0`).
         attribution: The citation obligation the licence carries.
         license_file: Path to the in-archive licence text.
-        sources: Archive source directory to its :class:`Source` row.
-        default_version: Key into :attr:`versions` used when none is requested.
-        versions: Version key to its :class:`Version`.
+        sources: Archive source directory to its `Source` row.
+        default_version: Key into `versions` used when none is requested.
+        versions: Version key to its `Version`.
 
     Examples:
         - The default release is the one a bare request resolves to:
@@ -439,8 +439,8 @@ class Extension(SummarisedLeaf):
         """Return the requested release, or the row's default.
 
         Args:
-            version: A key into :attr:`versions`. `None` (the default) picks
-                :attr:`default_version`.
+            version: A key into `versions`. `None` (the default) picks
+                `default_version`.
 
         Returns:
             Version: The matching release.
@@ -474,13 +474,13 @@ class Catalog(AbstractCatalog[Extension]):
     """Extension and variable catalog for the Caravan backend.
 
     Reads the bundled `caravan_data_catalog.yaml` (shipped as package data) and
-    exposes its `extensions:` block as :class:`Extension` rows keyed by the
-    `dataset=` name, plus the shared `variables:` block as :class:`Variable`
+    exposes its `extensions:` block as `Extension` rows keyed by the
+    `dataset=` name, plus the shared `variables:` block as `Variable`
     rows. Instantiate with no arguments (`Catalog()`).
 
     Attributes:
-        extensions: Map from extension key to its :class:`Extension` row.
-        variables: Map from friendly variable name to its :class:`Variable`.
+        extensions: Map from extension key to its `Extension` row.
+        variables: Map from friendly variable name to its `Variable`.
 
     Examples:
         - Look up an extension and the archive it would read:
@@ -501,22 +501,22 @@ class Catalog(AbstractCatalog[Extension]):
     _catalog_kind: str = "Caravan catalog"
     _entry_noun: str = "extensions"
 
-    #: The extension rows live in the base :attr:`datasets` field so the
+    #: The extension rows live in the base `datasets` field so the
     #: inherited dict surface (`len`, `in`, `[]`, iteration) and
-    #: :meth:`get_dataset`'s did-you-mean hint work unchanged.
+    #: `get_dataset`'s did-you-mean hint work unchanged.
     datasets: dict[str, Extension] = Field(default_factory=dict)
     variables: dict[str, Variable] = Field(default_factory=dict)
     #: The YAML's informational `available_extensions:` block, including the
     #: records deliberately not wrapped. Named apart from the
-    #: :attr:`available_extensions` property, which lists the supported keys.
+    #: `available_extensions` property, which lists the supported keys.
     extension_index: list[dict[str, Any]] = Field(default_factory=list)
 
     @property
     def extensions(self) -> dict[str, Extension]:
-        """The extension map — alias for the base :attr:`datasets` field.
+        """The extension map — alias for the base `datasets` field.
 
         Returns:
-            dict[str, Extension]: The same mapping stored in :attr:`datasets`.
+            dict[str, Extension]: The same mapping stored in `datasets`.
         """
         return self.datasets
 
@@ -536,7 +536,7 @@ class Catalog(AbstractCatalog[Extension]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the
-                module-level :data:`CATALOG_PATH`.
+                module-level `CATALOG_PATH`.
 
         Returns:
             Catalog: A fully-populated catalog.
@@ -560,7 +560,7 @@ class Catalog(AbstractCatalog[Extension]):
     def get_extension(self, key: str) -> Extension:
         """Resolve an extension key to its row.
 
-        Thin wrapper over the inherited :meth:`get_dataset`, which raises a
+        Thin wrapper over the inherited `get_dataset`, which raises a
         `ValueError` with a did-you-mean hint on an unknown key.
 
         Args:

@@ -1,6 +1,6 @@
 """Credentials and authentication for the GloH2O MSWEP / MSWX backend.
 
-Hosts :class:`MswepAuth`, an :class:`earthlens.base.AbstractAuth`
+Hosts `MswepAuth`, an `earthlens.base.AbstractAuth`
 subclass that builds an authenticated **Google Drive v3** client for the
 share GloH2O grants a user once their access request is approved.
 
@@ -23,7 +23,7 @@ Two properties of the upstream shape the whole module:
   simplest setup is often the machine's existing Application Default
   Credentials.
 
-The credential-resolution ladder used by :meth:`MswepAuth.configure` is:
+The credential-resolution ladder used by `MswepAuth.configure` is:
 
 1. An explicit `token_path` / `service_key` file — dispatched on its
    `type`: a Google **authorized-user** token.json (`client_id` /
@@ -41,7 +41,7 @@ Note:
     `rclone` writes its built-in OAuth client id / secret **nowhere** —
     when the user leaves them blank at `rclone config` time, the remote
     carries a `token` that cannot be refreshed by anything but `rclone`
-    itself. :func:`credentials_from_rclone_remote` detects that and
+    itself. `credentials_from_rclone_remote` detects that and
     raises with a pointer to `rclone`'s "making your own client id"
     instructions rather than emitting a credential that dies at the
     first refresh.
@@ -78,7 +78,7 @@ MSWX_REQUEST_URL = "https://www.gloh2o.org/mswx/"
 #: when a remote's `client_id` / `client_secret` are blank.
 RCLONE_CLIENT_ID_URL = "https://rclone.org/drive/#making-your-own-client-id"
 
-#: Environment fallbacks for every field on :class:`MswepCredentials`.
+#: Environment fallbacks for every field on `MswepCredentials`.
 FOLDER_ID_ENV = "MSWEP_DRIVE_FOLDER"
 TOKEN_FILE_ENV = "MSWEP_TOKEN_FILE"  # nosec B105 - not a secret (env var name)
 RCLONE_CONFIG_ENV = "MSWEP_RCLONE_CONFIG"
@@ -94,7 +94,7 @@ class AuthenticationError(_BaseAuthenticationError):
     credential.
 
     A subclass of the cross-backend
-    :class:`earthlens.base.AuthenticationError` so callers can catch
+    `earthlens.base.AuthenticationError` so callers can catch
     every backend's auth failure with one `except` clause.
     """
 
@@ -161,7 +161,7 @@ def credentials_from_service_account(path: Path) -> Any:
 
     Returns:
         Any: A `google.oauth2.service_account.Credentials` scoped to
-            :data:`DRIVE_SCOPE`.
+            `DRIVE_SCOPE`.
 
     Raises:
         ImportError: When the `mswep` extra is not installed.
@@ -261,7 +261,7 @@ def credentials_from_rclone_remote(config_path: Path, remote: str) -> Any:
 
     Returns:
         Any: A `google.oauth2.credentials.Credentials` scoped to
-            :data:`DRIVE_SCOPE`.
+            `DRIVE_SCOPE`.
 
     Raises:
         AuthenticationError: When the config or remote is missing, the
@@ -441,7 +441,7 @@ class MswepAuth(AbstractAuth[MswepCredentials]):
     """Build an authenticated Google Drive v3 client for the GloH2O share.
 
     Wraps the credential ladder documented at module level in the
-    :class:`earthlens.base.AbstractAuth` contract. :meth:`configure` is
+    `earthlens.base.AbstractAuth` contract. `configure` is
     idempotent, so it is safe to call on every `download()`.
 
     The Drive client is **injectable**: passing `service=` skips
@@ -450,11 +450,11 @@ class MswepAuth(AbstractAuth[MswepCredentials]):
     Google SDK.
 
     Attributes:
-        _creds: The :class:`MswepCredentials` passed at construction.
+        _creds: The `MswepCredentials` passed at construction.
         _service: The built Drive v3 client, or `None` before
-            :meth:`configure` runs.
+            `configure` runs.
         _folder_id: The resolved shared-folder id, or `None` before
-            :meth:`configure` runs.
+            `configure` runs.
 
     Examples:
         - An injected service authenticates with no credentials at all:
@@ -481,15 +481,15 @@ class MswepAuth(AbstractAuth[MswepCredentials]):
         """Store the locators; does not contact Google.
 
         Construction is side-effect-free — the caller (or the backend's
-        `_initialize`) must call :meth:`configure`, or use the
+        `_initialize`) must call `configure`, or use the
         context-manager form.
 
         Args:
             credentials: Where to find the user's Drive credential.
-                Defaults to a fresh :class:`MswepCredentials`, which
+                Defaults to a fresh `MswepCredentials`, which
                 resolves everything from the environment.
             service: Optional pre-built Drive client. When given,
-                :meth:`configure` uses it verbatim and resolves no
+                `configure` uses it verbatim and resolves no
                 credentials — the seam the unit suite drives.
         """
         super().__init__(credentials or MswepCredentials())
@@ -501,7 +501,7 @@ class MswepAuth(AbstractAuth[MswepCredentials]):
         """Return the Drive v3 client.
 
         Raises:
-            AuthenticationError: When :meth:`configure` has not run.
+            AuthenticationError: When `configure` has not run.
         """
         if self._service is None:
             raise AuthenticationError(
@@ -515,7 +515,7 @@ class MswepAuth(AbstractAuth[MswepCredentials]):
         """Return the resolved shared-folder id.
 
         Raises:
-            AuthenticationError: When :meth:`configure` has not run.
+            AuthenticationError: When `configure` has not run.
         """
         if self._folder_id is None:
             raise AuthenticationError(
@@ -584,7 +584,7 @@ class MswepAuth(AbstractAuth[MswepCredentials]):
     def configure(self) -> None:
         """Resolve credentials and build the Drive v3 client.
 
-        Idempotent — short-circuits once :meth:`is_authenticated`
+        Idempotent — short-circuits once `is_authenticated`
         returns `True`. An injected `service=` is used verbatim, so no
         credential resolution or SDK import happens in tests.
 

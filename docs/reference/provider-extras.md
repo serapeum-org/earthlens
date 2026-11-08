@@ -36,7 +36,7 @@ it is bundled in `earthlens[all]`.
 | `goes` | atmosphere | `goes` | `earthlens-core[s3]` (boto3) | ✅ |
 | `hdx` | hazards | `hdx` | `hdx-python-api` | ✅ |
 | `jaxa` | imagery | `jaxa` | `jaxa.earth`, `gportal` | ✅ |
-| `nwm` | ocean | `nwm` | `earthlens-core[s3]` (boto3), `pyramids-gis[parquet]` | ✅ |
+| `nwm` | ocean | `nwm` | `earthlens-core[s3]` (boto3), `pyramids-core[parquet]` | ✅ |
 | `nwp` | atmosphere | `nwp` | `herbie-data`, `ecmwf-opendata`, `ecmwflibs` (win) | ✅ |
 | `obis` | ocean | `obis` | `pyobis` | ✅ |
 | `openeo` | imagery | `openeo` | `openeo` | ✅ |
@@ -45,7 +45,7 @@ it is bundled in `earthlens[all]`.
 | `radar` | atmosphere | `radar` | `earthlens-core[s3]` (boto3) | ✅ |
 | `s3` | atmosphere | `s3` | `earthlens-core[s3]` (boto3 / botocore) | ✅ |
 | `sentinel_hub` | imagery | `sentinel-hub` | `sentinelhub` | ✅ |
-| `stac` | imagery | `stac` | `pyramids-gis[stac]` | ✅ |
+| `stac` | imagery | `stac` | `pyramids-core[stac]` | ✅ |
 | `tropycal` | atmosphere | `tropycal` | `tropycal`, `cartopy` | ✅ |
 | `usgs_water` | ocean | `usgs-water` | `dataretrieval` | ✅ |
 | `worldpop` | land | `worldpop` | `worldpoppy`, `py7zr` | ✅ |

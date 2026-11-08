@@ -53,12 +53,12 @@ _DATE_FILTER_ROLLUPS = frozenset({"days", "months", "years"})
 class OpenaqClient:
     """Minimal OpenAQ v3 client: auth header, pagination, back-off.
 
-    Wraps a :class:`requests.Session`, attaching the `X-API-Key`
+    Wraps a `requests.Session`, attaching the `X-API-Key`
     header to every request and retrying on `429` with a
     `Retry-After`-aware exponential back-off. Exposes the two list
     endpoints the backend needs — `locations` and a sensor's
     measurements (raw or a server-side rollup) — plus a generic
-    :meth:`paginate` over any v3 list resource.
+    `paginate` over any v3 list resource.
 
     Attributes:
         max_retries: Maximum number of `429` retries before the last
@@ -82,7 +82,7 @@ class OpenaqClient:
 
         Args:
             api_key: The OpenAQ `X-API-Key` to attach to every request.
-            session: An existing :class:`requests.Session` to reuse.
+            session: An existing `requests.Session` to reuse.
                 Defaults to a fresh session. Injectable so tests can
                 supply a fake transport.
             max_retries: Maximum `429` retries before raising.
@@ -91,7 +91,7 @@ class OpenaqClient:
             timeout: Per-request timeout in seconds — a float or a
                 `(connect, read)` pair.
             sleep: The sleep function used between retries. Defaults to
-                :func:`time.sleep`; injectable so tests run without
+                `time.sleep`; injectable so tests run without
                 real delays.
         """
         self._http = HttpClient(
@@ -130,7 +130,7 @@ class OpenaqClient:
         immediately.
 
         Args:
-            path: Endpoint path relative to :data:`BASE_URL` (e.g.
+            path: Endpoint path relative to `BASE_URL` (e.g.
                 `"locations"`, `"sensors/42/days"`).
             params: Query parameters.
 
@@ -158,15 +158,15 @@ class OpenaqClient:
         Walks `page=1, 2, ...` until the endpoint is exhausted (or
         `max_items` is reached), yielding each element of the `results`
         array. The requested `limit` is clamped to
-        :data:`_MAX_PAGE_SIZE` (the v3 maximum), so the server never
+        `_MAX_PAGE_SIZE` (the v3 maximum), so the server never
         returns more rows than asked and a page shorter than that limit
         reliably marks the last page — no silent truncation, no extra
         empty round-trip.
 
         Args:
-            path: List-endpoint path relative to :data:`BASE_URL`.
+            path: List-endpoint path relative to `BASE_URL`.
             params: Query parameters; `limit` requests the page size
-                (clamped to :data:`_MAX_PAGE_SIZE`).
+                (clamped to `_MAX_PAGE_SIZE`).
             max_items: Stop after yielding this many results. `None`
                 (default) means no cap — exhaust the endpoint.
 
@@ -243,7 +243,7 @@ class OpenaqClient:
         `/days`, `/months`, and `/years` rollups take `date_from`/
         `date_to` (calendar dates) and silently ignore a `datetime_*`
         filter. This method routes to the correct one
-        (see :data:`_DATE_FILTER_ROLLUPS`).
+        (see `_DATE_FILTER_ROLLUPS`).
 
         Args:
             sensor_id: The OpenAQ sensor id.

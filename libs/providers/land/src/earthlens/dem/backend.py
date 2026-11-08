@@ -62,7 +62,7 @@ class DEM(AbstractDataSource):
         fmt: `strptime` format for `start` / `end`.
         dataset: Catalog key — `"cop-dem-glo-30"` (default) or
             `"cop-dem-glo-90"`.
-        catalog: Optional pre-built :class:`Catalog` (tests inject
+        catalog: Optional pre-built `Catalog` (tests inject
             one); defaults to the bundled catalog.
 
     Examples:
@@ -136,7 +136,7 @@ class DEM(AbstractDataSource):
 
         Returns:
             None: The auth object owns the client (accessed via
-                :meth:`_client`).
+                `_client`).
         """
         self._auth = S3Auth(
             S3Credentials(region=self._dataset.region),
@@ -146,7 +146,7 @@ class DEM(AbstractDataSource):
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
-        """Return a single-instant :class:`TemporalExtent` (DEM is static).
+        """Return a single-instant `TemporalExtent` (DEM is static).
 
         DEM has no time axis; the returned extent carries a single-date
         `DatetimeIndex` derived from `start` so the shared
@@ -192,7 +192,7 @@ class DEM(AbstractDataSource):
         `_fetch` calls `head_object` on each candidate.
 
         Returns:
-            list[RemoteProduct]: One :class:`RemoteProduct` per tile;
+            list[RemoteProduct]: One `RemoteProduct` per tile;
                 `href` carries the S3 key and `metadata` carries the
                 bucket, the tile identifier, and the SW corner.
         """
@@ -225,7 +225,7 @@ class DEM(AbstractDataSource):
         result — never a crash.
 
         Args:
-            products: The candidate products from :meth:`_search`.
+            products: The candidate products from `_search`.
 
         Returns:
             list[Path]: One local path per tile that existed and was
@@ -255,7 +255,7 @@ class DEM(AbstractDataSource):
         """Head + download one candidate tile; return `None` if absent.
 
         Args:
-            product: The candidate :class:`RemoteProduct` to fetch.
+            product: The candidate `RemoteProduct` to fetch.
 
         Returns:
             Path | None: The written local path, or `None` when the key

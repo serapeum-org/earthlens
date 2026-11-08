@@ -1,6 +1,6 @@
 """Variable-catalog loader for the CDS-backed ECMWF data source.
 
-Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
+Hosts `Catalog`, the pydantic-backed reader for the bundled
 CADS catalog spanning all five stores. The catalog
 ships as a directory of per-family YAML files under
 `src/earthlens/ecmwf/catalog/` — one `<family>.yaml` per product
@@ -9,31 +9,31 @@ family (CDS: `era5.yaml`, `carra.yaml`, `cerra.yaml`, `cmip5.yaml`,
 `ads.yaml`; EWDS: `ewds.yaml`, `efas.yaml`, `fire.yaml`) plus a single
 `_index.yaml` carrying the schema header and the informational
 per-store `available_datasets:` index. The loader unions every file's
-`datasets:` block into one :class:`Catalog` at construction time (a
+`datasets:` block into one `Catalog` at construction time (a
 dataset key declared in two files is a load-time error), the same way
 the GEE / CMEMS catalogs merge. Split out of
-:mod:`earthlens.ecmwf.backend` so the request / download machinery and
+`earthlens.ecmwf.backend` so the request / download machinery and
 the catalog file-IO live in separate modules.
 
 The two consumed top-level sections each map to a typed field on
-:class:`Catalog`:
+`Catalog`:
 
 * `available_datasets` (informational per-store index of dataset
-  names across all five stores) → :attr:`Catalog.available_datasets`
+  names across all five stores) → `Catalog.available_datasets`
 * `datasets` (structural map of CDS datasets, each carrying a
-  monthly variant and a per-variable map) → :attr:`Catalog.datasets`,
-  with each value a :class:`Dataset`
+  monthly variant and a per-variable map) → `Catalog.datasets`,
+  with each value a `Dataset`
 
 The catalog has no flat per-variable view: variables are addressed
 by the `(dataset_name, variable_name)` pair via
-:meth:`Catalog.get_variable`. The same short code can legitimately
+`Catalog.get_variable`. The same short code can legitimately
 appear under more than one dataset (e.g. `"2m-temperature"` lives
 in both `reanalysis-era5-single-levels` and
 `reanalysis-era5-land`), so the dataset name is part of the
 identity.
 
 The path to the bundled catalog directory lives at
-:data:`CATALOG_PATH`; tests can monkey-patch that module attribute to
+`CATALOG_PATH`; tests can monkey-patch that module attribute to
 redirect the loader at a temporary directory or single YAML file (the
 loader accepts both).
 
@@ -182,7 +182,7 @@ def _load_catalog_data(
     """Parse, validate, and cache the CDS catalog at `path`.
 
     Returns a `(available_datasets, datasets)` tuple of the same shape
-    :class:`Catalog` exposes. When `path` is a directory, every `*.yaml`
+    `Catalog` exposes. When `path` is a directory, every `*.yaml`
     is merged: `available_datasets:` entries are concatenated and
     `datasets:` maps are unioned (a dataset key declared in two files is
     an error). `available_datasets:` may be either a flat list of ids or a
@@ -261,12 +261,12 @@ def _build_dataset_map(
     datasets_yaml: dict[str, dict[str, Any]],
     catalog_path: Path,
 ) -> tuple[dict[str, Dataset], int]:
-    """Build the structural per-dataset :class:`Dataset` map (N1).
+    """Build the structural per-dataset `Dataset` map (N1).
 
     Walks every entry in `datasets_yaml`, validates each variable into
-    a :class:`Variable`, and packs the per-dataset metadata (monthly
+    a `Variable`, and packs the per-dataset metadata (monthly
     cross-reference, pressure_level / product_type defaults, extras,
-    request_kind) into a :class:`Dataset`. Returns the map plus the
+    request_kind) into a `Dataset`. Returns the map plus the
     total variable count (used by the caller to fail loudly when a
     catalog declares zero variables).
 
@@ -279,7 +279,7 @@ def _build_dataset_map(
         of variables built across all datasets.
 
     Raises:
-        ValueError: If any variable fails :class:`Variable` validation.
+        ValueError: If any variable fails `Variable` validation.
     """
     structural: dict[str, Dataset] = {}
     total_vars = 0
@@ -521,15 +521,15 @@ def _denotes_temporal_aggregate(value: Any) -> bool:
 
 
 class Variable(FluxableLeaf):
-    """Per-variable catalog entry consumed by :class:`ECMWF`.
+    """Per-variable catalog entry consumed by `ECMWF`.
 
     A frozen pydantic model carrying the metadata for one row in the
-    bundled CDS catalog. Loaded through :class:`Catalog`, which
-    rewraps any :class:`pydantic.ValidationError` with the offending
+    bundled CDS catalog. Loaded through `Catalog`, which
+    rewraps any `pydantic.ValidationError` with the offending
     row's catalog key so a typo in the file (e.g. `cd_dataset` vs
     `cds_dataset`) surfaces at import time, not mid-download.
     Inherits `types` + `is_flux` from
-    :class:`earthlens.base.FluxableLeaf`.
+    `earthlens.base.FluxableLeaf`.
 
     Attributes:
         cds_dataset: CDS dataset short name the retrieve is sent to (the
@@ -724,7 +724,7 @@ class Variable(FluxableLeaf):
         `number_para` / `download type` / `var_name` were the
         request-shape keys of the legacy MARS-ECMWFAPI flow. They are
         meaningless under cdsapi and would silently corrupt requests
-        if they reached :meth:`ECMWF._api`; reject them at load time so
+        if they reached `ECMWF._api`; reject them at load time so
         a stale catalog row fails loud instead of mid-download.
         """
         if not isinstance(value, dict):
@@ -875,7 +875,7 @@ class Dataset(SummarisedLeaf):
     bundled CDS catalog — the monthly-aggregate variant of the
     dataset, the default pressure levels (for pressure-level
     datasets), and the per-variable map. Same dataset name is used
-    as the parent key in :attr:`Catalog.datasets`; it is not stored
+    as the parent key in `Catalog.datasets`; it is not stored
     again here.
 
     Attributes:
@@ -887,7 +887,7 @@ class Dataset(SummarisedLeaf):
             for single-level datasets. Propagated to each variable's
             `cds_pressure_level` at load time.
         extras: Default extra CDS request parameters propagated into
-            each child :class:`Variable`'s `extras` map. Per-row
+            each child `Variable`'s `extras` map. Per-row
             `extras:` overrides win over these defaults. Carries
             the family-wide selectors (e.g. `domain`, `leadtime_hour`,
             `experiment`, `model`) that the dataset's request shape
@@ -971,11 +971,11 @@ class Catalog(AbstractCatalog[Dataset]):
     Reads the bundled CDS catalog (the `catalog/` directory, shipped as
     package data) and exposes its consumed top-level sections as typed
     pydantic fields.
-    Instantiate with no arguments (`Catalog()`) — :func:`model_post_init`
+    Instantiate with no arguments (`Catalog()`) — `model_post_init`
     parses the YAML and populates every field in one pass.
 
     Variables are addressed by the `(dataset_name, variable_name)`
-    pair via :meth:`get_variable`; there is no flat per-code lookup.
+    pair via `get_variable`; there is no flat per-code lookup.
     The same short code can legitimately appear under more than one
     dataset (e.g. `"2m-temperature"` lives in both
     `reanalysis-era5-single-levels` and `reanalysis-era5-land`), so
@@ -987,7 +987,7 @@ class Catalog(AbstractCatalog[Dataset]):
             per-store `available_datasets:` block in `_index.yaml`; runtime
             code does not consume it.
         datasets: Structural map keyed by CDS dataset short name. Each
-            value is a :class:`Dataset` carrying that dataset's
+            value is a `Dataset` carrying that dataset's
             monthly-aggregate variant and its per-variable map. The
             authoritative store: every catalog lookup goes through
             it.
@@ -1007,7 +1007,7 @@ class Catalog(AbstractCatalog[Dataset]):
 
             ```
         - The same short code under a different dataset is a
-          different :class:`Variable`:
+          different `Variable`:
 
             ```python
             >>> from earthlens.ecmwf import Catalog
@@ -1101,23 +1101,23 @@ class Catalog(AbstractCatalog[Dataset]):
     ) -> Catalog:
         """Read the CDS catalog + providers registry from disk (cached).
 
-        Mirrors :meth:`earthlens.gee.Catalog.load` so the two backends
+        Mirrors `earthlens.gee.Catalog.load` so the two backends
         feel identical. Validates that every `Dataset.provider` slug
         is in the registry; an unregistered slug is a load-time error.
 
         Args:
             catalog_path: Path to a catalog directory (of per-family
                 `*.yaml` files) or a single YAML file. Defaults to
-                module-level :data:`CATALOG_PATH`.
+                module-level `CATALOG_PATH`.
             providers_path: Path to `providers.yaml`. Defaults to
-                module-level :data:`PROVIDERS_PATH`.
+                module-level `PROVIDERS_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog`.
+            A fully-populated `Catalog`.
 
         Raises:
-            ValueError: Propagated from :func:`_load_catalog_data` or
-                :func:`earthlens.base.providers.load_providers`, plus
+            ValueError: Propagated from `_load_catalog_data` or
+                `earthlens.base.providers.load_providers`, plus
                 an unregistered-slug error if the YAML references a
                 provider not in the registry.
         """
@@ -1150,11 +1150,11 @@ class Catalog(AbstractCatalog[Dataset]):
         )
 
     def get_variable(self, dataset_name: str, variable_name: str) -> Variable:
-        """Return the :class:`Variable` for a `(dataset, code)` pair.
+        """Return the `Variable` for a `(dataset, code)` pair.
 
         Args:
             dataset_name: CDS dataset short name as it appears as a
-                key in :attr:`datasets` (e.g.
+                key in `datasets` (e.g.
                 `"reanalysis-era5-single-levels"`).
             variable_name: Short variable code as it appears as a
                 YAML key under that dataset (e.g.
@@ -1223,7 +1223,7 @@ class Catalog(AbstractCatalog[Dataset]):
     # `get_dataset(name)` (with the did-you-mean hint) and the dict-like
     # `__getitem__` / `__contains__` / `__iter__` / `__len__` / `__repr__`
     # / `__str__` dunders are inherited from
-    # :class:`earthlens.base.AbstractCatalog` (M1 in
+    # `earthlens.base.AbstractCatalog` (M1 in
     # the cross-backend catalog comparison).
 
     def health(self) -> dict[str, list[str]]:
@@ -1278,7 +1278,7 @@ class Catalog(AbstractCatalog[Dataset]):
 
         Args:
             dataset_name: CDS dataset short name as it appears as a
-                key in :attr:`datasets` (e.g.
+                key in `datasets` (e.g.
                 `"reanalysis-era5-land"`).
 
         Returns:
@@ -1291,7 +1291,7 @@ class Catalog(AbstractCatalog[Dataset]):
 
         Raises:
             KeyError: If `dataset_name` is not a curated dataset
-                (i.e. not present in :attr:`datasets`).
+                (i.e. not present in `datasets`).
 
         Examples:
             - Describe ERA5-Land at a glance:
@@ -1327,7 +1327,7 @@ class Catalog(AbstractCatalog[Dataset]):
         request dict with one value per selector. Useful for:
 
         * verifying a CDS account is set up correctly (submit the
-          returned dict via :meth:`cdsapi.Client.retrieve` and watch
+          returned dict via `cdsapi.Client.retrieve` and watch
           for a NetCDF rather than a 400),
         * seeing what a valid extras schema looks like for a new
           dataset before authoring catalog rows,
@@ -1338,12 +1338,12 @@ class Catalog(AbstractCatalog[Dataset]):
 
         Args:
             dataset_name: CDS dataset short name. Does not need to be
-                in :attr:`datasets` — the constraints endpoint is
+                in `datasets` — the constraints endpoint is
                 hit directly so any addressable dataset works.
 
         Returns:
             dict[str, Any]: A request dict ready to pass to
-            :meth:`cdsapi.Client.retrieve`. Empty dict (besides
+            `cdsapi.Client.retrieve`. Empty dict (besides
             `data_format`) when the dataset's constraints are
             empty / unreachable.
 
@@ -1401,7 +1401,7 @@ class Catalog(AbstractCatalog[Dataset]):
         """Return the user's recent CDS retrieval jobs.
 
         Thin wrapper that delegates to
-        :func:`earthlens.ecmwf.jobs.list_recent_jobs` (N3); see that
+        `earthlens.ecmwf.jobs.list_recent_jobs` (N3); see that
         for the full docstring. Kept on `Catalog` as a convenience so
         `Catalog().list_recent_jobs(...)` keeps working.
         """
@@ -1418,7 +1418,7 @@ class Catalog(AbstractCatalog[Dataset]):
         """Download the result asset of a successful CDS job.
 
         Thin wrapper that delegates to
-        :func:`earthlens.ecmwf.jobs.download_job` (N3); see that for
+        `earthlens.ecmwf.jobs.download_job` (N3); see that for
         the full docstring.
         """
         return _download_job_impl(job_id, target, chunk_size=chunk_size)

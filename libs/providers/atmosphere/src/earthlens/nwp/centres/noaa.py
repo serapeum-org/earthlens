@@ -2,16 +2,16 @@
 
 Herbie owns the `.idx` byte-range subsetting that cuts >99 % of the
 download volume for the NOAA models (GFS / GEFS / HRRR / RAP / NAM /
-…). :class:`NOAACentre` is the thin adapter: it maps the requested
+…). `NOAACentre` is the thin adapter: it maps the requested
 earthlens params to a single Herbie `search` regex, builds the
 mirror-priority list from the `mirror=` kwarg, and returns the local
 path of the variable-subset GRIB2 that Herbie wrote.
 
-Herbie is imported lazily inside :meth:`NOAACentre.fetch_one` (never at
+Herbie is imported lazily inside `NOAACentre.fetch_one` (never at
 module import) for two reasons: its import chain pulls `cfgrib` /
 `eccodes` (the `[nwp]` extra + the eccodes binary), and its package
 `__init__` prints a Unicode banner that crashes a cp1252 Windows
-console — :func:`_import_herbie` captures that banner and rewrites a
+console — `_import_herbie` captures that banner and rewrites a
 missing-dependency import into a friendly `earthlens[nwp]` hint.
 """
 

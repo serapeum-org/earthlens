@@ -32,7 +32,7 @@ def _rest_json(
     """GET `url` through the shared `HttpClient` and decode the JSON body.
 
     Routes every WorldPop metadata GET through
-    :class:`earthlens.base.http.HttpClient` so the four query helpers share
+    `earthlens.base.http.HttpClient` so the four query helpers share
     one `Retry-After`-aware retry / back-off policy against the hub's
     occasional `429`/`5xx`. A passed `session` is reused (connection
     pooling); otherwise each call opens a fresh connection.

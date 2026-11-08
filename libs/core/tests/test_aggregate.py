@@ -80,7 +80,7 @@ def _make_nc(
 
 
 class TestAggregationConfig:
-    """Tests for :class:`AggregationConfig` (H1 surface)."""
+    """Tests for `AggregationConfig` (H1 surface)."""
 
     def test_freq_is_required(self):
         """`freq` has no default — omitting it raises ValidationError."""
@@ -749,7 +749,7 @@ class TestAggregateNetcdf:
     """Smoke tests for the public entry point.
 
     Heavy round-trip behaviour against a synthetic NetCDF lives in
-    :class:`TestAggregateNetcdfRoundTrip` (H7). These checks only
+    `TestAggregateNetcdfRoundTrip` (H7). These checks only
     verify the function reaches the pyramids layer.
     """
 

@@ -4,17 +4,17 @@
 aggregator of >180 air-quality monitoring networks worldwide (US
 AirNow, EEA, UK AURN, Sensor.Community, and many national networks) —
 and returns ground-station pollutant measurements as a long-format
-:class:`pandas.DataFrame` (one row per measurement).
+`pandas.DataFrame` (one row per measurement).
 
 This is the package's first `tabular` backend: the result is a table
 of per-row station observations, not a gridded array, so
-`OUTPUT_KIND = "tabular"` and the :class:`earthlens.earthlens.EarthLens`
+`OUTPUT_KIND = "tabular"` and the `earthlens.earthlens.EarthLens`
 facade rejects an `aggregate=` argument (there is no meaningful
 gridded reduction of a pollutant timeseries; use the server-side
 `temporal_resolution` rollup instead).
 
 HTTP path: a thin `requests`-based client
-(:class:`earthlens.openaq.client.OpenaqClient`) owns pagination and
+(`earthlens.openaq.client.OpenaqClient`) owns pagination and
 the `429`/`Retry-After` rate-limit back-off, rather than the official
 (pre-v1, unstable) `openaq` SDK — `requests` is already a core
 earthlens dependency, so this adds none, and the rate-limit handling
@@ -88,14 +88,14 @@ class OpenAQ(AbstractDataSource):
     Fetches ground-station pollutant measurements for a bbox / date
     window / parameter list through the same `download()` shape every
     other earthlens backend uses, and returns a long-format
-    :class:`pandas.DataFrame` (one row per measurement). The query is
-    a search/fetch split: :meth:`_search` enumerates one product per
+    `pandas.DataFrame` (one row per measurement). The query is
+    a search/fetch split: `_search` enumerates one product per
     sensor (cheap — locations + sensor enumeration, no measurement
-    bytes), and :meth:`_fetch` pulls the measurements per sensor with
+    bytes), and `_fetch` pulls the measurements per sensor with
     rate-limit back-off.
 
     Authentication is a single free `X-API-Key`, resolved once by
-    :meth:`_initialize` via :class:`OpenaqAuth` (explicit `api_key=`
+    `_initialize` via `OpenaqAuth` (explicit `api_key=`
     then the `OPENAQ_API_KEY` env var).
 
     Attributes:
@@ -207,14 +207,14 @@ class OpenAQ(AbstractDataSource):
         )
 
     def _initialize(self):
-        """Build :class:`OpenaqAuth` and resolve the API key.
+        """Build `OpenaqAuth` and resolve the API key.
 
         Returns `None` so the parent binds no opaque client object —
         OpenAQ has no global SDK client; the resolved key lives on
         `self._auth` and is attached per-request by the HTTP client.
 
         Raises:
-            AuthenticationError: When :meth:`OpenaqAuth.configure`
+            AuthenticationError: When `OpenaqAuth.configure`
                 finds no key (no `api_key=` and no `OPENAQ_API_KEY`).
         """
         self._auth = OpenaqAuth(
@@ -232,7 +232,7 @@ class OpenAQ(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse the `[start, end]` window into a :class:`TemporalExtent`.
+        """Parse the `[start, end]` window into a `TemporalExtent`.
 
         OpenAQ fetches the whole window per sensor in one paginated
         call (optionally rolled up server-side), so there is no
@@ -284,7 +284,7 @@ class OpenAQ(AbstractDataSource):
     def _client(self) -> OpenaqClient:
         """Build (once) and return the rate-limit-aware HTTP client.
 
-        The client is created lazily — after :meth:`_initialize` has
+        The client is created lazily — after `_initialize` has
         resolved the API key — and cached on the instance, so a
         multi-sensor `_fetch` reuses one `requests.Session`.
 
@@ -293,7 +293,7 @@ class OpenAQ(AbstractDataSource):
 
         Raises:
             AuthenticationError: When the auth was never configured
-                (reading :attr:`OpenaqAuth.api_key` before
+                (reading `OpenaqAuth.api_key` before
                 `configure()`).
         """
         if self._client_obj is None:
@@ -314,7 +314,7 @@ class OpenAQ(AbstractDataSource):
         )
 
     def _search(self) -> list[RemoteProduct]:
-        """Enumerate one :class:`RemoteProduct` per matching sensor.
+        """Enumerate one `RemoteProduct` per matching sensor.
 
         Lists monitoring locations in the bbox filtered by the
         requested parameter ids (cheap — locations + sensor
@@ -383,14 +383,14 @@ class OpenAQ(AbstractDataSource):
 
         Widens the inherited `-> list[Path]` contract: a tabular
         backend returns in-memory long-format
-        :class:`pandas.DataFrame`s, not file paths (the `R4` finding —
+        `pandas.DataFrame`s, not file paths (the `R4` finding —
         the composition is sound because `_api_via_search_fetch` only
         short-circuits on the empty product list and otherwise returns
         this list verbatim). Each sensor's measurements are fetched
-        with `429`/`Retry-After` back-off via :class:`OpenaqClient`.
+        with `429`/`Retry-After` back-off via `OpenaqClient`.
 
         Args:
-            products: The list returned by :meth:`_search`.
+            products: The list returned by `_search`.
 
         Returns:
             list[pd.DataFrame]: One schema-shaped frame per product, in
@@ -403,7 +403,7 @@ class OpenAQ(AbstractDataSource):
         """Fetch one sensor's measurements and shape them to the schema.
 
         Args:
-            product: One :class:`RemoteProduct` from :meth:`_search`.
+            product: One `RemoteProduct` from `_search`.
 
         Returns:
             pd.DataFrame: The sensor's rows in the long-format schema
@@ -436,8 +436,8 @@ class OpenAQ(AbstractDataSource):
     ) -> pd.DataFrame:
         """Fetch measurements, write them to `path`, and return the frame.
 
-        Runs the cheap :meth:`_search` (locations + sensors) then the
-        rate-limited :meth:`_fetch` (per-sensor measurements), wrapping
+        Runs the cheap `_search` (locations + sensors) then the
+        rate-limited `_fetch` (per-sensor measurements), wrapping
         the per-sensor loop in a `tqdm` progress bar. The per-product
         frames are concatenated into one long-format DataFrame, written
         to `path` as CSV (or Parquet), and returned. An empty result
@@ -501,7 +501,7 @@ class OpenAQ(AbstractDataSource):
         """C3 composition with an explicit per-sensor progress bar.
 
         Mirrors the CMEMS backend's progress-aware composition: run the
-        cheap :meth:`_search`, then map :meth:`_fetch_one` over the
+        cheap `_search`, then map `_fetch_one` over the
         products wrapped in a `tqdm` bar (disabled when `progress_bar`
         is `False`). Short-circuits on an empty search so `_fetch_one`
         is never called when there is nothing to fetch.
@@ -558,7 +558,7 @@ def _empty_frame() -> pd.DataFrame:
     whether any measurements came back.
 
     Returns:
-        pd.DataFrame: Zero rows, :data:`_SCHEMA` columns and dtypes.
+        pd.DataFrame: Zero rows, `_SCHEMA` columns and dtypes.
     """
     return pd.DataFrame({column: [] for column in _SCHEMA}).astype(_SCHEMA)
 
@@ -596,15 +596,15 @@ def _measurement_row(
 
     The station-level fields (`station_id` / `parameter` / `units` /
     `lat` / `lon` / `provider`) come from the product metadata captured
-    in :meth:`OpenAQ._search`; only `value` and `datetime_utc` come
+    in `OpenAQ._search`; only `value` and `datetime_utc` come
     from the measurement object.
 
     Args:
-        product: The sensor's :class:`RemoteProduct`.
+        product: The sensor's `RemoteProduct`.
         measurement: One measurement result object for that sensor.
 
     Returns:
-        dict[str, Any]: A row keyed by the :data:`_SCHEMA` columns.
+        dict[str, Any]: A row keyed by the `_SCHEMA` columns.
     """
     meta = product.metadata
     return {

@@ -1,6 +1,6 @@
 """Optional Personal Access Token resolution for the USGS Water backend.
 
-Hosts :class:`UsgsWaterAuth`, an :class:`earthlens.base.AbstractAuth`
+Hosts `UsgsWaterAuth`, an `earthlens.base.AbstractAuth`
 subclass that resolves an **optional** USGS Personal Access Token (PAT)
 from, in priority order, an explicit `api_token=` argument or the
 `API_USGS_PAT` environment variable. Unlike the OpenAQ backend (whose
@@ -12,18 +12,18 @@ the backend handles by falling back to the legacy endpoint).
 
 The shape:
 
-* :class:`UsgsWaterCredentials` is a frozen pydantic value object
-  carrying the optional token as a :class:`pydantic.SecretStr`.
-* :class:`UsgsWaterAuth` binds those credentials and, in
-  :meth:`UsgsWaterAuth.configure`, resolves the token (explicit then
+* `UsgsWaterCredentials` is a frozen pydantic value object
+  carrying the optional token as a `pydantic.SecretStr`.
+* `UsgsWaterAuth` binds those credentials and, in
+  `UsgsWaterAuth.configure`, resolves the token (explicit then
   env var) and — when one is present — exports it back to the
   `API_USGS_PAT` environment variable, which is the channel the
   `dataretrieval` SDK reads. `configure()` is a no-op when anonymous.
-* :meth:`UsgsWaterAuth.is_authenticated` reports whether a token was
+* `UsgsWaterAuth.is_authenticated` reports whether a token was
   resolved (i.e. whether the request is token-backed or anonymous);
   both are valid operating modes.
 
-The resolved token is read back via the :attr:`UsgsWaterAuth.token`
+The resolved token is read back via the `UsgsWaterAuth.token`
 property (which returns `None` when anonymous).
 """
 
@@ -46,12 +46,12 @@ class UsgsWaterCredentials(BaseModel):
 
     The token is optional at construction time: `None` means "resolve
     from the `API_USGS_PAT` environment variable at
-    :meth:`UsgsWaterAuth.configure` time, and if that is also unset,
+    `UsgsWaterAuth.configure` time, and if that is also unset,
     run anonymously".
 
     Attributes:
         api_token: The USGS Personal Access Token, stored as a
-            :class:`pydantic.SecretStr` so it is never echoed by
+            `pydantic.SecretStr` so it is never echoed by
             `repr(creds)` or in logs. `None` defers resolution to the
             environment variable (and then to anonymous access).
 
@@ -83,21 +83,21 @@ class UsgsWaterCredentials(BaseModel):
 class UsgsWaterAuth(AbstractAuth[UsgsWaterCredentials]):
     """Resolve and hold the optional USGS Personal Access Token.
 
-    Implements the :class:`earthlens.base.AbstractAuth` contract for an
+    Implements the `earthlens.base.AbstractAuth` contract for an
     **optional**-secret backend. Construction does not touch the
-    environment; :meth:`configure` performs the resolution and is
+    environment; `configure` performs the resolution and is
     idempotent. After `configure()`, the token (or `None` for
-    anonymous) is available via the :attr:`token` property, and — when
+    anonymous) is available via the `token` property, and — when
     a token was resolved — it is exported to the `API_USGS_PAT`
     environment variable so the `dataretrieval` SDK picks it up.
 
     The class is a context manager (inherited from
-    :class:`AbstractAuth`): `with UsgsWaterAuth(creds) as auth: ...`
+    `AbstractAuth`): `with UsgsWaterAuth(creds) as auth: ...`
     calls `configure()` on enter and the default no-op `close()` on
     exit.
 
     Attributes:
-        _creds: The :class:`UsgsWaterCredentials` passed at
+        _creds: The `UsgsWaterCredentials` passed at
             construction.
 
     Examples:
@@ -133,7 +133,7 @@ class UsgsWaterAuth(AbstractAuth[UsgsWaterCredentials]):
         """Store credentials; does not resolve the token yet.
 
         Args:
-            credentials: The :class:`UsgsWaterCredentials` value object
+            credentials: The `UsgsWaterCredentials` value object
                 carrying the optional token.
         """
         super().__init__(credentials)
@@ -148,12 +148,12 @@ class UsgsWaterAuth(AbstractAuth[UsgsWaterCredentials]):
     def configure(self) -> None:
         """Resolve the optional token and export it to the environment.
 
-        Idempotent — short-circuits when :meth:`is_authenticated`
+        Idempotent — short-circuits when `is_authenticated`
         already returns `True`. Resolves the token in this order: the
         explicit `api_token` on the credentials, then the
         `API_USGS_PAT` environment variable. When a token is found it
         is written back to `API_USGS_PAT` (the channel `dataretrieval`
-        reads) and :meth:`is_authenticated` flips to `True`. When none
+        reads) and `is_authenticated` flips to `True`. When none
         is found this is a **no-op** — the request runs anonymously
         (rate-limited) and no error is raised.
         """
@@ -173,7 +173,7 @@ class UsgsWaterAuth(AbstractAuth[UsgsWaterCredentials]):
     def token(self) -> str | None:
         """The resolved PAT, or `None` for anonymous access.
 
-        Valid after :meth:`configure`; returns `None` both before
+        Valid after `configure`; returns `None` both before
         configuration and when no token was available (anonymous).
 
         Returns:

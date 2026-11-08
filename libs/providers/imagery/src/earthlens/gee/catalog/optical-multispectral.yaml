@@ -15,6 +15,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Use of this dataset is subject to the [Brazil Forest Imagery Dataset 2008 license'
+    visualizations:
+      - name: "Multispectral (NIR/R/G)"
+        bands: ["N", "R", "G"]
+        vmin: [0]
+        vmax: [255]
     bands:
       G:
         description: Green (0.50-0.59 µm)
@@ -49,6 +54,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Use of this dataset is subject to the [Brazil Forest Imagery Dataset 2008 license'
+    visualizations:
+      - name: "Natural Color RGB"
+        bands: ["R", "G", "B"]
+        vmin: [0]
+        vmax: [255]
     bands:
       R:
         description: Red reflectance
@@ -82,6 +92,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Use of this dataset is subject to the [Brazil Forest Imagery Dataset 2008 license'
+    visualizations:
+      - name: "Panchromatic"
+        bands: ["P"]
+        vmin: [0]
+        vmax: [255]
     bands:
       P:
         description: Panchromatic
@@ -101,6 +116,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'Use of this dataset is subject to the [Brazil Forest Imagery Dataset 2008 license'
+    visualizations:
+      - name: "Natural Color RGB"
+        bands: ["R", "G", "B"]
+        vmin: [0]
+        vmax: [255]
     bands:
       R:
         description: Red reflectance
@@ -134,6 +154,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Free for any use (NASA LP DAAC).'
+    visualizations:
+      - name: "False Color"
+        bands: ["B3N", "B02", "B01"]
+        vmin: [0]
+        vmax: [255]
     bands:
       B01:
         description: VNIR band 1 (visible green/yellow)
@@ -191,6 +216,11 @@ datasets:
     default_reducer: median
     license: proprietary
     terms_note: 'Free for use under the Copernicus Sentinel data terms.'
+    visualizations:
+      - name: "RGB"
+        bands: ["B4", "B3", "B2"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       B2:
         description: Blue
@@ -248,6 +278,11 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for use under the Copernicus Sentinel data terms.'
+    visualizations:
+      - name: "RGB"
+        bands: ["probability"]
+        vmin: [0]
+        vmax: [100]
     bands:
       probability:
         description: Per-pixel cloud probability (0-100, s2cloudless model)
@@ -268,6 +303,17 @@ datasets:
     default_reducer: median
     license: proprietary
     terms_note: 'Free for use under the Copernicus Sentinel data terms.'
+    preprocess:
+      mask: sentinel2_qa60
+      scale: true
+      note: >-
+        Top-of-atmosphere, so there is no SCL band - QA60 is the standard
+        pre-Scene-Classification cloud bitmask for this product.
+    visualizations:
+      - name: "RGB"
+        bands: ["B4", "B3", "B2"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       B2:
         description: Blue
@@ -325,6 +371,11 @@ datasets:
     default_reducer: median
     license: proprietary
     terms_note: 'Free for use under the Copernicus Sentinel data terms.'
+    visualizations:
+      - name: "RGB"
+        bands: ["B4", "B3", "B2"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       B2:
         description: Blue
@@ -384,6 +435,17 @@ datasets:
     default_reducer: median
     license: proprietary
     terms_note: 'Copernicus Sentinel Data Terms and Conditions.'
+    preprocess:
+      mask: sentinel2_scl
+      scale: true
+      note: >-
+        Level-2A arrives as 0-10000 scaled surface reflectance; the SCL band
+        carries the scene classification the mask reads.
+    visualizations:
+      - name: "RGB"
+        bands: ["B4", "B3", "B2"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       B2:
         description: Blue
@@ -429,6 +491,24 @@ datasets:
         description: Cloud probability, 0-100
         min: 0
         max: 100
+      NDVI:
+        description: Normalized Difference Vegetation Index (computed from B8 / B4)
+        derived_from: { normalized_difference: [B8, B4] }
+        min: -1
+        max: 1
+      NDWI:
+        description: Normalized Difference Water Index (computed from B3 / B8)
+        derived_from: { normalized_difference: [B3, B8] }
+        min: -1
+        max: 1
+      EVI:
+        description: Enhanced Vegetation Index (computed from B8 / B4 / B2 on scaled reflectance)
+        derived_from:
+          expression:
+            formula: "2.5 * ((NIR - RED) / (NIR + 6 * RED - 7.5 * BLUE + 1))"
+            bands: { NIR: B8, RED: B4, BLUE: B2 }
+        min: -1
+        max: 1
 
   COPERNICUS/S3/OLCI:
     title: "Sentinel-3 OLCI EFR: Ocean and Land Colour Instrument (Earth Observation Full Resolution, 300m)"
@@ -442,6 +522,12 @@ datasets:
     default_reducer: median
     license: proprietary
     terms_note: 'Free for use under the Copernicus Sentinel data terms.'
+    visualizations:
+      - name: "RGB"
+        bands: ["Oa08_radiance", "Oa06_radiance", "Oa04_radiance"]
+        vmin: [0]
+        vmax: [255]
+        gamma: [1.5]
     bands:
       Oa03_radiance:
         description: Chlorophyll absorption maximum (biogeochemistry, vegetation)
@@ -482,6 +568,12 @@ datasets:
       end_date: null
     default_reducer: mosaic
     license: public-domain
+    visualizations:
+      - name: "RGB"
+        bands: ["B050", "B023", "B015"]
+        vmin: [1000]
+        vmax: [14000]
+        gamma: [2.5]
     bands:
       B008:
         description: VNIR band B8
@@ -1288,6 +1380,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'The data is free to use for commercial and non-commercial purposes for a'
+    visualizations:
+      - name: "mono"
+        bands: ["mono"]
+        vmin: [0]
+        vmax: [255]
     bands:
       mono:
         description: Grayscale
@@ -1306,6 +1403,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'The data is free to use for commercial and non-commercial purposes for a'
+    visualizations:
+      - name: "mono"
+        bands: ["mono"]
+        vmin: [0]
+        vmax: [255]
     bands:
       mono:
         description: Grayscale
@@ -1324,6 +1426,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'The data is free to use for commercial and non-commercial purposes for a'
+    visualizations:
+      - name: "RGB"
+        bands: ["R", "G", "B"]
+        vmin: [0]
+        vmax: [255]
     bands:
       R:
         description: Red
@@ -1350,6 +1457,11 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'The data is free to use for commercial and non-commercial purposes for a'
+    visualizations:
+      - name: "RGB"
+        bands: ["R", "G", "B"]
+        vmin: [0]
+        vmax: [255]
     bands:
       R:
         description: Red
@@ -1376,6 +1488,11 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Mention the name of the Licensor (the National Land Survey of Finland),'
+    visualizations:
+      - name: "NRG"
+        bands: ["N", "R", "G"]
+        vmin: [11]
+        vmax: [190]
     bands:
       "N":
         description: Near-Infrared
@@ -1402,6 +1519,11 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Mention the name of the Licensor (the National Land Survey of Finland),'
+    visualizations:
+      - name: "RGB"
+        bands: ["R", "G", "B"]
+        vmin: [11]
+        vmax: [190]
     bands:
       R:
         description: Red
@@ -1428,6 +1550,11 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Mention the name of the Licensor (the National Land Survey of Finland),'
+    visualizations:
+      - name: "NRG"
+        bands: ["N", "R", "G"]
+        vmin: [11]
+        vmax: [190]
     bands:
       "N":
         description: Near-Infrared
@@ -1452,6 +1579,12 @@ datasets:
       end_date: null
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Cloud Score Plus (cs_cdf)"
+        bands: ["cs_cdf"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["white", "black"]
     bands:
       cs:
         description: Pixel quality score based on spectral distance from a
@@ -1477,6 +1610,15 @@ datasets:
     license: proprietary
     terms_note: 'The user must ensure that the source note contains the following'
     source: republished
+    visualizations:
+      - name: "RGB"
+        bands: ["R", "G", "B"]
+        vmin: [0]
+        vmax: [255]
+      - name: "NRG"
+        bands: ["N", "R", "G"]
+        vmin: [0]
+        vmax: [255]
     bands:
       "N":
         description: Near infrared
@@ -1507,6 +1649,11 @@ datasets:
     default_reducer: median
     license: proprietary
     terms_note: 'Free with attribution (JAXA AVNIR-2 terms).'
+    visualizations:
+      - name: "AVNIR-2 ORI RGB"
+        bands: ["B3", "B2", "B1"]
+        vmin: [0]
+        vmax: [255]
     bands:
       B1:
         description: Blue (0.42-0.50 µm)
@@ -1533,6 +1680,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (JAXA GCOM-C terms).'
+    visualizations:
+      - name: "Leaf Area Index"
+        bands: ["LAI_AVE"]
+        vmin: [0]
+        vmax: [8000]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LAI_AVE:
         description: One-sided green leaf area per unit ground area
@@ -1552,6 +1705,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (JAXA GCOM-C terms).'
+    visualizations:
+      - name: "Leaf Area Index"
+        bands: ["LAI_AVE"]
+        vmin: [0]
+        vmax: [8000]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LAI_AVE:
         description: One-sided green leaf area per unit ground area
@@ -1571,6 +1730,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (JAXA GCOM-C terms).'
+    visualizations:
+      - name: "Leaf Area Index"
+        bands: ["LAI_AVE"]
+        vmin: [0]
+        vmax: [8000]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LAI_AVE:
         description: One-sided green leaf area per unit ground area
@@ -1590,6 +1755,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (JAXA GCOM-C terms).'
+    visualizations:
+      - name: "Land Surface Temperature"
+        bands: ["LST_AVE"]
+        vmin: [12338]
+        vmax: [16830]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LST_AVE:
         description: Land surface temperature
@@ -1609,6 +1780,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (JAXA GCOM-C terms).'
+    visualizations:
+      - name: "Land Surface Temperature"
+        bands: ["LST_AVE"]
+        vmin: [12338]
+        vmax: [16830]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LST_AVE:
         description: Land surface temperature
@@ -1628,6 +1805,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (JAXA GCOM-C terms).'
+    visualizations:
+      - name: "Land Surface Temperature"
+        bands: ["LST_AVE"]
+        vmin: [12338]
+        vmax: [16830]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LST_AVE:
         description: Land surface temperature
@@ -1647,6 +1830,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (JAXA GCOM-C terms).'
+    visualizations:
+      - name: "Sea Surface Temperature"
+        bands: ["SST_AVE"]
+        vmin: [6000]
+        vmax: [47000]
+        palette: ["000000", "005aff", "43c8c8", "fff700", "ff0000"]
     bands:
       SST_AVE:
         description: Sea-surface temperature
@@ -1666,6 +1855,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (JAXA GCOM-C terms).'
+    visualizations:
+      - name: "Sea Surface Temperature"
+        bands: ["SST_AVE"]
+        vmin: [6000]
+        vmax: [47000]
+        palette: ["000000", "005aff", "43c8c8", "fff700", "ff0000"]
     bands:
       SST_AVE:
         description: Sea-surface temperature
@@ -1685,6 +1880,12 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for any use (JAXA GCOM-C terms).'
+    visualizations:
+      - name: "Sea Surface Temperature"
+        bands: ["SST_AVE"]
+        vmin: [6000]
+        vmax: [47000]
+        palette: ["000000", "005aff", "43c8c8", "fff700", "ff0000"]
     bands:
       SST_AVE:
         description: Sea-surface temperature
@@ -1704,6 +1905,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color Composite"
+        bands: ["red", "green", "blue"]
+        vmin: [0]
+        vmax: [0.3]
     bands:
       blue:
         description: Blue (surface reflectance)
@@ -1733,6 +1939,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Scaled"
+        bands: ["BAI"]
+        vmin: [0]
+        vmax: [100]
     bands:
       BAI:
         description: Burn Area Index
@@ -1749,6 +1960,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NBR"]
+        vmin: [0.9]
+        vmax: [1]
+        palette: ["000000", "ffffff"]
     bands:
       NBR:
         description: Normalized Burn Ratio Thermal
@@ -1765,6 +1982,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDWI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000", "ffffff"]
     bands:
       NDWI:
         description: Normalized Difference Water Index
@@ -1781,6 +2004,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color Composite"
+        bands: ["red", "green", "blue"]
+        vmin: [0]
+        vmax: [0.3]
     bands:
       blue:
         description: Blue (surface reflectance)
@@ -1810,6 +2038,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Scaled"
+        bands: ["BAI"]
+        vmin: [0]
+        vmax: [100]
     bands:
       BAI:
         description: Burn Area Index
@@ -1826,6 +2059,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NBR"]
+        vmin: [0.9]
+        vmax: [1]
+        palette: ["000000", "ffffff"]
     bands:
       NBR:
         description: Normalized Burn Ratio Thermal
@@ -1842,6 +2081,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDWI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000", "ffffff"]
     bands:
       NDWI:
         description: Normalized Difference Water Index
@@ -1858,6 +2103,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color Composite"
+        bands: ["red", "green", "blue"]
+        vmin: [0]
+        vmax: [0.3]
     bands:
       blue:
         description: Blue (surface reflectance)
@@ -1887,6 +2137,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Scaled"
+        bands: ["BAI"]
+        vmin: [0]
+        vmax: [100]
     bands:
       BAI:
         description: Burn Area Index
@@ -1903,6 +2158,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NBR"]
+        vmin: [0.9]
+        vmax: [1]
+        palette: ["000000", "ffffff"]
     bands:
       NBR:
         description: Normalized Burn Ratio Thermal
@@ -1919,6 +2180,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDWI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000", "ffffff"]
     bands:
       NDWI:
         description: Normalized Difference Water Index
@@ -1934,6 +2201,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "False Color"
+        bands: ["30", "20", "10"]
+        gamma: [1.6]
+        gain: [1.4]
     bands:
       "10":
         description: Green
@@ -1960,6 +2232,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "False Color"
+        bands: ["30", "20", "10"]
+        gamma: [1.6]
+        gain: [1.4]
     bands:
       "10":
         description: Green
@@ -1985,6 +2262,16 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["30", "20", "10"]
+        gain: [1.4, 1.2, 1]
+      - name: "Near Infrared (432)"
+        bands: ["40", "30", "20"]
+        gain: [1.4, 1.2, 1.4]
+      - name: "Shortwave Infrared (742)"
+        bands: ["70", "40", "20"]
+        gain: [1.8, 1.9, 1.9]
     bands:
       "10":
         description: Blue
@@ -2016,6 +2303,16 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["30", "20", "10"]
+        gain: [1.4, 1.2, 1]
+      - name: "Near Infrared (432)"
+        bands: ["40", "30", "20"]
+        gain: [1.4, 1.2, 1.4]
+      - name: "Shortwave Infrared (742)"
+        bands: ["70", "40", "20"]
+        gain: [1.8, 1.9, 1.9]
     bands:
       "10":
         description: Blue
@@ -2050,6 +2347,16 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["30", "20", "10"]
+        gain: [1.4, 1.2, 1]
+      - name: "Near Infrared (432)"
+        bands: ["40", "30", "20"]
+        gain: [1.4, 1.2, 1.4]
+      - name: "Shortwave Infrared (742)"
+        bands: ["70", "40", "20"]
+        gain: [1.8, 1.9, 1.9]
     bands:
       "10":
         description: Blue
@@ -2085,6 +2392,19 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (432)"
+        bands: ["B4", "B3", "B2"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Near Infrared (543)"
+        bands: ["B5", "B4", "B3"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Shortwave Infrared (753)"
+        bands: ["B7", "B5", "B3"]
+        vmin: [0]
+        vmax: [30000]
     bands:
       B1:
         description: Coastal aerosol
@@ -2143,6 +2463,25 @@ datasets:
       end_date: null
     default_reducer: median
     license: public-domain
+    preprocess:
+      mask: landsat_sr
+      scale: true
+      note: >-
+        Collection-2 Level-2 surface reflectance; bit 6 of QA_PIXEL is USGS's
+        derived Clear flag. LandsatQaRefinedMask is the stricter alternative.
+    visualizations:
+      - name: "True Color (432)"
+        bands: ["SR_B4", "SR_B3", "SR_B2"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Near Infrared (543)"
+        bands: ["SR_B5", "SR_B4", "SR_B3"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Shortwave Infrared (753)"
+        bands: ["SR_B7", "SR_B5", "SR_B3"]
+        vmin: [0]
+        vmax: [30000]
     bands:
       SR_B2:
         description: Band 2 (blue) surface reflectance
@@ -2208,6 +2547,19 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (432)"
+        bands: ["B4", "B3", "B2"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Near Infrared (543)"
+        bands: ["B5", "B4", "B3"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Shortwave Infrared (753)"
+        bands: ["B7", "B5", "B3"]
+        vmin: [0]
+        vmax: [30000]
     bands:
       B1:
         description: Coastal aerosol
@@ -2267,6 +2619,19 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (432)"
+        bands: ["B4", "B3", "B2"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Near Infrared (543)"
+        bands: ["B5", "B4", "B3"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Shortwave Infrared (753)"
+        bands: ["B7", "B5", "B3"]
+        vmin: [0]
+        vmax: [30000]
     bands:
       B1:
         description: Coastal aerosol
@@ -2325,6 +2690,19 @@ datasets:
       end_date: null
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "True Color (432)"
+        bands: ["B4", "B3", "B2"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Near Infrared (543)"
+        bands: ["B5", "B4", "B3"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Shortwave Infrared (753)"
+        bands: ["B7", "B5", "B3"]
+        vmin: [0]
+        vmax: [30000]
     bands:
       B1:
         description: Coastal aerosol
@@ -2374,6 +2752,19 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (432)"
+        bands: ["B4", "B3", "B2"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Near Infrared (543)"
+        bands: ["B5", "B4", "B3"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Shortwave Infrared (753)"
+        bands: ["B7", "B5", "B3"]
+        vmin: [0]
+        vmax: [30000]
     bands:
       B1:
         description: Coastal aerosol
@@ -2432,6 +2823,19 @@ datasets:
       end_date: null
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "True Color (432)"
+        bands: ["SR_B4", "SR_B3", "SR_B2"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Near Infrared (543)"
+        bands: ["SR_B5", "SR_B4", "SR_B3"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Shortwave Infrared (753)"
+        bands: ["SR_B7", "SR_B5", "SR_B3"]
+        vmin: [0]
+        vmax: [30000]
     bands:
       SR_B1:
         description: Band 1 (ultra-blue / coastal aerosol) surface reflectance
@@ -2489,6 +2893,19 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (432)"
+        bands: ["B4", "B3", "B2"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Near Infrared (543)"
+        bands: ["B5", "B4", "B3"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Shortwave Infrared (753)"
+        bands: ["B7", "B5", "B3"]
+        vmin: [0]
+        vmax: [30000]
     bands:
       B1:
         description: Coastal aerosol
@@ -2548,6 +2965,19 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (432)"
+        bands: ["B4", "B3", "B2"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Near Infrared (543)"
+        bands: ["B5", "B4", "B3"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Shortwave Infrared (753)"
+        bands: ["B7", "B5", "B3"]
+        vmin: [0]
+        vmax: [30000]
     bands:
       B1:
         description: Coastal aerosol
@@ -2606,6 +3036,25 @@ datasets:
       end_date: null
     default_reducer: median
     license: public-domain
+    preprocess:
+      mask: landsat_sr
+      scale: true
+      note: >-
+        Collection-2 Level-2 surface reflectance; bit 6 of QA_PIXEL is USGS's
+        derived Clear flag. LandsatQaRefinedMask is the stricter alternative.
+    visualizations:
+      - name: "True Color (432)"
+        bands: ["SR_B4", "SR_B3", "SR_B2"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Near Infrared (543)"
+        bands: ["SR_B5", "SR_B4", "SR_B3"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Shortwave Infrared (753)"
+        bands: ["SR_B7", "SR_B5", "SR_B3"]
+        vmin: [0]
+        vmax: [30000]
     bands:
       SR_B2:
         description: Band 2 (blue) surface reflectance
@@ -2658,6 +3107,11 @@ datasets:
         description: Pixel quality attributes (CFMask)
       QA_RADSAT:
         description: Radiometric saturation and dropped-pixel QA
+      NDVI:
+        description: Normalized Difference Vegetation Index (computed from SR_B5 / SR_B4)
+        derived_from: { normalized_difference: [SR_B5, SR_B4] }
+        min: -1
+        max: 1
 
   LANDSAT/LC09/C02/T1_TOA:
     title: "USGS Landsat 9 Collection 2 Tier 1 Top-of-Atmosphere Reflectance"
@@ -2670,6 +3124,19 @@ datasets:
       end_date: null
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "True Color (432)"
+        bands: ["B4", "B3", "B2"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Near Infrared (543)"
+        bands: ["B5", "B4", "B3"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Shortwave Infrared (753)"
+        bands: ["B7", "B5", "B3"]
+        vmin: [0]
+        vmax: [30000]
     bands:
       B1:
         description: Coastal aerosol
@@ -2719,6 +3186,19 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (432)"
+        bands: ["B4", "B3", "B2"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Near Infrared (543)"
+        bands: ["B5", "B4", "B3"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Shortwave Infrared (753)"
+        bands: ["B7", "B5", "B3"]
+        vmin: [0]
+        vmax: [30000]
     bands:
       B1:
         description: Coastal aerosol
@@ -2777,6 +3257,19 @@ datasets:
       end_date: null
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "True Color (432)"
+        bands: ["SR_B4", "SR_B3", "SR_B2"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Near Infrared (543)"
+        bands: ["SR_B5", "SR_B4", "SR_B3"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Shortwave Infrared (753)"
+        bands: ["SR_B7", "SR_B5", "SR_B3"]
+        vmin: [0]
+        vmax: [30000]
     bands:
       SR_B1:
         description: Band 1 (coastal aerosol) surface reflectance
@@ -2833,6 +3326,19 @@ datasets:
       end_date: null
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "True Color (432)"
+        bands: ["B4", "B3", "B2"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Near Infrared (543)"
+        bands: ["B5", "B4", "B3"]
+        vmin: [0]
+        vmax: [30000]
+      - name: "Shortwave Infrared (753)"
+        bands: ["B7", "B5", "B3"]
+        vmin: [0]
+        vmax: [30000]
     bands:
       B1:
         description: Coastal aerosol
@@ -2882,6 +3388,16 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["B3", "B2", "B1"]
+        gain: [1.4, 1.2, 1]
+      - name: "Near Infrared (432)"
+        bands: ["B4", "B3", "B2"]
+        gain: [1.4, 1.2, 1.4]
+      - name: "Shortwave Infrared (742)"
+        bands: ["B7", "B4", "B2"]
+        gain: [1.8, 1.9, 1.9]
     bands:
       B1:
         description: Blue
@@ -2934,6 +3450,23 @@ datasets:
       end_date: "2024-04-06"
     default_reducer: median
     license: public-domain
+    preprocess:
+      mask: landsat_sr
+      scale: true
+      note: >-
+        Collection-2 Level-2 surface reflectance; bit 6 of QA_PIXEL is USGS's
+        derived Clear flag. SLC-off after 2003-05-31 leaves unfilled scan gaps
+        that no cloud mask can recover.
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["SR_B3", "SR_B2", "SR_B1"]
+        gain: [1.4, 1.2, 1]
+      - name: "Near Infrared (432)"
+        bands: ["SR_B4", "SR_B3", "SR_B2"]
+        gain: [1.4, 1.2, 1.4]
+      - name: "Shortwave Infrared (742)"
+        bands: ["SR_B7", "SR_B4", "SR_B2"]
+        gain: [1.8, 1.9, 1.9]
     bands:
       SR_B1:
         description: Band 1 (blue) surface reflectance
@@ -2988,6 +3521,16 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["B3", "B2", "B1"]
+        gain: [1.4, 1.2, 1]
+      - name: "Near Infrared (432)"
+        bands: ["B4", "B3", "B2"]
+        gain: [1.4, 1.2, 1.4]
+      - name: "Shortwave Infrared (742)"
+        bands: ["B7", "B4", "B2"]
+        gain: [1.8, 1.9, 1.9]
     bands:
       B1:
         description: Blue
@@ -3041,6 +3584,16 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["B3", "B2", "B1"]
+        gain: [1.4, 1.2, 1]
+      - name: "Near Infrared (432)"
+        bands: ["B4", "B3", "B2"]
+        gain: [1.4, 1.2, 1.4]
+      - name: "Shortwave Infrared (742)"
+        bands: ["B7", "B4", "B2"]
+        gain: [1.8, 1.9, 1.9]
     bands:
       B1:
         description: Blue
@@ -3093,6 +3646,16 @@ datasets:
       end_date: "2024-04-06"
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["B3", "B2", "B1"]
+        gain: [1.4, 1.2, 1]
+      - name: "Near Infrared (432)"
+        bands: ["B4", "B3", "B2"]
+        gain: [1.4, 1.2, 1.4]
+      - name: "Shortwave Infrared (742)"
+        bands: ["B7", "B4", "B2"]
+        gain: [1.8, 1.9, 1.9]
     bands:
       B1:
         description: Blue
@@ -3136,6 +3699,16 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["B3", "B2", "B1"]
+        gain: [1.4, 1.2, 1]
+      - name: "Near Infrared (432)"
+        bands: ["B4", "B3", "B2"]
+        gain: [1.4, 1.2, 1.4]
+      - name: "Shortwave Infrared (742)"
+        bands: ["B7", "B4", "B2"]
+        gain: [1.8, 1.9, 1.9]
     bands:
       B1:
         description: Blue
@@ -3188,6 +3761,16 @@ datasets:
       end_date: "2024-04-06"
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["SR_B3", "SR_B2", "SR_B1"]
+        gain: [1.4, 1.2, 1]
+      - name: "Near Infrared (432)"
+        bands: ["SR_B4", "SR_B3", "SR_B2"]
+        gain: [1.4, 1.2, 1.4]
+      - name: "Shortwave Infrared (742)"
+        bands: ["SR_B7", "SR_B4", "SR_B2"]
+        gain: [1.8, 1.9, 1.9]
     bands:
       SR_B1:
         description: Band 1 (blue) surface reflectance
@@ -3239,6 +3822,16 @@ datasets:
       end_date: "2024-04-06"
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["B3", "B2", "B1"]
+        gain: [1.4, 1.2, 1]
+      - name: "Near Infrared (432)"
+        bands: ["B4", "B3", "B2"]
+        gain: [1.4, 1.2, 1.4]
+      - name: "Shortwave Infrared (742)"
+        bands: ["B7", "B4", "B2"]
+        gain: [1.8, 1.9, 1.9]
     bands:
       B1:
         description: Blue
@@ -3281,6 +3874,11 @@ datasets:
       end_date: "1978-01-06"
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "Near Infrared (321)"
+        bands: ["B6", "B5", "B4"]
+      - name: "Shortwave Infrared (421)"
+        bands: ["B7", "B5", "B4"]
     bands:
       B4:
         description: Green
@@ -3311,6 +3909,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Near Infrared (321)"
+        bands: ["B6", "B5", "B4"]
+      - name: "Shortwave Infrared (421)"
+        bands: ["B7", "B5", "B4"]
     bands:
       B4:
         description: Green
@@ -3340,6 +3943,11 @@ datasets:
       end_date: "1982-02-25"
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "Near Infrared (321)"
+        bands: ["B6", "B5", "B4"]
+      - name: "Shortwave Infrared (421)"
+        bands: ["B7", "B5", "B4"]
     bands:
       B4:
         description: Green
@@ -3370,6 +3978,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Near Infrared (321)"
+        bands: ["B6", "B5", "B4"]
+      - name: "Shortwave Infrared (421)"
+        bands: ["B7", "B5", "B4"]
     bands:
       B4:
         description: Green
@@ -3399,6 +4012,11 @@ datasets:
       end_date: "1983-03-31"
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "Near Infrared (321)"
+        bands: ["B6", "B5", "B4"]
+      - name: "Shortwave Infrared (421)"
+        bands: ["B7", "B5", "B4"]
     bands:
       B4:
         description: Green
@@ -3429,6 +4047,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Near Infrared (321)"
+        bands: ["B6", "B5", "B4"]
+      - name: "Shortwave Infrared (421)"
+        bands: ["B7", "B5", "B4"]
     bands:
       B4:
         description: Green
@@ -3458,6 +4081,11 @@ datasets:
       end_date: "1993-12-14"
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "Near Infrared (321)"
+        bands: ["B3", "B2", "B1"]
+      - name: "Shortwave Infrared (421)"
+        bands: ["B4", "B2", "B1"]
     bands:
       B1:
         description: Green
@@ -3488,6 +4116,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Near Infrared (321)"
+        bands: ["B3", "B2", "B1"]
+      - name: "Shortwave Infrared (421)"
+        bands: ["B4", "B2", "B1"]
     bands:
       B1:
         description: Green
@@ -3517,6 +4150,11 @@ datasets:
       end_date: "2013-01-15"
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "Near Infrared (321)"
+        bands: ["B3", "B2", "B1"]
+      - name: "Shortwave Infrared (421)"
+        bands: ["B4", "B2", "B1"]
     bands:
       B1:
         description: Green
@@ -3547,6 +4185,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "Near Infrared (321)"
+        bands: ["B3", "B2", "B1"]
+      - name: "Shortwave Infrared (421)"
+        bands: ["B4", "B2", "B1"]
     bands:
       B1:
         description: Green
@@ -3577,6 +4220,19 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["B3", "B2", "B1"]
+        gamma: [1.2]
+        gain: [600]
+      - name: "Near Infrared (432)"
+        bands: ["B4", "B3", "B2"]
+        gamma: [1.2]
+        gain: [500]
+      - name: "Shortwave Infrared (742)"
+        bands: ["B7", "B4", "B2"]
+        gamma: [1.2]
+        gain: [500]
     bands:
       B1:
         description: Blue
@@ -3623,6 +4279,16 @@ datasets:
       end_date: "1993-12-14"
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["SR_B3", "SR_B2", "SR_B1"]
+        gain: [1.4, 1.2, 1]
+      - name: "Near Infrared (432)"
+        bands: ["SR_B4", "SR_B3", "SR_B2"]
+        gain: [1.4, 1.2, 1.4]
+      - name: "Shortwave Infrared (742)"
+        bands: ["SR_B7", "SR_B4", "SR_B2"]
+        gain: [1.8, 1.9, 1.9]
     bands:
       SR_B1:
         description: Band 1 (blue) surface reflectance
@@ -3674,6 +4340,19 @@ datasets:
       end_date: "1993-12-14"
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["B3", "B2", "B1"]
+        gamma: [1.2]
+        gain: [600]
+      - name: "Near Infrared (432)"
+        bands: ["B4", "B3", "B2"]
+        gamma: [1.2]
+        gain: [500]
+      - name: "Shortwave Infrared (742)"
+        bands: ["B7", "B4", "B2"]
+        gamma: [1.2]
+        gain: [500]
     bands:
       B1:
         description: Blue
@@ -3713,6 +4392,19 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["B3", "B2", "B1"]
+        gamma: [1.2]
+        gain: [600]
+      - name: "Near Infrared (432)"
+        bands: ["B4", "B3", "B2"]
+        gamma: [1.2]
+        gain: [500]
+      - name: "Shortwave Infrared (742)"
+        bands: ["B7", "B4", "B2"]
+        gamma: [1.2]
+        gain: [500]
     bands:
       B1:
         description: Blue
@@ -3760,6 +4452,16 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["SR_B3", "SR_B2", "SR_B1"]
+        gain: [1.4, 1.2, 1]
+      - name: "Near Infrared (432)"
+        bands: ["SR_B4", "SR_B3", "SR_B2"]
+        gain: [1.4, 1.2, 1.4]
+      - name: "Shortwave Infrared (742)"
+        bands: ["SR_B7", "SR_B4", "SR_B2"]
+        gain: [1.8, 1.9, 1.9]
     bands:
       SR_B1:
         description: Band 1 (blue) surface reflectance
@@ -3880,6 +4582,19 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["B3", "B2", "B1"]
+        gamma: [1.2]
+        gain: [600]
+      - name: "Near Infrared (432)"
+        bands: ["B4", "B3", "B2"]
+        gamma: [1.2]
+        gain: [500]
+      - name: "Shortwave Infrared (742)"
+        bands: ["B7", "B4", "B2"]
+        gamma: [1.2]
+        gain: [500]
     bands:
       B1:
         description: Blue
@@ -3927,6 +4642,19 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["B3", "B2", "B1"]
+        gamma: [1.2]
+        gain: [600]
+      - name: "Near Infrared (432)"
+        bands: ["B4", "B3", "B2"]
+        gamma: [1.2]
+        gain: [500]
+      - name: "Shortwave Infrared (742)"
+        bands: ["B7", "B4", "B2"]
+        gamma: [1.2]
+        gain: [500]
     bands:
       B1:
         description: Blue
@@ -3973,6 +4701,16 @@ datasets:
       end_date: "2012-05-05"
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["SR_B3", "SR_B2", "SR_B1"]
+        gain: [1.4, 1.2, 1]
+      - name: "Near Infrared (432)"
+        bands: ["SR_B4", "SR_B3", "SR_B2"]
+        gain: [1.4, 1.2, 1.4]
+      - name: "Shortwave Infrared (742)"
+        bands: ["SR_B7", "SR_B4", "SR_B2"]
+        gain: [1.8, 1.9, 1.9]
     bands:
       SR_B1:
         description: Band 1 (blue) surface reflectance
@@ -4026,6 +4764,19 @@ datasets:
       end_date: "2012-05-05"
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["B3", "B2", "B1"]
+        gamma: [1.2]
+        gain: [600]
+      - name: "Near Infrared (432)"
+        bands: ["B4", "B3", "B2"]
+        gamma: [1.2]
+        gain: [500]
+      - name: "Shortwave Infrared (742)"
+        bands: ["B7", "B4", "B2"]
+        gamma: [1.2]
+        gain: [500]
     bands:
       B1:
         description: Blue
@@ -4065,6 +4816,19 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'Landsat datasets are federally created data'
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["B3", "B2", "B1"]
+        gamma: [1.2]
+        gain: [600]
+      - name: "Near Infrared (432)"
+        bands: ["B4", "B3", "B2"]
+        gamma: [1.2]
+        gain: [500]
+      - name: "Shortwave Infrared (742)"
+        bands: ["B7", "B4", "B2"]
+        gamma: [1.2]
+        gain: [500]
     bands:
       B1:
         description: Blue
@@ -4111,6 +4875,16 @@ datasets:
       end_date: "2012-05-05"
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["SR_B3", "SR_B2", "SR_B1"]
+        gain: [1.4, 1.2, 1]
+      - name: "Near Infrared (432)"
+        bands: ["SR_B4", "SR_B3", "SR_B2"]
+        gain: [1.4, 1.2, 1.4]
+      - name: "Shortwave Infrared (742)"
+        bands: ["SR_B7", "SR_B4", "SR_B2"]
+        gain: [1.8, 1.9, 1.9]
     bands:
       SR_B1:
         description: Band 1 (blue) surface reflectance
@@ -4162,6 +4936,19 @@ datasets:
       end_date: "2012-05-05"
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "True Color (321)"
+        bands: ["B3", "B2", "B1"]
+        gamma: [1.2]
+        gain: [600]
+      - name: "Near Infrared (432)"
+        bands: ["B4", "B3", "B2"]
+        gamma: [1.2]
+        gain: [500]
+      - name: "Shortwave Infrared (742)"
+        bands: ["B7", "B4", "B2"]
+        gamma: [1.2]
+        gain: [500]
     bands:
       B1:
         description: Blue
@@ -4200,6 +4987,11 @@ datasets:
       bbox: [20.5, 55.5, 28.6, 58.5]
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "Near-Infrared, Red, and Green (NRG)"
+        bands: ["N", "R", "G"]
+        vmin: [0]
+        vmax: [255]
     bands:
       "N":
         description: Near-Infrared
@@ -4228,6 +5020,11 @@ datasets:
       bbox: [20.5, 55.5, 28.6, 58.5]
     default_reducer: mosaic
     license: CC-BY-4.0
+    visualizations:
+      - name: "RGB"
+        bands: ["R", "G", "B"]
+        vmin: [0]
+        vmax: [255]
     bands:
       R:
         description: Red
@@ -4257,6 +5054,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "True Color"
+        bands: ["sur_refl_b01", "sur_refl_b04", "sur_refl_b03"]
+        vmin: [-100]
+        vmax: [3000]
     bands:
       sur_refl_b01:
         description: Band 1 (red) surface reflectance
@@ -4297,6 +5099,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "True color"
+        bands: ["sur_refl_b01", "sur_refl_b04", "sur_refl_b03"]
+        vmin: [0]
+        vmax: [8000]
+        gamma: [1.5]
     bands:
       sur_refl_b01:
         description: Band 1 (red) surface reflectance
@@ -4339,6 +5147,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "False Color"
+        bands: ["sur_refl_b02", "sur_refl_b02", "sur_refl_b01"]
+        vmin: [-100]
+        vmax: [8000]
     bands:
       num_observations:
         description: Number of observations per 250m pixel
@@ -4388,6 +5201,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "False Color"
+        bands: ["sur_refl_b02", "sur_refl_b02", "sur_refl_b01"]
+        vmin: [-100]
+        vmax: [6000]
     bands:
       sur_refl_b01:
         description: Band 1 (red) surface reflectance
@@ -4414,6 +5232,13 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Land Surface Temperature"
+        bands: ["LST_Day_1km"]
+        vmin: [13000]
+        vmax: [16500]
+        gain: [0.1]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LST_Day_1km:
         description: Daytime land surface temperature
@@ -4448,6 +5273,13 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Land Surface Temperature"
+        bands: ["LST_Day_1km"]
+        vmin: [14000]
+        vmax: [16000]
+        gain: [0.1]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LST_Day_1km:
         description: 8-day mean daytime LST
@@ -4482,6 +5314,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "False Color"
+        bands: ["sur_refl_b11", "sur_refl_b10", "sur_refl_b09"]
+        vmin: [0]
+        vmax: [2000]
     bands:
       num_observations:
         description: Number of observations per pixel
@@ -4566,6 +5403,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "True Color"
+        bands: ["sur_refl_b01", "sur_refl_b04", "sur_refl_b03"]
+        vmin: [-100]
+        vmax: [3000]
     bands:
       sur_refl_b01:
         description: Surface reflectance for band 1
@@ -4648,6 +5490,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "True color"
+        bands: ["sur_refl_b01", "sur_refl_b04", "sur_refl_b03"]
+        vmin: [0]
+        vmax: [8000]
+        gamma: [1.5]
     bands:
       num_observations_1km:
         description: Number of observations per 1K pixel
@@ -4766,6 +5614,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "False Color"
+        bands: ["sur_refl_b02", "sur_refl_b02", "sur_refl_b01"]
+        vmin: [-100]
+        vmax: [8000]
     bands:
       num_observations:
         description: Number of observations per 250m pixel
@@ -4815,6 +5668,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "False Color"
+        bands: ["sur_refl_b02", "sur_refl_b02", "sur_refl_b01"]
+        vmin: [-100]
+        vmax: [6000]
     bands:
       sur_refl_b01:
         description: Surface reflectance band 1
@@ -4845,6 +5703,13 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Land Surface Temperature"
+        bands: ["LST_Day_1km"]
+        vmin: [13000]
+        vmax: [16500]
+        gain: [0.1]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LST_Day_1km:
         description: Daytime Land Surface Temperature
@@ -4921,6 +5786,13 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Land Surface Temperature"
+        bands: ["LST_Day_1km"]
+        vmin: [14000]
+        vmax: [16000]
+        gain: [0.1]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LST_Day_1km:
         description: Day land surface temperature
@@ -4991,6 +5863,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "GPP"
+        bands: ["Gpp"]
+        vmin: [0]
+        vmax: [600]
+        palette: ["bbe029", "0a9501", "074b03"]
     bands:
       Gpp:
         description: Gross primary production
@@ -5019,6 +5897,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "NPP"
+        bands: ["Npp"]
+        vmin: [0]
+        vmax: [19000]
+        palette: ["bbe029", "0a9501", "074b03"]
     bands:
       Npp:
         description: Net primary productivity
@@ -5041,6 +5925,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "NPP"
+        bands: ["Npp"]
+        vmin: [0]
+        vmax: [19000]
+        palette: ["bbe029", "0a9501", "074b03"]
     bands:
       Npp:
         description: Net primary productivity
@@ -5066,6 +5956,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "False Color"
+        bands: ["sur_refl_b11", "sur_refl_b10", "sur_refl_b09"]
+        vmin: [0]
+        vmax: [2000]
     bands:
       num_observations:
         description: Number of observations per pixel
@@ -5150,6 +6045,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "NPP"
+        bands: ["Npp"]
+        vmin: [0]
+        vmax: [18000]
+        palette: ["bbe029", "0a9501", "074b03"]
     bands:
       Gpp:
         description: Annual gross primary productivity
@@ -5181,6 +6082,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Total DSR at GMT 12:00"
+        bands: ["GMT_1200_DSR"]
+        vmin: [0]
+        vmax: [350]
+        palette: ["0f17ff", "b11406", "f1ff23"]
     bands:
       DSR:
         description: Instantaneous total downward shortwave radiation at MODIS overpass
@@ -5201,6 +6108,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Total PAR at GMT 12:00"
+        bands: ["GMT_1200_PAR"]
+        vmin: [-236]
+        vmax: [316]
+        palette: ["0f17ff", "b11406", "f1ff23"]
     bands:
       GMT_0000_PAR:
         description: Total PAR at GMT 00:00
@@ -5239,6 +6152,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Surface Bidirectional Reflectance Factor"
+        bands: ["Sur_refl1"]
+        vmin: [0]
+        vmax: [500]
+        palette: ["black", "blue", "purple", "cyan", "green", "yellow", "red"]
     bands:
       Sur_refl1:
         description: Surface reflectance, MODIS band 1 (red, 500m)
@@ -5261,6 +6180,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "True Color"
+        bands: ["sur_refl_b01", "sur_refl_b04", "sur_refl_b03"]
+        vmin: [-100]
+        vmax: [3000]
     bands:
       sur_refl_b01:
         description: Band 1 (red) surface reflectance
@@ -5301,6 +6225,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "True Color"
+        bands: ["Coarse_Resolution_Surface_Reflectance_Band_1", "Coarse_Resolution_Surface_Reflectance_Band_2", "Coarse_Resolution_Surface_Reflectance_Band_3"]
+        vmin: [-0.4]
+        vmax: [1]
     bands:
       Coarse_Resolution_Surface_Reflectance_Band_1:
         description: Surface reflectance, MODIS band 1 (red)
@@ -5327,6 +6256,18 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    preprocess:
+      mask: modis_state_1km
+      scale: true
+      note: >-
+        Daily surface reflectance; bits 0-1 of state_1km carry the cloud state,
+        of which only 0 (clear) is kept.
+    visualizations:
+      - name: "True color"
+        bands: ["sur_refl_b01", "sur_refl_b04", "sur_refl_b03"]
+        vmin: [0]
+        vmax: [8000]
+        gamma: [1.5]
     bands:
       sur_refl_b01:
         description: Band 1 (red) surface reflectance
@@ -5369,6 +6310,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "False Color"
+        bands: ["sur_refl_b02", "sur_refl_b02", "sur_refl_b01"]
+        vmin: [-100]
+        vmax: [8000]
     bands:
       sur_refl_b01:
         description: Band 1 (red) surface reflectance
@@ -5395,6 +6341,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "False Color"
+        bands: ["sur_refl_b02", "sur_refl_b02", "sur_refl_b01"]
+        vmin: [-100]
+        vmax: [6000]
     bands:
       sur_refl_b01:
         description: Band 1 (red) surface reflectance
@@ -5421,6 +6372,13 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Land Surface Temperature"
+        bands: ["LST_Day_1km"]
+        vmin: [13000]
+        vmax: [16500]
+        gain: [0.1]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LST_Day_1km:
         description: Daytime land surface temperature
@@ -5459,6 +6417,13 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Land Surface Temperature"
+        bands: ["LST_Day_1km"]
+        vmin: [14000]
+        vmax: [16000]
+        gain: [0.1]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LST_Day_1km:
         description: 8-day mean daytime land surface temperature
@@ -5497,6 +6462,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Land Surface Temperature"
+        bands: ["LST_1KM"]
+        vmin: [216]
+        vmax: [348]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LST_1KM:
         description: Daytime land surface temperature
@@ -5525,6 +6496,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Land Surface Temperature"
+        bands: ["LST_1KM"]
+        vmin: [216]
+        vmax: [348]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LST_1KM:
         description: Nighttime land surface temperature
@@ -5553,6 +6530,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Average Daytime Land Surface Temperature"
+        bands: ["LST_Day"]
+        vmin: [216]
+        vmax: [348]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       Count_Day:
         description: Count of Daytime Input Values
@@ -5706,6 +6689,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Average Daytime Land Surface Temperature"
+        bands: ["LST_Day"]
+        vmin: [216]
+        vmax: [348]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       Count_Day:
         description: Count of Daytime Input Values
@@ -5867,6 +6856,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Average Daytime Land Surface Temperature"
+        bands: ["LST_Day"]
+        vmin: [216]
+        vmax: [348]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LST_Day:
         description: Average daytime land surface temperature
@@ -5895,6 +6890,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "True Color"
+        bands: ["sur_refl_b01", "sur_refl_b04", "sur_refl_b03"]
+        vmin: [-100]
+        vmax: [3000]
     bands:
       sur_refl_b01:
         description: Band 1 (red) surface reflectance
@@ -5935,6 +6935,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "True Color"
+        bands: ["Coarse_Resolution_Surface_Reflectance_Band_1", "Coarse_Resolution_Surface_Reflectance_Band_2", "Coarse_Resolution_Surface_Reflectance_Band_3"]
+        vmin: [-0.4]
+        vmax: [1]
     bands:
       Coarse_Resolution_Surface_Reflectance_Band_1:
         description: Surface reflectance, MODIS band 1 (red)
@@ -5961,6 +6966,18 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    preprocess:
+      mask: modis_state_1km
+      scale: true
+      note: >-
+        Daily surface reflectance; bits 0-1 of state_1km carry the cloud state,
+        of which only 0 (clear) is kept.
+    visualizations:
+      - name: "True color"
+        bands: ["sur_refl_b01", "sur_refl_b04", "sur_refl_b03"]
+        vmin: [0]
+        vmax: [8000]
+        gamma: [1.5]
     bands:
       sur_refl_b01:
         description: Band 1 (red) surface reflectance
@@ -6003,6 +7020,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "False Color"
+        bands: ["sur_refl_b02", "sur_refl_b02", "sur_refl_b01"]
+        vmin: [-100]
+        vmax: [8000]
     bands:
       num_observations:
         description: Number of observations per 250m pixel
@@ -6052,6 +7074,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "False Color"
+        bands: ["sur_refl_b02", "sur_refl_b02", "sur_refl_b01"]
+        vmin: [-100]
+        vmax: [6000]
     bands:
       sur_refl_b01:
         description: Band 1 (red) surface reflectance
@@ -6078,6 +7105,13 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Land Surface Temperature"
+        bands: ["LST_Day_1km"]
+        vmin: [13000]
+        vmax: [16500]
+        gain: [0.1]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LST_Day_1km:
         description: Daytime land surface temperature
@@ -6116,6 +7150,13 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Land Surface Temperature"
+        bands: ["LST_Day_1km"]
+        vmin: [14000]
+        vmax: [16000]
+        gain: [0.1]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LST_Day_1km:
         description: 8-day mean daytime land surface temperature
@@ -6154,6 +7195,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "GPP"
+        bands: ["Gpp"]
+        vmin: [0]
+        vmax: [600]
+        palette: ["bbe029", "0a9501", "074b03"]
     bands:
       Gpp:
         description: Gross primary production over 8 days
@@ -6178,6 +7225,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "NPP"
+        bands: ["Npp"]
+        vmin: [0]
+        vmax: [19000]
+        palette: ["bbe029", "0a9501", "074b03"]
     bands:
       Gpp:
         description: Annual gross primary productivity
@@ -6205,6 +7258,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Land Surface Temperature"
+        bands: ["LST_1KM"]
+        vmin: [216]
+        vmax: [348]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LST_1KM:
         description: Daytime land surface temperature
@@ -6233,6 +7292,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Land Surface Temperature"
+        bands: ["LST_1KM"]
+        vmin: [216]
+        vmax: [348]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LST_1KM:
         description: Nighttime land surface temperature
@@ -6261,6 +7326,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Average Daytime Land Surface Temperature"
+        bands: ["LST_Day"]
+        vmin: [216]
+        vmax: [348]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       Count_Day:
         description: Count of Daytime Input Values
@@ -6414,6 +7485,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Average Daytime Land Surface Temperature"
+        bands: ["LST_Day"]
+        vmin: [216]
+        vmax: [348]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       Count_Day:
         description: Count of Daytime Input Values
@@ -6575,6 +7652,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA LP DAAC — no restrictions.'
+    visualizations:
+      - name: "Average Daytime Land Surface Temperature"
+        bands: ["LST_Day"]
+        vmin: [216]
+        vmax: [348]
+        palette: ["040274", "040281", "0502a3", "0502b8", "0502ce", "0502e6", "0602ff", "235cb1", "307ef3", "269db1", "30c8e2", "32d3ef", "3be285", "3ff38f", "86e26f", "3ae237", "b5e22e", "d6e21f", "fff705", "ffd611", "ffb613", "ff8b13", "ff6e08", "ff500d", "ff0000", "de0101", "c21301", "a71001", "911003"]
     bands:
       LST_Day:
         description: Average daytime land surface temperature
@@ -6603,6 +7686,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Total DSR at GMT 12:00"
+        bands: ["GMT_1200_DSR"]
+        vmin: [0]
+        vmax: [350]
+        palette: ["0f17ff", "b11406", "f1ff23"]
     bands:
       DSR:
         description: Instantaneous total DSR at MODIS overpass
@@ -6674,6 +7763,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Total PAR at GMT 12:00"
+        bands: ["GMT_1200_PAR"]
+        vmin: [-236]
+        vmax: [316]
+        palette: ["0f17ff", "b11406", "f1ff23"]
     bands:
       GMT_0000_PAR:
         description: Total PAR at GMT 00:00
@@ -6703,6 +7798,12 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "True Color (143)"
+        bands: ["Nadir_Reflectance_Band1", "Nadir_Reflectance_Band4", "Nadir_Reflectance_Band3"]
+        vmin: [0.01]
+        vmax: [2000]
+        gamma: [1.6]
     bands:
       Nadir_Reflectance_Band1:
       Nadir_Reflectance_Band2:
@@ -6723,6 +7824,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Scaled"
+        bands: ["BAI"]
+        vmin: [0]
+        vmax: [100]
     bands:
       BAI:
         description: Burn Area Index
@@ -6739,6 +7845,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["EVI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       EVI:
         description: Enhanced Vegetation Index
@@ -6755,6 +7867,10 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDSI"]
+        palette: ["000088", "0000ff", "8888ff", "ffffff"]
     bands:
       NDSI:
         description: Normalized Difference Snow Index
@@ -6771,6 +7887,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDWI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000", "ffffff"]
     bands:
       NDWI:
         description: Normalized Difference Water Index
@@ -6787,6 +7909,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Scaled"
+        bands: ["BAI"]
+        vmin: [0]
+        vmax: [100]
     bands:
       BAI:
         description: Burn Area Index
@@ -6803,6 +7930,10 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDSI"]
+        palette: ["000088", "0000ff", "8888ff", "ffffff"]
     bands:
       NDSI:
         description: Normalized Difference Snow Index
@@ -6819,6 +7950,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDWI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000", "ffffff"]
     bands:
       NDWI:
         description: Normalized Difference Water Index
@@ -6834,6 +7971,19 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "True Color (143)"
+        bands: ["sur_refl_b01", "sur_refl_b04", "sur_refl_b03"]
+        vmin: [-100]
+        vmax: [8000]
+      - name: "False Color (367: Snow/Water/Ice)"
+        bands: ["sur_refl_b03", "sur_refl_b06", "sur_refl_b07"]
+        vmin: [-100]
+        vmax: [8000]
+      - name: "False Color (721: Burns)"
+        bands: ["sur_refl_b07", "sur_refl_b02", "sur_refl_b01"]
+        vmin: [-100]
+        vmax: [8000]
     bands:
       sur_refl_b01:
       sur_refl_b02:
@@ -6859,6 +8009,19 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "True Color (143)"
+        bands: ["sur_refl_b01", "sur_refl_b04", "sur_refl_b03"]
+        vmin: [-100]
+        vmax: [8000]
+      - name: "False Color (367: Snow/Water/Ice)"
+        bands: ["sur_refl_b03", "sur_refl_b06", "sur_refl_b07"]
+        vmin: [-100]
+        vmax: [8000]
+      - name: "False Color (721: Burns)"
+        bands: ["sur_refl_b07", "sur_refl_b02", "sur_refl_b01"]
+        vmin: [-100]
+        vmax: [8000]
     bands:
       num_observations_1km:
       state_1km:
@@ -6893,6 +8056,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Scaled"
+        bands: ["BAI"]
+        vmin: [0]
+        vmax: [100]
     bands:
       BAI:
         description: Burn Area Index
@@ -6909,6 +8077,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["EVI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       EVI:
         description: Enhanced Vegetation Index
@@ -6925,6 +8099,10 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDSI"]
+        palette: ["000088", "0000ff", "8888ff", "ffffff"]
     bands:
       NDSI:
         description: Normalized Difference Snow Index
@@ -6941,6 +8119,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDWI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000", "ffffff"]
     bands:
       NDWI:
         description: Normalized Difference Water Index
@@ -6957,6 +8141,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Scaled"
+        bands: ["BAI"]
+        vmin: [0]
+        vmax: [100]
     bands:
       BAI:
         description: Burn Area Index
@@ -6973,6 +8162,10 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDSI"]
+        palette: ["000088", "0000ff", "8888ff", "ffffff"]
     bands:
       NDSI:
         description: Normalized Difference Snow Index
@@ -6989,6 +8182,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDWI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000", "ffffff"]
     bands:
       NDWI:
         description: Normalized Difference Water Index
@@ -7004,6 +8203,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "False Color (221)"
+        bands: ["sur_refl_b02", "sur_refl_b02", "sur_refl_b01"]
+        vmin: [-100]
+        vmax: [8000]
     bands:
       num_observations:
       sur_refl_b01:
@@ -7021,6 +8225,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "False Color (221)"
+        bands: ["sur_refl_b02", "sur_refl_b02", "sur_refl_b01"]
+        vmin: [-100]
+        vmax: [8000]
     bands:
       sur_refl_b01:
       sur_refl_b02:
@@ -7036,6 +8245,10 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Surface Temperature"
+        bands: ["LST_Day_1km"]
+        gain: [0.1]
     bands:
       LST_Day_1km:
       QC_Day:
@@ -7060,6 +8273,10 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Surface Temperature"
+        bands: ["LST_Day_1km"]
+        gain: [0.1]
     bands:
       LST_Day_1km:
       QC_Day:
@@ -7084,6 +8301,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC'
+    visualizations:
+      - name: "Water Mask"
+        bands: ["water_mask"]
+        vmin: [0]
+        vmax: [350]
+        gamma: [2.5]
     bands:
       water_mask:
         description: Land-water mask
@@ -7101,6 +8324,19 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "True Color (143)"
+        bands: ["sur_refl_b01", "sur_refl_b04", "sur_refl_b03"]
+        vmin: [-100]
+        vmax: [8000]
+      - name: "False Color (367: Snow/Water/Ice)"
+        bands: ["sur_refl_b03", "sur_refl_b06", "sur_refl_b07"]
+        vmin: [-100]
+        vmax: [8000]
+      - name: "False Color (721: Burns)"
+        bands: ["sur_refl_b07", "sur_refl_b02", "sur_refl_b01"]
+        vmin: [-100]
+        vmax: [8000]
     bands:
       sur_refl_b01:
       sur_refl_b02:
@@ -7126,6 +8362,19 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "True Color (143)"
+        bands: ["sur_refl_b01", "sur_refl_b04", "sur_refl_b03"]
+        vmin: [-100]
+        vmax: [8000]
+      - name: "False Color (367: Snow/Water/Ice)"
+        bands: ["sur_refl_b03", "sur_refl_b06", "sur_refl_b07"]
+        vmin: [-100]
+        vmax: [8000]
+      - name: "False Color (721: Burns)"
+        bands: ["sur_refl_b07", "sur_refl_b02", "sur_refl_b01"]
+        vmin: [-100]
+        vmax: [8000]
     bands:
       num_observations_1km:
       state_1km:
@@ -7160,6 +8409,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Scaled"
+        bands: ["BAI"]
+        vmin: [0]
+        vmax: [100]
     bands:
       BAI:
         description: Burn Area Index
@@ -7176,6 +8430,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["EVI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["ffffff", "ce7e45", "df923d", "f1b555", "fcd163", "99b718", "74a901", "66a000", "529400", "3e8601", "207401", "056201", "004c00", "023b01", "012e01", "011d01", "011301"]
     bands:
       EVI:
         description: Enhanced Vegetation Index
@@ -7192,6 +8452,10 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDSI"]
+        palette: ["000088", "0000ff", "8888ff", "ffffff"]
     bands:
       NDSI:
         description: Normalized Difference Snow Index
@@ -7208,6 +8472,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDWI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000", "ffffff"]
     bands:
       NDWI:
         description: Normalized Difference Water Index
@@ -7224,6 +8494,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Scaled"
+        bands: ["BAI"]
+        vmin: [0]
+        vmax: [100]
     bands:
       BAI:
         description: Burn Area Index
@@ -7240,6 +8515,10 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDSI"]
+        palette: ["000088", "0000ff", "8888ff", "ffffff"]
     bands:
       NDSI:
         description: Normalized Difference Snow Index
@@ -7256,6 +8535,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Colorized"
+        bands: ["NDWI"]
+        vmin: [0]
+        vmax: [1]
+        palette: ["0000ff", "00ffff", "ffff00", "ff0000", "ffffff"]
     bands:
       NDWI:
         description: Normalized Difference Water Index
@@ -7271,6 +8556,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "False Color (221)"
+        bands: ["sur_refl_b02", "sur_refl_b02", "sur_refl_b01"]
+        vmin: [-100]
+        vmax: [8000]
     bands:
       num_observations:
       sur_refl_b01:
@@ -7288,6 +8578,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "False Color (221)"
+        bands: ["sur_refl_b02", "sur_refl_b02", "sur_refl_b01"]
+        vmin: [-100]
+        vmax: [8000]
     bands:
       sur_refl_b01:
       sur_refl_b02:
@@ -7303,6 +8598,10 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Surface Temperature"
+        bands: ["LST_Day_1km"]
+        gain: [0.1]
     bands:
       LST_Day_1km:
       QC_Day:
@@ -7327,6 +8626,10 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "Surface Temperature"
+        bands: ["LST_Day_1km"]
+        gain: [0.1]
     bands:
       LST_Day_1km:
       QC_Day:
@@ -7351,6 +8654,11 @@ datasets:
       end_date: null
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "HLS L30 RGB bands"
+        bands: ["B4", "B3", "B2"]
+        vmin: [0.01]
+        vmax: [0.18]
     bands:
       B1:
         description: Coastal aerosol
@@ -7388,6 +8696,11 @@ datasets:
       end_date: null
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "HLS S30 RGB bands"
+        bands: ["B4", "B3", "B2"]
+        vmin: [0.01]
+        vmax: [0.18]
     bands:
       B1:
         description: Coastal aerosol
@@ -7426,6 +8739,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA promotes the full and open sharing of all data with the research and'
+    visualizations:
+      - name: "Fires"
+        bands: ["Bright_ti4"]
+        vmin: [325]
+        vmax: [400]
+        palette: ["yellow", "orange", "red", "white", "darkred"]
     bands:
       Bright_ti4:
         description: VIIRS I-4 channel brightness temperature of the fire pixel.
@@ -7469,6 +8788,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NASA promotes the full and open sharing of all data with the research and'
+    visualizations:
+      - name: "Fires"
+        bands: ["Bright_ti4"]
+        vmin: [325]
+        vmax: [400]
+        palette: ["yellow", "orange", "red", "white", "darkred"]
     bands:
       Bright_ti4:
         description: VIIRS I-4 channel brightness temperature of the fire pixel.
@@ -7512,6 +8837,11 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "RGB"
+        bands: ["M5", "M4", "M3"]
+        vmin: [0]
+        vmax: [0.3]
     bands:
       M1:
         description: 1km surface reflectance band M1
@@ -7650,6 +8980,11 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "RGB"
+        bands: ["SurfReflect_I1", "SurfReflect_I2", "SurfReflect_I3"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       SurfReflect_I1:
         description: 500 m Surface Reflectance Band I1
@@ -7684,6 +9019,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "Daily emissivity"
+        bands: ["LST_1KM"]
+        vmin: [200]
+        vmax: [300]
+        palette: ["a50026", "d73027", "f46d43", "fdae61", "fee08b", "ffffbf", "d9ef8b", "a6d96a", "66bd63", "1a9850", "006837"]
     bands:
       LST_1KM:
         description: Daily 1 km Land Surface Temperature.
@@ -7715,6 +9056,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "Daily emissivity"
+        bands: ["LST_1KM"]
+        vmin: [200]
+        vmax: [300]
+        palette: ["a50026", "d73027", "f46d43", "fdae61", "fee08b", "ffffbf", "d9ef8b", "a6d96a", "66bd63", "1a9850", "006837"]
     bands:
       LST_1KM:
         description: Daily 1 km Land Surface Temperature.
@@ -7746,6 +9093,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'The NOAA CDR Program''s official distribution point for CDRs is NOAA''s'
+    visualizations:
+      - name: "Surface Reflectance"
+        bands: ["SREFL_CH1"]
+        vmin: [-1000]
+        vmax: [9000]
+        palette: ["003b02", "006a03", "008d05", "01be07", "01ff09", "ffffff"]
     bands:
       SREFL_CH1:
         description: Bidirectional surface reflectance
@@ -7824,6 +9177,12 @@ datasets:
       end_date: null
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "Surface Reflectance"
+        bands: ["SREFL_CH1"]
+        vmin: [-1000]
+        vmax: [9000]
+        palette: ["003b02", "006a03", "008d05", "01be07", "01ff09", "ffffff"]
     bands:
       SREFL_CH1:
         description: Channel 1 (red, 0.64 µm) bidirectional surface reflectance
@@ -7853,6 +9212,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Data Quality Flags (DQF)"
+        bands: ["DQF"]
+        vmin: [0]
+        vmax: [5]
+        palette: ["blanchedalmond", "olive", "teal", "darkslateblue", "lemonchiffon", "burlywood"]
     bands:
       Area:
         description: Fire area
@@ -7892,6 +9257,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Data Quality Flags (DQF)"
+        bands: ["DQF"]
+        vmin: [0]
+        vmax: [5]
+        palette: ["blanchedalmond", "olive", "teal", "darkslateblue", "lemonchiffon", "burlywood"]
     bands:
       Area:
         description: Fire area
@@ -7931,6 +9302,11 @@ datasets:
       bbox: [-152.11, 14, -49.18, 56.77]
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "Blue band"
+        bands: ["CMI_C01"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       CMI_C01:
         description: ABI band 01 (visible blue) reflectance factor
@@ -7973,6 +9349,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Data Quality Flags (DQF)"
+        bands: ["DQF"]
+        vmin: [0]
+        vmax: [5]
+        palette: ["blanchedalmond", "olive", "teal", "darkslateblue", "lemonchiffon", "burlywood"]
     bands:
       Area:
         description: Fire area
@@ -8012,6 +9394,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Data Quality Flags (DQF)"
+        bands: ["DQF"]
+        vmin: [0]
+        vmax: [5]
+        palette: ["blanchedalmond", "olive", "teal", "darkslateblue", "lemonchiffon", "burlywood"]
     bands:
       Area:
         description: Fire area
@@ -8051,6 +9439,11 @@ datasets:
       bbox: [-180, 14.57, 180, 53.51]
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "Blue band"
+        bands: ["CMI_C01"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       CMI_C01:
         description: ABI band 01 (visible blue) reflectance factor
@@ -8093,6 +9486,12 @@ datasets:
     default_reducer: mean
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Data Quality Flags (DQF)"
+        bands: ["DQF"]
+        vmin: [0]
+        vmax: [5]
+        palette: ["blanchedalmond", "olive", "teal", "darkslateblue", "lemonchiffon", "burlywood"]
     bands:
       Area:
         description: Fire area
@@ -8132,6 +9531,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Data Quality Flags (DQF)"
+        bands: ["DQF"]
+        vmin: [0]
+        vmax: [5]
+        palette: ["blanchedalmond", "olive", "teal", "darkslateblue", "lemonchiffon", "burlywood"]
     bands:
       Area:
         description: Fire area
@@ -8172,6 +9577,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Data Quality Flags (DQF)"
+        bands: ["DQF"]
+        vmin: [0]
+        vmax: [5]
+        palette: ["blanchedalmond", "olive", "teal", "darkslateblue", "lemonchiffon", "burlywood"]
     bands:
       Area:
         description: Fire area
@@ -8211,6 +9622,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'NOAA data, information, and products, regardless of the method of delivery,'
+    visualizations:
+      - name: "Data Quality Flags (DQF)"
+        bands: ["DQF"]
+        vmin: [0]
+        vmax: [5]
+        palette: ["blanchedalmond", "olive", "teal", "darkslateblue", "lemonchiffon", "burlywood"]
     bands:
       Area:
         description: Fire area
@@ -8249,6 +9666,11 @@ datasets:
       end_date: null
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "RGB"
+        bands: ["M5", "M4", "M3"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       M3:
         description: Surface reflectance band M3 (visible blue)
@@ -8291,6 +9713,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "RGB"
+        bands: ["SurfReflect_I1", "SurfReflect_I2", "SurfReflect_I3"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       SurfReflect_I1:
         description: 500 m Surface Reflectance Band I1
@@ -8324,6 +9751,12 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "Daily emissivity"
+        bands: ["LST_1KM"]
+        vmin: [200]
+        vmax: [300]
+        palette: ["a50026", "d73027", "f46d43", "fdae61", "fee08b", "ffffbf", "d9ef8b", "a6d96a", "66bd63", "1a9850", "006837"]
     bands:
       LST_1KM:
         description: Daytime 1 km land surface temperature
@@ -8352,6 +9785,12 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "Daily emissivity"
+        bands: ["LST_1KM"]
+        vmin: [200]
+        vmax: [300]
+        palette: ["a50026", "d73027", "f46d43", "fdae61", "fee08b", "ffffbf", "d9ef8b", "a6d96a", "66bd63", "1a9850", "006837"]
     bands:
       LST_1KM:
         description: Daily 1 km Land Surface Temperature.
@@ -8383,6 +9822,11 @@ datasets:
     default_reducer: median
     license: public-domain
     terms_note: 'LP DAAC NASA data are freely accessible; however, when an author'
+    visualizations:
+      - name: "Day-Night Band (DNB) at sensor radiance 500m"
+        bands: ["DNB_At_Sensor_Radiance_500m"]
+        vmin: [0]
+        vmax: [100]
     bands:
       BrightnessTemperature_M12:
         description: Brightness temperature of band M12
@@ -8520,6 +9964,11 @@ datasets:
       end_date: null
     default_reducer: mean
     license: public-domain
+    visualizations:
+      - name: "brdf"
+        bands: ["DNB_BRDF_Corrected_NTL"]
+        vmin: [0]
+        vmax: [100]
     bands:
       DNB_BRDF_Corrected_NTL:
         description: BRDF-corrected DNB nighttime light radiance
@@ -8547,6 +9996,11 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for use with attribution (Colorado School of Mines).'
+    visualizations:
+      - name: "Nighttime"
+        bands: ["maximum"]
+        vmin: [0]
+        vmax: [60]
     bands:
       average:
         description: Annual average DNB radiance
@@ -8581,6 +10035,11 @@ datasets:
     default_reducer: median
     license: proprietary
     terms_note: 'Colorado School of Mines data, information, and products,'
+    visualizations:
+      - name: "Nighttime"
+        bands: ["maximum"]
+        vmin: [0]
+        vmax: [60]
     bands:
       average:
         description: Average DNB radiance values.
@@ -8618,6 +10077,11 @@ datasets:
     default_reducer: median
     license: proprietary
     terms_note: 'Colorado School of Mines data, information, and products,'
+    visualizations:
+      - name: "Nighttime"
+        bands: ["avg_rad"]
+        vmin: [0]
+        vmax: [60]
     bands:
       avg_rad:
         description: Average DNB radiance values.
@@ -8642,6 +10106,11 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'Free for use with attribution (Colorado School of Mines).'
+    visualizations:
+      - name: "Nighttime"
+        bands: ["avg_rad"]
+        vmin: [0]
+        vmax: [60]
     bands:
       avg_rad:
         description: Monthly average DNB radiance (nighttime lights)
@@ -8661,6 +10130,11 @@ datasets:
     default_reducer: median
     license: CC-BY-4.0
     terms_note: 'The images are made available with a CC BY 4.0 license. The user is required'
+    visualizations:
+      - name: "Netherlands orthophotos RGB"
+        bands: ["R", "G", "B"]
+        vmin: [0]
+        vmax: [255]
     bands:
       R:
         description: Red
@@ -8690,6 +10164,11 @@ datasets:
     default_reducer: mean
     license: CC-BY-SA-4.0
     terms_note: 'This dataset is made available publicly under the Creative Commons by'
+    visualizations:
+      - name: "False Color"
+        bands: ["N", "G", "B"]
+        vmin: [200]
+        vmax: [6000]
     bands:
       B:
         description: Blue
@@ -8729,6 +10208,11 @@ datasets:
     default_reducer: mean
     license: CC-BY-SA-4.0
     terms_note: 'This dataset is made available publicly under the Creative Commons by'
+    visualizations:
+      - name: "RGB"
+        bands: ["R", "G", "B"]
+        vmin: [11]
+        vmax: [190]
     bands:
       R:
         description: Red
@@ -8755,6 +10239,11 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'The User is entitled to combine the Source Data with other data, use it in'
+    visualizations:
+      - name: "Slovakia orthophotos RGB"
+        bands: ["R", "G", "B"]
+        vmin: [0]
+        vmax: [255]
     bands:
       R:
         description: Red
@@ -8784,6 +10273,11 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'The data is free and free use for any legitimate purpose,'
+    visualizations:
+      - name: "Spain RGB (10cm)"
+        bands: ["R", "G", "B"]
+        vmin: [0]
+        vmax: [255]
     bands:
       R:
         description: Red
@@ -8813,6 +10307,11 @@ datasets:
     default_reducer: mean
     license: proprietary
     terms_note: 'The free geodata and geoservices of swisstopo may be used, distributed and'
+    visualizations:
+      - name: "Switzerland RGB (10 cm)"
+        bands: ["R", "G", "B"]
+        vmin: [11]
+        vmax: [190]
     bands:
       R:
         description: Red
@@ -8841,6 +10340,11 @@ datasets:
       bbox: [-9, 36.9, 31.6, 68.1]
     default_reducer: median
     license: CDLA-Permissive-1.0
+    visualizations:
+      - name: "RGB"
+        bands: ["B4", "B3", "B2"]
+        vmin: [0]
+        vmax: [3000]
     bands:
       B2:
         description: Blue
@@ -8895,6 +10399,11 @@ datasets:
       bbox: [-124.84, 24.42, -64.82, 49.72]
     default_reducer: median
     license: public-domain
+    visualizations:
+      - name: "True Color"
+        bands: ["R", "G", "B"]
+        vmin: [0]
+        vmax: [255]
     bands:
       R:
         description: Red (digital number)
@@ -8917,6 +10426,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'These images are in the public domain and can be used freely'
+    visualizations:
+      - name: "Antarctica"
+        bands: ["B3", "B2", "B1"]
+        vmin: [0]
+        vmax: [10000]
     bands:
       B1:
         description: Blue
@@ -8943,6 +10457,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'These images are in the public domain and can be used freely'
+    visualizations:
+      - name: "Antarctica"
+        bands: ["B3", "B2", "B1"]
+        vmin: [0]
+        vmax: [10000]
     bands:
       B1:
         description: Blue
@@ -8991,6 +10510,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'PROBA-V 300m and 100m data are freely available for data older than 1 month.'
+    visualizations:
+      - name: "False Color"
+        bands: ["RED", "NIR", "BLUE"]
+        vmin: [20]
+        vmax: [2000]
     bands:
       RED:
         description: Top of canopy reflectance RED channel
@@ -9042,6 +10566,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'PROBA-V 300m and 100m data are freely available for data older than 1 month.'
+    visualizations:
+      - name: "False Color"
+        bands: ["RED", "NIR", "BLUE"]
+        vmin: [20]
+        vmax: [2000]
     bands:
       RED:
         description: Top of canopy reflectance RED channel
@@ -9093,6 +10622,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'PROBA-V 300m and 100m data are freely available for data older than 1 month.'
+    visualizations:
+      - name: "False Color"
+        bands: ["RED", "NIR", "BLUE"]
+        vmin: [20]
+        vmax: [2000]
     bands:
       RED:
         description: Top of canopy reflectance RED channel
@@ -9144,6 +10678,11 @@ datasets:
     default_reducer: mosaic
     license: proprietary
     terms_note: 'PROBA-V 300m and 100m data are freely available for data older than 1 month.'
+    visualizations:
+      - name: "False Color"
+        bands: ["RED", "NIR", "BLUE"]
+        vmin: [20]
+        vmax: [2000]
     bands:
       RED:
         description: Top of canopy reflectance RED channel
@@ -9196,6 +10735,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "False Color"
+        bands: ["Nadir_Reflectance_Band2", "Nadir_Reflectance_Band6", "Nadir_Reflectance_Band1"]
+        vmin: [0, 0, 0]
+        vmax: [5000, 9000, 7000]
     bands:
       Nadir_Reflectance_Band1:
         description: Best NBAR at local solar noon for band 1
@@ -9232,6 +10776,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "False Color"
+        bands: ["Nadir_Reflectance_Band2", "Nadir_Reflectance_Band6", "Nadir_Reflectance_Band1"]
+        vmin: [0, 0, 0]
+        vmax: [5000, 9000, 7000]
     bands:
       Nadir_Reflectance_Band1:
         description: Best NBAR at local solar noon for band 1
@@ -9268,6 +10817,11 @@ datasets:
     default_reducer: mosaic
     license: public-domain
     terms_note: 'MODIS data and products acquired through the LP DAAC have no restrictions on subsequent'
+    visualizations:
+      - name: "False Color"
+        bands: ["Nadir_Reflectance_Band2", "Nadir_Reflectance_Band6", "Nadir_Reflectance_Band1"]
+        vmin: [0, 0, 0]
+        vmax: [5000, 9000, 7000]
     bands:
       Nadir_Reflectance_Band1:
         description: Best NBAR at local solar noon for band 1

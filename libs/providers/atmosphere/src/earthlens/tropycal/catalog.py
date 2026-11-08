@@ -10,18 +10,18 @@ basin codes and which `source`s serve each one.
 
 `Basin` is the "Dataset" analog (`name`, `sources`, `fields`);
 `TrackField` is the "Variable" analog (`units`, `long_name`).
-:class:`Catalog` is an :class:`earthlens.base.AbstractCatalog` subclass
+`Catalog` is an `earthlens.base.AbstractCatalog` subclass
 that loads the bundled `tropycal_data_catalog.yaml` and stores the basin
 map under the inherited `datasets` field — which gives it the
 `cat["north_atlantic"]` / `"north_atlantic" in cat` / `len(cat)`
 dict-like surface and the did-you-mean error for free.
 
 It mirrors the ECMWF / GEE catalogs' shape: it exposes an
-:attr:`Catalog.available_datasets` index (every basin tropycal serves —
+`Catalog.available_datasets` index (every basin tropycal serves —
 here that *is* the curated set, since the basins are the whole universe),
-a :meth:`Catalog.health` hygiene report, and a `(path, mtime_ns)` parse
-cache (see :func:`clear_catalog_cache`) so repeated `Catalog()`
-construction is ~1 ms. :data:`CATALOG_PATH` is the path to the bundled
+a `Catalog.health` hygiene report, and a `(path, mtime_ns)` parse
+cache (see `clear_catalog_cache`) so repeated `Catalog()`
+construction is ~1 ms. `CATALOG_PATH` is the path to the bundled
 YAML and is monkey-patchable in tests.
 """
 
@@ -39,7 +39,7 @@ from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 CATALOG_PATH: Path = Path(__file__).parent / "tropycal_data_catalog.yaml"
 
 #: The data sources tropycal 1.4 exposes (no `jtwc`); used by
-#: :meth:`Catalog.health` to flag a basin row referencing an unknown one.
+#: `Catalog.health` to flag a basin row referencing an unknown one.
 _KNOWN_SOURCES: frozenset[str] = frozenset({"ibtracs", "hurdat"})
 
 # Module-level cache of parsed basin maps, keyed on `(resolved_path,
@@ -110,7 +110,7 @@ def _load_basins(path: Path) -> dict[str, Basin]:
 class TrackField(SummarisedLeaf):
     """One per-fix track field (the "Variable" analog).
 
-    The field's short code is the parent key in :attr:`Basin.fields` and
+    The field's short code is the parent key in `Basin.fields` and
     is not stored on the row.
 
     Attributes:
@@ -142,7 +142,7 @@ class TrackField(SummarisedLeaf):
 class Basin(SummarisedLeaf):
     """One ocean basin's catalog row (the "Dataset" analog).
 
-    The basin code is the parent key in :attr:`Catalog.datasets` and is
+    The basin code is the parent key in `Catalog.datasets` and is
     not stored on the row.
 
     Attributes:
@@ -180,16 +180,16 @@ class Catalog(AbstractCatalog[Basin]):
     """Basin -> track-field catalog for the Tropycal backend.
 
     Reads the bundled `tropycal_data_catalog.yaml` (shipped as package
-    data) and exposes its `basins:` block as a map of :class:`Basin`
-    rows, keyed by basin code under the inherited :attr:`datasets`
+    data) and exposes its `basins:` block as a map of `Basin`
+    rows, keyed by basin code under the inherited `datasets`
     field. Instantiate with no arguments (`Catalog()`);
-    :func:`model_post_init` loads and validates the YAML in one pass.
-    Resolve a basin with :meth:`get_basin` (a thin alias over
-    :meth:`~earthlens.base.AbstractCatalog.get_dataset`) and a single
-    track field with :meth:`get_field`.
+    `model_post_init` loads and validates the YAML in one pass.
+    Resolve a basin with `get_basin` (a thin alias over
+    `get_dataset`) and a single
+    track field with `get_field`.
 
     Attributes:
-        datasets: Map from the basin code to its :class:`Basin` row.
+        datasets: Map from the basin code to its `Basin` row.
 
     Examples:
         - List basin codes and resolve one:
@@ -223,13 +223,13 @@ class Catalog(AbstractCatalog[Basin]):
     def model_post_init(self, __context: Any) -> None:
         """Auto-load the bundled catalog when no basins were supplied.
 
-        `Catalog()` with no args reads :data:`CATALOG_PATH` (through the
+        `Catalog()` with no args reads `CATALOG_PATH` (through the
         `(path, mtime_ns)` cache); passing `datasets=...` skips the disk
-        read (used in tests). Either way, :attr:`available_datasets` is
+        read (used in tests). Either way, `available_datasets` is
         populated with the basin codes — the whole tropycal universe.
 
         Raises:
-            ValueError: Propagated from :meth:`load` when the YAML is
+            ValueError: Propagated from `load` when the YAML is
                 missing, empty, or has a malformed basin row.
         """
         if not self.datasets:
@@ -244,25 +244,25 @@ class Catalog(AbstractCatalog[Basin]):
 
         Args:
             catalog_path: Path to the catalog YAML. Defaults to the
-                module-level :data:`CATALOG_PATH`.
+                module-level `CATALOG_PATH`.
 
         Returns:
-            A fully-populated :class:`Catalog` with `datasets` and the
+            A fully-populated `Catalog` with `datasets` and the
             `available_datasets` index set.
 
         Raises:
             ValueError: If the file has no `basins:` block, or a row
-                fails :class:`Basin` validation.
+                fails `Basin` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         basins = _load_basins(catalog_path)
         return cls(datasets=dict(basins), available_datasets=sorted(basins))
 
     def get_basin(self, code: str) -> Basin:
-        """Return the :class:`Basin` for `code`, with a did-you-mean hint.
+        """Return the `Basin` for `code`, with a did-you-mean hint.
 
         Thin alias over
-        :meth:`~earthlens.base.AbstractCatalog.get_dataset`.
+        `get_dataset`.
 
         Args:
             code: A tropycal basin code (`"north_atlantic"`, …).
@@ -304,7 +304,7 @@ class Catalog(AbstractCatalog[Basin]):
     def get_variable(self, code: str, field: str) -> TrackField:
         """Leaf accessor for the shared two-arg get_variable contract.
 
-        Alias of :meth:`get_field` so the tropycal leaf is reachable
+        Alias of `get_field` so the tropycal leaf is reachable
         under the same `get_variable(dataset_key, variable_name)` verb
         the other two-level catalogs use.
 
@@ -344,7 +344,7 @@ class Catalog(AbstractCatalog[Basin]):
     def describe(self, code: str) -> dict[str, Any]:
         """Return a structured introspection record for a basin.
 
-        Mirrors :meth:`earthlens.ecmwf.Catalog.describe`: a runtime "what
+        Mirrors `earthlens.ecmwf.Catalog.describe`: a runtime "what
         does basin X expose?" helper a CLI / notebook can dump without
         walking the YAML.
 
@@ -384,8 +384,8 @@ class Catalog(AbstractCatalog[Basin]):
     def health(self) -> dict[str, list[str]]:
         """Report structural hygiene issues across the loaded catalog.
 
-        Mirrors :meth:`earthlens.ecmwf.Catalog.health` /
-        :meth:`earthlens.gee.Catalog.health`: returns a mapping
+        Mirrors `earthlens.ecmwf.Catalog.health` /
+        `earthlens.gee.Catalog.health`: returns a mapping
         `check_name -> sorted list of offenders`. An empty list means the
         check passes; an empty dict means the catalog is clean. Schema-level
         invariants (duplicate keys, unknown fields) are already enforced at

@@ -10,11 +10,11 @@ slot — wasting both queue capacity and wall-clock time.
 
 This module hits the constraints endpoint once per dataset (cached
 in-process), and rejects mismatched requests at the call site so
-the user sees a clear error before :meth:`cdsapi.Client.retrieve`
+the user sees a clear error before `cdsapi.Client.retrieve`
 is invoked.
 
-Pass `skip=True` to :class:`RequestValidator` — or, equivalently,
-construct :class:`earthlens.ecmwf.ECMWF` with `skip_constraints=True` —
+Pass `skip=True` to `RequestValidator` — or, equivalently,
+construct `earthlens.ecmwf.ECMWF` with `skip_constraints=True` —
 to bypass validation entirely. Useful when the constraints endpoint
 is missing or known to be inaccurate for a particular dataset.
 
@@ -221,7 +221,7 @@ def fetch_constraints(
 class Dates(BaseModel):
     """Year/month/day fields of a CDS request, validated for real dates.
 
-    Public entry point is :meth:`Dates.check` — fails fast on
+    Public entry point is `Dates.check` — fails fast on
     obvious calendar mistakes (Feb 30, month=13, year=1492, …) before
     the request is sent.
 
@@ -274,8 +274,8 @@ class Dates(BaseModel):
     def check(cls, request: dict[str, Any]) -> None:
         """Validate `request`'s date fields; raise `ValueError` on failure.
 
-        Thin wrapper that runs :meth:`model_validate` and translates
-        pydantic's :class:`ValidationError` to :class:`ValueError`
+        Thin wrapper that runs `model_validate` and translates
+        pydantic's `ValidationError` to `ValueError`
         (matching the rest of this module's error contract).
         """
         try:
@@ -289,7 +289,7 @@ class Dates(BaseModel):
 class Area(BaseModel):
     """CDS `area` bbox validated against lat/lon bounds.
 
-    Public entry point is :meth:`Area.check` — fails fast on swapped
+    Public entry point is `Area.check` — fails fast on swapped
     indices, out-of-range latitudes, or non-numeric values, before
     the request reaches CDS and burns a queue slot.
     """
@@ -378,7 +378,7 @@ def _impossible_calendar_date(tuple_dict: dict[str, Any]) -> bool:
     against the live store). The combinatorial cover check must do the same, or it
     rejects requests the server accepts: real `constraints.json` documents partition
     `day` by month length, so no entry serves `(month=06, day=31)`. This mirrors
-    :class:`Dates`, which already tolerates `day=[01..31]` spanning shorter months.
+    `Dates`, which already tolerates `day=[01..31]` spanning shorter months.
 
     Only `(month, day)` tuples are judged. A tuple missing either key, or carrying a
     non-numeric value (e.g. `"all"`), is never impossible. A numeric `year` is
@@ -420,8 +420,8 @@ class RequestValidator:
     Bundles every check that pre-flights a request to the Climate
     Data Store, in a fixed cheap-to-expensive order:
 
-    1. Date sanity (`year` / `month` / `day` form a real date) — :class:`Dates`.
-    2. Area bbox sanity (`[north, west, south, east]`) — :class:`Area`.
+    1. Date sanity (`year` / `month` / `day` form a real date) — `Dates`.
+    2. Area bbox sanity (`[north, west, south, east]`) — `Area`.
     3. Variable name spell-check (with close-match suggestions).
     4. Required-field check (every key present in every constraint
        entry must be in the request).
@@ -491,7 +491,7 @@ class RequestValidator:
 
         Walks `self.constraints` to collect every catalogued variable,
         then flags any request variable that is not in that set and
-        offers up to 3 close matches via :func:`difflib.get_close_matches`.
+        offers up to 3 close matches via `difflib.get_close_matches`.
         """
         raw = self.request.get("variable", [])
         requested = raw if isinstance(raw, list) else [raw]

@@ -124,7 +124,7 @@ def netcdf_variable_to_raster(
         epsg: The EPSG code to tag the raster with; the variable's own `epsg`
             is used when `None`.
         wrap_longitude: When `True`, wrap a whole-globe 0-360 longitude grid to
-            -180..180 (see :func:`array_to_raster`).
+            -180..180 (see `array_to_raster`).
 
     Returns:
         A new `pyramids.Dataset` for the variable.
@@ -133,7 +133,9 @@ def netcdf_variable_to_raster(
 
     cube = nc.get_variable(name)
     return array_to_raster(
-        np.asarray(cube.read_array()),
+        # squeeze=True: array_to_raster wants (bands, rows, cols); pyramids 0.66's
+        # read_array otherwise keeps every band dimension separate.
+        np.asarray(cube.read_array(squeeze=True)),
         tuple(cube.geotransform),
         epsg=cube.epsg if epsg is None else epsg,
         wrap_longitude=wrap_longitude,

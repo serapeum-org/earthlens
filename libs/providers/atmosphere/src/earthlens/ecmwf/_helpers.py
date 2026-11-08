@@ -28,7 +28,7 @@ def _looks_like_licence_not_accepted(exc: BaseException) -> bool:
     a valid Personal Access Token but has not ticked the licence on
     the dataset's download page. cdsapi raises this through to the
     caller as a generic exception; we detect it by message scan so we
-    can rewrite into a :class:`PermissionError` that names the
+    can rewrite into a `PermissionError` that names the
     dataset URL.
 
     Args:
@@ -113,7 +113,7 @@ class CadsUnavailableError(UpstreamUnavailableError):
             ```
 
     The `(message, status_code)` constructor is inherited from
-    :class:`~earthlens.base.UpstreamUnavailableError`.
+    `UpstreamUnavailableError`.
     """
 
 
@@ -152,7 +152,7 @@ def _looks_like_throttled(exc: BaseException) -> bool:
 def _status_of(exc: BaseException) -> int | None:
     """Return the HTTP status behind a failed retrieve, when discernible.
 
-    A thin wrapper over :func:`earthlens.base.http_status`: it walks the
+    A thin wrapper over `earthlens.base.http_status`: it walks the
     exception chain, because `cdsapi` wraps the `requests` error that carries the
     `response` — reading only the outermost exception would answer `None` for
     most real refusals. The status comes from a `response` object when one is
@@ -180,7 +180,7 @@ def _is_retryable_failure(exc: BaseException, dataset: str, endpoint: str) -> bo
     """Say whether a failed retrieve is a transient refusal worth retrying.
 
     An unaccepted licence is permanent, so it is rewritten into a
-    :class:`PermissionError` naming the dataset page; any other non-throttle
+    `PermissionError` naming the dataset page; any other non-throttle
     failure propagates untouched, because retrying a malformed request only
     reproduces the same error.
 
@@ -259,9 +259,9 @@ def _retrieve_with_retry(
     modes a CADS store has for a well-formed request are handled in one place:
 
     * **licence not accepted** - permanent until the user ticks the licence, so
-      it is rewritten into a :class:`PermissionError` naming the dataset page.
+      it is rewritten into a `PermissionError` naming the dataset page.
     * **queue limit** - transient, so it is retried with an exponential wait and,
-      if it outlives the attempts, raised as :class:`CadsUnavailableError` so a
+      if it outlives the attempts, raised as `CadsUnavailableError` so a
       caller can skip rather than fail.
 
     Anything else propagates untouched: a malformed request must fail fast, not

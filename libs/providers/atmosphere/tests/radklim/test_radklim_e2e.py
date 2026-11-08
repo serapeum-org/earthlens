@@ -26,18 +26,7 @@ _GERMANY_LAT = [47.0, 55.0]
 _GERMANY_LON = [6.0, 15.0]
 
 
-def _network_available() -> bool:
-    """Return whether the DWD operational radar tree is reachable."""
-    try:
-        HttpClient(timeout=30).get(
-            "https://opendata.dwd.de/weather/radar/radolan/rw/", raise_for_status=False
-        )
-        return True
-    except Exception:
-        return False
-
-
-@pytest.mark.skipif(not _network_available(), reason="opendata.dwd.de unreachable")
+@pytest.mark.requires_host("https://opendata.dwd.de/weather/radar/radolan/rw/")
 def test_operational_hdf5_download(tmp_path):
     """A recent radolan-rw window downloads at least one readable HDF5 granule."""
     now = dt.datetime.now(dt.UTC).replace(tzinfo=None)
@@ -57,7 +46,7 @@ def test_operational_hdf5_download(tmp_path):
     assert first.read_bytes()[:4] == b"\x89HDF", "not a valid HDF5 granule"
 
 
-@pytest.mark.skipif(not _network_available(), reason="opendata.dwd.de unreachable")
+@pytest.mark.requires_host("https://opendata.dwd.de/weather/radar/radolan/rw/")
 def test_reproc_archive_is_reachable():
     """The RADKLIM reproc yearly archive is live and gzip (a 1-byte range, not a full pull)."""
     url = reproc_archive_url("hourly", "2017_002", "RW", 2024)

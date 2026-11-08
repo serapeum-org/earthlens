@@ -2,12 +2,19 @@
 
 from __future__ import annotations
 
+from typing import Annotated
+
 import pytest
+from pydantic import TypeAdapter, ValidationError
 
 from earthlens.base import SpatialExtent
 from earthlens.gee._helpers import (
+    BOOL_REFUSAL_HINT,
     EE_MAX_DIMENSION,
+    NoBool,
+    checked_handle,
     reduce_collection,
+    refuse_bool,
     slug_asset_id,
     split_aoi_for_url,
     task_state_name,
@@ -92,7 +99,7 @@ class TestEeSizeGuard:
     The general `estimate_pixel_dims` tests live in
     `tests/test_base/test_spatial.py`; this class only verifies the
     EE-specific interplay between the bbox sizing and
-    :data:`EE_MAX_DIMENSION`.
+    `EE_MAX_DIMENSION`.
     """
 
     def test_oversized_box_exceeds_ee_limit(self):
@@ -241,3 +248,83 @@ class TestSplitAoiForUrl:
         space = SpatialExtent.from_pairs([0.0, 40.0], [0.0, 40.0], resolution=0.5)
         tiles = split_aoi_for_url(space, scale_m=30)
         assert {t.resolution for t in tiles} == {0.5}
+
+
+class TestCheckedHandle:
+    """Tests for the shared no-handle refusal."""
+
+    @pytest.mark.parametrize(
+        "handle, expected",
+        [
+            ("ID0001", "ID0001"),
+            (42, "42"),
+            ("projects/p/assets/x", "projects/p/assets/x"),
+        ],
+    )
+    def test_a_handle_passes_through_stringified(self, handle, expected):
+        """Any truthy handle comes back unchanged, as a string."""
+        got = checked_handle(handle, "task", ("id",), {"id": handle})
+        assert got == expected, f"expected {expected!r}, got {got!r}"
+
+    @pytest.mark.parametrize("handle", ["", None, 0])
+    def test_a_falsy_handle_is_refused(self, handle):
+        """Empty, missing and zero handles are all unusable."""
+        with pytest.raises(ValueError, match="no usable 'name'"):
+            checked_handle(handle, "task", ("name",), {"metadata": {}})
+
+    def test_one_key_reads_as_no_usable(self):
+        """A single searched key is phrased in the singular."""
+        with pytest.raises(
+            ValueError, match=r"the task payload carries no usable 'name'"
+        ):
+            checked_handle("", "task", ("name",), {})
+
+    def test_two_keys_read_as_neither_nor(self):
+        """Two searched keys are phrased as neither/nor, naming both."""
+        with pytest.raises(
+            ValueError, match=r"the asset payload carries neither 'id' nor 'name'"
+        ):
+            checked_handle(None, "asset", ("id", "name"), {"type": "FOLDER"})
+
+    def test_the_subject_names_the_row_in_the_message(self):
+        """The subject appears twice: the payload, and the id it lacks."""
+        with pytest.raises(ValueError, match="no asset id to address the row by"):
+            checked_handle("", "asset", ("name",), {})
+
+    def test_the_payload_keys_are_listed_sorted(self):
+        """The message lists the payload's keys, sorted, for diagnosis."""
+        with pytest.raises(ValueError, match=r"got keys \['alpha', 'zulu'\]"):
+            checked_handle("", "task", ("name",), {"zulu": 1, "alpha": 2})
+
+
+class TestRefuseBool:
+    """Tests for `refuse_bool`."""
+
+    @pytest.mark.parametrize("value", [1, 0, -3, 0.5, 2.0, None, "1", [1], (1,)])
+    def test_non_bool_passes_through_unchanged(self, value):
+        """Anything that is not a `bool` is returned as the same object."""
+        assert refuse_bool(value) is value
+
+    @pytest.mark.parametrize("value, becomes", [(True, "1"), (False, "0")])
+    def test_a_bool_is_refused(self, value, becomes):
+        """`True` / `False` raise `ValueError` naming the int they would become."""
+        with pytest.raises(ValueError, match=BOOL_REFUSAL_HINT) as exc:
+            refuse_bool(value)
+        message = str(exc.value)
+        assert repr(value) in message, message
+        assert f"silently become {becomes}" in message, message
+
+
+class TestNoBool:
+    """Tests for the shared `NoBool` field annotation."""
+
+    def test_guards_a_field_before_its_own_type(self):
+        """`Annotated[int, NoBool]` refuses `True` with the `refuse_bool` message."""
+        adapter = TypeAdapter(Annotated[int, NoBool])
+        with pytest.raises(ValidationError, match=BOOL_REFUSAL_HINT):
+            adapter.validate_python(True)
+
+    def test_a_plain_number_still_validates(self):
+        """The guard rejects only a `bool`; a real number passes through."""
+        adapter = TypeAdapter(Annotated[int, NoBool])
+        assert adapter.validate_python(1) == 1

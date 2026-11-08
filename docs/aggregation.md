@@ -53,11 +53,11 @@ iterator for anything large.
 Arguments:
 
 - `nc_path` — path to the NetCDF on disk.
-- `var_info` — :class:`earthlens.ecmwf.Variable` row (resolves
+- `var_info` — `earthlens.ecmwf.Variable` row (resolves
   `op="auto"` via `is_pre_aggregated` / `is_flux`, drives the output filename via
   `cds_variable`, picks the variable from the NetCDF via
   `nc_variable`).
-- `config` — :class:`AggregationConfig` describing the window,
+- `config` — `AggregationConfig` describing the window,
   reduction, and output location.
 
 ### `iter_aggregate_netcdf(nc_path, var_info, config) -> Iterator[AggregatedWindow]`
@@ -102,6 +102,29 @@ When supplied, every retrieved NetCDF is fed through
 `<self.root_dir>/aggregated/`. Aggregation failures surface
 alongside retrieve failures in the per-variable failure summary, so
 a single bad variable does not abort the rest of the loop.
+
+### `CHIRPS.download(aggregate=...)`
+
+CHIRPS emits **per-date GeoTIFFs**, not NetCDFs, so it reduces a *raster* stack rather than
+running `aggregate_netcdf`. When `aggregate=` is set, the per-date rasters fetched for each
+`(dataset, variable)` are grouped by `aggregate.freq` with the shared `window_groups` primitive
+and each window reduced with `reduce_time_axis` (nodata read as NaN through pyramids' masked
+read), writing one GeoTIFF per window. `op="auto"` resolves from the variable's kind — flux
+quantities such as precipitation **sum**, state quantities average. As with ECMWF, an unset
+`aggregate.out_dir` defaults to `<self.root_dir>/aggregated/`, and the returned list is the
+per-window rasters rather than the per-date ones. Discrete multi-year archive datasets
+(CenTrends) have no per-date stack to reduce and reject `aggregate=` with a `ValueError`.
+
+Per-window filenames follow `<ds_key>_<variable>_<op>_<freq>_<window-label-as-YYYYMMDD>.tif`
+(e.g. `global-daily_precipitation_sum_1MS_20200101.tif` — the January 2020 daily-to-monthly total).
+A sub-daily `freq` (e.g. `"6h"`) additionally stamps `HHMM` so windows inside one day stay distinct.
+
+Each window is reduced on its own — only the rasters for the current window are opened, stacked
+and closed before the next — so peak memory tracks the largest window, not the whole requested
+range. Note the flux edge case: with `op="sum"` (the `auto` default for precipitation) a window
+in which **every** date is nodata reduces to `0.0`, not nodata, because a NaN-aware sum of an
+all-missing slice is zero. Set `aggregate.min_count` to require a minimum count of valid dates per
+window when you need to tell a genuine zero apart from "all missing".
 
 ## Supported reduction operators
 
@@ -361,11 +384,14 @@ Examples:
 
 ## Related
 
-- :class:`earthlens.aggregate.AggregationConfig` — frozen request
+- `earthlens.aggregate.AggregationConfig` — frozen request
   payload.
-- :func:`earthlens.aggregate.aggregate_netcdf` — the core function.
-- :class:`earthlens.ecmwf.Catalog` — resolves `(dataset, code)` pairs
+- `earthlens.aggregate.aggregate_netcdf` — the core function.
+- `earthlens.ecmwf.Catalog` — resolves `(dataset, code)` pairs
   to the `Variable` rows that drive `op="auto"` and the output
   filename.
-- :meth:`earthlens.ecmwf.ECMWF.download` — accepts the `aggregate`
+- `earthlens.ecmwf.ECMWF.download` — accepts the `aggregate`
   parameter for one-call download-and-aggregate.
+- `earthlens.chc.CHIRPS.download` — accepts `aggregate=` to
+  re-aggregate its per-date GeoTIFF stack (raster reduction,
+  daily → monthly, etc.), distinct from the NetCDF path above.

@@ -12,10 +12,7 @@ from earthlens.s3 import S3
 pytestmark = [pytest.mark.s3]
 
 # A 1-degree DEM tile name whose synthetic COG fixture covers [6, 0, 7, 1].
-_DEM_KEY = (
-    "Copernicus_DSM_COG_10_N00_00_E006_00_DEM/"
-    "Copernicus_DSM_COG_10_N00_00_E006_00_DEM.tif"
-)
+from .conftest import DEM_KEY as _DEM_KEY
 
 
 def _dem_source(path, **kwargs):
@@ -31,18 +28,18 @@ def _dem_source(path, **kwargs):
     )
 
 
-def test_search_plans_the_dem_tile(tmp_path, fake_client_factory, patch_auth):
+def test_search_plans_the_dem_tile(tmp_path, seed_buckets):
     """_search returns the deterministic tile key with no transfer."""
-    patch_auth(fake_client_factory())
+    seed_buckets()
     products = _dem_source(tmp_path)._search()
     assert [p.href for p in products] == [_DEM_KEY]
 
 
-def test_download_crops_to_the_aoi(tmp_path, fake_client_factory, patch_auth):
+def test_download_crops_to_the_aoi(tmp_path, seed_buckets):
     """download fetches the tile and crops it to the requested bbox."""
     from pyramids.dataset import Dataset
 
-    patch_auth(fake_client_factory())
+    seed_buckets()
     paths = _dem_source(tmp_path).download(progress_bar=False)
     assert len(paths) == 1 and Path(paths[0]).exists()
     cropped = Dataset.read_file(str(paths[0]))
@@ -64,12 +61,11 @@ def test_download_is_idempotent_on_the_raw_file(
     assert len(client.downloaded) == 1
 
 
-def test_missing_object_is_skipped(tmp_path, fake_client_factory, patch_auth):
+def test_missing_object_is_skipped(tmp_path, seed_buckets):
     """An absent object is skipped while a present one is still fetched."""
     from earthlens.base import RemoteProduct
 
-    client = fake_client_factory(missing=["ghost.tif"])
-    patch_auth(client)
+    seed_buckets(missing=["ghost.tif"])
     source = _dem_source(tmp_path)
     present = source._search()[0]
     ghost = RemoteProduct(
@@ -79,11 +75,10 @@ def test_missing_object_is_skipped(tmp_path, fake_client_factory, patch_auth):
     assert len(written) == 1
 
 
-def test_all_missing_raises(tmp_path, fake_client_factory, patch_auth):
+def test_all_missing_raises(tmp_path, seed_buckets):
     """When every planned object is absent, download raises rather than return []."""
     source = _dem_source(tmp_path)
-    client = fake_client_factory(missing=[p.href for p in source._search()])
-    patch_auth(client)
+    seed_buckets(missing=[p.href for p in source._search()])
     with pytest.raises(RuntimeError, match="none of"):
         source.download(progress_bar=False)
 
@@ -123,16 +118,16 @@ def test_no_egress_warning_when_no_sizes(tmp_path, monkeypatch):
     assert calls == []
 
 
-def test_cog_dataset_rejects_aggregate(tmp_path, fake_client_factory, patch_auth):
+def test_cog_dataset_rejects_aggregate(tmp_path, seed_buckets):
     """aggregate= is rejected for a COG dataset with a clear message."""
-    patch_auth(fake_client_factory())
+    seed_buckets()
     with pytest.raises(NotImplementedError, match="COG"):
         _dem_source(tmp_path).download(aggregate=AggregationConfig(freq="D", op="mean"))
 
 
-def test_bucket_override(tmp_path, fake_client_factory, patch_auth):
+def test_bucket_override(tmp_path, seed_buckets):
     """A bucket= kwarg overrides the dataset's default bucket."""
-    patch_auth(fake_client_factory())
+    seed_buckets()
     source = _dem_source(tmp_path, bucket="copernicus-dem-90m")
     assert source._dataset.bucket == "copernicus-dem-90m"
 
@@ -142,9 +137,9 @@ def test_output_kind_is_mixed():
     assert S3.OUTPUT_KIND == "mixed"
 
 
-def test_static_dataset_yields_single_date(tmp_path, fake_client_factory, patch_auth):
+def test_static_dataset_yields_single_date(tmp_path, seed_buckets):
     """A static dataset collapses the window to one date entry."""
-    patch_auth(fake_client_factory())
+    seed_buckets()
     source = _dem_source(tmp_path)
     assert len(source.time.dates) == 1
 
@@ -204,9 +199,9 @@ def test_public_download_has_no_request_payer(
     assert client.extra_args == [None]
 
 
-def test_landsat_scene_resolves_band_keys(tmp_path, fake_client_factory, patch_auth):
+def test_landsat_scene_resolves_band_keys(tmp_path, seed_buckets):
     """The scene= argument flows into the per-band Landsat keys."""
-    patch_auth(fake_client_factory())
+    seed_buckets()
     source = S3(
         start="2021-09-01",
         end="2021-09-01",
@@ -222,28 +217,27 @@ def test_landsat_scene_resolves_band_keys(tmp_path, fake_client_factory, patch_a
     assert hrefs[0].endswith("_SR_B4.TIF") and hrefs[1].endswith("_SR_B5.TIF")
 
 
-def test_api_composes_search_and_fetch(tmp_path, fake_client_factory, patch_auth):
+def test_api_composes_search_and_fetch(tmp_path, seed_buckets):
     """_api returns the same paths as the search/fetch composition."""
-    patch_auth(fake_client_factory())
+    seed_buckets()
     assert len(_dem_source(tmp_path)._api()) == 1
 
 
 def test_non_missing_download_error_raises(tmp_path, fake_client_factory, patch_auth):
     """A non-404 download error is surfaced, not swallowed."""
     source = _dem_source(tmp_path)
-    client = fake_client_factory(broken=[source._search()[0].href])
-    patch_auth(client)
+    # Still on the double: this injects a *transport* failure mid-download,
+    # which is not a state a bucket can be put into. `missing`, `denied` and
+    # `no_bucket` all moved to the emulator because they are.
+    patch_auth(fake_client_factory(broken=[source._search()[0].href]))
     with pytest.raises(RuntimeError, match="failed to download"):
         source.download(progress_bar=False)
 
 
-def test_access_denied_raises_permission_error_not_skip(
-    tmp_path, fake_client_factory, patch_auth
-):
+def test_access_denied_raises_permission_error_not_skip(tmp_path, seed_buckets):
     """A 403/AccessDenied is a permission error, not a missing object (M1)."""
     source = _dem_source(tmp_path)
-    client = fake_client_factory(denied=[source._search()[0].href])
-    patch_auth(client)
+    seed_buckets(denied=[source._search()[0].href])
     with pytest.raises(PermissionError, match="access denied"):
         source.download(progress_bar=False)
 
@@ -260,33 +254,34 @@ def test_access_denied_names_requester_pays(tmp_path, fake_client_factory, patch
         scene="LC08_L2SP_039037_20210901_20210910_02_T1",
         path=str(tmp_path),
     )
-    client = fake_client_factory(denied=[source._search()[0].href])
-    patch_auth(client)
+    # Still on the double, unlike its unsigned sibling above. A requester-pays
+    # dataset is read with a *signed* client, and the emulator treats whoever
+    # holds the credentials as the bucket owner — so it answers 200 where real
+    # S3 answers 403. The denial is the whole point of the test.
+    patch_auth(fake_client_factory(denied=[source._search()[0].href]))
     with pytest.raises(PermissionError, match="requester-pays.*credentials"):
         source.download(progress_bar=False)
 
 
-def test_no_such_bucket_raises_clear_error(tmp_path, fake_client_factory, patch_auth):
+def test_no_such_bucket_raises_clear_error(tmp_path, seed_buckets):
     """A NoSuchBucket is reported as a bucket error, not 'no data' (M1)."""
     source = _dem_source(tmp_path)
-    client = fake_client_factory(no_bucket=[source._search()[0].href])
-    patch_auth(client)
+    seed_buckets(no_bucket=[source._search()[0].href])
     with pytest.raises(RuntimeError, match="bucket not found"):
         source.download(progress_bar=False)
 
 
-def test_variable_for_native_handles_none(tmp_path, fake_client_factory, patch_auth):
+def test_variable_for_native_handles_none(tmp_path, seed_buckets):
     """The variable lookup returns None for an unknown / missing token."""
-    patch_auth(fake_client_factory())
+    seed_buckets()
     source = _dem_source(tmp_path)
     assert source._variable_for_native(None) is None
     assert source._variable_for_native("nope") is None
 
 
-def test_reproject_branch_runs_for_non_4326(tmp_path, fake_client_factory, patch_auth):
+def test_reproject_branch_runs_for_non_4326(tmp_path, seed_buckets):
     """A dataset with crs other than 4326 routes through the reproject path."""
-    client = fake_client_factory()
-    patch_auth(client)
+    seed_buckets({"copernicus-dem-30m": ["any.tif"]})
     # Inline passthrough COG with crs=None (per-file) over the fixture's tile;
     # exercises the `crs != 4326 -> to_crs(4326)` branch in _localise.
     source = S3(
@@ -309,7 +304,7 @@ def test_reproject_branch_runs_for_non_4326(tmp_path, fake_client_factory, patch
     assert len(paths) == 1 and Path(paths[0]).exists()
 
 
-def test_goes_selects_cmi_over_dqf(tmp_path, fake_client_factory, patch_auth):
+def test_goes_selects_cmi_over_dqf(tmp_path, seed_buckets):
     """GOES resolves the data variable CMI, never the same-rank DQF quality flag (review M1)."""
     import numpy as np
     import xarray as xr
@@ -317,7 +312,7 @@ def test_goes_selects_cmi_over_dqf(tmp_path, fake_client_factory, patch_auth):
 
     from earthlens.base import RemoteProduct
 
-    patch_auth(fake_client_factory())
+    seed_buckets()
     nc_path = tmp_path / "goes_cmi_dqf.nc"
     n = 8
     # DQF deliberately listed before CMI to defeat a naive first-at-max-rank pick
@@ -350,9 +345,7 @@ def test_goes_selects_cmi_over_dqf(tmp_path, fake_client_factory, patch_auth):
     assert source._nc_variable_name(NetCDF.read_file(str(nc_path)), unpinned) == "CMI"
 
 
-def test_nc_variable_name_picks_gridded_over_helper(
-    tmp_path, fake_client_factory, patch_auth
-):
+def test_nc_variable_name_picks_gridded_over_helper(tmp_path, seed_buckets):
     """With multiple variables and no usable pin, the gridded data var wins over a 1-D helper (M3)."""
     import numpy as np
     import xarray as xr
@@ -360,7 +353,7 @@ def test_nc_variable_name_picks_gridded_over_helper(
 
     from earthlens.base import RemoteProduct
 
-    patch_auth(fake_client_factory())
+    seed_buckets()
     nc_path = tmp_path / "multivar.nc"
     lat = np.arange(42, 39.75, -0.25)
     lon = np.arange(0, 360, 0.25)
@@ -391,15 +384,13 @@ def test_nc_variable_name_picks_gridded_over_helper(
     assert source._nc_variable_name(NetCDF.read_file(str(nc_path)), product) == "VAR_2T"
 
 
-def test_netcdf_localise_rebuilds_and_crops(
-    tmp_path, fake_client_factory, patch_auth, tiny_era5_nc
-):
+def test_netcdf_localise_rebuilds_and_crops(tmp_path, seed_buckets, tiny_era5_nc):
     """An ERA5-style NetCDF is rebuilt to WGS84, lon-wrapped, and cropped."""
     from pyramids.dataset import Dataset
 
     from earthlens.base import RemoteProduct
 
-    patch_auth(fake_client_factory())
+    seed_buckets()
     source = S3(
         start="2023-12-01",
         end="2023-12-01",
@@ -421,14 +412,14 @@ def test_netcdf_localise_rebuilds_and_crops(
 
 
 def test_goes_geostationary_localise_warps_to_wgs84(
-    tmp_path, fake_client_factory, patch_auth, tiny_goes_nc
+    tmp_path, seed_buckets, tiny_goes_nc
 ):
     """GOES (geostationary NetCDF) localise warps the scan-angle grid to WGS84 + crops."""
     from pyramids.dataset import Dataset
 
     from earthlens.base import RemoteProduct
 
-    patch_auth(fake_client_factory())
+    seed_buckets()
     # AOI inside the synthetic frame's warped extent (~[-120, 36, -29, 63]).
     source = S3(
         start="2024-06-28",
@@ -484,22 +475,20 @@ def test_goes_geostationary_preserves_north_south_orientation(tmp_path, tiny_goe
     assert south - north > 5.0
 
 
-def test_variables_accepts_a_single_string(tmp_path, fake_client_factory, patch_auth):
+def test_variables_accepts_a_single_string(tmp_path, seed_buckets):
     """A bare string variable is normalised to a one-element list."""
-    patch_auth(fake_client_factory())
+    seed_buckets()
     source = _dem_source(tmp_path, variables="elevation")
     assert source.vars == ["elevation"]
 
 
-def test_netcdf_no_lon_wrap_branch(
-    tmp_path, fake_client_factory, patch_auth, tiny_era5_nc
-):
+def test_netcdf_no_lon_wrap_branch(tmp_path, seed_buckets, tiny_era5_nc):
     """A NetCDF dataset without the 0-360 convention skips the longitude wrap."""
     from pyramids.dataset import Dataset
 
     from earthlens.base import RemoteProduct
 
-    patch_auth(fake_client_factory())
+    seed_buckets()
     source = S3(
         start="2023-12-01",
         end="2023-12-01",
@@ -525,12 +514,12 @@ def test_netcdf_no_lon_wrap_branch(
 
 
 def test_resolve_nc_variable_reads_file_when_unpinned(
-    tmp_path, fake_client_factory, patch_auth, tiny_era5_nc
+    tmp_path, seed_buckets, tiny_era5_nc
 ):
     """With no pinned nc_variable, _resolve_nc_variable falls back to reading the granule."""
     from earthlens.base import RemoteProduct
 
-    patch_auth(fake_client_factory())
+    seed_buckets()
     source = S3(
         start="2024-06-01",
         end="2024-06-01",
@@ -551,11 +540,9 @@ def test_resolve_nc_variable_reads_file_when_unpinned(
     assert source._resolve_nc_variable(tiny_era5_nc, product) == "VAR_2T"
 
 
-def test_download_aggregate_routes_for_netcdf(
-    tmp_path, fake_client_factory, patch_auth, monkeypatch
-):
+def test_download_aggregate_routes_for_netcdf(tmp_path, seed_buckets, monkeypatch):
     """download(aggregate=) for a NetCDF dataset routes into _aggregate."""
-    patch_auth(fake_client_factory())
+    seed_buckets()
     source = S3(
         start="2024-06-01",
         end="2024-06-01",
@@ -571,14 +558,12 @@ def test_download_aggregate_routes_for_netcdf(
     ]
 
 
-def test_aggregate_skips_missing_and_failed(
-    tmp_path, fake_client_factory, patch_auth, monkeypatch
-):
+def test_aggregate_skips_missing_and_failed(tmp_path, seed_buckets, monkeypatch):
     """_aggregate skips a missing granule and a granule whose aggregation raises."""
     import earthlens.aggregate as agg
     from earthlens.base import RemoteProduct
 
-    patch_auth(fake_client_factory())
+    seed_buckets()
     source = S3(
         start="2024-06-01",
         end="2024-06-01",
@@ -608,13 +593,13 @@ def test_aggregate_skips_missing_and_failed(
 
 
 def test_aggregate_resolves_in_file_variable_and_runs(
-    tmp_path, fake_client_factory, patch_auth, monkeypatch, tiny_era5_nc
+    tmp_path, seed_buckets, monkeypatch, tiny_era5_nc
 ):
     """_aggregate resolves the in-file NetCDF variable (VAR_2T, not the native token) (M2)."""
     import earthlens.aggregate as agg
     from earthlens.base import RemoteProduct
 
-    patch_auth(fake_client_factory())
+    seed_buckets()
     source = S3(
         start="2024-06-01",
         end="2024-06-01",

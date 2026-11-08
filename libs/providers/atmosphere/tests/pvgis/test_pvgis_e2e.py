@@ -12,7 +12,6 @@ Run with:
 
 from __future__ import annotations
 
-import socket
 from pathlib import Path
 
 import pandas as pd
@@ -27,17 +26,7 @@ _LAT = 45.0
 _LON = 8.0
 
 
-def _network_ok() -> bool:
-    """Return True when the PVGIS host is reachable on 443."""
-    try:
-        socket.create_connection(("re.jrc.ec.europa.eu", 443), timeout=5).close()
-        return True
-    except OSError:
-        return False
-
-
-_ONLINE = _network_ok()
-_offline_skip = pytest.mark.skipif(not _ONLINE, reason="PVGIS host unreachable")
+_offline_skip = pytest.mark.requires_host("re.jrc.ec.europa.eu")
 
 
 @_offline_skip

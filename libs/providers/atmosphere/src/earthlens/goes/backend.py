@@ -212,7 +212,7 @@ class GOES(AbstractDataSource):
             domain: `"C"` / `"F"` / `"M1"` / `"M2"`. `None` uses the
                 product's `default_domain`.
             region: AWS region of the buckets.
-            catalog: Optional pre-built :class:`Catalog` (tests inject
+            catalog: Optional pre-built `Catalog` (tests inject
                 one); defaults to the bundled catalog.
 
         Raises:
@@ -258,7 +258,7 @@ class GOES(AbstractDataSource):
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
     ) -> TemporalExtent:
-        """Parse the scan-time window into a :class:`TemporalExtent`.
+        """Parse the scan-time window into a `TemporalExtent`.
 
         Args:
             start: Inclusive window start.
@@ -405,7 +405,7 @@ class GOES(AbstractDataSource):
         """Download each granule whole to `self.root_dir` (unsigned boto3).
 
         Args:
-            products: The granules from :meth:`_search`.
+            products: The granules from `_search`.
 
         Returns:
             list[Path]: The written NetCDF paths, in order.
@@ -426,8 +426,8 @@ class GOES(AbstractDataSource):
     ) -> list[Path]:
         """Fetch the in-window ABI granules and return the written paths.
 
-        Runs the cheap :meth:`_search` (key enumeration) then
-        :meth:`_fetch` (whole-granule download). The granules are raw,
+        Runs the cheap `_search` (key enumeration) then
+        `_fetch` (whole-granule download). The granules are raw,
         undecoded NetCDF — reading / cropping / band extraction is a
         downstream pyramids (or `satpy`) step.
 

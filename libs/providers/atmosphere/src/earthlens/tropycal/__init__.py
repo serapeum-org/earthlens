@@ -3,12 +3,12 @@
 Thin wrapper over `tropycal.tracks.TrackDataset` that returns tropical-
 cyclone best tracks — from IBTrACS (global, 1848-present) or HURDAT2
 (NHC North Atlantic / East Pacific reanalysis) — as a pyramids
-:class:`~pyramids.feature.collection.FeatureCollection` of track features
+`pyramids.feature.collection.FeatureCollection` of track features
 (CRS `EPSG:4326`).
 
 This is a `vector` backend: the result is a table of track features, not
-a gridded array, so :data:`TropicalCyclone.OUTPUT_KIND` is `"vector"` and
-the :class:`earthlens.earthlens.EarthLens` facade rejects an `aggregate=`
+a gridded array, so `TropicalCyclone.OUTPUT_KIND` is `"vector"` and
+the `earthlens.earthlens.EarthLens` facade rejects an `aggregate=`
 argument for it. The default geometry is one `Point` per 6-hourly fix; a
 `geometry="track"` kwarg returns one `LineString` per storm with summary
 attributes.
@@ -23,23 +23,23 @@ codes — `variables=["north_atlantic"]`, `variables=["north_atlantic",
 "east_pacific"]` — **not** data-variable names. This is an intentional,
 documented overload (the facade makes `variables` a required argument).
 The data source (`"ibtracs"`/`"hurdat"`), geometry mode, and filters
-arrive as explicit :class:`TropicalCyclone` constructor keyword
+arrive as explicit `TropicalCyclone` constructor keyword
 arguments. Best-track only — realtime / operational / forecast products
 are out of scope.
 
 Public surface (re-exported from this package):
 
-* :class:`TropicalCyclone` — the backend; instantiate with a date range,
+* `TropicalCyclone` — the backend; instantiate with a date range,
   a bbox, and `variables=[basin, ...]`, then call
-  :meth:`TropicalCyclone.download`.
-* :class:`Catalog` — pydantic-backed loader for the bundled
+  `TropicalCyclone.download`.
+* `Catalog` — pydantic-backed loader for the bundled
   `tropycal_data_catalog.yaml` basin -> track-field catalog.
-* :class:`Basin` — one basin's catalog row (`name`, `sources`,
+* `Basin` — one basin's catalog row (`name`, `sources`,
   `fields`).
-* :class:`TrackField` — one per-fix track field (`units`, `long_name`).
-* :func:`frame_to_fc` / :func:`empty_fc` — the storm-frame ->
+* `TrackField` — one per-fix track field (`units`, `long_name`).
+* `frame_to_fc` / `empty_fc` — the storm-frame ->
   FeatureCollection mapper and its empty-result counterpart.
-* :data:`CATALOG_PATH` — path to the bundled basin YAML;
+* `CATALOG_PATH` — path to the bundled basin YAML;
   monkey-patchable in tests.
 
 Examples:

@@ -1,0 +1,567 @@
+{
+  "id": "cmems_obs-sst_bal_phy-temp_my_l4_P1D-m_202506",
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/datacube/v2.1.0/schema.json"
+  ],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -10,
+          48
+        ],
+        [
+          -10,
+          66
+        ],
+        [
+          30,
+          66
+        ],
+        [
+          30,
+          48
+        ],
+        [
+          -10,
+          48
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -10,
+    48,
+    30,
+    66
+  ],
+  "properties": {
+    "datetime": null,
+    "start_datetime": "1982-01-01T00:00:00Z",
+    "end_datetime": "2024-12-31T00:00:00Z",
+    "Conventions": "CF-1.4, Unidata Observation Dataset v1.0",
+    "Metadata_Conventions": "Unidata Dataset Discovery v1.0",
+    "acknowledgment": "Please acknowledge the use of these data with the following statement: These data were provided by DMI and Copernicus CMEMS",
+    "cdm_data_type": "grid",
+    "comment": "IN NO EVENT SHALL DMI OR ITS REPRESENTATIVES BE LIABLE FOR ANY DAMAGES WHATSOEVER INCLUDING, WITHOUT LIMITATION, SPECIAL, INDIRECT, INCIDENTAL OR CONSEQUENTIAL DAMAGES OR DAMAGES FOR LOSS OF BUSINESS PROFITS OR SAVINGS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR OTHER PECUNIARY LOSS ARISING OUT OF THE USE OF OR THE BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR OTHER PECUNIARY LOSS ARISING OUT OF THE USE OF OR THE INABILITY TO USE THIS DMI PRODUCT, EVEN IF DMI HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. THIS LIMITATION SHALL APPLY TO CLAIMS OF PERSONAL INJURY TO THE EXTENT PERMITTED BY LAW. SOME COUNTRIES OR STATES DO NOT ALLOW THE EXCLUSION OR LIMITATION OF LIABILITY FOR CONSEQUENTIAL, SPECIAL, INDIRECT, INCIDENTAL DAMAGES AND, ACCORDINGLY, SOME PORTIONS OF THESE LIMITATIONS MAY NOT APPLY TO YOU. BY USING THIS PRODUCT, YOU HAVE ACCEPTED THAT THE ABOVE LIMITATIONS OR THE MAXIMUM LEGALLY APPLICABLE SUBSET OF THESE LIMITATIONS APPLY TO YOUR USE OF THIS PRODUCT. WARNING Some applications are unable to properly handle signed bytevalues. If values are encountered > 127, please subtract 256 from this reported value",
+    "creator_email": "myocean_po@dmi.dk",
+    "creator_name": "Danish Meteorological Institute - DMI Copenhagen",
+    "creator_url": "http://ocean.dmi.dk/satellite/",
+    "date_created": "20250117T143312Z",
+    "easternmost_longitude": 30,
+    "file_quality_level": 3,
+    "gds_version_id": "2.0",
+    "geospatial_lat_resolution": 0.019999999552965164,
+    "geospatial_lat_units": "degrees north",
+    "geospatial_lon_resolution": 0.019999999552965164,
+    "geospatial_lon_units": "degrees east",
+    "history": "Version 2.0",
+    "id": "DMI-L4UHfnd-NSEABALTIC-DMI_OI",
+    "institution": "Danish Meteorological Institute, DMI",
+    "keywords": "Oceans > Ocean Temperature > Sea Surface Temperature",
+    "keywords_vocabulary": "NASA Global Change Master Directory (GCMD) Science Keywords",
+    "originalLicense": "these data are available free of charge under the Copernicus CMEMS data policy",
+    "metadata_link": "http://data.nodc.noaa.gov/NESDIS_DataCenters/metadata/index.html",
+    "naming_authority": "org.ghrsst",
+    "netcdf_version_id": "netcdf-4.4.1.1.6",
+    "northernmost_latitude": 66,
+    "platform": "NOAA, ERS, ENVISAT, SENTINEL 3, MetOp",
+    "processing_level": "L4",
+    "product_version": "Version 2.0",
+    "project": "Copernicus CMEMS SST TAC project",
+    "publisher_email": "servicedesk.cmems@mercator-ocean.eu",
+    "publisher_name": "CMEMS SST TAC and DMI",
+    "publisher_url": "https://marine.copernicus.eu/",
+    "references": "Høyer, J. L. and She, J. (2007), Optimal interpolation of sea surface temperature for the North Sea and Baltic Sea,  J. Mar. Sys., Vol 65, 1-4, pp. 176-189. Høyer, J. L., Le Borgne, P., and Eastwood, S. (2014). A bias correction method for Arctic satellite sea surface temperature observations. Remote Sensing of Environment, 146,201-213. Høyer, J. L. and Karagali, I. (2016), Sea Surface Temperature Climate Data Record for the North Sea and Baltic Sea, J. Climate, 29(7), 2529-2541.",
+    "sensor": "AVHRR, ATSR1, ATSR2, AATSR, SLSTR",
+    "source": "ESA SST CCI v3.0, C3S and  CMEMS FMI and SMHI Sea ice concentration",
+    "southernmost_latitude": 48,
+    "spatial_resolution": "  0.02 degrees",
+    "standard_name_vocabulary": "NetCDF Climate and forecast (CF) Metadata Convention",
+    "start_time": "20241231T000000Z",
+    "stop_time": "20250101T000000Z",
+    "summary": "DMI Sea Surface Temperature analysis created using multisensor satellite SST observations",
+    "time_coverage_end": "20250101T000000Z",
+    "time_coverage_start": "20241231T000000Z",
+    "title": "Baltic Sea/North Sea SST analysis, daily reprocessed level 4 analysis (SST_BAL_SST_L4_REP_OBSERVATIONS_010_016)",
+    "uuid": "b51a00d1-bdab-4ac2-ae25-ffffc5939a0b",
+    "westernmost_longitude": -10,
+    "cube:dimensions": {
+      "time": {
+        "type": "temporal",
+        "extent": [
+          "1982-01-01T00:00:00Z",
+          "2024-12-31T00:00:00Z"
+        ],
+        "step": "P1D"
+      },
+      "latitude": {
+        "type": "spatial",
+        "axis": "y",
+        "extent": [
+          48,
+          66
+        ],
+        "step": 0.02,
+        "reference_system": 4326
+      },
+      "longitude": {
+        "type": "spatial",
+        "axis": "x",
+        "extent": [
+          -10,
+          30
+        ],
+        "step": 0.02,
+        "reference_system": 4326
+      }
+    },
+    "cube:variables": {
+      "analysed_sst": {
+        "id": "analysed_sst",
+        "dimensions": [
+          "time",
+          "latitude",
+          "longitude"
+        ],
+        "type": "data",
+        "unit": "kelvin",
+        "standardName": "sea_surface_foundation_temperature",
+        "abbreviation": "analysed_sst",
+        "name": {
+          "en": "Analysed sea surface temperature"
+        },
+        "unitConversion": null,
+        "missingValue": -32768,
+        "offset": 273.1499938964844,
+        "scale": 0.009999999776482582,
+        "valueMin": 274.6499938964844,
+        "valueMax": 285.2599792480469,
+        "valueDiffMax": 5.30499267578125,
+        "valueDiffRelMax": 25,
+        "valueClamp": true,
+        "hasLogScale": true,
+        "logScale": false,
+        "colormapId": "thermal",
+        "colormapInvert": false,
+        "colormapDiffId": "balance",
+        "colormapDiffInvert": false,
+        "valueColor": false
+      },
+      "analysis_error": {
+        "id": "analysis_error",
+        "dimensions": [
+          "time",
+          "latitude",
+          "longitude"
+        ],
+        "type": "data",
+        "unit": "kelvin",
+        "standardName": "sea_surface_temperature_error",
+        "abbreviation": "analysis_error",
+        "name": {
+          "en": "Estimated error standard deviation of analysed sst"
+        },
+        "unitConversion": null,
+        "missingValue": -32768,
+        "offset": 0,
+        "scale": 0.009999999776482582,
+        "valueMin": 0,
+        "valueMax": 0.949999988079071,
+        "valueDiffMax": 0.4749999940395355,
+        "valueDiffRelMax": 25,
+        "valueClamp": true,
+        "hasLogScale": true,
+        "logScale": false,
+        "colormapId": "rainbow",
+        "colormapInvert": false,
+        "colormapDiffId": "balance",
+        "colormapDiffInvert": false,
+        "valueColor": false
+      },
+      "mask": {
+        "id": "mask",
+        "dimensions": [
+          "time",
+          "latitude",
+          "longitude"
+        ],
+        "type": "data",
+        "standardName": null,
+        "abbreviation": "mask",
+        "name": {
+          "en": "Land sea ice lake bit mask"
+        },
+        "unitConversion": null,
+        "missingValue": -128,
+        "offset": null,
+        "scale": null,
+        "valueMin": 1,
+        "valueMax": 2,
+        "valueDiffMax": 0.5,
+        "valueDiffRelMax": 25,
+        "valueClamp": true,
+        "hasLogScale": true,
+        "logScale": false,
+        "colormapId": "viridis",
+        "colormapInvert": false,
+        "colormapDiffId": "balance",
+        "colormapDiffInvert": false,
+        "valueColor": false
+      },
+      "sea_ice_fraction": {
+        "id": "sea_ice_fraction",
+        "dimensions": [
+          "time",
+          "latitude",
+          "longitude"
+        ],
+        "type": "data",
+        "unit": "1",
+        "standardName": "sea_ice_area_fraction",
+        "abbreviation": "sea_ice_fraction",
+        "name": {
+          "en": "Sea ice area fraction"
+        },
+        "unitConversion": null,
+        "missingValue": -128,
+        "offset": 0,
+        "scale": 0.009999999776482582,
+        "valueMin": 0,
+        "valueMax": 0,
+        "valueDiffMax": 0,
+        "valueDiffRelMax": 25,
+        "valueClamp": true,
+        "hasLogScale": false,
+        "logScale": false,
+        "colormapId": "ice",
+        "colormapInvert": false,
+        "colormapDiffId": "balance",
+        "colormapDiffInvert": false,
+        "valueColor": false
+      }
+    },
+    "admp_in_preparation": false,
+    "admp_released_date": "2025-06-25T13:00:00.000Z",
+    "admp_retired_date": "2026-11-24T13:00:00.000Z",
+    "admp_title": "All data",
+    "admp_updated": "2026-10-14T07:38:39.833323Z",
+    "admp_sample_period": "day",
+    "admp_updating_start_date": null,
+    "admp_updated_data": "2025-11-03T14:43:10.358Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../../catalog.stac.json",
+      "title": "Copernicus Marine Data Store",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../product.stac.json",
+      "title": "SST_BAL_SST_L4_REP_OBSERVATIONS_010_016",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../product.stac.json",
+      "title": "SST_BAL_SST_L4_REP_OBSERVATIONS_010_016",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "native": {
+      "id": "native",
+      "href": "https://s3.waw3-1.cloudferro.com/mdl-native-06/native/SST_BAL_SST_L4_REP_OBSERVATIONS_010_016/cmems_obs-sst_bal_phy-temp_my_l4_P1D-m_202506",
+      "type": "application/x-netcdf",
+      "roles": [
+        "data"
+      ],
+      "title": "Native dataset",
+      "description": "The original, non-ARCO version of this dataset, as published by the data provider."
+    },
+    "timeChunked": {
+      "id": "timeChunked",
+      "href": "https://s3.waw3-1.cloudferro.com/mdl-arco-time-045/arco/SST_BAL_SST_L4_REP_OBSERVATIONS_010_016/cmems_obs-sst_bal_phy-temp_my_l4_P1D-m_202506/timeChunked.zarr",
+      "type": "application/vnd+zarr",
+      "roles": [
+        "data"
+      ],
+      "title": "Time-chunked dataset in Zarr",
+      "description": "An ARCO version of this dataset with a small chunk size in the temporal dimension.\n    \nNote that the link (`href`) associated to this asset is the base directory\nof this dataset, but it cannot be accessed directly.\n\nTo download this dataset or part of it, \nuse a library such as [xarray](https://docs.xarray.dev/).",
+      "xarray:open_kwargs": {
+        "consolidated": true
+      },
+      "viewDims": {
+        "time": {
+          "chunkLen": {
+            "analysed_sst": 1,
+            "analysis_error": 1,
+            "mask": 1,
+            "sea_ice_fraction": 1
+          },
+          "len": 15706,
+          "units": "milliseconds since 1970-01-01 00:00:00Z (no leap seconds)",
+          "coords": {
+            "type": "minMaxStep",
+            "min": 378691200000,
+            "max": 1735603200000,
+            "step": 86400000,
+            "len": 15706
+          }
+        },
+        "latitude": {
+          "chunkLen": {
+            "analysed_sst": 901,
+            "analysis_error": 901,
+            "mask": 901,
+            "sea_ice_fraction": 901
+          },
+          "len": 901,
+          "units": "degrees_north",
+          "coords": {
+            "type": "minMaxStep",
+            "min": 48,
+            "max": 66,
+            "step": 0.02,
+            "len": 901
+          }
+        },
+        "longitude": {
+          "chunkLen": {
+            "analysed_sst": 512,
+            "analysis_error": 512,
+            "mask": 512,
+            "sea_ice_fraction": 512
+          },
+          "len": 2001,
+          "units": "degrees_east",
+          "coords": {
+            "type": "minMaxStep",
+            "min": -10,
+            "max": 30,
+            "step": 0.02,
+            "len": 2001
+          }
+        }
+      },
+      "viewVariables": {
+        "analysed_sst": {
+          "dtype": "<i2",
+          "itemSize": 2,
+          "chunkSize": 683425.1851851852
+        },
+        "analysis_error": {
+          "dtype": "<i2",
+          "itemSize": 2,
+          "chunkSize": 683425.1851851852
+        },
+        "mask": {
+          "dtype": "|i1",
+          "itemSize": 1,
+          "chunkSize": 683425.1851851852
+        },
+        "sea_ice_fraction": {
+          "dtype": "|i1",
+          "itemSize": 1,
+          "chunkSize": 683425.1851851852
+        }
+      },
+      "isAggregated": false
+    },
+    "downsampled4": {
+      "id": "downsampled4",
+      "href": "https://s3.waw3-1.cloudferro.com/mdl-arco-time-045/arco/SST_BAL_SST_L4_REP_OBSERVATIONS_010_016/cmems_obs-sst_bal_phy-temp_my_l4_P1D-m_202506/downsampled4.zarr",
+      "type": "application/vnd+zarr",
+      "roles": [
+        "data",
+        "downsampled"
+      ],
+      "title": "Downsampled dataset (by 4) in Zarr",
+      "description": "An ARCO version of this dataset, downsampled in the spatial dimensions by 4.\n    \nNote that the link (`href`) associated to this asset is the base directory\nof this dataset, but it cannot be accessed directly.\n\nTo download this dataset or part of it, \nuse a library such as [xarray](https://docs.xarray.dev/).",
+      "xarray:open_kwargs": {
+        "consolidated": true
+      },
+      "viewDims": {
+        "time": {
+          "chunkLen": {
+            "analysed_sst": 1,
+            "analysis_error": 1,
+            "mask": 1,
+            "sea_ice_fraction": 1
+          },
+          "len": 15706,
+          "units": "milliseconds since 1970-01-01 00:00:00Z (no leap seconds)",
+          "coords": {
+            "type": "minMaxStep",
+            "min": 378691200000,
+            "max": 1735603200000,
+            "step": 86400000,
+            "len": 15706
+          }
+        },
+        "latitude": {
+          "chunkLen": {
+            "analysed_sst": 226,
+            "analysis_error": 226,
+            "mask": 226,
+            "sea_ice_fraction": 226
+          },
+          "len": 226,
+          "units": "degrees_north",
+          "coords": {
+            "type": "minMaxStep",
+            "min": 48,
+            "max": 66,
+            "step": 0.08,
+            "len": 226
+          }
+        },
+        "longitude": {
+          "chunkLen": {
+            "analysed_sst": 501,
+            "analysis_error": 501,
+            "mask": 501,
+            "sea_ice_fraction": 501
+          },
+          "len": 501,
+          "units": "degrees_east",
+          "coords": {
+            "type": "minMaxStep",
+            "min": -10,
+            "max": 30,
+            "step": 0.08,
+            "len": 501
+          }
+        }
+      },
+      "viewVariables": {
+        "analysed_sst": {
+          "dtype": "<i2",
+          "itemSize": 2,
+          "chunkSize": 683425.1851851852
+        },
+        "analysis_error": {
+          "dtype": "<i2",
+          "itemSize": 2,
+          "chunkSize": 683425.1851851852
+        },
+        "mask": {
+          "dtype": "|i1",
+          "itemSize": 1,
+          "chunkSize": 683425.1851851852
+        },
+        "sea_ice_fraction": {
+          "dtype": "|i1",
+          "itemSize": 1,
+          "chunkSize": 683425.1851851852
+        }
+      },
+      "isAggregated": true
+    },
+    "geoChunked": {
+      "id": "geoChunked",
+      "href": "https://s3.waw3-1.cloudferro.com/mdl-arco-geo-045/arco/SST_BAL_SST_L4_REP_OBSERVATIONS_010_016/cmems_obs-sst_bal_phy-temp_my_l4_P1D-m_202506/geoChunked.zarr",
+      "type": "application/vnd+zarr",
+      "roles": [
+        "data"
+      ],
+      "title": "Geo-chunked dataset in Zarr",
+      "description": "An ARCO version of this dataset with a small chunk size in the spatial dimensions.\n    \nNote that the link (`href`) associated to this asset is the base directory\nof this dataset, but it cannot be accessed directly.\n\nTo download this dataset or part of it, \nuse a library such as [xarray](https://docs.xarray.dev/).",
+      "xarray:open_kwargs": {
+        "consolidated": true
+      },
+      "viewDims": {
+        "time": {
+          "chunkLen": {
+            "analysed_sst": 3141,
+            "analysis_error": 3141,
+            "mask": 3141,
+            "sea_ice_fraction": 3141
+          },
+          "len": 15706,
+          "units": "milliseconds since 1970-01-01 00:00:00Z (no leap seconds)",
+          "coords": {
+            "type": "minMaxStep",
+            "min": 378691200000,
+            "max": 1735603200000,
+            "step": 86400000,
+            "len": 15706
+          }
+        },
+        "latitude": {
+          "chunkLen": {
+            "analysed_sst": 16,
+            "analysis_error": 16,
+            "mask": 16,
+            "sea_ice_fraction": 16
+          },
+          "len": 901,
+          "units": "degrees_north",
+          "coords": {
+            "type": "minMaxStep",
+            "min": 48,
+            "max": 66,
+            "step": 0.02,
+            "len": 901
+          }
+        },
+        "longitude": {
+          "chunkLen": {
+            "analysed_sst": 16,
+            "analysis_error": 16,
+            "mask": 16,
+            "sea_ice_fraction": 16
+          },
+          "len": 2001,
+          "units": "degrees_east",
+          "coords": {
+            "type": "minMaxStep",
+            "min": -10,
+            "max": 30,
+            "step": 0.02,
+            "len": 2001
+          }
+        }
+      },
+      "viewVariables": {
+        "analysed_sst": {
+          "dtype": "<i2",
+          "itemSize": 2,
+          "chunkSize": 1891990.5882352942
+        },
+        "analysis_error": {
+          "dtype": "<i2",
+          "itemSize": 2,
+          "chunkSize": 1891990.5882352942
+        },
+        "mask": {
+          "dtype": "|i1",
+          "itemSize": 1,
+          "chunkSize": 1891990.5882352942
+        },
+        "sea_ice_fraction": {
+          "dtype": "|i1",
+          "itemSize": 1,
+          "chunkSize": 1891990.5882352942
+        }
+      },
+      "isAggregated": false
+    },
+    "wmts": {
+      "id": "wmts",
+      "href": "https://wmts.marine.copernicus.eu/teroWmts/SST_BAL_SST_L4_REP_OBSERVATIONS_010_016/cmems_obs-sst_bal_phy-temp_my_l4_P1D-m_202506?service=WMTS&request=GetCapabilities",
+      "type": "application/xml",
+      "roles": [
+        "visual"
+      ],
+      "title": "OGC Web Map Tile Service (WMTS)",
+      "description": "Georeferenced map tiles using the OGC WMTS standard."
+    }
+  },
+  "collection": "SST_BAL_SST_L4_REP_OBSERVATIONS_010_016"
+}

@@ -6,9 +6,13 @@ import io
 from typing import Any
 
 import pytest
-from botocore.exceptions import ClientError
 
 from earthlens.goes import GOES, Catalog
+from earthlens.testing import seed_s3
+
+#: boto3 ships with the backend's optional extra; absent, skip the module
+#: instead of interrupting collection for the directory.
+ClientError = pytest.importorskip("botocore.exceptions").ClientError
 
 
 class _FakeBody:
@@ -102,3 +106,27 @@ def patch_client(monkeypatch):
         return fake
 
     return _patch
+
+
+@pytest.fixture
+def seed_goes(s3_emulator):
+    """Seed the backend's own bucket with the given keys, on an in-process S3.
+
+    Replaces `patch_client(goes, FakeS3(pages={prefix: keys}))`. Nothing is
+    injected: `mock_aws()` intercepts inside botocore, so the unsigned client
+    the backend builds resolves to the seeded bucket and the prefix walk runs
+    against S3's real `list_objects_v2` rather than a re-implementation of it.
+
+    `FakeS3` stays for `test_helpers.py`, which unit-tests the pagination
+    helper itself and needs to drive continuation tokens directly — something
+    the emulator only does past a thousand keys.
+    """
+
+    def _seed(goes, keys, *, missing=()):
+        present = {
+            key: b"netcdf:" + key.encode() for key in keys if key not in set(missing)
+        }
+        seed_s3(s3_emulator, goes._bucket, present)
+        return s3_emulator
+
+    return _seed
