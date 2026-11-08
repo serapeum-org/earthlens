@@ -9,10 +9,13 @@
 # on their now-404 paths are replaced here by the v3 products, verified
 # live against `data.chc.ucsb.edu` on 2026-11-08:
 #
-#   * Region: `global` only. v3 publishes a `global/` (50S-50N, the full
-#     CHIRPS domain) and a smaller `africa/` crop of the SAME data; the
-#     global raster already contains Africa, and the backend crops to any
-#     requested AOI, so the africa cutout is redundant and is not shipped.
+#   * Region: every shipped row is `global`. Where v3 also publishes an
+#     `africa/` crop (only 05/10/15-day and dekad_lead_0), it is a smaller
+#     cutout of the SAME data the global raster (50S-50N, the full CHIRPS
+#     domain) already contains, so it is redundant with a global download
+#     plus an AOI crop and is not shipped. The pentad leads and `daily`
+#     publish only `global/`, and `16_day` has no region level at all --
+#     it partitions straight into `year/month/`.
 #   * Products: `data/` (the forecast) and `anom/` (anomaly vs
 #     climatology). The old issue note mentioned a `zscore/` product, but
 #     no `zscore/` directory exists on the live server for any lead, so
