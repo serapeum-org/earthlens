@@ -125,12 +125,17 @@ class Variable(FluxableLeaf):
         units: Unit string (e.g. `"mm/day"`, `"mm/month"`).
         signed: Whether the variable carries genuine negative values
             (e.g. an anomaly, a temperature in degrees Celsius, or a
-            standardised index). Defaults to `False`. The backend's
+            standardised index). Defaults to `False`. On the raster
+            (`tif` / `cog` / `bil`) download path the backend's
             `_clip_and_normalise` rewrites every negative pixel to the
             -9999 no-data sentinel for unsigned variables (CHIRPS fill);
             when `signed` is `True` that rewrite is skipped so
             below-zero values survive, while the raster's own -9999 fill
-            is still honoured as no-data.
+            is still honoured as no-data. NetCDF variables are passed
+            through unmodified and never reach `_clip_and_normalise`, so
+            for a NetCDF-only variable (e.g. SPEI) the flag is a true
+            statement about the data that the download path does not
+            need to consult.
     """
 
     _summary_fields = (
@@ -146,6 +151,22 @@ class Variable(FluxableLeaf):
     description: str
     units: str
     signed: bool = False
+
+    def summary_parts(self) -> list[str]:
+        """Append a `signed` marker after the flux/state one for signed variables.
+
+        `signed` decides whether a variable's negative pixels survive the
+        download (see the field docstring), so it is worth surfacing in the
+        one-line summary. It is appended only when `True`, so the common
+        unsigned rows stay terse.
+
+        Returns:
+            list[str]: The inherited fragments, then `"signed"` when signed.
+        """
+        parts = super().summary_parts()
+        if self.signed:
+            parts.append("signed")
+        return parts
 
     # `is_flux` property inherited from `FluxableLeaf` (N1 in
     # the cross-backend catalog comparison).
