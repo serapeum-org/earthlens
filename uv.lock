@@ -2400,8 +2400,8 @@ dev = [
     { name = "pre-commit", specifier = ">=3.7.1" },
     { name = "pre-commit-hooks", specifier = ">=4.6.0" },
     { name = "psutil", specifier = ">=5.9" },
-    { name = "pyramids-core", extras = ["viz"], specifier = ">=0.71.0" },
-    { name = "pyramids-eo", specifier = ">=0.11.0,<0.12" },
+    { name = "pyramids-core", extras = ["viz"], specifier = ">=0.74.0" },
+    { name = "pyramids-eo", specifier = ">=0.12.0,<0.13" },
     { name = "pytest", specifier = ">=8.2.2" },
     { name = "pytest-cov", specifier = ">=5.0.0" },
     { name = "pytest-recording", specifier = ">=0.13.2" },
@@ -2424,7 +2424,7 @@ docs = [
     { name = "mkdocs-table-reader-plugin", specifier = ">=3.1.0" },
     { name = "mkdocstrings", specifier = ">=0.24.0" },
     { name = "mkdocstrings-python", specifier = ">=1.7.5" },
-    { name = "pyramids-core", extras = ["viz"], specifier = ">=0.71.0" },
+    { name = "pyramids-core", extras = ["viz"], specifier = ">=0.74.0" },
     { name = "python-dotenv", specifier = ">=1.0" },
     { name = "scipy", specifier = ">=1.11" },
 ]
@@ -2438,7 +2438,7 @@ notebook = [
 ]
 notebooks = [
     { name = "imageio-ffmpeg", specifier = ">=0.5" },
-    { name = "pyramids-eo", specifier = ">=0.11.0,<0.12" },
+    { name = "pyramids-eo", specifier = ">=0.12.0,<0.13" },
     { name = "python-dotenv", specifier = ">=1.0" },
     { name = "scipy", specifier = ">=1.11" },
 ]
@@ -2554,7 +2554,7 @@ requires-dist = [
     { name = "platformdirs", specifier = ">=3.0.0" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pyproj", specifier = ">=3.7.0" },
-    { name = "pyramids-core", specifier = ">=0.71.0" },
+    { name = "pyramids-core", specifier = ">=0.74.0" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=8" },
     { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "requests", specifier = ">=2.28.1" },
@@ -2679,11 +2679,11 @@ requires-dist = [
     { name = "jaxa-earth", marker = "extra == 'jaxa'", specifier = ">=0.1.6,<0.2" },
     { name = "openeo", marker = "extra == 'openeo'", specifier = ">=0.47,<0.52" },
     { name = "pyproj", specifier = ">=3.7.0" },
-    { name = "pyramids-core", specifier = ">=0.73.0" },
-    { name = "pyramids-core", extras = ["lazy"], marker = "extra == 'eedai'", specifier = ">=0.73.0" },
-    { name = "pyramids-core", extras = ["stac"], marker = "extra == 'stac'", specifier = ">=0.71.0" },
-    { name = "pyramids-eo", specifier = ">=0.11.0,<0.12" },
-    { name = "pyramids-eo", marker = "extra == 'eedai'", specifier = ">=0.11.0,<0.12" },
+    { name = "pyramids-core", specifier = ">=0.74.0" },
+    { name = "pyramids-core", extras = ["lazy"], marker = "extra == 'eedai'", specifier = ">=0.74.0" },
+    { name = "pyramids-core", extras = ["stac"], marker = "extra == 'stac'", specifier = ">=0.74.0" },
+    { name = "pyramids-eo", specifier = ">=0.12.0,<0.13" },
+    { name = "pyramids-eo", marker = "extra == 'eedai'", specifier = ">=0.12.0,<0.13" },
     { name = "rtree", marker = "extra == 'gee'", specifier = ">=1.0.0" },
     { name = "scikit-learn", marker = "extra == 'gee'", specifier = ">=1.5" },
     { name = "sentinelhub", marker = "extra == 'sentinel-hub'", specifier = ">=3.11.5" },
@@ -2759,7 +2759,7 @@ requires-dist = [
     { name = "earthlens-core", extras = ["s3"], marker = "extra == 'nwm'", editable = "libs/core" },
     { name = "erddapy", marker = "extra == 'erddap'", specifier = ">=3.0" },
     { name = "pyobis", marker = "extra == 'obis'", specifier = ">=1.6.1" },
-    { name = "pyramids-core", extras = ["parquet"], marker = "extra == 'nwm'", specifier = ">=0.70.0" },
+    { name = "pyramids-core", extras = ["parquet"], marker = "extra == 'nwm'", specifier = ">=0.74.0" },
 ]
 provides-extras = ["argo", "cmems", "erddap", "nwm", "usgs-water", "obis"]
 
@@ -7531,7 +7531,7 @@ viz = [
 
 [[package]]
 name = "pyramids-eo"
-version = "0.11.0"
+version = "0.12.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
@@ -7539,9 +7539,9 @@ dependencies = [
     { name = "pyramids-core" },
     { name = "pyyaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7b/57/9a866d1640ad61c134136404395c74617e177a50f63493bc84725aae9c77/pyramids_eo-0.11.0.tar.gz", hash = "sha256:2a39c486b9795f317627982463a36a30a83c74894f56216f9a6464168a6d2468", size = 296037, upload-time = "2026-10-21T17:31:28.721Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b0/e8/459981682762e9cffa8198ca830847276f6957b4ad03f9a429cc969f0316/pyramids_eo-0.12.0.tar.gz", hash = "sha256:d3c027709b7f8392472f82dca58e522e4670321699b5087be7f2101eb68f0b17", size = 455485, upload-time = "2026-11-06T22:23:04.229Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/38/2a/4190e8914a7042095517dcd4726f4c5d25e2a27811649165defa39f2c1b2/pyramids_eo-0.11.0-py3-none-any.whl", hash = "sha256:6625f016a4843b5dff6f9b81ddbeda6cdc549bbe93d4b7afaa920b900036bdc3", size = 187829, upload-time = "2026-10-21T17:31:27.568Z" },
+    { url = "https://files.pythonhosted.org/packages/1f/e0/3bc9a2a84ff5b4a656661d1b4bc03ac34b90d2c6c875358bc213cb596f9f/pyramids_eo-0.12.0-py3-none-any.whl", hash = "sha256:5c0dd1d7dbe0a7d0c6f1c5ccddf238564b947492f85bf63f195c55c74b08ef90", size = 269631, upload-time = "2026-11-06T22:23:02.917Z" },
 ]
 
 [[package]]
