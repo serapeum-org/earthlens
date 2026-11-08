@@ -1036,7 +1036,7 @@ class Catalog(AbstractCatalog[Dataset]):
                 ```python
                 >>> from earthlens.chc import Catalog
                 >>> Catalog().list_datasets(temporal_resolution="daily")
-                ['africa-daily', 'chirp-daily', 'chirp-v3-global-daily', 'chirps-gefs-v12-daily-16day', 'chirps-v3-global-daily-prelim', 'chirps-v3-global-daily-rnl', 'chirps-v3-global-daily-sat', 'chirtsdaily-heat-index', 'chirtsdaily-relative-humidity', 'chirtsdaily-svp', 'chirtsdaily-tmax', 'chirtsdaily-tmin', 'chirtsdaily-vpd', 'global-daily', 'prelim-global-daily', 'western-hemisphere-daily']
+                ['africa-daily', 'chirp-daily', 'chirp-v3-global-daily', 'chirps-gefs-v3-16day', 'chirps-gefs-v3-daily', 'chirps-v3-global-daily-prelim', 'chirps-v3-global-daily-rnl', 'chirps-v3-global-daily-sat', 'chirtsdaily-heat-index', 'chirtsdaily-relative-humidity', 'chirtsdaily-svp', 'chirtsdaily-tmax', 'chirtsdaily-tmin', 'chirtsdaily-vpd', 'global-daily', 'prelim-global-daily', 'western-hemisphere-daily']
 
                 ```
         """

@@ -16,7 +16,7 @@ the tooling that supports catalog work.
 | `src/earthlens/chc/backend.py` | The `CHIRPS` class — consumes the catalog through `Dataset.ftp_bases` / `Dataset.file_patterns` / `Dataset.discrete_files` |
 | `tools/chc/refresh_chc_catalog.py` | Walks `data.chc.ucsb.edu` and regenerates the `available_datasets:` index |
 | `tools/chc/audit_chc_datasets.py` | Coverage / staleness classifier (parallel of `earthlens datasets audit gee --coverage`) |
-| `earthlens datasets probe chc <key>` | CHIRPS FTP probe — samples a directory's filenames + suggests a `file_patterns` template (used to verify the GEFS v3 patterns before they were withdrawn) |
+| `earthlens datasets probe chc <key>` | CHIRPS FTP probe — samples a directory's filenames + suggests a `file_patterns` template (used to verify the GEFS v3 forecast-lead patterns live) |
 
 ## Layout — per-family split
 
@@ -30,7 +30,7 @@ src/earthlens/chc/catalog/
 ├── chirps-v3.yaml           # 11 datasets — CHIRPS v3 (final + preliminary)
 ├── chirp.yaml               # 7 datasets — CHIRP + CHIRP v3
 ├── chirts.yaml              # 7 datasets — CHIRTSdaily + CHIRTSmonthly
-├── gefs.yaml                # 9 datasets — CHIRPS-GEFS v12
+├── gefs.yaml                # 16 datasets — CHIRPS-GEFS v3
 ├── indices.yaml             # 15 datasets — SPI/CHIRPS3 + SPEI v1
 ├── cmip6.yaml               # 16 datasets — CHC_CMIP6 scenario deltas
 └── derived.yaml             # 5 datasets — CHPclim v2, WBGT, CentennialTrends v1
@@ -307,13 +307,12 @@ haven't been touched since N days). Parallel of
 CHIRPS FTP probe. Lists a sample of the real filenames under a
 dataset's `ftp_base` on the live FTP and adds a `(suggested pattern)`
 row carrying a `file_patterns` template inferred from the listing.
-Run against the GEFS keys, it was the basis for the H2 decision to
-**withdraw** the
-CHIRPS-GEFS v3 rows — the probe found the directory shape didn't
-match the YAML's provisional patterns
-(`year/` partitioning vs the YAML's `year/month/` assumption;
-`anom/data/zscore` subdir split on the dekad/pentad variants). The
-rows are reinstated only when the probe confirms a verified pattern.
+Run against the GEFS keys, it mapped the live `products/CHIRPS-GEFS/v3/`
+layout the v3 rows now ship against (#1387): the per-horizon
+`data/` + `anom/` split, the `global`/`africa` region crops, and the
+`c3g_{year}.{month}.{day|dekad|pentad}.tif` filename shape. Every
+shipped `ftp_base` + `file_patterns` pair in `gefs.yaml` was confirmed
+to resolve on the live FTP with this probe before the rows landed.
 
 ## Adding a new dataset
 

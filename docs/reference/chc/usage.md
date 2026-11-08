@@ -235,11 +235,12 @@ after the `chirps/` → `chc/` rename.
   `ValueError` (caught by the per-date guard and logged) naming both
   extents.
 - **Every date fails with FTP 550.** Either the file pattern in the
-  YAML is wrong (the GEFS v3 rows shipped with a known-bad pattern
-  and were withdrawn — see `gefs.yaml`'s header for the probe
-  results) or your bbox / date is outside the dataset's actual
-  coverage. Try `Catalog().describe(ds_key)` to compare the
-  request's window against the dataset's `start_date` / `end_date`.
+  YAML is wrong for the requested dataset, or your bbox / date is
+  outside the dataset's actual coverage. Try
+  `Catalog().describe(ds_key)` to compare the request's window against
+  the dataset's `start_date` / `end_date`, and
+  `earthlens datasets probe chc <key>` to list the real filenames the
+  `ftp_base` currently holds.
 - **No outbound FTP allowed.** Some corporate firewalls block port 21.
   Run `python -c "from ftplib import FTP; FTP('data.chc.ucsb.edu').login()"`
   from the target host to confirm reachability before reaching for

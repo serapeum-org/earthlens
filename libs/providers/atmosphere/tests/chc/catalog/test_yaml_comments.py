@@ -24,16 +24,17 @@ def _read_folded(name: str) -> str:
 class TestYamlComments:
     """The H5 comment restorations are present in the per-family YAML files."""
 
-    def test_gefs_yaml_records_why_v3_rows_were_withheld(self):
-        """gefs.yaml's header still explains why the v3 rows are absent (post-H2)."""
+    def test_gefs_yaml_records_the_v3_migration(self):
+        """gefs.yaml's header documents the v12->v3 migration decisions (#1387)."""
         text = (CATALOG_PATH / "gefs.yaml").read_text(encoding="utf-8")
-        # After H2, the three `chirps-gefs-v3-*` rows were dropped because
-        # their FTP patterns were known-broken. The header banner must keep
-        # the institutional memory so a future maintainer who re-runs the
-        # probe can resurrect the rows knowingly.
-        assert "v3 rows are NOT shipped today" in text
+        # The header banner keeps the institutional memory of how the v3
+        # rows were derived: the #1387 remap, the global-only region, the
+        # data + anomaly products, and that no `zscore/` exists on the
+        # live server despite the old issue note mentioning it.
+        assert "#1387" in text
+        assert "global" in text
         assert "anom" in text and "zscore" in text
-        assert "year/month/" in text
+        assert "lead" in text
 
     def test_gefs_yaml_points_at_the_probe_tool(self):
         """gefs.yaml's banner names the probe verb so a maintainer knows where to look."""
@@ -51,9 +52,9 @@ class TestYamlComments:
         assert "fixed archive of multi-year NetCDFs" in folded
 
     def test_bundled_catalog_still_loads_after_comment_restoration(self):
-        """The comments don't break parsing -- catalog still loads 97 datasets."""
+        """The comments don't break parsing -- catalog still loads 104 datasets."""
         cat = Catalog()
-        assert len(cat.datasets) == 97
+        assert len(cat.datasets) == 104
         # Pin the same health state we had before the H5 commit: 7 clean keys
         # plus the known `precipitation/daily` drift flagged by H3.
         report = cat.health()
