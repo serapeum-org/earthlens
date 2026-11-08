@@ -174,3 +174,22 @@ class TestGefsV3Catalog:
         assert ds.variables["precipitation_anomaly"].signed, (
             f"{key}: anomaly must be signed so below-climatology negatives survive (C1)"
         )
+
+    @pytest.mark.parametrize(
+        "key, expected_start",
+        [
+            ("chirps-gefs-v3-pentad-lead0", "2001-01-01"),
+            ("chirps-gefs-v3-pentad-lead1", "2001-01-06"),
+            ("chirps-gefs-v3-pentad-lead2", "2001-01-11"),
+            ("chirps-gefs-v3-pentad-lead1-anom", "2001-01-06"),
+            ("chirps-gefs-v3-pentad-lead2-anom", "2001-01-11"),
+        ],
+    )
+    def test_pentad_lead_start_dates_match_the_archive_offset(
+        self, bundled_catalog: Catalog, key: str, expected_start: str
+    ):
+        """Each pentad lead starts at its N-pentad archive offset, not the floor (L1)."""
+        start = bundled_catalog.datasets[key].start_date
+        assert start == expected_start, (
+            f"{key}: start_date {start!r}, expected {expected_start!r}"
+        )

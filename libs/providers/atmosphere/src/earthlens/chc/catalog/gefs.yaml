@@ -156,7 +156,7 @@ datasets:
     pandas_freq: 5D
     spatial_resolution: [0.05]
     formats: [tif]
-    start_date: '2001-01-01'
+    start_date: '2001-01-06'
     file_patterns:
       tif: data/c3g_{year}.{month}.{pentad}.tif
     variables:
@@ -172,7 +172,7 @@ datasets:
     pandas_freq: 5D
     spatial_resolution: [0.05]
     formats: [tif]
-    start_date: '2001-01-01'
+    start_date: '2001-01-11'
     file_patterns:
       tif: data/c3g_{year}.{month}.{pentad}.tif
     variables:
@@ -273,7 +273,7 @@ datasets:
     pandas_freq: 5D
     spatial_resolution: [0.05]
     formats: [tif]
-    start_date: '2001-01-01'
+    start_date: '2001-01-06'
     file_patterns:
       tif: anom/c3g_anom_{year}.{month}.{pentad}.tif
     variables:
@@ -290,7 +290,7 @@ datasets:
     pandas_freq: 5D
     spatial_resolution: [0.05]
     formats: [tif]
-    start_date: '2001-01-01'
+    start_date: '2001-01-11'
     file_patterns:
       tif: anom/c3g_anom_{year}.{month}.{pentad}.tif
     variables:
