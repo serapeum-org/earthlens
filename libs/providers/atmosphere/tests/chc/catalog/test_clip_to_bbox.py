@@ -129,6 +129,44 @@ class TestClipAndNormaliseWindow:
         assert out.no_data_value[0] == pytest.approx(-9999.0)
 
 
+class TestClipAndNormaliseSigned:
+    """`_clip_and_normalise(signed=...)` controls negative-pixel handling (C1).
+
+    Precipitation negatives are fill and must clobber to -9999, but a signed
+    variable (e.g. `precipitation_anomaly`) carries genuine below-climatology
+    negatives that must survive while the raster's own -9999 fill stays no-data.
+    """
+
+    @staticmethod
+    def _granule_with_negatives() -> Dataset:
+        """A 100x360 granule of 5.0 with one real negative and one -9999 fill cell."""
+        arr = np.full((100, 360), 5.0, dtype=np.float32)
+        arr[45, 185] = -4.1  # genuine below-climatology anomaly inside the window
+        arr[46, 186] = -9999.0  # the raster's own ocean/fill sentinel
+        return Dataset.from_array(
+            arr=arr,
+            no_data_value=None,
+            geo_ref=GeoReference(geo=tuple(_FAKE_GEO), epsg=4326),
+        )
+
+    def test_unsigned_default_clobbers_negatives_to_nodata(self):
+        """With signed=False (the default) a real negative is rewritten to -9999."""
+        chirps = _chirps_with_bbox(lat_lim=[0.0, 10.0], lon_lim=[0.0, 10.0])
+        out = chirps._clip_and_normalise(self._granule_with_negatives())
+        window = out.read_array()
+        assert window[5, 5] == pytest.approx(-9999.0), "negative should be clobbered"
+        assert out.no_data_value[0] == pytest.approx(-9999.0)
+
+    def test_signed_preserves_negatives(self):
+        """With signed=True a real negative survives while -9999 stays no-data."""
+        chirps = _chirps_with_bbox(lat_lim=[0.0, 10.0], lon_lim=[0.0, 10.0])
+        out = chirps._clip_and_normalise(self._granule_with_negatives(), signed=True)
+        window = out.read_array()
+        assert window[5, 5] == pytest.approx(-4.1), "signed negative must be preserved"
+        assert window[6, 6] == pytest.approx(-9999.0), "raster fill stays -9999"
+        assert out.no_data_value[0] == pytest.approx(-9999.0)
+
+
 class TestClipToBboxOverlap:
     """`_check_bbox_overlaps` refuses non-overlapping bboxes (M2)."""
 

@@ -196,6 +196,7 @@ datasets:
         description: 5-day CHIRPS-GEFS precipitation anomaly vs climatology (v3)
         units: mm/5-days
         types: flux
+        signed: true
   chirps-gefs-v3-10day-anom:
     ftp_bases:
       tif: products/CHIRPS-GEFS/v3/10_day/global/
@@ -212,6 +213,7 @@ datasets:
         description: 10-day CHIRPS-GEFS precipitation anomaly vs climatology (v3)
         units: mm/10-days
         types: flux
+        signed: true
   chirps-gefs-v3-15day-anom:
     ftp_bases:
       tif: products/CHIRPS-GEFS/v3/15_day/global/
@@ -228,6 +230,7 @@ datasets:
         description: 15-day CHIRPS-GEFS precipitation anomaly vs climatology (v3)
         units: mm/15-days
         types: flux
+        signed: true
   chirps-gefs-v3-dekad-lead0-anom:
     ftp_bases:
       tif: products/CHIRPS-GEFS/v3/dekad_lead_0/global/
@@ -244,6 +247,7 @@ datasets:
         description: Lead-0 dekadal CHIRPS-GEFS precipitation anomaly (v3)
         units: mm/dekad
         types: flux
+        signed: true
   chirps-gefs-v3-pentad-lead0-anom:
     ftp_bases:
       tif: products/CHIRPS-GEFS/v3/pentad_lead_0/global/
@@ -260,6 +264,7 @@ datasets:
         description: Lead-0 pentad CHIRPS-GEFS precipitation anomaly (v3)
         units: mm/pentad
         types: flux
+        signed: true
   chirps-gefs-v3-pentad-lead1-anom:
     ftp_bases:
       tif: products/CHIRPS-GEFS/v3/pentad_lead_1/global/
@@ -276,6 +281,7 @@ datasets:
         description: Lead-1 pentad CHIRPS-GEFS precipitation anomaly (v3)
         units: mm/pentad
         types: flux
+        signed: true
   chirps-gefs-v3-pentad-lead2-anom:
     ftp_bases:
       tif: products/CHIRPS-GEFS/v3/pentad_lead_2/global/
@@ -292,3 +298,4 @@ datasets:
         description: Lead-2 pentad CHIRPS-GEFS precipitation anomaly (v3)
         units: mm/pentad
         types: flux
+        signed: true

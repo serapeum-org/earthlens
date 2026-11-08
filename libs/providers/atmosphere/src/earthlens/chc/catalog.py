@@ -123,6 +123,14 @@ class Variable(FluxableLeaf):
         name: Variable short code (e.g. `"precipitation"`).
         description: Human-readable description of the variable.
         units: Unit string (e.g. `"mm/day"`, `"mm/month"`).
+        signed: Whether the variable carries genuine negative values
+            (e.g. an anomaly, a temperature in degrees Celsius, or a
+            standardised index). Defaults to `False`. The backend's
+            `_clip_and_normalise` rewrites every negative pixel to the
+            -9999 no-data sentinel for unsigned variables (CHIRPS fill);
+            when `signed` is `True` that rewrite is skipped so
+            below-zero values survive, while the raster's own -9999 fill
+            is still honoured as no-data.
     """
 
     _summary_fields = (
@@ -137,6 +145,7 @@ class Variable(FluxableLeaf):
     name: str
     description: str
     units: str
+    signed: bool = False
 
     # `is_flux` property inherited from `FluxableLeaf` (N1 in
     # the cross-backend catalog comparison).
@@ -391,6 +400,7 @@ def _build_chc_dataset(
                 description=var_entry.get("description", ""),
                 units=var_entry.get("units", ""),
                 types=var_entry.get("types"),
+                signed=var_entry.get("signed", False),
             )
         except ValidationError as exc:
             raise ValueError(

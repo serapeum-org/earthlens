@@ -20,6 +20,7 @@ datasets:
         description: Daily maximum 2-metre air temperature
         units: degC
         types: state
+        signed: true
   chirtsdaily-tmin:
     ftp_bases:
       tif: products/CHIRTS/daily/v1.0/global_tifs_p05/Tmin/
@@ -37,6 +38,7 @@ datasets:
         description: Daily minimum 2-metre air temperature
         units: degC
         types: state
+        signed: true
   chirtsdaily-heat-index:
     ftp_bases:
       tif: products/CHIRTS/daily/v1.0/global_tifs_p05/HeatIndex/
@@ -122,3 +124,4 @@ datasets:
         description: Daily maximum 2-metre air temperature
         units: degC
         types: state
+        signed: true

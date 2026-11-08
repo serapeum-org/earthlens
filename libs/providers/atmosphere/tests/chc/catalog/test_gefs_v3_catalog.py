@@ -146,10 +146,13 @@ class TestGefsV3Catalog:
     def test_data_rows_expose_precipitation_flux(
         self, bundled_catalog: Catalog, key: str, units: str
     ):
-        """Each forecast row exposes `precipitation` as a flux with the expected units."""
+        """Each forecast row exposes `precipitation` as an unsigned flux with the expected units."""
         var = bundled_catalog.datasets[key].variables["precipitation"]
         assert var.is_flux, f"{key}: precipitation should be flux"
         assert var.units == units, f"{key}: units {var.units!r}, expected {units!r}"
+        assert not var.signed, (
+            f"{key}: precipitation fill negatives must clobber (unsigned)"
+        )
 
     @pytest.mark.parametrize(
         "key", [k for k, _, _ in _ROW_PATHS if k.endswith("-anom")]
@@ -167,4 +170,7 @@ class TestGefsV3Catalog:
         )
         assert ds.variables["precipitation_anomaly"].is_flux, (
             f"{key}: anomaly should be flux"
+        )
+        assert ds.variables["precipitation_anomaly"].signed, (
+            f"{key}: anomaly must be signed so below-climatology negatives survive (C1)"
         )
