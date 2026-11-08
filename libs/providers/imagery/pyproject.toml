@@ -52,7 +52,7 @@ dependencies = [
     # gated on the (now redundant) `[eedai]` extra being installed, which was how
     # the reader stayed opt-in. The reader is still only *reachable* through
     # `engine=`, so `engine="ee"` keeps Earth Engine's exact semantics.
-    "pyramids-eo >=0.12.0,<0.13",
+    "pyramids-eo >=0.12.0",
     # pyramids-core is imported directly here (earthlens.gee.reducers /
     # backend.py: `DatasetCollection`, `Dataset`, `merge_rasters`,
     # `reduce_time`), so it is a declared direct dependency, not left to arrive
@@ -76,7 +76,7 @@ asf = ["asf_search >=12.2.2", "earthlens-imagery[earthdata]"]
 # lives behind `earthlens-imagery[eedai]`; a bare `[gee]` install stays lean and a
 # client-side reduce there raises pyramids-core's `OptionalPackageDoesNotExist`
 # naming `pyramids-core[lazy]`. Floor kept in step with the base pyramids-core pin.
-eedai = ["pyramids-eo >=0.12.0,<0.13", "pyramids-core[lazy] >=0.74.0"]
+eedai = ["pyramids-eo >=0.12.0", "pyramids-core[lazy] >=0.74.0"]
 eumetsat = ["eumdac >=3.1"]
 # scikit-learn drives the two client-side learning operations in
 # `earthlens.gee.analysis` (k-means clustering and the supervised classifier).

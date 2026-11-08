@@ -2401,7 +2401,7 @@ dev = [
     { name = "pre-commit-hooks", specifier = ">=4.6.0" },
     { name = "psutil", specifier = ">=5.9" },
     { name = "pyramids-core", extras = ["viz"], specifier = ">=0.74.0" },
-    { name = "pyramids-eo", specifier = ">=0.12.0,<0.13" },
+    { name = "pyramids-eo", specifier = ">=0.12.0" },
     { name = "pytest", specifier = ">=8.2.2" },
     { name = "pytest-cov", specifier = ">=5.0.0" },
     { name = "pytest-recording", specifier = ">=0.13.2" },
@@ -2438,7 +2438,7 @@ notebook = [
 ]
 notebooks = [
     { name = "imageio-ffmpeg", specifier = ">=0.5" },
-    { name = "pyramids-eo", specifier = ">=0.12.0,<0.13" },
+    { name = "pyramids-eo", specifier = ">=0.12.0" },
     { name = "python-dotenv", specifier = ">=1.0" },
     { name = "scipy", specifier = ">=1.11" },
 ]
@@ -2682,8 +2682,8 @@ requires-dist = [
     { name = "pyramids-core", specifier = ">=0.74.0" },
     { name = "pyramids-core", extras = ["lazy"], marker = "extra == 'eedai'", specifier = ">=0.74.0" },
     { name = "pyramids-core", extras = ["stac"], marker = "extra == 'stac'", specifier = ">=0.74.0" },
-    { name = "pyramids-eo", specifier = ">=0.12.0,<0.13" },
-    { name = "pyramids-eo", marker = "extra == 'eedai'", specifier = ">=0.12.0,<0.13" },
+    { name = "pyramids-eo", specifier = ">=0.12.0" },
+    { name = "pyramids-eo", marker = "extra == 'eedai'", specifier = ">=0.12.0" },
     { name = "rtree", marker = "extra == 'gee'", specifier = ">=1.0.0" },
     { name = "scikit-learn", marker = "extra == 'gee'", specifier = ">=1.5" },
     { name = "sentinelhub", marker = "extra == 'sentinel-hub'", specifier = ">=3.11.5" },
