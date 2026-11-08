@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -792,6 +792,17 @@
     <span class="md-ellipsis">
       
         ECMWF.download(aggregate=...)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chirpsdownloadaggregate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CHIRPS.download(aggregate=...)
       
     </span>
   </a>
@@ -24076,6 +24087,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#chirpsdownloadaggregate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CHIRPS.download(aggregate=...)
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -24411,6 +24433,25 @@ When supplied, every retrieved NetCDF is fed through
 <code>&lt;self.root_dir&gt;/aggregated/</code>. Aggregation failures surface
 alongside retrieve failures in the per-variable failure summary, so
 a single bad variable does not abort the rest of the loop.</p>
+<h3 id="chirpsdownloadaggregate"><a class="toclink" href="#chirpsdownloadaggregate"><code>CHIRPS.download(aggregate=...)</code></a><a class="headerlink" href="#chirpsdownloadaggregate" title="Permanent link">#</a></h3>
+<p>CHIRPS emits <strong>per-date GeoTIFFs</strong>, not NetCDFs, so it reduces a <em>raster</em> stack rather than
+running <code>aggregate_netcdf</code>. When <code>aggregate=</code> is set, the per-date rasters fetched for each
+<code>(dataset, variable)</code> are grouped by <code>aggregate.freq</code> with the shared <code>window_groups</code> primitive
+and each window reduced with <code>reduce_time_axis</code> (nodata read as NaN through pyramids' masked
+read), writing one GeoTIFF per window. <code>op="auto"</code> resolves from the variable's kind — flux
+quantities such as precipitation <strong>sum</strong>, state quantities average. As with ECMWF, an unset
+<code>aggregate.out_dir</code> defaults to <code>&lt;self.root_dir&gt;/aggregated/</code>, and the returned list is the
+per-window rasters rather than the per-date ones. Discrete multi-year archive datasets
+(CenTrends) have no per-date stack to reduce and reject <code>aggregate=</code> with a <code>ValueError</code>.</p>
+<p>Per-window filenames follow <code>&lt;ds_key&gt;_&lt;variable&gt;_&lt;op&gt;_&lt;freq&gt;_&lt;window-label-as-YYYYMMDD&gt;.tif</code>
+(e.g. <code>global-daily_precipitation_sum_1MS_20200101.tif</code> — the January 2020 daily-to-monthly total).
+A sub-daily <code>freq</code> (e.g. <code>"6h"</code>) additionally stamps <code>HHMM</code> so windows inside one day stay distinct.</p>
+<p>Each window is reduced on its own — only the rasters for the current window are opened, stacked
+and closed before the next — so peak memory tracks the largest window, not the whole requested
+range. Note the flux edge case: with <code>op="sum"</code> (the <code>auto</code> default for precipitation) a window
+in which <strong>every</strong> date is nodata reduces to <code>0.0</code>, not nodata, because a NaN-aware sum of an
+all-missing slice is zero. Set <code>aggregate.min_count</code> to require a minimum count of valid dates per
+window when you need to tell a genuine zero apart from "all missing".</p>
 <h2 id="supported-reduction-operators"><a class="toclink" href="#supported-reduction-operators">Supported reduction operators</a><a class="headerlink" href="#supported-reduction-operators" title="Permanent link">#</a></h2>
 <table>
 <thead>
@@ -24749,6 +24790,9 @@ a plain caller passing a bare stand-in to <code>aggregate_netcdf</code>.</p>
   filename.</li>
 <li><code>earthlens.ecmwf.ECMWF.download</code> — accepts the <code>aggregate</code>
   parameter for one-call download-and-aggregate.</li>
+<li><code>earthlens.chc.CHIRPS.download</code> — accepts <code>aggregate=</code> to
+  re-aggregate its per-date GeoTIFF stack (raster reduction,
+  daily → monthly, etc.), distinct from the NetCDF path above.</li>
 </ul>
 
 

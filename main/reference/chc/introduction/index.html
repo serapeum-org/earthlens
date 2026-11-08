@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23969,7 +23969,7 @@ different in two ways:</p>
   socket, log in as <code>anonymous</code>, walk the tree. The earthlens
   backend wraps <code>ftplib</code> (stdlib) and that's all that's required.</li>
 <li><strong>Catalog-driven, not provider-driven.</strong> The CHC FTP layout is
-  per-product-family (<code>pub/org/chc/products/CHIRPS-2.0/global_daily/...</code>,
+  per-product-family (<code>products/CHIRPS/v2.0/global_daily/...</code>,
   <code>.../WBGT/wbgt_global_dekad_data/...</code>) with per-family filename
   conventions. The backend doesn't hardcode any of that — it
   consults <code>earthlens.chc.Catalog</code> and substitutes per-date
@@ -24020,7 +24020,7 @@ which only ~40 are CHIRPS-the-product) is one
 <td>1983-present, ±60° land</td>
 </tr>
 <tr>
-<td><strong>CHIRPS-GEFS v12</strong></td>
+<td><strong>CHIRPS-GEFS v12</strong> †</td>
 <td>9</td>
 <td><code>precipitation</code></td>
 <td>daily / pentadal / dekadal / 16-day forecast</td>
@@ -24072,7 +24072,13 @@ which only ~40 are CHIRPS-the-product) is one
 </table>
 <p>Browse the full list via <code>Catalog.list_datasets()</code> or
 <code>Catalog.available_datasets</code>. Every entry is reachable from
-<code>pub/org/chc/products/...</code> on the FTP.</p>
+<code>products/...</code> on the FTP, except as noted below.</p>
+<p>† <strong>CHIRPS-GEFS v12 is temporarily unavailable.</strong> CHC retired the v12
+forecast tree and replaced it with a re-organised <code>CHIRPS-GEFS/v3/</code>
+layout whose forecast-lead directory scheme differs from v12. The 9
+rows still carry their v12 paths and a <code>.download()</code> on them currently
+fails with an FTP <code>550</code>; re-mapping them to v3 is tracked in
+<a href="https://github.com/serapeum-org/earthlens/issues/1387">issue #1387</a>.</p>
 <h2 id="data-is-shipped-as-files-not-as-a-service"><a class="toclink" href="#data-is-shipped-as-files-not-as-a-service">Data is shipped as files, not as a service</a><a class="headerlink" href="#data-is-shipped-as-files-not-as-a-service" title="Permanent link">#</a></h2>
 <p>Every CHC dataset is a static raster (or NetCDF) sitting in a directory
 on the FTP. Two filename shapes show up:</p>
@@ -24140,7 +24146,7 @@ bandwidth.</p>
 <li>CHIRTS paper (Funk et al. 2019): <a href="https://doi.org/10.1175/JCLI-D-18-0698.1">https://doi.org/10.1175/JCLI-D-18-0698.1</a></li>
 <li>WBGT (Spangler et al. 2024): <a href="https://doi.org/10.1029/2023GH001003">https://doi.org/10.1029/2023GH001003</a></li>
 <li>CenTrends v1 (Funk et al. 2015): <a href="https://doi.org/10.7289/V5RX99FT">https://doi.org/10.7289/V5RX99FT</a></li>
-<li>CHC FTP root: <a href="ftp://data.chc.ucsb.edu/pub/org/chc/">ftp://data.chc.ucsb.edu/pub/org/chc/</a></li>
+<li>CHC FTP root: <a href="ftp://data.chc.ucsb.edu/products/">ftp://data.chc.ucsb.edu/products/</a></li>
 <li>CHC product browser (HTTPS mirror): <a href="https://data.chc.ucsb.edu/products/">https://data.chc.ucsb.edu/products/</a></li>
 <li>earthlens CHC usage: <a href="../usage/">Usage</a></li>
 <li>earthlens CHC catalog mechanics: <a href="../catalog/">Catalog</a></li>
