@@ -47,3 +47,18 @@ class TestSignedClassification:
         assert wrong == [], "signed classification drifted:\n" + "\n".join(
             sorted(set(wrong))
         )
+
+    def test_signed_marker_shows_in_the_variable_summary(
+        self, bundled_catalog: Catalog
+    ):
+        """A signed variable's one-line summary carries a `signed` marker; an unsigned one does not."""
+        anom = bundled_catalog.datasets["chirps-gefs-v3-05day-anom"].variables[
+            "precipitation_anomaly"
+        ]
+        precip = bundled_catalog.datasets["chirps-gefs-v3-05day"].variables[
+            "precipitation"
+        ]
+        assert "signed" in str(anom), f"signed variable summary should mark it: {anom}"
+        assert "signed" not in str(precip), (
+            f"unsigned variable summary must not mark it: {precip}"
+        )
