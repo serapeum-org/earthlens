@@ -84,7 +84,11 @@ class TestRegistry:
         """
         from earthlens.gee.reducers import collection_reducers
 
-        assert set(collection_reducers()) == set(CONVENIENCE)
+        assert set(collection_reducers()) == set(CONVENIENCE) | {
+            "count",
+            "stdDev",
+            "variance",
+        }
         assert set(CONVENIENCE) <= set(REDUCERS)
 
     @pytest.mark.parametrize(("name", "cls"), CONVENIENCE.items())

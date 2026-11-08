@@ -491,6 +491,24 @@ datasets:
         description: Cloud probability, 0-100
         min: 0
         max: 100
+      NDVI:
+        description: Normalized Difference Vegetation Index (computed from B8 / B4)
+        derived_from: { normalized_difference: [B8, B4] }
+        min: -1
+        max: 1
+      NDWI:
+        description: Normalized Difference Water Index (computed from B3 / B8)
+        derived_from: { normalized_difference: [B3, B8] }
+        min: -1
+        max: 1
+      EVI:
+        description: Enhanced Vegetation Index (computed from B8 / B4 / B2 on scaled reflectance)
+        derived_from:
+          expression:
+            formula: "2.5 * ((NIR - RED) / (NIR + 6 * RED - 7.5 * BLUE + 1))"
+            bands: { NIR: B8, RED: B4, BLUE: B2 }
+        min: -1
+        max: 1
 
   COPERNICUS/S3/OLCI:
     title: "Sentinel-3 OLCI EFR: Ocean and Land Colour Instrument (Earth Observation Full Resolution, 300m)"
@@ -3089,6 +3107,11 @@ datasets:
         description: Pixel quality attributes (CFMask)
       QA_RADSAT:
         description: Radiometric saturation and dropped-pixel QA
+      NDVI:
+        description: Normalized Difference Vegetation Index (computed from SR_B5 / SR_B4)
+        derived_from: { normalized_difference: [SR_B5, SR_B4] }
+        min: -1
+        max: 1
 
   LANDSAT/LC09/C02/T1_TOA:
     title: "USGS Landsat 9 Collection 2 Tier 1 Top-of-Atmosphere Reflectance"

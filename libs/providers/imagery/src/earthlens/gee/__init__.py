@@ -56,7 +56,8 @@ Public surface (re-exported from this package):
   raster at point locations via leaf-batched `reduceRegions`; the
   `_to_gdf` variant returns a `GeoDataFrame` via `getInfo()`.
 * `Sampler` / `PointSampler` / `RegionSampler` / `RandomSampler` /
-  `StratifiedSampler` / `TransectSampler` / `TimeSeriesSampler` — the
+  `StratifiedSampler` / `TransectSampler` / `TimeSeriesSampler` /
+  `RegionTimeSeriesSampler` — the
   object-oriented sampling family: a frozen base holding `scale_m` + a
   `Reducer`, plus the point, polygon-zonal (with a `ZonalStrategy`),
   random / stratified training-point, line-transect, and per-point
@@ -175,6 +176,9 @@ anything a string names:
 * `EnginePlan` (back-compat alias `EedaiPlan`) — the frozen
   routing verdict an engine returns, carrying the reason when a route
   is declined.
+* `RequestPreview` — the frozen pre-flight summary `GEE.preview()`
+  returns: which engine would serve the read, the scene / pixel / size
+  estimate, the tile count, and whether it fits in one pass.
 * `Sink`, with `SINKS` and `resolve_sink` — where
   the artifact goes: `UrlSink`, `DriveSink`,
   `GcsSink`, `AssetSink`, and `TableSink` (the
@@ -281,13 +285,19 @@ median composite is a facade call rather than raw `ee`:
   state), `Sentinel2Cdi` (the `ee.Algorithms.Sentinel2.CDI`
   parallax discriminator, thresholded — TOA scenes only) and
   `CloudScorePlus` (Google's Cloud Score+ quality score, linked per
-  scene by `system:index`) under the `ImageMask` base, plus the
-  function forms `landsat_sr(image, sensor=...)` and
+  scene by `system:index`) and `S2Cloudless` (the s2cloudless
+  cloud-probability join, opposite polarity) under the `ImageMask` base, plus the
+  generic `QaBitsMask` / `qa_bits(band, bits=..., keep=.../drop=...)`
+  primitive that unpacks any packed-QA bit field (single bit or a
+  contiguous run) so a new dataset needs a call, not a bespoke class,
+  and the function forms `landsat_sr(image, sensor=...)` and
   `sentinel2_scl(image)`. Two family members are not masks but the
   same shape: `BandScaler` (with `BandFactor`), which converts raw DN
   to physical units from the `scale` / `offset` the catalog declares
-  per band, and `SpeckleFilter`, the server-side `ee.Image.focalMedian`
-  counterpart of the client-side `FocalMedian`. Because the backend has
+  per band, `SpeckleFilter`, the server-side `ee.Image.focalMedian`
+  counterpart of the client-side `FocalMedian`, and the SAR dB <-> linear
+  power conversions `ToPower` / `ToDb` (`to_power` / `to_db`) that make a
+  power-domain `COPERNICUS/S1_GRD` reduction expressible. Because the backend has
   one `cloud_mask` slot, the ops compose with `>>` into a `MaskChain`
   (itself an `ImageMask`), with `PassThrough` as the documented no-op.
 * `earthlens.gee.filters` — collection filters: `ByYear` / `ByBounds`
@@ -475,7 +485,7 @@ from earthlens.gee.joins import (
 )
 from earthlens.gee.ml import ClassifierCodec, TreeEnsemble
 from earthlens.gee.pixels import HIGH_VOLUME_ENDPOINT, PixelsEngine
-from earthlens.gee.plans import EedaiPlan, EnginePlan
+from earthlens.gee.plans import EedaiPlan, EnginePlan, RequestPreview
 from earthlens.gee.reader import EedaiReader
 from earthlens.gee.recipes import preprocess
 from earthlens.gee.reducers import (
@@ -501,6 +511,7 @@ from earthlens.gee.sampling import (
     PointSampler,
     RandomSampler,
     RegionSampler,
+    RegionTimeSeriesSampler,
     Sampler,
     StratifiedSampler,
     TimeSeriesSampler,
@@ -585,6 +596,7 @@ __all__ = [
     "RegionSampler",
     "RandomSampler",
     "StratifiedSampler",
+    "RegionTimeSeriesSampler",
     "TimeSeriesSampler",
     "TransectSampler",
     "ZonalHistogram",
@@ -636,6 +648,7 @@ __all__ = [
     "SimpleJoin",
     "EnginePlan",
     "EedaiPlan",
+    "RequestPreview",
     "OutputGrid",
     "ExportConfig",
     "EngineConfig",

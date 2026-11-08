@@ -811,9 +811,10 @@ class TestInit:
             make_gee(export_via="ftp")
 
     def test_cloud_mask_and_filters_default_to_none(self, make_gee):
-        """Omitting the hooks leaves `cloud_mask=None` and `filters=()`."""
+        """Omitting the hooks leaves `image_op` / `cloud_mask` None, `filters=()`."""
         gee = make_gee()
         assert gee.cloud_mask is None
+        assert gee.image_op is None
         assert gee.filters == ()
 
     def test_cloud_mask_and_filters_captured(self, make_gee):
@@ -823,9 +824,48 @@ class TestInit:
         assert gee.cloud_mask is _identity_mask
         assert gee.filters == (first, second)
 
+    def test_image_op_is_the_primary_hook(self, make_gee):
+        """`image_op=` sets the per-image hook, surfaced on both attributes."""
+        gee = make_gee(image_op=_identity_mask)
+        assert gee.image_op is _identity_mask
+        assert gee.cloud_mask is _identity_mask
+
+    def test_cloud_mask_is_a_permanent_alias_for_image_op(self, make_gee):
+        """`cloud_mask=` still works and surfaces as `image_op` too."""
+        gee = make_gee(cloud_mask=_identity_mask)
+        assert gee.image_op is _identity_mask
+        assert gee.cloud_mask is _identity_mask
+
+    def test_image_op_and_cloud_mask_together_raise(self, make_gee):
+        """Passing both names for the one hook is refused, not silently merged."""
+        with pytest.raises(ValueError, match="not both"):
+            make_gee(image_op=_identity_mask, cloud_mask=_identity_mask)
+
+    def test_non_callable_image_op_rejected(self, make_gee):
+        """A non-callable `image_op` raises `TypeError` at construction."""
+        with pytest.raises(TypeError, match="must be a callable"):
+            make_gee(image_op="not-callable")
+
+    def test_a_derived_band_request_is_declined_by_the_eedai_reader(self, make_gee):
+        """A computed index band needs server-side math, so it stays on EE (#1211)."""
+        from earthlens.gee.catalog import Catalog
+
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["NDVI"]}, scale=10.0)
+        var_info = Catalog().get_dataset("COPERNICUS/S2_SR_HARMONIZED")
+        assert gee._requests_derived_band(var_info) is True
+        assert gee._eedai_eligible(var_info) is False
+
+    def test_a_raw_band_request_is_not_flagged_derived(self, make_gee):
+        """A native band carries no derived formula, so the reader is not declined for it."""
+        from earthlens.gee.catalog import Catalog
+
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0)
+        var_info = Catalog().get_dataset("COPERNICUS/S2_SR_HARMONIZED")
+        assert gee._requests_derived_band(var_info) is False
+
     def test_non_callable_cloud_mask_rejected(self, make_gee):
         """A non-callable `cloud_mask` raises `TypeError` at construction."""
-        with pytest.raises(TypeError, match="cloud_mask must be a callable"):
+        with pytest.raises(TypeError, match="must be a callable"):
             make_gee(cloud_mask="not-callable")
 
     def test_non_iterable_filters_rejected(self, make_gee):
@@ -857,7 +897,7 @@ class TestInit:
     @pytest.mark.parametrize(
         "kwargs, match",
         [
-            ({"cloud_mask": "x"}, r"cloud_mask must be a callable"),
+            ({"cloud_mask": "x"}, r"must be a callable"),
             ({"filters": 42}, r"filters must be an iterable"),
             ({"filters": [object()]}, r"each entry in filters"),
         ],
@@ -1667,6 +1707,36 @@ class TestBuildCollection:
         assert [args for name, args in col.calls if name == "map"] == [
             (_identity_mask,)
         ]
+
+    def test_an_expression_index_is_requestable_through_the_facade(self, make_gee):
+        """EVI (an expression index) constructs and builds with default flags (C1)."""
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["EVI"]}, scale=10.0)
+        ds = gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED")
+        col = gee._build_collection(
+            ds, ["EVI"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 2)
+        )
+        assert "map" in col.method_names(), (
+            "an expression index must construct and be materialised, not refused "
+            "at construction when no scaled=/preprocess= flag is set"
+        )
+
+    def test_derived_index_band_mapped_before_select(self, make_gee):
+        """A requested derived index band is `.map`-materialised before the select."""
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["NDVI"]}, scale=10.0)
+        ds = gee.catalog.get_dataset("COPERNICUS/S2_SR_HARMONIZED")
+        col = gee._build_collection(
+            ds, ["NDVI"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 2)
+        )
+        assert col.method_names() == ["filterDate", "filterBounds", "map", "select"], (
+            "the derived-band materialiser must be mapped before the band select"
+        )
+        from earthlens.gee.backend import _AddDerivedBands
+
+        mapped = [args for name, args in col.calls if name == "map"]
+        assert len(mapped) == 1, "exactly one op must be mapped"
+        assert isinstance(mapped[0][0], _AddDerivedBands), (
+            "the mapped op must be the _AddDerivedBands materialiser"
+        )
 
     def test_filters_then_cloud_mask_then_select(self, make_gee, monkeypatch):
         """On a collection the order is filters → cloud_mask → select, with no warning."""
@@ -5174,3 +5244,230 @@ class TestUnknownBandOnTheFlagPath:
         gee = self._gee(make_gee, ["B4", "B8A"], scaled=True)
         with pytest.raises(ValueError, match="is not a band of"):
             gee._download_dataset("COPERNICUS/S2_SR_HARMONIZED", ["B4", "B8A"])
+
+
+class TestPreview:
+    """`GEE.preview()` — a cheap pre-flight size / engine / fits summary (#1218)."""
+
+    def test_an_earth_engine_request_fits_in_one_pass_with_no_estimate(self, make_gee):
+        """A server-side EE read has no client tiling budget, so it fits, estimate-free."""
+        from earthlens.gee.plans import RequestPreview
+
+        gee = make_gee(
+            engine="ee", variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0
+        )
+        preview = gee.preview()
+        assert isinstance(preview, RequestPreview)
+        assert (preview.engine, preview.fits, preview.tiles) == ("ee", True, 1)
+        assert preview.scene_count is None
+        assert preview.reason is None
+
+    def test_an_eedai_request_reports_the_estimate_and_fits(
+        self, make_gee, monkeypatch
+    ):
+        """When the reader serves it, preview reuses estimate_cost + the plan."""
+        from types import SimpleNamespace
+
+        from earthlens.gee.plans import EnginePlan
+
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0)
+        monkeypatch.setattr(gee, "_eedai_eligible", lambda var_info: True)
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+        monkeypatch.setattr(
+            gee,
+            "estimate_cost",
+            lambda: SimpleNamespace(
+                scene_count=5, max_width=1000, max_height=800, total_size_bytes=4096
+            ),
+        )
+        monkeypatch.setattr(
+            gee,
+            "_eedai_single_image_plan",
+            lambda var_info, band_count: EnginePlan.serves(
+                tiles=1, tile_size=1024, engine="eedai"
+            ),
+        )
+        preview = gee.preview()
+        assert preview.engine == "eedai"
+        assert preview.fits is True
+        assert (preview.scene_count, preview.max_width, preview.max_height) == (
+            5,
+            1000,
+            800,
+        )
+        assert preview.total_size_bytes == 4096
+        assert preview.tiles == 1
+        assert preview.reason is None
+
+    def test_over_the_scene_budget_falls_back_to_earth_engine(
+        self, make_gee, monkeypatch
+    ):
+        """Too many scenes for the reader → fits False, engine 'ee', a reason given."""
+        from types import SimpleNamespace
+
+        from earthlens.gee.plans import EnginePlan
+
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0)
+        monkeypatch.setattr(gee, "_eedai_eligible", lambda var_info: True)
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+        monkeypatch.setattr(
+            gee,
+            "estimate_cost",
+            lambda: SimpleNamespace(
+                scene_count=9999, max_width=10, max_height=10, total_size_bytes=1
+            ),
+        )
+        monkeypatch.setattr(
+            gee,
+            "_eedai_single_image_plan",
+            lambda var_info, band_count: EnginePlan.serves(
+                tiles=1, tile_size=1024, engine="eedai"
+            ),
+        )
+        preview = gee.preview()
+        assert preview.fits is False
+        assert preview.engine == "ee"
+        assert preview.scene_count == 9999
+        assert "scenes" in (preview.reason or "")
+
+    def test_a_declined_reader_plan_falls_back_with_its_reason(
+        self, make_gee, monkeypatch
+    ):
+        """A declined plan (not a scene-budget miss) reports engine 'ee' and its reason."""
+        from types import SimpleNamespace
+
+        from earthlens.gee.plans import EnginePlan
+
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0)
+        monkeypatch.setattr(gee, "_eedai_eligible", lambda var_info: True)
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+        monkeypatch.setattr(
+            gee,
+            "estimate_cost",
+            lambda: SimpleNamespace(
+                scene_count=3, max_width=10, max_height=10, total_size_bytes=1
+            ),
+        )
+        monkeypatch.setattr(
+            gee,
+            "_eedai_single_image_plan",
+            lambda var_info, band_count: EnginePlan.declined(
+                "the band count is unsupported"
+            ),
+        )
+        preview = gee.preview()
+        assert preview.fits is False
+        assert preview.engine == "ee"
+        assert preview.reason == "the band count is unsupported"
+
+    def test_a_forced_eedai_request_keeps_its_name_when_it_would_decline(
+        self, make_gee, monkeypatch
+    ):
+        """engine='eedai' keeps the name with fits False so the caller sees the decline."""
+        from types import SimpleNamespace
+
+        from earthlens.gee.plans import EnginePlan
+
+        gee = make_gee(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+            scale=10.0,
+            engine="eedai",
+        )
+        monkeypatch.setattr(gee, "_eedai_eligible", lambda var_info: True)
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+        monkeypatch.setattr(
+            gee,
+            "estimate_cost",
+            lambda: SimpleNamespace(
+                scene_count=3, max_width=10, max_height=10, total_size_bytes=1
+            ),
+        )
+        monkeypatch.setattr(
+            gee,
+            "_eedai_single_image_plan",
+            lambda var_info, band_count: EnginePlan.declined("too many bands"),
+        )
+        preview = gee.preview()
+        assert preview.engine == "eedai"
+        assert preview.fits is False
+        assert preview.reason == "too many bands"
+
+    def test_an_unsupported_composite_reducer_routes_to_earth_engine(
+        self, make_gee, monkeypatch
+    ):
+        """An EE-only reducer (stdDev) declines the reader, so auto previews engine 'ee'."""
+        from earthlens.gee.backend import _EEDAI_UNSUPPORTED_REDUCER_REASONS
+
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+        gee = make_gee(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+            scale=10.0,
+            reducer="stdDev",
+        )
+        preview = gee.preview()
+        assert preview.engine == "ee", "stdDev routes to Earth Engine"
+        assert preview.fits is True, (
+            "stdDev routes to Earth Engine, so the preview must say engine='ee', fits=True"
+        )
+        assert preview.reason == _EEDAI_UNSUPPORTED_REDUCER_REASONS["stdDev"], (
+            "the fallback reason must be the reducer's own decline reason"
+        )
+
+    def test_a_forced_eedai_ineligible_request_previews_a_decline(
+        self, make_gee, monkeypatch
+    ):
+        """A cloud_mask makes a forced-eedai request ineligible; it would error, so fits=False."""
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+        gee = make_gee(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+            scale=10.0,
+            engine="eedai",
+            cloud_mask=lambda image: image,
+        )
+        preview = gee.preview()
+        assert preview.engine == "eedai", "a forced reader keeps its engine name"
+        assert preview.fits is False, (
+            "a forced reader that cannot serve must preview fits=False, not a false fit"
+        )
+        assert preview.reason
+        assert "server-side compute" in preview.reason
+
+    def test_without_the_eedai_extra_auto_previews_earth_engine(
+        self, make_gee, monkeypatch
+    ):
+        """With pyramids-eo absent, auto falls back to Earth Engine, fits in one pass."""
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
+        gee = make_gee(variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]}, scale=10.0)
+        preview = gee.preview()
+        assert preview.engine == "ee"
+        assert preview.fits is True
+        assert preview.reason
+        assert "not installed" in preview.reason
+
+    def test_forced_eedai_without_the_extra_previews_a_decline(
+        self, make_gee, monkeypatch
+    ):
+        """A forced reader with the extra absent would error, so fits=False."""
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
+        gee = make_gee(
+            variables={"COPERNICUS/S2_SR_HARMONIZED": ["B4"]},
+            scale=10.0,
+            engine="eedai",
+        )
+        preview = gee.preview()
+        assert preview.engine == "eedai"
+        assert preview.fits is False
+        assert preview.reason
+        assert "not installed" in preview.reason
+
+    def test_preview_sizes_a_single_dataset(self, make_gee):
+        """Like estimate_cost, preview refuses a multi-dataset request."""
+        gee = make_gee(
+            variables={
+                "COPERNICUS/S2_SR_HARMONIZED": ["B4"],
+                "LANDSAT/LC09/C02/T1_L2": ["SR_B4"],
+            },
+            scale=10.0,
+        )
+        with pytest.raises(ValueError, match="single dataset"):
+            gee.preview()

@@ -11,8 +11,10 @@ pattern, each taking an `ee.Image` (or an in-memory pyramids `Dataset`) and a
 * `RandomSampler` / `StratifiedSampler` — draw labelled training points over a
   region, uniformly or per class.
 * `TransectSampler` — sample a band along a line transect.
-* `TimeSeriesSampler` — sample one geometry across an image collection's time
+* `TimeSeriesSampler` — sample a point set across an image collection's time
   axis, long or wide.
+* `RegionTimeSeriesSampler` — the polygon counterpart: reduce each image over
+  polygon AOIs per date (the catchment / basin time series).
 * `ZonalHistogram` — per-polygon value histograms.
 
 Each sampler resolves its reducer through the shared `earthlens.gee.reducers`
@@ -40,7 +42,7 @@ from earthlens.gee.sampling.histogram import ZonalHistogram
 from earthlens.gee.sampling.point import PointSampler
 from earthlens.gee.sampling.random import RandomSampler, StratifiedSampler
 from earthlens.gee.sampling.region import RegionSampler, ZonalStrategy, zonal_stats
-from earthlens.gee.sampling.timeseries import TimeSeriesSampler
+from earthlens.gee.sampling.timeseries import RegionTimeSeriesSampler, TimeSeriesSampler
 from earthlens.gee.sampling.transect import TransectSampler
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -54,6 +56,7 @@ __all__ = [
     "RegionSampler",
     "Sampler",
     "StratifiedSampler",
+    "RegionTimeSeriesSampler",
     "TimeSeriesSampler",
     "TransectSampler",
     "ZonalHistogram",

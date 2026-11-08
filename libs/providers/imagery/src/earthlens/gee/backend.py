@@ -94,7 +94,7 @@ from earthlens.gee._helpers import (
     wait_for_task,
 )
 from earthlens.gee.auth import AuthenticationError, EarthEngineAuth, _redact
-from earthlens.gee.catalog import Catalog, Dataset
+from earthlens.gee.catalog import Catalog, Dataset, DerivedBand
 from earthlens.gee.cloud_masks import (
     BandScaler,
     ImageMask,
@@ -119,16 +119,20 @@ from earthlens.gee.grid import (
 )
 from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
 from earthlens.gee.pixels import PixelsEngine
-from earthlens.gee.plans import EedaiPlan, EnginePlan
+from earthlens.gee.plans import EedaiPlan, EnginePlan, RequestPreview
 from earthlens.gee.reader import EedaiReader
 
 # Aliased: `preprocess` is also the name of the constructor flag this module
 # resolves through it, so the two must not shadow each other.
 from earthlens.gee.recipes import preprocess as recipe_for
 from earthlens.gee.reducers import (
+    Count,
     LandsatComposite,
+    QualityMosaic,
     Reducer,
     Sentinel2Composite,
+    StdDev,
+    Variance,
     temporal_reducer_for,
 )
 from earthlens.gee.sinks import AssetSink, _BatchSink, resolve_sink
@@ -247,6 +251,22 @@ _EEDAI_UNSUPPORTED_REDUCER_REASONS: dict[str, str] = {
         "algorithm ee.Algorithms.Sentinel2.CDI, which exists only "
         "server-side, so Earth Engine composites this instead"
     ),
+    StdDev.name: (
+        f"reducer={StdDev.name!r} has no client-side reduce_time op, so Earth "
+        "Engine composites the per-pixel standard deviation instead"
+    ),
+    Variance.name: (
+        f"reducer={Variance.name!r} has no client-side reduce_time op, so Earth "
+        "Engine composites the per-pixel variance instead"
+    ),
+    Count.name: (
+        f"reducer={Count.name!r} has no client-side reduce_time op, so Earth "
+        "Engine composites the per-pixel observation count instead"
+    ),
+    QualityMosaic.name: (
+        f"reducer={QualityMosaic.name!r} picks each pixel's best-quality scene, "
+        "which has no client-side form, so Earth Engine composites this instead"
+    ),
 }
 
 #: The reducer names the reader must not serve, derived from the reasons map
@@ -308,7 +328,11 @@ _ZIP_MAGIC: bytes = b"PK\x03\x04"
 
 #: A per-image cloud/quality mask — `ee.Image -> ee.Image` — `.map`-applied
 #: to the collection before the reducer (see `earthlens.gee.cloud_masks`).
-CloudMask = Callable[[ee.Image], ee.Image]
+PerImageOp = Callable[[ee.Image], ee.Image]
+#: Permanent backwards-compatible alias: `cloud_mask=` is kept as an alias for
+#: the general `image_op=` hook (masking is the common case and the name is in
+#: published docs), so its type keeps the familiar spelling too.
+CloudMask = PerImageOp
 
 #: An `ee.ImageCollection` filter — collection in, filtered collection out —
 #: applied after `filterDate` / `filterBounds` (see `earthlens.gee.filters`).
@@ -323,6 +347,39 @@ CollectionFilter = Callable[[ee.ImageCollection], ee.ImageCollection]
 _CDI_FORBIDDEN_ASSETS: frozenset[str] = frozenset(
     {"COPERNICUS/S2_SR_HARMONIZED", "COPERNICUS/S2_SR"}
 )
+
+
+def _resolve_image_op(
+    image_op: PerImageOp | None, cloud_mask: CloudMask | None
+) -> CloudMask | None:
+    """Resolve the `image_op=` / `cloud_mask=` alias pair to one per-image hook.
+
+    `cloud_mask=` is the permanent backwards-compatible alias for the general
+    `image_op=` hook; they name the same `ee.Image -> ee.Image` callable.
+
+    Args:
+        image_op: The general per-image hook, or `None`.
+        cloud_mask: Its alias, or `None`.
+
+    Returns:
+        The single resolved callable, or `None` when neither was given.
+
+    Raises:
+        ValueError: If both `image_op=` and `cloud_mask=` are passed.
+        TypeError: If the resolved hook is not callable.
+    """
+    if image_op is not None and cloud_mask is not None:
+        raise ValueError(
+            "pass image_op= or its alias cloud_mask=, not both; they name "
+            "the same per-image ee.Image -> ee.Image hook"
+        )
+    resolved = image_op if image_op is not None else cloud_mask
+    if resolved is not None and not callable(resolved):
+        raise TypeError(
+            "image_op (a.k.a. cloud_mask) must be a callable "
+            f"ee.Image -> ee.Image (or None), got {type(resolved).__name__}"
+        )
+    return resolved
 
 
 def _flatten_image_ops(op: Any) -> tuple[Any, ...]:
@@ -419,8 +476,10 @@ def _resolve_server_side_ops(
         for any dataset whose op is an identity.
 
     Raises:
-        ValueError: If both flags are set (the recipe already scales), or
-            if `preprocess=True` meets a dataset with no curated recipe.
+        ValueError: If both flags are set (the recipe already scales); if
+            `preprocess=True` meets a dataset with no curated recipe; or if a
+            requested band is an `expression` index, which already scales its
+            own source bands (scaling them again here would double them).
     """
     resolved: dict[str, ImageMask] = {}
     if scaled and preprocess:
@@ -430,11 +489,36 @@ def _resolve_server_side_ops(
             "preprocess=True already includes the scaling — drop scaled=."
         )
     for asset, bands in variables.items():
+        dataset = catalog.get_dataset(asset)
+        # Skip bands this dataset does not declare: an unknown band is refused
+        # later, at download, and raising here would move that refusal ahead of
+        # the flag resolution this path deliberately runs first.
+        expression_indices = [
+            band
+            for band in bands
+            if (meta := dataset.bands.get(band)) is not None
+            and meta.derived_from is not None
+            and meta.derived_from.expression is not None
+        ]
+        if expression_indices and (scaled or preprocess):
+            # An expression index (e.g. EVI) already scales its own source
+            # bands to reflectance from the catalog scale/offset, so scaling
+            # them again here would apply the factor twice — the same
+            # double-scale the scaled=/preprocess= pair is refused for above.
+            # Only a flag that would re-scale triggers this: without one, the
+            # index is requestable like any other band.
+            raise ValueError(
+                f"{expression_indices} on {asset} are expression indices that "
+                "already compute on reflectance (their source bands are scaled "
+                "by the catalog scale/offset), so scaled=/preprocess= would "
+                "scale those inputs twice — drop scaled= / preprocess= when "
+                "requesting an expression index."
+            )
         op: ImageMask | None = None
         if preprocess:
             op = recipe_for(asset, bands, catalog=catalog)
         elif scaled:
-            op = BandScaler.for_dataset(catalog.get_dataset(asset), bands)
+            op = BandScaler.for_dataset(dataset, bands)
         if op is not None and not _is_identity_op(op):
             resolved[asset] = op
     return resolved
@@ -693,6 +777,94 @@ def _declaring(reader: Any, nodata: float | int) -> Any:
     )
 
 
+def _scaled_source(image: Any, var_info: Dataset, source: str) -> Any:
+    """Read `source` from `image` scaled to its physical units.
+
+    An `expression` index (e.g. EVI) is only meaningful on reflectance, not on
+    the raw digital numbers Earth Engine serves, so each source band is scaled
+    by its catalog `scale` / `offset` before it enters the formula. A band that
+    declares neither is already in native units and is read unchanged.
+
+    Args:
+        image: The `ee.Image` to read from.
+        var_info: The dataset whose catalog carries the source band's factors.
+        source: The source band id to read and scale.
+
+    Returns:
+        A single-band `ee.Image` of `source` in physical units
+        (`raw * scale + offset`).
+    """
+    band = var_info.get_band(source)
+    pixels = image.select(source)
+    if band.scale is not None:
+        pixels = pixels.multiply(band.scale)
+    if band.offset is not None:
+        pixels = pixels.add(band.offset)
+    return pixels
+
+
+def _materialise_derived_band(
+    image: Any, name: str, derived: DerivedBand, var_info: Dataset
+) -> Any:
+    """Compute one derived (index) band on `image`, server-side.
+
+    `normalized_difference` and `ratio` are scale-invariant (the scale cancels
+    in a quotient), so they read the raw bands directly; an `expression` index
+    is not — its additive constants assume physical units — so each of its
+    source bands is scaled to reflectance by `_scaled_source` first, making the
+    index correct on the raw digital numbers Earth Engine serves by default.
+
+    Args:
+        image: The `ee.Image` to read the source bands from.
+        name: The band id to give the computed result.
+        derived: The closed-vocabulary formula (`DerivedBand`).
+        var_info: The dataset whose catalog carries the source bands' scale /
+            offset (used for an `expression` index).
+
+    Returns:
+        A single-band `ee.Image` named `name` holding the computed index:
+        `normalizedDifference` for `normalized_difference`, a band `divide`
+        for `ratio`, or `ee.Image.expression` (on scaled reflectance) for
+        `expression`.
+    """
+    if derived.normalized_difference is not None:
+        first, second = derived.normalized_difference
+        return image.normalizedDifference([first, second]).rename(name)
+    if derived.ratio is not None:
+        numerator, denominator = derived.ratio
+        return image.select(numerator).divide(image.select(denominator)).rename(name)
+    expression = derived.expression
+    assert expression is not None  # noqa: S101 - model_validator guarantees one op
+    bindings = {
+        symbol: _scaled_source(image, var_info, source)
+        for symbol, source in expression.bands.items()
+    }
+    return image.expression(expression.formula, bindings).rename(name)
+
+
+class _AddDerivedBands:
+    """A per-image op that adds each requested derived (index) band.
+
+    `.map`-applied to the collection before `select`, so a requested index band
+    (`NDVI`, ...) exists by the time the bands are selected. `addBands` keeps the
+    source image's properties, `system:time_start` included.
+    """
+
+    def __init__(self, derived: tuple[tuple[str, DerivedBand], ...], var_info: Dataset):
+        self._derived = derived
+        self._var_info = var_info
+
+    def __call__(self, image: Any) -> Any:
+        """Add every derived band to `image`, overwriting any name clash."""
+        out = image
+        for name, formula in self._derived:
+            out = out.addBands(
+                _materialise_derived_band(image, name, formula, self._var_info),
+                overwrite=True,
+            )
+        return out
+
+
 def _eedai_remedy(reason: str) -> str:
     """Suggest what to change, given why the reader declined.
 
@@ -946,17 +1118,20 @@ class GEE(LazyClientMixin, AbstractDataSource):
             so the caller can track them asynchronously via
             `earthlens.gee.jobs`. Ignored for `export_via="url"`,
             which is always synchronous.
-        cloud_mask: Optional per-image mask `.map`-applied to every image
-            in the stack *before* the reducer, so the composite is built
-            from cloud-screened pixels — the usual way to get a clean
-            optical mosaic. A callable `ee.Image -> ee.Image`; see
-            `earthlens.gee.cloud_masks` (`landsat_sr` /
-            `sentinel2_scl`). It runs before the band `select`, so it may
-            read quality bands (`QA_PIXEL` / `SCL`) that are not listed in
-            `variables`. Meant for image collections; on a static
-            `ee_type="image"` dataset it is applied verbatim and a warning
-            is logged (see `_build_collection`). Defaults to `None`
-            (no masking).
+        image_op: Optional per-image hook `.map`-applied to every image in
+            the stack *before* the reducer — any `ee.Image -> ee.Image`
+            transform: a cloud mask (the common case, and the reason the
+            `cloud_mask=` alias exists), an index, a rescaling, a speckle
+            filter, or a `>>`-composed chain of them. It runs before the band
+            `select`, so it may read quality bands (`QA_PIXEL` / `SCL`) not
+            listed in `variables`. Meant for image collections; on a static
+            `ee_type="image"` dataset it is applied verbatim and a warning is
+            logged (see `_build_collection`). See `earthlens.gee.cloud_masks`
+            for the mask / op family. Defaults to `None` (no op).
+        cloud_mask: A permanent alias for `image_op`, kept because masking is
+            the common case and the name is in published docs and notebooks.
+            Pass one or the other, never both (passing both raises). Exposed
+            on the instance as both `self.image_op` and `self.cloud_mask`.
         scaled: Convert the requested bands from raw DN to physical units
             server-side, before the composite, using the `scale` /
             `offset` the catalog row already declares. Resolved inside
@@ -1259,6 +1434,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         auto_split: bool = False,
         discover_extent: bool = False,
         wait_for_export: bool = True,
+        image_op: PerImageOp | None = None,
         cloud_mask: CloudMask | None = None,
         scaled: bool = False,
         preprocess: bool = False,
@@ -1310,11 +1486,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 "asset_id": asset_id,
             }
         )
-        if cloud_mask is not None and not callable(cloud_mask):
-            raise TypeError(
-                "cloud_mask must be a callable ee.Image -> ee.Image (or None), "
-                f"got {type(cloud_mask).__name__}"
-            )
+        # `cloud_mask=` is a permanent alias for the general `image_op=` hook —
+        # masking is the common case and the name is in published docs — so
+        # resolve the two into one, refusing both at once rather than silently
+        # picking one.
+        cloud_mask = _resolve_image_op(image_op, cloud_mask)
         # The asset id and the ops are both in hand here, so the one
         # CDI/product mismatch that is detectable client-side is refused now
         # rather than returning a plausible-looking but wrong mask.
@@ -1431,6 +1607,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         #: The per-image `cloud_mask` hook (or `None`), `.map`-applied
         #: before the reducer in `_build_collection`.
         self.cloud_mask = cloud_mask
+        #: Alias of `cloud_mask`: the general per-image hook, whatever kwarg set it.
+        self.image_op = cloud_mask
         #: The validated `filters` as a tuple (empty when none were given),
         #: applied left to right in `_build_collection`.
         self.filters: tuple[CollectionFilter, ...] = collection_filters
@@ -1944,6 +2122,160 @@ class GEE(LazyClientMixin, AbstractDataSource):
             property_filter=self._property_filter_expression(),
         )
 
+    def preview(self) -> RequestPreview:
+        """Summarise what this request would cost, before downloading anything.
+
+        A cheap pre-flight check: which engine would serve the read, how many
+        scenes and output pixels it involves, how many tiles it streams in, and
+        whether it is served in a single pass or falls back to Earth Engine with
+        a reason. The **engine** mirrors the real routing decision in order —
+        reader eligibility, then the reducer gate — so a request whose reducer
+        is Earth-Engine-only (`stdDev` / `variance` / `count` / `qualityMosaic`),
+        or that shapes the image server-side, is reported as routing off the
+        reader exactly as `download()` routes it. A forced `engine="eedai"` the
+        reader cannot serve previews `fits=False` with the decline reason,
+        because that download raises rather than falling back.
+
+        The **size and `fits`** figures are a whole-window estimate: when the
+        reader is the engine, `preview()` sizes with `estimate_cost` (the whole
+        request window) and `_eedai_single_image_plan`, and applies the
+        single-pass scene cap to the aggregate scene count. This is exact for a
+        single image or a single-bucket read, but **approximate for a
+        multi-bucket collection composite**: the real router sizes each temporal
+        bucket separately and also applies a per-bucket stack-pixel budget this
+        summary does not, so for a many-bucket (or many-scene-per-bucket)
+        request the `fits` verdict can differ from what `download()` decides.
+        An Earth-Engine-served read is composited server-side, so it fits in one
+        pass with no per-scene estimate. The budget thresholds stay private.
+
+        Returns:
+            A `RequestPreview`. For an EEDAI-served read it carries the scene
+            count, output dimensions, size and tile count; for an
+            Earth-Engine-served one, the engine, `fits=True`, and (when the
+            reader was the preferred engine but declined) the fallback reason;
+            for a forced `engine="eedai"` the reader cannot serve, `fits=False`
+            with the decline reason.
+
+        Raises:
+            ValueError: If the request names more than one dataset (like
+                `estimate_cost`, a preview sizes a single asset).
+            ImportError: Propagated from `estimate_cost` when the reader is the
+                engine but `pyramids-eo` (the `[eedai]` extra) is not installed.
+            AuthenticationError: Propagated from `estimate_cost` when the reader
+                is the engine but its credential cannot be built (or another
+                read is in flight under a different service account).
+        """
+        assert isinstance(self.vars, dict)  # GEE always uses {asset_id: [band]}
+        if len(self.vars) != 1:
+            raise ValueError(
+                "preview() sizes a single dataset, but this request names "
+                f"{len(self.vars)}: {sorted(self.vars)}. Build one GEE per asset "
+                "to preview each."
+            )
+        asset_id = next(iter(self.vars))
+        var_info = self._catalog.get_dataset(asset_id)
+        band_count = max(len(self.vars[asset_id]), 1)
+        wants_reader = self.export_via == "url" and self.engine in ("auto", "eedai")
+        decline_reason = self._reader_decline_reason(var_info) if wants_reader else None
+        if wants_reader and decline_reason is None:
+            # The reader would serve it — size it the way the routing does.
+            result = self._reader_serves_preview(var_info, band_count)
+        elif self.engine == "eedai":
+            # A forced reader that cannot serve raises at download time; report
+            # the decline rather than a false fit.
+            result = RequestPreview(engine="eedai", fits=False, reason=decline_reason)
+        elif wants_reader:
+            # engine='auto' falls back to Earth Engine, which composites the read
+            # server-side — it still fits, in one pass, with the reason the reader
+            # declined.
+            result = RequestPreview(engine="ee", fits=True, reason=decline_reason)
+        else:
+            # engine='ee' / 'pixels' (or a non-url export): Earth Engine serves it.
+            engine = self.engine if self.engine != "auto" else "ee"
+            result = RequestPreview(engine=engine, fits=True)
+        return result
+
+    def _reader_decline_reason(self, var_info: Dataset) -> str | None:
+        """Why the EEDAI reader would not serve this read, or `None` if it would.
+
+        Mirrors the router's decision order — `_eedai_eligible` then the reducer
+        gate the collection verdict applies (`_eedai_verdict`) — so `preview()`
+        routes as `download()` does rather than on eligibility alone. Called
+        only when the engine could use the reader (`engine` in auto / eedai).
+
+        Args:
+            var_info: The catalog entry for the single requested dataset.
+
+        Returns:
+            The decline reason, or `None` when the reader would take the read.
+        """
+        reducer_name = (
+            temporal_reducer_for(self.reducer or var_info.default_reducer).name
+            if var_info.ee_type == "image_collection"
+            else None
+        )
+        if not eedai_available():
+            reason: str | None = (
+                "the pyramids-eo reader (the [eedai] extra) is not installed"
+            )
+        elif not self._eedai_eligible(var_info):
+            reason = (
+                "the request needs server-side compute the reader cannot run "
+                "(a reduced collection, cloud_mask / image_op, filters, a scaled= "
+                "flag, a derived index band, or a pinned crs_transform / CRS)"
+            )
+        elif reducer_name is not None and reducer_name in _EEDAI_UNSUPPORTED_REDUCERS:
+            reason = _EEDAI_UNSUPPORTED_REDUCER_REASONS[reducer_name]
+        else:
+            reason = None
+        return reason
+
+    def _reader_serves_preview(
+        self, var_info: Dataset, band_count: int
+    ) -> RequestPreview:
+        """Build the `RequestPreview` for a read the EEDAI reader would serve.
+
+        Sizes with `estimate_cost` (the whole request window) and
+        `_eedai_single_image_plan`, applying the single-pass scene cap to the
+        aggregate scene count (approximate for a multi-bucket collection — see
+        `preview`).
+
+        Args:
+            var_info: The catalog entry for the single requested dataset.
+            band_count: The number of requested bands (at least one).
+
+        Returns:
+            The `RequestPreview` with the reader's scene / pixel / size estimate
+            and the engine it resolves to (`eedai` when it fits, else the Earth
+            Engine fallback under `auto`; a forced `eedai` keeps its name with
+            `fits=False`).
+        """
+        plan = self._eedai_single_image_plan(var_info, band_count)
+        cost = self.estimate_cost()
+        over_scene_budget = (
+            cost.scene_count is not None and cost.scene_count > _EEDAI_MAX_SCENES
+        )
+        fits = plan.can_serve and not over_scene_budget
+        if plan.reason:
+            reason: str | None = plan.reason
+        elif over_scene_budget:
+            reason = (
+                f"{cost.scene_count} scenes exceed the reader's single-pass "
+                "budget, so Earth Engine composites this server-side"
+            )
+        else:
+            reason = None
+        return RequestPreview(
+            engine="eedai" if fits or self.engine == "eedai" else "ee",
+            fits=fits,
+            tiles=plan.tiles or 1,
+            scene_count=cost.scene_count,
+            max_width=cost.max_width,
+            max_height=cost.max_height,
+            total_size_bytes=cost.total_size_bytes,
+            reason=reason,
+        )
+
     def analyze(
         self,
         ops: RasterOperation | OperationChain | Sequence[RasterOperation],
@@ -2404,7 +2736,32 @@ class GEE(LazyClientMixin, AbstractDataSource):
             collection = image_filter(collection)
         if per_image is not None:
             collection = collection.map(per_image)
+        # Materialise any requested index band from the dataset's own bands,
+        # server-side, before the select — the per-image op (cloud_mask) has
+        # already run, so the index is computed on screened source pixels.
+        derived = self._derived_bands_requested(var_info, bands)
+        if derived:
+            collection = collection.map(_AddDerivedBands(derived, var_info))
         return collection.select(list(bands))
+
+    def _derived_bands_requested(
+        self, var_info: Dataset, bands: Iterable[str]
+    ) -> tuple[tuple[str, DerivedBand], ...]:
+        """Return the `(name, formula)` of each requested band that is derived.
+
+        Args:
+            var_info: The dataset whose bands were requested.
+            bands: The requested band ids.
+
+        Returns:
+            One `(band_id, DerivedBand)` pair per requested band carrying a
+            `derived_from` formula, in request order; empty when none are.
+        """
+        return tuple(
+            (name, band.derived_from)
+            for name in bands
+            if (band := var_info.get_band(name)).derived_from is not None
+        )
 
     def _per_image_op(self, var_info: Dataset) -> CloudMask | None:
         """Return the op to `.map` for one dataset, flags composed onto the hook.
@@ -3148,6 +3505,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # question, so the reader's eligibility and the engines read one
             # definition instead of each repeating the two-term test.
             and not self._engine_config.needs_server_side_compute
+            # A derived (index) band is computed server-side from the dataset's
+            # own bands; the reader reads only raw pixels, so it cannot serve it.
+            and not self._requests_derived_band(var_info)
             and var_info.ee_type in ("image", "image_collection")
             and self._eedai_crs_supported()
             # The reader sizes its own metre grid from `scale` and takes no
@@ -3155,6 +3515,27 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # request to it would return pixels on a grid other than the one
             # the caller pinned, which is worse than not using the reader.
             and self._engine_config.crs_transform is None
+        )
+
+    def _requests_derived_band(self, var_info: Dataset) -> bool:
+        """Whether any requested band of `var_info` is a computed (derived) band.
+
+        A derived band — a spectral index declared with `derived_from` — is
+        materialised server-side from the dataset's own bands in
+        `_build_collection`, which the EEDAI reader cannot do (it reads raw
+        pixels from an asset), so such a request stays on Earth Engine.
+
+        Args:
+            var_info: The catalog entry being fetched.
+
+        Returns:
+            `True` if at least one requested band of this dataset is derived.
+        """
+        requested = (
+            self.vars.get(var_info.id) or [] if isinstance(self.vars, dict) else []
+        )
+        return any(
+            var_info.get_band(name).derived_from is not None for name in requested
         )
 
     def _eedai_crs_supported(self) -> bool:

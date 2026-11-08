@@ -979,41 +979,193 @@ class First(_RegionReducer):
     """The first unmasked value in a region, for a region reduction only.
 
     Reachable through `sample_points(reducer="first")`; `GEE(reducer="first")`
-    is refused, because there is no collection form to composite with.
+    is refused, because "first in collection order" is not a per-pixel
+    reduction — that composite is `mosaic`.
     """
 
     name: ClassVar[str] = "first"
 
 
-class StdDev(_RegionReducer):
-    """Sample standard deviation over a region, for a region reduction only.
+class _ReduceRenameReducer(TemporalReducer):
+    """A collection reducer with no band-name-preserving convenience method.
 
-    Reachable through `sample_points(reducer="stdDev")`; `GEE(reducer="stdDev")`
-    is refused, because there is no collection form to composite with.
+    Earth Engine exposes `ImageCollection.mean()` / `.median()` etc. (which keep
+    band names) but no `.stdDev()` / `.variance()` / `.count()`. Those reduce
+    with `collection.reduce(ee.Reducer.<ee_factory>())`, which **suffixes** the
+    band names (`B4` -> `B4_stdDev`), so this base renames them back to the
+    originals — the same `reduce`-and-rename shape `Percentile` uses.
+
+    Composite-capable server-side. The EEDAI reader has no client-side
+    equivalent (there is no `reduce_time(op="stdDev")`), so `reduce_stack`
+    routes to Earth Engine; the backend declines these reducers for the reader
+    so `engine="auto"` composites them server-side.
+    """
+
+    collection_capable: ClassVar[bool] = True
+
+    def __call__(self, collection: Any) -> Any:
+        """Reduce `collection` with its `ee.Reducer`, restoring band names.
+
+        Args:
+            collection: An `ee.ImageCollection`.
+
+        Returns:
+            The reduced `ee.Image`, the `_<reducer>` band suffixes stripped back
+            to the original names.
+        """
+        band_names = collection.first().bandNames()
+        return collection.reduce(self.as_ee_reducer()).rename(band_names)
+
+    def apply_ee(self, collection: Any) -> Any:
+        """Collapse `collection` server-side (the `reduce`-and-rename call).
+
+        Args:
+            collection: An `ee.ImageCollection`.
+
+        Returns:
+            The reduced `ee.Image`, with the original band names restored.
+        """
+        return self(collection)
+
+    def reduce_stack(self, stack: DatasetCollection, times: Sequence) -> Dataset:
+        """Refuse: there is no client-side form for this reducer.
+
+        Args:
+            stack: Ignored — no client-side reduction to run.
+            times: Ignored, for the same reason.
+
+        Raises:
+            ValueError: Always. `pyramids`' `reduce_time` has no `stdDev` /
+                `variance` / `count` op, so the EEDAI path cannot compute these;
+                the composite runs on Earth Engine instead.
+        """
+        raise ValueError(
+            f"the {self.name!r} composite has no client-side equivalent over a "
+            "scene stack; composite it on Earth Engine instead (engine='ee')"
+        )
+
+
+class StdDev(_ReduceRenameReducer):
+    """Per-pixel standard deviation across a collection, or over a region.
+
+    As a composite (`GEE(reducer="stdDev")`) it is the temporal standard
+    deviation of each pixel — "how variable was this pixel over the window".
+    As a region reducer (`sample_points(reducer="stdDev")`) it is the sample
+    standard deviation over the sampled pixels. Composited server-side only.
     """
 
     name: ClassVar[str] = "stdDev"
 
 
-class Variance(_RegionReducer):
-    """Sample variance over a region, for a region reduction only.
+class Variance(_ReduceRenameReducer):
+    """Per-pixel variance across a collection, or over a region.
 
-    Reachable through `sample_points(reducer="variance")`;
-    `GEE(reducer="variance")` is refused, because there is no collection form to
-    composite with.
+    The composite form (`GEE(reducer="variance")`) is the temporal variance of
+    each pixel; the region form (`sample_points(reducer="variance")`) is the
+    sample variance over the sampled pixels. Composited server-side only.
     """
 
     name: ClassVar[str] = "variance"
 
 
-class Count(_RegionReducer):
-    """Count of unmasked pixels in a region, for a region reduction only.
+class Count(_ReduceRenameReducer):
+    """Per-pixel count of unmasked observations, or the region count.
 
-    Reachable through `sample_points(reducer="count")`; `GEE(reducer="count")`
-    is refused, because there is no collection form to composite with.
+    As a composite (`GEE(reducer="count")`) it is the number of unmasked scenes
+    that went into each pixel — the trust signal telling a user whether a
+    composite pixel rests on many clear observations or one. As a region
+    reducer it counts the unmasked pixels sampled. Composited server-side only.
     """
 
     name: ClassVar[str] = "count"
+
+
+class QualityMosaic(BaseModel, TemporalReducer):
+    """Greenest-pixel composite: keep each pixel from the image maximising a band.
+
+    `collection.qualityMosaic(quality_band)` picks, per pixel, the value from
+    whichever image scores highest on `quality_band` — the standard
+    "greenest-pixel" (or least-cloudy, highest-NDVI, ...) composite. Like
+    `Percentile` it is parameterised, so it is reached with a
+    `"qualityMosaic:<band>"` spec or by passing an instance, not by a bare
+    registry name. It composites server-side only: there is no band-name
+    suffix to undo, but also no client-side `reduce_time` equivalent, so the
+    EEDAI reader declines it and `engine="auto"` runs it on Earth Engine.
+
+    Attributes:
+        quality_band: The band to maximise per pixel (e.g. an NDVI band for a
+            greenest-pixel mosaic, or a cloud-score band).
+
+    Examples:
+        - A greenest-pixel composite maximises an NDVI band:
+            ```python
+            >>> QualityMosaic(quality_band="NDVI").quality_band
+            'NDVI'
+
+            ```
+        - It is collection-capable but carries no `ee.Reducer` factory:
+            ```python
+            >>> QualityMosaic(quality_band="NDVI").collection_capable
+            True
+
+            ```
+    """
+
+    quality_band: str
+    name: ClassVar[str] = "qualityMosaic"
+    ee_factory: ClassVar[str | None] = None
+    collection_capable: ClassVar[bool] = True
+
+    def __call__(self, collection: Any) -> Any:
+        """Composite `collection` by picking each pixel's best `quality_band`.
+
+        Args:
+            collection: An `ee.ImageCollection` whose images carry
+                `quality_band`.
+
+        Returns:
+            The `ee.Image` quality mosaic, band names unchanged.
+        """
+        return collection.qualityMosaic(self.quality_band)
+
+    def apply_ee(self, collection: Any) -> Any:
+        """Composite server-side (the parameterised path cannot name it).
+
+        Args:
+            collection: An `ee.ImageCollection`.
+
+        Returns:
+            The `ee.Image` quality mosaic.
+        """
+        return self(collection)
+
+    def as_ee_reducer(self) -> Any:
+        """Refuse: a quality mosaic is a collection composite, not a reducer.
+
+        Raises:
+            ValueError: Always — `qualityMosaic` has no `ee.Reducer` form, so it
+                cannot reduce a region the way `sample_points` needs.
+        """
+        raise ValueError(
+            "qualityMosaic is a collection composite, not a region reducer; use "
+            f"one of {sorted(sampling_reducers())}"
+        )
+
+    def reduce_stack(self, stack: DatasetCollection, times: Sequence) -> Dataset:
+        """Refuse: there is no client-side quality mosaic over a scene stack.
+
+        Args:
+            stack: Ignored — no client-side composite to run.
+            times: Ignored, for the same reason.
+
+        Raises:
+            ValueError: Always. Picking each pixel's best-quality scene has no
+                `reduce_time` op, so Earth Engine composites it instead.
+        """
+        raise ValueError(
+            "the 'qualityMosaic' composite has no client-side equivalent over a "
+            "scene stack; composite it on Earth Engine instead (engine='ee')"
+        )
 
 
 #: Every reducer addressable by name. `percentile` is absent deliberately: it
@@ -1048,10 +1200,12 @@ def collection_reducers() -> frozenset[str]:
         The collection-capable registry names.
 
     Examples:
-        - The seven band-name-preserving convenience reducers:
+        - The band-name-preserving convenience reducers, plus the reduce-and-
+          rename dispersion / count reducers (`percentile` and `qualityMosaic`
+          are parameterised, so they are reached by spec, not a bare name):
             ```python
             >>> sorted(collection_reducers())
-            ['max', 'mean', 'median', 'min', 'mode', 'mosaic', 'sum']
+            ['count', 'max', 'mean', 'median', 'min', 'mode', 'mosaic', 'stdDev', 'sum', 'variance']
 
             ```
     """
@@ -1125,7 +1279,7 @@ def resolve_reducer(spec: str | Reducer) -> Reducer:
             >>> resolve_reducer("average")
             Traceback (most recent call last):
                 ...
-            ValueError: unsupported reducer 'average'; expected one of ['max', 'mean', 'median', 'min', 'mode', 'mosaic', 'sum'] or 'percentile:<q>' for a collection, or ['count', 'first', 'stdDev', 'variance'] for a region sample
+            ValueError: unsupported reducer 'average'; expected one of ['count', 'max', 'mean', 'median', 'min', 'mode', 'mosaic', 'stdDev', 'sum', 'variance'] or 'percentile:<q>' for a collection, or ['first'] for a region sample
 
             ```
     """
@@ -1255,6 +1409,16 @@ def _temporal_reducer_from_str(spec: str) -> TemporalReducer:
         resolved = LinearTrend()
     elif spec == SensSlope.name:
         resolved = SensSlope()
+    elif spec == QualityMosaic.name or spec.startswith(f"{QualityMosaic.name}:"):
+        # The bare name (no colon) lands here too, so it gets the quality-band
+        # hint rather than falling through to the generic unsupported-reducer
+        # error from resolve_reducer.
+        band = spec.split(":", 1)[1] if ":" in spec else ""
+        if not band:
+            raise ValueError(
+                "qualityMosaic needs a quality band, e.g. 'qualityMosaic:NDVI'"
+            )
+        resolved = QualityMosaic(quality_band=band)
     else:
         reducer = resolve_reducer(spec)
         _reject_zero_percentile(reducer, spec)
@@ -1269,9 +1433,10 @@ def temporal_reducer_for(spec: str | Reducer) -> TemporalReducer:
 
     The time-axis counterpart to `resolve_reducer`: it returns a
     `TemporalReducer` for every reducer that can collapse a time bucket — the
-    seven band-name-preserving names, a `percentile:<q>` spec or its `p<q>`
-    shorthand, `trend`, and `sens_slope`. A region-only reducer has no time-axis
-    form and is refused.
+    band-name-preserving names, the reduce-and-rename `stdDev` / `variance` /
+    `count`, a `percentile:<q>` spec or its `p<q>` shorthand, a
+    `qualityMosaic:<band>` spec, `trend`, and `sens_slope`. The one remaining
+    region-only reducer (`first`) has no time-axis form and is refused.
 
     Args:
         spec: A collection reducer name (`"median"`), a percentile spec
@@ -1304,12 +1469,21 @@ def temporal_reducer_for(spec: str | Reducer) -> TemporalReducer:
             'sens_slope'
 
             ```
-        - A region-only reducer has no time-axis form:
+        - `stdDev` / `variance` / `count` now composite a stack too, and a
+          quality mosaic is reached by its `qualityMosaic:<band>` spec:
             ```python
-            >>> temporal_reducer_for("stdDev")
+            >>> temporal_reducer_for("stdDev").name
+            'stdDev'
+            >>> temporal_reducer_for("qualityMosaic:NDVI").quality_band
+            'NDVI'
+
+            ```
+        - A region-only reducer (`first`) still has no time-axis form:
+            ```python
+            >>> temporal_reducer_for("first")
             Traceback (most recent call last):
                 ...
-            ValueError: the 'stdDev' reducer reduces pixels in a region, not images over time; use a collection reducer or 'percentile:<q>' / 'trend' / 'sens_slope'
+            ValueError: the 'first' reducer reduces pixels in a region, not images over time; use a collection reducer or 'percentile:<q>' / 'trend' / 'sens_slope'
 
             ```
     """
