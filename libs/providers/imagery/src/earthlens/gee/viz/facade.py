@@ -257,7 +257,13 @@ class Visualizer:
             result = self.hints.clim_kwargs()
         return result
 
-    def timelapse(self, path: str | Path, **kwargs: Any) -> Any:
+    def timelapse(
+        self,
+        path: str | Path,
+        *,
+        scene_kw: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> Any:
         """Animate the result's collection through digitalearth's `animate`.
 
         The whole collection is handed over in one call — digitalearth's
@@ -265,8 +271,17 @@ class Visualizer:
         per-bucket frames here would be exactly the rendering logic this
         facade must not contain.
 
+        A `Map` setting is fixed when the scene is built, not when a frame is
+        rendered, so it cannot travel in `**kwargs`: those go to `animate`.
+        `scene_kw` is that second channel, named as digitalearth names it. It
+        matters most for `crs` and `figsize`, whose defaults (`3857` and a
+        square `(8, 8)`) label the axes in Web-Mercator metres and leave a wide
+        AOI surrounded by white.
+
         Args:
             path: Output file for the animation (`.gif` / `.mp4`).
+            scene_kw: Settings for the `Map` itself rather than the render —
+                `crs`, `figsize`, `domain`, `globe`.
             **kwargs: Passed through to `animate`, overriding the hints.
 
         Returns:
@@ -301,7 +316,7 @@ class Visualizer:
             kind = "imshow"
             hint_kwargs = self.hints.field_kwargs()
         merged = {"kind": kind, **hint_kwargs, **kwargs}
-        scene = _digitalearth().Map()
+        scene = _digitalearth().Map(**(scene_kw or {}))
         animation = scene.animate(cube, **merged)
         animation.save(str(path))
         return animation
