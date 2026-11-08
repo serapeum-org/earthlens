@@ -61,6 +61,35 @@ class TestChcPolygonMask:
         assert kept > 0, "the polygon's interior should be preserved"
         assert kept + masked == out.size, "every cell is either kept or masked"
 
+    def test_polygon_aoi_preserves_signed_negatives(self, tmp_path):
+        """A signed variable keeps an interior negative through the polygon mask (C1).
+
+        Exercises the polygon branch of `_clip_and_normalise`: the outside is
+        still -9999-masked, but a genuine below-climatology negative deep inside
+        the shape must survive instead of being clobbered to no-data.
+        """
+        from pyramids.dataset import Dataset, GeoReference
+
+        gpd = pytest.importorskip("geopandas")
+        shapely = pytest.importorskip("shapely")
+        triangle = shapely.geometry.Polygon([(0, 0), (10, 0), (0, 10)])
+        gdf = gpd.GeoDataFrame(geometry=[triangle], crs="EPSG:4326")
+        backend = _polygon_chirps(tmp_path, gdf)
+
+        arr = np.full((10, 10), 5.0, dtype="float32")
+        arr[8, 1] = -4.1  # a real anomaly in a cell fully inside the triangle
+        tif = tmp_path / "anom.tif"
+        Dataset.from_array(
+            arr, no_data_value=-9999.0, geo_ref=GeoReference(geo=_GEO, epsg=4326)
+        ).to_file(str(tif))
+        backend._clip_raster_in_place(tif, signed=True)
+
+        out = Dataset.read_file(str(tif)).read_array().astype(float)
+        assert out[8, 1] == pytest.approx(-4.1), (
+            "a signed negative inside the polygon must survive the mask"
+        )
+        assert int(np.sum(out == -9999.0)) > 0, "cells outside the polygon stay masked"
+
     def test_bbox_aoi_keeps_all_cells(self, tmp_path):
         """A bbox aoi attaches no mask, so every in-bbox cell is preserved."""
         from pyramids.dataset import Dataset
