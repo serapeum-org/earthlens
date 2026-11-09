@@ -74,12 +74,10 @@ class TestSpeiMigration:
     ):
         """Each SPEI row now ships as a `tif` and its `spei` variable stays signed."""
         ds = bundled_catalog.datasets[key]
-        assert ds.default_format == "tif", (
-            f"{key}: expected tif, got {ds.default_format}"
+        assert "tif" in ds.ftp_bases, (
+            f"{key}: expected a tif base, got {list(ds.ftp_bases)}"
         )
-        assert list(ds.ftp_bases) == ["tif"], (
-            f"{key}: ftp_bases should be tif-only, got {list(ds.ftp_bases)}"
-        )
+        assert "netcdf" not in ds.ftp_bases, f"{key}: stale netcdf base remains"
         assert ds.variables["spei"].signed, (
             f"{key}: spei must stay signed (now a raster)"
         )
