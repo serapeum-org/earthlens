@@ -1343,8 +1343,9 @@ class CHIRPS(AbstractDataSource):
 
         Covers `{year}`, `{month}`, `{day}`, `{dekad}`, `{pentad}`,
         `{hour}`, `{doy}` (always) plus `{start_yyyymmdd}` /
-        `{end_yyyymmdd}` (when `pandas_freq` or `temporal_resolution`
-        is supplied) -- the placeholders used by the curated datasets.
+        `{end_yyyymmdd}` (when `pandas_freq` is supplied, or
+        `temporal_resolution` is `dekadal` / `pentadal`) -- the
+        placeholders used by the curated datasets.
 
         The `{start_yyyymmdd}` / `{end_yyyymmdd}` pair (M5) is needed
         for WBGT, whose filenames carry the `[start, end]` endpoints
