@@ -35,9 +35,12 @@ class TestPrimarySpatialResolution:
         assert value == 0.05
 
     def test_named_examples_pin_known_values(self, catalog: Catalog):
-        """Pin the property's value on three datasets with different pixel sizes."""
+        """Pin the property's value on named datasets, including the 0.05 WBGT grid."""
         assert catalog.get_dataset("global-daily").primary_spatial_resolution == 0.05
-        assert catalog.get_dataset("wbgt-monthly").primary_spatial_resolution == 1.0
+        # WBGT granules are 0.05 (7200x2600), not the 1.0 the catalog
+        # once declared -- see the #1393 spatial_resolution fix.
+        assert catalog.get_dataset("wbgt-monthly").primary_spatial_resolution == 0.05
+        assert catalog.get_dataset("wbgt-dekad").primary_spatial_resolution == 0.05
         assert (
             catalog.get_dataset(
                 "chc-cmip6-precip-daily-delta-2030-ssp245"

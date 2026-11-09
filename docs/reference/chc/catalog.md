@@ -212,7 +212,9 @@ Placeholders the backend's `_placeholders()` expands:
 - `{hour}` — `00`–`23`
 - `{doy}` — Julian day-of-year (3-digit, zero-padded)
 - `{start_yyyymmdd}` / `{end_yyyymmdd}` — period-window endpoints
-  derived from `pandas_freq` (WBGT)
+  (WBGT). For dekadal/pentadal rows the inclusive end is the last day
+  of the calendar dekad/pentad (month-end for the final, short period);
+  for other cadences it is derived from `pandas_freq`.
 
 `{month_pair}` (CHIRPS v3 2-monthly) and `{res}` / `{scale}` are not
 implemented; a row using them would silently hit the per-date
