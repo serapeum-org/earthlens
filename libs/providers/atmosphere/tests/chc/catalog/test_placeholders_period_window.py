@@ -20,10 +20,44 @@ class TestPlaceholdersWithoutFreq:
         assert "start_yyyymmdd" not in ph
         assert "end_yyyymmdd" not in ph
 
-    def test_no_freq_keeps_the_original_seven_keys(self):
-        """The pre-M5 placeholder set is unchanged when `pandas_freq` is None."""
+    def test_no_freq_keeps_the_base_placeholder_keys(self):
+        """Without `pandas_freq` the base (non-window) placeholder set is returned."""
         ph = CHIRPS._placeholders(pd.Timestamp("2020-03-15"))
-        assert set(ph) == {"year", "month", "day", "dekad", "pentad", "hour", "doy"}
+        assert set(ph) == {
+            "year",
+            "month",
+            "day",
+            "dekad",
+            "pentad",
+            "pentad_of_year",
+            "hour",
+            "doy",
+        }
+
+
+class TestPentadOfYear:
+    """`{pentad_of_year}` is the zero-padded 01..72 index CHC's SPI filenames use."""
+
+    @pytest.mark.parametrize(
+        ("date", "expected"),
+        [
+            ("2001-01-01", "01"),  # Jan pentad 1
+            ("2001-01-26", "06"),  # Jan pentad 6
+            ("2001-02-01", "07"),  # Feb pentad 1
+            ("2001-07-16", "40"),  # mid-year
+            ("2001-12-26", "72"),  # Dec pentad 6, last of year
+        ],
+    )
+    def test_pentad_of_year_values(self, date, expected):
+        """pentad-of-year = (month-1)*6 + pentad-of-month, zero-padded to two digits."""
+        ph = CHIRPS._placeholders(pd.Timestamp(date))
+        assert ph["pentad_of_year"] == expected
+
+    def test_pentad_of_year_is_zero_padded_two_digits(self):
+        """Single-digit indices are padded (`p01`, not `p1`), unlike `{pentad}`."""
+        ph = CHIRPS._placeholders(pd.Timestamp("2001-01-01"))
+        assert ph["pentad_of_year"] == "01"
+        assert ph["pentad"] == "1"
 
 
 class TestPlaceholdersMonthly:

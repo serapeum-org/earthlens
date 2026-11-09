@@ -13,7 +13,7 @@ datasets:
     formats: [tif]
     start_date: '1981-01-01'
     file_patterns:
-      tif: SPI_01PentAccum_{year}_p{pentad}.tif
+      tif: SPI_01PentAccum_{year}_p{pentad_of_year}.tif
     variables:
       spi:
         description: Standardized Precipitation Index (SPI) based on CHIRPS3
@@ -30,7 +30,7 @@ datasets:
     formats: [tif]
     start_date: '1981-01-01'
     file_patterns:
-      tif: SPI_02PentAccum_{year}_p{pentad}.tif
+      tif: SPI_02PentAccum_{year}_p{pentad_of_year}.tif
     variables:
       spi:
         description: Standardized Precipitation Index (SPI) based on CHIRPS3
@@ -47,7 +47,7 @@ datasets:
     formats: [tif]
     start_date: '1981-01-01'
     file_patterns:
-      tif: SPI_05PentAccum_{year}_p{pentad}.tif
+      tif: SPI_05PentAccum_{year}_p{pentad_of_year}.tif
     variables:
       spi:
         description: Standardized Precipitation Index (SPI) based on CHIRPS3
@@ -64,7 +64,7 @@ datasets:
     formats: [tif]
     start_date: '1981-01-01'
     file_patterns:
-      tif: SPI_06PentAccum_{year}_p{pentad}.tif
+      tif: SPI_06PentAccum_{year}_p{pentad_of_year}.tif
     variables:
       spi:
         description: Standardized Precipitation Index (SPI) based on CHIRPS3
@@ -81,7 +81,7 @@ datasets:
     formats: [tif]
     start_date: '1981-01-01'
     file_patterns:
-      tif: SPI_09PentAccum_{year}_p{pentad}.tif
+      tif: SPI_09PentAccum_{year}_p{pentad_of_year}.tif
     variables:
       spi:
         description: Standardized Precipitation Index (SPI) based on CHIRPS3
@@ -98,7 +98,7 @@ datasets:
     formats: [tif]
     start_date: '1981-01-01'
     file_patterns:
-      tif: SPI_12PentAccum_{year}_p{pentad}.tif
+      tif: SPI_12PentAccum_{year}_p{pentad_of_year}.tif
     variables:
       spi:
         description: Standardized Precipitation Index (SPI) based on CHIRPS3
@@ -115,7 +115,7 @@ datasets:
     formats: [tif]
     start_date: '1981-01-01'
     file_patterns:
-      tif: SPI_15PentAccum_{year}_p{pentad}.tif
+      tif: SPI_15PentAccum_{year}_p{pentad_of_year}.tif
     variables:
       spi:
         description: Standardized Precipitation Index (SPI) based on CHIRPS3
@@ -132,7 +132,7 @@ datasets:
     formats: [tif]
     start_date: '1981-01-01'
     file_patterns:
-      tif: SPI_18PentAccum_{year}_p{pentad}.tif
+      tif: SPI_18PentAccum_{year}_p{pentad_of_year}.tif
     variables:
       spi:
         description: Standardized Precipitation Index (SPI) based on CHIRPS3
@@ -149,7 +149,7 @@ datasets:
     formats: [tif]
     start_date: '1981-01-01'
     file_patterns:
-      tif: SPI_21PentAccum_{year}_p{pentad}.tif
+      tif: SPI_21PentAccum_{year}_p{pentad_of_year}.tif
     variables:
       spi:
         description: Standardized Precipitation Index (SPI) based on CHIRPS3

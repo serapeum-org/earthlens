@@ -208,7 +208,9 @@ Placeholders the backend's `_placeholders()` expands:
 
 - `{year}`, `{month}`, `{day}` — calendar position
 - `{dekad}` (`1`/`2`/`3`) — third of the month
-- `{pentad}` (`1`..`6`) — fifth of the month
+- `{pentad}` (`1`..`6`) — fifth of the month (month-reset)
+- `{pentad_of_year}` (`01`..`72`, zero-padded) — pentad-of-year used by
+  the SPI filenames (`(month-1)*6 + pentad`)
 - `{hour}` — `00`–`23`
 - `{doy}` — Julian day-of-year (3-digit, zero-padded)
 - `{start_yyyymmdd}` / `{end_yyyymmdd}` — period-window endpoints

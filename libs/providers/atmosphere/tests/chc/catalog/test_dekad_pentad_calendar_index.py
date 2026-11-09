@@ -73,14 +73,10 @@ class TestDekadalCalendarWalk:
 class TestPentadalCalendarWalk:
     """Pentadal datasets yield exactly the six calendar pentads of every month."""
 
-    # Note: the SPI pentad rows are deliberately NOT exercised here. Their
-    # cadence is pentadal (so the date walk is correct), but their filename
-    # template `SPI_..PentAccum_{year}_p{pentad}.tif` indexes pentad-OF-YEAR
-    # (`p01`..`p72`, verified live on the FTP) while the `{pentad}` placeholder
-    # renders pentad-of-MONTH (`1`..`6`). That mismatch is a pre-existing SPI
-    # defect independent of this change (tracked in issue #1398), so asserting
-    # a 72-date walk for SPI here would wrongly read as validating SPI downloads.
-    @pytest.mark.parametrize("ds_key", ["global-pentad", "chirps-gefs-v3-pentad-lead0"])
+    @pytest.mark.parametrize(
+        "ds_key",
+        ["global-pentad", "chirps-gefs-v3-pentad-lead0", "spi-chirps3-01-pentad"],
+    )
     def test_full_year_has_72_pentads(self, tmp_path, ds_key):
         """A full year is 72 pentads -- six per month, none missing."""
         dates = _dates_for(_chirps_over_year(tmp_path), ds_key)
@@ -105,6 +101,48 @@ class TestLead1PentadRespectsDatasetStart:
         dates = _dates_for(_chirps_over_year(tmp_path), "chirps-gefs-v3-pentad-lead1")
         assert dates[0] == pd.Timestamp("2001-01-06")
         assert {d.day for d in dates} <= _PENTAD_DAYS
+
+
+class TestSpiPentadOfYearFilenames:
+    """SPI pentad rows render pentad-of-year `p01`..`p72`, not month-reset `p1`..`p6`."""
+
+    def test_full_year_renders_p01_through_p72(self, tmp_path):
+        """The 72 pentad starts of a year produce exactly `p01`..`p72`, all distinct."""
+        chirps = _chirps_over_year(tmp_path)
+        ds = chirps._catalog.datasets["spi-chirps3-01-pentad"]
+        pat = ds.file_patterns[ds.default_format]
+        names = [
+            pat.format(
+                **CHIRPS._placeholders(
+                    d,
+                    pandas_freq=ds.pandas_freq,
+                    temporal_resolution=ds.temporal_resolution,
+                )
+            )
+            for d in _dates_for(chirps, "spi-chirps3-01-pentad")
+        ]
+        assert len(set(names)) == 72, "pentad-of-year filenames must all be distinct"
+        assert names[0] == "SPI_01PentAccum_2001_p01.tif"
+        assert names[-1] == "SPI_01PentAccum_2001_p72.tif"
+        assert "SPI_01PentAccum_2001_p07.tif" in names  # Feb pentad 1
+
+    def test_no_month_reset_collision(self, tmp_path):
+        """January pentad 1 and February pentad 1 render different files (p01 vs p07)."""
+        ds = Catalog().get_dataset("spi-chirps3-01-pentad")
+        pat = ds.file_patterns[ds.default_format]
+
+        def render(date_str):
+            return pat.format(
+                **CHIRPS._placeholders(
+                    pd.Timestamp(date_str),
+                    pandas_freq=ds.pandas_freq,
+                    temporal_resolution=ds.temporal_resolution,
+                )
+            )
+
+        assert render("2001-01-01") == "SPI_01PentAccum_2001_p01.tif"
+        assert render("2001-02-01") == "SPI_01PentAccum_2001_p07.tif"
+        assert render("2001-01-01") != render("2001-02-01")
 
 
 class TestDekadPentadStartDatesAreBoundaryAligned:

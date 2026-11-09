@@ -1342,10 +1342,12 @@ class CHIRPS(AbstractDataSource):
         """Build the format-string substitution dict for one date.
 
         Covers `{year}`, `{month}`, `{day}`, `{dekad}`, `{pentad}`,
-        `{hour}`, `{doy}` (always) plus `{start_yyyymmdd}` /
-        `{end_yyyymmdd}` (when `pandas_freq` is supplied, or
-        `temporal_resolution` is `dekadal` / `pentadal`) -- the
-        placeholders used by the curated datasets.
+        `{pentad_of_year}`, `{hour}`, `{doy}` (always) plus
+        `{start_yyyymmdd}` / `{end_yyyymmdd}` (when `pandas_freq` is
+        supplied, or `temporal_resolution` is `dekadal` / `pentadal`) --
+        the placeholders used by the curated datasets. `{pentad}` is the
+        month-reset pentad (1..6); `{pentad_of_year}` is the
+        zero-padded pentad-of-year (01..72) that CHC's SPI filenames use.
 
         The `{start_yyyymmdd}` / `{end_yyyymmdd}` pair (M5) is needed
         for WBGT, whose filenames carry the `[start, end]` endpoints
@@ -1385,12 +1387,19 @@ class CHIRPS(AbstractDataSource):
             dict[str, str]: Placeholder names to substituted values.
         """
         day = date.day
+        pentad_of_month = min(6, ((day - 1) // 5) + 1)
         out = {
             "year": f"{date.year}",
             "month": f"{date.month:02d}",
             "day": f"{day:02d}",
             "dekad": str(min(3, ((day - 1) // 10) + 1)),
-            "pentad": str(min(6, ((day - 1) // 5) + 1)),
+            "pentad": str(pentad_of_month),
+            # Pentad-of-year (01..72, zero-padded): six pentads per month,
+            # so month M pentad P is `(M-1)*6 + P`. CHC's SPI series names
+            # files by this index (`SPI_..PentAccum_YYYY_pNN.tif`), unlike
+            # the dekad/pentad precip rows that carry `{month}` in the path
+            # and use the month-reset `{pentad}` 1..6.
+            "pentad_of_year": f"{(date.month - 1) * 6 + pentad_of_month:02d}",
             "hour": f"{date.hour:02d}",
             "doy": f"{date.dayofyear:03d}",
         }

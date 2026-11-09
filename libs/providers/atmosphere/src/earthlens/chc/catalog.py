@@ -190,8 +190,9 @@ class Dataset(SummarisedLeaf):
             the same way as `ftp_bases`.  Each value is a Python
             format-string whose placeholders are expanded by
             `earthlens.chc.CHIRPS._placeholders`: `{year}`,
-            `{month}`, `{day}`, `{dekad}`, `{pentad}`, `{hour}`,
-            `{doy}`.  Use `file_pattern` for the default pattern.
+            `{month}`, `{day}`, `{dekad}`, `{pentad}`,
+            `{pentad_of_year}`, `{hour}`, `{doy}`.  Use `file_pattern`
+            for the default pattern.
             `None` for datasets that publish a fixed enumerated set
             of files (`discrete_files`) instead of per-date partitions.
         discrete_files: Format-keyed map of fixed filenames for datasets
