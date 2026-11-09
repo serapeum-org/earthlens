@@ -43,7 +43,7 @@ dependencies = [
     # extra, because `earthlens.gee.analysis.TasseledCap` ships in the analysis
     # surface and applies pyramids-eo's per-sensor tasseled-cap coefficients
     # (`pyramids_eo.spectral.tasseled_cap`, added in pyramids-eo#117 / 0.9.0).
-    # The floor is 0.11.0: that release pins pyramids-core >=0.71.0
+    # The floor is 0.12.0: that release pins pyramids-core >=0.73.0
     # (pyramids-eo#127/#128), the version whose #1348 routes a custom S3 endpoint
     # to GDAL's multi-threaded read workers -- which is what lets the CDSE signer
     # read eodata without the GDAL_NUM_THREADS=1 stopgap. One consequence of
@@ -52,17 +52,17 @@ dependencies = [
     # gated on the (now redundant) `[eedai]` extra being installed, which was how
     # the reader stayed opt-in. The reader is still only *reachable* through
     # `engine=`, so `engine="ee"` keeps Earth Engine's exact semantics.
-    "pyramids-eo >=0.11.0,<0.12",
+    "pyramids-eo >=0.12.0",
     # pyramids-core is imported directly here (earthlens.gee.reducers /
     # backend.py: `DatasetCollection`, `Dataset`, `merge_rasters`,
     # `reduce_time`), so it is a declared direct dependency, not left to arrive
-    # transitively. Floor 0.73.0: the first release whose
-    # `DatasetCollection.reduce_time` / `.data` work on an in-memory
+    # transitively. Floor 0.75.0 (the latest release); 0.73.0 was the first
+    # whose `DatasetCollection.reduce_time` / `.data` work on an in-memory
     # (`datasets=`-backed) collection, not only a file-backed one
     # (pyramids-core #1349 / #1412). The GEE EEDAI client-side composite reduces
-    # exactly such an in-memory stack; below this release it had to spill the
+    # exactly such an in-memory stack; below 0.73.0 it had to spill the
     # scenes to COGs first (#1336).
-    "pyramids-core >=0.73.0",
+    "pyramids-core >=0.75.0",
 ]
 
 [project.optional-dependencies]
@@ -76,7 +76,7 @@ asf = ["asf_search >=12.2.2", "earthlens-imagery[earthdata]"]
 # lives behind `earthlens-imagery[eedai]`; a bare `[gee]` install stays lean and a
 # client-side reduce there raises pyramids-core's `OptionalPackageDoesNotExist`
 # naming `pyramids-core[lazy]`. Floor kept in step with the base pyramids-core pin.
-eedai = ["pyramids-eo >=0.11.0,<0.12", "pyramids-core[lazy] >=0.73.0"]
+eedai = ["pyramids-eo >=0.12.0", "pyramids-core[lazy] >=0.75.0"]
 eumetsat = ["eumdac >=3.1"]
 # scikit-learn drives the two client-side learning operations in
 # `earthlens.gee.analysis` (k-means clustering and the supervised classifier).
@@ -87,7 +87,7 @@ gee = ["earthengine-api >=1.7.26", "google-api-python-client >=2.0", "google-clo
 jaxa = ["jaxa.earth >=0.1.6,<0.2", "gportal >=0.4,<0.5"]
 openeo = ["openeo >=0.47,<0.52"]
 sentinel-hub = ["sentinelhub >=3.11.5"]
-stac = ["pyramids-core[stac] >=0.71.0"]
+stac = ["pyramids-core[stac] >=0.75.0"]
 # digitalearth is the visualization ORCHESTRATOR for the whole stack: it reads
 # pyramids objects and composes the render across its four backend tiers
 # (matplotlib / HoloViz / PyVista / MapLibre), delegating the drawing itself to
