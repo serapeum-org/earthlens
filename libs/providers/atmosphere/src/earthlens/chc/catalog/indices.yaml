@@ -258,3 +258,105 @@ datasets:
         units: dimensionless
         types: index
         signed: true
+  spei-fldas-01-month:
+    ftp_bases:
+      tif: products/SPEI/C3_FLDAS_SPEI/01_month/
+    region: global
+    temporal_resolution: monthly
+    pandas_freq: MS
+    spatial_resolution: [0.05]
+    formats: [tif]
+    start_date: '1982-01-01'
+    file_patterns:
+      tif: SPEI_C3_FLDAS_Global_01_{year}{month}.tif
+    variables:
+      spei:
+        description: Standardized Precipitation-Evapotranspiration Index (SPEI) based on CHIRPS3 + FLDAS PET
+        units: dimensionless
+        types: index
+        signed: true
+  spei-fldas-02-month:
+    ftp_bases:
+      tif: products/SPEI/C3_FLDAS_SPEI/02_month/
+    region: global
+    temporal_resolution: monthly
+    pandas_freq: MS
+    spatial_resolution: [0.05]
+    formats: [tif]
+    start_date: '1982-02-01'
+    file_patterns:
+      tif: SPEI_C3_FLDAS_Global_02_{year}{month}.tif
+    variables:
+      spei:
+        description: Standardized Precipitation-Evapotranspiration Index (SPEI) based on CHIRPS3 + FLDAS PET
+        units: dimensionless
+        types: index
+        signed: true
+  spei-fldas-03-month:
+    ftp_bases:
+      tif: products/SPEI/C3_FLDAS_SPEI/03_month/
+    region: global
+    temporal_resolution: monthly
+    pandas_freq: MS
+    spatial_resolution: [0.05]
+    formats: [tif]
+    start_date: '1982-03-01'
+    file_patterns:
+      tif: SPEI_C3_FLDAS_Global_03_{year}{month}.tif
+    variables:
+      spei:
+        description: Standardized Precipitation-Evapotranspiration Index (SPEI) based on CHIRPS3 + FLDAS PET
+        units: dimensionless
+        types: index
+        signed: true
+  spei-fldas-06-month:
+    ftp_bases:
+      tif: products/SPEI/C3_FLDAS_SPEI/06_month/
+    region: global
+    temporal_resolution: monthly
+    pandas_freq: MS
+    spatial_resolution: [0.05]
+    formats: [tif]
+    start_date: '1982-06-01'
+    file_patterns:
+      tif: SPEI_C3_FLDAS_Global_06_{year}{month}.tif
+    variables:
+      spei:
+        description: Standardized Precipitation-Evapotranspiration Index (SPEI) based on CHIRPS3 + FLDAS PET
+        units: dimensionless
+        types: index
+        signed: true
+  spei-fldas-09-month:
+    ftp_bases:
+      tif: products/SPEI/C3_FLDAS_SPEI/09_month/
+    region: global
+    temporal_resolution: monthly
+    pandas_freq: MS
+    spatial_resolution: [0.05]
+    formats: [tif]
+    start_date: '1982-09-01'
+    file_patterns:
+      tif: SPEI_C3_FLDAS_Global_09_{year}{month}.tif
+    variables:
+      spei:
+        description: Standardized Precipitation-Evapotranspiration Index (SPEI) based on CHIRPS3 + FLDAS PET
+        units: dimensionless
+        types: index
+        signed: true
+  spei-fldas-12-month:
+    ftp_bases:
+      tif: products/SPEI/C3_FLDAS_SPEI/12_month/
+    region: global
+    temporal_resolution: monthly
+    pandas_freq: MS
+    spatial_resolution: [0.05]
+    formats: [tif]
+    start_date: '1982-12-01'
+    file_patterns:
+      tif: SPEI_C3_FLDAS_Global_12_{year}{month}.tif
+    variables:
+      spei:
+        description: Standardized Precipitation-Evapotranspiration Index (SPEI) based on CHIRPS3 + FLDAS PET
+        units: dimensionless
+        types: index
+        signed: true

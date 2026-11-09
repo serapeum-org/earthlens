@@ -52,7 +52,7 @@ The CHC catalog covers 13 product families:
 | **CHPclim v2** | 1 | `precipitation` | 12 static climatological months (no time axis) | 1981–2010 baseline |
 | **WBGT** | 2 | `wbgt` (Wet Bulb Globe Temperature) | monthly / dekadal | 1980-present, ±90° |
 | **SPI / CHIRPS3** | 9 | `spi` (standardised precipitation index) | pentadal at 1 / 2 / 5 / 6 / 9 / 12 / 15 / 18 / 21-month windows | 1981-present, ±50° |
-| **SPEI v1** | 6 | `spei` (precip - PET, MERRA-2 PET) | monthly at 1 / 2 / 3 / 6 / 9 / 12-month windows | 1981-present, ±50° |
+| **SPEI (CHIRPS3)** | 12 | `spei` (precip - PET) | monthly at 1 / 2 / 3 / 6 / 9 / 12-month windows, each with a MERRA-2 and a FLDAS PET variant | MERRA 1981- / FLDAS 1982-present, ±50° |
 | **CHC_CMIP6 deltas** | 16 | `precip_delta`, `tmax_delta`, `tmin_delta`, `rh_delta` | daily climatology delta | SSP245 / SSP585, 2030 / 2050 targets |
 | **CentennialTrends v1** | 2 | `precipitation` | monthly + 4-season | 1900–2014, East Africa |
 
@@ -104,7 +104,7 @@ src/earthlens/chc/catalog/
 ├── cmip6.yaml           # 16 datasets (CHC_CMIP6 scenario deltas)
 ├── derived.yaml         # 5 datasets (CHPclim + WBGT + CenTrends)
 ├── gefs.yaml            # 16 datasets (CHIRPS-GEFS v3)
-└── indices.yaml         # 15 datasets (SPI + SPEI)
+└── indices.yaml         # 21 datasets (SPI + SPEI MERRA/FLDAS)
 ```
 
 `_index.yaml` carries an informational walk-order list of every dataset

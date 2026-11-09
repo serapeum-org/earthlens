@@ -52,9 +52,9 @@ class TestYamlComments:
         assert "fixed archive of multi-year NetCDFs" in folded
 
     def test_bundled_catalog_still_loads_after_comment_restoration(self):
-        """The comments don't break parsing -- catalog still loads 104 datasets."""
+        """The comments don't break parsing -- catalog still loads 110 datasets."""
         cat = Catalog()
-        assert len(cat.datasets) == 104
+        assert len(cat.datasets) == 110
         # Pin the same health state we had before the H5 commit: 7 clean keys
         # plus the known `precipitation/daily` drift flagged by H3.
         report = cat.health()

@@ -1,4 +1,4 @@
-"""Lock-in for the SPEI v1 -> C3_Merra_SPEI GeoTIFF remap (CHC reorg, 2026-11-09)."""
+"""Lock-in for the SPEI GeoTIFF rows: the v1->C3_Merra remap plus the new FLDAS variant."""
 
 from __future__ import annotations
 
@@ -42,6 +42,36 @@ _ROW_PATHS = [
         "1981-12-01",
         "products/SPEI/C3_Merra_SPEI/12_month/SPEI_C3_Merra_Global_12_198112.tif",
     ),
+    (
+        "spei-fldas-01-month",
+        "1982-01-01",
+        "products/SPEI/C3_FLDAS_SPEI/01_month/SPEI_C3_FLDAS_Global_01_198201.tif",
+    ),
+    (
+        "spei-fldas-02-month",
+        "1982-02-01",
+        "products/SPEI/C3_FLDAS_SPEI/02_month/SPEI_C3_FLDAS_Global_02_198202.tif",
+    ),
+    (
+        "spei-fldas-03-month",
+        "1982-03-01",
+        "products/SPEI/C3_FLDAS_SPEI/03_month/SPEI_C3_FLDAS_Global_03_198203.tif",
+    ),
+    (
+        "spei-fldas-06-month",
+        "1982-06-01",
+        "products/SPEI/C3_FLDAS_SPEI/06_month/SPEI_C3_FLDAS_Global_06_198206.tif",
+    ),
+    (
+        "spei-fldas-09-month",
+        "1982-09-01",
+        "products/SPEI/C3_FLDAS_SPEI/09_month/SPEI_C3_FLDAS_Global_09_198209.tif",
+    ),
+    (
+        "spei-fldas-12-month",
+        "1982-12-01",
+        "products/SPEI/C3_FLDAS_SPEI/12_month/SPEI_C3_FLDAS_Global_12_198212.tif",
+    ),
 ]
 
 
@@ -52,7 +82,7 @@ def bundled_catalog() -> Catalog:
 
 
 class TestSpeiMigration:
-    """The 6 SPEI rows point at the new GeoTIFF C3_Merra tree and build live-verified paths."""
+    """The SPEI rows (MERRA v1 remap + the new FLDAS variant) ship as GeoTIFFs and build live-verified paths."""
 
     @pytest.mark.parametrize("key, date, expected", _ROW_PATHS)
     def test_builds_the_live_verified_remote_path(

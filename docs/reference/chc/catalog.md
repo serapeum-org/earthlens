@@ -31,7 +31,7 @@ src/earthlens/chc/catalog/
 ├── chirp.yaml               # 7 datasets — CHIRP + CHIRP v3
 ├── chirts.yaml              # 7 datasets — CHIRTSdaily + CHIRTSmonthly
 ├── gefs.yaml                # 16 datasets — CHIRPS-GEFS v3
-├── indices.yaml             # 15 datasets — SPI/CHIRPS3 + SPEI v1
+├── indices.yaml             # 21 datasets — SPI/CHIRPS3 + SPEI (MERRA + FLDAS)
 ├── cmip6.yaml               # 16 datasets — CHC_CMIP6 scenario deltas
 └── derived.yaml             # 5 datasets — CHPclim v2, WBGT, CentennialTrends v1
 ```
