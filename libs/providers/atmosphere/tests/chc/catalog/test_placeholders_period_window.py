@@ -161,9 +161,42 @@ class TestBundledWbgtDatasetsResolve:
         # `start_yyyymmdd` / `end_yyyymmdd` weren't in the placeholders.
         out = pat.format(
             **CHIRPS._placeholders(
-                pd.Timestamp("2020-01-01"), pandas_freq=ds.pandas_freq
+                pd.Timestamp("2020-01-01"),
+                pandas_freq=ds.pandas_freq,
+                temporal_resolution=ds.temporal_resolution,
             )
         )
         # Both rows use the same template; sanity-check the shape.
         assert out.startswith("data_20200101_")
         assert out.endswith(".tif")
+
+    def test_wbgt_dekad_third_dekad_ends_on_month_end_via_production_path(self):
+        """The bundled `wbgt-dekad` row, driven as `_api` drives it, ends dekad 3 at month-end.
+
+        `_api` passes `temporal_resolution` too, routing WBGT through the
+        calendar branch -- so dekad 3 of January 2020 is `..0121_..0131`,
+        not the `..0130` a fixed `10D` offset gave.
+        """
+        ds = Catalog().get_dataset("wbgt-dekad")
+        pat = ds.file_patterns[ds.default_format]
+        out = pat.format(
+            **CHIRPS._placeholders(
+                pd.Timestamp("2020-01-21"),
+                pandas_freq=ds.pandas_freq,
+                temporal_resolution=ds.temporal_resolution,
+            )
+        )
+        assert out == "data_20200121_20200131.tif"
+
+    def test_wbgt_dekad_february_leap_dekad_via_production_path(self):
+        """February 2020's short third dekad ends on the 29th through the bundled row."""
+        ds = Catalog().get_dataset("wbgt-dekad")
+        pat = ds.file_patterns[ds.default_format]
+        out = pat.format(
+            **CHIRPS._placeholders(
+                pd.Timestamp("2020-02-21"),
+                pandas_freq=ds.pandas_freq,
+                temporal_resolution=ds.temporal_resolution,
+            )
+        )
+        assert out == "data_20200221_20200229.tif"
