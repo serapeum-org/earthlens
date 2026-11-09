@@ -158,15 +158,15 @@ datasets:
         signed: true
   spei-v1-01-month:
     ftp_bases:
-      netcdf: products/SPEI/v1/01_month/
+      tif: products/SPEI/C3_Merra_SPEI/01_month/
     region: global
     temporal_resolution: monthly
     pandas_freq: MS
     spatial_resolution: [0.05]
-    formats: [netcdf]
+    formats: [tif]
     start_date: '1981-01-01'
     file_patterns:
-      netcdf: SPEI_C3_Merra_Global_01month_{month}.nc
+      tif: SPEI_C3_Merra_Global_01_{year}{month}.tif
     variables:
       spei:
         description: Standardized Precipitation-Evapotranspiration Index (SPEI) based on CHIRPS3 + MERRA2 PET
@@ -175,15 +175,15 @@ datasets:
         signed: true
   spei-v1-02-month:
     ftp_bases:
-      netcdf: products/SPEI/v1/02_month/
+      tif: products/SPEI/C3_Merra_SPEI/02_month/
     region: global
     temporal_resolution: monthly
     pandas_freq: MS
     spatial_resolution: [0.05]
-    formats: [netcdf]
-    start_date: '1981-01-01'
+    formats: [tif]
+    start_date: '1981-02-01'
     file_patterns:
-      netcdf: SPEI_C3_Merra_Global_02month_{month}.nc
+      tif: SPEI_C3_Merra_Global_02_{year}{month}.tif
     variables:
       spei:
         description: Standardized Precipitation-Evapotranspiration Index (SPEI) based on CHIRPS3 + MERRA2 PET
@@ -192,15 +192,15 @@ datasets:
         signed: true
   spei-v1-03-month:
     ftp_bases:
-      netcdf: products/SPEI/v1/03_month/
+      tif: products/SPEI/C3_Merra_SPEI/03_month/
     region: global
     temporal_resolution: monthly
     pandas_freq: MS
     spatial_resolution: [0.05]
-    formats: [netcdf]
-    start_date: '1981-01-01'
+    formats: [tif]
+    start_date: '1981-03-01'
     file_patterns:
-      netcdf: SPEI_C3_Merra_Global_03month_{month}.nc
+      tif: SPEI_C3_Merra_Global_03_{year}{month}.tif
     variables:
       spei:
         description: Standardized Precipitation-Evapotranspiration Index (SPEI) based on CHIRPS3 + MERRA2 PET
@@ -209,15 +209,15 @@ datasets:
         signed: true
   spei-v1-06-month:
     ftp_bases:
-      netcdf: products/SPEI/v1/06_month/
+      tif: products/SPEI/C3_Merra_SPEI/06_month/
     region: global
     temporal_resolution: monthly
     pandas_freq: MS
     spatial_resolution: [0.05]
-    formats: [netcdf]
-    start_date: '1981-01-01'
+    formats: [tif]
+    start_date: '1981-06-01'
     file_patterns:
-      netcdf: SPEI_C3_Merra_Global_06month_{month}.nc
+      tif: SPEI_C3_Merra_Global_06_{year}{month}.tif
     variables:
       spei:
         description: Standardized Precipitation-Evapotranspiration Index (SPEI) based on CHIRPS3 + MERRA2 PET
@@ -226,15 +226,15 @@ datasets:
         signed: true
   spei-v1-09-month:
     ftp_bases:
-      netcdf: products/SPEI/v1/09_month/
+      tif: products/SPEI/C3_Merra_SPEI/09_month/
     region: global
     temporal_resolution: monthly
     pandas_freq: MS
     spatial_resolution: [0.05]
-    formats: [netcdf]
-    start_date: '1981-01-01'
+    formats: [tif]
+    start_date: '1981-09-01'
     file_patterns:
-      netcdf: SPEI_C3_Merra_Global_09month_{month}.nc
+      tif: SPEI_C3_Merra_Global_09_{year}{month}.tif
     variables:
       spei:
         description: Standardized Precipitation-Evapotranspiration Index (SPEI) based on CHIRPS3 + MERRA2 PET
@@ -243,15 +243,15 @@ datasets:
         signed: true
   spei-v1-12-month:
     ftp_bases:
-      netcdf: products/SPEI/v1/12_month/
+      tif: products/SPEI/C3_Merra_SPEI/12_month/
     region: global
     temporal_resolution: monthly
     pandas_freq: MS
     spatial_resolution: [0.05]
-    formats: [netcdf]
-    start_date: '1981-01-01'
+    formats: [tif]
+    start_date: '1981-12-01'
     file_patterns:
-      netcdf: SPEI_C3_Merra_Global_12month_{month}.nc
+      tif: SPEI_C3_Merra_Global_12_{year}{month}.tif
     variables:
       spei:
         description: Standardized Precipitation-Evapotranspiration Index (SPEI) based on CHIRPS3 + MERRA2 PET

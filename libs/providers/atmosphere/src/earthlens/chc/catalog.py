@@ -131,11 +131,10 @@ class Variable(FluxableLeaf):
             -9999 no-data sentinel for unsigned variables (CHIRPS fill);
             when `signed` is `True` that rewrite is skipped so
             below-zero values survive, while the raster's own -9999 fill
-            is still honoured as no-data. NetCDF variables are passed
+            is still honoured as no-data. NetCDF variables (read via the
+            discrete-file path, e.g. the CenTrends archive) are passed
             through unmodified and never reach `_clip_and_normalise`, so
-            for a NetCDF-only variable (e.g. SPEI) the flag is a true
-            statement about the data that the download path does not
-            need to consult.
+            `signed` is consulted only on the raster download path.
     """
 
     _summary_fields = (
