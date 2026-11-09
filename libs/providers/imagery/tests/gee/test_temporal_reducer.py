@@ -463,6 +463,17 @@ class TestReduceStack:
         reduced = temporal_reducer_for("mean").reduce_stack(stack, ["2020-01-01"])
         assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(7.0)
 
+    def test_mixed_precision_timestamps_reduce(self, tmp_path):
+        """A stack whose timestamps mix fractional and whole seconds still reduces."""
+        stack = _stack(tmp_path, [1.0, 5.0, 9.0])
+        times = [
+            "2020/01/01 09:41:12.345000+00",
+            "2020/02/01 09:43:06+00",
+            "2020/03/01 10:01:00.500000+00",
+        ]
+        reduced = temporal_reducer_for("median").reduce_stack(stack, times)
+        assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(5.0)
+
     def test_mosaic_has_no_client_side_form(self, tmp_path):
         """`mosaic` refuses a client-side stack reduction."""
         stack = _stack(tmp_path, [1.0, 5.0])

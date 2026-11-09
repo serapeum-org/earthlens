@@ -1338,9 +1338,16 @@ def _reduce_whole_window(
     Returns:
         The single reduced `Dataset`.
     """
-    index = pd.DatetimeIndex(pd.to_datetime(list(times)))
+    # Earth Engine serves per-scene timestamps with inconsistent precision -- some
+    # Landsat scenes carry fractional seconds ("...09:41:12.345000+00"), some do not
+    # ("...09:43:06+00"). A bare parse infers one format from the first element and
+    # then raises on the first that does not match, so parse as `format="mixed"`. The
+    # inputs are offset-aware, so `utc=True` keeps the index from mixing aware/naive
+    # timestamps. The parsed index -- not the raw strings -- is handed to pyramids,
+    # whose `reduce_time` otherwise re-parses them the same bare way one frame down.
+    index = pd.DatetimeIndex(pd.to_datetime(list(times), format="mixed", utc=True))
     span_days = int((index.max() - index.min()).days) + 1
-    reduced = stack.reduce_time(list(times), freq=f"{span_days}D", op=op, q=q)
+    reduced = stack.reduce_time(list(index), freq=f"{span_days}D", op=op, q=q)
     return reduced[0][1]
 
 
