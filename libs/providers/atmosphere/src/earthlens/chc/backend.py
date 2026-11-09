@@ -1106,23 +1106,29 @@ class CHIRPS(AbstractDataSource):
                 local_path = self.root_dir / f"{ds_key}_{filename}"
                 self._fetch_ftp(ftp_base, filename, local_path, ftp=ftp_session)
                 if is_2d_raster:
-                    self._clip_raster_in_place(local_path)
+                    self._clip_raster_in_place(local_path, signed=var.signed)
                 paths.append(local_path)
         finally:
             _close_ftp_quietly(ftp_session)
         return paths
 
-    def _clip_raster_in_place(self, path: Path) -> None:
+    def _clip_raster_in_place(self, path: Path, *, signed: bool = False) -> None:
         """Read a 2-D raster at `path`, clip to `self.space`, write back.
 
         Used by `_download_discrete` for `tif` / `cog` / `bil`
-        outputs. Negative pixels are normalised to -9999 (CHC's
-        documented no-data sentinel) and -9999 is declared as the
-        output band's no-data value, mirroring the per-date
+        outputs. For an unsigned variable negative pixels are normalised to
+        -9999 (CHC's documented no-data sentinel); for a `signed` variable the
+        genuine negatives are preserved. -9999 is declared as the output
+        band's no-data value either way, mirroring the per-date
         `_post_process` behaviour.
+
+        Args:
+            path: The on-disk raster to clip and rewrite in place.
+            signed: Forwarded to `_clip_and_normalise`; true preserves
+                negative pixels (a signed variable such as an anomaly).
         """
         raster = Dataset.read_file(str(path))
-        self._clip_and_normalise(raster).to_file(str(path))
+        self._clip_and_normalise(raster, signed=signed).to_file(str(path))
 
     def _api(
         self,
@@ -1307,7 +1313,7 @@ class CHIRPS(AbstractDataSource):
 
         raster = Dataset.read_file(str(local_path))
         out_path = self.root_dir / self._output_filename(ds_key, dataset, var, date)
-        self._clip_and_normalise(raster).to_file(str(out_path))
+        self._clip_and_normalise(raster, signed=var.signed).to_file(str(out_path))
 
         try:
             local_path.unlink(missing_ok=True)
@@ -1318,17 +1324,24 @@ class CHIRPS(AbstractDataSource):
             )
         return out_path
 
-    def _clip_and_normalise(self, raster: Dataset) -> Dataset:
+    def _clip_and_normalise(self, raster: Dataset, *, signed: bool = False) -> Dataset:
         """Normalise CHC negatives to the -9999 no-data sentinel and clip to the AOI.
 
         CHIRPS encodes "missing" as a negative value, and some rasters declare
-        no no-data value at all. Every negative pixel becomes -9999 and the
-        output band declares -9999 as its no-data value; the raster is then
-        clipped to the request bbox — or masked to the exact polygon when the
-        `aoi=` carried one — through the shared `crop_to_aoi`, rather than a
-        hand-rolled NumPy window slice. Normalising the whole granule before
-        the crop lets the polygon mask flag out-of-shape cells with the
-        now-declared -9999 no-data.
+        no no-data value at all. For an unsigned variable every negative pixel
+        becomes -9999 and the output band declares -9999 as its no-data value;
+        the raster is then clipped to the request bbox — or masked to the exact
+        polygon when the `aoi=` carried one — through the shared `crop_to_aoi`,
+        rather than a hand-rolled NumPy window slice. Normalising the whole
+        granule before the crop lets the polygon mask flag out-of-shape cells
+        with the now-declared -9999 no-data.
+
+        When `signed` is true the negative-to-sentinel rewrite is skipped: a
+        signed variable such as `precipitation_anomaly` carries genuine
+        below-climatology negatives that must survive, while the raster's own
+        -9999 fill is still honoured as no-data (it is declared on the output
+        band either way). Without this, every below-normal pixel of an anomaly
+        product would be silently nulled.
 
         The bbox is snapped **outward** to the granule's cell edges first (see
         `_snap_bbox_outward`), because `crop_to_aoi(touch=False)` keeps
@@ -1340,6 +1353,9 @@ class CHIRPS(AbstractDataSource):
 
         Args:
             raster: The freshly read source `Dataset` (the whole granule).
+            signed: When true, preserve negative pixels (a signed variable
+                such as an anomaly); when false (the default), rewrite every
+                negative to the -9999 no-data sentinel (precipitation fill).
 
         Returns:
             A new `Dataset` clipped (or polygon-masked) to the AOI, carrying
@@ -1362,9 +1378,10 @@ class CHIRPS(AbstractDataSource):
             # the crop. That costs a whole-granule normalise + rebuild.
             # `crop_to_aoi` masks to the geometry and ignores `bbox=` here, so
             # the request bbox is passed unsnapped (the snap is bbox-path-only).
-            data = np.where(data < 0, nodata_sentinel, data).astype(
-                data.dtype, copy=False
-            )
+            if not signed:
+                data = np.where(data < 0, nodata_sentinel, data).astype(
+                    data.dtype, copy=False
+                )
             full = Dataset.from_array(
                 data,
                 no_data_value=nodata_sentinel,
@@ -1384,9 +1401,10 @@ class CHIRPS(AbstractDataSource):
         )
         cropped = crop_to_aoi(raster, self.space, bbox=bbox, touch=False)
         window = cropped.read_array()
-        window = np.where(window < 0, nodata_sentinel, window).astype(
-            window.dtype, copy=False
-        )
+        if not signed:
+            window = np.where(window < 0, nodata_sentinel, window).astype(
+                window.dtype, copy=False
+            )
         return Dataset.from_array(
             window,
             no_data_value=nodata_sentinel,
