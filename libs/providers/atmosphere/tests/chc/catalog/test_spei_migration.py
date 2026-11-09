@@ -77,7 +77,9 @@ class TestSpeiMigration:
         assert ds.default_format == "tif", (
             f"{key}: expected tif, got {ds.default_format}"
         )
-        assert "netcdf" not in ds.ftp_bases, f"{key}: stale netcdf base remains"
+        assert list(ds.ftp_bases) == ["tif"], (
+            f"{key}: ftp_bases should be tif-only, got {list(ds.ftp_bases)}"
+        )
         assert ds.variables["spei"].signed, (
             f"{key}: spei must stay signed (now a raster)"
         )
