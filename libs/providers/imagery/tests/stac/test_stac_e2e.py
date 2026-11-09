@@ -85,7 +85,7 @@ class TestCdseE2E:
     this runs, so it executes under `-m e2e` and fails loudly (never skips
     silently) if the live read breaks. The non-AWS `eodata` endpoint reads with
     the default multi-threaded workers: serapeum-org/pyramids#1348 (in
-    pyramids-core >=0.71.0, under the pinned 0.74.0 floor) routes the custom
+    pyramids-core >=0.71.0, under the pinned 0.75.0 floor) routes the custom
     endpoint to them.
     """
 

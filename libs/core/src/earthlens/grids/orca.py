@@ -3,7 +3,7 @@
 ORCA grids (NEMO ocean model) store coordinates as two-dimensional `(ny, nx)`
 longitude/latitude arrays describing quadrilateral cells. pyramids already has a
 mesh-to-raster bridge (`pyramids.netcdf.ugrid.interpolation.mesh_to_grid`, reached
-through `pyramids.netcdf.ugrid.dataset.UgridDataset.to_dataset`); this module turns the
+through `pyramids.netcdf.ugrid.dataset.MeshDataset.to_dataset`); this module turns the
 curvilinear field into a UGRID quad mesh and reuses that bridge for the actual
 interpolation. No new third-party dependencies.
 """
@@ -14,7 +14,7 @@ import warnings
 from typing import TYPE_CHECKING
 
 import numpy as np
-from pyramids.netcdf.ugrid.dataset import UgridDataset
+from pyramids.netcdf.ugrid.dataset import MeshDataset
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from pyramids.dataset import Dataset
@@ -38,7 +38,7 @@ def from_orca(
     the last row and column) contributes; `NaN`-masked nodes are ignored and a face is
     `NaN` only when all four of its corners are `NaN`. Use `NaN` (not a finite
     sentinel) to mark missing input values. The resulting UGRID mesh is interpolated to
-    a regular grid via `UgridDataset.to_dataset`.
+    a regular grid via `MeshDataset.to_dataset`.
 
     Args:
         lon2d: `(ny, nx)` array of node longitudes (x-coordinates).
@@ -87,7 +87,7 @@ def from_orca(
 
     See Also:
         - `from_octahedral`: regrid ragged per-point fields.
-        - `pyramids.netcdf.ugrid.dataset.UgridDataset.to_dataset`: the mesh→raster
+        - `pyramids.netcdf.ugrid.dataset.MeshDataset.to_dataset`: the mesh→raster
           bridge this adapter delegates to.
     """
     lon2d = np.asarray(lon2d, dtype=np.float64)
@@ -129,7 +129,7 @@ def from_orca(
         warnings.simplefilter("ignore", category=RuntimeWarning)
         face_values = np.nanmean(corners, axis=0)
 
-    mesh = UgridDataset.from_arrays(
+    mesh = MeshDataset.from_arrays(
         node_x,
         node_y,
         faces,
