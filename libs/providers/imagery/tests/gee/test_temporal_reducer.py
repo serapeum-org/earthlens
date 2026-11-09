@@ -474,6 +474,37 @@ class TestReduceStack:
         reduced = temporal_reducer_for("median").reduce_stack(stack, times)
         assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(5.0)
 
+    def test_mixed_precision_collapses_to_one_window(self, tmp_path):
+        """Mixed-precision timestamps spanning months collapse into a single window."""
+        stack = _stack(tmp_path, [2.0, 4.0, 6.0, 100.0])
+        times = [
+            "2019/06/01 09:41:12.345000+00",
+            "2019/07/03 09:43:06+00",
+            "2019/08/20 10:01:00.500000+00",
+            "2020/09/30 11:11:11+00",
+        ]
+        reduced = temporal_reducer_for("mean").reduce_stack(stack, times)
+        assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(28.0)
+
+    def test_single_fractional_second_timestep(self, tmp_path):
+        """A one-scene stack whose only timestamp carries fractional seconds reduces."""
+        stack = _stack(tmp_path, [7.0])
+        reduced = temporal_reducer_for("mean").reduce_stack(
+            stack, ["2020/06/15 09:41:12.345000+00"]
+        )
+        assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(7.0)
+
+    def test_mixed_offsets_are_normalised_to_utc(self, tmp_path):
+        """Timestamps carrying different offsets are normalised, not left tz-mixed."""
+        stack = _stack(tmp_path, [1.0, 5.0, 9.0])
+        times = [
+            "2020/01/01 09:41:12.345000+00",
+            "2020/02/01 11:43:06+02",
+            "2020/03/01 10:01:00.500000+00",
+        ]
+        reduced = temporal_reducer_for("median").reduce_stack(stack, times)
+        assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(5.0)
+
     def test_mosaic_has_no_client_side_form(self, tmp_path):
         """`mosaic` refuses a client-side stack reduction."""
         stack = _stack(tmp_path, [1.0, 5.0])
