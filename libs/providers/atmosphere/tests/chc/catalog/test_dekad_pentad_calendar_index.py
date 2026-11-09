@@ -78,8 +78,8 @@ class TestPentadalCalendarWalk:
     # template `SPI_..PentAccum_{year}_p{pentad}.tif` indexes pentad-OF-YEAR
     # (`p01`..`p72`, verified live on the FTP) while the `{pentad}` placeholder
     # renders pentad-of-MONTH (`1`..`6`). That mismatch is a pre-existing SPI
-    # defect independent of this change, so asserting a 72-date walk for SPI
-    # here would wrongly read as validating SPI downloads.
+    # defect independent of this change (tracked in issue #1398), so asserting
+    # a 72-date walk for SPI here would wrongly read as validating SPI downloads.
     @pytest.mark.parametrize("ds_key", ["global-pentad", "chirps-gefs-v3-pentad-lead0"])
     def test_full_year_has_72_pentads(self, tmp_path, ds_key):
         """A full year is 72 pentads -- six per month, none missing."""
@@ -170,6 +170,13 @@ class TestForecastHorizonsKeepFixedStride:
         assert list(_dates_for(chirps, ds_key)) == list(expected)
 
     def test_05day_is_not_the_calendar_pentad_set(self, tmp_path):
-        """The 5-day forecast stride visits non-boundary days a pentad walk never would."""
-        dates = _dates_for(_chirps_over_year(tmp_path), "chirps-gefs-v3-05day")
-        assert {d.day for d in dates} - _PENTAD_DAYS
+        """The 5-day forecast stride lands on day 31, which a pentad walk never emits."""
+        days = {
+            d.day
+            for d in _dates_for(_chirps_over_year(tmp_path), "chirps-gefs-v3-05day")
+        }
+        # Day 31 is the fixed-stride 7th step of January (Jan 1 + 30d); the
+        # month-reset pentad boundaries stop at 26, so a calendar walk never
+        # visits it -- concrete proof the forecast row kept the fixed stride.
+        assert 31 in days
+        assert 31 not in _PENTAD_DAYS
