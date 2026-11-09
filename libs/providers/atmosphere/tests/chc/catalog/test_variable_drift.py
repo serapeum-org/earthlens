@@ -74,7 +74,7 @@ class TestVariableMetadataDrift:
     def test_bundled_catalog_reports_known_precipitation_daily_drift(
         self, bundled_catalog: Catalog
     ):
-        """The shipped catalog has exactly one drift: precipitation/daily (gefs-v12-16day outlier)."""
+        """The shipped catalog has exactly one drift: precipitation/daily (gefs-v3-16day outlier)."""
         report = bundled_catalog.health()
         assert report["variable_metadata_drift"] == ["precipitation/daily"]
 

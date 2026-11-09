@@ -123,6 +123,18 @@ class Variable(FluxableLeaf):
         name: Variable short code (e.g. `"precipitation"`).
         description: Human-readable description of the variable.
         units: Unit string (e.g. `"mm/day"`, `"mm/month"`).
+        signed: Whether the variable carries genuine negative values
+            (e.g. an anomaly, a temperature in degrees Celsius, or a
+            standardised index). Defaults to `False`. On the raster
+            (`tif` / `cog` / `bil`) download path the backend's
+            `_clip_and_normalise` rewrites every negative pixel to the
+            -9999 no-data sentinel for unsigned variables (CHIRPS fill);
+            when `signed` is `True` that rewrite is skipped so
+            below-zero values survive, while the raster's own -9999 fill
+            is still honoured as no-data. NetCDF variables (read via the
+            discrete-file path, e.g. the CenTrends archive) are passed
+            through unmodified and never reach `_clip_and_normalise`, so
+            `signed` is consulted only on the raster download path.
     """
 
     _summary_fields = (
@@ -137,6 +149,23 @@ class Variable(FluxableLeaf):
     name: str
     description: str
     units: str
+    signed: bool = False
+
+    def summary_parts(self) -> list[str]:
+        """Append a `signed` marker after the flux/state one for signed variables.
+
+        `signed` decides whether a variable's negative pixels survive the
+        download (see the field docstring), so it is worth surfacing in the
+        one-line summary. It is appended only when `True`, so the common
+        unsigned rows stay terse.
+
+        Returns:
+            list[str]: The inherited fragments, then `"signed"` when signed.
+        """
+        parts = super().summary_parts()
+        if self.signed:
+            parts.append("signed")
+        return parts
 
     # `is_flux` property inherited from `FluxableLeaf` (N1 in
     # the cross-backend catalog comparison).
@@ -391,6 +420,7 @@ def _build_chc_dataset(
                 description=var_entry.get("description", ""),
                 units=var_entry.get("units", ""),
                 types=var_entry.get("types"),
+                signed=var_entry.get("signed", False),
             )
         except ValidationError as exc:
             raise ValueError(
@@ -1036,7 +1066,7 @@ class Catalog(AbstractCatalog[Dataset]):
                 ```python
                 >>> from earthlens.chc import Catalog
                 >>> Catalog().list_datasets(temporal_resolution="daily")
-                ['africa-daily', 'chirp-daily', 'chirp-v3-global-daily', 'chirps-gefs-v12-daily-16day', 'chirps-v3-global-daily-prelim', 'chirps-v3-global-daily-rnl', 'chirps-v3-global-daily-sat', 'chirtsdaily-heat-index', 'chirtsdaily-relative-humidity', 'chirtsdaily-svp', 'chirtsdaily-tmax', 'chirtsdaily-tmin', 'chirtsdaily-vpd', 'global-daily', 'prelim-global-daily', 'western-hemisphere-daily']
+                ['africa-daily', 'chirp-daily', 'chirp-v3-global-daily', 'chirps-gefs-v3-16day', 'chirps-gefs-v3-daily', 'chirps-v3-global-daily-prelim', 'chirps-v3-global-daily-rnl', 'chirps-v3-global-daily-sat', 'chirtsdaily-heat-index', 'chirtsdaily-relative-humidity', 'chirtsdaily-svp', 'chirtsdaily-tmax', 'chirtsdaily-tmin', 'chirtsdaily-vpd', 'global-daily', 'prelim-global-daily', 'western-hemisphere-daily']
 
                 ```
         """
