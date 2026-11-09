@@ -1331,7 +1331,9 @@ def _reduce_whole_window(
 
     Args:
         stack: The scene stack to reduce.
-        times: One timestamp per timestep, in stack order.
+        times: One timestamp per timestep, in stack order. Parsed as mixed-format
+            and normalised to UTC, so Earth Engine's offset-aware timestamps mix
+            freely whether or not a given scene carries fractional seconds.
         op: The pyramids `reduce_time` operation (`"median"`, `"trend"`, ...).
         q: The percentile level for `op="percentile"`, else `None`.
 
