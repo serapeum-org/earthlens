@@ -136,6 +136,24 @@ class TestDekadPentadStartDatesAreBoundaryAligned:
         )
 
 
+class TestNonOverlappingWindow:
+    """A request window disjoint from the dataset yields `None`, not dates."""
+
+    def test_window_entirely_before_start_returns_none(self, tmp_path):
+        """A 1950 request against a 1981-start dataset does not overlap -> None."""
+        chirps = CHIRPS(
+            start="1950-01-01",
+            end="1950-12-31",
+            variables=["precipitation"],
+            temporal_resolution="daily",
+            lat_lim=[4.0, 5.0],
+            lon_lim=[-75.0, -74.0],
+            path=str(tmp_path),
+        )
+        dataset = chirps._catalog.datasets["global-dekad"]
+        assert chirps._overlapping_dates("global-dekad", dataset) is None
+
+
 class TestForecastHorizonsKeepFixedStride:
     """GEFS 5-day/10-day forecast rows share the stride but are NOT calendar-walked."""
 
