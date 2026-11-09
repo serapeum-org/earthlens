@@ -73,10 +73,14 @@ class TestDekadalCalendarWalk:
 class TestPentadalCalendarWalk:
     """Pentadal datasets yield exactly the six calendar pentads of every month."""
 
-    @pytest.mark.parametrize(
-        "ds_key",
-        ["global-pentad", "spi-chirps3-01-pentad", "chirps-gefs-v3-pentad-lead0"],
-    )
+    # Note: the SPI pentad rows are deliberately NOT exercised here. Their
+    # cadence is pentadal (so the date walk is correct), but their filename
+    # template `SPI_..PentAccum_{year}_p{pentad}.tif` indexes pentad-OF-YEAR
+    # (`p01`..`p72`, verified live on the FTP) while the `{pentad}` placeholder
+    # renders pentad-of-MONTH (`1`..`6`). That mismatch is a pre-existing SPI
+    # defect independent of this change, so asserting a 72-date walk for SPI
+    # here would wrongly read as validating SPI downloads.
+    @pytest.mark.parametrize("ds_key", ["global-pentad", "chirps-gefs-v3-pentad-lead0"])
     def test_full_year_has_72_pentads(self, tmp_path, ds_key):
         """A full year is 72 pentads -- six per month, none missing."""
         dates = _dates_for(_chirps_over_year(tmp_path), ds_key)
