@@ -24248,11 +24248,12 @@ after the <code>chirps/</code> → <code>chc/</code> rename.</p>
   <code>ValueError</code> (caught by the per-date guard and logged) naming both
   extents.</li>
 <li><strong>Every date fails with FTP 550.</strong> Either the file pattern in the
-  YAML is wrong (the GEFS v3 rows shipped with a known-bad pattern
-  and were withdrawn — see <code>gefs.yaml</code>'s header for the probe
-  results) or your bbox / date is outside the dataset's actual
-  coverage. Try <code>Catalog().describe(ds_key)</code> to compare the
-  request's window against the dataset's <code>start_date</code> / <code>end_date</code>.</li>
+  YAML is wrong for the requested dataset, or your bbox / date is
+  outside the dataset's actual coverage. Try
+  <code>Catalog().describe(ds_key)</code> to compare the request's window against
+  the dataset's <code>start_date</code> / <code>end_date</code>, and
+  <code>earthlens datasets probe chc &lt;key&gt;</code> to list the real filenames the
+  <code>ftp_base</code> currently holds.</li>
 <li><strong>No outbound FTP allowed.</strong> Some corporate firewalls block port 21.
   Run <code>python -c "from ftplib import FTP; FTP('data.chc.ucsb.edu').login()"</code>
   from the target host to confirm reachability before reaching for

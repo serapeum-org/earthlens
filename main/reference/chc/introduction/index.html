@@ -24020,11 +24020,11 @@ which only ~40 are CHIRPS-the-product) is one
 <td>1983-present, ±60° land</td>
 </tr>
 <tr>
-<td><strong>CHIRPS-GEFS v12</strong> †</td>
-<td>9</td>
-<td><code>precipitation</code></td>
-<td>daily / pentadal / dekadal / 16-day forecast</td>
-<td>2000-present, ±50°</td>
+<td><strong>CHIRPS-GEFS v3</strong></td>
+<td>16</td>
+<td><code>precipitation</code>, <code>precipitation_anomaly</code></td>
+<td>daily / 5-/10-/15-day / 16-day / pentadal (lead 0–2) / dekadal forecast</td>
+<td>2001-present, ±50°</td>
 </tr>
 <tr>
 <td><strong>CHPclim v2</strong></td>
@@ -24048,11 +24048,11 @@ which only ~40 are CHIRPS-the-product) is one
 <td>1981-present, ±50°</td>
 </tr>
 <tr>
-<td><strong>SPEI v1</strong></td>
-<td>6</td>
-<td><code>spei</code> (precip - PET, MERRA-2 PET)</td>
-<td>monthly at 1 / 2 / 3 / 6 / 9 / 12-month windows</td>
-<td>1981-present, ±50°</td>
+<td><strong>SPEI (CHIRPS3)</strong></td>
+<td>12</td>
+<td><code>spei</code> (precip - PET)</td>
+<td>monthly at 1 / 2 / 3 / 6 / 9 / 12-month windows, each with a MERRA-2 and a FLDAS PET variant</td>
+<td>MERRA 1981- / FLDAS 1982-present, ±50°</td>
 </tr>
 <tr>
 <td><strong>CHC_CMIP6 deltas</strong></td>
@@ -24072,13 +24072,14 @@ which only ~40 are CHIRPS-the-product) is one
 </table>
 <p>Browse the full list via <code>Catalog.list_datasets()</code> or
 <code>Catalog.available_datasets</code>. Every entry is reachable from
-<code>products/...</code> on the FTP, except as noted below.</p>
-<p>† <strong>CHIRPS-GEFS v12 is temporarily unavailable.</strong> CHC retired the v12
-forecast tree and replaced it with a re-organised <code>CHIRPS-GEFS/v3/</code>
-layout whose forecast-lead directory scheme differs from v12. The 9
-rows still carry their v12 paths and a <code>.download()</code> on them currently
-fails with an FTP <code>550</code>; re-mapping them to v3 is tracked in
-<a href="https://github.com/serapeum-org/earthlens/issues/1387">issue #1387</a>.</p>
+<code>products/...</code> on the FTP.</p>
+<p>The CHIRPS-GEFS rows are the v3 forecast products
+(<code>products/CHIRPS-GEFS/v3/</code>), which replaced the retired v12 tree. Each
+forecast horizon ships the global <code>data/</code> (the forecast) and, where CHC
+publishes it, an <code>anom/</code> anomaly-vs-climatology companion
+(<code>precipitation_anomaly</code>). The pentad leads <code>0</code>/<code>1</code>/<code>2</code> and the single
+dekad lead map from the old v12 <code>first</code>/<code>second</code>/<code>last</code> naming; the
+remap is <a href="https://github.com/serapeum-org/earthlens/issues/1387">issue #1387</a>.</p>
 <h2 id="data-is-shipped-as-files-not-as-a-service"><a class="toclink" href="#data-is-shipped-as-files-not-as-a-service">Data is shipped as files, not as a service</a><a class="headerlink" href="#data-is-shipped-as-files-not-as-a-service" title="Permanent link">#</a></h2>
 <p>Every CHC dataset is a static raster (or NetCDF) sitting in a directory
 on the FTP. Two filename shapes show up:</p>
@@ -24109,8 +24110,8 @@ never has to think about it.</p>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>├── chirts.yaml          # 7 datasets (daily + monthly + derived)
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>├── cmip6.yaml           # 16 datasets (CHC_CMIP6 scenario deltas)
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>├── derived.yaml         # 5 datasets (CHPclim + WBGT + CenTrends)
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>├── gefs.yaml            # 9 datasets (CHIRPS-GEFS v12)
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>└── indices.yaml         # 15 datasets (SPI + SPEI)
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>├── gefs.yaml            # 16 datasets (CHIRPS-GEFS v3)
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>└── indices.yaml         # 21 datasets (SPI + SPEI MERRA/FLDAS)
 </code></pre></div>
 <p><code>_index.yaml</code> carries an informational walk-order list of every dataset
 key and the <code>regions:</code> block (9 named geographic-coverage profiles —

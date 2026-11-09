@@ -24229,7 +24229,7 @@ the tooling that supports catalog work.</p>
 </tr>
 <tr>
 <td><code>earthlens datasets probe chc &lt;key&gt;</code></td>
-<td>CHIRPS FTP probe — samples a directory's filenames + suggests a <code>file_patterns</code> template (used to verify the GEFS v3 patterns before they were withdrawn)</td>
+<td>CHIRPS FTP probe — samples a directory's filenames + suggests a <code>file_patterns</code> template (used to verify the GEFS v3 forecast-lead patterns live)</td>
 </tr>
 </tbody>
 </table>
@@ -24242,8 +24242,8 @@ the GEE-style layout under <code>src/earthlens/gee/catalog/</code>:</p>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>├── chirps-v3.yaml           # 11 datasets — CHIRPS v3 (final + preliminary)
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>├── chirp.yaml               # 7 datasets — CHIRP + CHIRP v3
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>├── chirts.yaml              # 7 datasets — CHIRTSdaily + CHIRTSmonthly
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>├── gefs.yaml                # 9 datasets — CHIRPS-GEFS v12
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>├── indices.yaml             # 15 datasets — SPI/CHIRPS3 + SPEI v1
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>├── gefs.yaml                # 16 datasets — CHIRPS-GEFS v3
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>├── indices.yaml             # 21 datasets — SPI/CHIRPS3 + SPEI (MERRA + FLDAS)
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>├── cmip6.yaml               # 16 datasets — CHC_CMIP6 scenario deltas
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>└── derived.yaml             # 5 datasets — CHPclim v2, WBGT, CentennialTrends v1
 </code></pre></div>
@@ -24518,13 +24518,12 @@ haven't been touched since N days). Parallel of
 <p>CHIRPS FTP probe. Lists a sample of the real filenames under a
 dataset's <code>ftp_base</code> on the live FTP and adds a <code>(suggested pattern)</code>
 row carrying a <code>file_patterns</code> template inferred from the listing.
-Run against the GEFS keys, it was the basis for the H2 decision to
-<strong>withdraw</strong> the
-CHIRPS-GEFS v3 rows — the probe found the directory shape didn't
-match the YAML's provisional patterns
-(<code>year/</code> partitioning vs the YAML's <code>year/month/</code> assumption;
-<code>anom/data/zscore</code> subdir split on the dekad/pentad variants). The
-rows are reinstated only when the probe confirms a verified pattern.</p>
+Run against the GEFS keys, it mapped the live <code>products/CHIRPS-GEFS/v3/</code>
+layout the v3 rows now ship against (#1387): the per-horizon
+<code>data/</code> + <code>anom/</code> split, the <code>global</code>/<code>africa</code> region crops, and the
+<code>c3g_{year}.{month}.{day|dekad|pentad}.tif</code> filename shape. Every
+shipped <code>ftp_base</code> + <code>file_patterns</code> pair in <code>gefs.yaml</code> was confirmed
+to resolve on the live FTP with this probe before the rows landed.</p>
 <h2 id="adding-a-new-dataset"><a class="toclink" href="#adding-a-new-dataset">Adding a new dataset</a><a class="headerlink" href="#adding-a-new-dataset" title="Permanent link">#</a></h2>
 <ol>
 <li>Pick the right per-family file (e.g. a new SPEI window goes in
