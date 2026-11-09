@@ -168,7 +168,7 @@ def _calendar_period_end(
     Returns:
         pd.Timestamp: The period's inclusive end day.
     """
-    return _next_period_start(date, start_days) - pd.Timedelta(days=1)
+    return _next_period_start(date, start_days) - pd.Timedelta(1, "D")
 
 
 def _calendar_period_index(
@@ -1404,7 +1404,7 @@ class CHIRPS(AbstractDataSource):
             # subtract one day to get the inclusive end of THIS period.
             # For daily (`D`) this gives `end == date`, which matches
             # CHC's daily-WBGT-style naming if any catalog row uses it.
-            period_end = (date + offset) - pd.Timedelta(days=1)
+            period_end = (date + offset) - pd.Timedelta(1, "D")
             out["start_yyyymmdd"] = date.strftime("%Y%m%d")
             out["end_yyyymmdd"] = period_end.strftime("%Y%m%d")
         return out
