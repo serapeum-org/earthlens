@@ -107,6 +107,35 @@ class TestLead1PentadRespectsDatasetStart:
         assert {d.day for d in dates} <= _PENTAD_DAYS
 
 
+class TestDekadPentadStartDatesAreBoundaryAligned:
+    """Every shipped dekad/pentad row starts on a calendar boundary day.
+
+    `_calendar_period_index` floors `window_start` to its containing period
+    start, so a row whose `start_date` fell *between* boundary days could
+    have its first period floored to a day before the archive begins. All
+    current rows are boundary-aligned, which keeps that hazard latent; this
+    lock-in fails the moment a future row ships an off-boundary start.
+    """
+
+    @pytest.mark.parametrize(
+        ("cadence", "boundary_days"),
+        [("dekadal", _DEKAD_DAYS), ("pentadal", _PENTAD_DAYS)],
+    )
+    def test_start_dates_on_boundary(self, cadence, boundary_days):
+        """Each dekadal/pentadal row's start_date day is a period boundary."""
+        catalog = Catalog()
+        offenders = {
+            key: ds.start_date
+            for key, ds in catalog.datasets.items()
+            if ds.temporal_resolution == cadence
+            and pd.Timestamp(ds.start_date).day not in boundary_days
+        }
+        assert not offenders, (
+            f"{cadence} rows must start on a boundary day {sorted(boundary_days)}; "
+            f"off-boundary: {offenders}"
+        )
+
+
 class TestForecastHorizonsKeepFixedStride:
     """GEFS 5-day/10-day forecast rows share the stride but are NOT calendar-walked."""
 
