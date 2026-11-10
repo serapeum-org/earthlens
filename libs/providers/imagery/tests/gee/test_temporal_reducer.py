@@ -501,6 +501,17 @@ class TestReduceStack:
         reduced = temporal_reducer_for("mean").reduce_stack(stack, times)
         assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(5.0)
 
+    def test_three_scene_multiday_straddle_keeps_all(self, tmp_path):
+        """Three scenes spanning a multi-day epoch-anchored boundary all land in one window."""
+        stack = _stack(tmp_path, [3.0, 6.0, 9.0])
+        times = [
+            "2021-03-30 18:00:00+00",
+            "2021-04-02 12:00:00+00",
+            "2021-04-05 06:00:00+00",
+        ]
+        reduced = temporal_reducer_for("mean").reduce_stack(stack, times)
+        assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(6.0)
+
     def test_mixed_offsets_do_not_raise(self, tmp_path):
         """A stack whose timestamps carry different UTC offsets parses without raising."""
         stack = _stack(tmp_path, [1.0, 5.0, 9.0])
