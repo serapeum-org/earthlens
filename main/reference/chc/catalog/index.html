@@ -24413,11 +24413,15 @@ discriminator is structural, not a separate field:</p>
 <ul>
 <li><code>{year}</code>, <code>{month}</code>, <code>{day}</code> — calendar position</li>
 <li><code>{dekad}</code> (<code>1</code>/<code>2</code>/<code>3</code>) — third of the month</li>
-<li><code>{pentad}</code> (<code>1</code>..<code>6</code>) — fifth of the month</li>
+<li><code>{pentad}</code> (<code>1</code>..<code>6</code>) — fifth of the month (month-reset)</li>
+<li><code>{pentad_of_year}</code> (<code>01</code>..<code>72</code>, zero-padded) — pentad-of-year used by
+  the SPI filenames (<code>(month-1)*6 + pentad</code>)</li>
 <li><code>{hour}</code> — <code>00</code>–<code>23</code></li>
 <li><code>{doy}</code> — Julian day-of-year (3-digit, zero-padded)</li>
 <li><code>{start_yyyymmdd}</code> / <code>{end_yyyymmdd}</code> — period-window endpoints
-  derived from <code>pandas_freq</code> (WBGT)</li>
+  (WBGT). For dekadal/pentadal rows the inclusive end is the last day
+  of the calendar dekad/pentad (month-end for the final, short period);
+  for other cadences it is derived from <code>pandas_freq</code>.</li>
 </ul>
 <p><code>{month_pair}</code> (CHIRPS v3 2-monthly) and <code>{res}</code> / <code>{scale}</code> are not
 implemented; a row using them would silently hit the per-date
