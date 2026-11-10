@@ -540,8 +540,9 @@ class TestReduceStack:
     def test_empty_times_raises(self, tmp_path):
         """A whole-window reduction with no timesteps fails with a clear error."""
         stack = _stack(tmp_path, [1.0])
+        reducer = temporal_reducer_for("mean")
         with pytest.raises(ValueError, match="at least one timestep"):
-            temporal_reducer_for("mean").reduce_stack(stack, [])
+            reducer.reduce_stack(stack, [])
 
     def test_mosaic_has_no_client_side_form(self, tmp_path):
         """`mosaic` refuses a client-side stack reduction."""
