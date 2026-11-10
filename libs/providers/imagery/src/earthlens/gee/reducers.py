@@ -1340,6 +1340,8 @@ def _reduce_whole_window(
     Returns:
         The single reduced `Dataset`.
     """
+    if len(times) == 0:
+        raise ValueError("whole-window reduction needs at least one timestep.")
     # Earth Engine serves per-scene timestamps with inconsistent precision -- some
     # Landsat scenes carry fractional seconds ("...09:41:12.345000+00"), some do not
     # ("...09:43:06+00"). A bare parse infers one format from the first element and
@@ -1349,7 +1351,17 @@ def _reduce_whole_window(
     # whose `reduce_time` otherwise re-parses them the same bare way one frame down.
     index = pd.DatetimeIndex(pd.to_datetime(list(times), format="mixed", utc=True))
     span_days = int((index.max() - index.min()).days) + 1
-    reduced = stack.reduce_time(list(index), freq=f"{span_days}D", op=op, q=q)
+    # pyramids' `reduce_time` buckets with `pd.Grouper(freq)`, whose `{span_days}D`
+    # bins are anchored on the epoch, not on `index.min()`: a span-wide window is thus
+    # not guaranteed to be a single bin -- two timestamps straddling an epoch-anchored
+    # boundary split into two windows, and `reduced[0][1]` would silently drop every
+    # scene in the second. Shift the index so the earliest scene lands on the epoch, so
+    # every scene falls in the one `[epoch, epoch + span_days)` bin. The shift is a
+    # constant, so the median/mean value and the trend/sens_slope day-scaled x-axis
+    # (relative to the first timestamp) are unchanged. Tracked upstream in
+    # serapeum-org/pyramids-core#1510 (a `reduce_time(origin=)` would anchor it directly).
+    anchored = pd.Timestamp("1970-01-01", tz="UTC") + (index - index.min())
+    reduced = stack.reduce_time(list(anchored), freq=f"{span_days}D", op=op, q=q)
     return reduced[0][1]
 
 
