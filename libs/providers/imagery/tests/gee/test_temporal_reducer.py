@@ -494,8 +494,15 @@ class TestReduceStack:
         )
         assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(7.0)
 
-    def test_mixed_offsets_are_normalised_to_utc(self, tmp_path):
-        """Timestamps carrying different offsets are normalised, not left tz-mixed."""
+    def test_window_straddling_epoch_boundary_keeps_all_scenes(self, tmp_path):
+        """Scenes whose span straddles an epoch-anchored day bin still reduce as one window."""
+        stack = _stack(tmp_path, [2.0, 8.0])
+        times = ["2020-01-01 20:00:00+00", "2020-01-04 05:00:00+00"]
+        reduced = temporal_reducer_for("mean").reduce_stack(stack, times)
+        assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(5.0)
+
+    def test_mixed_offsets_do_not_raise(self, tmp_path):
+        """A stack whose timestamps carry different UTC offsets parses without raising."""
         stack = _stack(tmp_path, [1.0, 5.0, 9.0])
         times = [
             "2020/01/01 09:41:12.345000+00",
@@ -504,6 +511,26 @@ class TestReduceStack:
         ]
         reduced = temporal_reducer_for("median").reduce_stack(stack, times)
         assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(5.0)
+
+    def test_mixed_precision_trend_recovers_the_slope(self, tmp_path):
+        """A trend over mixed-precision, mixed-offset timestamps recovers the true per-day slope."""
+        stack = _stack(tmp_path, [1.0, 3.0, 5.0, 7.0])
+        times = [
+            "2020/06/01 00:00:00.500000+00",
+            "2020/06/11 02:00:00+02",
+            "2020/06/21 00:00:00.250000+00",
+            "2020/07/01 00:00:00+00",
+        ]
+        reduced = temporal_reducer_for("trend").reduce_stack(stack, times)
+        assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(
+            0.2, abs=1e-4
+        )
+
+    def test_empty_times_raises(self, tmp_path):
+        """A whole-window reduction with no timesteps fails with a clear error."""
+        stack = _stack(tmp_path, [1.0])
+        with pytest.raises(ValueError, match="at least one timestep"):
+            temporal_reducer_for("mean").reduce_stack(stack, [])
 
     def test_mosaic_has_no_client_side_form(self, tmp_path):
         """`mosaic` refuses a client-side stack reduction."""
