@@ -1331,24 +1331,32 @@ def _reduce_whole_window(
 
     Args:
         stack: The scene stack to reduce.
-        times: One timestamp per timestep, in stack order. Parsed as mixed-format
-            and normalised to UTC, so Earth Engine's offset-aware timestamps mix
-            freely whether or not a given scene carries fractional seconds.
+        times: One timestamp per timestep, in stack order. These are Earth Engine
+            EEDAI scene-time strings, which arrive slash-separated and offset-aware
+            (`"YYYY/MM/DD HH:MM:SS[.ffffff]+00"`) with inconsistent sub-second
+            precision; they are parsed as mixed-format and normalised to UTC, so
+            scenes mix freely whether or not a given one carries fractional seconds.
         op: The pyramids `reduce_time` operation (`"median"`, `"trend"`, ...).
         q: The percentile level for `op="percentile"`, else `None`.
 
     Returns:
         The single reduced `Dataset`.
+
+    Raises:
+        ValueError: If `times` is empty.
     """
     if len(times) == 0:
         raise ValueError("whole-window reduction needs at least one timestep.")
-    # Earth Engine serves per-scene timestamps with inconsistent precision -- some
-    # Landsat scenes carry fractional seconds ("...09:41:12.345000+00"), some do not
-    # ("...09:43:06+00"). A bare parse infers one format from the first element and
-    # then raises on the first that does not match, so parse as `format="mixed"`. The
-    # inputs are offset-aware, so `utc=True` keeps the index from mixing aware/naive
-    # timestamps. The parsed index -- not the raw strings -- is handed to pyramids,
-    # whose `reduce_time` otherwise re-parses them the same bare way one frame down.
+    # EEDAI scene-time strings arrive slash-separated and offset-aware with
+    # inconsistent sub-second precision -- some carry fractional seconds
+    # ("2020/06/15 09:41:12.345000+00"), some do not ("2020/06/15 09:43:06+00")
+    # (shape confirmed against a live MODIS/Landsat read). A bare `pd.to_datetime`
+    # infers one format from the first element and then raises on the first that does
+    # not match it, so parse `format="mixed"`: the robust choice for this heterogeneous,
+    # non-strict-ISO shape -- the YYYY-first strings are unambiguous, so "mixed" cannot
+    # mis-order day/month. `utc=True` keeps the index from mixing aware/naive. The
+    # parsed index -- not the raw strings -- is handed to pyramids, whose `reduce_time`
+    # otherwise re-parses them the same bare way one frame down.
     index = pd.DatetimeIndex(pd.to_datetime(list(times), format="mixed", utc=True))
     span_days = int((index.max() - index.min()).days) + 1
     # pyramids' `reduce_time` buckets with `pd.Grouper(freq)`, whose `{span_days}D`
