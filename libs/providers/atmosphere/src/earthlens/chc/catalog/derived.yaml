@@ -68,7 +68,7 @@ datasets:
     region: global-extended
     temporal_resolution: monthly
     pandas_freq: MS
-    spatial_resolution: [1.0]
+    spatial_resolution: [0.05]
     formats: [tif]
     start_date: '1980-01-01'
     file_patterns:
@@ -86,7 +86,7 @@ datasets:
     region: global-extended
     temporal_resolution: dekadal
     pandas_freq: 10D
-    spatial_resolution: [1.0]
+    spatial_resolution: [0.05]
     formats: [tif]
     start_date: '1980-01-01'
     file_patterns:

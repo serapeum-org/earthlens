@@ -20,10 +20,44 @@ class TestPlaceholdersWithoutFreq:
         assert "start_yyyymmdd" not in ph
         assert "end_yyyymmdd" not in ph
 
-    def test_no_freq_keeps_the_original_seven_keys(self):
-        """The pre-M5 placeholder set is unchanged when `pandas_freq` is None."""
+    def test_no_freq_keeps_the_base_placeholder_keys(self):
+        """Without `pandas_freq` the base (non-window) placeholder set is returned."""
         ph = CHIRPS._placeholders(pd.Timestamp("2020-03-15"))
-        assert set(ph) == {"year", "month", "day", "dekad", "pentad", "hour", "doy"}
+        assert set(ph) == {
+            "year",
+            "month",
+            "day",
+            "dekad",
+            "pentad",
+            "pentad_of_year",
+            "hour",
+            "doy",
+        }
+
+
+class TestPentadOfYear:
+    """`{pentad_of_year}` is the zero-padded 01..72 index CHC's SPI filenames use."""
+
+    @pytest.mark.parametrize(
+        ("date", "expected"),
+        [
+            ("2001-01-01", "01"),  # Jan pentad 1
+            ("2001-01-26", "06"),  # Jan pentad 6
+            ("2001-02-01", "07"),  # Feb pentad 1
+            ("2001-07-16", "40"),  # mid-year
+            ("2001-12-26", "72"),  # Dec pentad 6, last of year
+        ],
+    )
+    def test_pentad_of_year_values(self, date, expected):
+        """pentad-of-year = (month-1)*6 + pentad-of-month, zero-padded to two digits."""
+        ph = CHIRPS._placeholders(pd.Timestamp(date))
+        assert ph["pentad_of_year"] == expected
+
+    def test_pentad_of_year_is_zero_padded_two_digits(self):
+        """Single-digit indices are padded (`p01`, not `p1`), unlike `{pentad}`."""
+        ph = CHIRPS._placeholders(pd.Timestamp("2001-01-01"))
+        assert ph["pentad_of_year"] == "01"
+        assert ph["pentad"] == "1"
 
 
 class TestPlaceholdersMonthly:
@@ -68,6 +102,66 @@ class TestPlaceholdersDekadal:
         assert ph["end_yyyymmdd"] == "20200120"
 
 
+class TestPlaceholdersCalendarDekadal:
+    """`temporal_resolution='dekadal'` ends each dekad on the calendar grid."""
+
+    def test_first_dekad(self):
+        """Dekad 1 of January 2020 runs 20200101 - 20200110."""
+        ph = CHIRPS._placeholders(
+            pd.Timestamp("2020-01-01"), temporal_resolution="dekadal"
+        )
+        assert ph["start_yyyymmdd"] == "20200101"
+        assert ph["end_yyyymmdd"] == "20200110"
+
+    def test_third_dekad_ends_on_month_end_not_day_30(self):
+        """Dekad 3 absorbs the remainder: 20200121 - 20200131, not ...130."""
+        ph = CHIRPS._placeholders(
+            pd.Timestamp("2020-01-21"), temporal_resolution="dekadal"
+        )
+        assert ph["start_yyyymmdd"] == "20200121"
+        assert ph["end_yyyymmdd"] == "20200131"
+
+    def test_february_third_dekad_leap_year(self):
+        """February 2020's short third dekad ends on the 29th."""
+        ph = CHIRPS._placeholders(
+            pd.Timestamp("2020-02-21"), temporal_resolution="dekadal"
+        )
+        assert ph["end_yyyymmdd"] == "20200229"
+
+    def test_february_third_dekad_non_leap(self):
+        """February 2021's short third dekad ends on the 28th."""
+        ph = CHIRPS._placeholders(
+            pd.Timestamp("2021-02-21"), temporal_resolution="dekadal"
+        )
+        assert ph["end_yyyymmdd"] == "20210228"
+
+
+class TestPlaceholdersCalendarPentadal:
+    """`temporal_resolution='pentadal'` ends each pentad on the calendar grid."""
+
+    def test_first_pentad(self):
+        """Pentad 1 of January 2020 runs 20200101 - 20200105."""
+        ph = CHIRPS._placeholders(
+            pd.Timestamp("2020-01-01"), temporal_resolution="pentadal"
+        )
+        assert ph["end_yyyymmdd"] == "20200105"
+
+    def test_sixth_pentad_ends_on_month_end(self):
+        """Pentad 6 absorbs the remainder: 20200126 - 20200131."""
+        ph = CHIRPS._placeholders(
+            pd.Timestamp("2020-01-26"), temporal_resolution="pentadal"
+        )
+        assert ph["start_yyyymmdd"] == "20200126"
+        assert ph["end_yyyymmdd"] == "20200131"
+
+    def test_february_sixth_pentad_leap_year(self):
+        """February 2020's short sixth pentad ends on the 29th."""
+        ph = CHIRPS._placeholders(
+            pd.Timestamp("2020-02-26"), temporal_resolution="pentadal"
+        )
+        assert ph["end_yyyymmdd"] == "20200229"
+
+
 class TestPatternExpansionForWbgt:
     """End-to-end: the WBGT pattern format-string round-trips with the M5 placeholders."""
 
@@ -101,9 +195,42 @@ class TestBundledWbgtDatasetsResolve:
         # `start_yyyymmdd` / `end_yyyymmdd` weren't in the placeholders.
         out = pat.format(
             **CHIRPS._placeholders(
-                pd.Timestamp("2020-01-01"), pandas_freq=ds.pandas_freq
+                pd.Timestamp("2020-01-01"),
+                pandas_freq=ds.pandas_freq,
+                temporal_resolution=ds.temporal_resolution,
             )
         )
         # Both rows use the same template; sanity-check the shape.
         assert out.startswith("data_20200101_")
         assert out.endswith(".tif")
+
+    def test_wbgt_dekad_third_dekad_ends_on_month_end_via_production_path(self):
+        """The bundled `wbgt-dekad` row, driven as `_api` drives it, ends dekad 3 at month-end.
+
+        `_api` passes `temporal_resolution` too, routing WBGT through the
+        calendar branch -- so dekad 3 of January 2020 is `..0121_..0131`,
+        not the `..0130` a fixed `10D` offset gave.
+        """
+        ds = Catalog().get_dataset("wbgt-dekad")
+        pat = ds.file_patterns[ds.default_format]
+        out = pat.format(
+            **CHIRPS._placeholders(
+                pd.Timestamp("2020-01-21"),
+                pandas_freq=ds.pandas_freq,
+                temporal_resolution=ds.temporal_resolution,
+            )
+        )
+        assert out == "data_20200121_20200131.tif"
+
+    def test_wbgt_dekad_february_leap_dekad_via_production_path(self):
+        """February 2020's short third dekad ends on the 29th through the bundled row."""
+        ds = Catalog().get_dataset("wbgt-dekad")
+        pat = ds.file_patterns[ds.default_format]
+        out = pat.format(
+            **CHIRPS._placeholders(
+                pd.Timestamp("2020-02-21"),
+                pandas_freq=ds.pandas_freq,
+                temporal_resolution=ds.temporal_resolution,
+            )
+        )
+        assert out == "data_20200221_20200229.tif"
