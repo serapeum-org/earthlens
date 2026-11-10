@@ -235,3 +235,75 @@ def test_gportal_unconfigured_auth_raises(monkeypatch, tmp_path, extents) -> Non
             auth=auth,
             out_dir=tmp_path,
         )
+
+
+def _fake_gportal_raising(monkeypatch, exc: BaseException) -> None:
+    """Inject a fake `gportal` whose catalogue search raises `exc` from matched()."""
+
+    class _Search:
+        def matched(self):
+            raise exc
+
+        def products(self, convert_types=True):
+            raise exc
+
+    fake = types.ModuleType("gportal")
+    fake.username = None  # type: ignore[attr-defined]
+    fake.password = None  # type: ignore[attr-defined]
+    fake.search = lambda **kwargs: _Search()  # type: ignore[attr-defined]
+    fake.download = lambda *a, **k: []  # type: ignore[attr-defined]
+    fake.datasets = lambda: {}  # type: ignore[attr-defined]
+    monkeypatch.setitem(sys.modules, "gportal", fake)
+
+
+@pytest.mark.jaxa
+@pytest.mark.integration
+def test_gportal_http_503_raises_typed_unavailable(
+    monkeypatch, tmp_path, extents, configured_auth
+) -> None:
+    """A 503 HTTPError from the SDK becomes GportalUnavailableError carrying the status."""
+    import requests
+
+    resp = type("_Resp", (), {"status_code": 503})()
+    _fake_gportal_raising(
+        monkeypatch,
+        requests.HTTPError("503 Server Error: Service Unavailable", response=resp),
+    )
+    space, time = extents
+    ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
+    from earthlens.jaxa import GportalUnavailableError
+    from earthlens.jaxa._gportal import fetch_gportal
+
+    with pytest.raises(
+        GportalUnavailableError, match="down or throttling"
+    ) as excinfo:
+        fetch_gportal(
+            dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
+        )
+    assert excinfo.value.status_code == 503
+    assert "G-Portal" in str(excinfo.value)
+
+
+@pytest.mark.jaxa
+@pytest.mark.integration
+def test_gportal_html_body_jsondecode_raises_typed_unavailable(
+    monkeypatch, tmp_path, extents, configured_auth
+) -> None:
+    """A JSONDecodeError (HTML body, non-error status) becomes a typed error with no status."""
+    import requests
+
+    _fake_gportal_raising(
+        monkeypatch,
+        requests.exceptions.JSONDecodeError("Expecting value", "<html>", 0),
+    )
+    space, time = extents
+    ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
+    from earthlens.jaxa import GportalUnavailableError
+    from earthlens.jaxa._gportal import fetch_gportal
+
+    with pytest.raises(GportalUnavailableError, match="G-Portal") as excinfo:
+        fetch_gportal(
+            dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
+        )
+    assert excinfo.value.status_code is None
+    assert isinstance(excinfo.value.__cause__, requests.exceptions.JSONDecodeError)
