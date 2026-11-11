@@ -6,6 +6,13 @@ importable without the `[jaxa]` extra. The branch translates the
 materialises the resulting `Search.products()` iterator, and downloads
 each `Product` over SFTP via `gportal.download(...)`.
 
+Both phases translate a G-Portal outage into a typed
+`GportalUnavailableError` — an HTTP `5xx` or an HTML error page on the search,
+a dropped SFTP connection on the download — so a live `e2e` caller can skip a
+transient JAXA outage instead of failing on a raw `requests` / `paramiko`
+error. A genuine request error (a `4xx` on the search, a credential rejection
+or a local filesystem error on the download) is left to propagate unchanged.
+
 `gportal.download` is sequential upstream (a list comprehension in
 `gportal/sftp.py`); the function has no `processes=` argument and adding
 concurrency at this layer is a follow-on. Credentials are passed as
