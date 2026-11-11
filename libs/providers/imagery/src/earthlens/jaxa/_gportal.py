@@ -17,7 +17,6 @@ between requests.
 
 from __future__ import annotations
 
-from json import JSONDecodeError
 from pathlib import Path
 
 import requests
@@ -34,8 +33,9 @@ class GportalUnavailableError(UpstreamUnavailableError):
     JAXA's G-Portal serves an HTML error page rather than a JSON body when it
     is down or throttling, which surfaces from the `gportal` SDK as a bare
     `requests.HTTPError` (on a `5xx`, from `response.raise_for_status`) or a
-    `JSONDecodeError` (when a non-error status carries an HTML body and
-    `response.json` fails). Raised in its place so a caller — a live `e2e`
+    `requests.exceptions.JSONDecodeError` — which subclasses
+    `requests.RequestException` — when a non-error status carries an HTML body
+    and `response.json` fails. Raised in its place so a caller — a live `e2e`
     test especially — can tell a transient JAXA outage from a genuine request
     error and skip rather than fail. Carries the originating HTTP
     `status_code` when one is discernible from the chained exception.
@@ -96,7 +96,7 @@ def fetch_gportal(
         GportalUnavailableError: When the catalogue search fails because the
             service is down or throttling — an HTTP `5xx`, or a non-JSON
             (HTML) error page the `gportal` SDK surfaces as a bare
-            `requests.HTTPError` / `JSONDecodeError`.
+            `requests.HTTPError` / `requests.exceptions.JSONDecodeError`.
     """
     try:
         import gportal  # type: ignore[import-not-found]
@@ -127,11 +127,18 @@ def fetch_gportal(
         if matched == 0:
             return []
         products = list(search.products())
-    except (JSONDecodeError, requests.RequestException) as exc:
+    except requests.RequestException as exc:
+        # Any failure from the SDK's requests layer means G-Portal did not
+        # usefully answer the catalogue search, so surface it as unavailable:
+        # a connection drop / timeout, a 5xx from raise_for_status, or the
+        # JSONDecodeError that response.json() raises on an HTML error page
+        # (requests.exceptions.JSONDecodeError subclasses RequestException).
+        # The request-construction subclasses (MissingSchema / InvalidURL)
+        # cannot arise here because the SDK builds its own request URLs.
         raise GportalUnavailableError(
-            "JAXA G-Portal did not return JSON for the catalogue search; the "
-            "service is likely down or throttling. Retry later rather than "
-            "changing the request.",
+            "JAXA G-Portal did not return a usable response for the catalogue "
+            "search; the service is likely down or throttling. Retry later "
+            "rather than changing the request.",
             status_code=http_status(exc),
         ) from exc
     if not products:
