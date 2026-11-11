@@ -107,6 +107,9 @@ def fetch_gportal(
             (`requests.HTTPError` / `requests.exceptions.JSONDecodeError`), or a
             dropped/throttled SFTP transfer on the download (`paramiko.SSHException`
             or a reset / timed-out socket / DNS failure).
+        requests.HTTPError: A `4xx` client error on the catalogue search
+            propagates unchanged — G-Portal rejected the request, which is a
+            request problem to fix, not an outage to retry.
         paramiko.AuthenticationException: Propagated unchanged when G-Portal
             rejects the SFTP credentials — a login problem, not an outage.
         OSError: A local filesystem failure while writing the download (disk
@@ -142,18 +145,24 @@ def fetch_gportal(
             return []
         products = list(search.products())
     except requests.RequestException as exc:
-        # Any failure from the SDK's requests layer means G-Portal did not
-        # usefully answer the catalogue search, so surface it as unavailable:
-        # a connection drop / timeout, a 5xx from raise_for_status, or the
-        # JSONDecodeError that response.json() raises on an HTML error page
-        # (requests.exceptions.JSONDecodeError subclasses RequestException).
-        # The request-construction subclasses (MissingSchema / InvalidURL)
-        # cannot arise here because the SDK builds its own request URLs.
+        status = http_status(exc)
+        if status is not None and 400 <= status < 500:
+            # A 4xx is a client/request error, not an outage — G-Portal
+            # answered, it just rejected the request. Surface it as-is so a
+            # caller fixes the request rather than being told to retry later.
+            raise
+        # Any other failure from the SDK's requests layer means G-Portal did
+        # not usefully answer the catalogue search, so surface it as
+        # unavailable: a connection drop / timeout, a 5xx from
+        # raise_for_status, or the JSONDecodeError that response.json() raises
+        # on an HTML error page (requests.exceptions.JSONDecodeError subclasses
+        # RequestException). The request-construction subclasses (MissingSchema
+        # / InvalidURL) cannot arise here because the SDK builds its own URLs.
         raise GportalUnavailableError(
             "JAXA G-Portal did not return a usable response for the catalogue "
             "search; the service is likely down or throttling. Retry later "
             "rather than changing the request.",
-            status_code=http_status(exc),
+            status_code=status,
         ) from exc
     if not products:
         return []

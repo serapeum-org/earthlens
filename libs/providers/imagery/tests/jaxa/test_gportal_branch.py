@@ -405,3 +405,25 @@ def test_gportal_download_local_oserror_is_not_relabelled(
             dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
         )
     assert excinfo.type is OSError
+
+
+@pytest.mark.jaxa
+@pytest.mark.integration
+def test_gportal_search_4xx_client_error_is_not_relabelled(
+    monkeypatch, tmp_path, extents, configured_auth
+) -> None:
+    """A 4xx client error on the search propagates, not wrapped as unavailable."""
+    import requests
+
+    resp = type("_Resp", (), {"status_code": 404})()
+    _fake_gportal_raising(
+        monkeypatch, requests.HTTPError("404 Client Error: Not Found", response=resp)
+    )
+    space, time = extents
+    ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
+    from earthlens.jaxa._gportal import fetch_gportal
+
+    with pytest.raises(requests.HTTPError, match="404"):
+        fetch_gportal(
+            dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
+        )
