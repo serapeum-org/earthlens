@@ -17,6 +17,7 @@ between requests.
 
 from __future__ import annotations
 
+import socket
 from pathlib import Path
 
 import requests
@@ -36,13 +37,16 @@ class GportalUnavailableError(UpstreamUnavailableError):
     `requests.exceptions.JSONDecodeError` — which subclasses
     `requests.RequestException` — when a non-error status carries an HTML body
     and `response.json` fails. The later SFTP download goes over `paramiko`, so
-    the same outage mid-transfer surfaces as a `paramiko.SSHException` or an
-    `OSError`; both are translated here too (a `paramiko.AuthenticationException`
-    is not — a credential rejection is not an outage). Raised in its place so a
-    caller — a live `e2e` test especially — can tell a transient JAXA outage
-    from a genuine request error and skip rather than fail. Carries the
-    originating HTTP `status_code` when one is discernible from the chained
-    exception (the SFTP path has none, so it is `None` there).
+    the same outage mid-transfer surfaces as a `paramiko.SSHException` or a
+    connection-level error (a dropped / reset / timed-out socket, or a DNS
+    failure); those are translated here too. A `paramiko.AuthenticationException`
+    is not (a credential rejection is a login problem, not an outage), and
+    neither is a local filesystem error while writing the download (disk full /
+    permission denied) — both propagate raw. Raised in its place so a caller — a
+    live `e2e` test especially — can tell a transient JAXA outage from a genuine
+    request error and skip rather than fail. Carries the originating HTTP
+    `status_code` when one is discernible from the chained exception (the SFTP
+    path has none, so it is `None` there).
 
     Examples:
         - The typed error carries the status a caller branches on:
@@ -102,9 +106,11 @@ def fetch_gportal(
             `5xx` or a non-JSON (HTML) error page on the search
             (`requests.HTTPError` / `requests.exceptions.JSONDecodeError`), or a
             dropped/throttled SFTP transfer on the download (`paramiko.SSHException`
-            / `OSError`).
+            or a reset / timed-out socket / DNS failure).
         paramiko.AuthenticationException: Propagated unchanged when G-Portal
             rejects the SFTP credentials — a login problem, not an outage.
+        OSError: A local filesystem failure while writing the download (disk
+            full, permission denied) propagates unchanged — not a JAXA outage.
     """
     try:
         import gportal  # type: ignore[import-not-found]
@@ -166,12 +172,21 @@ def fetch_gportal(
         # A credential rejection is not an outage — surface it as-is so the
         # user fixes their G-Portal login rather than "retrying later".
         raise
-    except (paramiko.SSHException, OSError) as exc:
-        # The SFTP transfer goes over paramiko, so a connection drop /
-        # throttle mid-download raises an SSHException (protocol error) or an
-        # OSError (NoValidConnectionsError, socket timeout, reset). Translate
-        # the same way as the search phase so a live outage classifies as
-        # "unavailable" instead of escaping raw.
+    except (
+        paramiko.SSHException,
+        paramiko.ssh_exception.NoValidConnectionsError,
+        ConnectionError,
+        TimeoutError,
+        socket.gaierror,
+    ) as exc:
+        # The SFTP transfer goes over paramiko, so a dropped / throttled
+        # download raises an SSHException (protocol error) or a connection-level
+        # failure (NoValidConnectionsError, reset, timeout, DNS failure). Only
+        # those transport shapes are translated — a LOCAL filesystem OSError
+        # from writing the file (disk full, permission denied, size mismatch,
+        # all raised inside paramiko's SFTPClient.get) is the caller's
+        # environment, not a JAXA outage, and is deliberately left to propagate
+        # raw so "retry later" is not offered as wrong remediation.
         raise GportalUnavailableError(
             "JAXA G-Portal dropped the SFTP connection during download; the "
             "service is likely down or throttling. Retry later rather than "

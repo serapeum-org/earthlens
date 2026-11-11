@@ -362,3 +362,46 @@ def test_gportal_download_auth_error_is_not_relabelled(
         fetch_gportal(
             dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
         )
+
+
+@pytest.mark.jaxa
+@pytest.mark.integration
+def test_gportal_download_connection_reset_raises_typed_unavailable(
+    monkeypatch, tmp_path, extents, configured_auth
+) -> None:
+    """A reset socket during the SFTP download becomes GportalUnavailableError."""
+    _, fake = _fake_gportal(
+        monkeypatch, matched=1, products=[_make_product("A")], write_files=False
+    )
+    fake.download = _RaisingDownload(ConnectionResetError("Connection reset by peer"))
+    space, time = extents
+    ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
+    from earthlens.jaxa import GportalUnavailableError
+    from earthlens.jaxa._gportal import fetch_gportal
+
+    with pytest.raises(GportalUnavailableError, match="SFTP") as excinfo:
+        fetch_gportal(
+            dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
+        )
+    assert isinstance(excinfo.value.__cause__, ConnectionResetError)
+
+
+@pytest.mark.jaxa
+@pytest.mark.integration
+def test_gportal_download_local_oserror_is_not_relabelled(
+    monkeypatch, tmp_path, extents, configured_auth
+) -> None:
+    """A local filesystem OSError during the write propagates, not wrapped as unavailable."""
+    _, fake = _fake_gportal(
+        monkeypatch, matched=1, products=[_make_product("A")], write_files=False
+    )
+    fake.download = _RaisingDownload(OSError(28, "No space left on device"))
+    space, time = extents
+    ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
+    from earthlens.jaxa._gportal import fetch_gportal
+
+    with pytest.raises(OSError, match="No space left") as excinfo:
+        fetch_gportal(
+            dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
+        )
+    assert excinfo.type is OSError
