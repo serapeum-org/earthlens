@@ -1331,16 +1331,45 @@ def _reduce_whole_window(
 
     Args:
         stack: The scene stack to reduce.
-        times: One timestamp per timestep, in stack order.
+        times: One timestamp per timestep, in stack order. These are Earth Engine
+            EEDAI scene-time strings, which arrive slash-separated and offset-aware
+            (`"YYYY/MM/DD HH:MM:SS[.ffffff]+00"`) with inconsistent sub-second
+            precision; they are parsed as mixed-format and normalised to UTC, so
+            scenes mix freely whether or not a given one carries fractional seconds.
         op: The pyramids `reduce_time` operation (`"median"`, `"trend"`, ...).
         q: The percentile level for `op="percentile"`, else `None`.
 
     Returns:
         The single reduced `Dataset`.
+
+    Raises:
+        ValueError: If `times` is empty.
     """
-    index = pd.DatetimeIndex(pd.to_datetime(list(times)))
+    if len(times) == 0:
+        raise ValueError("whole-window reduction needs at least one timestep.")
+    # EEDAI scene-time strings arrive slash-separated and offset-aware with
+    # inconsistent sub-second precision -- some carry fractional seconds
+    # ("2020/06/15 09:41:12.345000+00"), some do not ("2020/06/15 09:43:06+00")
+    # (shape confirmed against a live MODIS/Landsat read). A bare `pd.to_datetime`
+    # infers one format from the first element and then raises on the first that does
+    # not match it, so parse `format="mixed"`: the robust choice for this heterogeneous,
+    # non-strict-ISO shape -- the YYYY-first strings are unambiguous, so "mixed" cannot
+    # mis-order day/month. `utc=True` keeps the index from mixing aware/naive. The
+    # parsed index -- not the raw strings -- is handed to pyramids, whose `reduce_time`
+    # otherwise re-parses them the same bare way one frame down.
+    index = pd.DatetimeIndex(pd.to_datetime(list(times), format="mixed", utc=True))
     span_days = int((index.max() - index.min()).days) + 1
-    reduced = stack.reduce_time(list(times), freq=f"{span_days}D", op=op, q=q)
+    # pyramids' `reduce_time` buckets with `pd.Grouper(freq)`, whose `{span_days}D`
+    # bins are anchored on the epoch, not on `index.min()`: a span-wide window is thus
+    # not guaranteed to be a single bin -- two timestamps straddling an epoch-anchored
+    # boundary split into two windows, and `reduced[0][1]` would silently drop every
+    # scene in the second. Shift the index so the earliest scene lands on the epoch, so
+    # every scene falls in the one `[epoch, epoch + span_days)` bin. The shift is a
+    # constant, so the median/mean value and the trend/sens_slope day-scaled x-axis
+    # (relative to the first timestamp) are unchanged. Tracked upstream in
+    # serapeum-org/pyramids-core#1510 (a `reduce_time(origin=)` would anchor it directly).
+    anchored = pd.Timestamp("1970-01-01", tz="UTC") + (index - index.min())
+    reduced = stack.reduce_time(list(anchored), freq=f"{span_days}D", op=op, q=q)
     return reduced[0][1]
 
 
