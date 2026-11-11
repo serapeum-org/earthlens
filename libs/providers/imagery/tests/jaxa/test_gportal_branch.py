@@ -274,9 +274,7 @@ def test_gportal_http_503_raises_typed_unavailable(
     from earthlens.jaxa import GportalUnavailableError
     from earthlens.jaxa._gportal import fetch_gportal
 
-    with pytest.raises(
-        GportalUnavailableError, match="down or throttling"
-    ) as excinfo:
+    with pytest.raises(GportalUnavailableError, match="down or throttling") as excinfo:
         fetch_gportal(
             dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
         )
