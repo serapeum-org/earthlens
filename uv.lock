@@ -2679,7 +2679,7 @@ requires-dist = [
     { name = "gportal", marker = "extra == 'jaxa'", specifier = ">=0.4,<0.5" },
     { name = "jaxa-earth", marker = "extra == 'jaxa'", specifier = ">=0.1.6,<0.2" },
     { name = "openeo", marker = "extra == 'openeo'", specifier = ">=0.47,<0.52" },
-    { name = "paramiko", marker = "extra == 'jaxa'", specifier = ">=3,<4" },
+    { name = "paramiko", marker = "extra == 'jaxa'", specifier = ">=3.1,<4" },
     { name = "pyproj", specifier = ">=3.7.0" },
     { name = "pyramids-core", specifier = ">=0.75.0" },
     { name = "pyramids-core", extras = ["lazy"], marker = "extra == 'eedai'", specifier = ">=0.75.0" },
