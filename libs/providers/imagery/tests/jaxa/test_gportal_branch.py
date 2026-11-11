@@ -256,6 +256,16 @@ def _fake_gportal_raising(monkeypatch, exc: BaseException) -> None:
     monkeypatch.setitem(sys.modules, "gportal", fake)
 
 
+class _RaisingDownload:
+    """Callable stand-in for `gportal.download` that always raises `exc`."""
+
+    def __init__(self, exc: BaseException) -> None:
+        self._exc = exc
+
+    def __call__(self, *args, **kwargs):
+        raise self._exc
+
+
 @pytest.mark.jaxa
 @pytest.mark.integration
 def test_gportal_http_503_raises_typed_unavailable(
@@ -305,3 +315,50 @@ def test_gportal_html_body_jsondecode_raises_typed_unavailable(
         )
     assert excinfo.value.status_code is None
     assert isinstance(excinfo.value.__cause__, requests.exceptions.JSONDecodeError)
+
+
+@pytest.mark.jaxa
+@pytest.mark.integration
+def test_gportal_download_drop_raises_typed_unavailable(
+    monkeypatch, tmp_path, extents, configured_auth
+) -> None:
+    """An SSH drop during the SFTP download becomes GportalUnavailableError."""
+    import paramiko
+
+    _, fake = _fake_gportal(
+        monkeypatch, matched=1, products=[_make_product("A")], write_files=False
+    )
+    fake.download = _RaisingDownload(paramiko.SSHException("Server connection dropped"))
+    space, time = extents
+    ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
+    from earthlens.jaxa import GportalUnavailableError
+    from earthlens.jaxa._gportal import fetch_gportal
+
+    with pytest.raises(GportalUnavailableError, match="SFTP") as excinfo:
+        fetch_gportal(
+            dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
+        )
+    assert excinfo.value.status_code is None
+    assert isinstance(excinfo.value.__cause__, paramiko.SSHException)
+
+
+@pytest.mark.jaxa
+@pytest.mark.integration
+def test_gportal_download_auth_error_is_not_relabelled(
+    monkeypatch, tmp_path, extents, configured_auth
+) -> None:
+    """A credential rejection during download propagates, not wrapped as unavailable."""
+    import paramiko
+
+    _, fake = _fake_gportal(
+        monkeypatch, matched=1, products=[_make_product("A")], write_files=False
+    )
+    fake.download = _RaisingDownload(paramiko.AuthenticationException("Auth failed"))
+    space, time = extents
+    ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
+    from earthlens.jaxa._gportal import fetch_gportal
+
+    with pytest.raises(paramiko.AuthenticationException):
+        fetch_gportal(
+            dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
+        )

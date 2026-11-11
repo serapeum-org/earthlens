@@ -35,10 +35,14 @@ class GportalUnavailableError(UpstreamUnavailableError):
     `requests.HTTPError` (on a `5xx`, from `response.raise_for_status`) or a
     `requests.exceptions.JSONDecodeError` — which subclasses
     `requests.RequestException` — when a non-error status carries an HTML body
-    and `response.json` fails. Raised in its place so a caller — a live `e2e`
-    test especially — can tell a transient JAXA outage from a genuine request
-    error and skip rather than fail. Carries the originating HTTP
-    `status_code` when one is discernible from the chained exception.
+    and `response.json` fails. The later SFTP download goes over `paramiko`, so
+    the same outage mid-transfer surfaces as a `paramiko.SSHException` or an
+    `OSError`; both are translated here too (a `paramiko.AuthenticationException`
+    is not — a credential rejection is not an outage). Raised in its place so a
+    caller — a live `e2e` test especially — can tell a transient JAXA outage
+    from a genuine request error and skip rather than fail. Carries the
+    originating HTTP `status_code` when one is discernible from the chained
+    exception (the SFTP path has none, so it is `None` there).
 
     Examples:
         - The typed error carries the status a caller branches on:
@@ -93,10 +97,14 @@ def fetch_gportal(
         ValueError: If `dataset.short_name` is missing — bad catalog row.
         AuthenticationError: When `auth` has not been configured (i.e.
             its `username` / `password` are still `None`).
-        GportalUnavailableError: When the catalogue search fails because the
-            service is down or throttling — an HTTP `5xx`, or a non-JSON
-            (HTML) error page the `gportal` SDK surfaces as a bare
-            `requests.HTTPError` / `requests.exceptions.JSONDecodeError`.
+        GportalUnavailableError: When the catalogue search or the SFTP
+            download fails because the service is down or throttling — an HTTP
+            `5xx` or a non-JSON (HTML) error page on the search
+            (`requests.HTTPError` / `requests.exceptions.JSONDecodeError`), or a
+            dropped/throttled SFTP transfer on the download (`paramiko.SSHException`
+            / `OSError`).
+        paramiko.AuthenticationException: Propagated unchanged when G-Portal
+            rejects the SFTP credentials — a login problem, not an outage.
     """
     try:
         import gportal  # type: ignore[import-not-found]
@@ -145,12 +153,30 @@ def fetch_gportal(
         return []
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    paths = gportal.download(
-        products,
-        local_dir=str(out_dir),
-        username=auth.username,
-        password=auth.password.get_secret_value(),
-    )
+    import paramiko
+
+    try:
+        paths = gportal.download(
+            products,
+            local_dir=str(out_dir),
+            username=auth.username,
+            password=auth.password.get_secret_value(),
+        )
+    except paramiko.AuthenticationException:
+        # A credential rejection is not an outage — surface it as-is so the
+        # user fixes their G-Portal login rather than "retrying later".
+        raise
+    except (paramiko.SSHException, OSError) as exc:
+        # The SFTP transfer goes over paramiko, so a connection drop /
+        # throttle mid-download raises an SSHException (protocol error) or an
+        # OSError (NoValidConnectionsError, socket timeout, reset). Translate
+        # the same way as the search phase so a live outage classifies as
+        # "unavailable" instead of escaping raw.
+        raise GportalUnavailableError(
+            "JAXA G-Portal dropped the SFTP connection during download; the "
+            "service is likely down or throttling. Retry later rather than "
+            "changing the request."
+        ) from exc
     if isinstance(paths, str):
         paths = [paths]
     return [Path(p) for p in paths]
