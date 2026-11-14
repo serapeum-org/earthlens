@@ -434,7 +434,7 @@ def test_edo_fetch_writes_one_tif_per_period(monkeypatch, tmp_path):
         # A full-width -180..180 strip, latitude-cropped like the real
         # Copernicus server returns — so the backend's `_clip_wcs_raster`
         # windows it down to the requested lon_lim.
-        bbox = [-180.0, 40.0, 180.0, 50.0]
+        total_bounds = [-180.0, 40.0, 180.0, 50.0]
         no_data_value = (None,)
 
         @classmethod
@@ -483,7 +483,7 @@ def test_edo_fetch_writes_one_tif_per_period(monkeypatch, tmp_path):
     # -180..180 strip `_FakeDataset` reports -- so re-open it and confirm the
     # crop actually landed.
     written = dataset_mod.Dataset.read_file(str(paths[0]))
-    assert written.bbox == pytest.approx([5.0, 40.0, 15.0, 50.0])
+    assert written.total_bounds == pytest.approx([5.0, 40.0, 15.0, 50.0])
     written.close()
 
 
@@ -492,7 +492,7 @@ def test_gdo_fetch_uses_the_single_do_wcs_map(monkeypatch, tmp_path):
     seen: list[str] = []
 
     class _FakeDataset:
-        bbox = [-180.0, 40.0, 180.0, 50.0]
+        total_bounds = [-180.0, 40.0, 180.0, 50.0]
         no_data_value = (None,)
 
         @classmethod
@@ -543,7 +543,7 @@ def test_clip_wcs_raster_trims_full_width_strip_to_bbox():
     clipped = Drought._clip_wcs_raster(strip, (-10.0, 36.0, 12.0, 52.0))
 
     assert clipped is not None
-    assert [round(b, 2) for b in clipped.bbox] == [-10.0, 36.0, 12.0, 52.0]
+    assert [round(b, 2) for b in clipped.total_bounds] == [-10.0, 36.0, 12.0, 52.0]
     assert clipped.columns < strip.columns  # longitude trimmed
     assert clipped.rows == strip.rows  # latitude already full-height
 
@@ -567,7 +567,7 @@ def test_fetch_wcs_warns_when_bbox_misses_downloaded_raster(monkeypatch, tmp_pat
 
     class _FakeDataset:
         # Covers lon 0..8, lat 0..4 -- nowhere near the requested lon_lim/lat_lim.
-        bbox = [0.0, 0.0, 8.0, 4.0]
+        total_bounds = [0.0, 0.0, 8.0, 4.0]
         no_data_value = (None,)
 
         @classmethod
