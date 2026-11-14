@@ -604,14 +604,14 @@ class NWM(AbstractDataSource):
         """
         feature_ids = self._feature_ids()
         if feature_ids is not None:
-            cube = cube.select(feature_id=feature_ids)
+            cube = cube.sel(feature_id=feature_ids)
         gage_ids = self._gage_ids()
         if gage_ids is not None:
-            cube = cube.select_by_coord("gage_id", gage_ids)
+            cube = cube.sel_by_coord("gage_id", gage_ids)
         if self._sites is None and self._wants_subset():
-            cube = cube.select_bbox(self._bbox())
+            cube = cube.sel_bbox(self._bbox())
         if slice_time:
-            cube = cube.select_time(self.time.start_date, self.time.end_date)
+            cube = cube.sel(time=slice(self.time.start_date, self.time.end_date))
         out_path = self.root_dir / f"{stem}.parquet"
         return Path(cube.to_parquet(out_path))
 

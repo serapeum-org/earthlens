@@ -99,7 +99,7 @@ class TestClipAndNormaliseWindow:
         chirps = _chirps_with_bbox(lat_lim=[0.5, 9.5], lon_lim=[0.5, 9.5])
         out = chirps._clip_and_normalise(self._granule())
         assert (out.rows, out.columns) == (10, 10)
-        west, south, east, north = out.bbox
+        west, south, east, north = out.total_bounds
         assert west <= 0.5 and south <= 0.5
         assert east >= 9.5 and north >= 9.5
 
@@ -121,7 +121,7 @@ class TestClipAndNormaliseWindow:
         )
         chirps = _chirps_with_bbox(lat_lim=[3.72, 12.28], lon_lim=[-9.03, -0.07])
         out = chirps._clip_and_normalise(granule)
-        west, south, east, north = out.bbox
+        west, south, east, north = out.total_bounds
         assert west <= -9.03 and south <= 3.72
         assert east >= -0.07 and north >= 12.28
         # Snapped to whole 0.05° cells: no partially-covered edge cell dropped,

@@ -764,7 +764,7 @@ class Drought(AbstractDataSource):
         arr = dataset.read_array()
         if arr.ndim == 3:
             arr = arr[0]
-        x_min, y_min, x_max, y_max = dataset.bbox
+        x_min, y_min, x_max, y_max = dataset.total_bounds
         rows, cols = arr.shape
         cell_x = (x_max - x_min) / cols
         cell_y = (y_max - y_min) / rows

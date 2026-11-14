@@ -27,7 +27,7 @@ classifiers = [
     "Intended Audience :: Developers",
 ]
 
-requires-python = ">=3.11,<4"
+requires-python = ">=3.11.5,<4"
 
 # Only the core abstractions. Every provider SDK is an extra, so installing
 # this distribution brings the backends' code without their dependencies —
@@ -42,7 +42,7 @@ dependencies = [
 argo = ["argopy >=1.4"]
 cmems = ["copernicusmarine >=2.0.0,<3"]
 erddap = ["erddapy >=3.0"]
-nwm = ["earthlens-core[s3]", "pyramids-core[parquet] >=0.75.0"]
+nwm = ["earthlens-core[s3]", "pyramids-core[parquet] >=0.78.0"]
 usgs-water = ["dataretrieval >=1.1.4"]
 obis = ["pyobis >=1.6.1"]
 

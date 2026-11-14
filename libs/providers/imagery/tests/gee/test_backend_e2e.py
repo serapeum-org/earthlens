@@ -187,7 +187,7 @@ def _open_raster(path):
     nodata = raster.no_data_value[0] if raster.no_data_value else None
     if nodata is not None:
         values = np.where(values == nodata, np.nan, values)
-    return values, raster.epsg, raster.bbox
+    return values, raster.epsg, raster.total_bounds
 
 
 @_skip_without_creds
