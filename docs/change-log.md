@@ -1,5 +1,24 @@
 # Change Log
 
+## 0.32.0 (2026-11-14)
+
+### Feat
+
+- **chc**: re-aggregate CHIRPS per-date GeoTIFFs via aggregate= (#1384)
+- **gee**: close the server-side capability gaps in the GEE backend (#1385)
+- **gee**: live EEDAI in-memory reduce and pandas-3 feature conversion (#1379)
+- **gee**: add Epic 5 visualization via digitalearth (#1360)
+
+### Fix
+
+- **jaxa**: surface G-Portal outages as a typed GportalUnavailableError  (#1404)
+- **gee**: parse mixed-precision timestamps and anchor the whole-window reducer (#1402)
+- **chc**: correct WBGT resolution and dekad/pentad/SPI period indexing (#1397)
+- **chc**: remap CHIRPS-GEFS to v3 and preserve signed-variable negatives (#1389)
+- **risk_indicators**: refuse a stale INFORM release from a partial JRC render (#1377)
+- **gee**: refuse a bool on user-facing numeric GEE fields (#1370)
+- **ecmwf**: track E-OBS version drift for the insitu-gridded Europe/Nordic catalogs (#1373)
+
 ## 0.31.0 (2026-10-25)
 
 ### Feat
