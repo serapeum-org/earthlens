@@ -27,7 +27,7 @@ classifiers = [
     "Intended Audience :: Developers",
 ]
 
-requires-python = ">=3.11,<4"
+requires-python = ">=3.11.5,<4"
 
 # Only the core abstractions. Every provider SDK is an extra, so installing
 # this distribution brings the backends' code without their dependencies —

@@ -27,7 +27,7 @@ classifiers = [
     "Intended Audience :: Developers",
 ]
 
-requires-python = ">=3.11,<4"
+requires-python = ">=3.11.5,<4"
 
 # Core carries only what is always reachable: the package surface, the
 # `EarthLens` facade, the abstractions every backend subclasses, and the
