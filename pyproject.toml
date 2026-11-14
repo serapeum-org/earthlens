@@ -154,7 +154,7 @@ dev = [
     # pyramids-core[viz] (cleopatra): the showcase notebooks render rasters and
     # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
     # runtime dep of earthlens itself.
-    "pyramids-core[viz] >=0.75.0",
+    "pyramids-core[viz] >=0.78.0",
     # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
     # animation.embed_gif, ArrayGlyph.save_animation); add_reference_map /
     # save_animation(crf=...) landed in 0.22.0, the animate() default
@@ -206,7 +206,7 @@ dev = [
     # workers. It is well past 0.9.0 (the tasseled-cap transform, pyramids-eo#117)
     # and 0.8.1 (whose tiled read passed no_data_value="none", rejected by
     # pyramids >= 0.61, pyramids-eo#111).
-    "pyramids-eo >=0.12.0",
+    "pyramids-eo >=0.12.1",
 ]
 # The eclipse showcase notebooks need the geostationary-imagery pieces of
 # pyramids-eo (read_fci_l1c, the composites, the viewing geometry) plus a few small
@@ -225,7 +225,7 @@ notebooks = [
     # pyramids 0.59's `from_array` / `GeoReference` constructors -- 0.7's reader
     # still called the removed `create_from_array`).
     # Also declared, at the same version, in `dev` and as an imagery base dep.
-    "pyramids-eo >=0.12.0",
+    "pyramids-eo >=0.12.1",
     # scipy: feathers the disc edge and softens the limb (ndimage.binary_erosion /
     # gaussian_filter).
     "scipy >=1.11",
@@ -252,7 +252,7 @@ docs = [
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
     # pyramids-core[viz] (cleopatra): showcase notebooks plot/animate Datasets.
-    "pyramids-core[viz] >=0.75.0",
+    "pyramids-core[viz] >=0.78.0",
     # [tiles] (pyproj, xyzservices): the satellite showcase textures its globe from
     # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
     # It arrives transitively through pyramids-core[viz], but an imported package
