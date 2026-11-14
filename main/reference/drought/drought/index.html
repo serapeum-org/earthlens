@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -27205,7 +27205,7 @@ The facade reads the instance value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-764" name="__codelineno-0-764"></a>        <span class="n">arr</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
 <a id="__codelineno-0-765" name="__codelineno-0-765"></a>        <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
 <a id="__codelineno-0-766" name="__codelineno-0-766"></a>            <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a>        <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">bbox</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a>        <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">total_bounds</span>
 <a id="__codelineno-0-768" name="__codelineno-0-768"></a>        <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
 <a id="__codelineno-0-769" name="__codelineno-0-769"></a>        <span class="n">cell_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cols</span>
 <a id="__codelineno-0-770" name="__codelineno-0-770"></a>        <span class="n">cell_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">rows</span>
@@ -29746,7 +29746,7 @@ The facade reads the instance value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-764" name="__codelineno-0-764"></a>        <span class="n">arr</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
 <a id="__codelineno-0-765" name="__codelineno-0-765"></a>        <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
 <a id="__codelineno-0-766" name="__codelineno-0-766"></a>            <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a>        <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">bbox</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a>        <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">total_bounds</span>
 <a id="__codelineno-0-768" name="__codelineno-0-768"></a>        <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
 <a id="__codelineno-0-769" name="__codelineno-0-769"></a>        <span class="n">cell_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">cols</span>
 <a id="__codelineno-0-770" name="__codelineno-0-770"></a>        <span class="n">cell_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">rows</span>
