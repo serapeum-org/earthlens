@@ -191,14 +191,14 @@ def resolve_time_window(
                 if start is None
                 else total
                 - int(
-                    dataset.select_time(start=start, time_dim=time_dim).sizes[time_dim]
+                    dataset.sel(**{time_dim: slice(start, None)}).sizes[time_dim]
                 )
             )
             i1 = (
                 total
                 if end is None
                 else int(
-                    dataset.select_time(end=end, time_dim=time_dim).sizes[time_dim]
+                    dataset.sel(**{time_dim: slice(None, end)}).sizes[time_dim]
                 )
             )
         except ValueError as exc:

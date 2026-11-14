@@ -181,7 +181,7 @@ class TestSpeibaseLive:
         try:
             assert ds.epsg in (4326, 0)
             assert ds.rows > 0 and ds.columns > 0
-            x_min, y_min, x_max, y_max = ds.bbox
+            x_min, y_min, x_max, y_max = ds.total_bounds
             # Requested lon [-95, -85], lat [30, 40]; the 0.5° SPEIbase grid
             # snaps to cell edges, so allow ~1° slack around each edge.
             assert -96.0 <= x_min <= -94.0

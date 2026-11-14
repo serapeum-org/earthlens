@@ -152,10 +152,11 @@ class FakeContainer:
 class FakeLabeled:
     """Stand-in for `pyramids.netcdf.LabeledDataset` with a CF time axis.
 
-    `select_time(start=...)` keeps steps at/after `start`; `select_time(end=...)`
-    keeps steps at/before `end`, over a fixed monthly axis, so the backend's
-    date-window -> index math can be checked without a real store. Like the real
-    reader, an empty single-sided selection **raises** `ValueError`.
+    `sel(<dim>=slice(start, None))` keeps steps at/after `start`;
+    `sel(<dim>=slice(None, end))` keeps steps at/before `end`, over a fixed monthly
+    axis, so the backend's date-window -> index math can be checked without a real
+    store. Like the real reader, an empty single-sided selection **raises**
+    `ValueError`.
     """
 
     _AXIS = pd.date_range("2015-01-01", periods=24, freq="MS")
@@ -168,17 +169,16 @@ class FakeLabeled:
         """Report the current time-axis length."""
         return {"time": len(self._kept)}
 
-    def select_time(
-        self, start: Any = None, end: Any = None, *, time_dim: str = "time"
-    ) -> FakeLabeled:
-        """Return a view restricted to the in-range steps (raising when empty)."""
+    def sel(self, **labels: Any) -> FakeLabeled:
+        """Return a view restricted to the sliced time steps (raising when empty)."""
+        (_dim, window), = labels.items()
         kept = self._kept
-        if start is not None:
-            kept = kept[kept >= pd.Timestamp(start)]
-        if end is not None:
-            kept = kept[kept <= pd.Timestamp(end)]
+        if window.start is not None:
+            kept = kept[kept >= pd.Timestamp(window.start)]
+        if window.stop is not None:
+            kept = kept[kept <= pd.Timestamp(window.stop)]
         if len(kept) == 0:
-            raise ValueError(f"no timesteps in window [{start}, {end}]")
+            raise ValueError(f"no timesteps in window [{window.start}, {window.stop}]")
         return FakeLabeled(kept)
 
     def close(self) -> None:
