@@ -171,7 +171,7 @@ class FakeLabeled:
 
     def sel(self, **labels: Any) -> FakeLabeled:
         """Return a view restricted to the sliced time steps (raising when empty)."""
-        (_dim, window), = labels.items()
+        ((_dim, window),) = labels.items()
         kept = self._kept
         if window.start is not None:
             kept = kept[kept >= pd.Timestamp(window.start)]
