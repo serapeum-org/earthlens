@@ -339,7 +339,7 @@ def test_retrospective_tabular_writes_parquet(make_nwm, fake_reader):
     paths = nwm.download(progress_bar=False)
     assert len(paths) == 1 and paths[0].suffix == ".parquet" and paths[0].exists()
     methods = [c[0] for c in reader.calls]
-    assert methods == ["read_file", "select", "select_time", "to_parquet"]
+    assert methods == ["read_file", "sel", "sel", "to_parquet"]
     # opened the product's retro Zarr anonymously
     assert reader.calls[0][1]["anon"] is True
     assert reader.calls[0][1]["path"].endswith("chrtout.zarr")
@@ -348,22 +348,22 @@ def test_retrospective_tabular_writes_parquet(make_nwm, fake_reader):
 
 
 def test_retrospective_gage_ids_join(make_nwm, fake_reader):
-    """USGS gage_id strings route to select_by_coord, not feature_id select."""
+    """USGS gage_id strings route to sel_by_coord, not feature_id sel."""
     nwm = make_nwm(mode="retrospective", sites=["01010000", "01010500"])
     reader = fake_reader(nwm)
     nwm.download(progress_bar=False)
     methods = [c[0] for c in reader.calls]
-    assert "select_by_coord" in methods
-    by_coord = next(c for c in reader.calls if c[0] == "select_by_coord")
+    assert "sel_by_coord" in methods
+    by_coord = next(c for c in reader.calls if c[0] == "sel_by_coord")
     assert by_coord[1] == ("gage_id", ["01010000", "01010500"])
 
 
 def test_retrospective_bbox_selection(make_nwm, fake_reader):
-    """A bbox (no sites=) routes to select_bbox with (W, S, E, N)."""
+    """A bbox (no sites=) routes to sel_bbox with (W, S, E, N)."""
     nwm = make_nwm(mode="retrospective", lat_lim=[39.0, 40.0], lon_lim=[-77.0, -76.0])
     reader = fake_reader(nwm)
     nwm.download(progress_bar=False)
-    bbox = next(c for c in reader.calls if c[0] == "select_bbox")
+    bbox = next(c for c in reader.calls if c[0] == "sel_bbox")
     assert bbox[1] == (-77.0, -76.0, 40.0, 39.0) or bbox[1] == (
         -77.0,
         39.0,
@@ -393,8 +393,8 @@ def test_operational_subset_downloads_then_reads(make_nwm, fake_reader, seed_nwm
     assert len(paths) == 1 and paths[0].suffix == ".parquet"
     methods = [c[0] for c in reader.calls]
     # operational subset selects labels but does NOT time-slice a single step
-    assert "read_file" in methods and "select" in methods
-    assert "select_time" not in methods
+    assert "read_file" in methods and "sel" in methods
+    assert not any(c[0] == "sel" and "time" in c[1] for c in reader.calls)
     assert reader.calls[0][1]["anon"] is False  # local downloaded file
 
 

@@ -32,6 +32,7 @@ lazily, and the `ptree` branch uses only stdlib. Install
 
 from __future__ import annotations
 
+from earthlens.jaxa._gportal import GportalUnavailableError
 from earthlens.jaxa._ptree import RetentionError
 from earthlens.jaxa.auth import (
     AuthenticationError,
@@ -48,6 +49,7 @@ __all__ = [
     "JaxaCredentials",
     "JaxaProtocol",
     "AuthenticationError",
+    "GportalUnavailableError",
     "RetentionError",
     "Catalog",
     "Dataset",

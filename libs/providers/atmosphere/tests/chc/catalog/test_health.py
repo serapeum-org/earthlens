@@ -124,32 +124,31 @@ class TestHealthIndexConsistency:
 
 
 class TestFtpPathMigration:
-    """The shipped catalog tracks CHC's reorganised FTP layout (#1386).
+    """The shipped catalog uses CHC's reorganised FTP layout (#1386, #1387).
 
     CHC retired the `pub/org/chc/products/...` tree in favour of a
-    `products/...` root. Every bundled dataset was migrated except the
-    CHIRPS-GEFS v12 forecast rows, whose v3 remap is a semantic change
-    (not a rename) tracked separately in #1387.
+    `products/...` root. #1386 migrated every product except the
+    CHIRPS-GEFS forecast rows, whose v12->v3 remap was a semantic change
+    deferred to #1387; #1387 then replaced those rows with the v3
+    products under `products/CHIRPS-GEFS/v3/`. No shipped `ftp_base`
+    references the retired prefix any more.
 
     These checks are a prefix/rooting lock-in, not a reachability check:
     they catch a revert to the retired prefix or a stray leading slash,
     but not a `products/`-rooted path mistyped within the tree. Live
-    resolution is covered by the e2e `test_all_migrated_ftp_bases_resolve_live`.
+    resolution is covered by the e2e `test_all_ftp_bases_resolve_live`.
     """
 
-    #: Key prefix of the rows deliberately left on the retired paths (#1387).
-    _GEFS_V12_PREFIX = "chirps-gefs-v12-"
-    #: The retired FTP root that no migrated path may use any more.
+    #: The retired FTP root that no shipped path may use any more.
     _RETIRED_PREFIX = "pub/org/chc/"
+    #: The v3 tree every CHIRPS-GEFS row must now live under (#1387).
+    _GEFS_V3_ROOT = "products/CHIRPS-GEFS/v3/"
 
-    def test_no_dataset_uses_the_retired_prefix_except_gefs_v12(
-        self, bundled_catalog: Catalog
-    ):
-        """Only CHIRPS-GEFS v12 rows may still carry the retired prefix."""
+    def test_no_dataset_uses_the_retired_prefix(self, bundled_catalog: Catalog):
+        """No shipped ftp_base may still carry the retired `pub/org/chc/` prefix."""
         offenders = sorted(
             key
             for key, ds in bundled_catalog.datasets.items()
-            if not key.startswith(self._GEFS_V12_PREFIX)
             for path in ds.ftp_bases.values()
             if path.startswith(self._RETIRED_PREFIX)
         )
@@ -157,38 +156,39 @@ class TestFtpPathMigration:
             f"datasets still on the retired {self._RETIRED_PREFIX!r} prefix: {offenders}"
         )
 
-    def test_migrated_paths_are_rooted_at_products(self, bundled_catalog: Catalog):
-        """Every migrated ftp_base starts at `products/` with no leading slash."""
+    def test_every_ftp_base_is_rooted_at_products(self, bundled_catalog: Catalog):
+        """Every ftp_base starts at `products/` with no leading slash."""
         bad = sorted(
             (key, path)
             for key, ds in bundled_catalog.datasets.items()
-            if not key.startswith(self._GEFS_V12_PREFIX)
             for path in ds.ftp_bases.values()
             if path.startswith("/") or not path.startswith("products/")
         )
-        assert bad == [], f"migrated paths not cleanly rooted at 'products/': {bad}"
+        assert bad == [], f"ftp_bases not cleanly rooted at 'products/': {bad}"
 
-    def test_gefs_v12_rows_are_the_only_retired_exception(
-        self, bundled_catalog: Catalog
-    ):
-        """Exactly the nine CHIRPS-GEFS v12 rows keep the old paths (update when #1387 lands)."""
-        retired = sorted(
-            key
+    def test_gefs_rows_are_migrated_to_the_v3_tree(self, bundled_catalog: Catalog):
+        """Every CHIRPS-GEFS row is now a v3 product under the v3 FTP tree (#1387)."""
+        gefs = {
+            key: list(ds.ftp_bases.values())
             for key, ds in bundled_catalog.datasets.items()
-            if any(p.startswith(self._RETIRED_PREFIX) for p in ds.ftp_bases.values())
+            if key.startswith("chirps-gefs")
+        }
+        assert gefs, "no CHIRPS-GEFS rows present in the bundled catalog"
+        stale_keys = sorted(k for k in gefs if not k.startswith("chirps-gefs-v3-"))
+        assert stale_keys == [], f"non-v3 CHIRPS-GEFS keys remain: {stale_keys}"
+        off_tree = sorted(
+            key
+            for key, paths in gefs.items()
+            if not all(p.startswith(self._GEFS_V3_ROOT) for p in paths)
         )
-        assert all(k.startswith(self._GEFS_V12_PREFIX) for k in retired), (
-            f"unexpected retired-prefix rows outside CHIRPS-GEFS v12: {retired}"
-        )
-        assert len(retired) == 9, (
-            f"expected exactly 9 CHIRPS-GEFS v12 rows on the retired prefix, "
-            f"got {len(retired)}: {retired}"
+        assert off_tree == [], (
+            f"CHIRPS-GEFS rows not under {self._GEFS_V3_ROOT!r}: {off_tree}"
         )
 
 
 @pytest.mark.e2e
-def test_all_migrated_ftp_bases_resolve_live(bundled_catalog: Catalog):
-    """Every migrated (non-GEFS-v12) ftp_base resolves on the live CHC FTP."""
+def test_all_ftp_bases_resolve_live(bundled_catalog: Catalog):
+    """Every shipped ftp_base resolves on the live CHC FTP."""
     from ftplib import FTP
 
     from earthlens.chc import CHIRPS
@@ -198,8 +198,6 @@ def test_all_migrated_ftp_bases_resolve_live(bundled_catalog: Catalog):
     try:
         ftp.login()
         for key, ds in bundled_catalog.datasets.items():
-            if key.startswith("chirps-gefs-v12-"):
-                continue
             for path in ds.ftp_bases.values():
                 try:
                     ftp.cwd("/" + path.strip("/"))

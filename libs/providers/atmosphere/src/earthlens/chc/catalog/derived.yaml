@@ -68,7 +68,7 @@ datasets:
     region: global-extended
     temporal_resolution: monthly
     pandas_freq: MS
-    spatial_resolution: [1.0]
+    spatial_resolution: [0.05]
     formats: [tif]
     start_date: '1980-01-01'
     file_patterns:
@@ -78,6 +78,7 @@ datasets:
         description: Wet Bulb Globe Temperature (WBGT)
         units: degC
         types: state
+        signed: true
 
   wbgt-dekad:
     ftp_bases:
@@ -85,7 +86,7 @@ datasets:
     region: global-extended
     temporal_resolution: dekadal
     pandas_freq: 10D
-    spatial_resolution: [1.0]
+    spatial_resolution: [0.05]
     formats: [tif]
     start_date: '1980-01-01'
     file_patterns:
@@ -95,6 +96,7 @@ datasets:
         description: Wet Bulb Globe Temperature (WBGT)
         units: degC
         types: state
+        signed: true
 
   centennial-trends-v1-monthly:
     ftp_bases:

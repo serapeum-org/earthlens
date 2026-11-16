@@ -75,7 +75,7 @@ jobs:
           version=$(ls dist/earthlens-[0-9]*.whl | sed -E 's|.*/earthlens-([^-]+)-py3.*|\1|')
           printf 'earthlens[all]==%s\npytest\npytest-cov\npytest-socket\nhypothesis\npsutil\nmoto\npytest-recording\n' "${version}" \
             > dist/requirements.in
-          uv pip compile --generate-hashes --universal --python-version 3.11 \
+          uv pip compile --generate-hashes --universal --python-version 3.11.5 \
             --find-links dist \
             --no-emit-package earthlens \
             --no-emit-package earthlens-core \

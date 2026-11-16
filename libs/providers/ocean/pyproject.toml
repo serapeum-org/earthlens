@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earthlens-ocean"
-version = "0.31.0"
+version = "0.32.0"
 description = "ocean, freshwater and marine-life backends for earthlens"
 readme = { file = "README.md", content-type = "text/markdown" }
 authors = [
@@ -27,13 +27,13 @@ classifiers = [
     "Intended Audience :: Developers",
 ]
 
-requires-python = ">=3.11,<4"
+requires-python = ">=3.11.5,<4"
 
 # Only the core abstractions. Every provider SDK is an extra, so installing
 # this distribution brings the backends' code without their dependencies —
 # `pip install earthlens-ocean[<backend>]` adds exactly one backend's SDK.
 dependencies = [
-    "earthlens-core ==0.31.0",
+    "earthlens-core ==0.32.0",
     # Imported directly by earthlens.caravan for its cache directory, so it is
     # declared here rather than relied on transitively through core.
 ]
@@ -42,7 +42,7 @@ dependencies = [
 argo = ["argopy >=1.4"]
 cmems = ["copernicusmarine >=2.0.0,<3"]
 erddap = ["erddapy >=3.0"]
-nwm = ["earthlens-core[s3]", "pyramids-core[parquet] >=0.70.0"]
+nwm = ["earthlens-core[s3]", "pyramids-core[parquet] >=0.78.0"]
 usgs-water = ["dataretrieval >=1.1.4"]
 obis = ["pyobis >=1.6.1"]
 

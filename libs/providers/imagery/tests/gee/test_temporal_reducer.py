@@ -463,6 +463,87 @@ class TestReduceStack:
         reduced = temporal_reducer_for("mean").reduce_stack(stack, ["2020-01-01"])
         assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(7.0)
 
+    def test_mixed_precision_timestamps_reduce(self, tmp_path):
+        """A stack whose timestamps mix fractional and whole seconds still reduces."""
+        stack = _stack(tmp_path, [1.0, 5.0, 9.0])
+        times = [
+            "2020/01/01 09:41:12.345000+00",
+            "2020/02/01 09:43:06+00",
+            "2020/03/01 10:01:00.500000+00",
+        ]
+        reduced = temporal_reducer_for("median").reduce_stack(stack, times)
+        assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(5.0)
+
+    def test_mixed_precision_collapses_to_one_window(self, tmp_path):
+        """Mixed-precision timestamps spanning months collapse into a single window."""
+        stack = _stack(tmp_path, [2.0, 4.0, 6.0, 100.0])
+        times = [
+            "2019/06/01 09:41:12.345000+00",
+            "2019/07/03 09:43:06+00",
+            "2019/08/20 10:01:00.500000+00",
+            "2020/09/30 11:11:11+00",
+        ]
+        reduced = temporal_reducer_for("mean").reduce_stack(stack, times)
+        assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(28.0)
+
+    def test_single_fractional_second_timestep(self, tmp_path):
+        """A one-scene stack whose only timestamp carries fractional seconds reduces."""
+        stack = _stack(tmp_path, [7.0])
+        reduced = temporal_reducer_for("mean").reduce_stack(
+            stack, ["2020/06/15 09:41:12.345000+00"]
+        )
+        assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(7.0)
+
+    def test_window_straddling_epoch_boundary_keeps_all_scenes(self, tmp_path):
+        """Scenes whose span straddles an epoch-anchored day bin still reduce as one window."""
+        stack = _stack(tmp_path, [2.0, 8.0])
+        times = ["2020-01-01 20:00:00+00", "2020-01-04 05:00:00+00"]
+        reduced = temporal_reducer_for("mean").reduce_stack(stack, times)
+        assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(5.0)
+
+    def test_three_scene_multiday_straddle_keeps_all(self, tmp_path):
+        """Three scenes spanning a multi-day epoch-anchored boundary all land in one window."""
+        stack = _stack(tmp_path, [3.0, 6.0, 9.0])
+        times = [
+            "2021-03-30 18:00:00+00",
+            "2021-04-02 12:00:00+00",
+            "2021-04-05 06:00:00+00",
+        ]
+        reduced = temporal_reducer_for("mean").reduce_stack(stack, times)
+        assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(6.0)
+
+    def test_mixed_offsets_do_not_raise(self, tmp_path):
+        """A stack whose timestamps carry different UTC offsets parses without raising."""
+        stack = _stack(tmp_path, [1.0, 5.0, 9.0])
+        times = [
+            "2020/01/01 09:41:12.345000+00",
+            "2020/02/01 11:43:06+02",
+            "2020/03/01 10:01:00.500000+00",
+        ]
+        reduced = temporal_reducer_for("median").reduce_stack(stack, times)
+        assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(5.0)
+
+    def test_mixed_precision_trend_recovers_the_slope(self, tmp_path):
+        """A trend over mixed-precision, mixed-offset timestamps recovers the true per-day slope."""
+        stack = _stack(tmp_path, [1.0, 3.0, 5.0, 7.0])
+        times = [
+            "2020/06/01 00:00:00.500000+00",
+            "2020/06/11 02:00:00+02",
+            "2020/06/21 00:00:00.250000+00",
+            "2020/07/01 00:00:00+00",
+        ]
+        reduced = temporal_reducer_for("trend").reduce_stack(stack, times)
+        assert np.asarray(reduced.read_array()).ravel()[0] == pytest.approx(
+            0.2, abs=1e-4
+        )
+
+    def test_empty_times_raises(self, tmp_path):
+        """A whole-window reduction with no timesteps fails with a clear error."""
+        stack = _stack(tmp_path, [1.0])
+        reducer = temporal_reducer_for("mean")
+        with pytest.raises(ValueError, match="at least one timestep"):
+            reducer.reduce_stack(stack, [])
+
     def test_mosaic_has_no_client_side_form(self, tmp_path):
         """`mosaic` refuses a client-side stack reduction."""
         stack = _stack(tmp_path, [1.0, 5.0])

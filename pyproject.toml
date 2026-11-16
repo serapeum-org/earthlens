@@ -1,6 +1,6 @@
 [project]
 name = "earthlens"
-version = "0.31.0"
+version = "0.32.0"
 description = "remote sensing package"
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
@@ -23,19 +23,19 @@ classifiers = [
     "Intended Audience :: Developers",
 ]
 
-requires-python = ">=3.11,<4"
+requires-python = ">=3.11.5,<4"
 
 # The meta-package: every workspace member, no code of its own. A thematic
 # distribution carries no SDK by default (they are extras), so depending on all
 # five is conflict-free — the irreconcilable pins only meet if a user asks for
 # two conflicting extras at once, exactly as before the split.
 dependencies = [
-    "earthlens-core ==0.31.0",
-    "earthlens-atmosphere ==0.31.0",
-    "earthlens-ocean ==0.31.0",
-    "earthlens-imagery ==0.31.0",
-    "earthlens-land ==0.31.0",
-    "earthlens-hazards ==0.31.0",
+    "earthlens-core ==0.32.0",
+    "earthlens-atmosphere ==0.32.0",
+    "earthlens-ocean ==0.32.0",
+    "earthlens-imagery ==0.32.0",
+    "earthlens-land ==0.32.0",
+    "earthlens-hazards ==0.32.0",
 ]
 
 
@@ -154,7 +154,7 @@ dev = [
     # pyramids-core[viz] (cleopatra): the showcase notebooks render rasters and
     # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
     # runtime dep of earthlens itself.
-    "pyramids-core[viz] >=0.71.0",
+    "pyramids-core[viz] >=0.78.0",
     # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
     # animation.embed_gif, ArrayGlyph.save_animation); add_reference_map /
     # save_animation(crf=...) landed in 0.22.0, the animate() default
@@ -222,13 +222,13 @@ dev = [
     # `TasseledCap`), so `uv sync --extra all` already installs it. This explicit
     # dev pin is redundant but kept so the floor is visible here too -- the tests
     # that pin the EEDAI reader's `from_earthengine` signature run against it, so
-    # a 0.x contract change surfaces in CI rather than only on a live run. 0.11.0
-    # is the floor: it pins pyramids-core >=0.71.0 (pyramids-eo#127/#128), whose
+    # a 0.x contract change surfaces in CI rather than only on a live run. 0.12.0
+    # is the floor: it pins pyramids-core >=0.73.0 (pyramids-eo#127/#128), whose
     # #1348 fix lets the CDSE signer read eodata with the default multi-threaded
     # workers. It is well past 0.9.0 (the tasseled-cap transform, pyramids-eo#117)
     # and 0.8.1 (whose tiled read passed no_data_value="none", rejected by
     # pyramids >= 0.61, pyramids-eo#111).
-    "pyramids-eo >=0.11.0,<0.12",
+    "pyramids-eo >=0.12.1",
 ]
 # The eclipse showcase notebooks need the geostationary-imagery pieces of
 # pyramids-eo (read_fci_l1c, the composites, the viewing geometry) plus a few small
@@ -241,13 +241,13 @@ notebooks = [
     # viewing geometry it needs. This replaces the satpy / pyresample / pyspectral
     # stack the eclipse notebook used to carry. 0.7 first carried `rayleigh_correct`,
     # `solar_zenith_azimuth`, `satellite_zenith_azimuth` and `relative_azimuth`
-    # (pyramids-eo#91-93). 0.11.0 now sets the floor (it pins pyramids-core
-    # >=0.71.0, pyramids-eo#127/#128); it is well past 0.9.0 (the tasseled-cap
+    # (pyramids-eo#91-93). 0.12.0 now sets the floor (it pins pyramids-core
+    # >=0.73.0, pyramids-eo#127/#128); it is well past 0.9.0 (the tasseled-cap
     # transform, pyramids-eo#117) and 0.8 (the first release built against
     # pyramids 0.59's `from_array` / `GeoReference` constructors -- 0.7's reader
     # still called the removed `create_from_array`).
     # Also declared, at the same version, in `dev` and as an imagery base dep.
-    "pyramids-eo >=0.11.0,<0.12",
+    "pyramids-eo >=0.12.1",
     # scipy: feathers the disc edge and softens the limb (ndimage.binary_erosion /
     # gaussian_filter).
     "scipy >=1.11",
@@ -282,7 +282,7 @@ docs = [
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
     # pyramids-core[viz] (cleopatra): showcase notebooks plot/animate Datasets.
-    "pyramids-core[viz] >=0.71.0",
+    "pyramids-core[viz] >=0.78.0",
     # [tiles] (pyproj, xyzservices): the satellite showcase textures its globe from
     # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
     # It arrives transitively through pyramids-core[viz], but an imported package
@@ -542,20 +542,35 @@ conflicts = [
 #
 # pyramids rename floor: the GIS backend's distribution was renamed `pyramids-gis`
 # -> `pyramids-core` at 0.70.0, and earthlens now depends on `pyramids-core`
-# directly. `pyramids-eo` (a dev/notebooks/imagery dependency) still declares the
-# old `pyramids-gis`, which would otherwise resolve to the real 0.69.0 package and
-# ship a second copy of the `pyramids` import alongside `pyramids-core` 0.70.0 --
-# two distributions clobbering the same top-level package. `pyramids-gis` 0.70.0 is
-# a code-free shim that just requires `pyramids-core==0.70.0`, so constraining the
-# transitive to >=0.70.0 collapses both onto the single `pyramids-core` install.
-# Remove once pyramids-eo depends on `pyramids-core` directly (serapeum-org/pyramids-eo#122).
+# directly. `digitalearth` (pulled by the `viz` extra, `earthlens-imagery[viz]`)
+# still declares the old `pyramids-gis`, which would otherwise resolve to the real
+# 0.69.0 package and ship a second copy of the `pyramids` import alongside
+# `pyramids-core` -- two distributions clobbering the same top-level package.
+# `pyramids-gis` >=0.70.0 is a code-free shim that just requires the matching
+# `pyramids-core`, so constraining the transitive to >=0.70.0 collapses both onto
+# the single `pyramids-core` install. (pyramids-eo switched to `pyramids-core`
+# directly in 0.12.0 -- serapeum-org/pyramids-eo#122 -- so digitalearth is now the
+# last consumer of the old name.) Remove once digitalearth depends on
+# `pyramids-core` directly.
 #
 # Security floor: pin the transitive `aiohttp` at/above 3.14.4, which fixes three CVEs present in 3.12.15 --
 # CVE-2026-111064 (keepalive timeout not applied before the request body, enabling an idle-connection DoS),
 # GHSA-2g87-pp6c-29x5 (unbounded memory / excessive CPU on attacker-controlled requests) and CVE-2026-111063
 # (the Secure attribute not enforced on a shared cookie). aiohttp arrives only transitively (openeo, s3fs,
 # earthaccess, ...); the floor satisfies the pip-audit gate, whose policy is to upgrade rather than ignore.
-constraint-dependencies = ["oauthlib>=4.0.0", "pyramids-gis>=0.70.0", "aiohttp>=3.14.4"]
+# Security floors for transitive deps the pip-audit gate flags (both arrive via
+# BeautifulSoup / jupyter, not pyramids):
+#   * soupsieve >=4.0.0 clears four selector-ReDoS / recursion advisories
+#     (CVE-2026-126190/126191/126192/126193); 126190's fix only landed in 4.0.
+#     BeautifulSoup only needs `soupsieve>=1.6.1`, so the major bump is safe.
+#   * tornado >=6.6.1 completes the open-redirect fix (CVE-2026-126347).
+constraint-dependencies = [
+    "oauthlib>=4.0.0",
+    "pyramids-gis>=0.70.0",
+    "aiohttp>=3.14.4",
+    "soupsieve>=4.0.0",
+    "tornado>=6.6.1",
+]
 
 [tool.uv.workspace]
 members = [

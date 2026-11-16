@@ -77,6 +77,130 @@ _LEGACY_DATASET_KEY: dict[str, str] = {
 }
 
 
+# Calendar dekad/pentad period boundaries.
+#
+# CHC publishes dekadal and pentadal products on a calendar grid that
+# *resets every month*: a dekad is a 10-day third of the month (days
+# 1-10, 11-20, 21-end) and a pentad a 5-day sixth (days 1-5, 6-10,
+# 11-15, 16-20, 21-25, 26-end). The last period of each month is short
+# -- 8-11 days for the dekad, 3-6 for the pentad -- because it absorbs
+# the 28-31 day remainder.
+#
+# This is why these cadences cannot be walked with a fixed `pandas_freq`
+# day stride (`10D` / `5D`): `pd.date_range(..., freq="10D")` never
+# realigns to the month boundary, so over a year it drifts off the
+# month-reset `{dekad}` / `{pentad}` index -- silently missing one
+# period (e.g. February's short third dekad) and re-fetching another.
+# `_calendar_period_index` steps on the calendar grid instead. Only the
+# `dekadal` / `pentadal` cadences are month-reset; the GEFS `5-day` /
+# `10-day` forecast-horizon rows share the `10D` / `5D` stride but are
+# daily-issued forecasts, so they keep the fixed `date_windows` walk.
+_DEKAD_START_DAYS: tuple[int, ...] = (1, 11, 21)
+_PENTAD_START_DAYS: tuple[int, ...] = (1, 6, 11, 16, 21, 26)
+_PERIOD_START_DAYS: dict[str, tuple[int, ...]] = {
+    "dekadal": _DEKAD_START_DAYS,
+    "pentadal": _PENTAD_START_DAYS,
+}
+
+
+def _period_start_days(temporal_resolution: str | None) -> tuple[int, ...] | None:
+    """Return the month-reset start days for a dekadal/pentadal cadence.
+
+    Args:
+        temporal_resolution: The dataset's `temporal_resolution` string.
+
+    Returns:
+        tuple[int, ...] | None: The `(1, 11, 21)` dekad or
+        `(1, 6, 11, 16, 21, 26)` pentad start days, or `None` for any
+        other cadence (which is walked by the shared fixed-stride
+        `date_windows`).
+    """
+    if temporal_resolution is None:
+        return None
+    return _PERIOD_START_DAYS.get(temporal_resolution)
+
+
+def _period_start_floor(
+    date: pd.Timestamp, start_days: tuple[int, ...]
+) -> pd.Timestamp:
+    """Snap `date` back to the start of the dekad/pentad that contains it.
+
+    Args:
+        date: Any timestamp within a calendar period.
+        start_days: The month-reset start days for the cadence.
+
+    Returns:
+        pd.Timestamp: The containing period's first day (same month).
+    """
+    return date.replace(day=max(d for d in start_days if d <= date.day))
+
+
+def _next_period_start(date: pd.Timestamp, start_days: tuple[int, ...]) -> pd.Timestamp:
+    """Return the start of the dekad/pentad after the one `date` begins.
+
+    Args:
+        date: A timestamp on or within a calendar period.
+        start_days: The month-reset start days for the cadence.
+
+    Returns:
+        pd.Timestamp: The next period's first day -- the next start day
+        in the same month, or the first start day of the next month when
+        `date` is in the month's final (short) period.
+    """
+    later = [d for d in start_days if d > date.day]
+    if later:
+        return date.replace(day=later[0])
+    return (date + pd.offsets.MonthBegin(1)).replace(day=start_days[0])
+
+
+def _calendar_period_end(
+    date: pd.Timestamp, start_days: tuple[int, ...]
+) -> pd.Timestamp:
+    """Return the inclusive last day of the dekad/pentad `date` begins.
+
+    The day before the next period's start, which for the month's final
+    period is month-end (the short 8-11 / 3-6 day remainder).
+
+    Args:
+        date: The period's start timestamp.
+        start_days: The month-reset start days for the cadence.
+
+    Returns:
+        pd.Timestamp: The period's inclusive end day.
+    """
+    return _next_period_start(date, start_days) - pd.Timedelta(1, "D")
+
+
+def _calendar_period_index(
+    window_start: pd.Timestamp,
+    window_end: pd.Timestamp,
+    start_days: tuple[int, ...],
+) -> pd.DatetimeIndex:
+    """Month-aligned dekad/pentad period starts over `[window_start, window_end]`.
+
+    The first entry is the period *containing* `window_start` (snapped
+    back to its calendar start), and each following entry steps one
+    dekad/pentad on the month-reset grid, up to and including the period
+    whose start is `<= window_end`. Unlike a fixed `10D` / `5D` stride,
+    this never drifts off the month boundary, so every calendar period
+    in range is visited exactly once.
+
+    Args:
+        window_start: First timestamp of the (clamped) request window.
+        window_end: Last timestamp of the (clamped) request window.
+        start_days: The month-reset start days for the cadence.
+
+    Returns:
+        pd.DatetimeIndex: The period-start timestamps to fetch.
+    """
+    starts: list[pd.Timestamp] = []
+    current = _period_start_floor(window_start, start_days)
+    while current <= window_end:
+        starts.append(current)
+        current = _next_period_start(current, start_days)
+    return pd.DatetimeIndex(starts)
+
+
 def _open_ftp() -> FTP:
     """Open an anonymous FTP session against CHC and return it (L5 helper).
 
@@ -949,6 +1073,12 @@ class CHIRPS(AbstractDataSource):
             pandas.DatetimeIndex | None: The dates to fetch, or `None` when the
                 request window does not overlap the dataset at all — which is a
                 warning and an empty result, not an error.
+
+        Dekadal and pentadal datasets are walked on the month-reset
+        calendar grid (`_calendar_period_index`) rather than a fixed
+        `10D` / `5D` `pandas_freq` stride, so every calendar period is
+        visited exactly once; all other cadences use the shared
+        fixed-stride `date_windows`.
         """
         ds_start = pd.Timestamp(dataset.start_date)
         ds_end = pd.Timestamp(dataset.end_date) if dataset.end_date else None
@@ -965,6 +1095,9 @@ class CHIRPS(AbstractDataSource):
                 f"{ds_end.date() if ds_end else 'now'}]; skipping"
             )
             return None
+        start_days = _period_start_days(dataset.temporal_resolution)
+        if start_days is not None:
+            return _calendar_period_index(window_start, window_end, start_days)
         return date_windows(window_start, window_end, dataset.pandas_freq)
 
     def _fetch_dates_sequential(
@@ -1106,23 +1239,29 @@ class CHIRPS(AbstractDataSource):
                 local_path = self.root_dir / f"{ds_key}_{filename}"
                 self._fetch_ftp(ftp_base, filename, local_path, ftp=ftp_session)
                 if is_2d_raster:
-                    self._clip_raster_in_place(local_path)
+                    self._clip_raster_in_place(local_path, signed=var.signed)
                 paths.append(local_path)
         finally:
             _close_ftp_quietly(ftp_session)
         return paths
 
-    def _clip_raster_in_place(self, path: Path) -> None:
+    def _clip_raster_in_place(self, path: Path, *, signed: bool = False) -> None:
         """Read a 2-D raster at `path`, clip to `self.space`, write back.
 
         Used by `_download_discrete` for `tif` / `cog` / `bil`
-        outputs. Negative pixels are normalised to -9999 (CHC's
-        documented no-data sentinel) and -9999 is declared as the
-        output band's no-data value, mirroring the per-date
+        outputs. For an unsigned variable negative pixels are normalised to
+        -9999 (CHC's documented no-data sentinel); for a `signed` variable the
+        genuine negatives are preserved. -9999 is declared as the output
+        band's no-data value either way, mirroring the per-date
         `_post_process` behaviour.
+
+        Args:
+            path: The on-disk raster to clip and rewrite in place.
+            signed: Forwarded to `_clip_and_normalise`; true preserves
+                negative pixels (a signed variable such as an anomaly).
         """
         raster = Dataset.read_file(str(path))
-        self._clip_and_normalise(raster).to_file(str(path))
+        self._clip_and_normalise(raster, signed=signed).to_file(str(path))
 
     def _api(
         self,
@@ -1159,7 +1298,11 @@ class CHIRPS(AbstractDataSource):
 
         try:
             relative = pattern.format(
-                **self._placeholders(date, pandas_freq=dataset.pandas_freq)
+                **self._placeholders(
+                    date,
+                    pandas_freq=dataset.pandas_freq,
+                    temporal_resolution=dataset.temporal_resolution,
+                )
             )
         except KeyError as missing:
             logger.warning(
@@ -1192,61 +1335,86 @@ class CHIRPS(AbstractDataSource):
 
     @staticmethod
     def _placeholders(
-        date: pd.Timestamp, pandas_freq: str | None = None
+        date: pd.Timestamp,
+        pandas_freq: str | None = None,
+        temporal_resolution: str | None = None,
     ) -> dict[str, str]:
         """Build the format-string substitution dict for one date.
 
         Covers `{year}`, `{month}`, `{day}`, `{dekad}`, `{pentad}`,
-        `{hour}`, `{doy}` (always) plus `{start_yyyymmdd}` /
-        `{end_yyyymmdd}` (when `pandas_freq` is supplied) -- the
-        placeholders used by the curated datasets.
+        `{pentad_of_year}`, `{hour}`, `{doy}` (always) plus
+        `{start_yyyymmdd}` / `{end_yyyymmdd}` (when `pandas_freq` is
+        supplied, or `temporal_resolution` is `dekadal` / `pentadal`) --
+        the placeholders used by the curated datasets. `{pentad}` is the
+        month-reset pentad (1..6); `{pentad_of_year}` is the
+        zero-padded pentad-of-year (01..72) that CHC's SPI filenames use.
 
         The `{start_yyyymmdd}` / `{end_yyyymmdd}` pair (M5) is needed
         for WBGT, whose filenames carry the `[start, end]` endpoints
         of the period each timestep represents
         (e.g. `data_20200101_20200131.tif` for January 2020 monthly,
-        `data_20200101_20200110.tif` for the first dekad of 2020).
-        The pair is derived from `pandas_freq`:
+        `data_20200121_20200131.tif` for the third dekad of 2020).
+        How the inclusive end is derived depends on the cadence:
 
-            start = date
-            end   = (date + offset(pandas_freq)) - 1 day
+        - Dekadal / pentadal (`temporal_resolution`): the period ends
+          the day before the next calendar dekad/pentad start, which
+          for the month's final period is month-end -- so the third
+          dekad of January is `20200121 / 20200131`, not the `20200130`
+          a fixed `10D` offset would give, and February's third dekad
+          correctly ends on the 28th/29th.
+        - Any other cadence (`pandas_freq`): `end = (date +
+          offset(pandas_freq)) - 1 day`. For `MS` on `2020-01-01` this
+          gives `20200101 / 20200131`; for daily (`D`) `end == date`.
 
-        For `MS` (month-start) on `2020-01-01` this gives
-        `20200101 / 20200131`; for `10D` on `2020-01-01` it gives
-        `20200101 / 20200110`. Other placeholders surface as a
-        `KeyError` that `_api` catches and logs
-        (`{month_pair}` for CHIRPS v3 2-monthly, `{res}` /
+        Other placeholders surface as a `KeyError` that `_api` catches
+        and logs (`{month_pair}` for CHIRPS v3 2-monthly, `{res}` /
         `{scale}` -- none of those are wired today).
 
         Args:
             date: The pandas Timestamp for the per-date request.
             pandas_freq: Optional pandas offset alias from
-                `Dataset.pandas_freq`. When provided, the returned
-                dict carries the M5 `start_yyyymmdd` /
-                `end_yyyymmdd` pair; when `None`, those keys are
-                omitted (the caller's pattern is assumed not to
+                `Dataset.pandas_freq`, used to derive the period end for
+                non-dekadal/pentadal cadences.
+            temporal_resolution: Optional `Dataset.temporal_resolution`.
+                When it is `"dekadal"` / `"pentadal"` the period end is
+                computed on the month-reset calendar grid instead of
+                from `pandas_freq`. When neither this nor `pandas_freq`
+                is supplied, the `start_yyyymmdd` / `end_yyyymmdd` keys
+                are omitted (the caller's pattern is assumed not to
                 reference them).
 
         Returns:
             dict[str, str]: Placeholder names to substituted values.
         """
         day = date.day
+        pentad_of_month = min(6, ((day - 1) // 5) + 1)
         out = {
             "year": f"{date.year}",
             "month": f"{date.month:02d}",
             "day": f"{day:02d}",
             "dekad": str(min(3, ((day - 1) // 10) + 1)),
-            "pentad": str(min(6, ((day - 1) // 5) + 1)),
+            "pentad": str(pentad_of_month),
+            # Pentad-of-year (01..72, zero-padded): six pentads per month,
+            # so month M pentad P is `(M-1)*6 + P`. CHC's SPI series names
+            # files by this index (`SPI_..PentAccum_YYYY_pNN.tif`), unlike
+            # the dekad/pentad precip rows that carry `{month}` in the path
+            # and use the month-reset `{pentad}` 1..6.
+            "pentad_of_year": f"{(date.month - 1) * 6 + pentad_of_month:02d}",
             "hour": f"{date.hour:02d}",
             "doy": f"{date.dayofyear:03d}",
         }
-        if pandas_freq is not None:
+        start_days = _period_start_days(temporal_resolution)
+        if start_days is not None:
+            period_end = _calendar_period_end(date, start_days)
+            out["start_yyyymmdd"] = date.strftime("%Y%m%d")
+            out["end_yyyymmdd"] = period_end.strftime("%Y%m%d")
+        elif pandas_freq is not None:
             offset = pd.tseries.frequencies.to_offset(pandas_freq)
             # `date + offset` lands at the start of the NEXT period;
             # subtract one day to get the inclusive end of THIS period.
             # For daily (`D`) this gives `end == date`, which matches
             # CHC's daily-WBGT-style naming if any catalog row uses it.
-            period_end = (date + offset) - pd.Timedelta(days=1)
+            period_end = (date + offset) - pd.Timedelta(1, "D")
             out["start_yyyymmdd"] = date.strftime("%Y%m%d")
             out["end_yyyymmdd"] = period_end.strftime("%Y%m%d")
         return out
@@ -1307,7 +1475,7 @@ class CHIRPS(AbstractDataSource):
 
         raster = Dataset.read_file(str(local_path))
         out_path = self.root_dir / self._output_filename(ds_key, dataset, var, date)
-        self._clip_and_normalise(raster).to_file(str(out_path))
+        self._clip_and_normalise(raster, signed=var.signed).to_file(str(out_path))
 
         try:
             local_path.unlink(missing_ok=True)
@@ -1318,17 +1486,24 @@ class CHIRPS(AbstractDataSource):
             )
         return out_path
 
-    def _clip_and_normalise(self, raster: Dataset) -> Dataset:
+    def _clip_and_normalise(self, raster: Dataset, *, signed: bool = False) -> Dataset:
         """Normalise CHC negatives to the -9999 no-data sentinel and clip to the AOI.
 
         CHIRPS encodes "missing" as a negative value, and some rasters declare
-        no no-data value at all. Every negative pixel becomes -9999 and the
-        output band declares -9999 as its no-data value; the raster is then
-        clipped to the request bbox — or masked to the exact polygon when the
-        `aoi=` carried one — through the shared `crop_to_aoi`, rather than a
-        hand-rolled NumPy window slice. Normalising the whole granule before
-        the crop lets the polygon mask flag out-of-shape cells with the
-        now-declared -9999 no-data.
+        no no-data value at all. For an unsigned variable every negative pixel
+        becomes -9999 and the output band declares -9999 as its no-data value;
+        the raster is then clipped to the request bbox — or masked to the exact
+        polygon when the `aoi=` carried one — through the shared `crop_to_aoi`,
+        rather than a hand-rolled NumPy window slice. Normalising the whole
+        granule before the crop lets the polygon mask flag out-of-shape cells
+        with the now-declared -9999 no-data.
+
+        When `signed` is true the negative-to-sentinel rewrite is skipped: a
+        signed variable such as `precipitation_anomaly` carries genuine
+        below-climatology negatives that must survive, while the raster's own
+        -9999 fill is still honoured as no-data (it is declared on the output
+        band either way). Without this, every below-normal pixel of an anomaly
+        product would be silently nulled.
 
         The bbox is snapped **outward** to the granule's cell edges first (see
         `_snap_bbox_outward`), because `crop_to_aoi(touch=False)` keeps
@@ -1340,6 +1515,9 @@ class CHIRPS(AbstractDataSource):
 
         Args:
             raster: The freshly read source `Dataset` (the whole granule).
+            signed: When true, preserve negative pixels (a signed variable
+                such as an anomaly); when false (the default), rewrite every
+                negative to the -9999 no-data sentinel (precipitation fill).
 
         Returns:
             A new `Dataset` clipped (or polygon-masked) to the AOI, carrying
@@ -1362,9 +1540,10 @@ class CHIRPS(AbstractDataSource):
             # the crop. That costs a whole-granule normalise + rebuild.
             # `crop_to_aoi` masks to the geometry and ignores `bbox=` here, so
             # the request bbox is passed unsnapped (the snap is bbox-path-only).
-            data = np.where(data < 0, nodata_sentinel, data).astype(
-                data.dtype, copy=False
-            )
+            if not signed:
+                data = np.where(data < 0, nodata_sentinel, data).astype(
+                    data.dtype, copy=False
+                )
             full = Dataset.from_array(
                 data,
                 no_data_value=nodata_sentinel,
@@ -1384,9 +1563,10 @@ class CHIRPS(AbstractDataSource):
         )
         cropped = crop_to_aoi(raster, self.space, bbox=bbox, touch=False)
         window = cropped.read_array()
-        window = np.where(window < 0, nodata_sentinel, window).astype(
-            window.dtype, copy=False
-        )
+        if not signed:
+            window = np.where(window < 0, nodata_sentinel, window).astype(
+                window.dtype, copy=False
+            )
         return Dataset.from_array(
             window,
             no_data_value=nodata_sentinel,

@@ -103,7 +103,7 @@ def test_resolve_time_window_between_steps_raises(monkeypatch):
 
 
 def test_resolve_time_window_wraps_select_error(monkeypatch):
-    """A select_time ValueError is wrapped with the store context."""
+    """A sel ValueError is wrapped with the store context."""
     monkeypatch.setattr(accessor, "_labeled_reader", lambda: _RaisingLabeledReader)
     with pytest.raises(ValueError, match="no CMIP6 timesteps"):
         resolve_time_window("gs://cmip6/x/", "tas", "2015-01-01", "2015-06-30")
@@ -220,19 +220,19 @@ class _FakeLabeledReader:
 
 
 class _RaisingLabeledReader:
-    """Reader whose select_time raises to exercise the wrap branch."""
+    """Reader whose sel raises to exercise the wrap branch."""
 
     @staticmethod
     def read_file(store, *, variables=None, anon=False, engine=None):
-        """Return a fake dataset whose select_time always raises."""
+        """Return a fake dataset whose sel always raises."""
         return _RaisingLabeled()
 
 
 class _RaisingLabeled(FakeLabeled):
-    """A labelled dataset whose select_time raises ValueError."""
+    """A labelled dataset whose sel raises ValueError."""
 
-    def select_time(self, start=None, end=None, *, time_dim="time"):
-        """Always raise, mimicking an empty-window select_time."""
+    def sel(self, **labels):
+        """Always raise, mimicking an empty-window selection."""
         raise ValueError("no timesteps in window")
 
 

@@ -39,24 +39,19 @@ class FakeLabeled:
         cls.calls.append(("read_file", {"path": str(path), "anon": anon}))
         return cls(str(path), variables)
 
-    def select(self, **labels: Any) -> FakeLabeled:
-        """Record a label selection."""
-        FakeLabeled.calls.append(("select", labels))
+    def sel(self, **labels: Any) -> FakeLabeled:
+        """Record a label selection (`feature_id=...` or `time=slice(...)`)."""
+        FakeLabeled.calls.append(("sel", labels))
         return self
 
-    def select_by_coord(self, coord: str, values: Any) -> FakeLabeled:
+    def sel_by_coord(self, coord: str, values: Any) -> FakeLabeled:
         """Record a secondary-coordinate (gage_id) selection."""
-        FakeLabeled.calls.append(("select_by_coord", (coord, list(values))))
+        FakeLabeled.calls.append(("sel_by_coord", (coord, list(values))))
         return self
 
-    def select_bbox(self, bbox: Any, **kw: Any) -> FakeLabeled:
+    def sel_bbox(self, bbox: Any, **kw: Any) -> FakeLabeled:
         """Record a bbox selection."""
-        FakeLabeled.calls.append(("select_bbox", tuple(bbox)))
-        return self
-
-    def select_time(self, start: Any, end: Any, **kw: Any) -> FakeLabeled:
-        """Record a time-window selection."""
-        FakeLabeled.calls.append(("select_time", (start, end)))
+        FakeLabeled.calls.append(("sel_bbox", tuple(bbox)))
         return self
 
     def to_parquet(self, path, **kw: Any) -> Path:

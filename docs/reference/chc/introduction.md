@@ -48,24 +48,25 @@ The CHC catalog covers 13 product families:
 | **CHIRPS v3** | 11 | `precipitation` | daily (rnl / sat / prelim) / pentadal / dekadal / monthly / 2-monthly / annual | 1981-present, ±50° |
 | **CHIRP / CHIRP v3** | 7 | `precipitation` | daily / pentadal / dekadal / monthly + v3 daily / dekadal / monthly | 1981-present, ±50° |
 | **CHIRTSdaily / CHIRTSmonthly** | 7 | `tmax`, `tmin`, `relative-humidity`, `heat-index`, `svp`, `vpd` | daily / monthly | 1983-present, ±60° land |
-| **CHIRPS-GEFS v12** † | 9 | `precipitation` | daily / pentadal / dekadal / 16-day forecast | 2000-present, ±50° |
+| **CHIRPS-GEFS v3** | 16 | `precipitation`, `precipitation_anomaly` | daily / 5-/10-/15-day / 16-day / pentadal (lead 0–2) / dekadal forecast | 2001-present, ±50° |
 | **CHPclim v2** | 1 | `precipitation` | 12 static climatological months (no time axis) | 1981–2010 baseline |
 | **WBGT** | 2 | `wbgt` (Wet Bulb Globe Temperature) | monthly / dekadal | 1980-present, ±90° |
 | **SPI / CHIRPS3** | 9 | `spi` (standardised precipitation index) | pentadal at 1 / 2 / 5 / 6 / 9 / 12 / 15 / 18 / 21-month windows | 1981-present, ±50° |
-| **SPEI v1** | 6 | `spei` (precip - PET, MERRA-2 PET) | monthly at 1 / 2 / 3 / 6 / 9 / 12-month windows | 1981-present, ±50° |
+| **SPEI (CHIRPS3)** | 12 | `spei` (precip - PET) | monthly at 1 / 2 / 3 / 6 / 9 / 12-month windows, each with a MERRA-2 and a FLDAS PET variant | MERRA 1981- / FLDAS 1982-present, ±50° |
 | **CHC_CMIP6 deltas** | 16 | `precip_delta`, `tmax_delta`, `tmin_delta`, `rh_delta` | daily climatology delta | SSP245 / SSP585, 2030 / 2050 targets |
 | **CentennialTrends v1** | 2 | `precipitation` | monthly + 4-season | 1900–2014, East Africa |
 
 Browse the full list via `Catalog.list_datasets()` or
 `Catalog.available_datasets`. Every entry is reachable from
-`products/...` on the FTP, except as noted below.
+`products/...` on the FTP.
 
-† **CHIRPS-GEFS v12 is temporarily unavailable.** CHC retired the v12
-forecast tree and replaced it with a re-organised `CHIRPS-GEFS/v3/`
-layout whose forecast-lead directory scheme differs from v12. The 9
-rows still carry their v12 paths and a `.download()` on them currently
-fails with an FTP `550`; re-mapping them to v3 is tracked in
-[issue #1387](https://github.com/serapeum-org/earthlens/issues/1387).
+The CHIRPS-GEFS rows are the v3 forecast products
+(`products/CHIRPS-GEFS/v3/`), which replaced the retired v12 tree. Each
+forecast horizon ships the global `data/` (the forecast) and, where CHC
+publishes it, an `anom/` anomaly-vs-climatology companion
+(`precipitation_anomaly`). The pentad leads `0`/`1`/`2` and the single
+dekad lead map from the old v12 `first`/`second`/`last` naming; the
+remap is [issue #1387](https://github.com/serapeum-org/earthlens/issues/1387).
 
 ## Data is shipped as files, not as a service
 
@@ -102,8 +103,8 @@ src/earthlens/chc/catalog/
 ├── chirts.yaml          # 7 datasets (daily + monthly + derived)
 ├── cmip6.yaml           # 16 datasets (CHC_CMIP6 scenario deltas)
 ├── derived.yaml         # 5 datasets (CHPclim + WBGT + CenTrends)
-├── gefs.yaml            # 9 datasets (CHIRPS-GEFS v12)
-└── indices.yaml         # 15 datasets (SPI + SPEI)
+├── gefs.yaml            # 16 datasets (CHIRPS-GEFS v3)
+└── indices.yaml         # 21 datasets (SPI + SPEI MERRA/FLDAS)
 ```
 
 `_index.yaml` carries an informational walk-order list of every dataset
