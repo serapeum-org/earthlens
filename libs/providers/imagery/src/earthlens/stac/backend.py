@@ -789,9 +789,13 @@ def _covers_aoi(
             still count. Defaults to `_MIN_OVERLAP_FRACTION`.
 
     Returns:
-        True when the footprint covers at least `min_fraction` of `aoi`. An item
-        whose geometry is absent, empty or unparseable is kept, so a missing
-        footprint never silently drops data that may well overlap.
+        True when the footprint covers at least `min_fraction` of whichever of the
+        footprint and `aoi` is smaller. An item whose geometry is absent, empty or
+        unparseable is kept, so a footprint we cannot judge never silently drops
+        data that may well overlap. A footprint with no area to take a fraction of
+        — a Point or a LineString — is judged topologically instead, so one
+        sitting in the AOI is kept while one far outside it is not. An invalid
+        ring is repaired and then judged.
 
     Examples:
         - A footprint spanning the AOI covers it:
@@ -874,10 +878,15 @@ def _overlaps(footprint: Any, aoi: Any, min_fraction: float) -> bool:
     result = True
     if not footprint.is_empty:
         # Scale by the smaller geometry so the measure does not invert for an AOI
-        # larger than one scene; see `_MIN_OVERLAP_FRACTION`. A zero-area AOI or
-        # footprint gives a zero floor, which keeps the item.
+        # larger than one scene; see `_MIN_OVERLAP_FRACTION`.
         scale = min(aoi.area, footprint.area)
-        result = footprint.intersection(aoi).area >= min_fraction * scale
+        if scale == 0:
+            # A Point or LineString footprint -- or a degenerate AOI -- has no
+            # area to take a fraction of, so judge it topologically instead of
+            # letting a zero floor keep everything, however far away it is.
+            result = footprint.intersects(aoi)
+        else:
+            result = footprint.intersection(aoi).area >= min_fraction * scale
     return result
 
 

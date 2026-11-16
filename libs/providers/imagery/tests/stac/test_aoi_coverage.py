@@ -163,12 +163,40 @@ class TestCoversAoi:
         """A mapping item with no geometry key is kept, like an object without one."""
         assert _covers_aoi({"id": "a"}, _AOI)
 
-    def test_degenerate_zero_area_aoi_keeps_everything(self):
-        """A zero-area AOI cannot be covered by any share, so nothing is dropped."""
+    @pytest.mark.parametrize(
+        ("name", "geometry", "expected"),
+        [
+            ("point inside", {"type": "Point", "coordinates": (-3.5, 40.5)}, True),
+            ("point outside", {"type": "Point", "coordinates": (10.0, 10.0)}, False),
+            (
+                "line across",
+                {"type": "LineString", "coordinates": [(-4.5, 40.5), (-2.5, 40.5)]},
+                True,
+            ),
+            (
+                "line outside",
+                {"type": "LineString", "coordinates": [(10.0, 10.0), (12.0, 12.0)]},
+                False,
+            ),
+        ],
+    )
+    def test_zero_area_footprints_fall_back_to_intersection(
+        self, name, geometry, expected
+    ):
+        """A Point or LineString footprint is judged topologically, not by area."""
+        assert shape(geometry).area == 0
+        item = make_item("a", "2024-01-05", {}, geometry=geometry)
+        assert _covers_aoi(item, _AOI) is expected
+
+    def test_degenerate_zero_area_aoi_is_judged_topologically(self):
+        """A zero-area AOI keeps a footprint containing it and drops one that misses."""
         point_aoi = box(-4.0, 40.0, -4.0, 40.0)
         assert point_aoi.area == 0
         assert _covers_aoi(
-            make_item("a", "2024-01-05", {}, geometry=_MISSING), point_aoi
+            make_item("a", "2024-01-05", {}, geometry=_COVERING), point_aoi
+        )
+        assert not _covers_aoi(
+            make_item("b", "2024-01-05", {}, geometry=_MISSING), point_aoi
         )
 
     def test_empty_footprint_is_kept(self):
