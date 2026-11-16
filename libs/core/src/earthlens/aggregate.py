@@ -4,8 +4,11 @@ Read a NetCDF whose first axis is time, group its samples by a pandas
 offset alias (`"1D"`, `"7D"`, `"1MS"`, `"QS-DEC"`, ...), reduce each
 group with one of mean / sum / min / max / std, and write one GeoTIFF
 per window. The whole pipeline runs against pyramids primitives —
-`pyramids.netcdf.NetCDF` for read + CF metadata, `pyramids.dataset.Dataset`
-for write — plus numpy and pandas. No xarray.
+`pyramids.netcdf.NetCDF` for read + CF metadata and its `reduce` for the
+per-window statistic (so the reduction, its `skipna` / `min_count` gating and
+its no-data handling have one definition, upstream), `pyramids.dataset.Dataset`
+for write — plus numpy and pandas. No xarray. The streamed read keeps only one
+window resident, so the reduction never needs the `lazy` (dask) stack.
 
 The module sits at the top level of `earthlens` because the algorithm is
 not specific to any backend: any CDS-shaped NetCDF works (ECMWF S3
@@ -930,6 +933,7 @@ def iter_aggregate_netcdf(
         # CF one. Taking the container's would place the output by pixel index
         # with the correct EPSG stamped on top, which hides the error.
         geo = var.geotransform
+        geo_ref = GeoReference(geo=geo, epsg=4326)
 
         in_range = _date_range_mask(time_axis, date_range)
         stem = _output_stem(var_info)
@@ -941,16 +945,18 @@ def iter_aggregate_netcdf(
                     # nothing to aggregate, so emit no GeoTIFF for it.
                     continue
             slice_ = _read_window(var, mask)
-            reduced = reduce_time_axis(
-                slice_, op=op, skipna=config.skipna, min_count=config.min_count
+            reduced = _reduce_window(
+                slice_,
+                op,
+                skipna=config.skipna,
+                min_count=config.min_count,
+                geo_ref=geo_ref,
             )
 
             target: Path | None = None
             if out_dir is not None:
                 target = out_dir / (f"{stem}_{config.freq}_{window_label:%Y%m%d}.tif")
-                Dataset.from_array(
-                    arr=reduced, geo_ref=GeoReference(geo=geo, epsg=4326)
-                ).to_file(str(target))
+                Dataset.from_array(arr=reduced, geo_ref=geo_ref).to_file(str(target))
 
             keep = config.keep_arrays or target is None
             yield AggregatedWindow(
@@ -1008,3 +1014,65 @@ def _read_window(var: Any, mask: np.ndarray) -> np.ndarray:
             out = out.astype(np.promote_types(out.dtype, band.dtype))
         out[position] = band
     return out
+
+
+def _reduce_window(
+    window: np.ndarray,
+    op: str,
+    *,
+    skipna: bool,
+    min_count: int | None,
+    geo_ref: Any,
+) -> np.ndarray:
+    """Collapse one `(time, y, x)` window to `(y, x)` through pyramids' reduce.
+
+    Wraps the already-read window as an in-memory pyramids variable and defers
+    to `pyramids.netcdf.NetCDF.reduce`, so earthlens inherits one tested
+    definition of each per-window statistic together with its `skipna` /
+    `min_count` gating and no-data handling — rather than re-implementing the
+    numpy reduction here. Only the window is ever resident (the streaming read
+    in `_read_window` is unchanged), so the delegation keeps the one-window
+    peak-memory guarantee and does not need the `lazy` (dask) stack.
+
+    The window's NaN gaps are its only no-data marker (`no_data_value=np.nan`),
+    so `skipna=True` skips them and a slice with no valid cell resolves to NaN.
+    One consequence differs from a bare `numpy.nansum`: a `sum` / `prod` over an
+    all-gap slice is **no-data**, not `0.0`, so a window built from zero valid
+    samples is emitted as missing rather than a confident zero.
+
+    Args:
+        window: The window's steps stacked as `(time, y, x)`, with NaN for gaps.
+        op: The concrete reduction (`"mean"`, `"sum"`, `"min"`, `"max"`,
+            `"std"`); `"auto"` must already be resolved by `_resolve_op`.
+        skipna: When `True`, NaN gaps are skipped; when `False`, any gap
+            propagates into the result.
+        min_count: Minimum valid (non-NaN) samples a cell needs for a value;
+            cells with fewer resolve to NaN. `None` disables the floor (mapped
+            to pyramids' `min_count=0`).
+        geo_ref: The `pyramids.dataset.GeoReference` for the window grid. The
+            reduction ignores it, but it keeps the in-memory variable a valid
+            georeferenced raster.
+
+    Returns:
+        np.ndarray: The reduced `(y, x)` grid.
+    """
+    from pyramids.netcdf import ExtraDimensions, Variable
+
+    steps = int(window.shape[0])
+    container = Variable.from_array(
+        window.astype("float64"),
+        geo_ref=geo_ref,
+        no_data_value=np.nan,
+        dims=ExtraDimensions(name="time", values=[float(i) for i in range(steps)]),
+    )
+    try:
+        variable = container.get_variable(container.variable_names[0])
+        reduced = variable.reduce(
+            "time",
+            op,
+            skipna=skipna,
+            min_count=0 if min_count is None else min_count,
+        )
+        return np.asarray(reduced.read_array())
+    finally:
+        close_quietly(container)
