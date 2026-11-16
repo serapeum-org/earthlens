@@ -61,12 +61,13 @@ jobs:
         # backends in the one lane that exercises the built wheels is not
         # worth saving a pin.
         #
-        # `uv pip compile`, not `uv export`: the workspace lock is deliberately
-        # forked (argopy needs xarray>=2025.7, openeo needs <2025.1.2, declared
-        # in `[tool.uv] conflicts`) and `export` emits the union of both forks
-        # unmarked, which pip rejects as self-contradictory. `compile` performs
-        # one ordinary resolution, so there is exactly one version per package.
-        # The guard below fails the build if that ever stops being true.
+        # `uv pip compile`, not `uv export`: `compile` performs one ordinary
+        # resolution, so there is exactly one version per package, which is what
+        # pip installs here. (`export` emits every branch of a *forked* lock
+        # unmarked, which pip rejects as self-contradictory; the earthlens lock
+        # no longer forks now that argo and openeo share one resolution -- see
+        # #789 -- but compile stays the robust choice.) The guard below fails the
+        # build if two unmarked, contradictory pins ever appear.
         #
         # The seven earthlens distributions are excluded — they are installed
         # from the wheels built above, by path.
