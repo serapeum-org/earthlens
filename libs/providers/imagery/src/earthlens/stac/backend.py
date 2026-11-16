@@ -329,6 +329,8 @@ class STAC(LazyClientMixin, AbstractDataSource):
         from pyramids.dataset.merge import merge_rasters
         from pyramids.stac import resolved_href
 
+        from earthlens.stac.signers import alternate_preference_for
+
         out: list[Path] = []
         # (collection_key, date, half index, path) for each written COG, so
         # download(aggregate=) can group + window them without re-parsing names.
@@ -340,6 +342,13 @@ class STAC(LazyClientMixin, AbstractDataSource):
             # Per-collection signer (e.g. requester-pays for usgs-landsat) — its
             # GDAL env must be active for the remote reads inside merge_rasters.
             signer = self._signer_for(collection_key)
+            # Which `alternate-assets` mirror this signer must read instead of the
+            # asset's canonical href. Requester-pays Landsat publishes a canonical
+            # HTTPS href that 302s to the EROS login (unreadable with an AWS key
+            # pair) alongside a readable `s3://` alternate; `None` keeps the
+            # canonical href, and resolved_href falls back to it for any asset
+            # that publishes no such alternate.
+            alternate = alternate_preference_for(signer)
             with CloudConfig(extra=signer.gdal_env()):
                 idx = self._aoi_bboxes.index(bbox_key) if multi else 0
                 assets = group[0].metadata["assets"]
@@ -364,7 +373,12 @@ class STAC(LazyClientMixin, AbstractDataSource):
                     # left-over s3:// to the GDAL /vsis3/ path.
                     hrefs = [
                         _to_vsi(
-                            resolved_href(p.metadata["item"], item_key, signer=signer)
+                            resolved_href(
+                                p.metadata["item"],
+                                item_key,
+                                signer=signer,
+                                alternate=alternate,
+                            )
                         )
                         for p in group
                     ]

@@ -38,8 +38,63 @@ __all__ = [
     "CdseS3Signer",
     "EarthdataSigner",
     "PlanetaryComputerSigner",
+    "alternate_preference_for",
     "build_signer",
 ]
+
+#: Which `alternate-assets` href a signer prefers over the asset's canonical one,
+#: keyed by signer name. A STAC asset may publish mirrors under `alternate`; the
+#: canonical href is not always the one the signer can actually read.
+#:
+#: `aws-requester-pays` is the case that forced this: every USGS Landsat asset
+#: publishes a canonical `https://landsatlook.usgs.gov/...` href *and* an
+#: `alternate.s3` href on the requester-pays bucket. The canonical one 302s to the
+#: EROS login, which an AWS key pair cannot satisfy, so reading it fails whatever
+#: credentials are present; the `s3://` mirror is the readable copy.
+#:
+#: `cdse-s3` is deliberately absent even though it also reads an S3 store: its own
+#: `sign_href` already rewrites the canonical `eodata` href to a `/vsis3/` path, so
+#: it reads correctly today and adding a preference here would change a working
+#: path with no way to verify it short of live CDSE credentials. The remaining
+#: signers (`anonymous`, `mpc-sas`, `earthdata`, `cdse`, `bdc-token`) read
+#: publicly-reachable HTTPS hrefs and need no mirror.
+_ALTERNATE_PREFERENCE: dict[str, tuple[str, ...]] = {
+    "aws-requester-pays": ("s3",),
+}
+
+
+def alternate_preference_for(signer: Any) -> tuple[str, ...] | None:
+    """Return the `alternate-assets` keys `signer` prefers, best first.
+
+    Keyed by the signer's `name`, so it resolves for both a `_ContractSigner`
+    wrapper and a bare pyramids-eo signer.
+
+    Args:
+        signer: Any object exposing the `Signer` protocol's `name`.
+
+    Returns:
+        The preferred `alternate` keys in order, or `None` when the signer wants
+        the canonical href. Pass the result straight to
+        `pyramids.stac.resolved_href(..., alternate=...)`, which falls back to the
+        canonical href for an asset that publishes no such alternate.
+
+    Examples:
+        - The requester-pays signer prefers the `s3` mirror:
+            ```python
+            >>> from earthlens.stac import alternate_preference_for, build_signer
+            >>> alternate_preference_for(build_signer("aws-requester-pays"))
+            ('s3',)
+
+            ```
+        - Every other signer keeps the canonical href:
+            ```python
+            >>> from earthlens.stac import alternate_preference_for, build_signer
+            >>> alternate_preference_for(build_signer("anonymous")) is None
+            True
+
+            ```
+    """
+    return _ALTERNATE_PREFERENCE.get(getattr(signer, "name", ""))
 
 
 class _ContractSigner:

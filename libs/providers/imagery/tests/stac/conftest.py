@@ -20,14 +20,16 @@ import pytest
 
 
 class _FakeAsset:
-    """A STAC asset stand-in carrying just an href."""
+    """A STAC asset stand-in carrying an href and optional `alternate` mirrors."""
 
-    def __init__(self, href: str) -> None:
+    def __init__(self, href: str, alternate: dict[str, str] | None = None) -> None:
         self.href = href
+        if alternate is not None:
+            self.alternate = {k: {"href": v} for k, v in alternate.items()}
 
 
 class _FakeItem:
-    """A STAC item stand-in with id, datetime, and an assets map."""
+    """A STAC item stand-in with id, datetime, assets and an optional footprint."""
 
     def __init__(
         self,
@@ -35,20 +37,49 @@ class _FakeItem:
         date: str,
         asset_hrefs: dict[str, str],
         proj_epsg: int | None = None,
+        geometry: dict[str, Any] | None = None,
+        alternates: dict[str, dict[str, str]] | None = None,
     ) -> None:
         import datetime as dt
 
         self.id = item_id
         self.datetime = dt.datetime.strptime(date, "%Y-%m-%d")
-        self.assets = {k: _FakeAsset(v) for k, v in asset_hrefs.items()}
+        self.assets = {
+            k: _FakeAsset(v, (alternates or {}).get(k)) for k, v in asset_hrefs.items()
+        }
         self.properties = {"proj:epsg": proj_epsg} if proj_epsg is not None else {}
+        if geometry is not None:
+            self.geometry = geometry
 
 
 def make_item(
-    item_id: str, date: str, asset_hrefs: dict[str, str], proj_epsg: int | None = None
+    item_id: str,
+    date: str,
+    asset_hrefs: dict[str, str],
+    proj_epsg: int | None = None,
+    geometry: dict[str, Any] | None = None,
+    alternates: dict[str, dict[str, str]] | None = None,
 ) -> _FakeItem:
-    """Build a fake STAC item for a search result (optional `proj:epsg`)."""
-    return _FakeItem(item_id, date, asset_hrefs, proj_epsg)
+    """Build a fake STAC item for a search result (optional epsg/footprint/mirrors)."""
+    return _FakeItem(item_id, date, asset_hrefs, proj_epsg, geometry, alternates)
+
+
+def make_bbox_geometry(
+    minx: float, miny: float, maxx: float, maxy: float
+) -> dict[str, Any]:
+    """Build a GeoJSON polygon footprint spanning the given bounds."""
+    return {
+        "type": "Polygon",
+        "coordinates": [
+            [
+                [minx, miny],
+                [maxx, miny],
+                [maxx, maxy],
+                [minx, maxy],
+                [minx, miny],
+            ]
+        ],
+    }
 
 
 class _FakeSearch:
@@ -225,9 +256,18 @@ class _PlanetaryComputerSigner(_AnonymousSigner):
 
 
 def _resolved_href(
-    item_or_asset: Any, asset_key: Any = None, *, signer: Any = None
+    item_or_asset: Any,
+    asset_key: Any = None,
+    *,
+    signer: Any = None,
+    alternate: Any = None,
 ) -> str:
-    """Stand-in for pyramids.stac.resolved_href: resolve href + apply sign_href."""
+    """Stand-in for pyramids.stac.resolved_href: resolve href + apply sign_href.
+
+    Mirrors the real `alternate=` preference: the first named `alternate-assets`
+    key the asset publishes wins, and an asset with none falls back to its
+    canonical href.
+    """
     if asset_key is None:
         asset = item_or_asset
     else:
@@ -244,6 +284,15 @@ def _resolved_href(
         href = asset.get("href")
     if href is None:
         raise KeyError(f"asset {asset_key!r} has no 'href'")
+    alternates = getattr(asset, "alternate", None)
+    if alternates is None and isinstance(asset, dict):
+        alternates = asset.get("alternate")
+    for key in (alternate,) if isinstance(alternate, str) else (alternate or ()):
+        entry = (alternates or {}).get(key)
+        mirror = entry.get("href") if isinstance(entry, dict) else None
+        if mirror:
+            href = mirror
+            break
     href = str(href)
     return signer.sign_href(href) if signer is not None else href
 

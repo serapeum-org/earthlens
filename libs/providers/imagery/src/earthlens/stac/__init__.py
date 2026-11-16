@@ -49,6 +49,7 @@ from earthlens.stac.signers import (
     CDSESigner,
     EarthdataSigner,
     PlanetaryComputerSigner,
+    alternate_preference_for,
     build_signer,
 )
 
@@ -66,5 +67,6 @@ __all__ = [
     "Endpoint",
     "Extent",
     "PlanetaryComputerSigner",
+    "alternate_preference_for",
     "build_signer",
 ]
