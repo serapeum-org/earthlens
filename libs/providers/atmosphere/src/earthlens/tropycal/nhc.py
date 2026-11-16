@@ -144,6 +144,29 @@ def fetch_btk_frames(
         KeyError: If `basin` is not an `NHC_BTK_BASINS` key (the backend
             validates this before calling, so it signals a programming
             error here).
+
+    Examples:
+        - Fetch one basin's season through the injectable getter (the same
+          seam the tests use, so the example stays off the network):
+            ```python
+            >>> from earthlens.tropycal.nhc import fetch_btk_frames, BTK_BASE_URL
+            >>> class _Resp:
+            ...     def __init__(self, text):
+            ...         self.text = text
+            ...     def raise_for_status(self):
+            ...         return None
+            >>> row = "EP, 12, 2026090218, , BEST, 0, 133N, 1537W, 140, 927, HU, 64, NEQ, 30, 25, 20, 30"
+            >>> pages = {
+            ...     BTK_BASE_URL: _Resp('<a href="bep122026.dat">bep122026.dat</a>'),
+            ...     BTK_BASE_URL + "bep122026.dat": _Resp(row),
+            ... }
+            >>> frames = fetch_btk_frames(
+            ...     "east_pacific", [2026], get=lambda url, timeout=None: pages[url]
+            ... )
+            >>> frames[0]["id"].iloc[0]
+            'EP122026'
+
+            ```
     """
     prefix = NHC_BTK_BASINS[basin]
     wanted_years = {str(year) for year in years}
@@ -196,6 +219,33 @@ def parse_btk_file(text: str, *, storm_id: str, basin: str) -> pd.DataFrame:
             columns, the twelve `RADII_COLUMNS`, and the `id` / `name` /
             `wmo_basin` attribute columns. Empty when the file has no usable
             `BEST` rows.
+
+    Examples:
+        - Fold a fix's 34- and 64-kt rows into one record and read its radii:
+            ```python
+            >>> from earthlens.tropycal.nhc import parse_btk_file
+            >>> row34 = "EP, 12, 2026090218, , BEST, 0, 133N, 1537W, 140, 927, HU, 34, NEQ, 80, 60, 60, 80"
+            >>> row64 = "EP, 12, 2026090218, , BEST, 0, 133N, 1537W, 140, 927, HU, 64, NEQ, 30, 25, 20, 30"
+            >>> frame = parse_btk_file(
+            ...     chr(10).join([row34, row64]), storm_id="EP122026", basin="east_pacific"
+            ... )
+            >>> len(frame)
+            1
+            >>> frame[["r34_ne", "r64_ne"]].iloc[0].tolist()
+            [80.0, 30.0]
+
+            ```
+        - A weak (threshold-0) fix parses with its radii left as NaN:
+            ```python
+            >>> from earthlens.tropycal.nhc import parse_btk_file
+            >>> row = "EP, 12, 2026082518, , BEST, 0, 101N, 1367W, 15, 1008, DB, 0, , 0, 0, 0, 0"
+            >>> frame = parse_btk_file(row, storm_id="EP122026", basin="east_pacific")
+            >>> round(float(frame["lon"].iloc[0]), 1)
+            -136.7
+            >>> bool(frame["r34_ne"].isna().iloc[0])
+            True
+
+            ```
     """
     fixes: dict[pd.Timestamp, dict[str, object]] = {}
     order: list[pd.Timestamp] = []

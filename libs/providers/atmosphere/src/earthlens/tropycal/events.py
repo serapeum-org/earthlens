@@ -527,7 +527,49 @@ def concat_recon_fcs(collections: list[FeatureCollection]) -> FeatureCollection:
 
 
 def concat_btk_fcs(collections: list[FeatureCollection]) -> FeatureCollection:
-    """Row-union per-basin NHC best-track collections, else `empty_btk_fc`."""
+    """Row-union per-basin NHC best-track collections, else `empty_btk_fc`.
+
+    Args:
+        collections: Per-basin point collections from `btk_frame_to_fc`,
+            all sharing the `BTK_POINT_COLUMNS` schema and CRS.
+
+    Returns:
+        FeatureCollection: The row-wise union, CRS `EPSG:4326`. A
+            schema-correct empty collection when every input is empty.
+
+    Examples:
+        - Union two basins' fixes into one collection:
+            ```python
+            >>> import datetime as dt
+            >>> import pandas as pd
+            >>> from earthlens.tropycal.events import btk_frame_to_fc, concat_btk_fcs
+            >>> win = (dt.datetime(2026, 8, 1), dt.datetime(2026, 10, 1))
+            >>> box = (-5.0, 60.0, -178.0, -10.0)
+            >>> ep = pd.DataFrame({
+            ...     "id": ["EP122026"], "name": ["LOWELL"],
+            ...     "time": pd.to_datetime(["2026-09-02 18:00"]),
+            ...     "lat": [13.3], "lon": [-153.7], "vmax": [140.0],
+            ...     "mslp": [927.0], "type": ["HU"], "wmo_basin": ["east_pacific"],
+            ... })
+            >>> al = ep.assign(id="AL012026", lon=-80.0, wmo_basin="north_atlantic")
+            >>> a = btk_frame_to_fc([ep], window=win, bbox=box, source="nhc")
+            >>> b = btk_frame_to_fc([al], window=win, bbox=box, source="nhc")
+            >>> merged = concat_btk_fcs([a, b])
+            >>> sorted(merged["storm_id"].tolist())
+            ['AL012026', 'EP122026']
+
+            ```
+        - Only-empty inputs give back the radii schema, not an error:
+            ```python
+            >>> from earthlens.tropycal.events import concat_btk_fcs, empty_btk_fc, RADII_COLUMNS
+            >>> merged = concat_btk_fcs([empty_btk_fc()])
+            >>> len(merged)
+            0
+            >>> set(RADII_COLUMNS).issubset(merged.columns)
+            True
+
+            ```
+    """
     return _concat_typed(collections, empty_btk_fc)
 
 
