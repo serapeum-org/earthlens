@@ -20,16 +20,11 @@ That installs core plus the five providers as editable, every backend SDK, and t
 
 !!! warning "Use `--extra all`, not `--all-extras`"
 
-    `--all-extras` activates *every* extra, including both `argo` and `openeo`, which are mutually exclusive:
-    `argopy` needs `xarray>=2025.7` while `openeo` needs `xarray<2025.1.2`. uv rejects the combination. The
-    curated `all` extra includes `openeo` and `osm` (which now also carries the bulk-pbf `osmium`), and omits
-    `argo` (which conflicts with `openeo`) and `eedai`, so it resolves.
-
-    To work on the argo side instead, prune the conflicting extra:
-
-    ```bash
-    uv sync --all-extras --no-extra openeo
-    ```
+    The curated `all` extra includes `argo`, `openeo` and `osm` (which also carries the bulk-pbf `osmium`) and
+    omits only `eedai`. `--all-extras` also resolves now that the `argo` ⊥ `openeo` xarray conflict is gone
+    ([#789](https://github.com/serapeum-org/earthlens/issues/789)), but it additionally pulls `eedai`, which
+    flips the GEE backend's default reader onto `pyramids-eo` (a different sampling/gridding path), so prefer
+    `--extra all` to keep that opt-in.
 
 Refresh the lockfile with `uv lock`; `uv lock --check` verifies it is current (the CI `--locked` gate).
 
