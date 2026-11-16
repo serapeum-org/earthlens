@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24831,7 +24831,6 @@ geostrophic flow over a region.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">GeoReference</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColorBar</span>
@@ -24847,7 +24846,6 @@ geostrophic flow over a region.</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
 
-import matplotlib.pyplot as plt
 import numpy as np
 from pyramids.dataset import Dataset, GeoReference
 from pyramids.plot import ColorBar
@@ -25344,7 +25342,6 @@ print(f"grid {celsius.rows} x {celsius.columns}, epsg {celsius.epsg}")</div>
 <span class="p">)</span>
 <span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"longitude"</span><span class="p">)</span>
 <span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"latitude"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-8">glyph = celsius.plot(
     figsize=(10, 5),
@@ -25374,8 +25371,7 @@ wind.plot_vector_field(
     scale=600,
 )
 glyph.ax.set_xlabel("longitude")
-glyph.ax.set_ylabel("latitude")
-plt.show()</div>
+glyph.ax.set_ylabel("latitude")</div>
 </div>
 </div>
 </div>

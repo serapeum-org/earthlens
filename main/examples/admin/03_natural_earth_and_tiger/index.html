@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24664,13 +24664,9 @@ normalisation to EPSG:4326.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import matplotlib.pyplot as plt
-
-from earthlens.core import EarthLens</div>
+<div class="clipboard-copy-txt" id="cell-1">from earthlens.core import EarthLens</div>
 </div>
 </div>
 </div>
@@ -24748,14 +24744,12 @@ print(len(countries), 'countries, EPSG:', countries.crs.to_epsg())</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">countries</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">edgecolor</span><span class="o">=</span><span class="s1">'white'</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">'#9ecae1'</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Natural Earth — admin-0 countries (110m)'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Longitude'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Latitude'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Latitude'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">ax = countries.plot(edgecolor='white', facecolor='#9ecae1', figsize=(11, 5.5))
 ax.set_title('Natural Earth — admin-0 countries (110m)')
 ax.set_xlabel('Longitude')
-ax.set_ylabel('Latitude')
-plt.show()</div>
+_ = ax.set_ylabel('Latitude')</div>
 </div>
 </div>
 </div>
@@ -24845,16 +24839,14 @@ the contiguous US for readability.</p>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'US Census TIGER — states (reprojected NAD83 -&gt; EPSG:4326)'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Longitude'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Latitude'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Latitude'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">ax = states.plot(edgecolor='black', facecolor='#fdd0a2', figsize=(10, 6))
 ax.set_xlim(-128, -65)
 ax.set_ylim(23, 50)
 ax.set_title('US Census TIGER — states (reprojected NAD83 -&gt; EPSG:4326)')
 ax.set_xlabel('Longitude')
-ax.set_ylabel('Latitude')
-plt.show()</div>
+_ = ax.set_ylabel('Latitude')</div>
 </div>
 </div>
 </div>

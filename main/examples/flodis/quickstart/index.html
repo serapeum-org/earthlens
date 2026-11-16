@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24742,8 +24742,8 @@ working directory is this notebook's own folder, so a temp directory keeps the f
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.stats.bar_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">BarGlyph</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
@@ -24754,8 +24754,8 @@ working directory is this notebook's own folder, so a temp directory keeps the f
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import pandas as pd
+from cleopatra.glyphs.stats.bar_glyph import BarGlyph
 
 from earthlens.core import EarthLens
 
@@ -24911,21 +24911,25 @@ thousands of USD, so we scale to millions for the axis.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">by_year</span> <span class="o">=</span> <span class="n">damages</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"year"</span><span class="p">)[</span><span class="s2">"total_damages_(000_USD)"</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="mi">1_000</span><span class="p">)</span>
 
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">by_year</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="n">by_year</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#2b6cb0"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"FLODIS matched flood damages by year (2000-2018)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"year"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"reported damages (million USD)"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">_fig</span><span class="p">,</span> <span class="n">_ax</span><span class="p">,</span> <span class="n">_bars</span> <span class="o">=</span> <span class="n">BarGlyph</span><span class="p">(</span>
+    <span class="n">by_year</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="n">by_year</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"FLODIS matched flood damages by year (2000-2018)"</span><span class="p">,</span>
+    <span class="n">xlabel</span><span class="o">=</span><span class="s2">"year"</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="s2">"reported damages (million USD)"</span><span class="p">,</span>
+    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">"#2b6cb0"</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">by_year</span><span class="p">),</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">by_year = damages.groupby("year")["total_damages_(000_USD)"].sum().div(1_000)
 
-fig, ax = plt.subplots(figsize=(9, 4))
-ax.bar(by_year.index.astype(int), by_year.values, color="#2b6cb0")
-ax.set_title("FLODIS matched flood damages by year (2000-2018)")
-ax.set_xlabel("year")
-ax.set_ylabel("reported damages (million USD)")
-plt.show()</div>
+_fig, _ax, _bars = BarGlyph(
+    by_year.index.astype(int), by_year.values, figsize=(9, 4)
+).plot(
+    title="FLODIS matched flood damages by year (2000-2018)",
+    xlabel="year",
+    ylabel="reported damages (million USD)",
+    colors=["#2b6cb0"] * len(by_year),
+)</div>
 </div>
 </div>
 </div>
@@ -24964,19 +24968,23 @@ most-affected nations over the period.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">top_deaths</span> <span class="o">=</span> <span class="n">damages</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"ISO3"</span><span class="p">)[</span><span class="s2">"total_deaths"</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
 
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">top_deaths</span><span class="o">.</span><span class="n">index</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">top_deaths</span><span class="o">.</span><span class="n">values</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#c53030"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Top 12 countries by FLODIS matched flood fatalities (2000-2018)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"total deaths"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">_fig</span><span class="p">,</span> <span class="n">_ax</span><span class="p">,</span> <span class="n">_bars</span> <span class="o">=</span> <span class="n">BarGlyph</span><span class="p">(</span>
+    <span class="n">top_deaths</span><span class="o">.</span><span class="n">index</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">top_deaths</span><span class="o">.</span><span class="n">values</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">horizontal</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"Top 12 countries by FLODIS matched flood fatalities (2000-2018)"</span><span class="p">,</span>
+    <span class="n">xlabel</span><span class="o">=</span><span class="s2">"total deaths"</span><span class="p">,</span>
+    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">"#c53030"</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">top_deaths</span><span class="p">),</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">top_deaths = damages.groupby("ISO3")["total_deaths"].sum().nlargest(12)
 
-fig, ax = plt.subplots(figsize=(9, 4))
-ax.barh(top_deaths.index[::-1], top_deaths.values[::-1], color="#c53030")
-ax.set_title("Top 12 countries by FLODIS matched flood fatalities (2000-2018)")
-ax.set_xlabel("total deaths")
-plt.show()</div>
+_fig, _ax, _bars = BarGlyph(
+    top_deaths.index[::-1], top_deaths.values[::-1], figsize=(9, 4), horizontal=True
+).plot(
+    title="Top 12 countries by FLODIS matched flood fatalities (2000-2018)",
+    xlabel="total deaths",
+    colors=["#c53030"] * len(top_deaths),
+)</div>
 </div>
 </div>
 </div>
@@ -25016,21 +25024,25 @@ behind them.</p>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">match_counts</span> <span class="o">=</span> <span class="n">damages</span><span class="p">[</span><span class="s2">"GFD_matches"</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
 
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">match_counts</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="n">match_counts</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#2f855a"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"GFD footprints matched per damage event"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"number of matched GFD events"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"count of impact events"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">_fig</span><span class="p">,</span> <span class="n">_ax</span><span class="p">,</span> <span class="n">_bars</span> <span class="o">=</span> <span class="n">BarGlyph</span><span class="p">(</span>
+    <span class="n">match_counts</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="n">match_counts</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"GFD footprints matched per damage event"</span><span class="p">,</span>
+    <span class="n">xlabel</span><span class="o">=</span><span class="s2">"number of matched GFD events"</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="s2">"count of impact events"</span><span class="p">,</span>
+    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">"#2f855a"</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">match_counts</span><span class="p">),</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">match_counts = damages["GFD_matches"].value_counts().sort_index()
 
-fig, ax = plt.subplots(figsize=(9, 4))
-ax.bar(match_counts.index.astype(int), match_counts.values, color="#2f855a")
-ax.set_title("GFD footprints matched per damage event")
-ax.set_xlabel("number of matched GFD events")
-ax.set_ylabel("count of impact events")
-plt.show()</div>
+_fig, _ax, _bars = BarGlyph(
+    match_counts.index.astype(int), match_counts.values, figsize=(9, 4)
+).plot(
+    title="GFD footprints matched per damage event",
+    xlabel="number of matched GFD events",
+    ylabel="count of impact events",
+    colors=["#2f855a"] * len(match_counts),
+)</div>
 </div>
 </div>
 </div>
@@ -25123,19 +25135,23 @@ displacement[
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">top_disp</span> <span class="o">=</span> <span class="n">displacement</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"ISO3"</span><span class="p">)[</span><span class="s2">"displacements"</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
 
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">top_disp</span><span class="o">.</span><span class="n">index</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">top_disp</span><span class="o">.</span><span class="n">values</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#6b46c1"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Top 12 countries by FLODIS flood displacements (2000-2018)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"people displaced"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">_fig</span><span class="p">,</span> <span class="n">_ax</span><span class="p">,</span> <span class="n">_bars</span> <span class="o">=</span> <span class="n">BarGlyph</span><span class="p">(</span>
+    <span class="n">top_disp</span><span class="o">.</span><span class="n">index</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">top_disp</span><span class="o">.</span><span class="n">values</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">horizontal</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"Top 12 countries by FLODIS flood displacements (2000-2018)"</span><span class="p">,</span>
+    <span class="n">xlabel</span><span class="o">=</span><span class="s2">"people displaced"</span><span class="p">,</span>
+    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">"#6b46c1"</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">top_disp</span><span class="p">),</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-8">top_disp = displacement.groupby("ISO3")["displacements"].sum().nlargest(12)
 
-fig, ax = plt.subplots(figsize=(9, 4))
-ax.barh(top_disp.index[::-1], top_disp.values[::-1], color="#6b46c1")
-ax.set_title("Top 12 countries by FLODIS flood displacements (2000-2018)")
-ax.set_xlabel("people displaced")
-plt.show()</div>
+_fig, _ax, _bars = BarGlyph(
+    top_disp.index[::-1], top_disp.values[::-1], figsize=(9, 4), horizontal=True
+).plot(
+    title="Top 12 countries by FLODIS flood displacements (2000-2018)",
+    xlabel="people displaced",
+    colors=["#6b46c1"] * len(top_disp),
+)</div>
 </div>
 </div>
 </div>

@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24639,6 +24639,8 @@ regions. Everything runs through the unified <code>EarthLens</code> facade.</p>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.stats.bar_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">BarGlyph</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.stats.histogram_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistogramGlyph</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
@@ -24651,6 +24653,8 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from cleopatra.glyphs.stats.bar_glyph import BarGlyph
+from cleopatra.glyphs.stats.histogram_glyph import HistogramGlyph
 
 from earthlens.core import EarthLens
 
@@ -24773,22 +24777,29 @@ exposure-normalised — see the backend's introduction page for why that distinc
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">losses</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">events</span><span class="p">[</span><span class="s2">"Losses (real value)"</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s2">"coerce"</span><span class="p">)</span>
 <span class="n">fatalities</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">events</span><span class="p">[</span><span class="s2">"Fatalities"</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s2">"coerce"</span><span class="p">)</span>
 
+<span class="c1"># matplotlib supplies the two panels; the bar and the histogram are glyphs.</span>
 <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 
-<span class="n">events</span><span class="p">[</span><span class="s2">"Type"</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#4C72B0"</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Flood events by type (DE + NL, 1950-2020)"</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Type"</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Number of events"</span><span class="p">)</span>
+<span class="n">by_type</span> <span class="o">=</span> <span class="n">events</span><span class="p">[</span><span class="s2">"Type"</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+<span class="n">BarGlyph</span><span class="p">(</span><span class="n">by_type</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">by_type</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"Flood events by type (DE + NL, 1950-2020)"</span><span class="p">,</span>
+    <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Type"</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Number of events"</span><span class="p">,</span>
+    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">"#4C72B0"</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">by_type</span><span class="p">),</span>
+<span class="p">)</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">"x"</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="n">valid</span> <span class="o">=</span> <span class="n">losses</span><span class="p">[</span><span class="n">losses</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">valid</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#C44E52"</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Distribution of real losses"</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Losses (real value, 2025 EUR)"</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Number of events"</span><span class="p">)</span>
+<span class="n">HistogramGlyph</span><span class="p">(</span><span class="n">valid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">)</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
+    <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s2">"#C44E52"</span><span class="p">],</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"Distribution of real losses"</span><span class="p">,</span>
+    <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Losses (real value, 2025 EUR)"</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Number of events"</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total recorded fatalities: </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">fatalities</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deadliest single event: </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">fatalities</span><span class="o">.</span><span class="n">max</span><span class="p">())</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> fatalities"</span><span class="p">)</span>
@@ -24796,22 +24807,29 @@ exposure-normalised — see the backend's introduction page for why that distinc
 <div class="clipboard-copy-txt" id="cell-3">losses = pd.to_numeric(events["Losses (real value)"], errors="coerce")
 fatalities = pd.to_numeric(events["Fatalities"], errors="coerce")
 
+# matplotlib supplies the two panels; the bar and the histogram are glyphs.
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
 
-events["Type"].value_counts().plot.bar(ax=ax1, color="#4C72B0")
-ax1.set_title("Flood events by type (DE + NL, 1950-2020)")
-ax1.set_xlabel("Type")
-ax1.set_ylabel("Number of events")
+by_type = events["Type"].value_counts()
+BarGlyph(by_type.index, by_type.values).plot(
+    ax=ax1,
+    title="Flood events by type (DE + NL, 1950-2020)",
+    xlabel="Type",
+    ylabel="Number of events",
+    colors=["#4C72B0"] * len(by_type),
+)
 ax1.tick_params(axis="x", rotation=0)
 
 valid = losses[losses &gt; 0]
-ax2.hist(valid, bins=20, color="#C44E52")
-ax2.set_title("Distribution of real losses")
-ax2.set_xlabel("Losses (real value, 2025 EUR)")
-ax2.set_ylabel("Number of events")
+HistogramGlyph(valid, ax=ax2).histogram(
+    bins=20,
+    color=["#C44E52"],
+    title="Distribution of real losses",
+    xlabel="Losses (real value, 2025 EUR)",
+    ylabel="Number of events",
+)
 
 fig.tight_layout()
-plt.show()
 
 print(f"Total recorded fatalities: {int(fatalities.sum()):,}")
 print(f"Deadliest single event: {int(fatalities.max()):,} fatalities")</div>

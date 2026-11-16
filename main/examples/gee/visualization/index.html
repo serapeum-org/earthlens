@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -25276,7 +25276,27 @@ May and receding by November.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"frames:"</span><span class="p">,</span> <span class="n">chirps_result</span><span class="o">.</span><span class="n">collection</span><span class="p">()</span><span class="o">.</span><span class="n">time_length</span><span class="p">)</span>
 
 <span class="n">gif_path</span> <span class="o">=</span> <span class="n">OUT_DIR</span> <span class="o">/</span> <span class="s2">"sahel_monsoon.gif"</span>
-<span class="n">chirps_gee</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">chirps_result</span><span class="p">)</span><span class="o">.</span><span class="n">timelapse</span><span class="p">(</span><span class="n">gif_path</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"Blues"</span><span class="p">)</span>
+<span class="c1"># One stretch across the whole stack (0-15 mm/day spans every month's peak) so what</span>
+<span class="c1"># changes between frames is the monsoon, not the colour mapping -- left to itself each</span>
+<span class="c1"># frame re-derives its own range and a dry month looks like a wet one. `scene_kw`</span>
+<span class="c1"># carries the two settings fixed when the Map is built rather than when a frame is</span>
+<span class="c1"># drawn: the display CRS, without which the axes are Web-Mercator metres instead of</span>
+<span class="c1"># degrees, and a figure shaped like the AOI (10 deg wide by 7 tall) instead of the</span>
+<span class="c1"># default square, which would surround it with white.</span>
+<span class="n">chirps_gee</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">chirps_result</span><span class="p">)</span><span class="o">.</span><span class="n">timelapse</span><span class="p">(</span>
+    <span class="n">gif_path</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">"Blues"</span><span class="p">,</span>
+    <span class="n">vmin</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">vmax</span><span class="o">=</span><span class="mf">15.0</span><span class="p">,</span>
+    <span class="n">titles</span><span class="o">=</span><span class="p">[</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">month</span><span class="si">}</span><span class="s2"> 2021"</span> <span class="k">for</span> <span class="n">month</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"May"</span><span class="p">,</span> <span class="s2">"Jun"</span><span class="p">,</span> <span class="s2">"Jul"</span><span class="p">,</span> <span class="s2">"Aug"</span><span class="p">,</span> <span class="s2">"Sep"</span><span class="p">,</span> <span class="s2">"Oct"</span><span class="p">,</span> <span class="s2">"Nov"</span><span class="p">)</span>
+    <span class="p">],</span>
+    <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">cbar_label</span><span class="o">=</span><span class="s2">"mean daily precipitation (mm/day)"</span><span class="p">,</span>
+    <span class="n">coastlines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">fps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">scene_kw</span><span class="o">=</span><span class="p">{</span><span class="s2">"crs"</span><span class="p">:</span> <span class="mi">4326</span><span class="p">,</span> <span class="s2">"figsize"</span><span class="p">:</span> <span class="p">(</span><span class="mf">9.5</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">)},</span>
+<span class="p">)</span>
 <span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">gif_path</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-10">chirps_gee = GEE(
@@ -25296,7 +25316,27 @@ chirps_result = chirps_gee.download(progress_bar=False)
 print("frames:", chirps_result.collection().time_length)
 
 gif_path = OUT_DIR / "sahel_monsoon.gif"
-chirps_gee.visualize(chirps_result).timelapse(gif_path, cmap="Blues")
+# One stretch across the whole stack (0-15 mm/day spans every month's peak) so what
+# changes between frames is the monsoon, not the colour mapping -- left to itself each
+# frame re-derives its own range and a dry month looks like a wet one. `scene_kw`
+# carries the two settings fixed when the Map is built rather than when a frame is
+# drawn: the display CRS, without which the axes are Web-Mercator metres instead of
+# degrees, and a figure shaped like the AOI (10 deg wide by 7 tall) instead of the
+# default square, which would surround it with white.
+chirps_gee.visualize(chirps_result).timelapse(
+    gif_path,
+    cmap="Blues",
+    vmin=0.0,
+    vmax=15.0,
+    titles=[
+        f"{month} 2021" for month in ("May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov")
+    ],
+    colorbar=True,
+    cbar_label="mean daily precipitation (mm/day)",
+    coastlines=True,
+    fps=2,
+    scene_kw={"crs": 4326, "figsize": (9.5, 6.0)},
+)
 Image(filename=str(gif_path))</div>
 </div>
 </div>

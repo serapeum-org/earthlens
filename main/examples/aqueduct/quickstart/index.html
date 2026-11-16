@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24802,12 +24802,14 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.stats.bar_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">BarGlyph</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">DATA</span> <span class="o">=</span> <span class="s2">"out"</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import matplotlib.pyplot as plt
+from cleopatra.glyphs.stats.bar_glyph import BarGlyph
 
 from earthlens.core import EarthLens
 
@@ -25078,21 +25080,23 @@ tops = {m: top5(m) for m in metrics}</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mf">3.4</span><span class="p">))</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># matplotlib lays the three panels out; each bar chart is a BarGlyph.</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mf">3.4</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">metrics</span><span class="p">):</span>
-    <span class="n">tops</span><span class="p">[</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#c0392b"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">series</span> <span class="o">=</span> <span class="n">tops</span><span class="p">[</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">BarGlyph</span><span class="p">(</span><span class="n">series</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">series</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">"#c0392b"</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">fig, axes = plt.subplots(1, 3, figsize=(13, 3.4))
+<div class="clipboard-copy-txt" id="cell-6"># matplotlib lays the three panels out; each bar chart is a BarGlyph.
+fig, axes = plt.subplots(1, 3, figsize=(13, 3.4))
 for ax, m in zip(axes, metrics):
-    tops[m].iloc[::-1].plot.barh(ax=ax, color="#c0392b")
-    ax.set_title(m)
-    ax.set_ylabel("")
-plt.tight_layout()
-plt.show()</div>
+    series = tops[m].iloc[::-1]
+    BarGlyph(series.index, series.values, horizontal=True).plot(
+        ax=ax, title=m, ylabel="", colors=["#c0392b"] * len(series)
+    )
+fig.tight_layout()</div>
 </div>
 </div>
 </div>
@@ -25196,19 +25200,17 @@ totals</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">totals</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="n">totals</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s2">"#2980b9"</span><span class="p">,</span> <span class="s2">"#c0392b"</span><span class="p">])</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Global population exposed (100-yr)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Baseline vs 2030 projection"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">_fig</span><span class="p">,</span> <span class="n">_ax</span><span class="p">,</span> <span class="n">_bars</span> <span class="o">=</span> <span class="n">BarGlyph</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">totals</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="n">totals</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"Baseline vs 2030 projection"</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Global population exposed (100-yr)"</span><span class="p">,</span>
+    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">"#2980b9"</span><span class="p">,</span> <span class="s2">"#c0392b"</span><span class="p">],</span>
+<span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-8">ax = plt.subplots(figsize=(5, 3))[1]
-ax.bar(list(totals), list(totals.values()), color=["#2980b9", "#c0392b"])
-ax.set_ylabel("Global population exposed (100-yr)")
-ax.set_title("Baseline vs 2030 projection")
-plt.tight_layout()
-plt.show()</div>
+<div class="clipboard-copy-txt" id="cell-8">_fig, _ax, _bars = BarGlyph(list(totals), list(totals.values()), figsize=(5, 3)).plot(
+    title="Baseline vs 2030 projection",
+    ylabel="Global population exposed (100-yr)",
+    colors=["#2980b9", "#c0392b"],
+)</div>
 </div>
 </div>
 </div>

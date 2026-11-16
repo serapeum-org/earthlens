@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24739,6 +24739,7 @@ output directory.</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.stats.bar_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">BarGlyph</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
@@ -24748,6 +24749,7 @@ output directory.</p>
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
 
 import matplotlib.pyplot as plt
+from cleopatra.glyphs.stats.bar_glyph import BarGlyph
 
 from earthlens.core import EarthLens
 
@@ -25006,23 +25008,23 @@ claims[
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Building claims paid: $</span><span class="si">{</span><span class="n">paid</span><span class="p">[</span><span class="s1">'building_paid'</span><span class="p">]</span><span class="si">:</span><span class="s2">,.0f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Contents claims paid: $</span><span class="si">{</span><span class="n">paid</span><span class="p">[</span><span class="s1">'contents_paid'</span><span class="p">]</span><span class="si">:</span><span class="s2">,.0f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-<span class="n">ax</span> <span class="o">=</span> <span class="n">claims</span><span class="p">[</span><span class="s2">"rated_flood_zone"</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"NFIP 2005 claims by rated flood zone — Orleans Parish (sample)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Rated flood zone"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Number of claims"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">zones</span> <span class="o">=</span> <span class="n">claims</span><span class="p">[</span><span class="s2">"rated_flood_zone"</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">_fig</span><span class="p">,</span> <span class="n">_ax</span><span class="p">,</span> <span class="n">_bars</span> <span class="o">=</span> <span class="n">BarGlyph</span><span class="p">(</span><span class="n">zones</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">zones</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"NFIP 2005 claims by rated flood zone — Orleans Parish (sample)"</span><span class="p">,</span>
+    <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Rated flood zone"</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Number of claims"</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">paid = claims[["building_paid", "contents_paid"]].fillna(0).sum()
 print(f"Building claims paid: ${paid['building_paid']:,.0f}")
 print(f"Contents claims paid: ${paid['contents_paid']:,.0f}")
 
-ax = claims["rated_flood_zone"].value_counts().head(10).plot.bar(figsize=(7, 4))
-ax.set_title("NFIP 2005 claims by rated flood zone — Orleans Parish (sample)")
-ax.set_xlabel("Rated flood zone")
-ax.set_ylabel("Number of claims")
-plt.tight_layout()
-plt.show()</div>
+zones = claims["rated_flood_zone"].value_counts().head(10)
+_fig, _ax, _bars = BarGlyph(zones.index, zones.values, figsize=(7, 4)).plot(
+    title="NFIP 2005 claims by rated flood zone — Orleans Parish (sample)",
+    xlabel="Rated flood zone",
+    ylabel="Number of claims",
+)</div>
 </div>
 </div>
 </div>

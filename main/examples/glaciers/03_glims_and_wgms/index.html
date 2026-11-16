@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24648,6 +24648,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.stats.bar_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">BarGlyph</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
@@ -24657,6 +24658,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+from cleopatra.glyphs.stats.bar_glyph import BarGlyph
 
 from earthlens.core import EarthLens
 
@@ -24912,25 +24914,29 @@ top, len(one)</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># A red bar is a losing year, a blue one a gaining year - BarGlyph takes the</span>
+<span class="c1"># per-category colours directly, so the sign test stays in one place.</span>
 <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'tab:red'</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">'tab:blue'</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">one</span><span class="p">[</span><span class="s1">'annual_balance'</span><span class="p">]]</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">one</span><span class="p">[</span><span class="s1">'year'</span><span class="p">],</span> <span class="n">one</span><span class="p">[</span><span class="s1">'annual_balance'</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
+<span class="n">_fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">_bars</span> <span class="o">=</span> <span class="n">BarGlyph</span><span class="p">(</span><span class="n">one</span><span class="p">[</span><span class="s1">'year'</span><span class="p">],</span> <span class="n">one</span><span class="p">[</span><span class="s1">'annual_balance'</span><span class="p">],</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s1">'WGMS annual mass balance — </span><span class="si">{</span><span class="n">top</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
+    <span class="n">xlabel</span><span class="o">=</span><span class="s1">'Year'</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="s1">'Annual balance (mm w.e.)'</span><span class="p">,</span>
+    <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1"># Zero line drawn on the glyph's own axes, so it sits above the bars.</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'0.3'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'WGMS annual mass balance — </span><span class="si">{</span><span class="n">top</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Year'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Annual balance (mm w.e.)'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7">fig, ax = plt.subplots(figsize=(9, 4))
+<div class="clipboard-copy-txt" id="cell-7"># A red bar is a losing year, a blue one a gaining year - BarGlyph takes the
+# per-category colours directly, so the sign test stays in one place.
 colors = ['tab:red' if v &lt; 0 else 'tab:blue' for v in one['annual_balance']]
-ax.bar(one['year'], one['annual_balance'], color=colors)
-ax.axhline(0, color='0.3', linewidth=0.8)
-ax.set_title(f'WGMS annual mass balance — {top}')
-ax.set_xlabel('Year')
-ax.set_ylabel('Annual balance (mm w.e.)')
-plt.tight_layout()
-plt.show()</div>
+_fig, ax, _bars = BarGlyph(one['year'], one['annual_balance'], figsize=(9, 4)).plot(
+    title=f'WGMS annual mass balance — {top}',
+    xlabel='Year',
+    ylabel='Annual balance (mm w.e.)',
+    colors=colors,
+)
+# Zero line drawn on the glyph's own axes, so it sits above the bars.
+ax.axhline(0, color='0.3', linewidth=0.8)</div>
 </div>
 </div>
 </div>

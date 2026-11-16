@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24727,15 +24727,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
 <span class="n">DATA</span> <span class="o">=</span> <span class="s2">"out"</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import matplotlib.pyplot as plt
-
-from earthlens.core import EarthLens
+<div class="clipboard-copy-txt" id="cell-1">from earthlens.core import EarthLens
 
 DATA = "out"</div>
 </div>
@@ -24835,8 +24831,7 @@ print(len(fc), "units |", list(fc.columns))</div>
     <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"FLOPROS merged riverine protection standard"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">ax = fc.plot(
     column="merged_riverine",
@@ -24848,8 +24843,7 @@ print(len(fc), "units |", list(fc.columns))</div>
     linewidth=0.1,
 )
 ax.set_title("FLOPROS merged riverine protection standard")
-ax.set_axis_off()
-plt.show()</div>
+_ = ax.set_axis_off()</div>
 </div>
 </div>
 </div>

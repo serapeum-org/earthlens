@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24985,25 +24985,35 @@ channels</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.stats.bar_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">BarGlyph</span>
 
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">channels</span><span class="p">[</span><span class="s2">"channel"</span><span class="p">],</span> <span class="n">channels</span><span class="p">[</span><span class="s2">"wavelength_um"</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#3b7dd8"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"wavelength (µm)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"ABI spectral channels"</span><span class="p">)</span>
+<span class="n">glyph</span> <span class="o">=</span> <span class="n">BarGlyph</span><span class="p">(</span>
+    <span class="n">channels</span><span class="p">[</span><span class="s2">"channel"</span><span class="p">],</span>
+    <span class="n">channels</span><span class="p">[</span><span class="s2">"wavelength_um"</span><span class="p">],</span>
+    <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">_fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">_bars</span> <span class="o">=</span> <span class="n">glyph</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"ABI spectral channels"</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="s2">"wavelength (µm)"</span><span class="p">,</span>
+    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">"#3b7dd8"</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">channels</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="c1"># The channel ids are dense, so turn the tick labels upright on the glyph's axes.</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">"x"</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">import matplotlib.pyplot as plt
+<div class="clipboard-copy-txt" id="cell-6">from cleopatra.glyphs.stats.bar_glyph import BarGlyph
 
-fig, ax = plt.subplots(figsize=(8, 3))
-ax.bar(channels["channel"], channels["wavelength_um"], color="#3b7dd8")
-ax.set_ylabel("wavelength (µm)")
-ax.set_title("ABI spectral channels")
-ax.tick_params(axis="x", rotation=90)
-plt.tight_layout()
-plt.show()</div>
+glyph = BarGlyph(
+    channels["channel"],
+    channels["wavelength_um"],
+    figsize=(8, 3),
+)
+_fig, ax, _bars = glyph.plot(
+    title="ABI spectral channels",
+    ylabel="wavelength (µm)",
+    colors=["#3b7dd8"] * len(channels),
+)
+# The channel ids are dense, so turn the tick labels upright on the glyph's axes.
+ax.tick_params(axis="x", rotation=90)</div>
 </div>
 </div>
 </div>

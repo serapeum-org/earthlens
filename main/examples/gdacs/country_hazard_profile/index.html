@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24733,16 +24733,16 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.stats.bar_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">BarGlyph</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import datetime as dt
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import pandas as pd
+from cleopatra.glyphs.stats.bar_glyph import BarGlyph
 
 from earthlens.core import EarthLens</div>
 </div>
@@ -25010,21 +25010,21 @@ if alerts is not None and len(alerts):
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">country</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">country</span><span class="p">):</span>
     <span class="n">counts</span> <span class="o">=</span> <span class="n">country</span><span class="p">[</span><span class="s1">'hazard_type'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
-    <span class="n">ax</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">'bar'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'steelblue'</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Alerts by hazard type — </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">START</span><span class="si">}</span><span class="s1"> to </span><span class="si">{</span><span class="n">END</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'hazard type'</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'alert count'</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">_fig</span><span class="p">,</span> <span class="n">_ax</span><span class="p">,</span> <span class="n">_bars</span> <span class="o">=</span> <span class="n">BarGlyph</span><span class="p">(</span><span class="n">counts</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">counts</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Alerts by hazard type — </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">START</span><span class="si">}</span><span class="s1"> to </span><span class="si">{</span><span class="n">END</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
+        <span class="n">xlabel</span><span class="o">=</span><span class="s1">'hazard type'</span><span class="p">,</span>
+        <span class="n">ylabel</span><span class="o">=</span><span class="s1">'alert count'</span><span class="p">,</span>
+        <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s1">'steelblue'</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">counts</span><span class="p">),</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">if country is not None and len(country):
     counts = country['hazard_type'].value_counts().sort_index()
-    ax = counts.plot(kind='bar', color='steelblue')
-    ax.set_title(f'Alerts by hazard type — {label}, {START} to {END}')
-    ax.set_xlabel('hazard type')
-    ax.set_ylabel('alert count')
-    plt.tight_layout()
-    plt.show()</div>
+    _fig, _ax, _bars = BarGlyph(counts.index, counts.values).plot(
+        title=f'Alerts by hazard type — {label}, {START} to {END}',
+        xlabel='hazard type',
+        ylabel='alert count',
+        colors=['steelblue'] * len(counts),
+    )</div>
 </div>
 </div>
 </div>

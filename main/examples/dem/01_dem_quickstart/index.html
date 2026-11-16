@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -17764,6 +17764,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#the-delta-as-a-surface-digital-earths-3-d-tier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The delta as a surface — Digital-Earth's 3-D tier
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#what-just-happened-the-account-free-path" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -23901,6 +23912,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#the-delta-as-a-surface-digital-earths-3-d-tier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The delta as a surface — Digital-Earth's 3-D tier
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#what-just-happened-the-account-free-path" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -24712,16 +24734,29 @@ downloaded COG; downloads go to a per-notebook temp directory.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">digitalearth</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_source</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">digitalearth.three_d</span><span class="w"> </span><span class="kn">import</span> <span class="n">Scene3D</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColorBar</span><span class="p">,</span> <span class="n">ColorScaling</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.dem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 
-<span class="n">download_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">'dem-quickstart-'</span><span class="p">))</span>
+<span class="c1"># DEM tiles are large, so they land off the system drive; override with EARTHLENS_CACHE.</span>
+<span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'EARTHLENS_CACHE'</span><span class="p">,</span> <span class="s1">'D:/earthlens-cache'</span><span class="p">))</span> <span class="o">/</span> <span class="s1">'dem'</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span>
+    <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="n">download_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
+    <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s1">'dem-quickstart-'</span><span class="p">,</span>
+        <span class="nb">dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'EARTHLENS_CACHE'</span><span class="p">,</span> <span class="s1">'D:/earthlens-cache'</span><span class="p">))</span> <span class="o">/</span> <span class="s1">'dem'</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'downloads will land under: </span><span class="si">{</span><span class="n">download_root</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 
 <span class="c1"># Shared class breaks so all three maps are directly comparable. Most of the</span>
@@ -24733,16 +24768,29 @@ downloaded COG; downloads go to a per-notebook temp directory.</p>
 <span class="n">LON_LABEL</span> <span class="o">=</span> <span class="s1">'longitude (°E)'</span>
 <span class="n">LAT_LABEL</span> <span class="o">=</span> <span class="s1">'latitude (°N)'</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import tempfile
+<div class="clipboard-copy-txt" id="cell-1">import os
+import tempfile
 from pathlib import Path
 
+from digitalearth import get_source
+from digitalearth.three_d import Scene3D
+from IPython.display import Image, display
 from pyramids.dataset import Dataset
 from pyramids.plot import ColorBar, ColorScaling
 
 from earthlens.core import EarthLens
 from earthlens.dem import Catalog
 
-download_root = Path(tempfile.mkdtemp(prefix='dem-quickstart-'))
+# DEM tiles are large, so they land off the system drive; override with EARTHLENS_CACHE.
+(Path(os.environ.get('EARTHLENS_CACHE', 'D:/earthlens-cache')) / 'dem').mkdir(
+    parents=True, exist_ok=True
+)
+download_root = Path(
+    tempfile.mkdtemp(
+        prefix='dem-quickstart-',
+        dir=Path(os.environ.get('EARTHLENS_CACHE', 'D:/earthlens-cache')) / 'dem',
+    )
+)
 print(f'downloads will land under: {download_root}')
 
 # Shared class breaks so all three maps are directly comparable. Most of the
@@ -25145,6 +25193,73 @@ glyph.ax.set_ylabel(LAT_LABEL)</div>
 </div>
 </div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=14">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="the-delta-as-a-surface-digital-earths-3-d-tier">The delta as a surface — Digital-Earth's 3-D tier<a class="anchor-link" href="#the-delta-as-a-surface-digital-earths-3-d-tier">¶</a></h2><p>Every map above is a colour ramp standing in for height. That is the only way a 2-D axes can show
+elevation, and on a delta it is a poor one: almost the whole scene sits inside the first few metres, so the
+class breaks have to crowd down there and the shape is carried entirely by colour.</p>
+<p><code>digitalearth.Scene3D</code> builds the raster into an actual surface mesh with PyVista, so height is height.
+<code>z_exaggeration</code> is needed because the delta is genuinely flat — 382 km across with 730 m of relief, a ratio
+of about 1:522, which at true scale is a sheet of paper. The vertical unit conversion is handled for us:
+this raster is in degrees and the elevation is in metres, and <code>terrain</code> divides by the metres-per-degree so
+the two axes are commensurate before the exaggeration is applied.</p>
+<p><strong>One still, not a fly-through.</strong> <code>Scene3D</code> can also <code>orbit</code> the camera and write the sweep to a GIF, and it
+is tempting here — but on this scene it would show nothing a single view does not. Rotation earns its keep
+by revealing ground hidden behind relief, and this delta hides <strong>0.00%</strong> of its cells at every azimuth and
+every camera angle; there is simply nothing to occlude. The orbit lives in the
+<a href="../bathymetry/05_shaded_relief.ipynb">bathymetry shaded-relief notebook</a> instead, over the Mid-Atlantic
+Ridge, where the relief is 1:42 and a low pass genuinely does bring new seafloor into view.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=15">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-8">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">scene</span> <span class="o">=</span> <span class="n">Scene3D</span><span class="p">(</span><span class="n">off_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">700</span><span class="p">))</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">terrain</span><span class="p">(</span><span class="n">get_source</span><span class="p">(</span><span class="n">delta</span><span class="p">),</span> <span class="n">z_exaggeration</span><span class="o">=</span><span class="mf">40.0</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'terrain'</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">view_isometric</span><span class="p">()</span>
+
+<span class="n">delta_3d</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">delta_out</span> <span class="o">/</span> <span class="s1">'nile_delta_3d.png'</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">delta_3d</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">delta_3d</span><span class="p">))</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-8">scene = Scene3D(off_screen=True, window_size=(900, 700))
+scene.terrain(get_source(delta), z_exaggeration=40.0, cmap='terrain')
+scene.plotter.view_isometric()
+
+delta_3d = str(delta_out / 'nile_delta_3d.png')
+scene.save(delta_3d)
+scene.close()
+
+display(Image(filename=delta_3d))</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=16">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

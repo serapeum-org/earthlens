@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24715,10 +24715,10 @@ runs only when <code>airbase</code> is importable, so the notebook stays runnabl
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.util</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.stats.bar_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">BarGlyph</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.util</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.eea_aq</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
@@ -24726,10 +24726,10 @@ runs only when <code>airbase</code> is importable, so the notebook stays runnabl
 <span class="n">have_airbase</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">"airbase"</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"airbase available:"</span><span class="p">,</span> <span class="n">have_airbase</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">%matplotlib inline
-import importlib.util
+<div class="clipboard-copy-txt" id="cell-1">from cleopatra.glyphs.stats.bar_glyph import BarGlyph
 
-import matplotlib.pyplot as plt
+%matplotlib inline
+import importlib.util
 
 from earthlens.core import EarthLens
 from earthlens.eea_aq import Catalog
@@ -24956,23 +24956,19 @@ else:
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
     <span class="n">means</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"station_id"</span><span class="p">)[</span><span class="s2">"value"</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span>
-    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-    <span class="n">means</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"mean PM2.5 (ug.m-3)"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"sampling point"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"June 2022 mean PM2.5 by EEA station — Malta"</span><span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">_fig</span><span class="p">,</span> <span class="n">_ax</span><span class="p">,</span> <span class="n">_bars</span> <span class="o">=</span> <span class="n">BarGlyph</span><span class="p">(</span><span class="n">means</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">means</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"June 2022 mean PM2.5 by EEA station — Malta"</span><span class="p">,</span>
+        <span class="n">xlabel</span><span class="o">=</span><span class="s2">"sampling point"</span><span class="p">,</span>
+        <span class="n">ylabel</span><span class="o">=</span><span class="s2">"mean PM2.5 (ug.m-3)"</span><span class="p">,</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">if df is not None and not df.empty:
     means = df.groupby("station_id")["value"].mean().sort_values()
-    fig, ax = plt.subplots(figsize=(9, 4))
-    means.plot.bar(ax=ax)
-    ax.set_ylabel("mean PM2.5 (ug.m-3)")
-    ax.set_xlabel("sampling point")
-    ax.set_title("June 2022 mean PM2.5 by EEA station — Malta")
-    fig.tight_layout()
-    plt.show()</div>
+    _fig, _ax, _bars = BarGlyph(means.index, means.values, figsize=(9, 4)).plot(
+        title="June 2022 mean PM2.5 by EEA station — Malta",
+        xlabel="sampling point",
+        ylabel="mean PM2.5 (ug.m-3)",
+    )</div>
 </div>
 </div>
 </div>
