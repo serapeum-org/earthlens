@@ -404,16 +404,23 @@ class STAC(LazyClientMixin, AbstractDataSource):
         than for the cap itself (see `_DEFAULT_MAX_CANDIDATES`).
 
         Every `(collection, bbox)` pair reports what the screen did: a warning
-        when the pair matched candidates and kept none, a debug line otherwise.
-        An all-dropped search is still an empty result here, not an exception —
-        `search()`, `count()` and `preview()` all document one — and sets
-        `_screened_out` so `download` can fail loudly instead.
+        when the pair matched candidates and kept none, another when it stopped at
+        the candidate budget, and a debug line otherwise.
+
+        Neither outcome is an exception here — `search()`, `count()` and
+        `preview()` all document an empty result — so each is recorded for
+        `download` to fail on instead. They are kept apart because the remedies
+        differ: `_screened_out` means the screen examined everything and nothing
+        covered the AOI, while `_budget_exhausted` means it stopped looking, so
+        nothing was established at all. Both are reset on entry, so a search that
+        raises part-way leaves no verdict from the previous call.
 
         Returns:
             One `RemoteProduct` per matched item whose footprint covers the AOI;
             the pystac item, its acquisition date, the logical collection key,
             and the requested asset list ride on `metadata`. The empty list when
-            nothing matched, or when the screen dropped everything that did.
+            nothing matched, when the screen dropped everything that did, or when
+            the budget ran out before a covering item was found.
         """
         start = self.time.start_date.strftime("%Y-%m-%d")
         end = self.time.end_date.strftime("%Y-%m-%d")
@@ -774,8 +781,13 @@ class STAC(LazyClientMixin, AbstractDataSource):
         Raises:
             ValueError: When the search matched candidates on their bbox but the
                 footprint screen dropped every one of them, so there are no
-                pixels to write. A search the API matched nothing for is not an
-                error and still returns the empty list.
+                pixels to write; or when the search stopped at the
+                `max_candidates` budget before finding a covering item, which is
+                reported separately because raising the budget is the remedy
+                there and changing the request is the remedy in the other case. A
+                search the API matched nothing for is not an error and still
+                returns the empty list, and `search` / `count` / `preview` never
+                raise for any of these.
         """
         paths = self._api_via_search_fetch()
         if not paths and self._budget_exhausted:
