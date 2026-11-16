@@ -146,6 +146,10 @@ class STAC(LazyClientMixin, AbstractDataSource):
         # Non-crossing AOI sub-bboxes; populated by _create_grid (one box, or
         # two when the request crosses the antimeridian).
         self._aoi_bboxes: list[tuple[float, float, float, float]] = []
+        #: Set by `_search`: the API matched candidates but the footprint screen
+        #: dropped every one. `download` turns that into an error; `search` /
+        #: `count` / `preview` keep their documented empty result.
+        self._screened_out = False
         # Filled by _fetch: (collection_key, date, half index, path) per COG.
         self._written: list[tuple[str, str, int, Path]] = []
         self._catalog: Catalog | None = None
@@ -317,8 +321,10 @@ class STAC(LazyClientMixin, AbstractDataSource):
                 )
                 aoi = box(*bbox)
                 kept = 0
+                seen = 0
                 for item in search.items():
                     examined += 1
+                    seen += 1
                     if not _covers_aoi(item, aoi):
                         continue
                     products.append(
@@ -338,14 +344,28 @@ class STAC(LazyClientMixin, AbstractDataSource):
                     # lazily, so breaking here fetches no page we do not need.
                     if self._max_items is not None and kept >= self._max_items:
                         break
-        if examined and not products:
-            raise ValueError(
-                f"{examined} item(s) matched the search bbox but none covers the "
-                "requested AOI: a STAC search filters on the item bbox, which for "
-                "a rotated footprint is larger than the scene itself. Widen the "
-                "AOI, move the date window, or pick a collection whose footprints "
-                "cover it."
-            )
+                # Report per (collection, bbox) pair, not once globally: a request
+                # whose eastern antimeridian half is wholly dropped still returns
+                # the western half, and that partial case is the one most in need
+                # of the diagnostic.
+                if seen and not kept:
+                    logger.warning(
+                        f"STAC screen: {collection_key} {tuple(bbox)} matched "
+                        f"{seen} candidate(s) on bbox but none covers the AOI "
+                        "(a STAC search filters on the item bbox, which for a "
+                        "footprint lying at an angle to the lon/lat grid is "
+                        "larger than the scene itself)"
+                    )
+                elif seen:
+                    logger.debug(
+                        f"STAC screen: {collection_key} {tuple(bbox)} kept "
+                        f"{kept}/{seen} candidate(s)"
+                    )
+        # `examined` with nothing kept is a data-availability outcome, not an
+        # invalid request, so it stays an empty result here -- `search()`,
+        # `count()` and `preview()` all document one. `download` turns it into an
+        # error, where writing no pixels is actionable.
+        self._screened_out = bool(examined) and not products
         return products
 
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
@@ -604,8 +624,22 @@ class STAC(LazyClientMixin, AbstractDataSource):
             The written COG paths: one per `(collection, date)` when `aggregate`
             is `None`, or one per `(collection, window)` when `aggregate` is set.
 
+        Raises:
+            ValueError: When the search matched candidates on their bbox but the
+                footprint screen dropped every one of them, so there are no
+                pixels to write. A search the API matched nothing for is not an
+                error and still returns the empty list.
         """
         paths = self._api_via_search_fetch()
+        if self._screened_out:
+            raise ValueError(
+                "every item the search matched was dropped because none covers "
+                "the requested AOI: a STAC search filters on the item bbox, "
+                "which for a footprint lying at an angle to the lon/lat grid is "
+                "larger than the scene itself. The per-collection warnings above "
+                "name the bbox(es) concerned. Move the date window, or pick a "
+                "collection whose footprints cover the AOI."
+            )
         if aggregate is not None:
             return self._aggregate_cogs(aggregate)
         return paths

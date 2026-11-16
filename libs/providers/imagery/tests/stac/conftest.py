@@ -308,6 +308,21 @@ def _read_extension_metadata(item: Any, asset_key: Any = None) -> dict[str, Any]
 
 
 @pytest.fixture
+def warnings_buffer():
+    """Collect loguru's WARNING output, which pytest's `caplog` never sees.
+
+    loguru writes through its own handler set, bound to the original stderr at
+    registration time, so a dedicated sink is the only way to read it back.
+    """
+    from loguru import logger
+
+    buffer: list[str] = []
+    sink_id = logger.add(buffer.append, level="WARNING")
+    yield buffer
+    logger.remove(sink_id)
+
+
+@pytest.fixture
 def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> FakePyramids:
     """Inject fake pyramids submodules into `sys.modules` and return the recorder."""
     fp = FakePyramids()

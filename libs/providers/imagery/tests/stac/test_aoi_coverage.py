@@ -286,15 +286,37 @@ class TestSearchScreensByFootprint:
         products = _build_stac(tmp_path, max_items=2)._search()
         assert [p.id for p in products] == ["hit0", "hit1"]
 
-    def test_all_dropped_raises_naming_the_bbox_mismatch(self, fake_pyramids, tmp_path):
-        """When every candidate misses the AOI the error says so, not 'no pixels'."""
+    def test_all_dropped_returns_empty_rather_than_raising(
+        self, fake_pyramids, tmp_path
+    ):
+        """_search keeps its empty-result contract, so count() can still answer 0."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
             make_item(
                 "miss", "2024-01-05", {"B04": "https://h/1.tif"}, geometry=_MISSING
             )
         ]
-        with pytest.raises(ValueError, match="matched the search bbox but none covers"):
-            _build_stac(tmp_path, max_items=1)._search()
+        stac = _build_stac(tmp_path, max_items=1)
+        assert stac._search() == []
+        assert stac._count() == 0
+
+    def test_download_raises_when_every_candidate_missed_the_aoi(
+        self, fake_pyramids, tmp_path
+    ):
+        """A download that can write nothing because of the screen fails loudly."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item(
+                "miss", "2024-01-05", {"B04": "https://h/1.tif"}, geometry=_MISSING
+            )
+        ]
+        with pytest.raises(ValueError, match="none covers the requested AOI"):
+            _build_stac(tmp_path, max_items=1).download()
+
+    def test_download_returns_empty_when_the_api_matched_nothing(
+        self, fake_pyramids, tmp_path
+    ):
+        """A genuinely empty search still returns an empty list from download."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = []
+        assert _build_stac(tmp_path).download() == []
 
     def test_rotated_bbox_only_match_is_dropped_by_the_search(
         self, fake_pyramids, tmp_path
@@ -381,10 +403,10 @@ class TestSearchScreensByFootprint:
         )._search()
         assert [p.id for p in products] == ["hit"]
 
-    def test_the_error_names_how_many_candidates_were_dropped(
-        self, fake_pyramids, tmp_path
+    def test_an_all_dropped_pair_warns_naming_the_counts_and_the_collection(
+        self, fake_pyramids, tmp_path, warnings_buffer
     ):
-        """The all-dropped error reports the number of candidates it examined."""
+        """The all-dropped case is reported loudly rather than returning none quietly."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
             make_item(
                 "m1", "2024-01-05", {"B04": "https://h/1.tif"}, geometry=_MISSING
@@ -393,8 +415,29 @@ class TestSearchScreensByFootprint:
                 "m2", "2024-01-06", {"B04": "https://h/2.tif"}, geometry=_MISSING
             ),
         ]
-        with pytest.raises(ValueError, match=r"^2 item\(s\) matched"):
-            _build_stac(tmp_path)._search()
+        _build_stac(tmp_path)._search()
+        warned = "".join(warnings_buffer)
+        assert "2 candidate" in warned
+        assert "sentinel-2-l2a" in warned
+
+    def test_a_dropped_antimeridian_half_is_reported_on_its_own(
+        self, fake_pyramids, tmp_path, warnings_buffer
+    ):
+        """A half that drops everything warns even though the other half succeeded."""
+        east = make_bbox_geometry(170.5, -1.0, 179.5, 1.0)
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item("east", "2024-01-05", {"B04": "https://h/1.tif"}, geometry=east),
+            make_item(
+                "miss", "2024-01-06", {"B04": "https://h/2.tif"}, geometry=_MISSING
+            ),
+        ]
+        products = _build_stac(
+            tmp_path, lat_lim=[-1.0, 1.0], lon_lim=[170.0, -170.0]
+        )._search()
+        assert [p.id for p in products] == ["east"]
+        # the western half matched one candidate and kept none -- the partial case
+        # the old global check stayed silent about
+        assert "(-180.0, -1.0, -170.0, 1.0)" in "".join(warnings_buffer)
 
     def test_each_split_bbox_is_screened_against_its_own_half(
         self, fake_pyramids, tmp_path
