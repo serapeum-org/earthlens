@@ -565,8 +565,9 @@ class TestSearchScreensByFootprint:
                 "miss", "2024-01-05", {"B04": "https://h/1.tif"}, geometry=_MISSING
             )
         ]
+        stac = _build_stac(tmp_path, max_items=1)
         with pytest.raises(ValueError, match="none covers the requested AOI"):
-            _build_stac(tmp_path, max_items=1).download()
+            stac.download()
 
     def test_download_returns_empty_when_the_api_matched_nothing(
         self, fake_pyramids, tmp_path

@@ -455,60 +455,11 @@ class STAC(LazyClientMixin, AbstractDataSource):
                     datetime=f"{start}/{end}",
                     max_items=probe,
                 )
-                aoi = box(*bbox)
-                kept = 0
-                seen = 0
-                for item in search.items():
-                    examined += 1
-                    seen += 1
-                    if not _covers_aoi(item, aoi, self._min_overlap_fraction):
-                        continue
-                    products.append(
-                        RemoteProduct(
-                            id=getattr(item, "id", str(item)),
-                            metadata={
-                                "item": item,
-                                "date": _acq_date(item),
-                                "collection_key": collection_key,
-                                "assets": assets,
-                                "bbox": tuple(bbox),
-                            },
-                        )
-                    )
-                    kept += 1
-                    # Stop as soon as the cap is met: `search.items()` pages
-                    # lazily, so breaking here fetches no page we do not need.
-                    if self._max_items is not None and kept >= self._max_items:
-                        break
-                # Report per (collection, bbox) pair, not once globally: a request
-                # whose eastern antimeridian half is wholly dropped still returns
-                # the western half, and that partial case is the one most in need
-                # of the diagnostic.
-                if probe is not None and seen >= probe:
-                    # Consuming budget + 1 candidates means the list did not end
-                    # here, so there may be covering items never examined. A
-                    # collection holding exactly `max_candidates` items stops one
-                    # short of this and is reported as the ordinary case.
-                    self._budget_exhausted.append((collection_key, tuple(bbox)))
-                    logger.warning(
-                        f"STAC screen: {collection_key} {tuple(bbox)} stopped "
-                        f"after the {self._max_candidates}-candidate budget with "
-                        f"{kept} usable item(s) found; raise `max_candidates` to "
-                        "examine more, or narrow the AOI or date window"
-                    )
-                if seen and not kept:
-                    logger.warning(
-                        f"STAC screen: {collection_key} {tuple(bbox)} matched "
-                        f"{seen} candidate(s) on bbox but none covers the AOI "
-                        "(a STAC search filters on the item bbox, which for a "
-                        "footprint lying at an angle to the lon/lat grid is "
-                        "larger than the scene itself)"
-                    )
-                elif seen:
-                    logger.debug(
-                        f"STAC screen: {collection_key} {tuple(bbox)} kept "
-                        f"{kept}/{seen} candidate(s)"
-                    )
+                kept, seen = self._screen_pair(
+                    search, collection_key, tuple(bbox), assets, probe, products
+                )
+                examined += seen
+                self._report_pair(collection_key, tuple(bbox), kept, seen, probe)
         # `examined` with nothing kept is a data-availability outcome, not an
         # invalid request, so it stays an empty result here -- `search()`,
         # `count()` and `preview()` all document one. `download` turns it into an
@@ -521,6 +472,99 @@ class STAC(LazyClientMixin, AbstractDataSource):
             bool(examined) and not products and not self._budget_exhausted
         )
         return products
+
+    def _screen_pair(
+        self,
+        search: Any,
+        collection_key: str,
+        bbox: tuple[float, ...],
+        assets: list[str],
+        probe: int | None,
+        products: list[RemoteProduct],
+    ) -> tuple[int, int]:
+        """Screen one `(collection, bbox)` search, appending what survives.
+
+        Args:
+            search: The search whose items to walk; it pages lazily, so stopping
+                early fetches no page that is not needed.
+            collection_key: The logical collection key, carried on each product.
+            bbox: The AOI bbox this search covers.
+            assets: The asset list the products should request.
+            probe: The item bound the search was given (budget + 1), or `None`.
+            products: The accumulating result list, appended to in place.
+
+        Returns:
+            How many items were kept and how many were examined.
+        """
+        aoi = box(*bbox)
+        kept = 0
+        seen = 0
+        for item in search.items():
+            seen += 1
+            if not _covers_aoi(item, aoi, self._min_overlap_fraction):
+                continue
+            products.append(
+                RemoteProduct(
+                    id=getattr(item, "id", str(item)),
+                    metadata={
+                        "item": item,
+                        "date": _acq_date(item),
+                        "collection_key": collection_key,
+                        "assets": assets,
+                        "bbox": bbox,
+                    },
+                )
+            )
+            kept += 1
+            if self._max_items is not None and kept >= self._max_items:
+                break
+        if probe is not None and seen >= probe:
+            # Consuming budget + 1 candidates means the list did not end here, so
+            # there may be covering items never examined. A collection holding
+            # exactly `max_candidates` items stops one short of this and is
+            # reported as the ordinary case.
+            self._budget_exhausted.append((collection_key, bbox))
+        return kept, seen
+
+    def _report_pair(
+        self,
+        collection_key: str,
+        bbox: tuple[float, ...],
+        kept: int,
+        seen: int,
+        probe: int | None,
+    ) -> None:
+        """Log what the screen did for one `(collection, bbox)` pair.
+
+        Reported per pair rather than once globally: a request whose eastern
+        antimeridian half is wholly dropped still returns the western half, and
+        that partial case is the one most in need of the diagnostic.
+
+        Args:
+            collection_key: The logical collection key.
+            bbox: The AOI bbox this pair covers.
+            kept: How many items survived the screen.
+            seen: How many candidates were examined.
+            probe: The item bound the search was given, or `None`.
+        """
+        if probe is not None and seen >= probe:
+            logger.warning(
+                f"STAC screen: {collection_key} {bbox} stopped after the "
+                f"{self._max_candidates}-candidate budget with {kept} usable "
+                "item(s) found; raise `max_candidates` to examine more, or "
+                "narrow the AOI or date window"
+            )
+        if seen and not kept:
+            logger.warning(
+                f"STAC screen: {collection_key} {bbox} matched {seen} "
+                "candidate(s) on bbox but none covers the AOI (a STAC search "
+                "filters on the item bbox, which for a footprint lying at an "
+                "angle to the lon/lat grid is larger than the scene itself)"
+            )
+        elif seen:
+            logger.debug(
+                f"STAC screen: {collection_key} {bbox} kept {kept}/{seen} candidate(s)"
+            )
 
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
         """Mosaic the matched items per `(collection, date)` and write COGs.
@@ -1069,7 +1113,7 @@ def _normalise_longitudes(footprint: Any) -> Any:
         shift = -360.0
     elif max_x <= -180.0:
         shift = 360.0
-    return footprint if shift == 0.0 else translate(footprint, xoff=shift)
+    return translate(footprint, xoff=shift) if shift else footprint
 
 
 def _overlaps(footprint: Any, aoi: Any, min_fraction: float) -> bool:
@@ -1091,7 +1135,7 @@ def _overlaps(footprint: Any, aoi: Any, min_fraction: float) -> bool:
         # Scale by the smaller geometry so the measure does not invert for an AOI
         # larger than one scene; see `_MIN_OVERLAP_FRACTION`.
         scale = min(aoi.area, footprint.area)
-        if scale == 0:
+        if scale <= 0.0:
             # A Point or LineString footprint -- or a degenerate AOI -- has no
             # area to take a fraction of, so judge it topologically instead of
             # letting a zero floor keep everything, however far away it is.
