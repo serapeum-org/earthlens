@@ -126,7 +126,10 @@ class STAC(LazyClientMixin, AbstractDataSource):
                 actually contribute pixels: candidates whose footprint misses the
                 AOI are dropped before the cap is applied, so `max_items=1` is
                 the first *covering* scene rather than whatever the API lists
-                first.
+                first. `None` means no cap; a value below 1 is rejected.
+
+        Raises:
+            ValueError: When `max_items` is given and is less than 1.
         """
         self._endpoint = endpoint
         self._resolution = resolution
@@ -139,6 +142,14 @@ class STAC(LazyClientMixin, AbstractDataSource):
         self._password = password
         self._token = token
         self._client_id = client_id
+        if max_items is not None and max_items < 1:
+            # `0` used to reach pystac_client, where `if self._max_items` makes it
+            # falsy and therefore means "no cap"; the client-side cap now reads it
+            # as "stop after the first kept item". Neither reading is defensible,
+            # so reject it rather than silently picking one.
+            raise ValueError(
+                f"max_items must be None (no cap) or at least 1, got {max_items}"
+            )
         self._max_items = max_items
         # Stored before super().__init__ because the base constructor calls
         # _initialize() (which needs the request) before it sets self.vars.

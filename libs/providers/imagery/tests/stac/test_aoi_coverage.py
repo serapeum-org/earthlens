@@ -291,6 +291,12 @@ class TestSearchScreensByFootprint:
             == 50 * _CANDIDATE_OVERFETCH
         )
 
+    @pytest.mark.parametrize("cap", [0, -1])
+    def test_a_non_positive_cap_is_rejected(self, fake_pyramids, tmp_path, cap):
+        """max_items must be a usable count, not 0 or negative."""
+        with pytest.raises(ValueError, match="max_items"):
+            _build_stac(tmp_path, max_items=cap)
+
     def test_an_uncapped_search_is_left_unbounded(self, fake_pyramids, tmp_path):
         """Asking for every item still asks the API for every item."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = []
