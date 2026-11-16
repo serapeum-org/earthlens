@@ -41,6 +41,7 @@ from __future__ import annotations
 
 import socket
 from pathlib import Path
+from typing import NoReturn
 
 import requests
 
@@ -203,6 +204,70 @@ def _probe_search_endpoint_status() -> int | None:
     return status
 
 
+def _raise_for_search_failure(exc: requests.RequestException) -> NoReturn:
+    """Translate a catalogue-search `requests` failure into the right typed error.
+
+    Always raises. A plain `4xx` client error (anything but the gone-ambiguous
+    `404` / `410`) propagates unchanged. A statusless failure, or a direct `404` /
+    `410`, is confirmed against the service URL with
+    `_probe_search_endpoint_status`: a gone status raises
+    `GportalEndpointRetiredError`, a `404` / `410` whose service URL is still
+    alive propagates as a resource-level client error, and anything else (a
+    `5xx`, a transport drop, an HTML page from a live service) raises the
+    transient `GportalUnavailableError`. See `fetch_gportal` for the full
+    contract.
+
+    Args:
+        exc: The `requests.RequestException` the SDK raised from the search.
+
+    Raises:
+        requests.HTTPError: A `4xx` client error — propagated unchanged.
+        GportalEndpointRetiredError: The probe confirms the CSW endpoint is gone.
+        GportalUnavailableError: A transient outage (`5xx` / transport / live-service
+            HTML).
+    """
+    status = http_status(exc)
+    # A plain client error — a 4xx other than the "gone"-ambiguous 404/410 — is a
+    # request G-Portal answered and rejected; surface it as-is.
+    if (
+        status is not None
+        and 400 <= status < 500
+        and status not in _NOT_FOUND_GONE_STATUSES
+    ):
+        raise exc
+    # The ambiguous failures could each mean the endpoint is gone: a statusless
+    # failure (the JSONDecodeError after following the retired /csw/csw 301 to the
+    # landing page, or a transport drop) AND a direct 404/410. Confirm with a
+    # no-redirect probe; a 5xx carries a status and never needs it. `probe_status`
+    # is None when the probe did not run or could not reach the host.
+    needs_probe = status is None or status in _NOT_FOUND_GONE_STATUSES
+    probe_status = _probe_search_endpoint_status() if needs_probe else None
+    if probe_status in _PERMANENTLY_GONE_STATUSES:
+        gone_detail = (
+            "it permanently redirects to the portal landing page"
+            if probe_status in _REDIRECT_GONE_STATUSES
+            else "the path no longer exists"
+        )
+        raise GportalEndpointRetiredError(
+            "JAXA G-Portal's CSW catalogue-search endpoint no longer "
+            f"exists (the service URL answers HTTP {probe_status} without "
+            f"following redirects — {gone_detail}). The search cannot be "
+            "made to work by retrying or by changing the request; a "
+            "successor endpoint has to be found. See earthlens issue #1415.",
+            status_code=probe_status,
+        ) from exc
+    # A direct 404/410 whose service URL is still alive was a resource-level
+    # client error (a bad dataset id or window), not a retirement.
+    if status is not None and 400 <= status < 500:
+        raise exc
+    raise GportalUnavailableError(
+        "JAXA G-Portal did not return a usable response for the catalogue "
+        "search; the service is likely down or throttling. Retry later "
+        "rather than changing the request.",
+        status_code=status,
+    ) from exc
+
+
 def fetch_gportal(
     *,
     dataset: Dataset,
@@ -284,57 +349,9 @@ def fetch_gportal(
             return []
         products = list(search.products())
     except requests.RequestException as exc:
-        status = http_status(exc)
-        # A plain client error — a 4xx other than the "gone"-ambiguous 404/410 —
-        # is a request G-Portal answered and rejected. Surface it as-is so a
-        # caller fixes the request rather than being told to retry later.
-        if (
-            status is not None
-            and 400 <= status < 500
-            and status not in _NOT_FOUND_GONE_STATUSES
-        ):
-            raise
-        # The ambiguous failures each could mean the endpoint is gone: a
-        # statusless failure (the JSONDecodeError the SDK raises after following
-        # the permanent 301 the retired /csw/csw endpoint sends to the portal
-        # landing page, or a transport drop), AND a direct 404/410 on the search.
-        # Confirm against the service URL with a no-redirect probe. A 5xx carries
-        # a status and is a genuine transient outage, so it never needs the probe;
-        # `probe_status` is None when the probe did not run or could not reach the
-        # host, so the membership test is False and the failure stays transient.
-        needs_probe = status is None or status in _NOT_FOUND_GONE_STATUSES
-        probe_status = _probe_search_endpoint_status() if needs_probe else None
-        if probe_status in _PERMANENTLY_GONE_STATUSES:
-            gone_detail = (
-                "it permanently redirects to the portal landing page"
-                if probe_status in _REDIRECT_GONE_STATUSES
-                else "the path no longer exists"
-            )
-            raise GportalEndpointRetiredError(
-                "JAXA G-Portal's CSW catalogue-search endpoint no longer "
-                f"exists (the service URL answers HTTP {probe_status} without "
-                f"following redirects — {gone_detail}). The search cannot be "
-                "made to work by retrying or by changing the request; a "
-                "successor endpoint has to be found. See earthlens issue #1415.",
-                status_code=probe_status,
-            ) from exc
-        # A direct 404/410 whose service URL is still alive was a resource-level
-        # client error (a bad dataset id or window), not a retirement — surface
-        # it as-is like any other 4xx.
-        if status is not None and 400 <= status < 500:
-            raise
-        # A 5xx, a connection drop / timeout, or the JSONDecodeError that
-        # response.json() raises on an HTML error page from a live service
-        # (requests.exceptions.JSONDecodeError subclasses RequestException) all
-        # mean G-Portal did not usefully answer, so report a transient outage.
-        # The request-construction subclasses (MissingSchema / InvalidURL) cannot
-        # arise here because the SDK builds its own URLs.
-        raise GportalUnavailableError(
-            "JAXA G-Portal did not return a usable response for the catalogue "
-            "search; the service is likely down or throttling. Retry later "
-            "rather than changing the request.",
-            status_code=status,
-        ) from exc
+        # Classify the failure (4xx client error / retirement / transient outage)
+        # in one named place; it always raises, so `products` is bound below.
+        _raise_for_search_failure(exc)
     if not products:
         return []
 
