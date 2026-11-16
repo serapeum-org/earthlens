@@ -12,8 +12,7 @@ from shapely.geometry import box, shape
 
 from earthlens.stac import STAC
 from earthlens.stac.backend import (
-    _CANDIDATE_OVERFETCH,
-    _MIN_CANDIDATE_POOL,
+    _DEFAULT_MAX_CANDIDATES,
     _MIN_OVERLAP_FRACTION,
     _covers_aoi,
     _has_normalised_longitudes,
@@ -323,28 +322,15 @@ class TestSearchScreensByFootprint:
         products = _build_stac(tmp_path, max_items=1)._search()
         assert [p.id for p in products] == ["hit"]
 
-    def test_the_api_cap_is_a_candidate_pool_not_the_item_cap(
-        self, fake_pyramids, tmp_path
-    ):
-        """The API is asked for a pool of candidates, never for just the cap."""
+    def test_the_item_cap_never_reaches_the_api(self, fake_pyramids, tmp_path):
+        """The cap stays client-side; only the candidate budget bounds the search."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
             make_item(
                 "hit", "2024-01-06", {"B04": "https://h/2.tif"}, geometry=_COVERING
             )
         ]
         _build_stac(tmp_path, max_items=1)._search()
-        requested = fake_pyramids.client.search_calls[0].get("max_items")
-        assert requested == _MIN_CANDIDATE_POOL
-        assert requested > 1
-
-    def test_a_large_cap_scales_the_candidate_pool(self, fake_pyramids, tmp_path):
-        """A bigger cap asks for proportionally more candidates."""
-        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = []
-        _build_stac(tmp_path, max_items=50)._search()
-        assert (
-            fake_pyramids.client.search_calls[0]["max_items"]
-            == 50 * _CANDIDATE_OVERFETCH
-        )
+        assert fake_pyramids.client.search_calls[0].get("max_items") != 1
 
     def test_the_floor_is_reachable_from_the_constructor(self, fake_pyramids, tmp_path):
         """min_overlap_fraction=0 turns the screen off for a caller who needs that."""
@@ -381,30 +367,111 @@ class TestSearchScreensByFootprint:
         with pytest.raises(ValueError, match="min_overlap_fraction"):
             _build_stac(tmp_path, min_overlap_fraction=fraction)
 
+    def test_a_covering_item_beyond_the_pool_is_still_found(
+        self, fake_pyramids, tmp_path
+    ):
+        """A cap must not shrink the pool to where a covering scene is unreachable.
+
+        This is #1414's own failure mode: letting the request's item cap decide how
+        many candidates are examined truncates the list before the screen runs.
+        """
+        misses = [
+            make_item(
+                f"m{n}", "2024-01-05", {"B04": "https://h/x.tif"}, geometry=_MISSING
+            )
+            for n in range(150)
+        ]
+        hit = make_item(
+            "hit", "2024-01-06", {"B04": "https://h/h.tif"}, geometry=_COVERING
+        )
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [*misses, hit]
+        products = _build_stac(tmp_path, max_items=1)._search()
+        assert [p.id for p in products] == ["hit"]
+
+    def test_pool_exhaustion_is_reported_as_itself_not_as_no_coverage(
+        self, fake_pyramids, tmp_path, warnings_buffer
+    ):
+        """Hitting the candidate budget is a different outcome from nothing covering."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item(
+                f"m{n}", "2024-01-05", {"B04": "https://h/x.tif"}, geometry=_MISSING
+            )
+            for n in range(12)
+        ]
+        stac = _build_stac(tmp_path, max_items=1, max_candidates=10)
+        assert stac._search() == []
+        warned = "".join(warnings_buffer)
+        assert "max_candidates" in warned
+        with pytest.raises(ValueError, match="max_candidates"):
+            stac.download()
+
+    def test_the_candidate_budget_does_not_follow_the_item_cap(
+        self, fake_pyramids, tmp_path
+    ):
+        """The budget is its own knob, so a small cap does not shrink it."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = []
+        _build_stac(tmp_path, max_items=1)._search()
+        _build_stac(tmp_path, max_items=50)._search()
+        requested = [c.get("max_items") for c in fake_pyramids.client.search_calls]
+        assert requested == [_DEFAULT_MAX_CANDIDATES + 1] * 2
+
+    def test_the_budget_actually_bounds_what_is_consumed(self, fake_pyramids, tmp_path):
+        """The bound is observed by the search, not merely requested."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item(
+                f"m{n}", "2024-01-05", {"B04": "https://h/x.tif"}, geometry=_MISSING
+            )
+            for n in range(40)
+        ]
+        _build_stac(tmp_path, max_items=1, max_candidates=10)._search()
+        assert fake_pyramids.client.searches[0].yielded == 11
+
+    def test_an_unbounded_budget_asks_for_everything(self, fake_pyramids, tmp_path):
+        """max_candidates=None leaves the search unbounded."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = []
+        _build_stac(tmp_path, max_items=1, max_candidates=None)._search()
+        assert fake_pyramids.client.search_calls[0].get("max_items") is None
+
+    def test_a_collection_ending_exactly_at_the_budget_does_not_warn(
+        self, fake_pyramids, tmp_path, warnings_buffer
+    ):
+        """Genuine exhaustion is not reported as truncation."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item(
+                f"m{n}", "2024-01-05", {"B04": "https://h/x.tif"}, geometry=_MISSING
+            )
+            for n in range(10)
+        ]
+        _build_stac(tmp_path, max_items=5, max_candidates=10)._search()
+        assert "budget" not in "".join(warnings_buffer)
+
     @pytest.mark.parametrize("cap", [0, -1])
     def test_a_non_positive_cap_is_rejected(self, fake_pyramids, tmp_path, cap):
         """max_items must be a usable count, not 0 or negative."""
         with pytest.raises(ValueError, match="max_items"):
             _build_stac(tmp_path, max_items=cap)
 
-    def test_an_uncapped_search_is_left_unbounded(self, fake_pyramids, tmp_path):
-        """Asking for every item still asks the API for every item."""
-        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = []
-        _build_stac(tmp_path)._search()
-        assert fake_pyramids.client.search_calls[0].get("max_items") is None
+    @pytest.mark.parametrize("budget", [0, -1, True, 2.5])
+    def test_a_bad_candidate_budget_is_rejected(self, fake_pyramids, tmp_path, budget):
+        """The budget must be a positive int or None."""
+        with pytest.raises(ValueError, match="max_candidates"):
+            _build_stac(tmp_path, max_candidates=budget)
 
-    def test_exhausting_the_candidate_pool_short_of_the_cap_warns(
-        self, fake_pyramids, tmp_path, warnings_buffer
+    @pytest.mark.parametrize(
+        ("kwargs", "match"),
+        [
+            ({"max_items": True}, "max_items"),
+            ({"max_items": 2.5}, "max_items"),
+            ({"min_overlap_fraction": True}, "min_overlap_fraction"),
+            ({"min_overlap_fraction": "half"}, "min_overlap_fraction"),
+        ],
+    )
+    def test_non_numeric_knobs_are_rejected(
+        self, fake_pyramids, tmp_path, kwargs, match
     ):
-        """Truncating the pool is reported, not silently treated as 'no more data'."""
-        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
-            make_item(
-                f"m{n}", "2024-01-05", {"B04": "https://h/x.tif"}, geometry=_MISSING
-            )
-            for n in range(_MIN_CANDIDATE_POOL)
-        ]
-        _build_stac(tmp_path, max_items=2)._search()
-        assert "candidate pool" in "".join(warnings_buffer)
+        """A bool or a float is not silently coerced into a count."""
+        with pytest.raises(ValueError, match=match):
+            _build_stac(tmp_path, **kwargs)
 
     def test_cap_stops_once_enough_covering_items_are_found(
         self, fake_pyramids, tmp_path

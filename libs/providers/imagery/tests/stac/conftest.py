@@ -103,14 +103,28 @@ def make_bbox_geometry(
 
 
 class _FakeSearch:
-    """A pystac-client search stand-in yielding a fixed item list."""
+    """A pystac-client search stand-in that truncates at `max_items` as it does.
 
-    def __init__(self, items: list[_FakeItem]) -> None:
+    `pystac_client.ItemSearch.pages_as_dicts` stops yielding once `max_items`
+    items have been produced (`item_search.py`, the `if self._max_items and
+    num_items >= self._max_items: return` branch), so a fake that ignores the
+    argument cannot show whether a bound actually bounds anything. `yielded`
+    records how many items were consumed, which is the only way to tell a search
+    that stopped early from one that ran out of data.
+    """
+
+    def __init__(self, items: list[_FakeItem], max_items: int | None = None) -> None:
         self._items = items
+        self._max_items = max_items
+        self.yielded = 0
 
     def items(self):
-        """Yield the configured items."""
-        return iter(self._items)
+        """Yield items up to `max_items`, counting what the caller consumed."""
+        for item in self._items:
+            if self._max_items is not None and self.yielded >= self._max_items:
+                return
+            self.yielded += 1
+            yield item
 
 
 class _FakeClient:
@@ -119,12 +133,18 @@ class _FakeClient:
     def __init__(self, items_by_collection: dict[str, list[_FakeItem]]) -> None:
         self._items_by_collection = items_by_collection
         self.search_calls: list[dict[str, Any]] = []
+        self.searches: list[_FakeSearch] = []
 
     def search(self, **kwargs: Any) -> _FakeSearch:
         """Record the search kwargs and return the items for the collection."""
         self.search_calls.append(dict(kwargs))
         collection = kwargs.get("collections", [None])[0]
-        return _FakeSearch(self._items_by_collection.get(collection, []))
+        search = _FakeSearch(
+            self._items_by_collection.get(collection, []),
+            max_items=kwargs.get("max_items"),
+        )
+        self.searches.append(search)
+        return search
 
 
 class _FakeDataset:

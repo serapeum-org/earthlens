@@ -81,21 +81,23 @@ if TYPE_CHECKING:
 #: compared; it is not a true-area measure and is not meant to be one.
 _MIN_OVERLAP_FRACTION = 1e-4
 
-#: How many bbox-matched candidates to ask the API for per usable item wanted.
+#: How many bbox-matched candidates a search may examine before giving up.
 #:
-#: `max_items` cannot be passed straight through, because the API truncates on
-#: bbox order before the footprint screen ever runs — that is the defect this
-#: module's screen exists to fix. But dropping it entirely removes
-#: `pystac_client`'s only paging stop (`ItemSearch._pages`: it returns early just
-#: `if self._max_items`), so a capped search would page the whole catalogue
-#: whenever its early pages hold nothing that covers the AOI. Asking for a pool
-#: several times the cap keeps a bound on the paging while leaving ample room for
-#: the screen to reject candidates.
-_CANDIDATE_OVERFETCH = 20
-
-#: Floor for that pool, so a `max_items=1` smoke pull still draws on a workable
-#: number of candidates rather than 20.
-_MIN_CANDIDATE_POOL = 100
+#: `max_items` cannot be passed through to the API, because the truncation happens
+#: on bbox order before the footprint screen runs — that is the defect this
+#: module's screen exists to fix. But dropping any bound removes
+#: `pystac_client`'s only stop (`ItemSearch.pages_as_dicts` returns early just
+#: `if self._max_items`; the truncation is client-side in that method, not
+#: server-side), so a search whose early pages hold nothing covering would page a
+#: whole catalogue.
+#:
+#: This budget is therefore deliberately *not* derived from `max_items`. Scaling
+#: it by the cap reintroduces exactly the bug above at a new threshold: a request
+#: for one item would examine only a handful of candidates and miss a covering
+#: scene sitting behind them. It is a safety valve against runaway paging, sized
+#: so that reaching it means something is unusual about the request rather than
+#: about the cap, and the caller can raise it with `max_candidates=`.
+_DEFAULT_MAX_CANDIDATES = 2000
 
 
 class STAC(LazyClientMixin, AbstractDataSource):
@@ -137,6 +139,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
         client_id: str | None = None,
         max_items: int | None = None,
         min_overlap_fraction: float = _MIN_OVERLAP_FRACTION,
+        max_candidates: int | None = _DEFAULT_MAX_CANDIDATES,
     ):
         """Initialise a STAC backend instance.
 
@@ -178,12 +181,19 @@ class STAC(LazyClientMixin, AbstractDataSource):
                 first. `None` means no cap; a value below 1 is rejected.
             min_overlap_fraction: How much of the smaller of the footprint and
                 the AOI their overlap must cover for an item to be read. Defaults
-                to `_MIN_OVERLAP_FRACTION`; `0` keeps every item the API matched,
-                which turns the footprint screen off.
+                to `0.0001` (0.01% of the smaller geometry); `0` turns the
+                footprint screen off completely, keeping every item the API
+                matched.
+            max_candidates: How many bbox-matched candidates a search may examine
+                per `(collection, bbox)` before giving up, as a bound on paging a
+                large catalogue. Defaults to `2000`; `None` removes the bound.
+                Deliberately independent of `max_items` — see
+                `_DEFAULT_MAX_CANDIDATES`.
 
         Raises:
-            ValueError: When `max_items` is given and is less than 1, or when
-                `min_overlap_fraction` is outside `[0, 1]`.
+            ValueError: When `max_items` is given and is less than 1, when
+                `min_overlap_fraction` is outside `[0, 1]`, or when
+                `max_candidates` is given and is less than 1.
         """
         self._endpoint = endpoint
         self._resolution = resolution
@@ -196,6 +206,10 @@ class STAC(LazyClientMixin, AbstractDataSource):
         self._password = password
         self._token = token
         self._client_id = client_id
+        if max_items is not None and (
+            isinstance(max_items, bool) or not isinstance(max_items, int)
+        ):
+            raise ValueError(f"max_items must be an int or None, got {max_items!r}")
         if max_items is not None and max_items < 1:
             # `0` used to reach pystac_client, where `if self._max_items` makes it
             # falsy and therefore means "no cap"; the client-side cap now reads it
@@ -204,13 +218,29 @@ class STAC(LazyClientMixin, AbstractDataSource):
             raise ValueError(
                 f"max_items must be None (no cap) or at least 1, got {max_items}"
             )
+        if isinstance(min_overlap_fraction, bool) or not isinstance(
+            min_overlap_fraction, (int, float)
+        ):
+            raise ValueError(
+                f"min_overlap_fraction must be a number, got {min_overlap_fraction!r}"
+            )
         if not 0.0 <= min_overlap_fraction <= 1.0:
             raise ValueError(
                 "min_overlap_fraction must be between 0 and 1, got "
                 f"{min_overlap_fraction}"
             )
+        if max_candidates is not None and (
+            isinstance(max_candidates, bool)
+            or not isinstance(max_candidates, int)
+            or max_candidates < 1
+        ):
+            raise ValueError(
+                "max_candidates must be None (no bound) or an int of at least 1, "
+                f"got {max_candidates!r}"
+            )
         self._max_items = max_items
-        self._min_overlap_fraction = min_overlap_fraction
+        self._min_overlap_fraction = float(min_overlap_fraction)
+        self._max_candidates = max_candidates
         # Stored before super().__init__ because the base constructor calls
         # _initialize() (which needs the request) before it sets self.vars.
         self._variables = variables
@@ -221,6 +251,11 @@ class STAC(LazyClientMixin, AbstractDataSource):
         #: dropped every one. `download` turns that into an error; `search` /
         #: `count` / `preview` keep their documented empty result.
         self._screened_out = False
+        #: Set by `_search`: the `(collection, bbox)` pairs whose candidate budget
+        #: ran out before the list ended, so "nothing covers the AOI" was never
+        #: established for them. `download` reports this cause in preference to
+        #: `_screened_out`, because the remedy is different.
+        self._budget_exhausted: list[tuple[str, tuple[float, ...]]] = []
         # Filled by _fetch: (collection_key, date, half index, path) per COG.
         self._written: list[tuple[str, str, int, Path]] = []
         self._catalog: Catalog | None = None
@@ -358,7 +393,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
         covering none of the AOI. Candidates are therefore screened with
         `_covers_aoi` before `max_items` is applied, which makes the cap count
         usable scenes. The API is asked for a bounded pool of candidates rather
-        than for the cap itself (see `_CANDIDATE_OVERFETCH`).
+        than for the cap itself (see `_DEFAULT_MAX_CANDIDATES`).
 
         Every `(collection, bbox)` pair reports what the screen did: a warning
         when the pair matched candidates and kept none, a debug line otherwise.
@@ -378,6 +413,15 @@ class STAC(LazyClientMixin, AbstractDataSource):
         # Candidates the API returned, kept or dropped, so an all-dropped search
         # can be told apart from one the API matched nothing for.
         examined = 0
+        # Reset both verdicts up front: they are read by `download` after this
+        # method returns, so leaving a previous call's values in place would let a
+        # search that failed part-way report the earlier outcome.
+        self._screened_out = False
+        self._budget_exhausted = []
+        # Ask for one more than the budget, so consuming budget + 1 candidates is
+        # what distinguishes "the bound truncated the list" from "the collection
+        # happens to hold exactly this many".
+        probe = None if self._max_candidates is None else self._max_candidates + 1
         assert self._catalog is not None  # set in _initialize
         assert self._endpoint is not None  # resolved in _initialize
         assert isinstance(self.vars, dict)  # STAC always uses the mapping form
@@ -386,24 +430,15 @@ class STAC(LazyClientMixin, AbstractDataSource):
             assets = list(requested) or list(collection.default_assets)
             resolved_id = self._catalog.resolve(self._endpoint, collection_key)
             for bbox in self._bboxes():
-                # The API is asked for a *pool* of candidates, not for the item
-                # cap: it can only filter on the item bbox, so letting it truncate
-                # to the cap would hand us scenes covering none of the AOI. The
-                # pool still bounds the paging, which `max_items` was the only
-                # thing providing. `None` (no cap) stays unbounded, since that is
-                # what the caller asked for.
-                pool = (
-                    None
-                    if self._max_items is None
-                    else max(
-                        self._max_items * _CANDIDATE_OVERFETCH, _MIN_CANDIDATE_POOL
-                    )
-                )
+                # The API is bounded by the candidate budget, never by `max_items`:
+                # it can only filter on the item bbox, so letting the item cap
+                # truncate the list would hand us scenes covering none of the AOI
+                # and hide the ones that do.
                 search = self.client.search(
                     collections=[resolved_id],
                     bbox=list(bbox),
                     datetime=f"{start}/{end}",
-                    max_items=pool,
+                    max_items=probe,
                 )
                 aoi = box(*bbox)
                 kept = 0
@@ -434,15 +469,17 @@ class STAC(LazyClientMixin, AbstractDataSource):
                 # whose eastern antimeridian half is wholly dropped still returns
                 # the western half, and that partial case is the one most in need
                 # of the diagnostic.
-                if pool is not None and seen >= pool and kept < (self._max_items or 0):
-                    # The pool ran out before the cap was met, so there may be
-                    # covering items the API never got round to returning. Say so
-                    # rather than letting it look like the data simply ends here.
+                if probe is not None and seen >= probe:
+                    # Consuming budget + 1 candidates means the list did not end
+                    # here, so there may be covering items never examined. A
+                    # collection holding exactly `max_candidates` items stops one
+                    # short of this and is reported as the ordinary case.
+                    self._budget_exhausted.append((collection_key, tuple(bbox)))
                     logger.warning(
-                        f"STAC screen: {collection_key} {tuple(bbox)} exhausted "
-                        f"the {pool}-item candidate pool with only {kept} of "
-                        f"{self._max_items} usable item(s) found; raise "
-                        "`max_items` or narrow the date window if more are needed"
+                        f"STAC screen: {collection_key} {tuple(bbox)} stopped "
+                        f"after the {self._max_candidates}-candidate budget with "
+                        f"{kept} usable item(s) found; raise `max_candidates` to "
+                        "examine more, or narrow the AOI or date window"
                     )
                 if seen and not kept:
                     logger.warning(
@@ -461,7 +498,13 @@ class STAC(LazyClientMixin, AbstractDataSource):
         # invalid request, so it stays an empty result here -- `search()`,
         # `count()` and `preview()` all document one. `download` turns it into an
         # error, where writing no pixels is actionable.
-        self._screened_out = bool(examined) and not products
+        #
+        # A budget-truncated pair is deliberately excluded: there the screen did
+        # not establish that nothing covers the AOI, only that it stopped looking,
+        # so `download` must report that cause instead.
+        self._screened_out = (
+            bool(examined) and not products and not self._budget_exhausted
+        )
         return products
 
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
@@ -727,14 +770,23 @@ class STAC(LazyClientMixin, AbstractDataSource):
                 error and still returns the empty list.
         """
         paths = self._api_via_search_fetch()
+        if not paths and self._budget_exhausted:
+            where = ", ".join(f"{key} {bbox}" for key, bbox in self._budget_exhausted)
+            raise ValueError(
+                f"no item covering the AOI was found within the "
+                f"{self._max_candidates}-candidate budget for {where}. The search "
+                "stopped before the list ended, so a covering item may simply not "
+                "have been reached: raise `max_candidates` to examine more, or "
+                "narrow the AOI or date window so fewer candidates match."
+            )
         if self._screened_out:
             raise ValueError(
                 "every item the search matched was dropped because none covers "
                 "the requested AOI: a STAC search filters on the item bbox, "
                 "which for a footprint lying at an angle to the lon/lat grid is "
-                "larger than the scene itself. The per-collection warnings above "
-                "name the bbox(es) concerned. Move the date window, or pick a "
-                "collection whose footprints cover the AOI."
+                "larger than the scene itself. Move the date window, or pick a "
+                "collection whose footprints cover the AOI. The per-collection "
+                "warnings name the bbox(es) concerned."
             )
         if aggregate is not None:
             return self._aggregate_cogs(aggregate)
