@@ -387,7 +387,7 @@ def _get_text(
         return None
 
 
-def _parse_time(token: str, minute_token: str = "") -> pd.Timestamp | None:
+def _parse_time(token: str, minute_field: str = "") -> pd.Timestamp | None:
     """Parse an ATCF `YYYYMMDDHH` UTC timestamp plus the optional minute field.
 
     Field 2 carries the synoptic hour; for `BEST` tracks field 3 may carry the
@@ -400,7 +400,7 @@ def _parse_time(token: str, minute_token: str = "") -> pd.Timestamp | None:
     token = token.strip()
     if len(token) != 10 or not token.isdigit():
         return None
-    minute = _to_int(minute_token)
+    minute = _to_int(minute_field)
     if minute is None or not 0 <= minute < 60:
         minute = 0
     try:
