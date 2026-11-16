@@ -1343,7 +1343,9 @@ def _reduce_whole_window(
         The single reduced `Dataset`.
 
     Raises:
-        ValueError: If `times` is empty, or if any timestamp is unparseable.
+        ValueError: If `times` is empty, if any timestamp is unparseable, or if
+            `times` has a different length from `stack` (the last propagated from
+            pyramids' `reduce_time`).
     """
     if len(times) == 0:
         raise ValueError("whole-window reduction needs at least one timestep.")
