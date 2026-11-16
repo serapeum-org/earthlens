@@ -970,7 +970,7 @@ def _has_normalised_longitudes(footprint: Any) -> bool:
         meaningfully be compared with a normalised AOI bbox.
     """
     min_x, _, max_x, _ = footprint.bounds
-    return min_x >= -180.0 and max_x <= 180.0
+    return bool(min_x >= -180.0 and max_x <= 180.0)
 
 
 def _overlaps(footprint: Any, aoi: Any, min_fraction: float) -> bool:
