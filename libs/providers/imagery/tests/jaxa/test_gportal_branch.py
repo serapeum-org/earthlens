@@ -266,6 +266,11 @@ class _RaisingDownload:
         raise self._exc
 
 
+def _probe_must_not_run() -> int | None:
+    """Stand-in probe that fails the test if the classification branch consults it."""
+    raise AssertionError("the endpoint probe must not run on this path")
+
+
 @pytest.mark.jaxa
 @pytest.mark.integration
 def test_gportal_http_503_raises_typed_unavailable(
@@ -452,10 +457,6 @@ def test_gportal_search_5xx_does_not_probe(
         monkeypatch,
         requests.HTTPError("503 Server Error: Service Unavailable", response=resp),
     )
-
-    def _probe_must_not_run() -> int | None:
-        raise AssertionError("the endpoint probe must not run for a 5xx failure")
-
     monkeypatch.setattr(_gportal, "_probe_search_endpoint_status", _probe_must_not_run)
     space, time = extents
     ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
@@ -467,6 +468,33 @@ def test_gportal_search_5xx_does_not_probe(
         )
     assert not isinstance(excinfo.value, GportalEndpointRetiredError)
     assert excinfo.value.status_code == 503
+
+
+@pytest.mark.jaxa
+@pytest.mark.integration
+@pytest.mark.parametrize("probe_status", [302, 303, 307])
+def test_gportal_search_temporary_redirect_probe_stays_transient(
+    monkeypatch, tmp_path, extents, configured_auth, probe_status
+) -> None:
+    """A temporary-redirect probe status is not in the gone-set, so it stays transient."""
+    import requests
+
+    from earthlens.jaxa import _gportal
+
+    _fake_gportal_raising(
+        monkeypatch,
+        requests.exceptions.JSONDecodeError("Expecting value", "<html>", 0),
+    )
+    monkeypatch.setattr(_gportal, "_probe_search_endpoint_status", lambda: probe_status)
+    space, time = extents
+    ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
+    from earthlens.jaxa import GportalEndpointRetiredError, GportalUnavailableError
+
+    with pytest.raises(GportalUnavailableError, match="down or throttling") as excinfo:
+        _gportal.fetch_gportal(
+            dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
+        )
+    assert not isinstance(excinfo.value, GportalEndpointRetiredError)
 
 
 @pytest.mark.jaxa
@@ -645,21 +673,76 @@ def test_probe_search_endpoint_status_returns_none_on_transport_failure(
 
 @pytest.mark.jaxa
 @pytest.mark.integration
-def test_gportal_search_4xx_client_error_is_not_relabelled(
+def test_gportal_search_plain_4xx_propagates_without_probing(
     monkeypatch, tmp_path, extents, configured_auth
 ) -> None:
-    """A 4xx client error on the search propagates, not wrapped as unavailable."""
+    """A plain 4xx (not 404/410) propagates raw and never consults the endpoint probe."""
     import requests
+
+    from earthlens.jaxa import _gportal
+
+    resp = type("_Resp", (), {"status_code": 400})()
+    _fake_gportal_raising(
+        monkeypatch, requests.HTTPError("400 Client Error: Bad Request", response=resp)
+    )
+    monkeypatch.setattr(_gportal, "_probe_search_endpoint_status", _probe_must_not_run)
+    space, time = extents
+    ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
+
+    with pytest.raises(requests.HTTPError, match="400"):
+        _gportal.fetch_gportal(
+            dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
+        )
+
+
+@pytest.mark.jaxa
+@pytest.mark.integration
+def test_gportal_search_direct_404_live_service_propagates(
+    monkeypatch, tmp_path, extents, configured_auth
+) -> None:
+    """A direct 404 whose service URL is still alive is a resource error and propagates raw."""
+    import requests
+
+    from earthlens.jaxa import _gportal
 
     resp = type("_Resp", (), {"status_code": 404})()
     _fake_gportal_raising(
         monkeypatch, requests.HTTPError("404 Client Error: Not Found", response=resp)
     )
+    monkeypatch.setattr(_gportal, "_probe_search_endpoint_status", lambda: 200)
     space, time = extents
     ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
-    from earthlens.jaxa._gportal import fetch_gportal
 
     with pytest.raises(requests.HTTPError, match="404"):
-        fetch_gportal(
+        _gportal.fetch_gportal(
             dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
         )
+
+
+@pytest.mark.jaxa
+@pytest.mark.integration
+@pytest.mark.parametrize("search_status", [404, 410])
+def test_gportal_search_direct_404_410_retires_when_probe_confirms(
+    monkeypatch, tmp_path, extents, configured_auth, search_status
+) -> None:
+    """A direct 404/410 on the search becomes a retirement when the probe confirms the endpoint is gone."""
+    import requests
+
+    from earthlens.jaxa import _gportal
+
+    resp = type("_Resp", (), {"status_code": search_status})()
+    _fake_gportal_raising(
+        monkeypatch, requests.HTTPError(f"{search_status} Client Error", response=resp)
+    )
+    monkeypatch.setattr(_gportal, "_probe_search_endpoint_status", lambda: 410)
+    space, time = extents
+    ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
+    from earthlens.jaxa import GportalEndpointRetiredError
+
+    with pytest.raises(
+        GportalEndpointRetiredError, match="no longer exists"
+    ) as excinfo:
+        _gportal.fetch_gportal(
+            dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
+        )
+    assert excinfo.value.status_code == 410
