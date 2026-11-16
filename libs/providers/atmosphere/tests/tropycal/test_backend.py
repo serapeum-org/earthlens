@@ -765,6 +765,7 @@ class TestNhcBtk:
         from earthlens.tropycal import nhc
         from earthlens.tropycal.events import RADII_COLUMNS
 
+        monkeypatch.setattr(nhc, "fetch_btk_listing", lambda: "<index>")
         monkeypatch.setattr(
             nhc, "fetch_btk_frames", lambda basin, years, **kw: [_btk_frame()]
         )
@@ -780,6 +781,7 @@ class TestNhcBtk:
         """geometry='track' returns the summary LineString schema (no radii)."""
         from earthlens.tropycal import nhc
 
+        monkeypatch.setattr(nhc, "fetch_btk_listing", lambda: "<index>")
         monkeypatch.setattr(
             nhc, "fetch_btk_frames", lambda basin, years, **kw: [_btk_frame()]
         )
@@ -793,6 +795,7 @@ class TestNhcBtk:
         from earthlens.tropycal import nhc
         from earthlens.tropycal.events import BTK_POINT_COLUMNS
 
+        monkeypatch.setattr(nhc, "fetch_btk_listing", lambda: "<index>")
         monkeypatch.setattr(nhc, "fetch_btk_frames", lambda basin, years, **kw: [])
         backend = _backend(tmp_path, product="nhc_btk")
         fc = backend.download(progress_bar=False)
