@@ -11,7 +11,7 @@ import pytest
 from shapely.geometry import box, shape
 
 from earthlens.stac import STAC
-from earthlens.stac.backend import _MIN_AOI_COVERAGE, _covers_aoi
+from earthlens.stac.backend import _MIN_OVERLAP_FRACTION, _covers_aoi
 
 from .conftest import make_bbox_geometry, make_item
 
@@ -101,9 +101,34 @@ class TestCoversAoi:
         assert footprint.intersection(_AOI).area == 0
         assert not _covers_aoi(item, _AOI)
 
+    def test_a_tile_is_judged_on_its_own_overlap_not_its_share_of_the_aoi(self):
+        """A whole tile inside a continental AOI is kept however small its share."""
+        continental = box(-180.0, -60.0, 180.0, 60.0)
+        tile = make_bbox_geometry(-0.5, -0.5, 0.5, 0.5)
+        item = make_item("a", "2024-01-05", {}, geometry=tile)
+        # the tile is 1 deg^2 of an 86400 deg^2 AOI -- 1.2e-05 of it, far under
+        # the floor, yet it covers itself completely and carries real pixels
+        assert _covers_aoi(item, continental)
+
+    def test_a_hairline_is_still_dropped_against_a_large_aoi(self):
+        """Scaling to the smaller geometry must not stop edge slivers being dropped."""
+        continental = box(-180.0, -60.0, 180.0, 60.0)
+        # a real scene (500 deg^2) that merely grazes the AOI's eastern edge, so
+        # the overlap is negligible relative to the scene as well as to the AOI
+        grazing = make_bbox_geometry(179.999995, -50.0, 185.0, 50.0)
+        item = make_item("a", "2024-01-05", {}, geometry=grazing)
+        assert not _covers_aoi(item, continental)
+
+    def test_a_footprint_smaller_than_the_floor_is_kept_when_wholly_inside(self):
+        """A genuinely tiny scene is kept: its whole extent is all the data there is."""
+        continental = box(-180.0, -60.0, 180.0, 60.0)
+        tiny = make_bbox_geometry(0.0, 0.0, 0.001, 0.001)
+        item = make_item("a", "2024-01-05", {}, geometry=tiny)
+        assert _covers_aoi(item, continental)
+
     def test_coverage_floor_is_a_small_fraction(self):
         """The default floor excludes slivers without excluding partial tiles."""
-        assert 0 < _MIN_AOI_COVERAGE < 0.01
+        assert 0 < _MIN_OVERLAP_FRACTION < 0.01
 
     def test_geometry_is_read_from_a_mapping_item(self):
         """An item carrying its geometry as a mapping key is judged the same way."""
@@ -236,6 +261,22 @@ class TestSearchScreensByFootprint:
         ]
         products = _build_stac(tmp_path, max_items=1)._search()
         assert [p.id for p in products] == ["covering"]
+
+    def test_a_continental_aoi_keeps_its_tiles(self, fake_pyramids, tmp_path):
+        """A tiled mosaic over a continental AOI survives the screen."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item(
+                f"t{n}",
+                "2024-01-05",
+                {"B04": f"https://h/{n}.tif"},
+                geometry=make_bbox_geometry(n, 0.0, n + 1.0, 1.0),
+            )
+            for n in range(5)
+        ]
+        products = _build_stac(
+            tmp_path, lat_lim=[-60.0, 60.0], lon_lim=[-180.0, 180.0]
+        )._search()
+        assert [p.id for p in products] == ["t0", "t1", "t2", "t3", "t4"]
 
     def test_an_empty_api_result_does_not_raise(self, fake_pyramids, tmp_path):
         """A search the API matched nothing for returns no products without raising."""

@@ -744,26 +744,48 @@ def _acq_date(item: Any) -> str:
     return "unknown"
 
 
-#: Smallest share of the AOI an item's footprint must cover to be worth reading.
-#: A STAC `/search` can only filter candidates by their *bbox*. For a rotated
-#: footprint — every Landsat scene — the bbox is the envelope of a tilted
-#: quadrilateral and so is substantially larger than the scene, which lets an item
-#: pass the bbox filter while its geometry misses the AOI completely. A hairline
-#: overlap along one edge is no more useful: it crops to a sliver a few pixels
-#: wide. Measured against DEAfrica `wofs_ls` over a 0.25 deg^2 AOI, the genuine
-#: hairlines covered 0.0009%-0.0029% of it — three orders below this bound — while
-#: a partially-overlapping tile worth mosaicking covers whole percents.
-_MIN_AOI_COVERAGE = 1e-4
+#: Smallest overlap an item's footprint must share with the AOI to be worth
+#: reading, as a fraction of whichever of the two is *smaller*.
+#:
+#: A STAC `/search` can only filter candidates by their *bbox*. A footprint that
+#: sits at an angle to the lon/lat grid — a Landsat scene's is about 0.68 of its
+#: own bbox, measured on live `landsat-c2l2-sr` items — therefore passes the bbox
+#: filter while its geometry can miss the AOI completely. A hairline overlap along
+#: one edge is no more useful: it crops to a sliver a few pixels wide. Measured
+#: against DEAfrica `wofs_ls` over a 0.25 deg^2 AOI, the genuine hairlines covered
+#: 9.0e-06 and 2.9e-05 of it, i.e. 11x and 3.4x under this bound.
+#:
+#: The fraction is of the *smaller* geometry, which is what makes the measure
+#: scale-free. Against the AOI alone it inverts as soon as the AOI outgrows one
+#: scene: a tile wholly inside a continental AOI covers all of itself but a
+#: negligible share of the AOI, so a fraction-of-AOI floor rejects every tile of
+#: a legitimate mosaic once the AOI passes roughly 10,000 scene areas (NAIP over
+#: CONUS, Sentinel-2 near-globally). A hairline, by contrast, covers almost none
+#: of either geometry and is still dropped.
+#:
+#: One consequence is deliberate: a footprint that is itself tiny and lies wholly
+#: inside the AOI covers all of itself and is kept, because its whole extent is
+#: the only data that item has to offer. What the floor drops is an overlap that
+#: is negligible against *both* geometries — a large scene merely grazing the
+#: AOI's edge, which is the shape the DEAfrica hairlines took.
+#:
+#: Both areas are planar squared degrees, so the ratio carries the `cos(lat)`
+#: distortion of the lon/lat plane. It cancels for footprint and AOI at a similar
+#: latitude, which is the case here because the two must overlap at all to be
+#: compared; it is not a true-area measure and is not meant to be one.
+_MIN_OVERLAP_FRACTION = 1e-4
 
 
-def _covers_aoi(item: Any, aoi: Any, min_fraction: float = _MIN_AOI_COVERAGE) -> bool:
+def _covers_aoi(
+    item: Any, aoi: Any, min_fraction: float = _MIN_OVERLAP_FRACTION
+) -> bool:
     """Return whether `item`'s footprint covers enough of `aoi` to be read.
 
     Args:
         item: A STAC item; its `geometry` is the acquisition footprint.
         aoi: The AOI as a shapely geometry.
         min_fraction: Smallest share of `aoi` the intersection may cover and
-            still count. Defaults to `_MIN_AOI_COVERAGE`.
+            still count. Defaults to `_MIN_OVERLAP_FRACTION`.
 
     Returns:
         True when the footprint covers at least `min_fraction` of `aoi`. An item
@@ -813,7 +835,7 @@ def _covers_aoi(item: Any, aoi: Any, min_fraction: float = _MIN_AOI_COVERAGE) ->
     if geometry is None and isinstance(item, dict):
         geometry = item.get("geometry")
     result = True
-    if geometry and aoi.area > 0:
+    if geometry:
         try:
             footprint = shape(geometry)
         except (AttributeError, KeyError, TypeError, ValueError, ShapelyError):
@@ -822,7 +844,11 @@ def _covers_aoi(item: Any, aoi: Any, min_fraction: float = _MIN_AOI_COVERAGE) ->
             # AttributeError -- none of which should cost us a usable scene.
             footprint = None
         if footprint is not None and not footprint.is_empty:
-            result = footprint.intersection(aoi).area >= min_fraction * aoi.area
+            # Scale by the smaller geometry so the measure does not invert for an
+            # AOI larger than one scene; see `_MIN_OVERLAP_FRACTION`. A zero-area
+            # AOI or footprint gives a zero floor, which keeps the item.
+            scale = min(aoi.area, footprint.area)
+            result = footprint.intersection(aoi).area >= min_fraction * scale
     return result
 
 
