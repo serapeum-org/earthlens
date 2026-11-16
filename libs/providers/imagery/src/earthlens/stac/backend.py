@@ -310,14 +310,24 @@ class STAC(LazyClientMixin, AbstractDataSource):
             assets = list(requested) or list(collection.default_assets)
             resolved_id = self._catalog.resolve(self._endpoint, collection_key)
             for bbox in self._bboxes():
-                # `max_items` is NOT passed to the API: the API can only filter on
-                # the item bbox, which over-selects rotated footprints, so letting
-                # it truncate would hand us scenes that cover none of the AOI. Cap
-                # on *usable* items below instead, after the geometry filter.
+                # The API is asked for a *pool* of candidates, not for the item
+                # cap: it can only filter on the item bbox, so letting it truncate
+                # to the cap would hand us scenes covering none of the AOI. The
+                # pool still bounds the paging, which `max_items` was the only
+                # thing providing. `None` (no cap) stays unbounded, since that is
+                # what the caller asked for.
+                pool = (
+                    None
+                    if self._max_items is None
+                    else max(
+                        self._max_items * _CANDIDATE_OVERFETCH, _MIN_CANDIDATE_POOL
+                    )
+                )
                 search = self.client.search(
                     collections=[resolved_id],
                     bbox=list(bbox),
                     datetime=f"{start}/{end}",
+                    max_items=pool,
                 )
                 aoi = box(*bbox)
                 kept = 0
@@ -348,6 +358,16 @@ class STAC(LazyClientMixin, AbstractDataSource):
                 # whose eastern antimeridian half is wholly dropped still returns
                 # the western half, and that partial case is the one most in need
                 # of the diagnostic.
+                if pool is not None and seen >= pool and kept < (self._max_items or 0):
+                    # The pool ran out before the cap was met, so there may be
+                    # covering items the API never got round to returning. Say so
+                    # rather than letting it look like the data simply ends here.
+                    logger.warning(
+                        f"STAC screen: {collection_key} {tuple(bbox)} exhausted "
+                        f"the {pool}-item candidate pool with only {kept} of "
+                        f"{self._max_items} usable item(s) found; raise "
+                        "`max_items` or narrow the date window if more are needed"
+                    )
                 if seen and not kept:
                     logger.warning(
                         f"STAC screen: {collection_key} {tuple(bbox)} matched "
@@ -809,6 +829,22 @@ def _acq_date(item: Any) -> str:
 #: latitude, which is the case here because the two must overlap at all to be
 #: compared; it is not a true-area measure and is not meant to be one.
 _MIN_OVERLAP_FRACTION = 1e-4
+
+#: How many bbox-matched candidates to ask the API for per usable item wanted.
+#:
+#: `max_items` cannot be passed straight through, because the API truncates on
+#: bbox order before the footprint screen ever runs — that is the defect this
+#: module's screen exists to fix. But dropping it entirely removes
+#: `pystac_client`'s only paging stop (`ItemSearch._pages`: it returns early just
+#: `if self._max_items`), so a capped search would page the whole catalogue
+#: whenever its early pages hold nothing that covers the AOI. Asking for a pool
+#: several times the cap keeps a bound on the paging while leaving ample room for
+#: the screen to reject candidates.
+_CANDIDATE_OVERFETCH = 20
+
+#: Floor for that pool, so a `max_items=1` smoke pull still draws on a workable
+#: number of candidates rather than 20.
+_MIN_CANDIDATE_POOL = 100
 
 
 def _covers_aoi(

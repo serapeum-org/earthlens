@@ -11,7 +11,12 @@ import pytest
 from shapely.geometry import box, shape
 
 from earthlens.stac import STAC
-from earthlens.stac.backend import _MIN_OVERLAP_FRACTION, _covers_aoi
+from earthlens.stac.backend import (
+    _CANDIDATE_OVERFETCH,
+    _MIN_CANDIDATE_POOL,
+    _MIN_OVERLAP_FRACTION,
+    _covers_aoi,
+)
 
 from .conftest import make_bbox_geometry, make_item
 
@@ -263,15 +268,47 @@ class TestSearchScreensByFootprint:
         products = _build_stac(tmp_path, max_items=1)._search()
         assert [p.id for p in products] == ["hit"]
 
-    def test_max_items_is_not_delegated_to_the_api(self, fake_pyramids, tmp_path):
-        """The cap is applied after screening, so the API is not asked to truncate."""
+    def test_the_api_cap_is_a_candidate_pool_not_the_item_cap(
+        self, fake_pyramids, tmp_path
+    ):
+        """The API is asked for a pool of candidates, never for just the cap."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
             make_item(
                 "hit", "2024-01-06", {"B04": "https://h/2.tif"}, geometry=_COVERING
             )
         ]
         _build_stac(tmp_path, max_items=1)._search()
+        requested = fake_pyramids.client.search_calls[0].get("max_items")
+        assert requested == _MIN_CANDIDATE_POOL
+        assert requested > 1
+
+    def test_a_large_cap_scales_the_candidate_pool(self, fake_pyramids, tmp_path):
+        """A bigger cap asks for proportionally more candidates."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = []
+        _build_stac(tmp_path, max_items=50)._search()
+        assert (
+            fake_pyramids.client.search_calls[0]["max_items"]
+            == 50 * _CANDIDATE_OVERFETCH
+        )
+
+    def test_an_uncapped_search_is_left_unbounded(self, fake_pyramids, tmp_path):
+        """Asking for every item still asks the API for every item."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = []
+        _build_stac(tmp_path)._search()
         assert fake_pyramids.client.search_calls[0].get("max_items") is None
+
+    def test_exhausting_the_candidate_pool_short_of_the_cap_warns(
+        self, fake_pyramids, tmp_path, warnings_buffer
+    ):
+        """Truncating the pool is reported, not silently treated as 'no more data'."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item(
+                f"m{n}", "2024-01-05", {"B04": "https://h/x.tif"}, geometry=_MISSING
+            )
+            for n in range(_MIN_CANDIDATE_POOL)
+        ]
+        _build_stac(tmp_path, max_items=2)._search()
+        assert "candidate pool" in "".join(warnings_buffer)
 
     def test_cap_stops_once_enough_covering_items_are_found(
         self, fake_pyramids, tmp_path
