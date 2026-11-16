@@ -81,10 +81,10 @@ worldpop = ["earthlens-land[worldpop]"]
 
 # The self-referential "everything" extra: each entry re-activates one backend's
 # own extra on earthlens itself. `argo` now joins too: openeo 0.54 dropped its
-# `xarray<2025.1.2` cap and argopy 1.5 dropped its `erddapy` pin, so argopy's
-# `xarray>=2025.7` floor, openeo, and the `erddap` backend's `erddapy>=3.0` finally
-# share one resolution and the `[tool.uv] conflicts` fork is retired (see #789).
-# `osm` is included because openeo
+# `xarray<2025.1.2` cap and argopy 1.5 fixed its erddapy 3.x import break, so
+# argopy's `xarray>=2025.7` floor, openeo, and the `erddap` backend's
+# `erddapy>=3.0` finally share one resolution and the `[tool.uv] conflicts` fork
+# is retired (see #789). `osm` is included because openeo
 # already pins pandas<3, so ohsome's pandas<3 no longer collides. `osm` now also
 # carries the bulk-pbf SDK (`osmium`), all wheels, so the whole OSM backend is in
 # `all` with no source build (see #1186). pyrosm (the in-memory pbf engine) is

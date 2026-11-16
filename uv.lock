@@ -2893,7 +2893,7 @@ usgs-water = [
 
 [package.metadata]
 requires-dist = [
-    { name = "argopy", marker = "extra == 'argo'", specifier = ">=1.4" },
+    { name = "argopy", marker = "extra == 'argo'", specifier = ">=1.5" },
     { name = "copernicusmarine", marker = "extra == 'cmems'", specifier = ">=2.0.0,<3" },
     { name = "dataretrieval", marker = "extra == 'usgs-water'", specifier = ">=1.1.4" },
     { name = "earthlens-core", editable = "libs/core" },
