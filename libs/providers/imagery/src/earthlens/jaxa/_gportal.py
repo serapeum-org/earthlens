@@ -129,17 +129,25 @@ class GportalEndpointRetiredError(GportalUnavailableError):
     #1415.
 
     Examples:
-        - The retirement error carries the probe's permanent-redirect status:
+        - An existing `except GportalUnavailableError` still catches it, and the
+          handler can read the probe's permanent-redirect status off it:
             ```python
             >>> from earthlens.jaxa import (
             ...     GportalEndpointRetiredError,
             ...     GportalUnavailableError,
             ... )
-            >>> err = GportalEndpointRetiredError("CSW search retired", status_code=301)
-            >>> err.status_code
+            >>> try:
+            ...     raise GportalEndpointRetiredError("CSW search retired", status_code=301)
+            ... except GportalUnavailableError as exc:
+            ...     exc.status_code
             301
-            >>> isinstance(err, GportalUnavailableError)
-            True
+
+            ```
+        - The error reads as a plain, actionable message:
+            ```python
+            >>> from earthlens.jaxa import GportalEndpointRetiredError
+            >>> str(GportalEndpointRetiredError("CSW search retired", status_code=404))
+            'CSW search retired'
 
             ```
     """
