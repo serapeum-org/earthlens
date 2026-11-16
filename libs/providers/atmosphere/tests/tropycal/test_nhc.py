@@ -294,3 +294,121 @@ class TestFetchBtkFrames:
         )
         frames = nhc.fetch_btk_frames("east_pacific", [2026], get=getter)
         assert [f["id"].iloc[0] for f in frames] == ["EP122026"]
+
+    def test_zero_radii_row_leaves_nan(self):
+        """A 34-kt row whose four radii are all 0 leaves those columns NaN."""
+        text = _atcf_line(
+            time="2026090218",
+            lat="133N",
+            lon="1537W",
+            vmax=65,
+            mslp=985,
+            threshold=34,
+            radii=(0, 0, 0, 0),
+            name="LOWELL",
+        )
+        frame = nhc.parse_btk_file(text, storm_id="EP122026", basin="east_pacific")
+        assert frame[["r34_ne", "r34_se", "r34_sw", "r34_nw"]].isna().all(axis=None)
+
+    def test_invalid_calendar_date_dropped(self):
+        """A 10-digit timestamp that is not a real date is skipped."""
+        text = _atcf_line(
+            time="2026139999",
+            lat="133N",
+            lon="1537W",
+            vmax=140,
+            mslp=927,
+        )
+        frame = nhc.parse_btk_file(text, storm_id="EP122026", basin="east_pacific")
+        assert frame.empty
+
+
+class TestParsers:
+    """Tests for the private ATCF field parsers."""
+
+    @pytest.mark.parametrize(
+        "token, expected",
+        [
+            ("133N", 13.3),
+            ("1537W", -153.7),
+            ("0859W", -85.9),
+            ("101S", -10.1),
+            ("50E", 5.0),
+        ],
+    )
+    def test_parse_latlon_valid(self, token, expected):
+        """Valid lat/lon tokens parse as tenths of a degree, S/W negated.
+
+        Args:
+            token: The ATCF lat/lon token.
+            expected: The signed decimal degrees it should yield.
+        """
+        assert nhc._parse_latlon(token) == pytest.approx(expected)
+
+    @pytest.mark.parametrize("token", ["", "N", "1234X", "ABCN", "   "])
+    def test_parse_latlon_malformed_is_none(self, token):
+        """A too-short, bad-hemisphere, or non-numeric token yields None.
+
+        Args:
+            token: The malformed ATCF lat/lon token.
+        """
+        assert nhc._parse_latlon(token) is None
+
+    @pytest.mark.parametrize(
+        "token, expected",
+        [(" 42 ", 42), ("0", 0), ("", None), ("abc", None), ("  ", None)],
+    )
+    def test_to_int(self, token, expected):
+        """Integer fields parse, blank/non-numeric map to None.
+
+        Args:
+            token: The ATCF integer field.
+            expected: The parsed int, or None.
+        """
+        assert nhc._to_int(token) == expected
+
+
+def _only_forecast_body() -> _FakeResponse:
+    """A btk response whose only rows are non-BEST (so it parses empty)."""
+    return _FakeResponse(
+        _atcf_line(
+            time="2026090218",
+            lat="133N",
+            lon="1537W",
+            vmax=140,
+            mslp=927,
+            track_type="OFCL",
+        )
+    )
+
+
+class TestFetchEmptyParse:
+    """A fetched file that parses to no rows is dropped, not returned."""
+
+    def test_empty_parse_is_skipped(self):
+        """A file with only forecast rows is fetched but contributes no frame."""
+        base = nhc.BTK_BASE_URL
+        listing = "".join(
+            f'<a href="{n}">{n}</a>\n' for n in ("bep112026.dat", "bep122026.dat")
+        )
+        getter = _FakeGetter(
+            {
+                base: _FakeResponse(listing),
+                f"{base}bep112026.dat": _only_forecast_body(),
+                f"{base}bep122026.dat": _FakeResponse(
+                    _atcf_line(
+                        time="2026090218",
+                        lat="133N",
+                        lon="1537W",
+                        vmax=120,
+                        mslp=940,
+                        threshold=64,
+                        radii=(30, 25, 20, 30),
+                        name="LOWELL",
+                    )
+                ),
+            }
+        )
+        frames = nhc.fetch_btk_frames("east_pacific", [2026], get=getter)
+        assert [f["id"].iloc[0] for f in frames] == ["EP122026"]
+        assert f"{base}bep112026.dat" in getter.calls

@@ -152,20 +152,16 @@ def fetch_btk_frames(
         return []
 
     pattern = re.compile(_FILE_RE_TEMPLATE.format(prefix=prefix))
-    names = sorted(
-        {
-            match.group(0)
-            for match in pattern.finditer(listing)
-            if match.group(2) in wanted_years
-        }
-    )
+    matches = {
+        match.group(0): (match.group(1), match.group(2))
+        for match in pattern.finditer(listing)
+        if match.group(2) in wanted_years
+    }
 
     frames: list[pd.DataFrame] = []
-    for name in names:
-        match = pattern.search(name)
-        if match is None:
-            continue
-        storm_id = f"{prefix.upper()}{match.group(1)}{match.group(2)}"
+    for name in sorted(matches):
+        number, year = matches[name]
+        storm_id = f"{prefix.upper()}{number}{year}"
         text = _get_text(
             f"{base_url}{name}", get=get, timeout=timeout, what=f"btk file {name}"
         )
