@@ -333,8 +333,8 @@ pip install earthlens[gee]     # earthengine-api
 pip install earthlens[all]     # every backend SDK
 ```
 
-`[all]` deliberately omits `argo` (and `eedai`): `argopy` requires `xarray>=2025.7`
-while `openeo` (which *is* in `all`) caps `xarray<2025.1.2`. `osm` **is** included and
+`[all]` includes `argo`; only `eedai` is held out of it (installing `eedai` changes the
+GEE backend's default reader — a behaviour choice, not a packaging conflict). `osm` **is** included and
 covers all three protocols — overpy/ohsome plus the wheel-clean `osmium` (pyosmium) for
 bulk `.osm.pbf` reads. The richer in-memory `pyrosm` pbf engine is opt-in (`pip install
 pyrosm`, which builds the sdist-only `cykhash` from source). See

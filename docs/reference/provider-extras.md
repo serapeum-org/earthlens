@@ -3,7 +3,7 @@
 Which pip **extra** (if any) each earthlens backend needs, the **SDK** it pulls, its **distribution**, and whether
 it is bundled in `earthlens[all]`.
 
-**At a glance:** **61 backends** · **34 extras** (31 in `all`, 3 held out) · **30 backends are SDK-free** (no extra
+**At a glance:** **61 backends** · **34 extras** (32 in `all`, 2 held out) · **30 backends are SDK-free** (no extra
 — they ship with their thematic distribution and just work).
 
 - **SDK-bearing backend** → `pip install "earthlens[<extra>]"`.

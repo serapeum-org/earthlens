@@ -160,7 +160,7 @@ A thematic package depends only on `earthlens-core`, so its SDKs stay extras:
 SDKs, so you can take `earthlens-ocean[argo]` without inheriting the imagery or
 atmosphere stacks. (Until recently the split was also forced by a hard
 conflict — `argopy` needs `xarray>=2025.7` while `openeo` capped
-`xarray<2025.01.2` — but `openeo 0.54` dropped that cap, so the two now
+`xarray<2025.1.2` — but `openeo 0.54` dropped that cap, so the two now
 co-resolve and `argo` has joined `earthlens[all]`; see
 [#789](https://github.com/serapeum-org/earthlens/issues/789).)
 
@@ -174,7 +174,7 @@ one environment** — that is every extra in the table above **except one**:
 |---|---|---|
 | `eedai` | `pyramids-eo` | It resolves cleanly — this one is about *behaviour*, not packaging. Installing it activates the GEE backend's default `engine="auto"`, which serves raw single-asset reads through the EEDAI reader; that path samples and grids differently from Earth Engine (see the [GEE usage page](reference/gee/usage.md)). Holding it out of `all` means an upgrade never silently changes an existing user's pixels. |
 
-`argo` **is** now in `all`: `openeo 0.54` dropped its `xarray<2025.01.2` cap and
+`argo` **is** now in `all`: `openeo 0.54` dropped its `xarray<2025.1.2` cap and
 `argopy 1.5` fixed its `erddapy 3.x` import break (`argopy 1.4` imported
 `erddapy.erddapy._quote_string_constraints`, which `erddapy 3.3` removed), so
 `argopy`'s `xarray>=2025.7` floor, `openeo`, and the `erddap` backend's
