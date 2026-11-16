@@ -6,9 +6,11 @@ The `argo` backend needs the `argopy` SDK:
 pip install earthlens[argo]
 ```
 
-`argopy` pins a newer `xarray` than some other backends (notably
-`openeo`), so it is intentionally **not** part of the `[all]` extra —
-install `[argo]` into its own environment.
+`argo` is part of the `[all]` extra, so `pip install earthlens[all]`
+includes it alongside every other backend. It co-resolves with the rest
+of the stack as of
+[#789](https://github.com/serapeum-org/earthlens/issues/789) (`openeo 0.54`
+dropped the `xarray` cap that used to force `argo` into its own environment).
 
 All examples return a long-format `pandas.DataFrame` (one row per
 measured level); there are no credentials.

@@ -2,7 +2,7 @@
 
 Hits the real Argo data services through `argopy` (open data, no
 credentials), so these are gated only on the `e2e` marker plus a network
-reachability skip (a default `pytest` run skips them). `argopy` 1.4
+reachability skip (a default `pytest` run skips them). `argopy`
 realises some access paths through an xarray data-mode-merge step that is
 fragile against the installed xarray (the erddap region path can hit an
 `oindex` / `set_dims` error, and `.float()` / `.profile()` can crash in
