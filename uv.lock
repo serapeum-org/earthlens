@@ -2790,6 +2790,7 @@ dependencies = [
     { name = "pyproj" },
     { name = "pyramids-core" },
     { name = "pyramids-eo" },
+    { name = "shapely" },
 ]
 
 [package.optional-dependencies]
@@ -2857,6 +2858,7 @@ requires-dist = [
     { name = "rtree", marker = "extra == 'gee'", specifier = ">=1.0.0" },
     { name = "scikit-learn", marker = "extra == 'gee'", specifier = ">=1.5" },
     { name = "sentinelhub", marker = "extra == 'sentinel-hub'", specifier = ">=3.11.5" },
+    { name = "shapely", specifier = ">=2.0.0" },
     { name = "urllib3", marker = "extra == 'gee'", specifier = ">=1.26" },
 ]
 provides-extras = ["earthdata", "asf", "eedai", "eumetsat", "gee", "jaxa", "openeo", "sentinel-hub", "stac", "viz"]

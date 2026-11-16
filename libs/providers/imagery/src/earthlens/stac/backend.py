@@ -28,6 +28,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
 from loguru import logger
+from shapely.errors import ShapelyError
+from shapely.geometry import box, shape
 
 from earthlens.base import (
     CADENCE_ALIASES,
@@ -119,7 +121,11 @@ class STAC(LazyClientMixin, AbstractDataSource):
             client_id: Keycloak client id for a `cdse` bearer endpoint
                 (defaults to `cdse-public` in the signer).
             max_items: Optional cap on the number of items per collection
-                search (mainly for tests / smoke pulls).
+                search (mainly for tests / smoke pulls). Counts items that can
+                actually contribute pixels: candidates whose footprint misses the
+                AOI are dropped before the cap is applied, so `max_items=1` is
+                the first *covering* scene rather than whatever the API lists
+                first.
         """
         self._endpoint = endpoint
         self._resolution = resolution
@@ -271,14 +277,26 @@ class STAC(LazyClientMixin, AbstractDataSource):
     def _search(self) -> list[RemoteProduct]:
         """Search every requested collection for the bbox + window.
 
+        A STAC search filters candidates by their bbox only, so an item with a
+        rotated footprint can match the bbox while covering none of the AOI.
+        Candidates are therefore screened with `_covers_aoi` before `max_items`
+        is applied, which makes the cap count usable scenes.
+
         Returns:
-            One `RemoteProduct` per matched item; the pystac item, its
-            acquisition date, the logical collection key, and the requested
-            asset list ride on `metadata`.
+            One `RemoteProduct` per matched item whose footprint covers the AOI;
+            the pystac item, its acquisition date, the logical collection key,
+            and the requested asset list ride on `metadata`.
+
+        Raises:
+            ValueError: When the API matched candidates but every one of them was
+                dropped for missing the AOI.
         """
         start = self.time.start_date.strftime("%Y-%m-%d")
         end = self.time.end_date.strftime("%Y-%m-%d")
         products: list[RemoteProduct] = []
+        # Candidates the API returned, kept or dropped, so an all-dropped search
+        # can be told apart from one the API matched nothing for.
+        examined = 0
         assert self._catalog is not None  # set in _initialize
         assert self._endpoint is not None  # resolved in _initialize
         assert isinstance(self.vars, dict)  # STAC always uses the mapping form
@@ -287,13 +305,21 @@ class STAC(LazyClientMixin, AbstractDataSource):
             assets = list(requested) or list(collection.default_assets)
             resolved_id = self._catalog.resolve(self._endpoint, collection_key)
             for bbox in self._bboxes():
+                # `max_items` is NOT passed to the API: the API can only filter on
+                # the item bbox, which over-selects rotated footprints, so letting
+                # it truncate would hand us scenes that cover none of the AOI. Cap
+                # on *usable* items below instead, after the geometry filter.
                 search = self.client.search(
                     collections=[resolved_id],
                     bbox=list(bbox),
                     datetime=f"{start}/{end}",
-                    max_items=self._max_items,
                 )
+                aoi = box(*bbox)
+                kept = 0
                 for item in search.items():
+                    examined += 1
+                    if not _covers_aoi(item, aoi):
+                        continue
                     products.append(
                         RemoteProduct(
                             id=getattr(item, "id", str(item)),
@@ -306,6 +332,19 @@ class STAC(LazyClientMixin, AbstractDataSource):
                             },
                         )
                     )
+                    kept += 1
+                    # Stop as soon as the cap is met: `search.items()` pages
+                    # lazily, so breaking here fetches no page we do not need.
+                    if self._max_items is not None and kept >= self._max_items:
+                        break
+        if examined and not products:
+            raise ValueError(
+                f"{examined} item(s) matched the search bbox but none covers the "
+                "requested AOI: a STAC search filters on the item bbox, which for "
+                "a rotated footprint is larger than the scene itself. Widen the "
+                "AOI, move the date window, or pick a collection whose footprints "
+                "cover it."
+            )
         return products
 
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
@@ -700,6 +739,49 @@ def _acq_date(item: Any) -> str:
     if isinstance(value, str) and len(value) >= 10:
         return value[:10]
     return "unknown"
+
+
+#: Smallest share of the AOI an item's footprint must cover to be worth reading.
+#: A STAC `/search` can only filter candidates by their *bbox*. For a rotated
+#: footprint — every Landsat scene — the bbox is the envelope of a tilted
+#: quadrilateral and so is substantially larger than the scene, which lets an item
+#: pass the bbox filter while its geometry misses the AOI completely. A hairline
+#: overlap along one edge is no more useful: it crops to a sliver a few pixels
+#: wide. Measured against DEAfrica `wofs_ls` over a 0.25 deg^2 AOI, the genuine
+#: hairlines covered 0.0009%-0.0029% of it — three orders below this bound — while
+#: a partially-overlapping tile worth mosaicking covers whole percents.
+_MIN_AOI_COVERAGE = 1e-4
+
+
+def _covers_aoi(item: Any, aoi: Any, min_fraction: float = _MIN_AOI_COVERAGE) -> bool:
+    """Return whether `item`'s footprint covers enough of `aoi` to be read.
+
+    Args:
+        item: A STAC item; its `geometry` is the acquisition footprint.
+        aoi: The AOI as a shapely geometry.
+        min_fraction: Smallest share of `aoi` the intersection may cover and
+            still count. Defaults to `_MIN_AOI_COVERAGE`.
+
+    Returns:
+        True when the footprint covers at least `min_fraction` of `aoi`. An item
+        whose geometry is absent, empty or unparseable is kept, so a missing
+        footprint never silently drops data that may well overlap.
+    """
+    geometry = getattr(item, "geometry", None)
+    if geometry is None and isinstance(item, dict):
+        geometry = item.get("geometry")
+    result = True
+    if geometry and aoi.area > 0:
+        try:
+            footprint = shape(geometry)
+        except (AttributeError, KeyError, TypeError, ValueError, ShapelyError):
+            # An unknown `type` raises ShapelyError (GeometryTypeError), a missing
+            # `coordinates` raises KeyError, and a non-mapping raises
+            # AttributeError -- none of which should cost us a usable scene.
+            footprint = None
+        if footprint is not None and not footprint.is_empty:
+            result = footprint.intersection(aoi).area >= min_fraction * aoi.area
+    return result
 
 
 def _to_vsi(href: str) -> str:
