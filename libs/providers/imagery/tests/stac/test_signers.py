@@ -106,16 +106,22 @@ class TestAlternatePreference:
 
     def test_every_key_is_a_name_build_signer_can_produce(self):
         """A typo in the table cannot sit there inert, matching no signer."""
+        creds = {"username": "u", "password": "p"}
         names = {
-            build_signer(signer_type, **creds).name
-            for signer_type, creds in (
+            build_signer(signer_type, **kwargs).name
+            for signer_type, kwargs in (
                 ("anonymous", {}),
                 ("aws-requester-pays", {}),
                 ("mpc-sas", {}),
+                ("earthdata", creds),
+                ("cdse", creds),
                 ("cdse-s3", {"access_key": "ak", "secret_key": "sk"}),
                 ("bdc-token", {"token": "tok"}),
             )
         }
+        # all seven signer types, so the guard cannot reject a legitimate future
+        # entry for `earthdata` or `cdse`
+        assert len(names) == 7
         assert set(_ALTERNATE_PREFERENCE) <= names
 
     def test_the_wrapper_does_not_shadow_the_lookup(self):

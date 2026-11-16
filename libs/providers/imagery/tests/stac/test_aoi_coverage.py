@@ -327,8 +327,19 @@ class TestCoversAoi:
         item = make_item("a", "2024-01-05", {}, geometry=tile)
         assert _covers_aoi(item, _AOI, min_fraction=min_fraction) is expected
 
-    def test_overlap_exactly_at_the_floor_is_kept(self):
-        """The floor is inclusive: an overlap equal to it still counts."""
+    def test_an_overlap_exactly_at_the_floor_is_kept(self):
+        """The comparison is inclusive at the floor itself, not just above it."""
+        # the AOI is 1 deg^2 and is the smaller geometry here, so an overlap of
+        # exactly _MIN_OVERLAP_FRACTION deg^2 sits precisely on the floor
+        exact = make_bbox_geometry(-3.0 - _MIN_OVERLAP_FRACTION, 40.0, -2.0, 41.0)
+        footprint = shape(exact)
+        assert footprint.intersection(_AOI).area == pytest.approx(
+            _MIN_OVERLAP_FRACTION * min(_AOI.area, footprint.area), rel=1e-9
+        )
+        assert _covers_aoi(make_item("a", "2024-01-05", {}, geometry=exact), _AOI)
+
+    def test_full_containment_satisfies_any_demand(self):
+        """A footprint containing the AOI passes even a 100% demand."""
         item = make_item("a", "2024-01-05", {}, geometry=_COVERING)
         assert _covers_aoi(item, _AOI, min_fraction=1.0)
 

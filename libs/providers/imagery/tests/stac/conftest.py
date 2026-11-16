@@ -302,11 +302,16 @@ def _asset_field(asset: Any, key: str) -> Any:
     A raw dict carries extension fields as top-level keys; a `pystac.Asset` keeps
     them in `extra_fields`. Nothing reads an attribute of that name, so neither
     does this.
+
+    The `dict` checks are deliberate, not an oversight: the real `asset_field`
+    uses `isinstance(..., dict)`, while `asset_alternate_entry` uses `Mapping` for
+    the entry it pulls out. A fake that is looser than production in one place and
+    stricter in the other cannot catch a regression in either.
     """
-    if isinstance(asset, Mapping):
+    if isinstance(asset, dict):
         return asset.get(key)
     extra = getattr(asset, "extra_fields", None)
-    return extra.get(key) if isinstance(extra, Mapping) else None
+    return extra.get(key) if isinstance(extra, dict) else None
 
 
 def _resolved_href(

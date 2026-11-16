@@ -77,9 +77,16 @@ if TYPE_CHECKING:
 #: AOI's edge, which is the shape the DEAfrica hairlines took.
 #:
 #: Both areas are planar squared degrees, so the ratio carries the `cos(lat)`
-#: distortion of the lon/lat plane. It cancels for footprint and AOI at a similar
-#: latitude, which is the case here because the two must overlap at all to be
-#: compared; it is not a true-area measure and is not meant to be one.
+#: distortion of the lon/lat plane and is not a true-area measure. Where the
+#: footprint is the smaller geometry the distortion largely cancels, since the
+#: intersection and the footprint occupy the same latitudes. Where the AOI is the
+#: smaller one it does not: a 120-degree-tall AOI weights its equatorial rows
+#: about twice its 60-degree rows, while the intersection may sit entirely in one
+#: band, so a high-latitude overlap is measured against an AOI area inflated by
+#: the tropics and is judged more harshly than the same overlap at the equator.
+#: The floor is three to four orders below any plausible real coverage, so this
+#: never decides a realistic case; it would have to be tightened a long way
+#: before an equal-area projection were worth the cost.
 _MIN_OVERLAP_FRACTION = 1e-4
 
 #: How many bbox-matched candidates a search may examine before giving up.

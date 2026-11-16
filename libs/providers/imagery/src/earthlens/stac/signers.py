@@ -66,11 +66,15 @@ __all__ = [
 #: keyed by signer name. A STAC asset may publish mirrors under `alternate`; the
 #: canonical href is not always the one the signer can actually read.
 #:
-#: `aws-requester-pays` is the case that forced this: every USGS Landsat asset
-#: publishes a canonical `https://landsatlook.usgs.gov/...` href *and* an
-#: `alternate.s3` href on the requester-pays bucket. The canonical one 302s to the
-#: EROS login, which an AWS key pair cannot satisfy, so reading it fails whatever
-#: credentials are present; the `s3://` mirror is the readable copy.
+#: `aws-requester-pays` is the case that forced this: on the `usgs-landsat`
+#: (landsatlook) endpoint an asset publishes a canonical
+#: `https://landsatlook.usgs.gov/...` href *and* an `alternate.s3` href on the
+#: requester-pays bucket. The canonical one 302s to the EROS login, which an AWS
+#: key pair cannot satisfy, so reading it fails whatever credentials are present;
+#: the `s3://` mirror is the readable copy. This is a property of that endpoint,
+#: not of Landsat data: the same scenes on `earth-search/landsat-c2-l2` publish
+#: `s3://` canonically and no `alternate` block at all (verified live), which is
+#: the counter-example the note below turns on.
 #:
 #: `cdse-s3` is deliberately absent even though it also reads an S3 store: its own
 #: `sign_href` already rewrites the canonical `eodata` href to a `/vsis3/` path, so
