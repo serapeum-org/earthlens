@@ -453,3 +453,53 @@ class TestFetchParseResilience:
         monkeypatch.setattr(nhc, "parse_btk_file", _parse_failing_for_ep11)
         frames = nhc.fetch_btk_frames("east_pacific", [2026], get=getter)
         assert [f["id"].iloc[0] for f in frames] == ["EP122026"]
+
+
+# Verbatim lines from the real NHC operational best track for East Pacific
+# storm EP12 (Lowell), fetched from
+# https://ftp.nhc.noaa.gov/atcf/btk/bep122026.dat on 2026-11-16: the genesis
+# fix plus the 140 kt peak fix's three threshold rows. Real ATCF b-deck rows
+# carry ~37 fields (far more than the synthetic fixtures above), so this pins
+# the parser's hard-coded field indices against the actual format (M1).
+_REAL_BTK_SAMPLE = 'EP, 12, 2026082518,   , BEST,   0, 101N, 1367W,  15,    0, DB,   0,    ,    0,    0,    0,    0,    0,    0,   0,   0,   0,   E,   0,    ,   0,   0, GENESIS021,  ,  0,    ,    0,    0,    0,    0, genesis-num, 021, \nEP, 12, 2026090218,   , BEST,   0, 133N, 1537W, 140,  927, HU,  34, NEQ,   80,   60,   60,   80, 1010,  240,  10, 170,   0,   E,   0,    ,   0,   0,     LOWELL, D, 12, NEQ,  180,  130,  115,  180, genesis-num, 021, \nEP, 12, 2026090218,   , BEST,   0, 133N, 1537W, 140,  927, HU,  50, NEQ,   40,   35,   30,   40, 1010,  240,  10, 170,   0,   E,   0,    ,   0,   0,     LOWELL, D, 12, NEQ,  180,  130,  115,  180, genesis-num, 021, \nEP, 12, 2026090218,   , BEST,   0, 133N, 1537W, 140,  927, HU,  64, NEQ,   30,   25,   20,   30, 1010,  240,  10, 170,   0,   E,   0,    ,   0,   0,     LOWELL, D, 12, NEQ,  180,  130,  115,  180, genesis-num, 021, '
+
+
+class TestRealAtcfSample:
+    """parse_btk_file decodes a verbatim real NHC b-deck snippet (M1)."""
+
+    def test_decodes_real_fields(self):
+        """Hand-read lat/lon/vmax/mslp/radii/name match the decoded record."""
+        frame = nhc.parse_btk_file(
+            _REAL_BTK_SAMPLE, storm_id="EP122026", basin="east_pacific"
+        )
+        assert len(frame) == 2
+        peak = frame.loc[frame["vmax"].idxmax()]
+        assert peak["vmax"] == 140
+        assert peak["mslp"] == 927
+        assert round(float(peak["lat"]), 1) == 13.3
+        assert round(float(peak["lon"]), 1) == -153.7
+        assert peak["type"] == "HU"
+        assert peak["name"] == "LOWELL"
+        assert [peak["r34_ne"], peak["r34_se"], peak["r34_sw"], peak["r34_nw"]] == [
+            80.0,
+            60.0,
+            60.0,
+            80.0,
+        ]
+        assert [peak["r50_ne"], peak["r50_se"], peak["r50_sw"], peak["r50_nw"]] == [
+            40.0,
+            35.0,
+            30.0,
+            40.0,
+        ]
+        assert [peak["r64_ne"], peak["r64_se"], peak["r64_sw"], peak["r64_nw"]] == [
+            30.0,
+            25.0,
+            20.0,
+            30.0,
+        ]
+        genesis = frame.loc[frame["vmax"].idxmin()]
+        assert round(float(genesis["lat"]), 1) == 10.1
+        assert round(float(genesis["lon"]), 1) == -136.7
+        assert genesis["type"] == "DB"
+        assert genesis[["r34_ne", "r34_se", "r34_sw", "r34_nw"]].isna().all()
