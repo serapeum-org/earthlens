@@ -50,6 +50,54 @@ if TYPE_CHECKING:
     from earthlens.stac.catalog import Catalog, Endpoint
 
 
+#: Smallest overlap an item's footprint must share with the AOI to be worth
+#: reading, as a fraction of whichever of the two is *smaller*.
+#:
+#: A STAC `/search` can only filter candidates by their *bbox*. A footprint that
+#: sits at an angle to the lon/lat grid — a Landsat scene's is about 0.68 of its
+#: own bbox, measured on live `landsat-c2l2-sr` items — therefore passes the bbox
+#: filter while its geometry can miss the AOI completely. A hairline overlap along
+#: one edge is no more useful: it crops to a sliver a few pixels wide. Measured
+#: against DEAfrica `wofs_ls` over a 0.25 deg^2 AOI, the genuine hairlines covered
+#: 9.0e-06 and 2.9e-05 of it, i.e. 11x and 3.4x under this bound.
+#:
+#: The fraction is of the *smaller* geometry, which is what makes the measure
+#: scale-free. Against the AOI alone it inverts as soon as the AOI outgrows one
+#: scene: a tile wholly inside a continental AOI covers all of itself but a
+#: negligible share of the AOI, so a fraction-of-AOI floor rejects every tile of
+#: a legitimate mosaic once the AOI passes roughly 10,000 scene areas (NAIP over
+#: CONUS, Sentinel-2 near-globally). A hairline, by contrast, covers almost none
+#: of either geometry and is still dropped.
+#:
+#: One consequence is deliberate: a footprint that is itself tiny and lies wholly
+#: inside the AOI covers all of itself and is kept, because its whole extent is
+#: the only data that item has to offer. What the floor drops is an overlap that
+#: is negligible against *both* geometries — a large scene merely grazing the
+#: AOI's edge, which is the shape the DEAfrica hairlines took.
+#:
+#: Both areas are planar squared degrees, so the ratio carries the `cos(lat)`
+#: distortion of the lon/lat plane. It cancels for footprint and AOI at a similar
+#: latitude, which is the case here because the two must overlap at all to be
+#: compared; it is not a true-area measure and is not meant to be one.
+_MIN_OVERLAP_FRACTION = 1e-4
+
+#: How many bbox-matched candidates to ask the API for per usable item wanted.
+#:
+#: `max_items` cannot be passed straight through, because the API truncates on
+#: bbox order before the footprint screen ever runs — that is the defect this
+#: module's screen exists to fix. But dropping it entirely removes
+#: `pystac_client`'s only paging stop (`ItemSearch._pages`: it returns early just
+#: `if self._max_items`), so a capped search would page the whole catalogue
+#: whenever its early pages hold nothing that covers the AOI. Asking for a pool
+#: several times the cap keeps a bound on the paging while leaving ample room for
+#: the screen to reject candidates.
+_CANDIDATE_OVERFETCH = 20
+
+#: Floor for that pool, so a `max_items=1` smoke pull still draws on a workable
+#: number of candidates rather than 20.
+_MIN_CANDIDATE_POOL = 100
+
+
 class STAC(LazyClientMixin, AbstractDataSource):
     """Unified STAC-API + COG backend (Planetary Computer / CDSE / Earth Search).
 
@@ -88,6 +136,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
         token: str | None = None,
         client_id: str | None = None,
         max_items: int | None = None,
+        min_overlap_fraction: float = _MIN_OVERLAP_FRACTION,
     ):
         """Initialise a STAC backend instance.
 
@@ -127,9 +176,14 @@ class STAC(LazyClientMixin, AbstractDataSource):
                 AOI are dropped before the cap is applied, so `max_items=1` is
                 the first *covering* scene rather than whatever the API lists
                 first. `None` means no cap; a value below 1 is rejected.
+            min_overlap_fraction: How much of the smaller of the footprint and
+                the AOI their overlap must cover for an item to be read. Defaults
+                to `_MIN_OVERLAP_FRACTION`; `0` keeps every item the API matched,
+                which turns the footprint screen off.
 
         Raises:
-            ValueError: When `max_items` is given and is less than 1.
+            ValueError: When `max_items` is given and is less than 1, or when
+                `min_overlap_fraction` is outside `[0, 1]`.
         """
         self._endpoint = endpoint
         self._resolution = resolution
@@ -150,7 +204,13 @@ class STAC(LazyClientMixin, AbstractDataSource):
             raise ValueError(
                 f"max_items must be None (no cap) or at least 1, got {max_items}"
             )
+        if not 0.0 <= min_overlap_fraction <= 1.0:
+            raise ValueError(
+                "min_overlap_fraction must be between 0 and 1, got "
+                f"{min_overlap_fraction}"
+            )
         self._max_items = max_items
+        self._min_overlap_fraction = min_overlap_fraction
         # Stored before super().__init__ because the base constructor calls
         # _initialize() (which needs the request) before it sets self.vars.
         self._variables = variables
@@ -346,7 +406,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
                 for item in search.items():
                     examined += 1
                     seen += 1
-                    if not _covers_aoi(item, aoi):
+                    if not _covers_aoi(item, aoi, self._min_overlap_fraction):
                         continue
                     products.append(
                         RemoteProduct(
@@ -808,54 +868,6 @@ def _acq_date(item: Any) -> str:
     if isinstance(value, str) and len(value) >= 10:
         return value[:10]
     return "unknown"
-
-
-#: Smallest overlap an item's footprint must share with the AOI to be worth
-#: reading, as a fraction of whichever of the two is *smaller*.
-#:
-#: A STAC `/search` can only filter candidates by their *bbox*. A footprint that
-#: sits at an angle to the lon/lat grid — a Landsat scene's is about 0.68 of its
-#: own bbox, measured on live `landsat-c2l2-sr` items — therefore passes the bbox
-#: filter while its geometry can miss the AOI completely. A hairline overlap along
-#: one edge is no more useful: it crops to a sliver a few pixels wide. Measured
-#: against DEAfrica `wofs_ls` over a 0.25 deg^2 AOI, the genuine hairlines covered
-#: 9.0e-06 and 2.9e-05 of it, i.e. 11x and 3.4x under this bound.
-#:
-#: The fraction is of the *smaller* geometry, which is what makes the measure
-#: scale-free. Against the AOI alone it inverts as soon as the AOI outgrows one
-#: scene: a tile wholly inside a continental AOI covers all of itself but a
-#: negligible share of the AOI, so a fraction-of-AOI floor rejects every tile of
-#: a legitimate mosaic once the AOI passes roughly 10,000 scene areas (NAIP over
-#: CONUS, Sentinel-2 near-globally). A hairline, by contrast, covers almost none
-#: of either geometry and is still dropped.
-#:
-#: One consequence is deliberate: a footprint that is itself tiny and lies wholly
-#: inside the AOI covers all of itself and is kept, because its whole extent is
-#: the only data that item has to offer. What the floor drops is an overlap that
-#: is negligible against *both* geometries — a large scene merely grazing the
-#: AOI's edge, which is the shape the DEAfrica hairlines took.
-#:
-#: Both areas are planar squared degrees, so the ratio carries the `cos(lat)`
-#: distortion of the lon/lat plane. It cancels for footprint and AOI at a similar
-#: latitude, which is the case here because the two must overlap at all to be
-#: compared; it is not a true-area measure and is not meant to be one.
-_MIN_OVERLAP_FRACTION = 1e-4
-
-#: How many bbox-matched candidates to ask the API for per usable item wanted.
-#:
-#: `max_items` cannot be passed straight through, because the API truncates on
-#: bbox order before the footprint screen ever runs — that is the defect this
-#: module's screen exists to fix. But dropping it entirely removes
-#: `pystac_client`'s only paging stop (`ItemSearch._pages`: it returns early just
-#: `if self._max_items`), so a capped search would page the whole catalogue
-#: whenever its early pages hold nothing that covers the AOI. Asking for a pool
-#: several times the cap keeps a bound on the paging while leaving ample room for
-#: the screen to reject candidates.
-_CANDIDATE_OVERFETCH = 20
-
-#: Floor for that pool, so a `max_items=1` smoke pull still draws on a workable
-#: number of candidates rather than 20.
-_MIN_CANDIDATE_POOL = 100
 
 
 def _covers_aoi(

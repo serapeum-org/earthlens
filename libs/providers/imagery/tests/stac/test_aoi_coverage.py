@@ -308,6 +308,41 @@ class TestSearchScreensByFootprint:
             == 50 * _CANDIDATE_OVERFETCH
         )
 
+    def test_the_floor_is_reachable_from_the_constructor(self, fake_pyramids, tmp_path):
+        """min_overlap_fraction=0 turns the screen off for a caller who needs that."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item(
+                "miss", "2024-01-05", {"B04": "https://h/1.tif"}, geometry=_MISSING
+            )
+        ]
+        kept = _build_stac(tmp_path, min_overlap_fraction=0.0)._search()
+        assert [p.id for p in kept] == ["miss"]
+        assert _build_stac(tmp_path)._search() == []
+
+    def test_a_tighter_floor_from_the_constructor_is_applied(
+        self, fake_pyramids, tmp_path
+    ):
+        """A caller can demand more coverage than the default floor."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item(
+                "partial",
+                "2024-01-05",
+                {"B04": "https://h/1.tif"},
+                geometry=make_bbox_geometry(-3.1, 40.0, -2.0, 41.0),
+            )
+        ]
+        # the tile overlaps a tenth of the AOI, so a 50% demand rejects it
+        assert _build_stac(tmp_path, min_overlap_fraction=0.5)._search() == []
+        assert len(_build_stac(tmp_path, min_overlap_fraction=0.05)._search()) == 1
+
+    @pytest.mark.parametrize("fraction", [-0.1, 1.5])
+    def test_a_floor_outside_the_unit_range_is_rejected(
+        self, fake_pyramids, tmp_path, fraction
+    ):
+        """A fraction must be a fraction."""
+        with pytest.raises(ValueError, match="min_overlap_fraction"):
+            _build_stac(tmp_path, min_overlap_fraction=fraction)
+
     @pytest.mark.parametrize("cap", [0, -1])
     def test_a_non_positive_cap_is_rejected(self, fake_pyramids, tmp_path, cap):
         """max_items must be a usable count, not 0 or negative."""
