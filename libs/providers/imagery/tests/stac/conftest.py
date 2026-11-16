@@ -210,6 +210,7 @@ class FakePyramids:
         self.client = _FakeClient(self.items_by_collection)
         self.open_client_calls: list[dict[str, Any]] = []
         self.merge_calls: list[tuple[list[str], str]] = []
+        self.resolved_href_calls: list[dict[str, Any]] = []
         self.stack_calls: list[dict[str, Any]] = []
         self.write_calls: list[str] = []
         self.write_data: list = []
@@ -318,7 +319,18 @@ def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> FakePyramids:
     stac_mod.AnonymousSigner = _AnonymousSigner
     stac_mod.AWSRequesterPaysSigner = _AWSRequesterPaysSigner
     stac_mod.PlanetaryComputerSigner = _PlanetaryComputerSigner
-    stac_mod.resolved_href = _resolved_href
+
+    def _recording_resolved_href(*args: Any, **kwargs: Any) -> str:
+        """Record the asset key and alternate preference, then resolve the href."""
+        fp.resolved_href_calls.append(
+            {
+                "asset_key": args[1] if len(args) > 1 else kwargs.get("asset_key"),
+                "alternate": kwargs.get("alternate"),
+            }
+        )
+        return _resolved_href(*args, **kwargs)
+
+    stac_mod.resolved_href = _recording_resolved_href
     stac_mod.read_extension_metadata = _read_extension_metadata
 
     def _open_client(url: str, *, signer: Any = None, **kwargs: Any):

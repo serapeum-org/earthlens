@@ -10,6 +10,7 @@ from __future__ import annotations
 import pytest
 from shapely.geometry import box, shape
 
+from earthlens.stac import STAC
 from earthlens.stac.backend import _MIN_AOI_COVERAGE, _covers_aoi
 
 from .conftest import make_bbox_geometry, make_item
@@ -33,14 +34,12 @@ _ROTATED_BBOX_HIT_GEOMETRY_MISS = {
 
 def _build_stac(tmp_path, **kwargs):
     """Construct a STAC backend over the standard test AOI."""
-    from earthlens.stac import STAC
-
     return STAC(
         start="2024-01-01",
         end="2024-01-31",
         variables=kwargs.pop("variables", None) or {"sentinel-2-l2a": ["B04"]},
-        lat_lim=[40.0, 41.0],
-        lon_lim=[-4.0, -3.0],
+        lat_lim=kwargs.pop("lat_lim", None) or [40.0, 41.0],
+        lon_lim=kwargs.pop("lon_lim", None) or [-4.0, -3.0],
         path=str(tmp_path),
         endpoint="earth-search",
         **kwargs,
@@ -105,6 +104,56 @@ class TestCoversAoi:
     def test_coverage_floor_is_a_small_fraction(self):
         """The default floor excludes slivers without excluding partial tiles."""
         assert 0 < _MIN_AOI_COVERAGE < 0.01
+
+    def test_geometry_is_read_from_a_mapping_item(self):
+        """An item carrying its geometry as a mapping key is judged the same way."""
+        assert _covers_aoi({"geometry": _COVERING}, _AOI)
+        assert not _covers_aoi({"geometry": _MISSING}, _AOI)
+
+    def test_mapping_item_without_geometry_is_kept(self):
+        """A mapping item with no geometry key is kept, like an object without one."""
+        assert _covers_aoi({"id": "a"}, _AOI)
+
+    def test_degenerate_zero_area_aoi_keeps_everything(self):
+        """A zero-area AOI cannot be covered by any share, so nothing is dropped."""
+        point_aoi = box(-4.0, 40.0, -4.0, 40.0)
+        assert point_aoi.area == 0
+        assert _covers_aoi(
+            make_item("a", "2024-01-05", {}, geometry=_MISSING), point_aoi
+        )
+
+    def test_empty_footprint_is_kept(self):
+        """A syntactically valid but empty footprint is kept, not dropped."""
+        empty = {"type": "Polygon", "coordinates": []}
+        assert shape(empty).is_empty
+        assert _covers_aoi(make_item("a", "2024-01-05", {}, geometry=empty), _AOI)
+
+    def test_multipolygon_footprint_is_measured_as_a_whole(self):
+        """A split footprint counts the total area it shares with the AOI."""
+        multi = {
+            "type": "MultiPolygon",
+            "coordinates": [
+                make_bbox_geometry(-3.9, 40.1, -3.8, 40.9)["coordinates"][0],
+                make_bbox_geometry(10.0, 10.0, 11.0, 11.0)["coordinates"][0],
+            ],
+        }
+        assert _covers_aoi(make_item("a", "2024-01-05", {}, geometry=multi), _AOI)
+
+    @pytest.mark.parametrize(
+        ("min_fraction", "expected"),
+        [(0.05, True), (0.2, False)],
+    )
+    def test_min_fraction_is_honoured(self, min_fraction, expected):
+        """An explicit floor decides the same 10% overlap either way."""
+        # a tenth of the AOI's width over its full height -> 10% of its area
+        tile = make_bbox_geometry(-3.1, 40.0, -2.0, 41.0)
+        item = make_item("a", "2024-01-05", {}, geometry=tile)
+        assert _covers_aoi(item, _AOI, min_fraction=min_fraction) is expected
+
+    def test_overlap_exactly_at_the_floor_is_kept(self):
+        """The floor is inclusive: an overlap equal to it still counts."""
+        item = make_item("a", "2024-01-05", {}, geometry=_COVERING)
+        assert _covers_aoi(item, _AOI, min_fraction=1.0)
 
 
 @pytest.mark.stac
@@ -192,3 +241,83 @@ class TestSearchScreensByFootprint:
         """A search the API matched nothing for returns no products without raising."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = []
         assert _build_stac(tmp_path)._search() == []
+
+    def test_without_a_cap_every_covering_item_is_kept(self, fake_pyramids, tmp_path):
+        """max_items=None keeps all covering items and still drops the misses."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item(
+                "miss", "2024-01-05", {"B04": "https://h/1.tif"}, geometry=_MISSING
+            ),
+            make_item(
+                "hit1", "2024-01-06", {"B04": "https://h/2.tif"}, geometry=_COVERING
+            ),
+            make_item(
+                "hit2", "2024-01-07", {"B04": "https://h/3.tif"}, geometry=_COVERING
+            ),
+        ]
+        products = _build_stac(tmp_path)._search()
+        assert [p.id for p in products] == ["hit1", "hit2"]
+
+    def test_items_without_geometry_survive_the_search(self, fake_pyramids, tmp_path):
+        """An item publishing no footprint still becomes a product."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item("a", "2024-01-05", {"B04": "https://h/1.tif"})
+        ]
+        assert [p.id for p in _build_stac(tmp_path)._search()] == ["a"]
+
+    def test_one_covered_collection_does_not_raise_for_another(
+        self, fake_pyramids, tmp_path
+    ):
+        """An all-dropped collection is tolerated while another yields coverage."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item(
+                "hit", "2024-01-06", {"B04": "https://h/2.tif"}, geometry=_COVERING
+            )
+        ]
+        fake_pyramids.items_by_collection["landsat-c2-l2"] = [
+            make_item(
+                "miss", "2024-01-05", {"red": "https://h/1.tif"}, geometry=_MISSING
+            )
+        ]
+        products = _build_stac(
+            tmp_path,
+            variables={
+                "sentinel-2-l2a": ["B04"],
+                "earth-search/landsat-c2-l2": ["red"],
+            },
+        )._search()
+        assert [p.id for p in products] == ["hit"]
+
+    def test_the_error_names_how_many_candidates_were_dropped(
+        self, fake_pyramids, tmp_path
+    ):
+        """The all-dropped error reports the number of candidates it examined."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item(
+                "m1", "2024-01-05", {"B04": "https://h/1.tif"}, geometry=_MISSING
+            ),
+            make_item(
+                "m2", "2024-01-06", {"B04": "https://h/2.tif"}, geometry=_MISSING
+            ),
+        ]
+        with pytest.raises(ValueError, match=r"^2 item\(s\) matched"):
+            _build_stac(tmp_path)._search()
+
+    def test_each_split_bbox_is_screened_against_its_own_half(
+        self, fake_pyramids, tmp_path
+    ):
+        """An antimeridian AOI screens each half against that half, not the whole."""
+        # lon 170..-170 splits into (170, 180) and (-180, -170)
+        east = make_bbox_geometry(170.5, -1.0, 179.5, 1.0)
+        west = make_bbox_geometry(-179.5, -1.0, -170.5, 1.0)
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item("east", "2024-01-05", {"B04": "https://h/1.tif"}, geometry=east),
+            make_item("west", "2024-01-06", {"B04": "https://h/2.tif"}, geometry=west),
+        ]
+        products = _build_stac(
+            tmp_path, lat_lim=[-1.0, 1.0], lon_lim=[170.0, -170.0]
+        )._search()
+        assert len(fake_pyramids.client.search_calls) == 2
+        # each half keeps only the item that falls in it, so both survive overall
+        by_bbox = {p.metadata["bbox"][0]: p.id for p in products}
+        assert by_bbox == {170.0: "east", -180.0: "west"}

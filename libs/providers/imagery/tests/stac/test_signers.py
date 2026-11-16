@@ -14,7 +14,7 @@ import pytest
 from pyramids.stac.signers import Signer
 
 from earthlens.base import AuthenticationError
-from earthlens.stac import build_signer
+from earthlens.stac import alternate_preference_for, build_signer
 from earthlens.stac.signers import _ContractSigner
 
 # pyramids-eo is a base dependency, but the distribution-boundary guard requires
@@ -60,6 +60,57 @@ class _PassingInner:
 
 
 @pytest.mark.stac
+class _NamedSigner:
+    """A bare stand-in exposing only the Signer protocol's `name`."""
+
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+
+class TestAlternatePreference:
+    """`alternate_preference_for` says which asset mirror a signer must read."""
+
+    def test_requester_pays_prefers_the_s3_mirror(self):
+        """The requester-pays signer reads the s3 alternate, not the canonical href."""
+        assert alternate_preference_for(build_signer("aws-requester-pays")) == ("s3",)
+
+    @pytest.mark.parametrize(
+        "name",
+        [
+            "anonymous",
+            "planetary-computer",
+            "earthdata",
+            "cdse",
+            "cdse-s3",
+            "bdc-token",
+        ],
+    )
+    def test_every_other_signer_keeps_the_canonical_href(self, name):
+        """Only requester-pays has a mirror preference; the rest resolve canonically."""
+        assert alternate_preference_for(_NamedSigner(name)) is None
+
+    def test_cdse_s3_is_deliberately_left_canonical(self):
+        """CDSE's own hrefs are already s3, so it must not be given a preference."""
+        signer = build_signer("cdse-s3", access_key="ak", secret_key="sk")
+        assert alternate_preference_for(signer) is None
+
+    def test_an_object_without_a_name_has_no_preference(self):
+        """A signer exposing no name resolves canonically instead of raising."""
+        assert alternate_preference_for(object()) is None
+
+    def test_the_preference_is_an_immutable_tuple(self):
+        """Callers cannot mutate the shared preference they are handed."""
+        preference = alternate_preference_for(build_signer("aws-requester-pays"))
+        assert isinstance(preference, tuple)
+
+    def test_the_wrapper_does_not_shadow_the_lookup(self):
+        """The wrapped signer and its bare name agree on the preference."""
+        wrapped = build_signer("aws-requester-pays")
+        assert alternate_preference_for(wrapped) == alternate_preference_for(
+            _NamedSigner(wrapped.name)
+        )
+
+
 class TestBuildSignerDispatch:
     """`build_signer` selects the right pyramids-eo signer and wraps it."""
 
