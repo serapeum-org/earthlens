@@ -534,3 +534,28 @@ class TestInvestGuard:
         frames = nhc.fetch_btk_frames("east_pacific", [2026], get=getter)
         assert [f["id"].iloc[0] for f in frames] == ["EP122026"]
         assert not any("bep902026" in url for url in getter.calls)
+
+
+class TestStormNameGate:
+    """_is_storm_name accepts hyphenated names but not placeholders (L2)."""
+
+    @pytest.mark.parametrize(
+        "token, expected",
+        [
+            ("LOWELL", True),
+            ("TWO-E", True),
+            ("SIX-E", True),
+            ("GENESIS021", False),
+            ("INVEST", False),
+            ("", False),
+            ("   ", False),
+        ],
+    )
+    def test_gate(self, token, expected):
+        """Alphabetic (optionally hyphenated) non-placeholder tokens register.
+
+        Args:
+            token: The ATCF field-27 candidate.
+            expected: Whether it should count as a storm name.
+        """
+        assert nhc._is_storm_name(token) is expected

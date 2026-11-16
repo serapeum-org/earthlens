@@ -408,12 +408,14 @@ def _to_int(token: str) -> int | None:
 def _is_storm_name(token: str) -> bool:
     """Return whether an ATCF field-27 token is a real storm name.
 
-    A real name is alphabetic and not a placeholder — this rejects the
-    numbered pre-naming labels (`GENESIS021`, which carry digits) and the
-    `INVEST` / `UNNAMED`-style placeholders, so a storm's assigned name wins
-    over its earlier disturbance label.
+    A real name is alphabetic — hyphens allowed, so numbered-depression
+    designations such as `TWO-E` / `SIX-E` register — and not a placeholder.
+    The hyphens-aside alphabetic test rejects the numbered pre-naming labels
+    (`GENESIS021`, which carry digits), and the placeholder set rejects
+    `INVEST` / `UNNAMED`-style labels, so a storm's assigned name wins over
+    its earlier disturbance label.
     """
     token = token.strip()
-    if not token or not token.isalpha():
+    if not token or not token.replace("-", "").isalpha():
         return False
     return token.upper() not in _NAME_PLACEHOLDERS
