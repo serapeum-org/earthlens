@@ -36,6 +36,7 @@ class _FakeItem:
         item_id: str,
         date: str,
         asset_hrefs: dict[str, str],
+        *,
         proj_epsg: int | None = None,
         geometry: dict[str, Any] | None = None,
         alternates: dict[str, dict[str, str]] | None = None,
@@ -56,12 +57,20 @@ def make_item(
     item_id: str,
     date: str,
     asset_hrefs: dict[str, str],
+    *,
     proj_epsg: int | None = None,
     geometry: dict[str, Any] | None = None,
     alternates: dict[str, dict[str, str]] | None = None,
 ) -> _FakeItem:
     """Build a fake STAC item for a search result (optional epsg/footprint/mirrors)."""
-    return _FakeItem(item_id, date, asset_hrefs, proj_epsg, geometry, alternates)
+    return _FakeItem(
+        item_id,
+        date,
+        asset_hrefs,
+        proj_epsg=proj_epsg,
+        geometry=geometry,
+        alternates=alternates,
+    )
 
 
 def make_bbox_geometry(

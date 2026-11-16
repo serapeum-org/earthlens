@@ -15,7 +15,7 @@ from pyramids.stac.signers import Signer
 
 from earthlens.base import AuthenticationError
 from earthlens.stac import alternate_preference_for, build_signer
-from earthlens.stac.signers import _ContractSigner
+from earthlens.stac.signers import _ALTERNATE_PREFERENCE, _ContractSigner
 
 # pyramids-eo is a base dependency, but the distribution-boundary guard requires
 # test modules to soft-import any `_OPTIONAL_SDKS` name so a narrower environment
@@ -59,7 +59,6 @@ class _PassingInner:
         return {"AWS_NO_SIGN_REQUEST": "YES"}
 
 
-@pytest.mark.stac
 class _NamedSigner:
     """A bare stand-in exposing only the Signer protocol's `name`."""
 
@@ -67,6 +66,7 @@ class _NamedSigner:
         self.name = name
 
 
+@pytest.mark.stac
 class TestAlternatePreference:
     """`alternate_preference_for` says which asset mirror a signer must read."""
 
@@ -98,10 +98,25 @@ class TestAlternatePreference:
         """A signer exposing no name resolves canonically instead of raising."""
         assert alternate_preference_for(object()) is None
 
-    def test_the_preference_is_an_immutable_tuple(self):
-        """Callers cannot mutate the shared preference they are handed."""
+    def test_the_preference_is_handed_out_as_a_tuple(self):
+        """The value callers receive is a tuple, not a mutable list."""
         preference = alternate_preference_for(build_signer("aws-requester-pays"))
         assert isinstance(preference, tuple)
+        assert not hasattr(preference, "append")
+
+    def test_every_key_is_a_name_build_signer_can_produce(self):
+        """A typo in the table cannot sit there inert, matching no signer."""
+        names = {
+            build_signer(signer_type, **creds).name
+            for signer_type, creds in (
+                ("anonymous", {}),
+                ("aws-requester-pays", {}),
+                ("mpc-sas", {}),
+                ("cdse-s3", {"access_key": "ak", "secret_key": "sk"}),
+                ("bdc-token", {"token": "tok"}),
+            )
+        }
+        assert set(_ALTERNATE_PREFERENCE) <= names
 
     def test_the_wrapper_does_not_shadow_the_lookup(self):
         """The wrapped signer and its bare name agree on the preference."""
@@ -111,6 +126,7 @@ class TestAlternatePreference:
         )
 
 
+@pytest.mark.stac
 class TestBuildSignerDispatch:
     """`build_signer` selects the right pyramids-eo signer and wraps it."""
 
