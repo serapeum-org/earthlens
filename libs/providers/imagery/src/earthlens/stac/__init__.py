@@ -24,6 +24,10 @@ Public surface (re-exported from this package):
   generic `Signer` protocol and the `aws-requester-pays` signer come from
   `pyramids.stac`; the `anonymous` signer is pyramids-eo's `_AnonymousS3Signer`
   (which adds `AWS_NO_SIGN_REQUEST` and the opt-in-region endpoint pin).
+* `alternate_preference_for` — which `alternate-assets` mirror a signer prefers
+  over an asset's canonical href, keyed by signer name. `aws-requester-pays`
+  prefers `s3`, because every USGS Landsat asset's canonical href is the
+  login-gated HTTPS copy; every other signer reads the canonical href.
 * `CATALOG_PATH` — absolute path to the bundled catalog directory;
   monkey-patchable to redirect the loader at a temporary directory.
 

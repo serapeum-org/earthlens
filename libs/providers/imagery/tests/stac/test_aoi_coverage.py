@@ -25,10 +25,13 @@ _AOI = box(-4.0, 40.0, -3.0, 41.0)
 _COVERING = make_bbox_geometry(-4.5, 39.5, -2.5, 41.5)
 _MISSING = make_bbox_geometry(10.0, 10.0, 11.0, 11.0)
 
-# The case the API cannot filter out and this screen exists for: a square rotated
-# 45 degrees (what every Landsat/Sentinel scene looks like), placed so its bbox
-# covers 81% of the AOI while the footprint itself covers none of it. A STAC
-# search matches it on the bbox; only the geometry shows it is useless.
+# The case the API cannot filter out and this screen exists for: a footprint at an
+# angle to the lon/lat grid, placed so its bbox covers 81% of the AOI while the
+# footprint itself covers none of it. A STAC search matches it on the bbox; only
+# the geometry shows it is useless. A square rotated a full 45 degrees is the
+# extreme of that shape (half its bbox); a live `landsat-c2l2-sr` footprint
+# measures 0.68 of its bbox, and Sentinel-2's MGRS tiles are near axis-aligned in
+# lon/lat, so this is a deliberately exaggerated fixture, not a typical scene.
 _ROTATED_BBOX_HIT_GEOMETRY_MISS = {
     "type": "Polygon",
     "coordinates": [

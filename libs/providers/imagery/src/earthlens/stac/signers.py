@@ -15,9 +15,23 @@ returns signers whose credential-minting calls re-raise pyramids-eo's
 covers every other backend.
 
 The second is which asset mirror a signer has to read — `alternate_preference_for`
-and the `_ALTERNATE_PREFERENCE` table below. That is a property of the endpoint's
-asset layout rather than of the signing algorithm, so it belongs on this side of
-the boundary; the backend reads it when resolving each asset href.
+and the `_ALTERNATE_PREFERENCE` table below. It belongs on this side of the
+boundary because it is an earthlens-level policy, not part of pyramids-eo's
+signing algorithm; the backend reads it when resolving each asset href.
+
+Where it should live long-term is not settled. The fact it encodes is a property
+of an *endpoint's asset layout*, which the catalog already models per endpoint and
+per collection (`Endpoint` / `Collection` carry endpoint-specific details such as
+`region`), whereas the table is keyed by *signer name* — so it currently applies
+to any collection using `aws-requester-pays`, present or future, whether or not
+that collection publishes the same layout. `earth-search/landsat-c2-l2` is the
+live counter-example: same signer, canonical hrefs already `s3://`, no `alternate`
+block at all. A catalog `alternate:` field, or a `preferred_alternates` attribute
+upstreamed to the pyramids-eo signers, would tie the fact to whatever actually
+determines it. The name key is kept for now because there is exactly one entry;
+`TestAlternatePreference` asserts every key is a name `build_signer` can really
+produce, so a typo cannot sit here inert, and this comment is the note to settle
+the home before a second entry is added.
 """
 
 from __future__ import annotations
