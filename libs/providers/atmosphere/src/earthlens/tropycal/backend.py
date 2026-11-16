@@ -831,12 +831,23 @@ class TropicalCyclone(AbstractDataSource):
         window = (self.time.start_date, self.time.end_date)
         bbox = (self.space.south, self.space.north, self.space.west, self.space.east)
         years = range(self.time.start_date.year, self.time.end_date.year + 1)
+        # The btk/ directory is shared across basins, so list it once here and
+        # pass the index to each basin's fetch rather than re-listing per basin.
+        # An unreachable directory (None, already logged) means nothing to fetch.
+        listing = nhc.fetch_btk_listing()
         # Lazy so a `limit=` stops the work: a basin past the cap is never
         # fetched (one basin is the common case, so this mostly bounds the
         # returned feature count).
-        collections = self._take_limited(
-            (self._nhc_btk_one(basin, years, window, bbox) for basin in self.vars),
-            limit=self._limit,
+        collections = (
+            self._take_limited(
+                (
+                    self._nhc_btk_one(basin, years, window, bbox, listing)
+                    for basin in self.vars
+                ),
+                limit=self._limit,
+            )
+            if listing is not None
+            else []
         )
         written = [
             self._write(basin, collection)
@@ -865,6 +876,7 @@ class TropicalCyclone(AbstractDataSource):
         years: range,
         window: tuple[dt.datetime, dt.datetime],
         bbox: tuple[float, float, float, float],
+        listing: str,
     ) -> FeatureCollection:
         """Fetch and map one basin's NHC operational best tracks.
 
@@ -873,6 +885,8 @@ class TropicalCyclone(AbstractDataSource):
             years: The season years spanned by the request window.
             window: `(start, end)` inclusive datetime bounds.
             bbox: `(south, north, west, east)` degree bounds.
+            listing: The shared `btk/` directory index fetched once by the
+                caller, so the directory is not re-listed per basin.
 
         Returns:
             FeatureCollection: The basin's matched features (point mode with
@@ -880,7 +894,7 @@ class TropicalCyclone(AbstractDataSource):
         """
         frames = [
             self._apply_fix_filters(frame)
-            for frame in nhc.fetch_btk_frames(basin, years)
+            for frame in nhc.fetch_btk_frames(basin, years, listing=listing)
         ]
         if self._geometry == "track":
             return events.frame_to_fc(

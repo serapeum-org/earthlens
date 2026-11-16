@@ -596,3 +596,28 @@ class TestSubHourFix:
         )
         assert len(frame) == 2
         assert sorted(frame["vmax"].tolist()) == [130, 140]
+
+
+class TestListingReuse:
+    """A pre-fetched directory listing is reused, not re-fetched (L2)."""
+
+    def test_passed_listing_skips_directory_fetch(self):
+        """When listing= is given, fetch_btk_frames does not GET the directory."""
+        base = nhc.BTK_BASE_URL
+        storm = _atcf_line(
+            time="2026090218",
+            lat="133N",
+            lon="1537W",
+            vmax=120,
+            mslp=940,
+            threshold=64,
+            radii=(30, 25, 20, 30),
+            name="LOWELL",
+        )
+        getter = _FakeGetter({f"{base}bep122026.dat": _FakeResponse(storm)})
+        listing = '<a href="bep122026.dat">bep122026.dat</a>'
+        frames = nhc.fetch_btk_frames(
+            "east_pacific", [2026], get=getter, listing=listing
+        )
+        assert [f["id"].iloc[0] for f in frames] == ["EP122026"]
+        assert base not in getter.calls

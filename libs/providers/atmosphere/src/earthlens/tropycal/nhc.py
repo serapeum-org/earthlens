@@ -111,6 +111,29 @@ _INVEST_NUMBER = 90
 _FILE_RE_TEMPLATE = r"b{prefix}(\d{{2}})(\d{{4}})\.dat"
 
 
+def fetch_btk_listing(
+    *,
+    base_url: str = BTK_BASE_URL,
+    get: Callable[..., _HttpResponse] = requests.get,
+    timeout: float = HTTP_TIMEOUT,
+) -> str | None:
+    """Fetch the ATCF `btk` directory index, or `None` (logged) on failure.
+
+    The `btk/` directory is shared across all basins, so a multi-basin
+    request fetches this index once and passes it to each `fetch_btk_frames`
+    call via `listing=`, rather than re-listing the directory per basin.
+
+    Args:
+        base_url: The ATCF best-track directory URL (overridable in tests).
+        get: The HTTP getter, `requests.get` by default; injected in tests.
+        timeout: Per-request timeout in seconds.
+
+    Returns:
+        The directory index HTML, or `None` when it could not be read.
+    """
+    return _get_text(f"{base_url}", get=get, timeout=timeout, what="btk listing")
+
+
 def fetch_btk_frames(
     basin: str,
     years: Iterable[int],
@@ -118,15 +141,16 @@ def fetch_btk_frames(
     base_url: str = BTK_BASE_URL,
     get: Callable[..., _HttpResponse] = requests.get,
     timeout: float = HTTP_TIMEOUT,
+    listing: str | None = None,
 ) -> list[pd.DataFrame]:
     """Fetch and parse one basin's NHC operational best-track files.
 
-    Lists the ATCF `btk` directory once, selects the storm files for
-    `basin` in the requested `years`, fetches each, and folds it into a
-    per-storm DataFrame. Resilient in the batch sense (matching the
-    tropycal backend's season/storm policy): a listing that cannot be read,
-    or a single storm file that fails to fetch or parse, is logged and
-    skipped so the rest of the basin still returns.
+    Lists the ATCF `btk` directory (unless a `listing` is supplied), selects
+    the storm files for `basin` in the requested `years`, fetches each, and
+    folds it into a per-storm DataFrame. Resilient in the batch sense
+    (matching the tropycal backend's season/storm policy): a listing that
+    cannot be read, or a single storm file that fails to fetch or parse, is
+    logged and skipped so the rest of the basin still returns.
 
     Args:
         basin: An earthlens basin code in `NHC_BTK_BASINS`
@@ -137,6 +161,10 @@ def fetch_btk_frames(
             Called as `get(url, timeout=...)` and expected to return an
             object with `.text` and `.raise_for_status()`.
         timeout: Per-request timeout in seconds.
+        listing: A directory index already fetched by `fetch_btk_listing`.
+            When `None` (the default) this call fetches it itself; a caller
+            serving several basins passes the shared index so the directory
+            is listed only once.
 
     Returns:
         list[pd.DataFrame]: One folded best-track frame per storm that has
@@ -173,7 +201,8 @@ def fetch_btk_frames(
     """
     prefix = NHC_BTK_BASINS[basin]
     wanted_years = {str(year) for year in years}
-    listing = _get_text(f"{base_url}", get=get, timeout=timeout, what="btk listing")
+    if listing is None:
+        listing = fetch_btk_listing(base_url=base_url, get=get, timeout=timeout)
     if listing is None:
         return []
 

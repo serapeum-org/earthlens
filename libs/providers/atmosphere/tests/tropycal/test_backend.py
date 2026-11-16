@@ -736,8 +736,8 @@ def _btk_frame(
             "mslp": list(mslp),
             "type": ["HU"] * n,
             "wmo_basin": [basin] * n,
-            "r34_ne": [70.0, 80.0][:n],
-            "r64_ne": [25.0, 30.0][:n],
+            "r34_ne": [70.0 + 10.0 * i for i in range(n)],
+            "r64_ne": [25.0 + 5.0 * i for i in range(n)],
         }
     )
 
@@ -813,3 +813,87 @@ class TestNhcBtkSource:
         """source='nhc' is still rejected for the reanalysis besttrack product."""
         with pytest.raises(ValueError, match="source must be one of"):
             _backend(tmp_path, product="besttrack", source="nhc")
+
+
+class _ListingSpy:
+    """A fetch_btk_listing double that counts calls and returns a canned index."""
+
+    def __init__(self, listing="<index>"):
+        self.listing = listing
+        self.calls = 0
+
+    def __call__(self):
+        self.calls += 1
+        return self.listing
+
+
+class _FramesSpy:
+    """A fetch_btk_frames double recording (basin, listing) and serving frames."""
+
+    def __init__(self, frames_by_basin):
+        self.frames_by_basin = frames_by_basin
+        self.basins_seen = []
+        self.listings_seen = []
+
+    def __call__(self, basin, years, *, listing=None, **kwargs):
+        self.basins_seen.append(basin)
+        self.listings_seen.append(listing)
+        return list(self.frames_by_basin.get(basin, []))
+
+
+class TestNhcBtkListingReuse:
+    """The btk directory is listed once per download, not per basin (L2)."""
+
+    def test_lists_directory_once_for_two_basins(self, tmp_path, monkeypatch):
+        """A two-basin nhc_btk download fetches the shared index exactly once."""
+        from earthlens.tropycal import nhc
+
+        listing_spy = _ListingSpy()
+        frames_spy = _FramesSpy(
+            {
+                "north_atlantic": [
+                    _btk_frame(storm_id="AL012026", basin="north_atlantic")
+                ],
+                "east_pacific": [_btk_frame(storm_id="EP122026", basin="east_pacific")],
+            }
+        )
+        monkeypatch.setattr(nhc, "fetch_btk_listing", listing_spy)
+        monkeypatch.setattr(nhc, "fetch_btk_frames", frames_spy)
+        backend = _backend(
+            tmp_path, product="nhc_btk", variables=["north_atlantic", "east_pacific"]
+        )
+        backend.download(progress_bar=False)
+        assert listing_spy.calls == 1
+        assert frames_spy.listings_seen == ["<index>", "<index>"]
+
+
+class TestNhcBtkLimit:
+    """limit= trims inside a basin and stops before the next one (L4)."""
+
+    def test_limit_trims_and_stops(self, tmp_path, monkeypatch):
+        """A cap inside the first basin trims its file and skips the second."""
+        import geopandas as gpd
+
+        from earthlens.tropycal import nhc
+
+        na = _btk_frame(
+            storm_id="AL012026",
+            basin="north_atlantic",
+            times=("2005-08-25 00:00", "2005-08-25 06:00", "2005-08-25 12:00"),
+            lats=(25.4, 25.9, 26.0),
+            lons=(-85.0, -86.0, -87.0),
+            vmax=(120.0, 140.0, 110.0),
+            mslp=(945.0, 927.0, 950.0),
+        )
+        ep = _btk_frame(storm_id="EP122026", basin="east_pacific")
+        frames_spy = _FramesSpy({"north_atlantic": [na], "east_pacific": [ep]})
+        monkeypatch.setattr(nhc, "fetch_btk_listing", _ListingSpy())
+        monkeypatch.setattr(nhc, "fetch_btk_frames", frames_spy)
+        backend = _backend(
+            tmp_path, product="nhc_btk", variables=["north_atlantic", "east_pacific"]
+        )
+        fc = backend.download(progress_bar=False, limit=2)
+        assert len(fc) == 2
+        assert frames_spy.basins_seen == ["north_atlantic"]
+        written = gpd.read_file(tmp_path / "tropycal_nhc_btk_north_atlantic_point.gpkg")
+        assert len(written) == 2
