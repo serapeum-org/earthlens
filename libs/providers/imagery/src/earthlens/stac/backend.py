@@ -353,19 +353,24 @@ class STAC(LazyClientMixin, AbstractDataSource):
     def _search(self) -> list[RemoteProduct]:
         """Search every requested collection for the bbox + window.
 
-        A STAC search filters candidates by their bbox only, so an item with a
-        rotated footprint can match the bbox while covering none of the AOI.
-        Candidates are therefore screened with `_covers_aoi` before `max_items`
-        is applied, which makes the cap count usable scenes.
+        A STAC search filters candidates by their bbox only, so an item whose
+        footprint lies at an angle to the lon/lat grid can match the bbox while
+        covering none of the AOI. Candidates are therefore screened with
+        `_covers_aoi` before `max_items` is applied, which makes the cap count
+        usable scenes. The API is asked for a bounded pool of candidates rather
+        than for the cap itself (see `_CANDIDATE_OVERFETCH`).
+
+        Every `(collection, bbox)` pair reports what the screen did: a warning
+        when the pair matched candidates and kept none, a debug line otherwise.
+        An all-dropped search is still an empty result here, not an exception —
+        `search()`, `count()` and `preview()` all document one — and sets
+        `_screened_out` so `download` can fail loudly instead.
 
         Returns:
             One `RemoteProduct` per matched item whose footprint covers the AOI;
             the pystac item, its acquisition date, the logical collection key,
-            and the requested asset list ride on `metadata`.
-
-        Raises:
-            ValueError: When the API matched candidates but every one of them was
-                dropped for missing the AOI.
+            and the requested asset list ride on `metadata`. The empty list when
+            nothing matched, or when the screen dropped everything that did.
         """
         start = self.time.start_date.strftime("%Y-%m-%d")
         end = self.time.end_date.strftime("%Y-%m-%d")
