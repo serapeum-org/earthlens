@@ -6,12 +6,18 @@ token, and the anonymous / opt-in-region signer — lives in `pyramids_eo.stac`.
 earthlens consumes those classes directly rather than keeping a second copy, so
 there is only one home for the signing logic to harden and evolve.
 
-The one earthlens-specific concern kept here is the framework's exception
-contract: every earthlens backend raises `earthlens.base.AuthenticationError` on
-an auth failure, so `build_signer` returns signers whose credential-minting calls
-re-raise pyramids-eo's `AuthenticationError` as that single type. A consumer's
+Two earthlens-specific concerns are kept here. The first is the framework's
+exception contract: every earthlens backend raises
+`earthlens.base.AuthenticationError` on an auth failure, so `build_signer`
+returns signers whose credential-minting calls re-raise pyramids-eo's
+`AuthenticationError` as that single type. A consumer's
 `except earthlens.base.AuthenticationError` therefore still covers STAC, as it
 covers every other backend.
+
+The second is which asset mirror a signer has to read — `alternate_preference_for`
+and the `_ALTERNATE_PREFERENCE` table below. That is a property of the endpoint's
+asset layout rather than of the signing algorithm, so it belongs on this side of
+the boundary; the backend reads it when resolving each asset href.
 """
 
 from __future__ import annotations
@@ -93,6 +99,18 @@ def alternate_preference_for(signer: Any) -> tuple[str, ...] | None:
             True
 
             ```
+        - An object exposing no `name` resolves canonically rather than raising:
+            ```python
+            >>> from earthlens.stac import alternate_preference_for
+            >>> alternate_preference_for(object()) is None
+            True
+
+            ```
+
+    See Also:
+        build_signer: Builds the signer whose preference this reports.
+        earthlens.stac.backend.STAC._fetch: Passes the result to
+            `pyramids.stac.resolved_href` as its `alternate` argument.
     """
     return _ALTERNATE_PREFERENCE.get(getattr(signer, "name", ""))
 

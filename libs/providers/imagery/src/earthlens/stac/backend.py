@@ -351,7 +351,10 @@ class STAC(LazyClientMixin, AbstractDataSource):
         """Mosaic the matched items per `(collection, date)` and write COGs.
 
         For each group: per requested band, collect the **signed** hrefs of the
-        tiles covering the bbox, reproject mismatched-CRS tiles to a common CRS
+        tiles covering the bbox — resolved through the signer's preferred
+        `alternate-assets` mirror where it has one, since an endpoint's canonical
+        href is not always the copy its credentials can read — reproject
+        mismatched-CRS tiles to a common CRS
         (`merge_rasters` does not reproject), mosaic, stack the bands, crop to
         the AOI, and write one COG. The merge / stack calls run inside
         `CloudConfig(extra=signer.gdal_env())` because those helpers read URLs
@@ -766,6 +769,45 @@ def _covers_aoi(item: Any, aoi: Any, min_fraction: float = _MIN_AOI_COVERAGE) ->
         True when the footprint covers at least `min_fraction` of `aoi`. An item
         whose geometry is absent, empty or unparseable is kept, so a missing
         footprint never silently drops data that may well overlap.
+
+    Examples:
+        - A footprint spanning the AOI covers it:
+            ```python
+            >>> from shapely.geometry import box
+            >>> from earthlens.stac.backend import _covers_aoi
+            >>> aoi = box(-4.0, 40.0, -3.0, 41.0)
+            >>> scene = {"geometry": box(-4.5, 39.5, -2.5, 41.5).__geo_interface__}
+            >>> _covers_aoi(scene, aoi)
+            True
+
+            ```
+        - A footprint rotated 45 degrees can match the AOI on its bbox while
+          covering none of it, which is what a STAC search cannot filter out:
+            ```python
+            >>> from shapely.geometry import Polygon, box
+            >>> from earthlens.stac.backend import _covers_aoi
+            >>> aoi = box(-4.0, 40.0, -3.0, 41.0)
+            >>> diamond = Polygon(
+            ...     [(-3.9, 42.0), (-2.0, 43.9), (-0.1, 42.0), (-2.0, 40.1)]
+            ... )
+            >>> round(box(*diamond.bounds).intersection(aoi).area / aoi.area, 2)
+            0.81
+            >>> _covers_aoi({"geometry": diamond.__geo_interface__}, aoi)
+            False
+
+            ```
+        - An item publishing no footprint is kept, so nothing is dropped for a
+          missing geometry:
+            ```python
+            >>> from shapely.geometry import box
+            >>> from earthlens.stac.backend import _covers_aoi
+            >>> _covers_aoi({"id": "no-geometry"}, box(-4.0, 40.0, -3.0, 41.0))
+            True
+
+            ```
+
+    See Also:
+        STAC._search: Applies this screen before `max_items` caps the results.
     """
     geometry = getattr(item, "geometry", None)
     if geometry is None and isinstance(item, dict):
