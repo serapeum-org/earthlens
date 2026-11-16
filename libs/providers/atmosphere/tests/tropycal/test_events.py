@@ -535,3 +535,50 @@ class TestConcatBtkFcs:
         merged = events.concat_btk_fcs([events.empty_btk_fc()])
         assert len(merged) == 0
         assert set(events.RADII_COLUMNS).issubset(merged.columns)
+
+
+class TestBtkWindowBoundary:
+    """The NHC best-track window end is inclusive to the start of the end day (L1)."""
+
+    def _four_synoptic(self):
+        """Build a frame with the four 00/06/12/18Z fixes of one day."""
+        return pd.DataFrame(
+            {
+                "id": ["EP122026"] * 4,
+                "name": ["LOWELL"] * 4,
+                "time": pd.to_datetime(
+                    [
+                        "2026-09-02 00:00",
+                        "2026-09-02 06:00",
+                        "2026-09-02 12:00",
+                        "2026-09-02 18:00",
+                    ]
+                ),
+                "lat": [13.0] * 4,
+                "lon": [-153.0] * 4,
+                "vmax": [120.0] * 4,
+                "mslp": [945.0] * 4,
+                "type": ["HU"] * 4,
+                "wmo_basin": ["east_pacific"] * 4,
+            }
+        )
+
+    def test_date_only_end_keeps_only_00z(self):
+        """A date-only end (parsed to 00:00) keeps only that day's 00Z fix."""
+        fc = events.btk_frame_to_fc(
+            [self._four_synoptic()],
+            window=(dt.datetime(2026, 9, 1), dt.datetime(2026, 9, 2)),
+            bbox=_BTK_BBOX,
+            source="nhc",
+        )
+        assert len(fc) == 1
+
+    def test_datetime_end_keeps_later_synoptic_fixes(self):
+        """An end with an explicit 18:00 hour keeps all four synoptic fixes."""
+        fc = events.btk_frame_to_fc(
+            [self._four_synoptic()],
+            window=(dt.datetime(2026, 9, 1), dt.datetime(2026, 9, 2, 18, 0)),
+            bbox=_BTK_BBOX,
+            source="nhc",
+        )
+        assert len(fc) == 4

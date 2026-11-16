@@ -809,6 +809,13 @@ class TropicalCyclone(AbstractDataSource):
         `source="nhc"` to mark them operational (preliminary until NHC's
         post-season reanalysis).
 
+        The `[start, end]` window is inclusive and compared at fix
+        granularity, so a date-only `end` (which parses to that day's
+        `00:00`) keeps only the final day's 00Z fix and drops its
+        06/12/18Z fixes; pass an `end` with an explicit hour (e.g.
+        `"2026-09-02 18:00"`) to include the later synoptic times. This
+        matches the reanalysis `besttrack` product's window semantics.
+
         Returns:
             FeatureCollection: The row-wise union across basins, CRS
                 `EPSG:4326`. Point mode carries the radii columns
