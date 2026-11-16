@@ -61,6 +61,11 @@ def test_jaxa_earth_authless_fetch_lives(tmp_path: Path) -> None:
     not (os.environ.get("GPORTAL_USERNAME") and os.environ.get("GPORTAL_PASSWORD")),
     reason="needs $GPORTAL_USERNAME + $GPORTAL_PASSWORD",
 )
+@pytest.mark.xfail(
+    reason="G-Portal CSW catalogue-search endpoint retired — earthlens #1415; "
+    "remove this marker when a successor endpoint lands and the search works again",
+    strict=False,
+)
 def test_gportal_search_lives() -> None:
     """A live G-Portal search over a 1-day window matches a small product set.
 
@@ -69,6 +74,11 @@ def test_gportal_search_lives() -> None:
     the live catalog; the JAXA backend's auth threading keeps credentials
     off the SDK's module-level globals, so this helper does not need to
     set or restore them.
+
+    Currently `xfail`: JAXA retired the CSW endpoint, so the raw SDK search
+    raises `requests.exceptions.JSONDecodeError` (the `/csw/csw` path
+    301-redirects to the portal landing page). `strict=False` so a restored
+    endpoint flips this to `XPASS` and signals that the retirement is over.
     """
     pytest.importorskip("gportal")
     import gportal
@@ -88,19 +98,22 @@ def test_gportal_search_lives() -> None:
     reason="needs $GPORTAL_USERNAME + $GPORTAL_PASSWORD",
 )
 def test_gportal_sftp_download_lives(tmp_path: Path) -> None:
-    """A credentialed JAXA request actually pulls files over SFTP.
+    """A credentialed JAXA gportal request fails fast with the retired-endpoint error.
 
     Drives the full backend chain through the gportal protocol: resolves
     `sgli-l3-nwlr`, authenticates against `$GPORTAL_USERNAME` /
-    `$GPORTAL_PASSWORD`, runs `gportal.search`, then `gportal.download`
-    over SFTP into `tmp_path`. Asserts at least one non-empty HDF5
-    product lands on disk so a regression that breaks the credentialed
-    path surfaces here (the other e2e test only exercises the anonymous
-    search half). The 1-day window over a large bbox returns ~6 daily
-    L3 mosaics totalling ~10 MB.
+    `$GPORTAL_PASSWORD`, then runs `gportal.search`. Because JAXA retired
+    the CSW catalogue-search endpoint (earthlens #1415), the search — the
+    first step of the chain — now fails, and the backend raises
+    `GportalEndpointRetiredError` before the SFTP download is ever reached.
+    This asserts that documented reality; when a successor endpoint lands and
+    the search works again, this assertion will fail (no exception raised) and
+    signal that the SFTP-download half should be restored to a real
+    file-on-disk check.
     """
     pytest.importorskip("gportal")
     from earthlens.core import EarthLens
+    from earthlens.jaxa import GportalEndpointRetiredError
 
     lens = EarthLens(
         data_source="jaxa",
@@ -111,11 +124,8 @@ def test_gportal_sftp_download_lives(tmp_path: Path) -> None:
         lon_lim=[120.0, 150.0],
         path=tmp_path,
     )
-    written = lens.download()
-    assert len(written) >= 1
-    assert all(p.exists() for p in written)
-    assert all(p.stat().st_size > 0 for p in written)
-    assert all(p.suffix == ".h5" for p in written)
+    with pytest.raises(GportalEndpointRetiredError):
+        lens.download()
 
 
 @pytest.mark.slow
