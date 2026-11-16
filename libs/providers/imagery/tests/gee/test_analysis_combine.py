@@ -94,13 +94,16 @@ class TestMatchHistogram:
         assert float(np.asarray(matched.read_array()).mean()) > 150.0
 
     def test_no_data_is_preserved_not_matched(self):
-        """A void stays the source's sentinel rather than being remapped."""
+        """A void stays no-data rather than being remapped onto the reference."""
         arr = np.random.default_rng(3).normal(50, 10, (8, 8)).astype("float32")
         arr[0, 0] = -9999.0
         src = Dataset.from_array(arr=arr, geo_ref=GEO, no_data_value=-9999.0)
         matched = MatchHistogram(reference=_band(200, 30, seed=4)).apply(src)
-        assert float(np.asarray(matched.read_array())[0, 0]) == -9999.0
-        assert matched.no_data_value[0] == -9999.0
+        void = float(np.asarray(matched.read_array())[0, 0])
+        assert np.isnan(void), f"void should stay no-data, not be remapped, got {void}"
+        assert np.isnan(matched.no_data_value[0]), (
+            f"match_histogram now declares NaN no-data, got {matched.no_data_value[0]}"
+        )
 
     def test_matching_to_itself_is_close_to_identity(self):
         """A band matched to its own distribution barely moves."""
