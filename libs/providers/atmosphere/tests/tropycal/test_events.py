@@ -430,3 +430,108 @@ class TestConcatFcs:
         merged = events.concat_fcs([events.empty_fc("track")], "track")
         assert len(merged) == 0
         assert set(events.TRACK_COLUMNS).issubset(merged.columns)
+
+
+def _btk_frame(
+    times=("2026-09-02 12:00", "2026-09-02 18:00"),
+    lats=(13.0, 13.3),
+    lons=(-153.0, -153.7),
+    vmax=(120.0, 140.0),
+    mslp=(945.0, 927.0),
+    types_=("HU", "HU"),
+    storm_id="EP122026",
+    name="LOWELL",
+    basin="east_pacific",
+    r34_ne=(70.0, 80.0),
+    r64_ne=(25.0, 30.0),
+):
+    """Build a folded NHC best-track frame (track fields + two radii columns)."""
+    n = len(times)
+    data = {
+        "id": [storm_id] * n,
+        "name": [name] * n,
+        "time": pd.to_datetime(list(times)),
+        "lat": list(lats),
+        "lon": list(lons),
+        "vmax": list(vmax),
+        "mslp": list(mslp),
+        "type": list(types_),
+        "wmo_basin": [basin] * n,
+        "r34_ne": list(r34_ne),
+        "r64_ne": list(r64_ne),
+    }
+    return pd.DataFrame(data)
+
+
+_BTK_WINDOW = (dt.datetime(2026, 8, 25), dt.datetime(2026, 9, 11))
+_BTK_BBOX = (-5.0, 40.0, -178.0, -75.0)
+
+
+class TestBtkFrameToFc:
+    """Tests for btk_frame_to_fc (NHC operational best-track point mode)."""
+
+    def test_maps_points_with_radii(self):
+        """In-window fixes map to points carrying the full radii schema."""
+        fc = events.btk_frame_to_fc(
+            [_btk_frame()], window=_BTK_WINDOW, bbox=_BTK_BBOX, source="nhc"
+        )
+        assert len(fc) == 2
+        assert set(events.RADII_COLUMNS).issubset(fc.columns)
+        peak = fc.loc[fc["vmax_kt"].idxmax()]
+        assert peak["r34_ne"] == 80.0
+        assert peak["r64_ne"] == 30.0
+        assert int(peak["category"]) == 5
+        assert set(fc["source"]) == {"nhc"}
+
+    def test_absent_threshold_is_nan(self):
+        """A radii column the frame never carries degrades to NaN, not an error."""
+        fc = events.btk_frame_to_fc(
+            [_btk_frame()], window=_BTK_WINDOW, bbox=_BTK_BBOX, source="nhc"
+        )
+        assert fc["r50_sw"].isna().all()
+
+    def test_out_of_window_returns_empty_schema(self):
+        """A storm wholly outside the window yields an empty but typed FC."""
+        fc = events.btk_frame_to_fc(
+            [_btk_frame(times=("2020-01-01 00:00", "2020-01-01 06:00"))],
+            window=_BTK_WINDOW,
+            bbox=_BTK_BBOX,
+            source="nhc",
+        )
+        assert len(fc) == 0
+        assert set(events.BTK_POINT_COLUMNS).issubset(fc.columns)
+
+
+class TestEmptyBtkFc:
+    """Tests for the empty NHC best-track collection."""
+
+    def test_schema_and_crs(self):
+        """empty_btk_fc carries the radii columns and EPSG:4326."""
+        fc = events.empty_btk_fc()
+        assert len(fc) == 0
+        assert set(events.RADII_COLUMNS).issubset(fc.columns)
+        assert fc.crs.to_epsg() == 4326
+
+
+class TestConcatBtkFcs:
+    """Tests for concat_btk_fcs."""
+
+    def test_union(self):
+        """concat_btk_fcs row-unions non-empty NHC best-track collections."""
+        a = events.btk_frame_to_fc(
+            [_btk_frame()], window=_BTK_WINDOW, bbox=_BTK_BBOX, source="nhc"
+        )
+        b = events.btk_frame_to_fc(
+            [_btk_frame(storm_id="EP112026", name="KARINA")],
+            window=_BTK_WINDOW,
+            bbox=_BTK_BBOX,
+            source="nhc",
+        )
+        merged = events.concat_btk_fcs([a, b])
+        assert len(merged) == 4
+
+    def test_all_empty_returns_empty(self):
+        """concat_btk_fcs over only-empty inputs returns a schema-correct empty FC."""
+        merged = events.concat_btk_fcs([events.empty_btk_fc()])
+        assert len(merged) == 0
+        assert set(events.RADII_COLUMNS).issubset(merged.columns)

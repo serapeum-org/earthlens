@@ -45,7 +45,7 @@ from earthlens.base import (
     RemoteProduct,
     TemporalExtent,
 )
-from earthlens.tropycal import events
+from earthlens.tropycal import events, nhc
 from earthlens.tropycal.catalog import Catalog
 
 if TYPE_CHECKING:
@@ -54,14 +54,20 @@ if TYPE_CHECKING:
 
 FileFormat = Literal["gpkg", "geojson"]
 Geometry = Literal["point", "track"]
-Product = Literal["besttrack", "recon", "ships", "realtime"]
+Product = Literal["besttrack", "recon", "ships", "realtime", "nhc_btk"]
 ReconProduct = Literal["hdobs", "dropsondes", "vdms"]
 
 #: Products: `besttrack` (default) is basin+window keyed (vector); `recon`
 #: is storm-keyed aircraft observations (vector); `ships` is storm +
 #: forecast-cycle keyed SHIPS guidance (tabular); `realtime` is live active
-#: storms (vector, no date window).
-_PRODUCTS = ("besttrack", "recon", "ships", "realtime")
+#: storms (vector, no date window); `nhc_btk` is basin+window keyed NHC
+#: operational best tracks with wind radii (vector), read directly from
+#: ATCF files rather than the tropycal SDK.
+_PRODUCTS = ("besttrack", "recon", "ships", "realtime", "nhc_btk")
+
+#: Products whose `variables` are basin codes and that default to the North
+#: Atlantic when `variables` is empty.
+_BASIN_KEYED = ("besttrack", "nhc_btk")
 _RECON_PRODUCTS = ("hdobs", "dropsondes", "vdms")
 
 #: Products that are storm-keyed (variables are storm ids, not basins).
@@ -97,9 +103,11 @@ class TropicalCyclone(AbstractDataSource):
     and the basins' results are unioned into the single FeatureCollection
     `download()` returns.
 
-    Four products, selected with `product=`: `besttrack` (the default),
-    `recon` aircraft observations, `ships` forecast guidance, and
-    `realtime` active storms. No credentials are needed.
+    Five products, selected with `product=`: `besttrack` (the default),
+    `recon` aircraft observations, `ships` forecast guidance, `realtime`
+    active storms, and `nhc_btk` NHC operational best tracks (current-season
+    storms, with wind radii, read straight from ATCF files). No credentials
+    are needed.
 
     Attributes:
         OUTPUT_KIND: `"vector"` — the result is a table of track
@@ -178,7 +186,13 @@ class TropicalCyclone(AbstractDataSource):
                 list of basin codes. `"recon"` is storm-keyed (aircraft
                 reconnaissance observations for named storms): `variables`
                 is then a list of storm identifiers and `basin` / `source`
-                say where to resolve them.
+                say where to resolve them. `"nhc_btk"` is basin + date-window
+                keyed like `besttrack`, but reads NHC's **operational**
+                ATCF best-track files directly (not the tropycal SDK), so it
+                covers current-season storms and adds the 34/50/64-kt wind
+                radii; `variables` is a list of NHC operational basin codes
+                (`"north_atlantic"` / `"east_pacific"` / `"central_pacific"`)
+                and `source` is ignored (rows are stamped `source="nhc"`).
             recon_product: For `product="recon"`, which recon sub-product
                 to map — `"hdobs"` (default, high-density flight-level
                 observations), `"dropsondes"`, or `"vdms"`.
@@ -197,8 +211,9 @@ class TropicalCyclone(AbstractDataSource):
         Raises:
             ValueError: If `file_format`, `source`, `geometry`, `product`, or
                 `recon_product` is not a recognised value; if a storm-keyed
-                product is given an empty `variables`; or if `product="ships"`
-                is given no `ships_time`.
+                product is given an empty `variables`; if `product="ships"`
+                is given no `ships_time`; or if `product="nhc_btk"` is given
+                a basin NHC does not serve operationally.
             TypeError: If `variables` is a mapping rather than a list.
         """
         if file_format not in _DRIVERS:
@@ -255,11 +270,11 @@ class TropicalCyclone(AbstractDataSource):
         # Per-process memo of loaded TrackDatasets, keyed (basin, source),
         # so a multi-basin/multi-year request loads each basin once (G3).
         self._track_datasets: dict[tuple[str, str], object] = {}
-        # besttrack: empty `variables` defaults to North Atlantic. recon:
-        # `variables` are storm ids (already validated non-empty above).
+        # besttrack / nhc_btk: empty `variables` defaults to North Atlantic.
+        # recon: `variables` are storm ids (already validated non-empty above).
         resolved_vars = (
             list(variables) or list(_DEFAULT_BASINS)
-            if product == "besttrack"
+            if product in _BASIN_KEYED
             else list(variables)
         )
         super().__init__(
@@ -272,6 +287,14 @@ class TropicalCyclone(AbstractDataSource):
             fmt=fmt,
             path=path,
         )
+        if product == "nhc_btk":
+            unknown = [basin for basin in self.vars if basin not in nhc.NHC_BTK_BASINS]
+            if unknown:
+                raise ValueError(
+                    f"product='nhc_btk' serves only "
+                    f"{sorted(nhc.NHC_BTK_BASINS)} (the NHC operational "
+                    f"basins); got unknown basin(s) {unknown}."
+                )
 
     def _check_input_dates(
         self,
@@ -640,6 +663,8 @@ class TropicalCyclone(AbstractDataSource):
             return self._download_ships()
         if self._product == "realtime":
             return self._download_realtime()
+        if self._product == "nhc_btk":
+            return self._download_nhc_btk()
 
         products = self._search()
         collections = self._fetch(products) if products else []
@@ -770,6 +795,86 @@ class TropicalCyclone(AbstractDataSource):
             bbox=bbox,
             source="realtime",
         )
+
+    def _download_nhc_btk(self) -> FeatureCollection:
+        """Fetch NHC operational best tracks for each basin and union them.
+
+        `product="nhc_btk"` reads NHC's operational ATCF best-track files
+        directly (via `earthlens.tropycal.nhc`) rather than the tropycal
+        SDK, so it returns storms from the season still being analysed —
+        with the 34/50/64-kt wind radii HURDAT2/IBTrACS do not expose. Each
+        requested basin's storms are fetched for the window's season years,
+        filtered to the window + bbox, written to one vector file under
+        `path`, and the per-basin results unioned. Rows are stamped
+        `source="nhc"` to mark them operational (preliminary until NHC's
+        post-season reanalysis).
+
+        Returns:
+            FeatureCollection: The row-wise union across basins, CRS
+                `EPSG:4326`. Point mode carries the radii columns
+                (`BTK_POINT_COLUMNS`); `geometry="track"` carries the
+                best-track summary schema without radii. Empty
+                (schema-only) when nothing matched.
+        """
+        window = (self.time.start_date, self.time.end_date)
+        bbox = (self.space.south, self.space.north, self.space.west, self.space.east)
+        years = range(self.time.start_date.year, self.time.end_date.year + 1)
+        # Lazy so a `limit=` stops the work: a basin past the cap is never
+        # fetched (one basin is the common case, so this mostly bounds the
+        # returned feature count).
+        collections = self._take_limited(
+            (self._nhc_btk_one(basin, years, window, bbox) for basin in self.vars),
+            limit=self._limit,
+        )
+        written = [
+            self._write(basin, collection)
+            for basin, collection in zip(self.vars, collections)
+            if len(collection)
+        ]
+        combined = (
+            events.concat_fcs(collections, "track")
+            if self._geometry == "track"
+            else events.concat_btk_fcs(collections)
+        )
+        if written:
+            logger.info(
+                f"Tropycal nhc_btk: {len(combined)} feature(s) across "
+                f"{len(written)} file(s) written to {self.root_dir}"
+            )
+        else:
+            logger.warning(
+                "Tropycal nhc_btk: no tracks matched the request, nothing written"
+            )
+        return combined
+
+    def _nhc_btk_one(
+        self,
+        basin: str,
+        years: range,
+        window: tuple[dt.datetime, dt.datetime],
+        bbox: tuple[float, float, float, float],
+    ) -> FeatureCollection:
+        """Fetch and map one basin's NHC operational best tracks.
+
+        Args:
+            basin: An `nhc.NHC_BTK_BASINS` basin code (validated in `__init__`).
+            years: The season years spanned by the request window.
+            window: `(start, end)` inclusive datetime bounds.
+            bbox: `(south, north, west, east)` degree bounds.
+
+        Returns:
+            FeatureCollection: The basin's matched features (point mode with
+                radii, or track mode), empty on no match.
+        """
+        frames = [
+            self._apply_fix_filters(frame)
+            for frame in nhc.fetch_btk_frames(basin, years)
+        ]
+        if self._geometry == "track":
+            return events.frame_to_fc(
+                frames, geometry="track", window=window, bbox=bbox, source="nhc"
+            )
+        return events.btk_frame_to_fc(frames, window=window, bbox=bbox, source="nhc")
 
     def _download_ships(self) -> pd.DataFrame:
         """Fetch SHIPS guidance for each storm and return one tabular frame.

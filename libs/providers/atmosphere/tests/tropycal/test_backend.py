@@ -710,3 +710,92 @@ class TestPublicDownloadHonoursTheCap:
     def test_without_the_keyword_everything_is_returned(self, tmp_path, fake_tropycal):
         """The default is unchanged."""
         assert len(_backend(tmp_path).download()) == 3
+
+
+def _btk_frame(
+    *,
+    storm_id="AL122026",
+    name="HELENE",
+    basin="north_atlantic",
+    times=("2005-08-25 00:00", "2005-08-25 06:00"),
+    lats=(25.4, 25.9),
+    lons=(-85.0, -86.0),
+    vmax=(120.0, 140.0),
+    mslp=(945.0, 927.0),
+):
+    """Build a folded NHC best-track frame (nhc.fetch_btk_frames output shape)."""
+    n = len(times)
+    return pd.DataFrame(
+        {
+            "id": [storm_id] * n,
+            "name": [name] * n,
+            "time": pd.to_datetime(list(times)),
+            "lat": list(lats),
+            "lon": list(lons),
+            "vmax": list(vmax),
+            "mslp": list(mslp),
+            "type": ["HU"] * n,
+            "wmo_basin": [basin] * n,
+            "r34_ne": [70.0, 80.0][:n],
+            "r64_ne": [25.0, 30.0][:n],
+        }
+    )
+
+
+class TestNhcBtk:
+    """Tests for the product='nhc_btk' NHC operational best-track path."""
+
+    def test_output_kind_is_vector(self, tmp_path):
+        """nhc_btk is a vector product (so the facade rejects aggregate=)."""
+        backend = _backend(tmp_path, product="nhc_btk")
+        assert backend.OUTPUT_KIND == "vector"
+
+    def test_unknown_basin_rejected(self, tmp_path):
+        """A basin NHC does not serve operationally is rejected at construction."""
+        with pytest.raises(ValueError, match="nhc_btk"):
+            _backend(tmp_path, product="nhc_btk", variables=["west_pacific"])
+
+    def test_empty_variables_defaults_to_north_atlantic(self, tmp_path):
+        """nhc_btk defaults an empty variables list to ['north_atlantic']."""
+        backend = _backend(tmp_path, product="nhc_btk", variables=[])
+        assert backend.vars == ["north_atlantic"]
+
+    def test_download_points_with_radii(self, tmp_path, monkeypatch):
+        """download returns point features carrying radii, stamped source='nhc'."""
+        from earthlens.tropycal import nhc
+        from earthlens.tropycal.events import RADII_COLUMNS
+
+        monkeypatch.setattr(
+            nhc, "fetch_btk_frames", lambda basin, years, **kw: [_btk_frame()]
+        )
+        backend = _backend(tmp_path, product="nhc_btk")
+        fc = backend.download(progress_bar=False)
+        assert len(fc) == 2
+        assert set(RADII_COLUMNS).issubset(fc.columns)
+        assert set(fc["source"]) == {"nhc"}
+        assert fc.loc[fc["vmax_kt"].idxmax(), "r64_ne"] == 30.0
+        assert list(tmp_path.glob("tropycal_nhc_btk_north_atlantic_point.gpkg"))
+
+    def test_download_track_geometry_has_no_radii(self, tmp_path, monkeypatch):
+        """geometry='track' returns the summary LineString schema (no radii)."""
+        from earthlens.tropycal import nhc
+
+        monkeypatch.setattr(
+            nhc, "fetch_btk_frames", lambda basin, years, **kw: [_btk_frame()]
+        )
+        backend = _backend(tmp_path, product="nhc_btk", geometry="track")
+        fc = backend.download(progress_bar=False)
+        assert set(fc.columns) == set(TRACK_COLUMNS) | {"geometry"}
+        assert fc.geometry.iloc[0].geom_type == "LineString"
+
+    def test_empty_download_returns_schema_only(self, tmp_path, monkeypatch):
+        """No matching storms returns an empty radii-schema FC and writes nothing."""
+        from earthlens.tropycal import nhc
+        from earthlens.tropycal.events import BTK_POINT_COLUMNS
+
+        monkeypatch.setattr(nhc, "fetch_btk_frames", lambda basin, years, **kw: [])
+        backend = _backend(tmp_path, product="nhc_btk")
+        fc = backend.download(progress_bar=False)
+        assert len(fc) == 0
+        assert set(BTK_POINT_COLUMNS).issubset(fc.columns)
+        assert not list(tmp_path.glob("tropycal_nhc_btk_*"))

@@ -32,7 +32,7 @@ so it is derived from `vmax` here via `saffir_simpson_category`
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from typing import TYPE_CHECKING, Literal
 
 import geopandas as gpd
@@ -100,6 +100,32 @@ RECON_COLUMNS: dict[str, str] = {
     "wspd_kt": "float64",
     "pres_hpa": "float64",
     "temp_c": "float64",
+}
+
+#: Wind-radius thresholds (kt) carried by ATCF best-track rows; a `0`
+#: threshold row carries no radii. Used by the NHC operational best-track
+#: product (`product="nhc_btk"`).
+RADII_THRESHOLDS: tuple[int, ...] = (34, 50, 64)
+
+#: Quadrant suffixes, in the NE / SE / SW / NW order ATCF lists the four
+#: wind-radius values of each threshold.
+RADII_QUADRANTS: tuple[str, ...] = ("ne", "se", "sw", "nw")
+
+#: The wind-radii output columns (`r34_ne` … `r64_nw`), all in nautical
+#: miles — one per (threshold, quadrant) pair, in threshold-then-quadrant
+#: order.
+RADII_COLUMNS: tuple[str, ...] = tuple(
+    f"r{threshold}_{quadrant}"
+    for threshold in RADII_THRESHOLDS
+    for quadrant in RADII_QUADRANTS
+)
+
+#: NHC operational best-track (`product="nhc_btk"`) point schema: the
+#: per-fix `POINT_COLUMNS` plus the twelve wind-radii columns. Radii are
+#: `float64` so an absent threshold degrades to `NaN`.
+BTK_POINT_COLUMNS: dict[str, str] = {
+    **POINT_COLUMNS,
+    **{column: "float64" for column in RADII_COLUMNS},
 }
 
 
@@ -220,31 +246,11 @@ def frame_to_fc(
 
             ```
     """
-    south, north, west, east = bbox
-    start, end = window
     track_rows: list[dict[str, object]] = []
     track_geoms: list[object] = []
     point_frames: list[pd.DataFrame] = []
 
-    for frame in storm_frames:
-        if frame is None or len(frame) == 0:
-            continue
-        prepared = _prepare_frame(frame)
-        in_window = prepared[
-            (prepared["_time"] >= pd.Timestamp(start))
-            & (prepared["_time"] <= pd.Timestamp(end))
-        ]
-        if in_window.empty:
-            continue
-        in_box = in_window[
-            (in_window["_lat"] >= south)
-            & (in_window["_lat"] <= north)
-            & (in_window["_lon"] >= west)
-            & (in_window["_lon"] <= east)
-        ]
-        if in_box.empty:
-            continue
-
+    for in_window, in_box in _iter_windowed_fixes(storm_frames, window, bbox):
         if geometry == "track":
             track_row = _track_row(in_window, source)
             if track_row is not None:
@@ -261,6 +267,66 @@ def frame_to_fc(
     if not point_frames:
         return empty_fc("point")
     return _points_to_fc(pd.concat(point_frames, ignore_index=True), source)
+
+
+def btk_frame_to_fc(
+    storm_frames: Iterable[pd.DataFrame],
+    *,
+    window: tuple[dt.datetime, dt.datetime],
+    bbox: tuple[float, float, float, float],
+    source: str,
+) -> FeatureCollection:
+    """Map NHC operational best-track frames to a point `FeatureCollection`.
+
+    The point analogue of `frame_to_fc` for the `product="nhc_btk"`
+    source: each input frame is one storm's folded ATCF best-track table
+    (from `earthlens.tropycal.nhc.parse_btk_file`), carrying the per-fix
+    `time` / `lat` / `lon` / `vmax` / `mslp` / `type` columns alongside the
+    twelve `r34_ne` … `r64_nw` wind-radii columns. Fixes are filtered to
+    the window + bbox with the same loose rule as best tracks, then mapped
+    to the `BTK_POINT_COLUMNS` schema (one row per in-window/in-box fix).
+
+    Args:
+        storm_frames: Iterable of per-storm folded best-track DataFrames.
+        window: `(start, end)` inclusive datetime bounds (tz-naive).
+        bbox: `(south, north, west, east)` degree bounds.
+        source: The source label stamped on every row (`"nhc"`).
+
+    Returns:
+        FeatureCollection: Point collection with the radii columns, CRS
+            `EPSG:4326`. Empty (schema-only) when nothing matched.
+
+    Examples:
+        - Map one fix carrying 64-kt radii and read a radius column:
+            ```python
+            >>> import datetime as dt
+            >>> import pandas as pd
+            >>> from earthlens.tropycal.events import btk_frame_to_fc
+            >>> frame = pd.DataFrame({
+            ...     "id": ["EP122026"], "name": ["LOWELL"],
+            ...     "time": pd.to_datetime(["2026-09-02 18:00"]),
+            ...     "lat": [13.3], "lon": [-153.7], "vmax": [140.0],
+            ...     "mslp": [927.0], "type": ["HU"], "wmo_basin": ["east_pacific"],
+            ...     "r64_ne": [30.0], "r64_se": [25.0], "r64_sw": [20.0], "r64_nw": [30.0],
+            ... })
+            >>> fc = btk_frame_to_fc(
+            ...     [frame],
+            ...     window=(dt.datetime(2026, 8, 25), dt.datetime(2026, 9, 11)),
+            ...     bbox=(-5.0, 40.0, -178.0, -75.0), source="nhc",
+            ... )
+            >>> len(fc)
+            1
+            >>> float(fc["r64_ne"].iloc[0])
+            30.0
+
+            ```
+    """
+    point_frames = [
+        in_box for _, in_box in _iter_windowed_fixes(storm_frames, window, bbox)
+    ]
+    if not point_frames:
+        return empty_btk_fc()
+    return _btk_points_to_fc(pd.concat(point_frames, ignore_index=True), source)
 
 
 def empty_fc(geometry: Geometry = "point") -> FeatureCollection:
@@ -294,13 +360,33 @@ def empty_fc(geometry: Geometry = "point") -> FeatureCollection:
             ```
     """
     columns = POINT_COLUMNS if geometry == "point" else TRACK_COLUMNS
-    frame = pd.DataFrame(
-        {column: pd.Series([], dtype=dtype) for column, dtype in columns.items()}
-    )
-    gdf = gpd.GeoDataFrame(
-        frame, geometry=gpd.GeoSeries([], crs=EVENT_CRS), crs=EVENT_CRS
-    )
-    return FeatureCollection(gdf)
+    return _empty_typed_fc(columns)
+
+
+def empty_btk_fc() -> FeatureCollection:
+    """Return an empty NHC best-track `FeatureCollection` (schema-correct).
+
+    The `product="nhc_btk"` empty-result counterpart of `empty_fc`, so a
+    request that matched no fixes still returns the full `BTK_POINT_COLUMNS`
+    schema (track fields + the twelve radii columns).
+
+    Returns:
+        FeatureCollection: Zero rows, the `BTK_POINT_COLUMNS` columns with
+            their dtypes, an empty `geometry`, CRS `EPSG:4326`.
+
+    Examples:
+        - The radii columns are present even with no rows:
+            ```python
+            >>> from earthlens.tropycal.events import empty_btk_fc, RADII_COLUMNS
+            >>> fc = empty_btk_fc()
+            >>> len(fc)
+            0
+            >>> set(RADII_COLUMNS).issubset(fc.columns)
+            True
+
+            ```
+    """
+    return _empty_typed_fc(BTK_POINT_COLUMNS)
 
 
 def concat_fcs(
@@ -322,13 +408,7 @@ def concat_fcs(
     Returns:
         FeatureCollection: The row-wise union, CRS `EPSG:4326`.
     """
-    non_empty = [fc for fc in collections if len(fc)]
-    if not non_empty:
-        return empty_fc(geometry)
-    merged = pd.concat(non_empty, ignore_index=True)
-    return FeatureCollection(
-        gpd.GeoDataFrame(merged, geometry="geometry", crs=EVENT_CRS)
-    )
+    return _concat_typed(collections, lambda: empty_fc(geometry))
 
 
 def recon_to_fc(
@@ -438,8 +518,79 @@ def empty_recon_fc() -> FeatureCollection:
 
             ```
     """
+    return _empty_typed_fc(RECON_COLUMNS)
+
+
+def concat_recon_fcs(collections: list[FeatureCollection]) -> FeatureCollection:
+    """Row-union per-storm recon collections, falling back to `empty_recon_fc`."""
+    return _concat_typed(collections, empty_recon_fc)
+
+
+def concat_btk_fcs(collections: list[FeatureCollection]) -> FeatureCollection:
+    """Row-union per-basin NHC best-track collections, else `empty_btk_fc`."""
+    return _concat_typed(collections, empty_btk_fc)
+
+
+def _iter_windowed_fixes(
+    storm_frames: Iterable[pd.DataFrame],
+    window: tuple[dt.datetime, dt.datetime],
+    bbox: tuple[float, float, float, float],
+) -> Iterable[tuple[pd.DataFrame, pd.DataFrame]]:
+    """Yield `(in_window, in_box)` for each storm passing both filters.
+
+    The single implementation of the loose fix-level filter shared by the
+    best-track (`frame_to_fc`) and NHC operational best-track
+    (`btk_frame_to_fc`) point/track mappers: each storm frame is
+    normalised (`_prepare_frame`), restricted to the `[start, end]` time
+    window, then to the `(south, north, west, east)` bbox. A storm with no
+    in-window or no in-box fix is skipped entirely.
+
+    Args:
+        storm_frames: Iterable of per-storm DataFrames.
+        window: `(start, end)` inclusive datetime bounds (tz-naive).
+        bbox: `(south, north, west, east)` degree bounds.
+
+    Yields:
+        `(in_window, in_box)` pairs — the window-filtered fixes (used by
+        track mode, which draws the clipped line) and the
+        window-and-bbox-filtered fixes (used by point mode).
+    """
+    south, north, west, east = bbox
+    start, end = window
+    for frame in storm_frames:
+        if frame is None or len(frame) == 0:
+            continue
+        prepared = _prepare_frame(frame)
+        in_window = prepared[
+            (prepared["_time"] >= pd.Timestamp(start))
+            & (prepared["_time"] <= pd.Timestamp(end))
+        ]
+        if in_window.empty:
+            continue
+        in_box = in_window[
+            (in_window["_lat"] >= south)
+            & (in_window["_lat"] <= north)
+            & (in_window["_lon"] >= west)
+            & (in_window["_lon"] <= east)
+        ]
+        if in_box.empty:
+            continue
+        yield in_window, in_box
+
+
+def _empty_typed_fc(columns: dict[str, str]) -> FeatureCollection:
+    """Return a zero-row `FeatureCollection` with a typed-but-empty schema.
+
+    Args:
+        columns: The schema (column -> pandas dtype) to materialise with no
+            rows.
+
+    Returns:
+        FeatureCollection: Zero rows, `columns` with their dtypes, an empty
+            `geometry`, CRS `EPSG:4326`.
+    """
     frame = pd.DataFrame(
-        {col: pd.Series([], dtype=dtype) for col, dtype in RECON_COLUMNS.items()}
+        {column: pd.Series([], dtype=dtype) for column, dtype in columns.items()}
     )
     gdf = gpd.GeoDataFrame(
         frame, geometry=gpd.GeoSeries([], crs=EVENT_CRS), crs=EVENT_CRS
@@ -447,11 +598,23 @@ def empty_recon_fc() -> FeatureCollection:
     return FeatureCollection(gdf)
 
 
-def concat_recon_fcs(collections: list[FeatureCollection]) -> FeatureCollection:
-    """Row-union per-storm recon collections, falling back to `empty_recon_fc`."""
+def _concat_typed(
+    collections: list[FeatureCollection],
+    empty: Callable[[], FeatureCollection],
+) -> FeatureCollection:
+    """Row-union non-empty collections, falling back to an empty schema.
+
+    Args:
+        collections: Per-unit FeatureCollections sharing one schema + CRS.
+        empty: Factory for the schema-correct empty result, used when every
+            input is empty (or the list is empty).
+
+    Returns:
+        FeatureCollection: The row-wise union, CRS `EPSG:4326`.
+    """
     non_empty = [fc for fc in collections if len(fc)]
     if not non_empty:
-        return empty_recon_fc()
+        return empty()
     merged = pd.concat(non_empty, ignore_index=True)
     return FeatureCollection(
         gpd.GeoDataFrame(merged, geometry="geometry", crs=EVENT_CRS)
@@ -494,6 +657,42 @@ def _prepare_frame(frame: pd.DataFrame) -> pd.DataFrame:
     return prepared
 
 
+def _base_point_frame(fixes: pd.DataFrame, source: str) -> pd.DataFrame:
+    """Build the untyped `POINT_COLUMNS` attribute frame from in-box fixes.
+
+    The shared core of the point mappers (`_points_to_fc` and the NHC
+    best-track `_btk_points_to_fc`): the eleven track-field columns every
+    point collection carries, before geometry and the schema cast. The
+    NHC mapper then appends its radii columns.
+
+    Args:
+        fixes: All in-window/in-box fixes, concatenated across storms (with
+            the `_time` / `_lat` / `_lon` helper columns).
+        source: The source label stamped on every row.
+
+    Returns:
+        pd.DataFrame: The untyped attribute frame (one row per fix).
+    """
+    vmax = pd.to_numeric(_column(fixes, "vmax"), errors="coerce")
+    return pd.DataFrame(
+        {
+            "storm_id": _column(fixes, "id").to_numpy(),
+            "name": _column(fixes, "name").to_numpy(),
+            "time": fixes["_time"].to_numpy(),
+            "lat": fixes["_lat"].to_numpy(),
+            "lon": fixes["_lon"].to_numpy(),
+            "vmax_kt": vmax.to_numpy(),
+            "mslp_hpa": pd.to_numeric(
+                _column(fixes, "mslp"), errors="coerce"
+            ).to_numpy(),
+            "storm_type": _column(fixes, "type").to_numpy(),
+            "category": _categories(vmax).to_numpy(),
+            "basin": _column(fixes, "wmo_basin").to_numpy(),
+            "source": source,
+        }
+    )
+
+
 def _points_to_fc(fixes: pd.DataFrame, source: str) -> FeatureCollection:
     """Build the point-mode FeatureCollection from concatenated in-box fixes.
 
@@ -512,26 +711,33 @@ def _points_to_fc(fixes: pd.DataFrame, source: str) -> FeatureCollection:
     Returns:
         FeatureCollection: Point-mode collection, CRS `EPSG:4326`.
     """
-    vmax = pd.to_numeric(_column(fixes, "vmax"), errors="coerce")
-    frame = pd.DataFrame(
-        {
-            "storm_id": _column(fixes, "id").to_numpy(),
-            "name": _column(fixes, "name").to_numpy(),
-            "time": fixes["_time"].to_numpy(),
-            "lat": fixes["_lat"].to_numpy(),
-            "lon": fixes["_lon"].to_numpy(),
-            "vmax_kt": vmax.to_numpy(),
-            "mslp_hpa": pd.to_numeric(
-                _column(fixes, "mslp"), errors="coerce"
-            ).to_numpy(),
-            "storm_type": _column(fixes, "type").to_numpy(),
-            "category": _categories(vmax).to_numpy(),
-            "basin": _column(fixes, "wmo_basin").to_numpy(),
-            "source": source,
-        }
-    )
+    frame = _base_point_frame(fixes, source)
     geoms = gpd.points_from_xy(frame["lon"], frame["lat"])
     return _frame_to_typed_fc(frame, geoms, POINT_COLUMNS)
+
+
+def _btk_points_to_fc(fixes: pd.DataFrame, source: str) -> FeatureCollection:
+    """Build the NHC best-track point FeatureCollection (track fields + radii).
+
+    Extends `_points_to_fc` with the twelve `r34_ne` … `r64_nw` wind-radii
+    columns read from the folded best-track fixes (absent thresholds stay
+    `NaN`), and casts to the wider `BTK_POINT_COLUMNS` schema.
+
+    Args:
+        fixes: All in-window/in-box fixes, concatenated across storms, each
+            carrying the `RADII_COLUMNS` as well as the track fields.
+        source: The source label stamped on every row (`"nhc"`).
+
+    Returns:
+        FeatureCollection: Point-mode collection with radii, CRS `EPSG:4326`.
+    """
+    frame = _base_point_frame(fixes, source)
+    for column in RADII_COLUMNS:
+        frame[column] = pd.to_numeric(
+            _column(fixes, column), errors="coerce"
+        ).to_numpy()
+    geoms = gpd.points_from_xy(frame["lon"], frame["lat"])
+    return _frame_to_typed_fc(frame, geoms, BTK_POINT_COLUMNS)
 
 
 def _categories(vmax: pd.Series) -> pd.Series:
