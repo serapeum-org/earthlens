@@ -103,6 +103,9 @@ _NAME_PLACEHOLDERS = frozenset({"INVEST", "UNNAMED", "NONAME", "NAMELESS"})
 #: Minimum ATCF field count for a usable row (through the radii quadrants).
 _MIN_FIELDS = 17
 
+#: ATCF cyclone numbers at or above this are INVEST / genesis areas, not storms.
+_INVEST_NUMBER = 90
+
 #: A storm-file name: `b` + basin prefix + 2-digit cyclone number + 4-digit
 #: year + `.dat` (the capture groups give the number and year).
 _FILE_RE_TEMPLATE = r"b{prefix}(\d{{2}})(\d{{4}})\.dat"
@@ -175,10 +178,13 @@ def fetch_btk_frames(
         return []
 
     pattern = re.compile(_FILE_RE_TEMPLATE.format(prefix=prefix))
+    # ATCF reserves cyclone numbers 90-99 for INVEST / genesis areas; those are
+    # pre-genesis disturbances, not storms, so they are filtered out here rather
+    # than surfaced as (unnamed) track features.
     matches = {
         match.group(0): (match.group(1), match.group(2))
         for match in pattern.finditer(listing)
-        if match.group(2) in wanted_years
+        if match.group(2) in wanted_years and int(match.group(1)) < _INVEST_NUMBER
     }
 
     frames: list[pd.DataFrame] = []

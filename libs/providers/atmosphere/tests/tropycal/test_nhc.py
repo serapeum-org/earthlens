@@ -503,3 +503,34 @@ class TestRealAtcfSample:
         assert round(float(genesis["lon"]), 1) == -136.7
         assert genesis["type"] == "DB"
         assert genesis[["r34_ne", "r34_se", "r34_sw", "r34_nw"]].isna().all()
+
+
+class TestInvestGuard:
+    """Cyclone numbers >= 90 (INVEST / genesis areas) are not surfaced (L3)."""
+
+    def test_invest_number_ignored(self):
+        """A b<basin>90<yyyy> listing entry is neither fetched nor returned."""
+        base = nhc.BTK_BASE_URL
+        storm = _atcf_line(
+            time="2026090218",
+            lat="133N",
+            lon="1537W",
+            vmax=120,
+            mslp=940,
+            threshold=64,
+            radii=(30, 25, 20, 30),
+            name="LOWELL",
+        )
+        listing = "".join(
+            f'<a href="{n}">{n}</a>\n' for n in ("bep902026.dat", "bep122026.dat")
+        )
+        getter = _FakeGetter(
+            {
+                base: _FakeResponse(listing),
+                f"{base}bep902026.dat": _FakeResponse(storm),
+                f"{base}bep122026.dat": _FakeResponse(storm),
+            }
+        )
+        frames = nhc.fetch_btk_frames("east_pacific", [2026], get=getter)
+        assert [f["id"].iloc[0] for f in frames] == ["EP122026"]
+        assert not any("bep902026" in url for url in getter.calls)
