@@ -355,6 +355,35 @@ def test_gportal_search_retired_endpoint_raises_retired_error(
 
 @pytest.mark.jaxa
 @pytest.mark.integration
+def test_gportal_retired_not_found_message_omits_redirect_claim(
+    monkeypatch, tmp_path, extents, configured_auth
+) -> None:
+    """A 404 probe is reported as a gone path, not as a redirect to the landing page."""
+    import requests
+
+    from earthlens.jaxa import _gportal
+
+    _fake_gportal_raising(
+        monkeypatch,
+        requests.exceptions.JSONDecodeError("Expecting value", "<html>", 0),
+    )
+    monkeypatch.setattr(_gportal, "_probe_search_endpoint_status", lambda: 404)
+    space, time = extents
+    ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
+    from earthlens.jaxa import GportalEndpointRetiredError
+
+    with pytest.raises(GportalEndpointRetiredError) as excinfo:
+        _gportal.fetch_gportal(
+            dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
+        )
+    message = str(excinfo.value)
+    assert "HTTP 404" in message
+    assert "redirects to the portal landing page" not in message
+    assert "the path no longer exists" in message
+
+
+@pytest.mark.jaxa
+@pytest.mark.integration
 def test_gportal_search_live_endpoint_stays_transient(
     monkeypatch, tmp_path, extents, configured_auth
 ) -> None:

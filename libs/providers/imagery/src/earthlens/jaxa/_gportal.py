@@ -46,12 +46,18 @@ from earthlens.base.abstractdatasource import SpatialExtent, TemporalExtent
 from earthlens.jaxa.auth import AuthenticationError, JaxaAuth
 from earthlens.jaxa.catalog import Dataset
 
+#: Permanent-redirect statuses: the service URL redirects away for good (to the
+#: portal landing page), rather than serving the search.
+_REDIRECT_GONE_STATUSES = frozenset({301, 308})
+
+#: Hard not-found statuses: the service URL no longer exists at all.
+_NOT_FOUND_GONE_STATUSES = frozenset({404, 410})
+
 #: HTTP statuses on the CSW service URL that mean the endpoint itself is gone,
-#: not transiently down: a permanent redirect away (`301` / `308`) or a hard
-#: not-found (`404` / `410`). Probed without following redirects, so the `301`
-#: to the portal landing page is visible rather than masked by the `200` HTML
-#: the SDK lands on.
-_PERMANENTLY_GONE_STATUSES = frozenset({301, 308, 404, 410})
+#: not transiently down. Probed without following redirects, so the `301` to the
+#: portal landing page is visible rather than masked by the `200` HTML the SDK
+#: lands on.
+_PERMANENTLY_GONE_STATUSES = _REDIRECT_GONE_STATUSES | _NOT_FOUND_GONE_STATUSES
 
 #: Path of the CSW `GetCapabilities` service, relative to the SDK's `BASE_URL`.
 _CSW_SEARCH_PATH = "csw/csw"
@@ -286,13 +292,17 @@ def fetch_gportal(
         # failure stays classified as transient.
         probe_status = _probe_search_endpoint_status() if status is None else None
         if probe_status in _PERMANENTLY_GONE_STATUSES:
+            gone_detail = (
+                "it permanently redirects to the portal landing page"
+                if probe_status in _REDIRECT_GONE_STATUSES
+                else "the path no longer exists"
+            )
             raise GportalEndpointRetiredError(
                 "JAXA G-Portal's CSW catalogue-search endpoint no longer "
                 f"exists (the service URL answers HTTP {probe_status} without "
-                "following redirects — it permanently redirects to the portal "
-                "landing page). The search cannot be made to work by retrying "
-                "or by changing the request; a successor endpoint has to be "
-                "found. See earthlens issue #1415.",
+                f"following redirects — {gone_detail}). The search cannot be "
+                "made to work by retrying or by changing the request; a "
+                "successor endpoint has to be found. See earthlens issue #1415.",
                 status_code=probe_status,
             ) from exc
         # Any other failure from the SDK's requests layer means G-Portal did
