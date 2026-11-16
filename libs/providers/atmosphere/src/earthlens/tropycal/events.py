@@ -125,7 +125,7 @@ RADII_COLUMNS: tuple[str, ...] = tuple(
 #: `float64` so an absent threshold degrades to `NaN`.
 BTK_POINT_COLUMNS: dict[str, str] = {
     **POINT_COLUMNS,
-    **{column: "float64" for column in RADII_COLUMNS},
+    **dict.fromkeys(RADII_COLUMNS, "float64"),
 }
 
 
