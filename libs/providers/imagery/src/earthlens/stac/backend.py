@@ -936,10 +936,29 @@ def _covers_aoi(
                 # would otherwise reach the zero-scale rule below and be kept
                 # without ever being judged.
                 footprint = make_valid(footprint)
-            result = _overlaps(footprint, aoi, min_fraction)
+            # A footprint outside [-180, 180] is left alone: some providers emit
+            # 181.5 where RFC 7946 wants -178.5, and because the AOI bbox halves
+            # are normalised such a footprint intersects neither half and would be
+            # lost. Keeping it beats dropping a scene over a longitude convention.
+            if _has_normalised_longitudes(footprint):
+                result = _overlaps(footprint, aoi, min_fraction)
         except (AttributeError, KeyError, TypeError, ValueError, ShapelyError):
             result = True
     return result
+
+
+def _has_normalised_longitudes(footprint: Any) -> bool:
+    """Return whether `footprint`'s longitudes lie within the standard range.
+
+    Args:
+        footprint: The item's footprint as a shapely geometry.
+
+    Returns:
+        True when the footprint's x bounds are inside `[-180, 180]`, i.e. it can
+        meaningfully be compared with a normalised AOI bbox.
+    """
+    min_x, _, max_x, _ = footprint.bounds
+    return min_x >= -180.0 and max_x <= 180.0
 
 
 def _overlaps(footprint: Any, aoi: Any, min_fraction: float) -> bool:

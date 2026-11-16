@@ -117,12 +117,13 @@ class TestCoversAoi:
 
     def test_a_hairline_is_still_dropped_against_a_large_aoi(self):
         """Scaling to the smaller geometry must not stop edge slivers being dropped."""
-        continental = box(-180.0, -60.0, 180.0, 60.0)
-        # a real scene (500 deg^2) that merely grazes the AOI's eastern edge, so
+        # a hemispheric AOI, so the grazing scene stays inside [-180, 180]
+        hemisphere = box(-180.0, -60.0, 0.0, 60.0)
+        # a real scene (5000 deg^2) that merely grazes the AOI's eastern edge, so
         # the overlap is negligible relative to the scene as well as to the AOI
-        grazing = make_bbox_geometry(179.999995, -50.0, 185.0, 50.0)
+        grazing = make_bbox_geometry(-0.000005, -50.0, 50.0, 50.0)
         item = make_item("a", "2024-01-05", {}, geometry=grazing)
-        assert not _covers_aoi(item, continental)
+        assert not _covers_aoi(item, hemisphere)
 
     def test_a_footprint_smaller_than_the_floor_is_kept_when_wholly_inside(self):
         """A genuinely tiny scene is kept: its whole extent is all the data there is."""
@@ -154,6 +155,22 @@ class TestCoversAoi:
         assert not _covers_aoi(
             make_item("a", "2024-01-05", {}, geometry=far_bowtie), _AOI
         )
+
+    @pytest.mark.parametrize(
+        ("name", "bounds"),
+        [
+            ("wholly beyond 180", (180.5, -0.5, 181.5, 0.5)),
+            ("wholly below -180", (-181.5, -0.5, -180.5, 0.5)),
+            ("straddling 180", (178.5, -0.5, 181.5, 0.5)),
+        ],
+    )
+    def test_a_footprint_outside_the_lon_range_is_kept(self, name, bounds):
+        """An unnormalised longitude keeps the item rather than losing it."""
+        # the antimeridian AOI halves are normalised, so a footprint at 181.5
+        # (where RFC 7946 wants -178.5) intersects neither half
+        half = box(-180.0, -1.0, -170.0, 1.0)
+        item = make_item("a", "2024-01-05", {}, geometry=make_bbox_geometry(*bounds))
+        assert _covers_aoi(item, half)
 
     def test_coverage_floor_is_a_small_fraction(self):
         """The default floor excludes slivers without excluding partial tiles."""
