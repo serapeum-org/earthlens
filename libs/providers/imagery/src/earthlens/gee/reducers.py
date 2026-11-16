@@ -1353,7 +1353,8 @@ def _reduce_whole_window(
     # (shape confirmed against a live MODIS/Landsat read). Parse them once with
     # `format="mixed", utc=True` -- robust to that heterogeneous, non-strict-ISO
     # shape -- and reuse the tz-aware index to size the window, anchor the bins,
-    # and feed `reduce_time` (so pyramids does not re-coerce them a frame down).
+    # and feed `reduce_time` (so pyramids does not re-parse the strings a frame
+    # down -- it still wraps the list in a DatetimeIndex, just without the parse).
     index = pd.DatetimeIndex(pd.to_datetime(list(times), format="mixed", utc=True))
     span_days = int((index.max() - index.min()).days) + 1
     # Anchor the fixed-width bins on the earliest scene (`origin=`) so the whole
