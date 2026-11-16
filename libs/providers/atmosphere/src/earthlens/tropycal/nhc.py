@@ -233,8 +233,7 @@ def fetch_btk_frames(
             # cannot be parsed is logged with its exception type and skipped
             # so the rest of the basin still returns.
             logger.warning(
-                f"NHC btk file {name} could not be parsed: "
-                f"{type(exc).__name__}: {exc}"
+                f"NHC btk file {name} could not be parsed: {type(exc).__name__}: {exc}"
             )
             continue
         if len(frame):
