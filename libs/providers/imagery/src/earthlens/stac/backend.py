@@ -29,6 +29,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 from loguru import logger
 from shapely import make_valid
+from shapely.affinity import translate
 from shapely.errors import ShapelyError
 from shapely.geometry import box, shape
 
@@ -935,17 +936,25 @@ def _covers_aoi(
     Args:
         item: A STAC item; its `geometry` is the acquisition footprint.
         aoi: The AOI as a shapely geometry.
-        min_fraction: Smallest share of `aoi` the intersection may cover and
-            still count. Defaults to `_MIN_OVERLAP_FRACTION`.
+        min_fraction: Smallest share of the *smaller* of the footprint and `aoi`
+            that their intersection may cover and still count. Defaults to
+            `0.0001`; `0` keeps every item.
 
     Returns:
         True when the footprint covers at least `min_fraction` of whichever of the
-        footprint and `aoi` is smaller. An item whose geometry is absent, empty or
-        unparseable is kept, so a footprint we cannot judge never silently drops
-        data that may well overlap. A footprint with no area to take a fraction of
-        — a Point or a LineString — is judged topologically instead, so one
-        sitting in the AOI is kept while one far outside it is not. An invalid
-        ring is repaired and then judged.
+        footprint and `aoi` is smaller. The keep cases, in the order they apply:
+
+        - `min_fraction` of `0` keeps everything, which is the documented way to
+          turn the screen off;
+        - a geometry that is absent, empty or unparseable is kept, so a footprint
+          we cannot judge never silently drops data that may well overlap;
+        - a footprint whose longitudes fall outside `[-180, 180]` is shifted by
+          360 degrees into range and then judged, so a `0`-`360`-convention
+          footprint is neither lost nor exempted from the screen;
+        - an invalid ring is repaired with `make_valid` and then judged;
+        - a footprint with no area to take a fraction of — a Point or a
+          LineString, or a degenerate AOI — is judged topologically, so one
+          touching the AOI is kept and one away from it is not.
 
     Examples:
         - A footprint spanning the AOI covers it:
@@ -990,7 +999,11 @@ def _covers_aoi(
     if geometry is None and isinstance(item, dict):
         geometry = item.get("geometry")
     result = True
-    if geometry:
+    # A zero floor is the documented off-switch, so it must short-circuit the
+    # whole screen rather than every individual rule below -- the zero-area rule
+    # ignores `min_fraction` entirely, which used to leave the off-switch working
+    # for polygons and silently failing for Point and LineString footprints.
+    if geometry and min_fraction > 0:
         # The parse and the overlay are both inside the guard. An unknown `type`
         # raises ShapelyError (GeometryTypeError) and a missing `coordinates`
         # raises KeyError at parse time, but a self-intersecting or non-noded ring
@@ -1005,32 +1018,39 @@ def _covers_aoi(
                 # would otherwise reach the zero-scale rule below and be kept
                 # without ever being judged.
                 footprint = make_valid(footprint)
-            # A footprint outside [-180, 180] is left alone: some providers emit
-            # 181.5 where RFC 7946 wants -178.5, and because the AOI bbox halves
-            # are normalised such a footprint intersects neither half and would be
-            # lost. Keeping it beats dropping a scene over a longitude convention.
-            if _has_normalised_longitudes(footprint):
-                result = _overlaps(footprint, aoi, min_fraction)
+            result = _overlaps(_normalise_longitudes(footprint), aoi, min_fraction)
         except (AttributeError, KeyError, TypeError, ValueError, ShapelyError):
             result = True
     return result
 
 
-def _has_normalised_longitudes(footprint: Any) -> bool:
-    """Return whether `footprint`'s longitudes lie within the standard range.
+def _normalise_longitudes(footprint: Any) -> Any:
+    """Shift a footprint whose longitudes leave `[-180, 180]` back into range.
+
+    Some providers publish a `0`-`360` longitude, emitting `181.5` where RFC 7946
+    wants `-178.5`. The AOI bboxes are always normalised, so such a footprint
+    intersects none of them and would be dropped wherever it really is. Shifting
+    it by a whole turn puts it back on the same meridian as the AOI, after which
+    the ordinary measurement applies — which matters because exempting these
+    footprints from the screen instead would keep a Pacific scene for a European
+    AOI, let it consume the item cap and have it fetched for nothing.
 
     Args:
         footprint: The item's footprint as a shapely geometry.
 
     Returns:
-        True when the footprint's x bounds are inside `[-180, 180]`, i.e. it can
-        meaningfully be compared with a normalised AOI bbox. An empty geometry's
-        bounds are `(nan, nan, nan, nan)` and every comparison against `nan` is
-        False, so an empty footprint also reports False here and is kept by the
-        caller — the same outcome `_overlaps` would give it.
+        The footprint shifted by -360, +360 or not at all, whichever brings its
+        longitudes inside `[-180, 180]`. A footprint already in range, one with
+        no bounds to read (an empty geometry's are `nan`), or one too wide for any
+        shift to help is returned unchanged.
     """
     min_x, _, max_x, _ = footprint.bounds
-    return bool(min_x >= -180.0 and max_x <= 180.0)
+    shift = 0.0
+    if min_x >= 180.0:
+        shift = -360.0
+    elif max_x <= -180.0:
+        shift = 360.0
+    return footprint if shift == 0.0 else translate(footprint, xoff=shift)
 
 
 def _overlaps(footprint: Any, aoi: Any, min_fraction: float) -> bool:

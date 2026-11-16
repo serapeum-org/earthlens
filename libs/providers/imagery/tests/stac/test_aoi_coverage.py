@@ -15,7 +15,7 @@ from earthlens.stac.backend import (
     _DEFAULT_MAX_CANDIDATES,
     _MIN_OVERLAP_FRACTION,
     _covers_aoi,
-    _has_normalised_longitudes,
+    _normalise_longitudes,
     _overlaps,
 )
 
@@ -186,21 +186,63 @@ class TestCoversAoi:
             make_item("a", "2024-01-05", {}, geometry=far_bowtie), _AOI
         )
 
+    def test_an_out_of_range_footprint_is_shifted_into_range_and_kept(self):
+        """A 0-360-convention footprint over the AOI is normalised, then kept."""
+        # 180.5..181.5 is -179.5..-178.5, which is inside this antimeridian half
+        half = box(-180.0, -1.0, -170.0, 1.0)
+        item = make_item(
+            "a", "2024-01-05", {}, geometry=make_bbox_geometry(180.5, -0.5, 181.5, 0.5)
+        )
+        assert _covers_aoi(item, half)
+
+    def test_an_out_of_range_footprint_away_from_the_aoi_is_dropped(self):
+        """Normalising is not an exemption: a Pacific scene loses a European AOI.
+
+        Exempting out-of-range footprints from the screen instead would keep this
+        one, let it consume the item cap and have it fetched for nothing.
+        """
+        pacific = make_bbox_geometry(200.0, 39.0, 210.0, 42.0)
+        item = make_item("a", "2024-01-05", {}, geometry=pacific)
+        assert not _covers_aoi(item, _AOI)
+
+    def test_a_shifted_footprint_that_still_misses_is_dropped(self):
+        """A shift that lands the footprint elsewhere does not keep it."""
+        # -181.5..-180.5 shifts to 178.5..179.5, which misses this half entirely
+        half = box(-180.0, -1.0, -170.0, 1.0)
+        item = make_item(
+            "a",
+            "2024-01-05",
+            {},
+            geometry=make_bbox_geometry(-181.5, -0.5, -180.5, 0.5),
+        )
+        assert not _covers_aoi(item, half)
+
+    def test_a_footprint_straddling_180_is_judged_where_it_lies(self):
+        """A straddling footprint is matched by the half its in-range part covers."""
+        straddling = make_bbox_geometry(178.5, -0.5, 181.5, 0.5)
+        item = make_item("a", "2024-01-05", {}, geometry=straddling)
+        # its in-range part (178.5..180) covers the eastern half
+        assert _covers_aoi(item, box(170.0, -1.0, 180.0, 1.0))
+        # the western half is served by that same item through the eastern bbox,
+        # so no shift is attempted for a footprint that is partly in range
+        assert not _covers_aoi(item, box(-180.0, -1.0, -170.0, 1.0))
+
     @pytest.mark.parametrize(
-        ("name", "bounds"),
+        ("name", "geometry"),
         [
-            ("wholly beyond 180", (180.5, -0.5, 181.5, 0.5)),
-            ("wholly below -180", (-181.5, -0.5, -180.5, 0.5)),
-            ("straddling 180", (178.5, -0.5, 181.5, 0.5)),
+            ("far point", {"type": "Point", "coordinates": (10.0, 10.0)}),
+            (
+                "far line",
+                {"type": "LineString", "coordinates": [(10.0, 10.0), (12.0, 12.0)]},
+            ),
+            ("far polygon", _MISSING),
+            ("no geometry", None),
         ],
     )
-    def test_a_footprint_outside_the_lon_range_is_kept(self, name, bounds):
-        """An unnormalised longitude keeps the item rather than losing it."""
-        # the antimeridian AOI halves are normalised, so a footprint at 181.5
-        # (where RFC 7946 wants -178.5) intersects neither half
-        half = box(-180.0, -1.0, -170.0, 1.0)
-        item = make_item("a", "2024-01-05", {}, geometry=make_bbox_geometry(*bounds))
-        assert _covers_aoi(item, half)
+    def test_a_zero_floor_keeps_everything(self, name, geometry):
+        """min_overlap_fraction=0 is an off-switch for every footprint shape."""
+        item = make_item("a", "2024-01-05", {}, geometry=geometry)
+        assert _covers_aoi(item, _AOI, 0.0)
 
     def test_coverage_floor_is_a_small_fraction(self):
         """The default floor excludes slivers without excluding partial tiles."""
@@ -257,11 +299,10 @@ class TestCoversAoi:
         assert shape(empty).is_empty
         assert _covers_aoi(make_item("a", "2024-01-05", {}, geometry=empty), _AOI)
 
-    def test_an_empty_footprint_is_caught_by_the_longitude_guard(self):
-        """An empty geometry's nan bounds are what keep it, before any measuring."""
+    def test_an_empty_footprint_survives_normalisation_and_is_kept(self):
+        """An empty geometry's nan bounds shift nowhere, and _overlaps keeps it."""
         empty = shape({"type": "Polygon", "coordinates": []})
-        assert not _has_normalised_longitudes(empty)
-        # and _overlaps would keep it too, so either route gives the same answer
+        assert _normalise_longitudes(empty) is empty
         assert _overlaps(empty, _AOI, _MIN_OVERLAP_FRACTION)
 
     def test_multipolygon_footprint_is_measured_as_a_whole(self):
@@ -571,6 +612,24 @@ class TestSearchScreensByFootprint:
         written = stac._fetch(stac._search())
         assert len(written) == 1
         assert fake_pyramids.merge_calls[0][0] == ["https://h/1.tif"]
+
+    def test_an_out_of_range_footprint_does_not_starve_the_covering_scene(
+        self, fake_pyramids, tmp_path
+    ):
+        """A Pacific scene must not consume max_items=1 over a European AOI."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item(
+                "pacific",
+                "2024-01-05",
+                {"B04": "https://h/p.tif"},
+                geometry=make_bbox_geometry(200.0, 39.0, 210.0, 42.0),
+            ),
+            make_item(
+                "covering", "2024-01-06", {"B04": "https://h/c.tif"}, geometry=_COVERING
+            ),
+        ]
+        products = _build_stac(tmp_path, max_items=1)._search()
+        assert [p.id for p in products] == ["covering"]
 
     def test_an_empty_api_result_does_not_raise(self, fake_pyramids, tmp_path):
         """A search the API matched nothing for returns no products without raising."""
