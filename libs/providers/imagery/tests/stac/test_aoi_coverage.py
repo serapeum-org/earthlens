@@ -450,6 +450,26 @@ class TestSearchScreensByFootprint:
         )._search()
         assert [p.id for p in products] == ["t0", "t1", "t2", "t3", "t4"]
 
+    def test_the_fetch_path_runs_with_a_real_footprint(self, fake_pyramids, tmp_path):
+        """A full search-and-fetch works on an item carrying a genuine footprint.
+
+        The older fetch-path tests all build geometry-less items, so without this
+        the whole write path is only ever exercised through the keep-on-missing
+        branch rather than through a footprint the screen actually measures.
+        """
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item(
+                "with-footprint",
+                "2024-01-05",
+                {"B04": "https://h/1.tif"},
+                geometry=_COVERING,
+            )
+        ]
+        stac = _build_stac(tmp_path)
+        written = stac._fetch(stac._search())
+        assert len(written) == 1
+        assert fake_pyramids.merge_calls[0][0] == ["https://h/1.tif"]
+
     def test_an_empty_api_result_does_not_raise(self, fake_pyramids, tmp_path):
         """A search the API matched nothing for returns no products without raising."""
         fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = []
