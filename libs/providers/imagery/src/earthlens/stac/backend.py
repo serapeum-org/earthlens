@@ -972,7 +972,10 @@ def _has_normalised_longitudes(footprint: Any) -> bool:
 
     Returns:
         True when the footprint's x bounds are inside `[-180, 180]`, i.e. it can
-        meaningfully be compared with a normalised AOI bbox.
+        meaningfully be compared with a normalised AOI bbox. An empty geometry's
+        bounds are `(nan, nan, nan, nan)` and every comparison against `nan` is
+        False, so an empty footprint also reports False here and is kept by the
+        caller — the same outcome `_overlaps` would give it.
     """
     min_x, _, max_x, _ = footprint.bounds
     return bool(min_x >= -180.0 and max_x <= 180.0)

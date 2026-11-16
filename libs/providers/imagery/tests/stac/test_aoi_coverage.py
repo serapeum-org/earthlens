@@ -16,6 +16,8 @@ from earthlens.stac.backend import (
     _MIN_CANDIDATE_POOL,
     _MIN_OVERLAP_FRACTION,
     _covers_aoi,
+    _has_normalised_longitudes,
+    _overlaps,
 )
 
 from .conftest import make_bbox_geometry, make_item
@@ -146,6 +148,32 @@ class TestCoversAoi:
         assert not shape(bowtie).is_valid
         assert _covers_aoi(make_item("a", "2024-01-05", {}, geometry=bowtie), _AOI)
 
+    def test_an_invalid_footprint_grazing_the_aoi_is_dropped_after_repair(self):
+        """The repair is what judges this one; without it the item would be kept.
+
+        An invalid ring's area cancels to 0, so unrepaired it reaches the
+        zero-area rule, `intersects` is True and the scene is kept. Repaired it
+        has a real area of 1.0 and an overlap of 5e-11, far under the floor.
+        """
+        grazing_bowtie = {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    (-3.00001, 40.0),
+                    (-1.0, 41.0),
+                    (-3.00001, 41.0),
+                    (-1.0, 40.0),
+                    (-3.00001, 40.0),
+                ]
+            ],
+        }
+        raw = shape(grazing_bowtie)
+        assert not raw.is_valid
+        assert raw.area == 0
+        assert raw.intersects(_AOI)
+        item = make_item("a", "2024-01-05", {}, geometry=grazing_bowtie)
+        assert not _covers_aoi(item, _AOI)
+
     def test_a_self_intersecting_footprint_away_from_the_aoi_is_dropped(self):
         """Repairing an invalid ring still lets a non-overlapping one be dropped."""
         far_bowtie = {
@@ -229,6 +257,13 @@ class TestCoversAoi:
         empty = {"type": "Polygon", "coordinates": []}
         assert shape(empty).is_empty
         assert _covers_aoi(make_item("a", "2024-01-05", {}, geometry=empty), _AOI)
+
+    def test_an_empty_footprint_is_caught_by_the_longitude_guard(self):
+        """An empty geometry's nan bounds are what keep it, before any measuring."""
+        empty = shape({"type": "Polygon", "coordinates": []})
+        assert not _has_normalised_longitudes(empty)
+        # and _overlaps would keep it too, so either route gives the same answer
+        assert _overlaps(empty, _AOI, _MIN_OVERLAP_FRACTION)
 
     def test_multipolygon_footprint_is_measured_as_a_whole(self):
         """A split footprint counts the total area it shares with the AOI."""
