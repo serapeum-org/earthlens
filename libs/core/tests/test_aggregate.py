@@ -41,6 +41,7 @@ from earthlens.aggregate import (
     _output_stem,
     _read_time_axis,
     _read_window,
+    _reduce_window,
     _resolve_op,
     _resolve_pressure_level,
     aggregate_netcdf,
@@ -630,6 +631,94 @@ class TestReduce:
         """Reduction collapses axis 0; the remaining shape passes through."""
         arr = np.zeros((4, 3, 5))
         result = reduce_time_axis(arr, op="mean", skipna=True, min_count=None)
+        assert result.shape == (3, 5), f"Expected (3, 5), got {result.shape}"
+
+
+class TestReduceWindow:
+    """Tests for `_reduce_window`, the per-window pyramids `reduce` delegation."""
+
+    @pytest.fixture(scope="class")
+    def geo_ref(self) -> GeoReference:
+        """A trivial 1-degree georeference; the reduction ignores it."""
+        return GeoReference(geo=(0.0, 1.0, 0.0, 0.0, 0.0, -1.0), epsg=4326)
+
+    @pytest.fixture(scope="class")
+    def window(self) -> np.ndarray:
+        """A (time=4, y=1, x=3) window: a full pixel, a 2-valid pixel, an all-gap pixel."""
+        return np.array(
+            [
+                [[1.0, 1.0, np.nan]],
+                [[2.0, np.nan, np.nan]],
+                [[3.0, np.nan, np.nan]],
+                [[4.0, 4.0, np.nan]],
+            ]
+        )
+
+    @pytest.mark.parametrize("op", ["mean", "min", "max", "std"])
+    @pytest.mark.parametrize("skipna", [True, False])
+    @pytest.mark.parametrize("min_count", [None, 2])
+    def test_matches_legacy_numpy_reducer(self, window, geo_ref, op, skipna, min_count):
+        """Delegated mean/min/max/std reproduce the legacy numpy reducer exactly."""
+        delegated = _reduce_window(
+            window, op, skipna=skipna, min_count=min_count, geo_ref=geo_ref
+        )
+        legacy = reduce_time_axis(window, op=op, skipna=skipna, min_count=min_count)
+        np.testing.assert_allclose(
+            delegated,
+            legacy,
+            equal_nan=True,
+            err_msg=f"{op} (skipna={skipna}, min_count={min_count}) diverged from numpy",
+        )
+
+    @pytest.mark.parametrize("skipna", [True, False])
+    @pytest.mark.parametrize("min_count", [None, 2])
+    def test_sum_matches_legacy_on_sampled_pixels(
+        self, window, geo_ref, skipna, min_count
+    ):
+        """Delegated sum matches numpy wherever a pixel has at least one valid sample."""
+        delegated = _reduce_window(
+            window, "sum", skipna=skipna, min_count=min_count, geo_ref=geo_ref
+        )
+        legacy = reduce_time_axis(window, op="sum", skipna=skipna, min_count=min_count)
+        np.testing.assert_allclose(
+            delegated[0, :2],
+            legacy[0, :2],
+            equal_nan=True,
+            err_msg=f"sampled-pixel sum diverged (skipna={skipna}, min_count={min_count})",
+        )
+
+    def test_sum_all_gap_window_is_nodata_not_zero(self, geo_ref):
+        """An all-gap sum window resolves to no-data, not the numpy 0.0 (intended change)."""
+        all_gap = np.full((3, 1, 1), np.nan)
+        delegated = _reduce_window(
+            all_gap, "sum", skipna=True, min_count=None, geo_ref=geo_ref
+        )
+        legacy = reduce_time_axis(all_gap, op="sum", skipna=True, min_count=None)
+        assert np.isnan(delegated[0, 0]), (
+            f"all-gap sum should be no-data under pyramids reduce, got {delegated[0, 0]}"
+        )
+        assert legacy[0, 0] == pytest.approx(0.0), (
+            f"legacy numpy nansum should still give 0.0 for all-gap, got {legacy[0, 0]}"
+        )
+
+    def test_min_count_masks_under_sampled_pixel(self, window, geo_ref):
+        """With min_count=2 the 2-valid pixel survives and the all-gap pixel is no-data."""
+        result = _reduce_window(
+            window, "mean", skipna=True, min_count=2, geo_ref=geo_ref
+        )
+        assert result[0, 1] == pytest.approx(2.5), (
+            f"2-valid pixel should survive min_count=2, got {result[0, 1]}"
+        )
+        assert np.isnan(result[0, 2]), (
+            f"all-gap pixel should be no-data under min_count=2, got {result[0, 2]}"
+        )
+
+    def test_collapses_time_axis_to_two_d_grid(self, geo_ref):
+        """The reduction drops the time axis and returns a 2-D (y, x) grid."""
+        window = np.zeros((4, 3, 5))
+        result = _reduce_window(
+            window, "mean", skipna=True, min_count=None, geo_ref=geo_ref
+        )
         assert result.shape == (3, 5), f"Expected (3, 5), got {result.shape}"
 
 

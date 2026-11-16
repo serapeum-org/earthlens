@@ -39,7 +39,7 @@ _skip_without_creds = pytest.mark.skipif(
 #: erroring, mirroring the eedai/creds guards.
 _skip_without_dask = pytest.mark.skipif(
     importlib.util.find_spec("dask") is None,
-    reason="client-side EEDAI reduce needs pyramids-core[lazy] (dask)",
+    reason="client-side EEDAI reduce needs the pyramids-lazy plugin (dask)",
 )
 
 
