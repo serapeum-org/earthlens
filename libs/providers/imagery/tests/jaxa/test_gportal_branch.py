@@ -294,27 +294,123 @@ def test_gportal_http_503_raises_typed_unavailable(
 
 @pytest.mark.jaxa
 @pytest.mark.integration
-def test_gportal_html_body_jsondecode_raises_typed_unavailable(
+def test_gportal_html_body_jsondecode_transient_when_probe_cannot_confirm(
     monkeypatch, tmp_path, extents, configured_auth
 ) -> None:
-    """A JSONDecodeError (HTML body, non-error status) becomes a typed error with no status."""
+    """A JSONDecodeError stays a transient outage when the probe cannot confirm retirement."""
     import requests
+
+    from earthlens.jaxa import _gportal
 
     _fake_gportal_raising(
         monkeypatch,
         requests.exceptions.JSONDecodeError("Expecting value", "<html>", 0),
     )
+    # Probe cannot reach the host (returns None) -> the ambiguous HTML body is
+    # classified as a transient outage, not a confirmed retirement.
+    monkeypatch.setattr(_gportal, "_probe_search_endpoint_status", lambda: None)
     space, time = extents
     ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
-    from earthlens.jaxa import GportalUnavailableError
-    from earthlens.jaxa._gportal import fetch_gportal
+    from earthlens.jaxa import GportalEndpointRetiredError, GportalUnavailableError
 
-    with pytest.raises(GportalUnavailableError, match="G-Portal") as excinfo:
-        fetch_gportal(
+    with pytest.raises(GportalUnavailableError, match="down or throttling") as excinfo:
+        _gportal.fetch_gportal(
             dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
         )
+    assert not isinstance(excinfo.value, GportalEndpointRetiredError)
     assert excinfo.value.status_code is None
     assert isinstance(excinfo.value.__cause__, requests.exceptions.JSONDecodeError)
+
+
+@pytest.mark.jaxa
+@pytest.mark.integration
+def test_gportal_search_retired_endpoint_raises_retired_error(
+    monkeypatch, tmp_path, extents, configured_auth
+) -> None:
+    """A JSONDecodeError plus a permanent-redirect probe becomes GportalEndpointRetiredError."""
+    import requests
+
+    from earthlens.jaxa import _gportal
+
+    _fake_gportal_raising(
+        monkeypatch,
+        requests.exceptions.JSONDecodeError("Expecting value", "<html>", 0),
+    )
+    # The no-redirect probe sees the 301 the retired /csw/csw endpoint sends to
+    # the portal landing page -> the search is gone, not transiently down.
+    monkeypatch.setattr(_gportal, "_probe_search_endpoint_status", lambda: 301)
+    space, time = extents
+    ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
+    from earthlens.jaxa import GportalEndpointRetiredError, GportalUnavailableError
+
+    with pytest.raises(GportalEndpointRetiredError, match="no longer") as excinfo:
+        _gportal.fetch_gportal(
+            dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
+        )
+    assert isinstance(excinfo.value, GportalUnavailableError)
+    assert excinfo.value.status_code == 301
+    assert "#1415" in str(excinfo.value)
+    assert isinstance(excinfo.value.__cause__, requests.exceptions.JSONDecodeError)
+
+
+@pytest.mark.jaxa
+@pytest.mark.integration
+def test_gportal_search_live_endpoint_stays_transient(
+    monkeypatch, tmp_path, extents, configured_auth
+) -> None:
+    """A JSONDecodeError stays transient when the probe finds the service URL alive (200)."""
+    import requests
+
+    from earthlens.jaxa import _gportal
+
+    _fake_gportal_raising(
+        monkeypatch,
+        requests.exceptions.JSONDecodeError("Expecting value", "<html>", 0),
+    )
+    # The service URL answers 200 (no redirect) -> the endpoint exists; the
+    # parse failure was a transient blip, not a retirement.
+    monkeypatch.setattr(_gportal, "_probe_search_endpoint_status", lambda: 200)
+    space, time = extents
+    ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
+    from earthlens.jaxa import GportalEndpointRetiredError, GportalUnavailableError
+
+    with pytest.raises(GportalUnavailableError, match="down or throttling") as excinfo:
+        _gportal.fetch_gportal(
+            dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
+        )
+    assert not isinstance(excinfo.value, GportalEndpointRetiredError)
+
+
+@pytest.mark.jaxa
+@pytest.mark.integration
+def test_gportal_search_5xx_does_not_probe(
+    monkeypatch, tmp_path, extents, configured_auth
+) -> None:
+    """A 5xx carries a status, so it is classified transient without probing the endpoint."""
+    import requests
+
+    from earthlens.jaxa import _gportal
+
+    resp = type("_Resp", (), {"status_code": 503})()
+    _fake_gportal_raising(
+        monkeypatch,
+        requests.HTTPError("503 Server Error: Service Unavailable", response=resp),
+    )
+
+    def _probe_must_not_run() -> int | None:
+        raise AssertionError("the endpoint probe must not run for a 5xx failure")
+
+    monkeypatch.setattr(_gportal, "_probe_search_endpoint_status", _probe_must_not_run)
+    space, time = extents
+    ds = Dataset(key="sgli", protocol="gportal", short_name="10003001")
+    from earthlens.jaxa import GportalEndpointRetiredError, GportalUnavailableError
+
+    with pytest.raises(GportalUnavailableError, match="down or throttling") as excinfo:
+        _gportal.fetch_gportal(
+            dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
+        )
+    assert not isinstance(excinfo.value, GportalEndpointRetiredError)
+    assert excinfo.value.status_code == 503
 
 
 @pytest.mark.jaxa
@@ -405,6 +501,62 @@ def test_gportal_download_local_oserror_is_not_relabelled(
             dataset=ds, space=space, time=time, auth=configured_auth, out_dir=tmp_path
         )
     assert excinfo.type is OSError
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_probe_search_endpoint_status_reads_status_without_following_redirects(
+    monkeypatch,
+) -> None:
+    """The probe HEADs the service URL with redirects off and returns the raw status."""
+    import requests
+
+    from earthlens.jaxa import _gportal
+
+    fake = types.ModuleType("gportal")
+    fake.http_client = types.SimpleNamespace(  # type: ignore[attr-defined]
+        BASE_URL="https://gportal.jaxa.jp/"
+    )
+    monkeypatch.setitem(sys.modules, "gportal", fake)
+    monkeypatch.setitem(sys.modules, "gportal.http_client", fake.http_client)
+
+    captured: dict = {}
+
+    def _head(url, params=None, allow_redirects=True, timeout=None):
+        captured.update(
+            url=url, params=params, allow_redirects=allow_redirects, timeout=timeout
+        )
+        return type("_Resp", (), {"status_code": 301})()
+
+    monkeypatch.setattr(requests, "head", _head)
+    assert _gportal._probe_search_endpoint_status() == 301
+    assert captured["url"] == "https://gportal.jaxa.jp/csw/csw"
+    assert captured["allow_redirects"] is False
+    assert captured["params"]["request"] == "GetCapabilities"
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+def test_probe_search_endpoint_status_returns_none_on_transport_failure(
+    monkeypatch,
+) -> None:
+    """The probe returns None (treat as transient) when it cannot reach the host."""
+    import requests
+
+    from earthlens.jaxa import _gportal
+
+    fake = types.ModuleType("gportal")
+    fake.http_client = types.SimpleNamespace(  # type: ignore[attr-defined]
+        BASE_URL="https://gportal.jaxa.jp/"
+    )
+    monkeypatch.setitem(sys.modules, "gportal", fake)
+    monkeypatch.setitem(sys.modules, "gportal.http_client", fake.http_client)
+
+    def _head(*a, **k):
+        raise requests.ConnectionError("boom")
+
+    monkeypatch.setattr(requests, "head", _head)
+    assert _gportal._probe_search_endpoint_status() is None
 
 
 @pytest.mark.jaxa
