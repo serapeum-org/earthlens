@@ -41,6 +41,11 @@ _ROTATED_BBOX_HIT_GEOMETRY_MISS = {
 }
 
 
+def _raise_api_error(**kwargs):
+    """Stand in for a client whose search fails part-way through."""
+    raise RuntimeError("API down")
+
+
 def _build_stac(tmp_path, **kwargs):
     """Construct a STAC backend over the standard test AOI."""
     return STAC(
@@ -641,6 +646,37 @@ class TestSearchScreensByFootprint:
         ]
         products = _build_stac(tmp_path, max_items=1)._search()
         assert [p.id for p in products] == ["covering"]
+
+    def test_budget_exhaustion_is_not_recorded_as_nothing_covering(
+        self, fake_pyramids, tmp_path
+    ):
+        """A truncated search never established that nothing covers the AOI."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item(
+                f"m{n}", "2024-01-05", {"B04": "https://h/x.tif"}, geometry=_MISSING
+            )
+            for n in range(12)
+        ]
+        stac = _build_stac(tmp_path, max_items=1, max_candidates=10)
+        stac._search()
+        assert stac._budget_exhausted
+        assert stac._screened_out is False
+
+    def test_a_failed_search_leaves_no_stale_verdict(self, fake_pyramids, tmp_path):
+        """A search that raises part-way must not keep the previous call's answer."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item(
+                "miss", "2024-01-05", {"B04": "https://h/1.tif"}, geometry=_MISSING
+            )
+        ]
+        stac = _build_stac(tmp_path)
+        stac._search()
+        assert stac._screened_out is True
+        fake_pyramids.client.search = _raise_api_error
+        with pytest.raises(RuntimeError, match="API down"):
+            stac._search()
+        assert stac._screened_out is False
+        assert stac._budget_exhausted == []
 
     def test_an_empty_api_result_does_not_raise(self, fake_pyramids, tmp_path):
         """A search the API matched nothing for returns no products without raising."""
