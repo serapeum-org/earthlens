@@ -621,3 +621,35 @@ class TestListingReuse:
         )
         assert [f["id"].iloc[0] for f in frames] == ["EP122026"]
         assert base not in getter.calls
+
+
+class TestParseWarningLogged:
+    """A skipped parse failure surfaces as a WARNING, not silently (L3)."""
+
+    def test_parse_failure_logs_warning(self, monkeypatch, caplog):
+        """The log-and-skip path emits a warning naming the file and cause."""
+        import logging
+
+        from loguru import logger as _loguru_logger
+
+        base = nhc.BTK_BASE_URL
+        listing = '<a href="bep112026.dat">bep112026.dat</a>'
+        getter = _FakeGetter(
+            {
+                base: _FakeResponse(listing),
+                f"{base}bep112026.dat": _FakeResponse("anything"),
+            }
+        )
+        monkeypatch.setattr(nhc, "parse_btk_file", _parse_failing_for_ep11)
+        handler_id = _loguru_logger.add(
+            lambda msg: logging.getLogger().warning(msg.record["message"])
+        )
+        try:
+            with caplog.at_level(logging.WARNING):
+                frames = nhc.fetch_btk_frames("east_pacific", [2026], get=getter)
+        finally:
+            _loguru_logger.remove(handler_id)
+        assert frames == []
+        joined = " ".join(record.message for record in caplog.records)
+        assert "bep112026.dat" in joined
+        assert "could not be parsed" in joined
