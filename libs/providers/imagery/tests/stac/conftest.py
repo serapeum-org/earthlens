@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import sys
 import types
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
@@ -20,12 +21,22 @@ import pytest
 
 
 class _FakeAsset:
-    """A STAC asset stand-in carrying an href and optional `alternate` mirrors."""
+    """A STAC asset stand-in carrying an href and optional `alternate` mirrors.
+
+    The mirrors live in `extra_fields`, which is where `pystac.Asset` keeps
+    extension fields and the only place `pyramids.stac` looks on a non-dict asset
+    (`_item.asset_field`: a raw dict's top-level key, else `asset.extra_fields`).
+    An `alternate` attribute is never consulted, so modelling it as one would make
+    the fake honour a spelling the real resolver ignores.
+    """
 
     def __init__(self, href: str, alternate: dict[str, str] | None = None) -> None:
         self.href = href
+        self.extra_fields: dict[str, Any] = {}
         if alternate is not None:
-            self.alternate = {k: {"href": v} for k, v in alternate.items()}
+            self.extra_fields["alternate"] = {
+                k: {"href": v} for k, v in alternate.items()
+            }
 
 
 class _FakeItem:
@@ -265,6 +276,19 @@ class _PlanetaryComputerSigner(_AnonymousSigner):
         return href + "?sas=token"
 
 
+def _asset_field(asset: Any, key: str) -> Any:
+    """Read an extension field the way `pyramids.stac._item.asset_field` does.
+
+    A raw dict carries extension fields as top-level keys; a `pystac.Asset` keeps
+    them in `extra_fields`. Nothing reads an attribute of that name, so neither
+    does this.
+    """
+    if isinstance(asset, Mapping):
+        return asset.get(key)
+    extra = getattr(asset, "extra_fields", None)
+    return extra.get(key) if isinstance(extra, Mapping) else None
+
+
 def _resolved_href(
     item_or_asset: Any,
     asset_key: Any = None,
@@ -294,9 +318,7 @@ def _resolved_href(
         href = asset.get("href")
     if href is None:
         raise KeyError(f"asset {asset_key!r} has no 'href'")
-    alternates = getattr(asset, "alternate", None)
-    if alternates is None and isinstance(asset, dict):
-        alternates = asset.get("alternate")
+    alternates = _asset_field(asset, "alternate")
     for key in (alternate,) if isinstance(alternate, str) else (alternate or ()):
         entry = (alternates or {}).get(key)
         mirror = entry.get("href") if isinstance(entry, dict) else None
