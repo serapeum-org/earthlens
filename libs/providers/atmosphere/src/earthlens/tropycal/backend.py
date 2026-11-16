@@ -218,45 +218,15 @@ class TropicalCyclone(AbstractDataSource):
                 a basin NHC does not serve operationally.
             TypeError: If `variables` is a mapping rather than a list.
         """
-        if file_format not in _DRIVERS:
-            raise ValueError(
-                f"file_format must be one of {sorted(_DRIVERS)}, got {file_format!r}."
-            )
-        # nhc_btk ignores source (rows are stamped "nhc"), but accept "nhc" as
-        # a no-op so a user who reads that the rows carry source="nhc" can pass
-        # it back without hitting the reanalysis-source validation.
-        if source not in _SOURCES and not (product == "nhc_btk" and source == "nhc"):
-            raise ValueError(
-                f"source must be one of {list(_SOURCES)}, got {source!r}. "
-                "tropycal 1.4 has no 'jtwc' source."
-            )
-        if geometry not in ("point", "track"):
-            raise ValueError(f"geometry must be 'point' or 'track', got {geometry!r}.")
-        if product not in _PRODUCTS:
-            raise ValueError(
-                f"product must be one of {list(_PRODUCTS)}, got {product!r}."
-            )
-        if recon_product not in _RECON_PRODUCTS:
-            raise ValueError(
-                f"recon_product must be one of {list(_RECON_PRODUCTS)}, got "
-                f"{recon_product!r}."
-            )
-        if isinstance(variables, dict):
-            raise TypeError(
-                "TropicalCyclone `variables` must be a list (basin codes for "
-                "product='besttrack', storm identifiers for product='recon'), "
-                "not a mapping."
-            )
-        if product in _STORM_KEYED and not list(variables):
-            raise ValueError(
-                f"product={product!r} is storm-keyed: `variables` must list "
-                "at least one storm identifier (e.g. ['AL092022'])."
-            )
-        if product == "ships" and not ships_time:
-            raise ValueError(
-                "product='ships' needs ships_time=<forecast-init datetime> "
-                "(e.g. '2022-09-27 00:00'); SHIPS guidance is per cycle."
-            )
+        self._validate_arguments(
+            file_format=file_format,
+            source=source,
+            geometry=geometry,
+            product=product,
+            recon_product=recon_product,
+            variables=variables,
+            ships_time=ships_time,
+        )
         self._source = source
         self._geometry: Geometry = geometry
         self._min_category = min_category
@@ -300,6 +270,76 @@ class TropicalCyclone(AbstractDataSource):
                     f"{sorted(nhc.NHC_BTK_BASINS)} (the NHC operational "
                     f"basins); got unknown basin(s) {unknown}."
                 )
+
+    @staticmethod
+    def _validate_arguments(
+        *,
+        file_format: str,
+        source: str,
+        geometry: str,
+        product: str,
+        recon_product: str,
+        variables: list[str],
+        ships_time: str | None,
+    ) -> None:
+        """Validate the constructor arguments, raising on the first bad one.
+
+        Extracted from `__init__` so the constructor stays simple; the checks
+        are unchanged. `nhc_btk` ignores `source` (rows are stamped `"nhc"`)
+        but accepts `"nhc"` as a no-op so the stamped value can be passed back.
+
+        Args:
+            file_format: The requested output format.
+            source: The requested data source.
+            geometry: The requested geometry mode.
+            product: The requested product.
+            recon_product: The requested recon sub-product.
+            variables: The raw `variables` argument (basins or storm ids).
+            ships_time: The SHIPS forecast-init cycle, if any.
+
+        Raises:
+            ValueError: If `file_format`, `source`, `geometry`, `product`, or
+                `recon_product` is not recognised; if a storm-keyed product
+                is given an empty `variables`; or if `product="ships"` is
+                given no `ships_time`.
+            TypeError: If `variables` is a mapping rather than a list.
+        """
+        if file_format not in _DRIVERS:
+            raise ValueError(
+                f"file_format must be one of {sorted(_DRIVERS)}, got {file_format!r}."
+            )
+        if source not in _SOURCES and not (product == "nhc_btk" and source == "nhc"):
+            raise ValueError(
+                f"source must be one of {list(_SOURCES)}, got {source!r}. "
+                "tropycal 1.4 has no 'jtwc' source."
+            )
+        if geometry not in ("point", "track"):
+            raise ValueError(f"geometry must be 'point' or 'track', got {geometry!r}.")
+        if product not in _PRODUCTS:
+            raise ValueError(
+                f"product must be one of {list(_PRODUCTS)}, got {product!r}."
+            )
+        if recon_product not in _RECON_PRODUCTS:
+            raise ValueError(
+                f"recon_product must be one of {list(_RECON_PRODUCTS)}, got "
+                f"{recon_product!r}."
+            )
+        if isinstance(variables, dict):
+            raise TypeError(
+                "TropicalCyclone `variables` must be a list (basin codes for "
+                "product='besttrack', storm identifiers for product='recon'), "
+                "not a mapping."
+            )
+        if product in _STORM_KEYED and not list(variables):
+            raise ValueError(
+                f"product={product!r} is storm-keyed: `variables` must list "
+                "at least one storm identifier (e.g. ['AL092022'])."
+            )
+        if product == "ships" and not ships_time:
+            raise ValueError(
+                "product='ships' needs ships_time=<forecast-init datetime> "
+                "(e.g. '2022-09-27 00:00'); SHIPS guidance is per cycle."
+            )
 
     def _check_input_dates(
         self,
