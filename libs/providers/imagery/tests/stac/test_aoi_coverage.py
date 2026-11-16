@@ -126,6 +126,30 @@ class TestCoversAoi:
         item = make_item("a", "2024-01-05", {}, geometry=tiny)
         assert _covers_aoi(item, continental)
 
+    def test_a_self_intersecting_footprint_overlapping_the_aoi_is_kept(self):
+        """An invalid ring is repaired and judged, not allowed to raise."""
+        bowtie = {
+            "type": "Polygon",
+            "coordinates": [
+                [(-4.5, 39.5), (-2.5, 41.5), (-4.5, 41.5), (-2.5, 39.5), (-4.5, 39.5)]
+            ],
+        }
+        assert not shape(bowtie).is_valid
+        assert _covers_aoi(make_item("a", "2024-01-05", {}, geometry=bowtie), _AOI)
+
+    def test_a_self_intersecting_footprint_away_from_the_aoi_is_dropped(self):
+        """Repairing an invalid ring still lets a non-overlapping one be dropped."""
+        far_bowtie = {
+            "type": "Polygon",
+            "coordinates": [
+                [(10.0, 10.0), (12.0, 12.0), (10.0, 12.0), (12.0, 10.0), (10.0, 10.0)]
+            ],
+        }
+        assert not shape(far_bowtie).is_valid
+        assert not _covers_aoi(
+            make_item("a", "2024-01-05", {}, geometry=far_bowtie), _AOI
+        )
+
     def test_coverage_floor_is_a_small_fraction(self):
         """The default floor excludes slivers without excluding partial tiles."""
         assert 0 < _MIN_OVERLAP_FRACTION < 0.01

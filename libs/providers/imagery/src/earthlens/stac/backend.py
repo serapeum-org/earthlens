@@ -28,6 +28,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
 from loguru import logger
+from shapely import make_valid
 from shapely.errors import ShapelyError
 from shapely.geometry import box, shape
 
@@ -836,19 +837,47 @@ def _covers_aoi(
         geometry = item.get("geometry")
     result = True
     if geometry:
+        # The parse and the overlay are both inside the guard. An unknown `type`
+        # raises ShapelyError (GeometryTypeError) and a missing `coordinates`
+        # raises KeyError at parse time, but a self-intersecting or non-noded ring
+        # -- common in real catalogs -- parses fine and raises GEOSException
+        # (also a ShapelyError) from `intersection`, which is the step most likely
+        # to throw. Neither should cost us a usable scene.
         try:
             footprint = shape(geometry)
+            if not footprint.is_valid:
+                # Repair before measuring, not only after a raise: a symmetric
+                # self-intersecting ring has an `area` that cancels to 0, so it
+                # would otherwise reach the zero-scale rule below and be kept
+                # without ever being judged.
+                footprint = make_valid(footprint)
+            result = _overlaps(footprint, aoi, min_fraction)
         except (AttributeError, KeyError, TypeError, ValueError, ShapelyError):
-            # An unknown `type` raises ShapelyError (GeometryTypeError), a missing
-            # `coordinates` raises KeyError, and a non-mapping raises
-            # AttributeError -- none of which should cost us a usable scene.
-            footprint = None
-        if footprint is not None and not footprint.is_empty:
-            # Scale by the smaller geometry so the measure does not invert for an
-            # AOI larger than one scene; see `_MIN_OVERLAP_FRACTION`. A zero-area
-            # AOI or footprint gives a zero floor, which keeps the item.
-            scale = min(aoi.area, footprint.area)
-            result = footprint.intersection(aoi).area >= min_fraction * scale
+            result = True
+    return result
+
+
+def _overlaps(footprint: Any, aoi: Any, min_fraction: float) -> bool:
+    """Return whether `footprint` shares enough area with `aoi` to be worth reading.
+
+    Args:
+        footprint: The item's footprint as a shapely geometry.
+        aoi: The AOI as a shapely geometry.
+        min_fraction: Smallest share of the smaller geometry the intersection may
+            cover and still count.
+
+    Returns:
+        True when the intersection covers at least `min_fraction` of whichever of
+        the two geometries is smaller, or when the footprint is empty (which
+        cannot be judged, so it is kept).
+    """
+    result = True
+    if not footprint.is_empty:
+        # Scale by the smaller geometry so the measure does not invert for an AOI
+        # larger than one scene; see `_MIN_OVERLAP_FRACTION`. A zero-area AOI or
+        # footprint gives a zero floor, which keeps the item.
+        scale = min(aoi.area, footprint.area)
+        result = footprint.intersection(aoi).area >= min_fraction * scale
     return result
 
 
