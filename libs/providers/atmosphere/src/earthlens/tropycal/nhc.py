@@ -72,7 +72,7 @@ class _HttpResponse(Protocol):
         """The response body as text."""
         ...
 
-    def raise_for_status(self) -> object:
+    def raise_for_status(self) -> None:
         """Raise for an error status (return value unused)."""
         ...
 
