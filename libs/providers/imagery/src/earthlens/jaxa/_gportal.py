@@ -59,8 +59,10 @@ _NOT_FOUND_GONE_STATUSES = frozenset({404, 410})
 #: lands on.
 _PERMANENTLY_GONE_STATUSES = _REDIRECT_GONE_STATUSES | _NOT_FOUND_GONE_STATUSES
 
-#: Path of the CSW `GetCapabilities` service, relative to the SDK's `BASE_URL`.
-_CSW_SEARCH_PATH = "csw/csw"
+#: CSW service path, root-absolute to match the SDK's own `http_client.get`
+#: (`"/csw/csw"`) exactly — so the probe and the search `urljoin` to the same
+#: URL even if `BASE_URL` ever carries a path segment.
+_CSW_SEARCH_PATH = "/csw/csw"
 
 #: The lightest request that proves the CSW service still exists.
 _CSW_CAPABILITIES_PARAMS = {

@@ -566,6 +566,34 @@ def test_probe_search_endpoint_status_reads_status_without_following_redirects(
 
 @pytest.mark.jaxa
 @pytest.mark.unit
+def test_probe_search_endpoint_status_matches_sdk_path_under_base_with_segment(
+    monkeypatch,
+) -> None:
+    """The probe resolves the same root-absolute /csw/csw the SDK hits, even if BASE_URL has a path."""
+    import requests
+
+    from earthlens.jaxa import _gportal
+
+    fake = types.ModuleType("gportal")
+    fake.http_client = types.SimpleNamespace(  # type: ignore[attr-defined]
+        BASE_URL="https://gportal.jaxa.jp/api/"
+    )
+    monkeypatch.setitem(sys.modules, "gportal", fake)
+    monkeypatch.setitem(sys.modules, "gportal.http_client", fake.http_client)
+
+    captured: dict = {}
+
+    def _head(url, params=None, allow_redirects=True, timeout=None):
+        captured["url"] = url
+        return type("_Resp", (), {"status_code": 301})()
+
+    monkeypatch.setattr(requests, "head", _head)
+    _gportal._probe_search_endpoint_status()
+    assert captured["url"] == "https://gportal.jaxa.jp/csw/csw"
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
 def test_probe_search_endpoint_status_returns_none_on_transport_failure(
     monkeypatch,
 ) -> None:
