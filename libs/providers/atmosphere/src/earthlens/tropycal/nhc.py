@@ -190,7 +190,18 @@ def fetch_btk_frames(
         )
         if text is None:
             continue
-        frame = parse_btk_file(text, storm_id=storm_id, basin=basin)
+        try:
+            frame = parse_btk_file(text, storm_id=storm_id, basin=basin)
+        except Exception as exc:  # noqa: BLE001
+            # Batch resilience (matches the fetch-failure path and the
+            # tropycal backend's season/storm policy): a storm file that
+            # cannot be parsed is logged with its exception type and skipped
+            # so the rest of the basin still returns.
+            logger.warning(
+                f"NHC btk file {name} could not be parsed: "
+                f"{type(exc).__name__}: {exc}"
+            )
+            continue
         if len(frame):
             frames.append(frame)
     return frames

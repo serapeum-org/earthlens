@@ -412,3 +412,44 @@ class TestFetchEmptyParse:
         frames = nhc.fetch_btk_frames("east_pacific", [2026], get=getter)
         assert [f["id"].iloc[0] for f in frames] == ["EP122026"]
         assert f"{base}bep112026.dat" in getter.calls
+
+
+_ORIG_PARSE = nhc.parse_btk_file
+
+
+def _parse_failing_for_ep11(text, *, storm_id, basin):
+    """Delegate to the real parser, but raise for storm EP112026 (test seam)."""
+    if storm_id == "EP112026":
+        raise ValueError("synthetic parse failure")
+    return _ORIG_PARSE(text, storm_id=storm_id, basin=basin)
+
+
+class TestFetchParseResilience:
+    """A storm file that fails to PARSE is skipped, like a fetch failure (M2)."""
+
+    def test_parse_error_is_skipped(self, monkeypatch):
+        """A parse exception for one file does not abort the basin's others."""
+        base = nhc.BTK_BASE_URL
+        listing = "".join(
+            f'<a href="{n}">{n}</a>\n' for n in ("bep112026.dat", "bep122026.dat")
+        )
+        good = _atcf_line(
+            time="2026090218",
+            lat="133N",
+            lon="1537W",
+            vmax=120,
+            mslp=940,
+            threshold=64,
+            radii=(30, 25, 20, 30),
+            name="LOWELL",
+        )
+        getter = _FakeGetter(
+            {
+                base: _FakeResponse(listing),
+                f"{base}bep112026.dat": _FakeResponse("anything"),
+                f"{base}bep122026.dat": _FakeResponse(good),
+            }
+        )
+        monkeypatch.setattr(nhc, "parse_btk_file", _parse_failing_for_ep11)
+        frames = nhc.fetch_btk_frames("east_pacific", [2026], get=getter)
+        assert [f["id"].iloc[0] for f in frames] == ["EP122026"]
