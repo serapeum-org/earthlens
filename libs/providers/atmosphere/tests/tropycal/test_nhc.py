@@ -25,12 +25,14 @@ def _atcf_line(
     prefix: str = "EP",
     number: str = "12",
     track_type: str = "BEST",
+    minute: str = "",
 ) -> str:
     """Build one comma-delimited ATCF best-track line with 28 fields."""
     fields = [""] * 28
     fields[0] = prefix
     fields[1] = number
     fields[2] = time
+    fields[3] = minute
     fields[4] = track_type
     fields[5] = "0"
     fields[6] = lat
@@ -559,3 +561,38 @@ class TestStormNameGate:
             expected: Whether it should count as a storm name.
         """
         assert nhc._is_storm_name(token) is expected
+
+
+class TestSubHourFix:
+    """Two BEST rows sharing a synoptic hour but differing by minute (L1)."""
+
+    def test_sub_hour_special_fix_kept_distinct(self):
+        """A :15 landfall fix is not folded into the :00 synoptic fix."""
+        synoptic = _atcf_line(
+            time="2026090212",
+            lat="150N",
+            lon="1600W",
+            vmax=130,
+            mslp=935,
+            threshold=34,
+            radii=(70, 50, 50, 70),
+            name="LOWELL",
+        )
+        landfall = _atcf_line(
+            time="2026090212",
+            minute="15",
+            lat="151N",
+            lon="1602W",
+            vmax=140,
+            mslp=927,
+            threshold=34,
+            radii=(80, 60, 60, 80),
+            name="LOWELL",
+        )
+        frame = nhc.parse_btk_file(
+            chr(10).join([synoptic, landfall]),
+            storm_id="EP122026",
+            basin="east_pacific",
+        )
+        assert len(frame) == 2
+        assert sorted(frame["vmax"].tolist()) == [130, 140]

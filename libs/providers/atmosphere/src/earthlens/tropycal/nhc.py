@@ -272,7 +272,7 @@ def parse_btk_file(text: str, *, storm_id: str, basin: str) -> pd.DataFrame:
         parts = [field.strip() for field in line.split(",")]
         if len(parts) < _MIN_FIELDS or parts[4] != "BEST":
             continue
-        time = _parse_time(parts[2])
+        time = _parse_time(parts[2], parts[3])
         if time is None:
             continue
 
@@ -359,17 +359,29 @@ def _get_text(
         return None
 
 
-def _parse_time(token: str) -> pd.Timestamp | None:
-    """Parse an ATCF `YYYYMMDDHH` UTC timestamp, or `None` when malformed."""
+def _parse_time(token: str, minute_token: str = "") -> pd.Timestamp | None:
+    """Parse an ATCF `YYYYMMDDHH` UTC timestamp plus the optional minute field.
+
+    Field 2 carries the synoptic hour; for `BEST` tracks field 3 may carry the
+    minute of a special (e.g. landfall / peak-intensity) fix, so folding on the
+    hour alone would merge such a fix into the synoptic one. The minute is
+    included in the timestamp when present and valid (`0 <= minute < 60`); a
+    missing or malformed minute is treated as `00`. A malformed date token
+    yields `None`.
+    """
     token = token.strip()
     if len(token) != 10 or not token.isdigit():
         return None
+    minute = _to_int(minute_token)
+    if minute is None or not 0 <= minute < 60:
+        minute = 0
     try:
         return pd.Timestamp(
             year=int(token[0:4]),
             month=int(token[4:6]),
             day=int(token[6:8]),
             hour=int(token[8:10]),
+            minute=minute,
         )
     except ValueError:
         return None
