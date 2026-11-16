@@ -1350,26 +1350,20 @@ def _reduce_whole_window(
     # EEDAI scene-time strings arrive slash-separated and offset-aware with
     # inconsistent sub-second precision -- some carry fractional seconds
     # ("2020/06/15 09:41:12.345000+00"), some do not ("2020/06/15 09:43:06+00")
-    # (shape confirmed against a live MODIS/Landsat read). A bare `pd.to_datetime`
-    # infers one format from the first element and then raises on the first that does
-    # not match it, so parse `format="mixed"`: the robust choice for this heterogeneous,
-    # non-strict-ISO shape -- the YYYY-first strings are unambiguous, so "mixed" cannot
-    # mis-order day/month. `utc=True` keeps the index from mixing aware/naive. The
-    # parsed index -- not the raw strings -- is handed to pyramids, whose `reduce_time`
-    # otherwise re-parses them the same bare way one frame down.
+    # (shape confirmed against a live MODIS/Landsat read). Parse them once with
+    # `format="mixed", utc=True` -- robust to that heterogeneous, non-strict-ISO
+    # shape -- and reuse the tz-aware index to size the window, anchor the bins,
+    # and feed `reduce_time` (so pyramids does not re-coerce them a frame down).
     index = pd.DatetimeIndex(pd.to_datetime(list(times), format="mixed", utc=True))
     span_days = int((index.max() - index.min()).days) + 1
-    # pyramids' `reduce_time` buckets with `pd.Grouper(freq)`, whose `{span_days}D`
-    # bins are anchored on the epoch, not on `index.min()`: a span-wide window is thus
-    # not guaranteed to be a single bin -- two timestamps straddling an epoch-anchored
-    # boundary split into two windows, and `reduced[0][1]` would silently drop every
-    # scene in the second. Shift the index so the earliest scene lands on the epoch, so
-    # every scene falls in the one `[epoch, epoch + span_days)` bin. The shift is a
-    # constant, so the median/mean value and the trend/sens_slope day-scaled x-axis
-    # (relative to the first timestamp) are unchanged. Tracked upstream in
-    # serapeum-org/pyramids-core#1510 (a `reduce_time(origin=)` would anchor it directly).
-    anchored = pd.Timestamp("1970-01-01", tz="UTC") + (index - index.min())
-    reduced = stack.reduce_time(list(anchored), freq=f"{span_days}D", op=op, q=q)
+    # Anchor the fixed-width bins on the earliest scene (`origin=`) so the whole
+    # span collapses into one `[min, min + span_days)` window. Without it the
+    # `{span_days}D` bins are epoch-anchored, and a span straddling a bin boundary
+    # would split in two -- `reduced[0][1]` would then silently drop every scene
+    # past the first bucket.
+    reduced = stack.reduce_time(
+        list(index), freq=f"{span_days}D", op=op, q=q, origin=index.min()
+    )
     return reduced[0][1]
 
 
