@@ -1343,7 +1343,7 @@ def _reduce_whole_window(
         The single reduced `Dataset`.
 
     Raises:
-        ValueError: If `times` is empty.
+        ValueError: If `times` is empty, or if any timestamp is unparseable.
     """
     if len(times) == 0:
         raise ValueError("whole-window reduction needs at least one timestep.")
@@ -1355,7 +1355,15 @@ def _reduce_whole_window(
     # shape -- and reuse the tz-aware index to size the window, anchor the bins,
     # and feed `reduce_time` (so pyramids does not re-parse the strings a frame
     # down -- it still wraps the list in a DatetimeIndex, just without the parse).
-    index = pd.DatetimeIndex(pd.to_datetime(list(times), format="mixed", utc=True))
+    # `errors="coerce"` turns an unparseable stamp into `NaT` so the guard below
+    # reports it with one clear message instead of pandas' raw parse error.
+    index = pd.DatetimeIndex(
+        pd.to_datetime(list(times), format="mixed", utc=True, errors="coerce")
+    )
+    if index.isna().any():
+        raise ValueError(
+            "whole-window reduction got an unparseable timestamp in `times`."
+        )
     span_days = int((index.max() - index.min()).days) + 1
     # Anchor the fixed-width bins on the earliest scene (`origin=`) so the whole
     # span collapses into one `[min, min + span_days)` window. Without it the
