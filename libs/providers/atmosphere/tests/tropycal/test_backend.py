@@ -799,3 +799,17 @@ class TestNhcBtk:
         assert len(fc) == 0
         assert set(BTK_POINT_COLUMNS).issubset(fc.columns)
         assert not list(tmp_path.glob("tropycal_nhc_btk_*"))
+
+
+class TestNhcBtkSource:
+    """source handling for product='nhc_btk' (N2)."""
+
+    def test_source_nhc_accepted(self, tmp_path):
+        """source='nhc' (the stamped value) is accepted as a no-op for nhc_btk."""
+        backend = _backend(tmp_path, product="nhc_btk", source="nhc")
+        assert backend._source == "nhc"
+
+    def test_source_nhc_rejected_for_besttrack(self, tmp_path):
+        """source='nhc' is still rejected for the reanalysis besttrack product."""
+        with pytest.raises(ValueError, match="source must be one of"):
+            _backend(tmp_path, product="besttrack", source="nhc")

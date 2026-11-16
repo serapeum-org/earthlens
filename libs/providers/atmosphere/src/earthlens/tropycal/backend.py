@@ -164,7 +164,9 @@ class TropicalCyclone(AbstractDataSource):
             source: tropycal data source — `"ibtracs"` (default, global
                 coverage) or `"hurdat"` (North Atlantic / East Pacific
                 reanalysis only). Note this overrides tropycal's own
-                default of `"hurdat"`.
+                default of `"hurdat"`. Ignored for `product="nhc_btk"`
+                (operational rows are stamped `source="nhc"`), though
+                `"nhc"` is accepted there as a no-op.
             geometry: Output geometry — `"point"` (default, one feature
                 per 6-hourly fix) or `"track"` (one `LineString` per
                 storm with summary attributes).
@@ -220,7 +222,10 @@ class TropicalCyclone(AbstractDataSource):
             raise ValueError(
                 f"file_format must be one of {sorted(_DRIVERS)}, got {file_format!r}."
             )
-        if source not in _SOURCES:
+        # nhc_btk ignores source (rows are stamped "nhc"), but accept "nhc" as
+        # a no-op so a user who reads that the rows carry source="nhc" can pass
+        # it back without hitting the reanalysis-source validation.
+        if source not in _SOURCES and not (product == "nhc_btk" and source == "nhc"):
             raise ValueError(
                 f"source must be one of {list(_SOURCES)}, got {source!r}. "
                 "tropycal 1.4 has no 'jtwc' source."
