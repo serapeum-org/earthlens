@@ -44,9 +44,39 @@ endpoint.
 
 ## Optional knobs
 
-`resolution=` (output GSD, metres), `epsg=` (output CRS), and `max_items=` (cap
-the items per collection — handy for smoke pulls) are accepted as keyword
-arguments and forwarded through the facade.
+`resolution=` (output GSD, metres) and `epsg=` (output CRS) are accepted as
+keyword arguments and forwarded through the facade, along with the three that
+control item selection:
+
+| Knob | Default | What it does |
+|---|---|---|
+| `max_items=` | `None` (no cap) | Caps the items kept **per collection**, counting only items that can contribute pixels — see the footprint screen below. Must be `None` or at least 1. |
+| `min_overlap_fraction=` | `0.0001` | How much of the smaller of the scene footprint and the AOI their overlap must cover for the scene to be read. `0` turns the footprint screen off. |
+| `max_candidates=` | `2000` | How many bbox-matched candidates a search examines per `(collection, bbox)` before giving up, bounding how much of a large catalogue is paged. `None` removes the bound. |
+
+### The footprint screen
+
+A STAC `/search` can only filter candidates by their **bbox**. A scene whose
+footprint lies at an angle to the lon/lat grid therefore matches the bbox while
+its geometry may cover none of the AOI — a Landsat footprint is about 0.68 of its
+own bbox. Such candidates are dropped before `max_items` is applied, so
+`max_items=1` gives you the first *covering* scene rather than whatever the API
+happens to list first.
+
+A scene is kept when its footprint overlaps at least `min_overlap_fraction` of
+the smaller of the two geometries. Measuring against the smaller one keeps the
+test scale-free: a tile wholly inside a continental AOI covers all of itself, and
+a scene merely grazing the AOI's edge covers little of either. Footprints that
+cannot be judged — absent, empty or unparseable geometry — are kept rather than
+discarded, invalid rings are repaired first, and a footprint published on the
+`0`–`360` longitude convention is shifted into range before being measured.
+
+`download()` raises `ValueError` when the search matched candidates but every one
+was dropped, or when the candidate budget ran out before a covering scene was
+found; the two cases carry different messages because the remedies differ. A
+search the API matched nothing for is not an error — `search()`, `count()` and
+`preview()` return an empty result in every one of these cases, so a dry run
+never raises.
 
 ## Output
 

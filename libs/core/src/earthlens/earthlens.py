@@ -1605,6 +1605,14 @@ class EarthLens:
                 `earthlens.ecmwf.AuthenticationError`.
             KeyError: When any backend receives an unknown variable
                 code that the catalog cannot resolve.
+            ValueError: When the STAC backend matched candidate items on
+                their bbox but its footprint screen dropped every one of
+                them, so there are no pixels to write, or when its
+                candidate budget ran out before a covering item was
+                found. A search the API matched nothing for is not an
+                error and still returns the empty list, and `search` /
+                `count` / `preview` never raise for either case. See
+                `earthlens.stac.STAC.download`.
             NotImplementedError: When `aggregate=` is not `None` and the
                 bound backend does not support it — either because its
                 `OUTPUT_KIND` is `"vector"` / `"tabular"` (those emit
