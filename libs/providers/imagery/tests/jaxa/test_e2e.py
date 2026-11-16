@@ -98,22 +98,26 @@ def test_gportal_search_lives() -> None:
     reason="needs $GPORTAL_USERNAME + $GPORTAL_PASSWORD",
 )
 def test_gportal_sftp_download_lives(tmp_path: Path) -> None:
-    """A credentialed JAXA gportal request fails fast with the retired-endpoint error.
+    """A credentialed JAXA gportal request fails fast as an outage, not a file on disk.
 
     Drives the full backend chain through the gportal protocol: resolves
     `sgli-l3-nwlr`, authenticates against `$GPORTAL_USERNAME` /
     `$GPORTAL_PASSWORD`, then runs `gportal.search`. Because JAXA retired
     the CSW catalogue-search endpoint (earthlens #1415), the search — the
     first step of the chain — now fails, and the backend raises
-    `GportalEndpointRetiredError` before the SFTP download is ever reached.
-    This asserts that documented reality; when a successor endpoint lands and
-    the search works again, this assertion will fail (no exception raised) and
-    signal that the SFTP-download half should be restored to a real
+    `GportalUnavailableError` before the SFTP download is ever reached.
+    Asserts the **parent** `GportalUnavailableError` rather than the narrower
+    `GportalEndpointRetiredError`: against the live host the error is normally
+    the retirement, but a flaky confirmation probe (timeout / a `HEAD` the host
+    answers differently) legitimately yields the transient parent, and the test
+    must not go red on correct code for that. When a successor endpoint lands
+    and the search works again, this assertion will fail (no exception raised)
+    and signal that the SFTP-download half should be restored to a real
     file-on-disk check.
     """
     pytest.importorskip("gportal")
     from earthlens.core import EarthLens
-    from earthlens.jaxa import GportalEndpointRetiredError
+    from earthlens.jaxa import GportalUnavailableError
 
     lens = EarthLens(
         data_source="jaxa",
@@ -124,7 +128,7 @@ def test_gportal_sftp_download_lives(tmp_path: Path) -> None:
         lon_lim=[120.0, 150.0],
         path=tmp_path,
     )
-    with pytest.raises(GportalEndpointRetiredError):
+    with pytest.raises(GportalUnavailableError):
         lens.download()
 
 
