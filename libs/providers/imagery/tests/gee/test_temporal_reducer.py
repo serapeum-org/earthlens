@@ -544,6 +544,15 @@ class TestReduceStack:
         with pytest.raises(ValueError, match="at least one timestep"):
             reducer.reduce_stack(stack, [])
 
+    def test_unparseable_timestamp_raises(self, tmp_path):
+        """An unparseable stamp beside a valid EEDAI stamp fails with a clear error."""
+        stack = _stack(tmp_path, [1.0, 5.0])
+        reducer = temporal_reducer_for("mean")
+        with pytest.raises(ValueError, match="unparseable timestamp"):
+            reducer.reduce_stack(
+                stack, ["2020/06/15 09:41:12.345000+00", "not-a-timestamp"]
+            )
+
     def test_mosaic_has_no_client_side_form(self, tmp_path):
         """`mosaic` refuses a client-side stack reduction."""
         stack = _stack(tmp_path, [1.0, 5.0])
