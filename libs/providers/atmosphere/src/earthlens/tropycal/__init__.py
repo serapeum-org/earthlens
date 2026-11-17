@@ -24,8 +24,11 @@ codes — `variables=["north_atlantic"]`, `variables=["north_atlantic",
 documented overload (the facade makes `variables` a required argument).
 The data source (`"ibtracs"`/`"hurdat"`), geometry mode, and filters
 arrive as explicit `TropicalCyclone` constructor keyword
-arguments. Best-track only — realtime / operational / forecast products
-are out of scope.
+arguments. Alongside the reanalysis best track it also serves `recon`
+aircraft observations, `ships` forecast guidance, `realtime` active storms,
+and `nhc_btk` — NHC's **operational** best track, read straight from ATCF
+files so current-season storms and their wind radii are available before
+the reanalysis publishes.
 
 Public surface (re-exported from this package):
 
@@ -39,6 +42,10 @@ Public surface (re-exported from this package):
 * `TrackField` — one per-fix track field (`units`, `long_name`).
 * `frame_to_fc` / `empty_fc` — the storm-frame ->
   FeatureCollection mapper and its empty-result counterpart.
+* `btk_frame_to_fc` / `empty_btk_fc` — the NHC operational best-track
+  (`product="nhc_btk"`) point mapper and its empty-result counterpart.
+* `fetch_btk_frames` / `NHC_BTK_BASINS` — the ATCF best-track fetcher and
+  the NHC operational basin map it accepts.
 * `CATALOG_PATH` — path to the bundled basin YAML;
   monkey-patchable in tests.
 
@@ -70,22 +77,36 @@ from earthlens.tropycal.catalog import (  # noqa: E402
     clear_catalog_cache,
 )
 from earthlens.tropycal.events import (  # noqa: E402
+    btk_frame_to_fc,
+    empty_btk_fc,
     empty_fc,
     empty_recon_fc,
     frame_to_fc,
     recon_to_fc,
 )
+from earthlens.tropycal.nhc import (  # noqa: E402
+    NHC_BTK_BASINS,
+    fetch_btk_frames,
+    fetch_btk_listing,
+    parse_btk_file,
+)
 
 __all__ = [
     "CATALOG_PATH",
+    "NHC_BTK_BASINS",
     "Basin",
     "Catalog",
     "TrackField",
     "TropicalCyclone",
     "Tropycal",
+    "btk_frame_to_fc",
     "clear_catalog_cache",
+    "empty_btk_fc",
     "empty_fc",
     "empty_recon_fc",
+    "fetch_btk_frames",
+    "fetch_btk_listing",
     "frame_to_fc",
+    "parse_btk_file",
     "recon_to_fc",
 ]
