@@ -530,9 +530,10 @@ def _first_column(
 def _point_x(geometry: Any) -> Any:
     """Return a shapely point's longitude (`x`), or `pd.NA` when unusable.
 
-    A `None` cell, an empty geometry, or any object without the shapely
-    point interface yields `pd.NA` rather than raising, so the mapping is
-    safe across a mixed or sparse `geometry` column.
+    A `None` cell, an empty geometry, or any value without a scalar `x`
+    ordinate — including a non-point geometry such as a `MultiPoint`,
+    `LineString`, or `Polygon` — yields `pd.NA` rather than raising, so
+    the mapping is safe across a mixed or sparse `geometry` column.
 
     Args:
         geometry: A cell of a `geometry` column (a shapely point or any
@@ -541,15 +542,16 @@ def _point_x(geometry: Any) -> Any:
     Returns:
         The point's `x` ordinate, or `pd.NA`.
     """
-    if geometry is None or getattr(geometry, "is_empty", True):
-        return pd.NA
-    return geometry.x
+    result: Any = pd.NA
+    if geometry is not None and not getattr(geometry, "is_empty", True):
+        result = getattr(geometry, "x", pd.NA)
+    return result
 
 
 def _point_y(geometry: Any) -> Any:
     """Return a shapely point's latitude (`y`), or `pd.NA` when unusable.
 
-    The empty / non-geometry handling mirrors `_point_x`.
+    The empty / non-point / non-geometry handling mirrors `_point_x`.
 
     Args:
         geometry: A cell of a `geometry` column (a shapely point or any
@@ -558,9 +560,10 @@ def _point_y(geometry: Any) -> Any:
     Returns:
         The point's `y` ordinate, or `pd.NA`.
     """
-    if geometry is None or getattr(geometry, "is_empty", True):
-        return pd.NA
-    return geometry.y
+    result: Any = pd.NA
+    if geometry is not None and not getattr(geometry, "is_empty", True):
+        result = getattr(geometry, "y", pd.NA)
+    return result
 
 
 def _site_coordinates(df: pd.DataFrame) -> tuple[pd.Series, pd.Series]:

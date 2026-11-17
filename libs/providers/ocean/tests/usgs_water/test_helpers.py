@@ -627,6 +627,22 @@ class TestPointOrdinate:
         assert pd.isna(_helpers._point_x(empty)), "empty point x should be NA"
         assert pd.isna(_helpers._point_y(empty)), "empty point y should be NA"
 
+    def test_non_point_geometry_returns_na(self):
+        """A non-point geometry yields `pd.NA` rather than raising.
+
+        Test scenario:
+            A `MultiPoint` and a `Polygon` have `is_empty` False but no
+            scalar `x`/`y`; both extractors must return `pd.NA` instead of
+            raising `AttributeError`.
+        """
+        import pandas as pd
+        from shapely.geometry import MultiPoint, Polygon
+
+        multipoint = MultiPoint([(1.0, 2.0), (3.0, 4.0)])
+        polygon = Polygon([(0.0, 0.0), (1.0, 0.0), (1.0, 1.0)])
+        assert pd.isna(_helpers._point_x(multipoint)), "MultiPoint x should be NA"
+        assert pd.isna(_helpers._point_y(polygon)), "Polygon y should be NA"
+
 
 class TestSiteCoordinates:
     """Tests for `_site_coordinates` scalar/geometry resolution."""
