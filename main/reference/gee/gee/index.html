@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -126666,12 +126666,7 @@ percentile shorthand outside <code>0 &lt; q &lt;= 100</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/gee/reducers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1460">1460</a></span>
-<span class="normal"><a href="#__codelineno-0-1461">1461</a></span>
-<span class="normal"><a href="#__codelineno-0-1462">1462</a></span>
-<span class="normal"><a href="#__codelineno-0-1463">1463</a></span>
-<span class="normal"><a href="#__codelineno-0-1464">1464</a></span>
-<span class="normal"><a href="#__codelineno-0-1465">1465</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1465">1465</a></span>
 <span class="normal"><a href="#__codelineno-0-1466">1466</a></span>
 <span class="normal"><a href="#__codelineno-0-1467">1467</a></span>
 <span class="normal"><a href="#__codelineno-0-1468">1468</a></span>
@@ -126736,77 +126731,82 @@ percentile shorthand outside <code>0 &lt; q &lt;= 100</code>.</p>
 <span class="normal"><a href="#__codelineno-0-1527">1527</a></span>
 <span class="normal"><a href="#__codelineno-0-1528">1528</a></span>
 <span class="normal"><a href="#__codelineno-0-1529">1529</a></span>
-<span class="normal"><a href="#__codelineno-0-1530">1530</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1460" name="__codelineno-0-1460"></a><span class="k">def</span><span class="w"> </span><span class="nf">temporal_reducer_for</span><span class="p">(</span><span class="n">spec</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Reducer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalReducer</span><span class="p">:</span>
-<a id="__codelineno-0-1461" name="__codelineno-0-1461"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a name, a percentile shorthand, or an instance to a `TemporalReducer`.</span>
-<a id="__codelineno-0-1462" name="__codelineno-0-1462"></a>
-<a id="__codelineno-0-1463" name="__codelineno-0-1463"></a><span class="sd">    The time-axis counterpart to `resolve_reducer`: it returns a</span>
-<a id="__codelineno-0-1464" name="__codelineno-0-1464"></a><span class="sd">    `TemporalReducer` for every reducer that can collapse a time bucket — the</span>
-<a id="__codelineno-0-1465" name="__codelineno-0-1465"></a><span class="sd">    band-name-preserving names, the reduce-and-rename `stdDev` / `variance` /</span>
-<a id="__codelineno-0-1466" name="__codelineno-0-1466"></a><span class="sd">    `count`, a `percentile:&lt;q&gt;` spec or its `p&lt;q&gt;` shorthand, a</span>
-<a id="__codelineno-0-1467" name="__codelineno-0-1467"></a><span class="sd">    `qualityMosaic:&lt;band&gt;` spec, `trend`, and `sens_slope`. The one remaining</span>
-<a id="__codelineno-0-1468" name="__codelineno-0-1468"></a><span class="sd">    region-only reducer (`first`) has no time-axis form and is refused.</span>
-<a id="__codelineno-0-1469" name="__codelineno-0-1469"></a>
-<a id="__codelineno-0-1470" name="__codelineno-0-1470"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-1471" name="__codelineno-0-1471"></a><span class="sd">        spec: A collection reducer name (`&quot;median&quot;`), a percentile spec</span>
-<a id="__codelineno-0-1472" name="__codelineno-0-1472"></a><span class="sd">            (`&quot;percentile:90&quot;`) or its shorthand (`&quot;p90&quot;`), `&quot;trend&quot;`,</span>
-<a id="__codelineno-0-1473" name="__codelineno-0-1473"></a><span class="sd">            `&quot;sens_slope&quot;`, or an already-built `TemporalReducer`.</span>
+<span class="normal"><a href="#__codelineno-0-1530">1530</a></span>
+<span class="normal"><a href="#__codelineno-0-1531">1531</a></span>
+<span class="normal"><a href="#__codelineno-0-1532">1532</a></span>
+<span class="normal"><a href="#__codelineno-0-1533">1533</a></span>
+<span class="normal"><a href="#__codelineno-0-1534">1534</a></span>
+<span class="normal"><a href="#__codelineno-0-1535">1535</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1465" name="__codelineno-0-1465"></a><span class="k">def</span><span class="w"> </span><span class="nf">temporal_reducer_for</span><span class="p">(</span><span class="n">spec</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Reducer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalReducer</span><span class="p">:</span>
+<a id="__codelineno-0-1466" name="__codelineno-0-1466"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a name, a percentile shorthand, or an instance to a `TemporalReducer`.</span>
+<a id="__codelineno-0-1467" name="__codelineno-0-1467"></a>
+<a id="__codelineno-0-1468" name="__codelineno-0-1468"></a><span class="sd">    The time-axis counterpart to `resolve_reducer`: it returns a</span>
+<a id="__codelineno-0-1469" name="__codelineno-0-1469"></a><span class="sd">    `TemporalReducer` for every reducer that can collapse a time bucket — the</span>
+<a id="__codelineno-0-1470" name="__codelineno-0-1470"></a><span class="sd">    band-name-preserving names, the reduce-and-rename `stdDev` / `variance` /</span>
+<a id="__codelineno-0-1471" name="__codelineno-0-1471"></a><span class="sd">    `count`, a `percentile:&lt;q&gt;` spec or its `p&lt;q&gt;` shorthand, a</span>
+<a id="__codelineno-0-1472" name="__codelineno-0-1472"></a><span class="sd">    `qualityMosaic:&lt;band&gt;` spec, `trend`, and `sens_slope`. The one remaining</span>
+<a id="__codelineno-0-1473" name="__codelineno-0-1473"></a><span class="sd">    region-only reducer (`first`) has no time-axis form and is refused.</span>
 <a id="__codelineno-0-1474" name="__codelineno-0-1474"></a>
-<a id="__codelineno-0-1475" name="__codelineno-0-1475"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-1476" name="__codelineno-0-1476"></a><span class="sd">        The resolved `TemporalReducer`.</span>
-<a id="__codelineno-0-1477" name="__codelineno-0-1477"></a>
-<a id="__codelineno-0-1478" name="__codelineno-0-1478"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-1479" name="__codelineno-0-1479"></a><span class="sd">        ValueError: If the name is a region-only reducer, an unknown name, or a</span>
-<a id="__codelineno-0-1480" name="__codelineno-0-1480"></a><span class="sd">            percentile shorthand outside `0 &lt; q &lt;= 100`.</span>
-<a id="__codelineno-0-1481" name="__codelineno-0-1481"></a><span class="sd">        TypeError: If `spec` is neither a string nor a `Reducer`.</span>
+<a id="__codelineno-0-1475" name="__codelineno-0-1475"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-1476" name="__codelineno-0-1476"></a><span class="sd">        spec: A collection reducer name (`&quot;median&quot;`), a percentile spec</span>
+<a id="__codelineno-0-1477" name="__codelineno-0-1477"></a><span class="sd">            (`&quot;percentile:90&quot;`) or its shorthand (`&quot;p90&quot;`), `&quot;trend&quot;`,</span>
+<a id="__codelineno-0-1478" name="__codelineno-0-1478"></a><span class="sd">            `&quot;sens_slope&quot;`, or an already-built `TemporalReducer`.</span>
+<a id="__codelineno-0-1479" name="__codelineno-0-1479"></a>
+<a id="__codelineno-0-1480" name="__codelineno-0-1480"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-1481" name="__codelineno-0-1481"></a><span class="sd">        The resolved `TemporalReducer`.</span>
 <a id="__codelineno-0-1482" name="__codelineno-0-1482"></a>
-<a id="__codelineno-0-1483" name="__codelineno-0-1483"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-1484" name="__codelineno-0-1484"></a><span class="sd">        - A bare name and the percentile shorthand:</span>
-<a id="__codelineno-0-1485" name="__codelineno-0-1485"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-1486" name="__codelineno-0-1486"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;median&quot;).name</span>
-<a id="__codelineno-0-1487" name="__codelineno-0-1487"></a><span class="sd">            &#39;median&#39;</span>
-<a id="__codelineno-0-1488" name="__codelineno-0-1488"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;p90&quot;).q</span>
-<a id="__codelineno-0-1489" name="__codelineno-0-1489"></a><span class="sd">            90.0</span>
-<a id="__codelineno-0-1490" name="__codelineno-0-1490"></a>
-<a id="__codelineno-0-1491" name="__codelineno-0-1491"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-1492" name="__codelineno-0-1492"></a><span class="sd">        - `trend` resolves to the linear-fit reducer, `sens_slope` to the</span>
-<a id="__codelineno-0-1493" name="__codelineno-0-1493"></a><span class="sd">          Theil-Sen one:</span>
-<a id="__codelineno-0-1494" name="__codelineno-0-1494"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-1495" name="__codelineno-0-1495"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;trend&quot;).name</span>
-<a id="__codelineno-0-1496" name="__codelineno-0-1496"></a><span class="sd">            &#39;trend&#39;</span>
-<a id="__codelineno-0-1497" name="__codelineno-0-1497"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;sens_slope&quot;).name</span>
-<a id="__codelineno-0-1498" name="__codelineno-0-1498"></a><span class="sd">            &#39;sens_slope&#39;</span>
-<a id="__codelineno-0-1499" name="__codelineno-0-1499"></a>
-<a id="__codelineno-0-1500" name="__codelineno-0-1500"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-1501" name="__codelineno-0-1501"></a><span class="sd">        - `stdDev` / `variance` / `count` now composite a stack too, and a</span>
-<a id="__codelineno-0-1502" name="__codelineno-0-1502"></a><span class="sd">          quality mosaic is reached by its `qualityMosaic:&lt;band&gt;` spec:</span>
-<a id="__codelineno-0-1503" name="__codelineno-0-1503"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-1504" name="__codelineno-0-1504"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;stdDev&quot;).name</span>
-<a id="__codelineno-0-1505" name="__codelineno-0-1505"></a><span class="sd">            &#39;stdDev&#39;</span>
-<a id="__codelineno-0-1506" name="__codelineno-0-1506"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;qualityMosaic:NDVI&quot;).quality_band</span>
-<a id="__codelineno-0-1507" name="__codelineno-0-1507"></a><span class="sd">            &#39;NDVI&#39;</span>
-<a id="__codelineno-0-1508" name="__codelineno-0-1508"></a>
-<a id="__codelineno-0-1509" name="__codelineno-0-1509"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-1510" name="__codelineno-0-1510"></a><span class="sd">        - A region-only reducer (`first`) still has no time-axis form:</span>
-<a id="__codelineno-0-1511" name="__codelineno-0-1511"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-1512" name="__codelineno-0-1512"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;first&quot;)</span>
-<a id="__codelineno-0-1513" name="__codelineno-0-1513"></a><span class="sd">            Traceback (most recent call last):</span>
-<a id="__codelineno-0-1514" name="__codelineno-0-1514"></a><span class="sd">                ...</span>
-<a id="__codelineno-0-1515" name="__codelineno-0-1515"></a><span class="sd">            ValueError: the &#39;first&#39; reducer reduces pixels in a region, not images over time; use a collection reducer or &#39;percentile:&lt;q&gt;&#39; / &#39;trend&#39; / &#39;sens_slope&#39;</span>
-<a id="__codelineno-0-1516" name="__codelineno-0-1516"></a>
-<a id="__codelineno-0-1517" name="__codelineno-0-1517"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-1518" name="__codelineno-0-1518"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-1519" name="__codelineno-0-1519"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">TemporalReducer</span><span class="p">):</span>
-<a id="__codelineno-0-1520" name="__codelineno-0-1520"></a>        <span class="n">_reject_zero_percentile</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">spec</span><span class="p">)</span>
-<a id="__codelineno-0-1521" name="__codelineno-0-1521"></a>        <span class="n">result</span><span class="p">:</span> <span class="n">TemporalReducer</span> <span class="o">=</span> <span class="n">spec</span>
-<a id="__codelineno-0-1522" name="__codelineno-0-1522"></a>    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">Reducer</span><span class="p">):</span>
-<a id="__codelineno-0-1523" name="__codelineno-0-1523"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;the </span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> reducer </span><span class="si">{</span><span class="n">_NO_TIME_AXIS</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-1524" name="__codelineno-0-1524"></a>    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-<a id="__codelineno-0-1525" name="__codelineno-0-1525"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">_temporal_reducer_from_str</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
-<a id="__codelineno-0-1526" name="__codelineno-0-1526"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-1527" name="__codelineno-0-1527"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-<a id="__codelineno-0-1528" name="__codelineno-0-1528"></a>            <span class="sa">f</span><span class="s2">&quot;reducer must be a name or a Reducer instance, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-1529" name="__codelineno-0-1529"></a>        <span class="p">)</span>
-<a id="__codelineno-0-1530" name="__codelineno-0-1530"></a>    <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-1483" name="__codelineno-0-1483"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-1484" name="__codelineno-0-1484"></a><span class="sd">        ValueError: If the name is a region-only reducer, an unknown name, or a</span>
+<a id="__codelineno-0-1485" name="__codelineno-0-1485"></a><span class="sd">            percentile shorthand outside `0 &lt; q &lt;= 100`.</span>
+<a id="__codelineno-0-1486" name="__codelineno-0-1486"></a><span class="sd">        TypeError: If `spec` is neither a string nor a `Reducer`.</span>
+<a id="__codelineno-0-1487" name="__codelineno-0-1487"></a>
+<a id="__codelineno-0-1488" name="__codelineno-0-1488"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-1489" name="__codelineno-0-1489"></a><span class="sd">        - A bare name and the percentile shorthand:</span>
+<a id="__codelineno-0-1490" name="__codelineno-0-1490"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-1491" name="__codelineno-0-1491"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;median&quot;).name</span>
+<a id="__codelineno-0-1492" name="__codelineno-0-1492"></a><span class="sd">            &#39;median&#39;</span>
+<a id="__codelineno-0-1493" name="__codelineno-0-1493"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;p90&quot;).q</span>
+<a id="__codelineno-0-1494" name="__codelineno-0-1494"></a><span class="sd">            90.0</span>
+<a id="__codelineno-0-1495" name="__codelineno-0-1495"></a>
+<a id="__codelineno-0-1496" name="__codelineno-0-1496"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-1497" name="__codelineno-0-1497"></a><span class="sd">        - `trend` resolves to the linear-fit reducer, `sens_slope` to the</span>
+<a id="__codelineno-0-1498" name="__codelineno-0-1498"></a><span class="sd">          Theil-Sen one:</span>
+<a id="__codelineno-0-1499" name="__codelineno-0-1499"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-1500" name="__codelineno-0-1500"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;trend&quot;).name</span>
+<a id="__codelineno-0-1501" name="__codelineno-0-1501"></a><span class="sd">            &#39;trend&#39;</span>
+<a id="__codelineno-0-1502" name="__codelineno-0-1502"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;sens_slope&quot;).name</span>
+<a id="__codelineno-0-1503" name="__codelineno-0-1503"></a><span class="sd">            &#39;sens_slope&#39;</span>
+<a id="__codelineno-0-1504" name="__codelineno-0-1504"></a>
+<a id="__codelineno-0-1505" name="__codelineno-0-1505"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-1506" name="__codelineno-0-1506"></a><span class="sd">        - `stdDev` / `variance` / `count` now composite a stack too, and a</span>
+<a id="__codelineno-0-1507" name="__codelineno-0-1507"></a><span class="sd">          quality mosaic is reached by its `qualityMosaic:&lt;band&gt;` spec:</span>
+<a id="__codelineno-0-1508" name="__codelineno-0-1508"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-1509" name="__codelineno-0-1509"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;stdDev&quot;).name</span>
+<a id="__codelineno-0-1510" name="__codelineno-0-1510"></a><span class="sd">            &#39;stdDev&#39;</span>
+<a id="__codelineno-0-1511" name="__codelineno-0-1511"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;qualityMosaic:NDVI&quot;).quality_band</span>
+<a id="__codelineno-0-1512" name="__codelineno-0-1512"></a><span class="sd">            &#39;NDVI&#39;</span>
+<a id="__codelineno-0-1513" name="__codelineno-0-1513"></a>
+<a id="__codelineno-0-1514" name="__codelineno-0-1514"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-1515" name="__codelineno-0-1515"></a><span class="sd">        - A region-only reducer (`first`) still has no time-axis form:</span>
+<a id="__codelineno-0-1516" name="__codelineno-0-1516"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-1517" name="__codelineno-0-1517"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;first&quot;)</span>
+<a id="__codelineno-0-1518" name="__codelineno-0-1518"></a><span class="sd">            Traceback (most recent call last):</span>
+<a id="__codelineno-0-1519" name="__codelineno-0-1519"></a><span class="sd">                ...</span>
+<a id="__codelineno-0-1520" name="__codelineno-0-1520"></a><span class="sd">            ValueError: the &#39;first&#39; reducer reduces pixels in a region, not images over time; use a collection reducer or &#39;percentile:&lt;q&gt;&#39; / &#39;trend&#39; / &#39;sens_slope&#39;</span>
+<a id="__codelineno-0-1521" name="__codelineno-0-1521"></a>
+<a id="__codelineno-0-1522" name="__codelineno-0-1522"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-1523" name="__codelineno-0-1523"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-1524" name="__codelineno-0-1524"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">TemporalReducer</span><span class="p">):</span>
+<a id="__codelineno-0-1525" name="__codelineno-0-1525"></a>        <span class="n">_reject_zero_percentile</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">spec</span><span class="p">)</span>
+<a id="__codelineno-0-1526" name="__codelineno-0-1526"></a>        <span class="n">result</span><span class="p">:</span> <span class="n">TemporalReducer</span> <span class="o">=</span> <span class="n">spec</span>
+<a id="__codelineno-0-1527" name="__codelineno-0-1527"></a>    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">Reducer</span><span class="p">):</span>
+<a id="__codelineno-0-1528" name="__codelineno-0-1528"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;the </span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> reducer </span><span class="si">{</span><span class="n">_NO_TIME_AXIS</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-1529" name="__codelineno-0-1529"></a>    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+<a id="__codelineno-0-1530" name="__codelineno-0-1530"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">_temporal_reducer_from_str</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+<a id="__codelineno-0-1531" name="__codelineno-0-1531"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-1532" name="__codelineno-0-1532"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+<a id="__codelineno-0-1533" name="__codelineno-0-1533"></a>            <span class="sa">f</span><span class="s2">&quot;reducer must be a name or a Reducer instance, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-1534" name="__codelineno-0-1534"></a>        <span class="p">)</span>
+<a id="__codelineno-0-1535" name="__codelineno-0-1535"></a>    <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -158011,12 +158011,7 @@ percentile shorthand outside <code>0 &lt; q &lt;= 100</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/imagery/src/earthlens/gee/reducers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1460">1460</a></span>
-<span class="normal"><a href="#__codelineno-0-1461">1461</a></span>
-<span class="normal"><a href="#__codelineno-0-1462">1462</a></span>
-<span class="normal"><a href="#__codelineno-0-1463">1463</a></span>
-<span class="normal"><a href="#__codelineno-0-1464">1464</a></span>
-<span class="normal"><a href="#__codelineno-0-1465">1465</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1465">1465</a></span>
 <span class="normal"><a href="#__codelineno-0-1466">1466</a></span>
 <span class="normal"><a href="#__codelineno-0-1467">1467</a></span>
 <span class="normal"><a href="#__codelineno-0-1468">1468</a></span>
@@ -158081,77 +158076,82 @@ percentile shorthand outside <code>0 &lt; q &lt;= 100</code>.</p>
 <span class="normal"><a href="#__codelineno-0-1527">1527</a></span>
 <span class="normal"><a href="#__codelineno-0-1528">1528</a></span>
 <span class="normal"><a href="#__codelineno-0-1529">1529</a></span>
-<span class="normal"><a href="#__codelineno-0-1530">1530</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1460" name="__codelineno-0-1460"></a><span class="k">def</span><span class="w"> </span><span class="nf">temporal_reducer_for</span><span class="p">(</span><span class="n">spec</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Reducer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalReducer</span><span class="p">:</span>
-<a id="__codelineno-0-1461" name="__codelineno-0-1461"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a name, a percentile shorthand, or an instance to a `TemporalReducer`.</span>
-<a id="__codelineno-0-1462" name="__codelineno-0-1462"></a>
-<a id="__codelineno-0-1463" name="__codelineno-0-1463"></a><span class="sd">    The time-axis counterpart to `resolve_reducer`: it returns a</span>
-<a id="__codelineno-0-1464" name="__codelineno-0-1464"></a><span class="sd">    `TemporalReducer` for every reducer that can collapse a time bucket — the</span>
-<a id="__codelineno-0-1465" name="__codelineno-0-1465"></a><span class="sd">    band-name-preserving names, the reduce-and-rename `stdDev` / `variance` /</span>
-<a id="__codelineno-0-1466" name="__codelineno-0-1466"></a><span class="sd">    `count`, a `percentile:&lt;q&gt;` spec or its `p&lt;q&gt;` shorthand, a</span>
-<a id="__codelineno-0-1467" name="__codelineno-0-1467"></a><span class="sd">    `qualityMosaic:&lt;band&gt;` spec, `trend`, and `sens_slope`. The one remaining</span>
-<a id="__codelineno-0-1468" name="__codelineno-0-1468"></a><span class="sd">    region-only reducer (`first`) has no time-axis form and is refused.</span>
-<a id="__codelineno-0-1469" name="__codelineno-0-1469"></a>
-<a id="__codelineno-0-1470" name="__codelineno-0-1470"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-1471" name="__codelineno-0-1471"></a><span class="sd">        spec: A collection reducer name (`&quot;median&quot;`), a percentile spec</span>
-<a id="__codelineno-0-1472" name="__codelineno-0-1472"></a><span class="sd">            (`&quot;percentile:90&quot;`) or its shorthand (`&quot;p90&quot;`), `&quot;trend&quot;`,</span>
-<a id="__codelineno-0-1473" name="__codelineno-0-1473"></a><span class="sd">            `&quot;sens_slope&quot;`, or an already-built `TemporalReducer`.</span>
+<span class="normal"><a href="#__codelineno-0-1530">1530</a></span>
+<span class="normal"><a href="#__codelineno-0-1531">1531</a></span>
+<span class="normal"><a href="#__codelineno-0-1532">1532</a></span>
+<span class="normal"><a href="#__codelineno-0-1533">1533</a></span>
+<span class="normal"><a href="#__codelineno-0-1534">1534</a></span>
+<span class="normal"><a href="#__codelineno-0-1535">1535</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1465" name="__codelineno-0-1465"></a><span class="k">def</span><span class="w"> </span><span class="nf">temporal_reducer_for</span><span class="p">(</span><span class="n">spec</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Reducer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalReducer</span><span class="p">:</span>
+<a id="__codelineno-0-1466" name="__codelineno-0-1466"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a name, a percentile shorthand, or an instance to a `TemporalReducer`.</span>
+<a id="__codelineno-0-1467" name="__codelineno-0-1467"></a>
+<a id="__codelineno-0-1468" name="__codelineno-0-1468"></a><span class="sd">    The time-axis counterpart to `resolve_reducer`: it returns a</span>
+<a id="__codelineno-0-1469" name="__codelineno-0-1469"></a><span class="sd">    `TemporalReducer` for every reducer that can collapse a time bucket — the</span>
+<a id="__codelineno-0-1470" name="__codelineno-0-1470"></a><span class="sd">    band-name-preserving names, the reduce-and-rename `stdDev` / `variance` /</span>
+<a id="__codelineno-0-1471" name="__codelineno-0-1471"></a><span class="sd">    `count`, a `percentile:&lt;q&gt;` spec or its `p&lt;q&gt;` shorthand, a</span>
+<a id="__codelineno-0-1472" name="__codelineno-0-1472"></a><span class="sd">    `qualityMosaic:&lt;band&gt;` spec, `trend`, and `sens_slope`. The one remaining</span>
+<a id="__codelineno-0-1473" name="__codelineno-0-1473"></a><span class="sd">    region-only reducer (`first`) has no time-axis form and is refused.</span>
 <a id="__codelineno-0-1474" name="__codelineno-0-1474"></a>
-<a id="__codelineno-0-1475" name="__codelineno-0-1475"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-1476" name="__codelineno-0-1476"></a><span class="sd">        The resolved `TemporalReducer`.</span>
-<a id="__codelineno-0-1477" name="__codelineno-0-1477"></a>
-<a id="__codelineno-0-1478" name="__codelineno-0-1478"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-1479" name="__codelineno-0-1479"></a><span class="sd">        ValueError: If the name is a region-only reducer, an unknown name, or a</span>
-<a id="__codelineno-0-1480" name="__codelineno-0-1480"></a><span class="sd">            percentile shorthand outside `0 &lt; q &lt;= 100`.</span>
-<a id="__codelineno-0-1481" name="__codelineno-0-1481"></a><span class="sd">        TypeError: If `spec` is neither a string nor a `Reducer`.</span>
+<a id="__codelineno-0-1475" name="__codelineno-0-1475"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-1476" name="__codelineno-0-1476"></a><span class="sd">        spec: A collection reducer name (`&quot;median&quot;`), a percentile spec</span>
+<a id="__codelineno-0-1477" name="__codelineno-0-1477"></a><span class="sd">            (`&quot;percentile:90&quot;`) or its shorthand (`&quot;p90&quot;`), `&quot;trend&quot;`,</span>
+<a id="__codelineno-0-1478" name="__codelineno-0-1478"></a><span class="sd">            `&quot;sens_slope&quot;`, or an already-built `TemporalReducer`.</span>
+<a id="__codelineno-0-1479" name="__codelineno-0-1479"></a>
+<a id="__codelineno-0-1480" name="__codelineno-0-1480"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-1481" name="__codelineno-0-1481"></a><span class="sd">        The resolved `TemporalReducer`.</span>
 <a id="__codelineno-0-1482" name="__codelineno-0-1482"></a>
-<a id="__codelineno-0-1483" name="__codelineno-0-1483"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-1484" name="__codelineno-0-1484"></a><span class="sd">        - A bare name and the percentile shorthand:</span>
-<a id="__codelineno-0-1485" name="__codelineno-0-1485"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-1486" name="__codelineno-0-1486"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;median&quot;).name</span>
-<a id="__codelineno-0-1487" name="__codelineno-0-1487"></a><span class="sd">            &#39;median&#39;</span>
-<a id="__codelineno-0-1488" name="__codelineno-0-1488"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;p90&quot;).q</span>
-<a id="__codelineno-0-1489" name="__codelineno-0-1489"></a><span class="sd">            90.0</span>
-<a id="__codelineno-0-1490" name="__codelineno-0-1490"></a>
-<a id="__codelineno-0-1491" name="__codelineno-0-1491"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-1492" name="__codelineno-0-1492"></a><span class="sd">        - `trend` resolves to the linear-fit reducer, `sens_slope` to the</span>
-<a id="__codelineno-0-1493" name="__codelineno-0-1493"></a><span class="sd">          Theil-Sen one:</span>
-<a id="__codelineno-0-1494" name="__codelineno-0-1494"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-1495" name="__codelineno-0-1495"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;trend&quot;).name</span>
-<a id="__codelineno-0-1496" name="__codelineno-0-1496"></a><span class="sd">            &#39;trend&#39;</span>
-<a id="__codelineno-0-1497" name="__codelineno-0-1497"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;sens_slope&quot;).name</span>
-<a id="__codelineno-0-1498" name="__codelineno-0-1498"></a><span class="sd">            &#39;sens_slope&#39;</span>
-<a id="__codelineno-0-1499" name="__codelineno-0-1499"></a>
-<a id="__codelineno-0-1500" name="__codelineno-0-1500"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-1501" name="__codelineno-0-1501"></a><span class="sd">        - `stdDev` / `variance` / `count` now composite a stack too, and a</span>
-<a id="__codelineno-0-1502" name="__codelineno-0-1502"></a><span class="sd">          quality mosaic is reached by its `qualityMosaic:&lt;band&gt;` spec:</span>
-<a id="__codelineno-0-1503" name="__codelineno-0-1503"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-1504" name="__codelineno-0-1504"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;stdDev&quot;).name</span>
-<a id="__codelineno-0-1505" name="__codelineno-0-1505"></a><span class="sd">            &#39;stdDev&#39;</span>
-<a id="__codelineno-0-1506" name="__codelineno-0-1506"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;qualityMosaic:NDVI&quot;).quality_band</span>
-<a id="__codelineno-0-1507" name="__codelineno-0-1507"></a><span class="sd">            &#39;NDVI&#39;</span>
-<a id="__codelineno-0-1508" name="__codelineno-0-1508"></a>
-<a id="__codelineno-0-1509" name="__codelineno-0-1509"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-1510" name="__codelineno-0-1510"></a><span class="sd">        - A region-only reducer (`first`) still has no time-axis form:</span>
-<a id="__codelineno-0-1511" name="__codelineno-0-1511"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-1512" name="__codelineno-0-1512"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;first&quot;)</span>
-<a id="__codelineno-0-1513" name="__codelineno-0-1513"></a><span class="sd">            Traceback (most recent call last):</span>
-<a id="__codelineno-0-1514" name="__codelineno-0-1514"></a><span class="sd">                ...</span>
-<a id="__codelineno-0-1515" name="__codelineno-0-1515"></a><span class="sd">            ValueError: the &#39;first&#39; reducer reduces pixels in a region, not images over time; use a collection reducer or &#39;percentile:&lt;q&gt;&#39; / &#39;trend&#39; / &#39;sens_slope&#39;</span>
-<a id="__codelineno-0-1516" name="__codelineno-0-1516"></a>
-<a id="__codelineno-0-1517" name="__codelineno-0-1517"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-1518" name="__codelineno-0-1518"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-1519" name="__codelineno-0-1519"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">TemporalReducer</span><span class="p">):</span>
-<a id="__codelineno-0-1520" name="__codelineno-0-1520"></a>        <span class="n">_reject_zero_percentile</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">spec</span><span class="p">)</span>
-<a id="__codelineno-0-1521" name="__codelineno-0-1521"></a>        <span class="n">result</span><span class="p">:</span> <span class="n">TemporalReducer</span> <span class="o">=</span> <span class="n">spec</span>
-<a id="__codelineno-0-1522" name="__codelineno-0-1522"></a>    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">Reducer</span><span class="p">):</span>
-<a id="__codelineno-0-1523" name="__codelineno-0-1523"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;the </span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> reducer </span><span class="si">{</span><span class="n">_NO_TIME_AXIS</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-1524" name="__codelineno-0-1524"></a>    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-<a id="__codelineno-0-1525" name="__codelineno-0-1525"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">_temporal_reducer_from_str</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
-<a id="__codelineno-0-1526" name="__codelineno-0-1526"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-1527" name="__codelineno-0-1527"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-<a id="__codelineno-0-1528" name="__codelineno-0-1528"></a>            <span class="sa">f</span><span class="s2">&quot;reducer must be a name or a Reducer instance, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-1529" name="__codelineno-0-1529"></a>        <span class="p">)</span>
-<a id="__codelineno-0-1530" name="__codelineno-0-1530"></a>    <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-1483" name="__codelineno-0-1483"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-1484" name="__codelineno-0-1484"></a><span class="sd">        ValueError: If the name is a region-only reducer, an unknown name, or a</span>
+<a id="__codelineno-0-1485" name="__codelineno-0-1485"></a><span class="sd">            percentile shorthand outside `0 &lt; q &lt;= 100`.</span>
+<a id="__codelineno-0-1486" name="__codelineno-0-1486"></a><span class="sd">        TypeError: If `spec` is neither a string nor a `Reducer`.</span>
+<a id="__codelineno-0-1487" name="__codelineno-0-1487"></a>
+<a id="__codelineno-0-1488" name="__codelineno-0-1488"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-1489" name="__codelineno-0-1489"></a><span class="sd">        - A bare name and the percentile shorthand:</span>
+<a id="__codelineno-0-1490" name="__codelineno-0-1490"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-1491" name="__codelineno-0-1491"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;median&quot;).name</span>
+<a id="__codelineno-0-1492" name="__codelineno-0-1492"></a><span class="sd">            &#39;median&#39;</span>
+<a id="__codelineno-0-1493" name="__codelineno-0-1493"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;p90&quot;).q</span>
+<a id="__codelineno-0-1494" name="__codelineno-0-1494"></a><span class="sd">            90.0</span>
+<a id="__codelineno-0-1495" name="__codelineno-0-1495"></a>
+<a id="__codelineno-0-1496" name="__codelineno-0-1496"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-1497" name="__codelineno-0-1497"></a><span class="sd">        - `trend` resolves to the linear-fit reducer, `sens_slope` to the</span>
+<a id="__codelineno-0-1498" name="__codelineno-0-1498"></a><span class="sd">          Theil-Sen one:</span>
+<a id="__codelineno-0-1499" name="__codelineno-0-1499"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-1500" name="__codelineno-0-1500"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;trend&quot;).name</span>
+<a id="__codelineno-0-1501" name="__codelineno-0-1501"></a><span class="sd">            &#39;trend&#39;</span>
+<a id="__codelineno-0-1502" name="__codelineno-0-1502"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;sens_slope&quot;).name</span>
+<a id="__codelineno-0-1503" name="__codelineno-0-1503"></a><span class="sd">            &#39;sens_slope&#39;</span>
+<a id="__codelineno-0-1504" name="__codelineno-0-1504"></a>
+<a id="__codelineno-0-1505" name="__codelineno-0-1505"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-1506" name="__codelineno-0-1506"></a><span class="sd">        - `stdDev` / `variance` / `count` now composite a stack too, and a</span>
+<a id="__codelineno-0-1507" name="__codelineno-0-1507"></a><span class="sd">          quality mosaic is reached by its `qualityMosaic:&lt;band&gt;` spec:</span>
+<a id="__codelineno-0-1508" name="__codelineno-0-1508"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-1509" name="__codelineno-0-1509"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;stdDev&quot;).name</span>
+<a id="__codelineno-0-1510" name="__codelineno-0-1510"></a><span class="sd">            &#39;stdDev&#39;</span>
+<a id="__codelineno-0-1511" name="__codelineno-0-1511"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;qualityMosaic:NDVI&quot;).quality_band</span>
+<a id="__codelineno-0-1512" name="__codelineno-0-1512"></a><span class="sd">            &#39;NDVI&#39;</span>
+<a id="__codelineno-0-1513" name="__codelineno-0-1513"></a>
+<a id="__codelineno-0-1514" name="__codelineno-0-1514"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-1515" name="__codelineno-0-1515"></a><span class="sd">        - A region-only reducer (`first`) still has no time-axis form:</span>
+<a id="__codelineno-0-1516" name="__codelineno-0-1516"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-1517" name="__codelineno-0-1517"></a><span class="sd">            &gt;&gt;&gt; temporal_reducer_for(&quot;first&quot;)</span>
+<a id="__codelineno-0-1518" name="__codelineno-0-1518"></a><span class="sd">            Traceback (most recent call last):</span>
+<a id="__codelineno-0-1519" name="__codelineno-0-1519"></a><span class="sd">                ...</span>
+<a id="__codelineno-0-1520" name="__codelineno-0-1520"></a><span class="sd">            ValueError: the &#39;first&#39; reducer reduces pixels in a region, not images over time; use a collection reducer or &#39;percentile:&lt;q&gt;&#39; / &#39;trend&#39; / &#39;sens_slope&#39;</span>
+<a id="__codelineno-0-1521" name="__codelineno-0-1521"></a>
+<a id="__codelineno-0-1522" name="__codelineno-0-1522"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-1523" name="__codelineno-0-1523"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-1524" name="__codelineno-0-1524"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">TemporalReducer</span><span class="p">):</span>
+<a id="__codelineno-0-1525" name="__codelineno-0-1525"></a>        <span class="n">_reject_zero_percentile</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">spec</span><span class="p">)</span>
+<a id="__codelineno-0-1526" name="__codelineno-0-1526"></a>        <span class="n">result</span><span class="p">:</span> <span class="n">TemporalReducer</span> <span class="o">=</span> <span class="n">spec</span>
+<a id="__codelineno-0-1527" name="__codelineno-0-1527"></a>    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">Reducer</span><span class="p">):</span>
+<a id="__codelineno-0-1528" name="__codelineno-0-1528"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;the </span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> reducer </span><span class="si">{</span><span class="n">_NO_TIME_AXIS</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-1529" name="__codelineno-0-1529"></a>    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+<a id="__codelineno-0-1530" name="__codelineno-0-1530"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">_temporal_reducer_from_str</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+<a id="__codelineno-0-1531" name="__codelineno-0-1531"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-1532" name="__codelineno-0-1532"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+<a id="__codelineno-0-1533" name="__codelineno-0-1533"></a>            <span class="sa">f</span><span class="s2">&quot;reducer must be a name or a Reducer instance, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-1534" name="__codelineno-0-1534"></a>        <span class="p">)</span>
+<a id="__codelineno-0-1535" name="__codelineno-0-1535"></a>    <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
