@@ -60,6 +60,7 @@ def _make_nc(
     time_strs_by_var: dict[str, list[str] | None] | None = None,
     time_values_by_var: dict[str, object] | None = None,
     time_units_by_var: dict[str, str | None] | None = None,
+    time_calendars_by_var: dict[str, str | None] | None = None,
     dimension_names: list[str] | None = None,
     sel_result: object | None = None,
 ) -> MagicMock:
@@ -75,6 +76,9 @@ def _make_nc(
         time_units_by_var: Map from dimension name to the CF `units`
             string exposed at `nc.metadata.get_dimension(name).attrs`.
             Names not in the map return `None`.
+        time_calendars_by_var: Map from dimension name to the CF `calendar`
+            string exposed alongside `units`. Names not in the map return
+            `None` (no calendar attribute).
         dimension_names: Value returned by the `dimension_names`
             property.
         sel_result: Object returned by `nc.sel(...)`. Defaults to a
@@ -88,8 +92,14 @@ def _make_nc(
         side_effect=lambda var_name: values_table.get(var_name)
     )
     units_table = time_units_by_var or {}
+    calendars_table = time_calendars_by_var or {}
     nc.metadata.get_dimension = MagicMock(
-        side_effect=lambda name: SimpleNamespace(attrs={"units": units_table.get(name)})
+        side_effect=lambda name: SimpleNamespace(
+            attrs={
+                "units": units_table.get(name),
+                "calendar": calendars_table.get(name),
+            }
+        )
     )
     nc.dimension_names = dimension_names
     nc.sel = MagicMock(
@@ -363,6 +373,23 @@ class TestDecodeCfOffsets:
         result = _decode_cf_offsets(np.array([0, 1]), units)
         assert result is None, f"Expected None for units={units!r}, got {result}"
 
+    @pytest.mark.parametrize(
+        "values, units",
+        [
+            ([0, 1], "days since 0001-01-01"),
+            ([10**19], "seconds since 1970-01-01"),
+        ],
+    )
+    def test_unrepresentable_epoch_or_offset_decodes_to_none(self, values, units):
+        """An epoch/offset outside pandas' range degrades to `None`, not a raise."""
+        result = _decode_cf_offsets(np.array(values), units)
+        assert result is None, f"Expected None for {units!r}+{values}, got {result}"
+
+    def test_year_zero_epoch_is_not_silently_misdecoded(self):
+        """A year-0 epoch pandas misparses is rejected rather than returned wrong."""
+        result = _decode_cf_offsets(np.array([0]), "days since 0000-01-01")
+        assert result is None, f"Expected None for a year-0 epoch, got {result}"
+
 
 class TestReadRawTimeAxis:
     """Tests for the `_read_raw_time_axis` fallback (H2)."""
@@ -415,6 +442,32 @@ class TestReadRawTimeAxis:
         assert _read_raw_time_axis(nc) is None, (
             "A metadata AttributeError should be tolerated as missing units"
         )
+
+    def test_non_standard_calendar_is_not_decoded(self):
+        """A non-Gregorian calendar bails rather than silently mis-decoding."""
+        nc = _make_nc(
+            time_strs_by_var={"time": None},
+            time_values_by_var={"time": np.array([0, 1])},
+            time_units_by_var={"time": "days since 2000-01-01"},
+            time_calendars_by_var={"time": "360_day"},
+        )
+        assert _read_raw_time_axis(nc) is None, (
+            "A 360_day calendar should not be decoded with the Gregorian path"
+        )
+
+    def test_standard_calendar_is_decoded(self):
+        """An explicit `standard` calendar decodes like no calendar at all."""
+        nc = _make_nc(
+            time_strs_by_var={"time": None},
+            time_values_by_var={"time": np.array([0, 1])},
+            time_units_by_var={"time": "days since 2000-01-01"},
+            time_calendars_by_var={"time": "standard"},
+        )
+        result = _read_raw_time_axis(nc)
+        assert list(result) == [
+            pd.Timestamp("2000-01-01"),
+            pd.Timestamp("2000-01-02"),
+        ], f"Expected a standard calendar to decode, got {result}"
 
 
 class TestFindLevelDim:

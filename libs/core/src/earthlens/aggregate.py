@@ -163,6 +163,13 @@ _CF_UNIT_ALIASES: dict[str, str] = {
     "d": "D",
 }
 
+#: CF `calendar` values the Gregorian `pandas` decoder reproduces faithfully. A
+#: non-standard calendar (`360_day`, `noleap`, `julian`, …) needs cftime, so the
+#: fallback bails rather than silently mis-dating.
+_STANDARD_CALENDARS: frozenset[str] = frozenset(
+    {"standard", "gregorian", "proleptic_gregorian"}
+)
+
 
 def _decode_cf_offsets(
     values: np.typing.NDArray[Any], units: str | None
@@ -188,11 +195,24 @@ def _decode_cf_offsets(
     alias = _CF_UNIT_ALIASES.get(match.group("unit").lower()) if match else None
     result: pd.DatetimeIndex | None = None
     if match is not None and alias is not None:
-        origin = pd.Timestamp(match.group("epoch"))
-        if origin.tz is not None:
-            origin = origin.tz_convert("UTC").tz_localize(None)
-        stamps = pd.to_datetime(np.asarray(values), unit=alias, origin=origin)
-        result = pd.DatetimeIndex(stamps)
+        epoch = match.group("epoch")
+        try:
+            origin = pd.Timestamp(epoch)
+            if origin.tz is not None:
+                origin = origin.tz_convert("UTC").tz_localize(None)
+            # Reject an epoch outside pandas' representable range: a pre-1677 or
+            # year-0 epoch either overflows or constructs a nonsense origin
+            # (pandas shifts year 0 into 1972), which would mis-bucket every
+            # sample. In range, a too-large offset still overflows in
+            # `to_datetime` and is caught below.
+            if pd.Timestamp.min <= origin <= pd.Timestamp.max:
+                stamps = pd.to_datetime(np.asarray(values), unit=alias, origin=origin)
+                result = pd.DatetimeIndex(stamps)
+        except (ValueError, OverflowError):
+            # An epoch or offset outside pandas' nanosecond range
+            # (`OutOfBoundsDatetime` is a `ValueError`) is undecodable here; fall
+            # through to `None` so the caller raises its honest `KeyError`.
+            result = None
     return result
 
 
@@ -216,7 +236,7 @@ def _read_raw_time_axis(nc: NetCDF) -> pd.DatetimeIndex | None:
     result: pd.DatetimeIndex | None = None
     for name in _TIME_VAR_CANDIDATES:
         values = nc.get_time_values(var_name=name)
-        if values is None or len(values) == 0:
+        if values is None or np.asarray(values).size == 0:
             continue
         # `get_dimension` returns `None` for a name it does not know (handled by
         # the `or {}` below), so this never raises for the real metadata object.
@@ -225,10 +245,12 @@ def _read_raw_time_axis(nc: NetCDF) -> pd.DatetimeIndex | None:
         try:
             dimension = nc.metadata.get_dimension(name)
             attrs = getattr(dimension, "attrs", None) or {}
-            units = attrs.get("units")
         except AttributeError:
-            units = None
-        decoded = _decode_cf_offsets(values, units)
+            attrs = {}
+        calendar = attrs.get("calendar")
+        if calendar and str(calendar).lower() not in _STANDARD_CALENDARS:
+            continue
+        decoded = _decode_cf_offsets(values, attrs.get("units"))
         if decoded is not None:
             result = decoded
             break
