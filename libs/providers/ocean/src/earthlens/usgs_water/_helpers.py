@@ -566,15 +566,49 @@ def _point_y(geometry: Any) -> Any:
     return result
 
 
+def _has_geographic_geometry(df: pd.DataFrame) -> bool:
+    """Whether `df` carries a `geometry` column in geographic lon/lat coords.
+
+    The geometry fallback reads longitude from each point's `x` and
+    latitude from its `y`, which is only correct for a geographic CRS in
+    lon/lat axis order — EPSG:4326 / OGC:CRS84, as the USGS OGC API
+    Features endpoint returns. A projected CRS (ordinates in metres) would
+    be silently mislocated, so a frame whose CRS is present and not
+    geographic is rejected (with a `UserWarning`) and its coordinates are
+    left unresolved rather than read as lon/lat. A frame with no CRS (a
+    plain `DataFrame` carrying a `geometry` column) is assumed geographic.
+
+    Args:
+        df: The site-metadata frame.
+
+    Returns:
+        bool: `True` when a usable geographic `geometry` column is present.
+    """
+    result = False
+    if "geometry" in df.columns:
+        crs = getattr(df, "crs", None)
+        result = crs is None or bool(getattr(crs, "is_geographic", True))
+        if not result:
+            warnings.warn(
+                f"usgs-water sites: geometry CRS {crs!r} is not geographic "
+                "lon/lat, so coordinates were not read from geometry.",
+                UserWarning,
+                stacklevel=2,
+            )
+    return result
+
+
 def _site_coordinates(df: pd.DataFrame) -> tuple[pd.Series, pd.Series]:
     """Resolve `(latitude, longitude)` numeric Series from a site frame.
 
     Prefers the scalar `dec_lat_va` / `dec_long_va` columns the legacy
     `nwis` frames carry. The modern monitoring-locations endpoint omits
     those and returns a GeoDataFrame whose coordinates live only in a
-    `geometry` column of shapely points, so when a `geometry` column is
-    present, any row still missing an ordinate is back-filled from the
-    matching geometry point (`y` for latitude, `x` for longitude).
+    `geometry` column of geographic (EPSG:4326 / CRS84) shapely points, so
+    when a usable geographic `geometry` column is present, any row still
+    missing an ordinate is back-filled from the matching geometry point
+    (`y` for latitude, `x` for longitude). See `_has_geographic_geometry`
+    for the CRS guard.
 
     Args:
         df: The site-metadata frame (legacy wide, or modern with a
@@ -586,7 +620,9 @@ def _site_coordinates(df: pd.DataFrame) -> tuple[pd.Series, pd.Series]:
     """
     latitude = pd.to_numeric(_first_column(df, ["dec_lat_va"]), errors="coerce")
     longitude = pd.to_numeric(_first_column(df, ["dec_long_va"]), errors="coerce")
-    if "geometry" in df.columns and (latitude.isna().any() or longitude.isna().any()):
+    if (latitude.isna().any() or longitude.isna().any()) and _has_geographic_geometry(
+        df
+    ):
         geometry = df["geometry"]
         if latitude.isna().any():
             latitude = latitude.fillna(

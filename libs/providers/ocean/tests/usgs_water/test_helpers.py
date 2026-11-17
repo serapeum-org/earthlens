@@ -713,6 +713,47 @@ class TestSiteCoordinates:
         assert latitude.iloc[1] == 39.0, "NA scalar row should be back-filled"
         assert longitude.iloc[0] == -77.1, "longitude should come from geometry.x"
 
+    def test_geographic_geodataframe_axis_order(self):
+        """A real EPSG:4326 GeoDataFrame reads x as longitude, y as latitude.
+
+        Test scenario:
+            A `geopandas.GeoDataFrame` in EPSG:4326 with a `Point(-77.1,
+            38.9)` resolves longitude to -77.1 (`x`) and latitude to 38.9
+            (`y`), exercising the real `GeoSeries` path.
+        """
+        import geopandas as gpd
+        from shapely.geometry import Point
+
+        gdf = gpd.GeoDataFrame(
+            {"monitoring_location_id": ["USGS-01646500"]},
+            geometry=[Point(-77.1, 38.9)],
+            crs="EPSG:4326",
+        )
+        latitude, longitude = _helpers._site_coordinates(gdf)
+        assert latitude.iloc[0] == 38.9, "latitude should be the geometry y"
+        assert longitude.iloc[0] == -77.1, "longitude should be the geometry x"
+
+    def test_projected_crs_is_not_misread(self):
+        """A projected GeoDataFrame is left unresolved instead of mislocated.
+
+        Test scenario:
+            A GeoDataFrame in EPSG:3857 (metres) is not read as lon/lat; the
+            coordinates stay NA and a `UserWarning` names the CRS.
+        """
+        import geopandas as gpd
+        import pandas as pd
+        from shapely.geometry import Point
+
+        gdf = gpd.GeoDataFrame(
+            {"monitoring_location_id": ["USGS-01646500"]},
+            geometry=[Point(-8585000.0, 4700000.0)],
+            crs="EPSG:3857",
+        )
+        with pytest.warns(UserWarning, match="not geographic"):
+            latitude, longitude = _helpers._site_coordinates(gdf)
+        assert pd.isna(latitude.iloc[0]), "projected latitude should stay NA"
+        assert pd.isna(longitude.iloc[0]), "projected longitude should stay NA"
+
     def test_mixed_geometry_rows_resolve_per_row(self):
         """A `None` geometry row maps to `NA` while valid rows resolve.
 
