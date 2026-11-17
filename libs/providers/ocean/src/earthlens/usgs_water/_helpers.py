@@ -734,6 +734,12 @@ def _format_time_of_year(year: Any, month: Any) -> str:
 def normalize_sites(df: pd.DataFrame, flavour: str) -> pd.DataFrame:
     """Fold a site frame (modern monitoring-locations / legacy what_sites).
 
+    Coordinates are resolved by `_site_coordinates`: from the scalar
+    `dec_lat_va` / `dec_long_va` columns the legacy frame carries, or
+    from the modern frame's `geometry` points when those are absent. A
+    coordinate column that still resolves to all-`NA` triggers a
+    `RuntimeWarning` rather than passing silently.
+
     Args:
         df: The site-metadata frame.
         flavour: `"waterdata"` or `"nwis"`.

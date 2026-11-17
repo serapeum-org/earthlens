@@ -581,6 +581,118 @@ def test_normalize_sites_all_na_coordinates_warns():
     assert out["longitude"].isna().all()
 
 
+class TestPointOrdinate:
+    """Tests for the `_point_x` / `_point_y` geometry-ordinate extractors."""
+
+    def test_valid_point_returns_ordinates(self):
+        """A shapely point yields its `x` (longitude) and `y` (latitude).
+
+        Test scenario:
+            A populated `Point(-77.1, 38.9)` returns -77.1 from `_point_x`
+            and 38.9 from `_point_y`.
+        """
+        from shapely.geometry import Point
+
+        point = Point(-77.1, 38.9)
+        assert _helpers._point_x(point) == -77.1, "x should be the longitude"
+        assert _helpers._point_y(point) == 38.9, "y should be the latitude"
+
+    @pytest.mark.parametrize("value", [None, "not-a-geometry", 42])
+    def test_non_geometry_returns_na(self, value):
+        """A `None` or non-geometry cell yields `pd.NA` rather than raising.
+
+        Args:
+            value: A cell that is not a usable geometry.
+
+        Test scenario:
+            Each of `None`, a string, and an int lacks the shapely point
+            interface, so both extractors return `pd.NA`.
+        """
+        import pandas as pd
+
+        assert pd.isna(_helpers._point_x(value)), f"_point_x({value!r}) should be NA"
+        assert pd.isna(_helpers._point_y(value)), f"_point_y({value!r}) should be NA"
+
+    def test_empty_geometry_returns_na(self):
+        """An empty point yields `pd.NA` instead of an invalid ordinate.
+
+        Test scenario:
+            `Point()` is empty (`is_empty` is True), so both extractors
+            short-circuit to `pd.NA`.
+        """
+        import pandas as pd
+        from shapely.geometry import Point
+
+        empty = Point()
+        assert pd.isna(_helpers._point_x(empty)), "empty point x should be NA"
+        assert pd.isna(_helpers._point_y(empty)), "empty point y should be NA"
+
+
+class TestSiteCoordinates:
+    """Tests for `_site_coordinates` scalar/geometry resolution."""
+
+    def test_scalar_latitude_geometry_longitude(self):
+        """Longitude falls back to geometry while latitude stays scalar.
+
+        Test scenario:
+            A frame carries `dec_lat_va` but no `dec_long_va`; latitude is
+            read from the scalar and longitude from the geometry's `x`.
+        """
+        import pandas as pd
+        from shapely.geometry import Point
+
+        df = pd.DataFrame({"dec_lat_va": [38.9], "geometry": [Point(-77.1, 0.0)]})
+        latitude, longitude = _helpers._site_coordinates(df)
+        assert latitude.iloc[0] == 38.9, "latitude should come from dec_lat_va"
+        assert longitude.iloc[0] == -77.1, "longitude should come from geometry.x"
+
+    def test_scalar_longitude_geometry_latitude(self):
+        """Latitude falls back to geometry while longitude stays scalar.
+
+        Test scenario:
+            A frame carries `dec_long_va` but no `dec_lat_va`; longitude is
+            read from the scalar and latitude from the geometry's `y`.
+        """
+        import pandas as pd
+        from shapely.geometry import Point
+
+        df = pd.DataFrame({"dec_long_va": [-77.1], "geometry": [Point(0.0, 38.9)]})
+        latitude, longitude = _helpers._site_coordinates(df)
+        assert longitude.iloc[0] == -77.1, "longitude should come from dec_long_va"
+        assert latitude.iloc[0] == 38.9, "latitude should come from geometry.y"
+
+    def test_no_scalars_no_geometry_stays_na(self):
+        """With neither scalars nor a geometry column, both axes stay all-`NA`.
+
+        Test scenario:
+            A frame with no coordinate source leaves latitude/longitude
+            all-`NA` and attempts no geometry fallback.
+        """
+        import pandas as pd
+
+        df = pd.DataFrame({"monitoring_location_id": ["USGS-01646500"]})
+        latitude, longitude = _helpers._site_coordinates(df)
+        assert latitude.isna().all(), "latitude should be all-NA"
+        assert longitude.isna().all(), "longitude should be all-NA"
+
+    def test_mixed_geometry_rows_resolve_per_row(self):
+        """A `None` geometry row maps to `NA` while valid rows resolve.
+
+        Test scenario:
+            A two-row geometry column (a point, then `None`) yields real
+            coordinates for the first row and `NA` for the second.
+        """
+        import pandas as pd
+        from shapely.geometry import Point
+
+        df = pd.DataFrame({"geometry": [Point(-77.1, 38.9), None]})
+        latitude, longitude = _helpers._site_coordinates(df)
+        assert latitude.iloc[0] == 38.9, "first row latitude should resolve"
+        assert longitude.iloc[0] == -77.1, "first row longitude should resolve"
+        assert pd.isna(latitude.iloc[1]), "None geometry latitude should be NA"
+        assert pd.isna(longitude.iloc[1]), "None geometry longitude should be NA"
+
+
 @pytest.mark.parametrize(
     "service", ["samples", "statistics", "sites", "peaks", "ratings"]
 )
