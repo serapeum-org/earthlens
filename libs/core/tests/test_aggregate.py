@@ -350,6 +350,18 @@ class TestDecodeCfOffsets:
             ("minutes", [0, 60], "2000-01-01", ["2000-01-01", "2000-01-01 01:00:00"]),
             ("hours", [0, 24], "2000-01-01", ["2000-01-01", "2000-01-02"]),
             ("days", [0, 1], "1979-01-01", ["1979-01-01", "1979-01-02"]),
+            (
+                "milliseconds",
+                [0, 1000],
+                "2000-01-01",
+                ["2000-01-01", "2000-01-01 00:00:01"],
+            ),
+            (
+                "microseconds",
+                [0, 1000000],
+                "2000-01-01",
+                ["2000-01-01", "2000-01-01 00:00:01"],
+            ),
         ],
     )
     def test_decodes_each_unit_family(self, unit_word, offsets, epoch, expected):
@@ -366,10 +378,18 @@ class TestDecodeCfOffsets:
         assert result[0] == pd.Timestamp("1970-01-01"), f"Got {result[0]}"
 
     @pytest.mark.parametrize(
-        "units", [None, "", "garbage", "fortnights since 1970-01-01"]
+        "units",
+        [
+            None,
+            "",
+            "garbage",
+            "fortnights since 1970-01-01",
+            "weeks since 2000-01-01",
+            "months since 2000-01-01",
+        ],
     )
     def test_returns_none_for_unusable_units(self, units):
-        """Missing, malformed, or unknown-unit strings decode to `None`."""
+        """Missing, malformed, or unsupported-unit strings decode to `None`."""
         result = _decode_cf_offsets(np.array([0, 1]), units)
         assert result is None, f"Expected None for units={units!r}, got {result}"
 

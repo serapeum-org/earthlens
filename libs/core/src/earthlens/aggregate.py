@@ -161,6 +161,16 @@ _CF_UNIT_ALIASES: dict[str, str] = {
     "days": "D",
     "day": "D",
     "d": "D",
+    "milliseconds": "ms",
+    "millisecond": "ms",
+    "msecs": "ms",
+    "msec": "ms",
+    "ms": "ms",
+    "microseconds": "us",
+    "microsecond": "us",
+    "usecs": "us",
+    "usec": "us",
+    "us": "us",
 }
 
 #: CF `calendar` values the Gregorian `pandas` decoder reproduces faithfully. A
