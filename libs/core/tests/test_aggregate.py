@@ -73,7 +73,7 @@ def _make_nc(
             returned by `nc.get_time_values(var_name=name)`. Names not
             in the map return `None`.
         time_units_by_var: Map from dimension name to the CF `units`
-            string exposed at `nc.meta_data.get_dimension(name).attrs`.
+            string exposed at `nc.metadata.get_dimension(name).attrs`.
             Names not in the map return `None`.
         dimension_names: Value returned by the `dimension_names`
             property.
@@ -88,7 +88,7 @@ def _make_nc(
         side_effect=lambda var_name: values_table.get(var_name)
     )
     units_table = time_units_by_var or {}
-    nc.meta_data.get_dimension = MagicMock(
+    nc.metadata.get_dimension = MagicMock(
         side_effect=lambda name: SimpleNamespace(attrs={"units": units_table.get(name)})
     )
     nc.dimension_names = dimension_names
@@ -394,15 +394,26 @@ class TestReadRawTimeAxis:
             f"Expected valid_time offsets to win, got {list(result)}"
         )
 
-    def test_dimension_lookup_error_is_treated_as_missing_units(self):
-        """A raising `meta_data.get_dimension` degrades to no units, yielding None."""
+    def test_absent_dimension_yields_no_units(self):
+        """A dimension `metadata.get_dimension` reports as `None` decodes to None."""
         nc = _make_nc(
             time_strs_by_var={"time": None},
             time_values_by_var={"time": np.array([0, 1])},
         )
-        nc.meta_data.get_dimension = MagicMock(side_effect=KeyError("time"))
+        nc.metadata.get_dimension = MagicMock(return_value=None)
         assert _read_raw_time_axis(nc) is None, (
-            "A dimension lookup failure should decode to None, not raise"
+            "A missing dimension (None) should give None, not raise"
+        )
+
+    def test_metadata_attribute_error_is_tolerated(self):
+        """A raising metadata accessor degrades to no units rather than propagating."""
+        nc = _make_nc(
+            time_strs_by_var={"time": None},
+            time_values_by_var={"time": np.array([0, 1])},
+        )
+        nc.metadata.get_dimension = MagicMock(side_effect=AttributeError("gone"))
+        assert _read_raw_time_axis(nc) is None, (
+            "A metadata AttributeError should be tolerated as missing units"
         )
 
 

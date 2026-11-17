@@ -218,11 +218,15 @@ def _read_raw_time_axis(nc: NetCDF) -> pd.DatetimeIndex | None:
         values = nc.get_time_values(var_name=name)
         if values is None or len(values) == 0:
             continue
+        # `get_dimension` returns `None` for a name it does not know (handled by
+        # the `or {}` below), so this never raises for the real metadata object.
+        # The guard is purely defensive against a future/renamed accessor that
+        # drops the attribute or method entirely.
         try:
-            dimension = nc.meta_data.get_dimension(name)
+            dimension = nc.metadata.get_dimension(name)
             attrs = getattr(dimension, "attrs", None) or {}
             units = attrs.get("units")
-        except (KeyError, AttributeError):
+        except AttributeError:
             units = None
         decoded = _decode_cf_offsets(values, units)
         if decoded is not None:
