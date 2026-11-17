@@ -37,8 +37,10 @@ from earthlens.aggregate import (
     _REDUCERS_STRICT,
     _TIME_VAR_CANDIDATES,
     AggregationConfig,
+    _decode_cf_offsets,
     _find_level_dim,
     _output_stem,
+    _read_raw_time_axis,
     _read_time_axis,
     _read_window,
     _reduce_window,
@@ -325,6 +327,82 @@ class TestReadTimeAxis:
         call_kwargs = [call.kwargs for call in nc.get_time_variable.call_args_list]
         assert all("var_name" in kwargs for kwargs in call_kwargs), (
             f"All calls should pass var_name as kwarg, got: {call_kwargs}"
+        )
+
+
+class TestDecodeCfOffsets:
+    """Tests for `_decode_cf_offsets` (CF `<unit> since <epoch>` decoding)."""
+
+    @pytest.mark.parametrize(
+        "unit_word, offsets, epoch, expected",
+        [
+            ("seconds", [0, 86400], "1970-01-01", ["1970-01-01", "1970-01-02"]),
+            ("minutes", [0, 60], "2000-01-01", ["2000-01-01", "2000-01-01 01:00:00"]),
+            ("hours", [0, 24], "2000-01-01", ["2000-01-01", "2000-01-02"]),
+            ("days", [0, 1], "1979-01-01", ["1979-01-01", "1979-01-02"]),
+        ],
+    )
+    def test_decodes_each_unit_family(self, unit_word, offsets, epoch, expected):
+        """Each CF unit family is added to its epoch to recover timestamps."""
+        result = _decode_cf_offsets(np.array(offsets), f"{unit_word} since {epoch}")
+        assert list(result) == [pd.Timestamp(e) for e in expected], (
+            f"Expected {expected} for {unit_word!r}, got {list(result)}"
+        )
+
+    def test_tz_aware_epoch_is_normalised_to_naive(self):
+        """A trailing `Z` epoch yields a tz-naive index, not a tz-aware one."""
+        result = _decode_cf_offsets(np.array([0]), "seconds since 1970-01-01T00:00:00Z")
+        assert result.tz is None, f"Expected tz-naive, got tz={result.tz}"
+        assert result[0] == pd.Timestamp("1970-01-01"), f"Got {result[0]}"
+
+    @pytest.mark.parametrize(
+        "units", [None, "", "garbage", "fortnights since 1970-01-01"]
+    )
+    def test_returns_none_for_unusable_units(self, units):
+        """Missing, malformed, or unknown-unit strings decode to `None`."""
+        result = _decode_cf_offsets(np.array([0, 1]), units)
+        assert result is None, f"Expected None for units={units!r}, got {result}"
+
+
+class TestReadRawTimeAxis:
+    """Tests for the `_read_raw_time_axis` fallback (H2)."""
+
+    def test_empty_values_array_is_skipped(self):
+        """A zero-length offsets array is treated as absence, yielding None."""
+        nc = _make_nc(
+            time_strs_by_var={"valid_time": None, "time": None},
+            time_values_by_var={"time": np.array([])},
+            time_units_by_var={"time": "seconds since 1970-01-01"},
+        )
+        assert _read_raw_time_axis(nc) is None, "Empty offsets should give None"
+
+    def test_valid_time_offsets_are_used_before_time(self):
+        """The first candidate with decodable offsets wins over later ones."""
+        nc = _make_nc(
+            time_strs_by_var={"valid_time": None, "time": None},
+            time_values_by_var={
+                "valid_time": np.array([0]),
+                "time": np.array([86400]),
+            },
+            time_units_by_var={
+                "valid_time": "seconds since 2022-01-01",
+                "time": "seconds since 2022-01-01",
+            },
+        )
+        result = _read_raw_time_axis(nc)
+        assert list(result) == [pd.Timestamp("2022-01-01")], (
+            f"Expected valid_time offsets to win, got {list(result)}"
+        )
+
+    def test_dimension_lookup_error_is_treated_as_missing_units(self):
+        """A raising `meta_data.get_dimension` degrades to no units, yielding None."""
+        nc = _make_nc(
+            time_strs_by_var={"time": None},
+            time_values_by_var={"time": np.array([0, 1])},
+        )
+        nc.meta_data.get_dimension = MagicMock(side_effect=KeyError("time"))
+        assert _read_raw_time_axis(nc) is None, (
+            "A dimension lookup failure should decode to None, not raise"
         )
 
 
