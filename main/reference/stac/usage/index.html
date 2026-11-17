@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -3488,6 +3488,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Optional knobs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-footprint-screen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The footprint screen
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -23871,6 +23888,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Optional knobs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-footprint-screen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The footprint screen
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -23992,9 +24026,55 @@ bbox and a date window:</p>
 <p>With no endpoint the backend infers it from the first collection's home
 endpoint.</p>
 <h2 id="optional-knobs"><a class="toclink" href="#optional-knobs">Optional knobs</a><a class="headerlink" href="#optional-knobs" title="Permanent link">#</a></h2>
-<p><code>resolution=</code> (output GSD, metres), <code>epsg=</code> (output CRS), and <code>max_items=</code> (cap
-the items per collection — handy for smoke pulls) are accepted as keyword
-arguments and forwarded through the facade.</p>
+<p><code>resolution=</code> (output GSD, metres) and <code>epsg=</code> (output CRS) are accepted as
+keyword arguments and forwarded through the facade, along with the three that
+control item selection:</p>
+<table>
+<thead>
+<tr>
+<th>Knob</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>max_items=</code></td>
+<td><code>None</code> (no cap)</td>
+<td>Caps the items kept <strong>per collection</strong>, counting only items that can contribute pixels — see the footprint screen below. Must be <code>None</code> or at least 1.</td>
+</tr>
+<tr>
+<td><code>min_overlap_fraction=</code></td>
+<td><code>0.0001</code></td>
+<td>How much of the smaller of the scene footprint and the AOI their overlap must cover for the scene to be read. <code>0</code> turns the footprint screen off.</td>
+</tr>
+<tr>
+<td><code>max_candidates=</code></td>
+<td><code>2000</code></td>
+<td>How many bbox-matched candidates a search examines per <code>(collection, bbox)</code> before giving up, bounding how much of a large catalogue is paged. <code>None</code> removes the bound.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-footprint-screen"><a class="toclink" href="#the-footprint-screen">The footprint screen</a><a class="headerlink" href="#the-footprint-screen" title="Permanent link">#</a></h3>
+<p>A STAC <code>/search</code> can only filter candidates by their <strong>bbox</strong>. A scene whose
+footprint lies at an angle to the lon/lat grid therefore matches the bbox while
+its geometry may cover none of the AOI — a Landsat footprint is about 0.68 of its
+own bbox. Such candidates are dropped before <code>max_items</code> is applied, so
+<code>max_items=1</code> gives you the first <em>covering</em> scene rather than whatever the API
+happens to list first.</p>
+<p>A scene is kept when its footprint overlaps at least <code>min_overlap_fraction</code> of
+the smaller of the two geometries. Measuring against the smaller one keeps the
+test scale-free: a tile wholly inside a continental AOI covers all of itself, and
+a scene merely grazing the AOI's edge covers little of either. Footprints that
+cannot be judged — absent, empty or unparseable geometry — are kept rather than
+discarded, invalid rings are repaired first, and a footprint published on the
+<code>0</code>–<code>360</code> longitude convention is shifted into range before being measured.</p>
+<p><code>download()</code> raises <code>ValueError</code> when the search matched candidates but every one
+was dropped, or when the candidate budget ran out before a covering scene was
+found; the two cases carry different messages because the remedies differ. A
+search the API matched nothing for is not an error — <code>search()</code>, <code>count()</code> and
+<code>preview()</code> return an empty result in every one of these cases, so a dry run
+never raises.</p>
 <h2 id="output"><a class="toclink" href="#output">Output</a><a class="headerlink" href="#output" title="Permanent link">#</a></h2>
 <p>One COG per <code>(collection, acquisition date)</code> is written to <code>path</code>, named
 <code>&lt;collection&gt;_&lt;YYYY-MM-DD&gt;.tif</code>. Multiple tiles covering the bbox on the same
