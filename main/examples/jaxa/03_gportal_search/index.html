@@ -27,7 +27,7 @@
     
     
       
-        <title>G-Portal search + SFTP download — research scenario - earthlens</title>
+        <title>G-Portal catalogue search — retired endpoint - earthlens</title>
       
     
     
@@ -87,20 +87,20 @@
     
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="earthlens">
-    <meta property="og:title" content="G-Portal search + SFTP download — research scenario">
+    <meta property="og:title" content="G-Portal catalogue search — retired endpoint">
     <meta property="og:description" content="One Python facade for 48 Earth-observation data providers">
     <meta property="og:url" content="https://serapeum-org.github.io/earthlens/main/examples/jaxa/03_gportal_search/">
     <meta property="og:image"
           content="https://serapeum-org.github.io/earthlens/main/_images/branding/earthlens-brand-kit/social/github-social-preview.png">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="G-Portal search + SFTP download — research scenario">
+    <meta name="twitter:title" content="G-Portal catalogue search — retired endpoint">
     <meta name="twitter:description" content="One Python facade for 48 Earth-observation data providers">
     <meta name="twitter:image"
           content="https://serapeum-org.github.io/earthlens/main/_images/branding/earthlens-brand-kit/social/announcement-card.png">
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -119,7 +119,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#g-portal-search-sftp-download-research-scenario" class="md-skip">
+        <a href="#g-portal-catalogue-search-retired-endpoint" class="md-skip">
           Skip to content
         </a>
       
@@ -158,7 +158,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              G-Portal search + SFTP download — research scenario
+              G-Portal catalogue search — retired endpoint
             
           </span>
         </div>
@@ -17088,7 +17088,7 @@
   <span class="md-ellipsis">
     
   
-    G-Portal search + SFTP download — research scenario
+    G-Portal catalogue search — retired endpoint
   
 
     
@@ -17106,7 +17106,7 @@
   <span class="md-ellipsis">
     
   
-    G-Portal search + SFTP download — research scenario
+    G-Portal catalogue search — retired endpoint
   
 
     
@@ -17143,10 +17143,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#anonymous-search" class="md-nav__link">
+  <a href="#what-the-search-used-to-do-and-what-happens-now" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Anonymous search
+        What the search used to do — and what happens now
       
     </span>
   </a>
@@ -17154,21 +17154,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#credentialed-sftp-download-skips-when-env-vars-absent" class="md-nav__link">
+  <a href="#a-jaxa-example-that-runs-today" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Credentialed SFTP download (skips when env vars absent)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#inspect-one-downloaded-hdf5-when-present" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Inspect one downloaded HDF5 (when present)
+        A JAXA example that runs today
       
     </span>
   </a>
@@ -23813,10 +23802,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#anonymous-search" class="md-nav__link">
+  <a href="#what-the-search-used-to-do-and-what-happens-now" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Anonymous search
+        What the search used to do — and what happens now
       
     </span>
   </a>
@@ -23824,21 +23813,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#credentialed-sftp-download-skips-when-env-vars-absent" class="md-nav__link">
+  <a href="#a-jaxa-example-that-runs-today" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Credentialed SFTP download (skips when env vars absent)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#inspect-one-downloaded-hdf5-when-present" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Inspect one downloaded HDF5 (when present)
+        A JAXA example that runs today
       
     </span>
   </a>
@@ -24605,8 +24583,22 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="g-portal-search-sftp-download-research-scenario">G-Portal search + SFTP download — research scenario<a class="anchor-link" href="#g-portal-search-sftp-download-research-scenario">¶</a></h1><p>Walk the full credentialed path: pick a GCOM-C/SGLI L3 ocean product from the catalog, search the live G-Portal catalogue for a 1-day window, then <strong>optionally download</strong> the matching products over SFTP into a temp dir. Inspect the resulting HDF5 file's metadata with <code>h5py</code> to confirm it's a real, usable product. This is the workflow an ocean-colour researcher runs to fetch a daily mosaic for a regional study.</p>
-<p>Needs the <code>[jaxa]</code> extra. The download step needs <code>$GPORTAL_USERNAME</code> + <code>$GPORTAL_PASSWORD</code> (free account at <a href="https://gportal.jaxa.jp/gpr/user/regist1">https://gportal.jaxa.jp/gpr/user/regist1</a>); without those it falls back to the anonymous-search-only path.</p>
+<h1 id="g-portal-catalogue-search-retired-endpoint">G-Portal catalogue search — retired endpoint<a class="anchor-link" href="#g-portal-catalogue-search-retired-endpoint">¶</a></h1><blockquote>
+<p>⚠️ <strong>Status: this example cannot run live.</strong> JAXA decommissioned the G-Portal
+<strong>CSW catalogue-search</strong> endpoint. The <code>gportal</code> SDK's <code>BASE_URL</code> now
+permanently (<code>301</code>) redirects every <code>/csw/csw</code> request to the portal landing
+page, so a search returns HTML instead of JSON and the SDK fails to parse it.
+Because the <code>gportal</code> protocol relies on this search to enumerate products,
+<strong>both</strong> the anonymous search <em>and</em> the credentialed SFTP download are blocked
+until a successor endpoint is found. Tracked in earthlens issue <strong>#1415</strong>.</p>
+</blockquote>
+<p>This notebook used to walk the full credentialed path: pick a GCOM-C/SGLI L3
+ocean product from the catalog, search the live G-Portal catalogue for a 1-day
+window, download the matching products over SFTP, and inspect the HDF5. The
+catalog half still works and is kept below; the live search/download is
+documented rather than executed. For a JAXA example that <em>does</em> run end-to-end
+today, see <a href="02_aw3d30_quickstart.ipynb"><code>02_aw3d30_quickstart.ipynb</code></a> — the
+authless <code>jaxa-earth</code> (STAC) path is unaffected by the CSW retirement.</p>
 </div>
 </div>
 </div>
@@ -24669,7 +24661,32 @@ print('short_name:   ', row.short_name)</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="anonymous-search">Anonymous search<a class="anchor-link" href="#anonymous-search">¶</a></h2><p><code>gportal.search()</code> does not require credentials. Query the live G-Portal catalogue for daily L3 NWLR products on 2024-01-01.</p>
+<h2 id="what-the-search-used-to-do-and-what-happens-now">What the search used to do — and what happens now<a class="anchor-link" href="#what-the-search-used-to-do-and-what-happens-now">¶</a></h2><p><code>gportal.search()</code> is anonymous (credentials are only needed for the SFTP
+download). It <em>used</em> to query the live G-Portal CSW catalogue:</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gportal</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">gportal</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+    <span class="n">dataset_ids</span><span class="o">=</span><span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">short_name</span><span class="p">],</span>
+    <span class="n">start_time</span><span class="o">=</span><span class="s2">"2024-01-01"</span><span class="p">,</span>
+    <span class="n">end_time</span><span class="o">=</span><span class="s2">"2024-01-02"</span><span class="p">,</span>
+    <span class="n">count</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">matched</span><span class="p">())</span>
+</pre></div>
+<p>That request now <code>301</code>-redirects to <code>https://www.gportal.jaxa.jp/</code>; the SDK
+follows the redirect, lands on the ~1 MB HTML landing page, and
+<code>response.json()</code> fails with <code>JSONDecodeError</code>. Driven through the earthlens
+backend —</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+
+<span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">"jaxa"</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"sgli-l3-nwlr"</span><span class="p">],</span> <span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</pre></div>
+<p>— the branch confirms the retirement with a no-redirect probe of the service
+URL and raises <code>GportalEndpointRetiredError</code>: a <code>GportalUnavailableError</code>
+subclass (so existing <code>except GportalUnavailableError</code> handlers still catch it)
+that is distinct, so you can tell <em>"the endpoint is gone"</em> from <em>"the service is
+temporarily down"</em>. The cell below shows that relationship without touching the
+network.</p>
 </div>
 </div>
 </div>
@@ -24692,31 +24709,29 @@ print('short_name:   ', row.short_name)</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gportal</span>
-
-<span class="n">result</span> <span class="o">=</span> <span class="n">gportal</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
-    <span class="n">dataset_ids</span><span class="o">=</span><span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">short_name</span><span class="p">],</span>
-    <span class="n">start_time</span><span class="o">=</span><span class="s1">'2024-01-01'</span><span class="p">,</span>
-    <span class="n">end_time</span><span class="o">=</span><span class="s1">'2024-01-02'</span><span class="p">,</span>
-    <span class="n">count</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jaxa</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GportalEndpointRetiredError</span><span class="p">,</span>
+    <span class="n">GportalUnavailableError</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">matched</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">matched</span><span class="p">()</span> <span class="ow">or</span> <span class="mi">0</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'matched products: </span><span class="si">{</span><span class="n">matched</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">products</span><span class="p">())[:</span><span class="mi">3</span><span class="p">]:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s1">  (</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">data_path</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-2">import gportal
 
-result = gportal.search(
-    dataset_ids=[row.short_name],
-    start_time='2024-01-01',
-    end_time='2024-01-02',
-    count=3,
+<span class="c1"># The retirement error subclasses the transient-outage error, so old handlers</span>
+<span class="c1"># keep working, but you can branch on the narrower type to tell a permanently</span>
+<span class="c1"># gone endpoint from a service that is merely down right now.</span>
+<span class="n">is_subclass</span> <span class="o">=</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">GportalEndpointRetiredError</span><span class="p">,</span> <span class="n">GportalUnavailableError</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"retired is-a unavailable:"</span><span class="p">,</span> <span class="n">is_subclass</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"retired error type:      "</span><span class="p">,</span> <span class="n">GportalEndpointRetiredError</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-2">from earthlens.jaxa import (
+    GportalEndpointRetiredError,
+    GportalUnavailableError,
 )
-matched = result.matched() or 0
-print(f'matched products: {matched}')
-for p in list(result.products())[:3]:
-    print(f'  {p.id}  ({p.data_path})')</div>
+
+# The retirement error subclasses the transient-outage error, so old handlers
+# keep working, but you can branch on the narrower type to tell a permanently
+# gone endpoint from a service that is merely down right now.
+is_subclass = issubclass(GportalEndpointRetiredError, GportalUnavailableError)
+print("retired is-a unavailable:", is_subclass)
+print("retired error type:      ", GportalEndpointRetiredError.__name__)</div>
 </div>
 </div>
 </div>
@@ -24729,168 +24744,11 @@ for p in list(result.products())[:3]:
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="credentialed-sftp-download-skips-when-env-vars-absent">Credentialed SFTP download (skips when env vars absent)<a class="anchor-link" href="#credentialed-sftp-download-skips-when-env-vars-absent">¶</a></h2><p>The full backend chain — authenticate, search, SFTP-download — is driven by <code>EarthLens(data_source='jaxa', ...)</code>. The cell below executes it when <code>$GPORTAL_USERNAME</code> and <code>$GPORTAL_PASSWORD</code> are set and prints a graceful skip notice otherwise.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-
-<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'GPORTAL_USERNAME'</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'GPORTAL_PASSWORD'</span><span class="p">)):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'SKIP: $GPORTAL_USERNAME + $GPORTAL_PASSWORD not set.'</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'Register at https://gportal.jaxa.jp/gpr/user/regist1 and re-run.'</span><span class="p">)</span>
-    <span class="n">written</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-
-    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s1">'earthlens-jaxa-sgli-'</span><span class="p">))</span>
-    <span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-        <span class="n">data_source</span><span class="o">=</span><span class="s1">'jaxa'</span><span class="p">,</span>
-        <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">'sgli-l3-nwlr'</span><span class="p">],</span>
-        <span class="n">start</span><span class="o">=</span><span class="s1">'2024-01-01'</span><span class="p">,</span>
-        <span class="n">end</span><span class="o">=</span><span class="s1">'2024-01-02'</span><span class="p">,</span>
-        <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span>
-        <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">120.0</span><span class="p">,</span> <span class="mf">150.0</span><span class="p">],</span>
-        <span class="n">path</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">written</span> <span class="o">=</span> <span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'downloaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">written</span><span class="p">)</span><span class="si">}</span><span class="s1"> product(s) to </span><span class="si">{</span><span class="n">out_dir</span><span class="si">}</span><span class="s1">:'</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">written</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">  (</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="mi">1024</span><span class="si">}</span><span class="s1"> KB)'</span><span class="p">)</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-3">import os
-import tempfile
-from pathlib import Path
-
-if not (os.environ.get('GPORTAL_USERNAME') and os.environ.get('GPORTAL_PASSWORD')):
-    print('SKIP: $GPORTAL_USERNAME + $GPORTAL_PASSWORD not set.')
-    print('Register at https://gportal.jaxa.jp/gpr/user/regist1 and re-run.')
-    written = []
-else:
-    from earthlens.core import EarthLens
-
-    out_dir = Path(tempfile.mkdtemp(prefix='earthlens-jaxa-sgli-'))
-    lens = EarthLens(
-        data_source='jaxa',
-        variables=['sgli-l3-nwlr'],
-        start='2024-01-01',
-        end='2024-01-02',
-        lat_lim=[0.0, 30.0],
-        lon_lim=[120.0, 150.0],
-        path=out_dir,
-    )
-    written = lens.download()
-    print(f'downloaded {len(written)} product(s) to {out_dir}:')
-    for p in written:
-        print(f'  {p.name}  ({p.stat().st_size // 1024} KB)')</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="inspect-one-downloaded-hdf5-when-present">Inspect one downloaded HDF5 (when present)<a class="anchor-link" href="#inspect-one-downloaded-hdf5-when-present">¶</a></h2><p>GCOM-C SGLI products are HDF5; the metadata attributes describe the instrument, observation epoch, geographic coverage, and the data variables inside. We pick the largest downloaded file (typically the global mosaic), open it read-only with <code>h5py</code>, and print the top-level groups + a few global attributes.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="ow">not</span> <span class="n">written</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'No file to inspect — re-run the previous cell with creds set.'</span><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
-    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">'h5py not installed — pip install h5py to peek inside the HDF5.'</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">biggest</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">written</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'opening </span><span class="si">{</span><span class="n">biggest</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">biggest</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="mi">1024</span><span class="si">}</span><span class="s1"> KB)'</span><span class="p">)</span>
-        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">biggest</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">h</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">'  top-level groups:'</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">keys</span><span class="p">())[:</span><span class="mi">8</span><span class="p">]:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'    /</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">()</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">'  selected global attributes:'</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">(</span>
-                <span class="s1">'Satellite'</span><span class="p">,</span>
-                <span class="s1">'Sensor'</span><span class="p">,</span>
-                <span class="s1">'Observation_start_date'</span><span class="p">,</span>
-                <span class="s1">'Observation_end_date'</span><span class="p">,</span>
-                <span class="s1">'Granule_ID'</span><span class="p">,</span>
-            <span class="p">):</span>
-                <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">h</span><span class="o">.</span><span class="n">attrs</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'    </span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">h</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-4">if not written:
-    print('No file to inspect — re-run the previous cell with creds set.')
-else:
-    try:
-        import h5py
-    except ImportError:
-        print('h5py not installed — pip install h5py to peek inside the HDF5.')
-    else:
-        biggest = max(written, key=lambda p: p.stat().st_size)
-        print(f'opening {biggest.name} ({biggest.stat().st_size // 1024} KB)')
-        with h5py.File(biggest, 'r') as h:
-            print('  top-level groups:')
-            for k in list(h.keys())[:8]:
-                print(f'    /{k}')
-            print()
-            print('  selected global attributes:')
-            for attr in (
-                'Satellite',
-                'Sensor',
-                'Observation_start_date',
-                'Observation_end_date',
-                'Granule_ID',
-            ):
-                if attr in h.attrs:
-                    print(f'    {attr}: {h.attrs[attr]}')</div>
-</div>
-</div>
+<h2 id="a-jaxa-example-that-runs-today">A JAXA example that runs today<a class="anchor-link" href="#a-jaxa-example-that-runs-today">¶</a></h2><p>The authless <code>jaxa-earth</code> (STAC) protocol is unaffected by the CSW retirement.
+See <a href="02_aw3d30_quickstart.ipynb"><code>02_aw3d30_quickstart.ipynb</code></a> for a JAXA
+download that works end-to-end today, and the
+<a href="../../reference/jaxa/usage.md">JAXA usage reference</a> for the full request shape
+and the current status of the <code>gportal</code> protocol.</p>
 </div>
 </div>
 </div>

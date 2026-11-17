@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -17203,7 +17203,7 @@
   <span class="md-ellipsis">
     
   
-    G-Portal search + SFTP download — research scenario
+    G-Portal catalogue search — retired endpoint
   
 
     
@@ -23964,6 +23964,20 @@
 <p>The output GeoTIFF is north-up, EPSG:4326, with one band per request
 (default band from the catalog, or one file per <code>bands=</code> entry).</p>
 <h2 id="quick-start-alos-2-palsar-2-product-credentialed-sftp"><a class="toclink" href="#quick-start-alos-2-palsar-2-product-credentialed-sftp">Quick start: ALOS-2 PALSAR-2 product (credentialed SFTP)</a><a class="headerlink" href="#quick-start-alos-2-palsar-2-product-credentialed-sftp" title="Permanent link">#</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">The G-Portal CSW catalogue search is retired</p>
+<p>JAXA decommissioned the CSW catalogue-search endpoint the <code>gportal</code> SDK
+uses. Its <code>BASE_URL</code> now permanently (<code>301</code>) redirects every <code>/csw/csw</code>
+request to the portal landing page, so a search returns HTML and the SDK
+fails to parse it. The <code>gportal</code> protocol depends on this search to
+enumerate products, so the credentialed SFTP example below <strong>cannot run
+today</strong> — <code>download()</code> raises <code>GportalEndpointRetiredError</code> (a
+<code>GportalUnavailableError</code> subclass, so existing handlers still catch it,
+but distinct so you can tell a retired endpoint from a transient outage).
+This is tracked in earthlens issue #1415; a successor endpoint has to be
+found before the <code>gportal</code> protocol works again. The authless <code>jaxa-earth</code>
+path above (AW3D30 and the other STAC collections) is unaffected.</p>
+</div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
@@ -23981,7 +23995,8 @@
 <a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="n">written</span> <span class="o">=</span> <span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>  <span class="c1"># SFTP fetch via the gportal SDK</span>
 </code></pre></div>
 <p>Search is anonymous but <code>download()</code> needs credentials. Empty time / AOI
-windows return <code>[]</code> rather than raising.</p>
+windows return <code>[]</code> rather than raising. (As noted above, the search endpoint
+this relies on is currently retired — see issue #1415.)</p>
 <h2 id="request-shape"><a class="toclink" href="#request-shape">Request shape</a><a class="headerlink" href="#request-shape" title="Permanent link">#</a></h2>
 <table>
 <thead>
