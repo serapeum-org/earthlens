@@ -28,6 +28,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
 from loguru import logger
+from shapely import make_valid
+from shapely.affinity import translate
+from shapely.errors import ShapelyError
+from shapely.geometry import box, shape
 
 from earthlens.base import (
     CADENCE_ALIASES,
@@ -45,6 +49,63 @@ from earthlens.base import (
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
     from earthlens.stac.catalog import Catalog, Endpoint
+
+
+#: Smallest overlap an item's footprint must share with the AOI to be worth
+#: reading, as a fraction of whichever of the two is *smaller*.
+#:
+#: A STAC `/search` can only filter candidates by their *bbox*. A footprint that
+#: sits at an angle to the lon/lat grid — a Landsat scene's is about 0.68 of its
+#: own bbox, measured on live `landsat-c2l2-sr` items — therefore passes the bbox
+#: filter while its geometry can miss the AOI completely. A hairline overlap along
+#: one edge is no more useful: it crops to a sliver a few pixels wide. Measured
+#: against DEAfrica `wofs_ls` over a 0.25 deg^2 AOI, the genuine hairlines covered
+#: 9.0e-06 and 2.9e-05 of it, i.e. 11x and 3.4x under this bound.
+#:
+#: The fraction is of the *smaller* geometry, which is what makes the measure
+#: scale-free. Against the AOI alone it inverts as soon as the AOI outgrows one
+#: scene: a tile wholly inside a continental AOI covers all of itself but a
+#: negligible share of the AOI, so a fraction-of-AOI floor rejects every tile of
+#: a legitimate mosaic once the AOI passes roughly 10,000 scene areas (NAIP over
+#: CONUS, Sentinel-2 near-globally). A hairline, by contrast, covers almost none
+#: of either geometry and is still dropped.
+#:
+#: One consequence is deliberate: a footprint that is itself tiny and lies wholly
+#: inside the AOI covers all of itself and is kept, because its whole extent is
+#: the only data that item has to offer. What the floor drops is an overlap that
+#: is negligible against *both* geometries — a large scene merely grazing the
+#: AOI's edge, which is the shape the DEAfrica hairlines took.
+#:
+#: Both areas are planar squared degrees, so the ratio carries the `cos(lat)`
+#: distortion of the lon/lat plane and is not a true-area measure. Where the
+#: footprint is the smaller geometry the distortion largely cancels, since the
+#: intersection and the footprint occupy the same latitudes. Where the AOI is the
+#: smaller one it does not: a 120-degree-tall AOI weights its equatorial rows
+#: about twice its 60-degree rows, while the intersection may sit entirely in one
+#: band, so a high-latitude overlap is measured against an AOI area inflated by
+#: the tropics and is judged more harshly than the same overlap at the equator.
+#: The floor is three to four orders below any plausible real coverage, so this
+#: never decides a realistic case; it would have to be tightened a long way
+#: before an equal-area projection were worth the cost.
+_MIN_OVERLAP_FRACTION = 1e-4
+
+#: How many bbox-matched candidates a search may examine before giving up.
+#:
+#: `max_items` cannot be passed through to the API, because the truncation happens
+#: on bbox order before the footprint screen runs — that is the defect this
+#: module's screen exists to fix. But dropping any bound removes
+#: `pystac_client`'s only stop (`ItemSearch.pages_as_dicts` returns early just
+#: `if self._max_items`; the truncation is client-side in that method, not
+#: server-side), so a search whose early pages hold nothing covering would page a
+#: whole catalogue.
+#:
+#: This budget is therefore deliberately *not* derived from `max_items`. Scaling
+#: it by the cap reintroduces exactly the bug above at a new threshold: a request
+#: for one item would examine only a handful of candidates and miss a covering
+#: scene sitting behind them. It is a safety valve against runaway paging, sized
+#: so that reaching it means something is unusual about the request rather than
+#: about the cap, and the caller can raise it with `max_candidates=`.
+_DEFAULT_MAX_CANDIDATES = 2000
 
 
 class STAC(LazyClientMixin, AbstractDataSource):
@@ -85,6 +146,8 @@ class STAC(LazyClientMixin, AbstractDataSource):
         token: str | None = None,
         client_id: str | None = None,
         max_items: int | None = None,
+        min_overlap_fraction: float = _MIN_OVERLAP_FRACTION,
+        max_candidates: int | None = _DEFAULT_MAX_CANDIDATES,
     ):
         """Initialise a STAC backend instance.
 
@@ -119,7 +182,26 @@ class STAC(LazyClientMixin, AbstractDataSource):
             client_id: Keycloak client id for a `cdse` bearer endpoint
                 (defaults to `cdse-public` in the signer).
             max_items: Optional cap on the number of items per collection
-                search (mainly for tests / smoke pulls).
+                search (mainly for tests / smoke pulls). Counts items that can
+                actually contribute pixels: candidates whose footprint misses the
+                AOI are dropped before the cap is applied, so `max_items=1` is
+                the first *covering* scene rather than whatever the API lists
+                first. `None` means no cap; a value below 1 is rejected.
+            min_overlap_fraction: How much of the smaller of the footprint and
+                the AOI their overlap must cover for an item to be read. Defaults
+                to `0.0001` (0.01% of the smaller geometry); `0` turns the
+                footprint screen off completely, keeping every item the API
+                matched.
+            max_candidates: How many bbox-matched candidates a search may examine
+                per `(collection, bbox)` before giving up, as a bound on paging a
+                large catalogue. Defaults to `2000`; `None` removes the bound.
+                Deliberately independent of `max_items` — see
+                `_DEFAULT_MAX_CANDIDATES`.
+
+        Raises:
+            ValueError: When `max_items` is given and is less than 1, when
+                `min_overlap_fraction` is outside `[0, 1]`, or when
+                `max_candidates` is given and is less than 1.
         """
         self._endpoint = endpoint
         self._resolution = resolution
@@ -132,13 +214,56 @@ class STAC(LazyClientMixin, AbstractDataSource):
         self._password = password
         self._token = token
         self._client_id = client_id
+        if max_items is not None and (
+            isinstance(max_items, bool) or not isinstance(max_items, int)
+        ):
+            raise ValueError(f"max_items must be an int or None, got {max_items!r}")
+        if max_items is not None and max_items < 1:
+            # `0` used to reach pystac_client, where `if self._max_items` makes it
+            # falsy and therefore means "no cap"; the client-side cap now reads it
+            # as "stop after the first kept item". Neither reading is defensible,
+            # so reject it rather than silently picking one.
+            raise ValueError(
+                f"max_items must be None (no cap) or at least 1, got {max_items}"
+            )
+        if isinstance(min_overlap_fraction, bool) or not isinstance(
+            min_overlap_fraction, (int, float)
+        ):
+            raise ValueError(
+                f"min_overlap_fraction must be a number, got {min_overlap_fraction!r}"
+            )
+        if not 0.0 <= min_overlap_fraction <= 1.0:
+            raise ValueError(
+                "min_overlap_fraction must be between 0 and 1, got "
+                f"{min_overlap_fraction}"
+            )
+        if max_candidates is not None and (
+            isinstance(max_candidates, bool)
+            or not isinstance(max_candidates, int)
+            or max_candidates < 1
+        ):
+            raise ValueError(
+                "max_candidates must be None (no bound) or an int of at least 1, "
+                f"got {max_candidates!r}"
+            )
         self._max_items = max_items
+        self._min_overlap_fraction = float(min_overlap_fraction)
+        self._max_candidates = max_candidates
         # Stored before super().__init__ because the base constructor calls
         # _initialize() (which needs the request) before it sets self.vars.
         self._variables = variables
         # Non-crossing AOI sub-bboxes; populated by _create_grid (one box, or
         # two when the request crosses the antimeridian).
         self._aoi_bboxes: list[tuple[float, float, float, float]] = []
+        #: Set by `_search`: the API matched candidates but the footprint screen
+        #: dropped every one. `download` turns that into an error; `search` /
+        #: `count` / `preview` keep their documented empty result.
+        self._screened_out = False
+        #: Set by `_search`: the `(collection, bbox)` pairs whose candidate budget
+        #: ran out before the list ended, so "nothing covers the AOI" was never
+        #: established for them. `download` reports this cause in preference to
+        #: `_screened_out`, because the remedy is different.
+        self._budget_exhausted: list[tuple[str, tuple[float, ...]]] = []
         # Filled by _fetch: (collection_key, date, half index, path) per COG.
         self._written: list[tuple[str, str, int, Path]] = []
         self._catalog: Catalog | None = None
@@ -271,14 +396,47 @@ class STAC(LazyClientMixin, AbstractDataSource):
     def _search(self) -> list[RemoteProduct]:
         """Search every requested collection for the bbox + window.
 
+        A STAC search filters candidates by their bbox only, so an item whose
+        footprint lies at an angle to the lon/lat grid can match the bbox while
+        covering none of the AOI. Candidates are therefore screened with
+        `_covers_aoi` before `max_items` is applied, which makes the cap count
+        usable scenes. The API is asked for a bounded pool of candidates rather
+        than for the cap itself (see `_DEFAULT_MAX_CANDIDATES`).
+
+        Every `(collection, bbox)` pair reports what the screen did: a warning
+        when the pair matched candidates and kept none, another when it stopped at
+        the candidate budget, and a debug line otherwise.
+
+        Neither outcome is an exception here — `search()`, `count()` and
+        `preview()` all document an empty result — so each is recorded for
+        `download` to fail on instead. They are kept apart because the remedies
+        differ: `_screened_out` means the screen examined everything and nothing
+        covered the AOI, while `_budget_exhausted` means it stopped looking, so
+        nothing was established at all. Both are reset on entry, so a search that
+        raises part-way leaves no verdict from the previous call.
+
         Returns:
-            One `RemoteProduct` per matched item; the pystac item, its
-            acquisition date, the logical collection key, and the requested
-            asset list ride on `metadata`.
+            One `RemoteProduct` per matched item whose footprint covers the AOI;
+            the pystac item, its acquisition date, the logical collection key,
+            and the requested asset list ride on `metadata`. The empty list when
+            nothing matched, when the screen dropped everything that did, or when
+            the budget ran out before a covering item was found.
         """
         start = self.time.start_date.strftime("%Y-%m-%d")
         end = self.time.end_date.strftime("%Y-%m-%d")
         products: list[RemoteProduct] = []
+        # Candidates the API returned, kept or dropped, so an all-dropped search
+        # can be told apart from one the API matched nothing for.
+        examined = 0
+        # Reset both verdicts up front: they are read by `download` after this
+        # method returns, so leaving a previous call's values in place would let a
+        # search that failed part-way report the earlier outcome.
+        self._screened_out = False
+        self._budget_exhausted = []
+        # Ask for one more than the budget, so consuming budget + 1 candidates is
+        # what distinguishes "the bound truncated the list" from "the collection
+        # happens to hold exactly this many".
+        probe = None if self._max_candidates is None else self._max_candidates + 1
         assert self._catalog is not None  # set in _initialize
         assert self._endpoint is not None  # resolved in _initialize
         assert isinstance(self.vars, dict)  # STAC always uses the mapping form
@@ -287,32 +445,135 @@ class STAC(LazyClientMixin, AbstractDataSource):
             assets = list(requested) or list(collection.default_assets)
             resolved_id = self._catalog.resolve(self._endpoint, collection_key)
             for bbox in self._bboxes():
+                # The API is bounded by the candidate budget, never by `max_items`:
+                # it can only filter on the item bbox, so letting the item cap
+                # truncate the list would hand us scenes covering none of the AOI
+                # and hide the ones that do.
                 search = self.client.search(
                     collections=[resolved_id],
                     bbox=list(bbox),
                     datetime=f"{start}/{end}",
-                    max_items=self._max_items,
+                    max_items=probe,
                 )
-                for item in search.items():
-                    products.append(
-                        RemoteProduct(
-                            id=getattr(item, "id", str(item)),
-                            metadata={
-                                "item": item,
-                                "date": _acq_date(item),
-                                "collection_key": collection_key,
-                                "assets": assets,
-                                "bbox": tuple(bbox),
-                            },
-                        )
-                    )
+                kept, seen = self._screen_pair(
+                    search, collection_key, tuple(bbox), assets, probe, products
+                )
+                examined += seen
+                self._report_pair(collection_key, tuple(bbox), kept, seen, probe)
+        # `examined` with nothing kept is a data-availability outcome, not an
+        # invalid request, so it stays an empty result here -- `search()`,
+        # `count()` and `preview()` all document one. `download` turns it into an
+        # error, where writing no pixels is actionable.
+        #
+        # A budget-truncated pair is deliberately excluded: there the screen did
+        # not establish that nothing covers the AOI, only that it stopped looking,
+        # so `download` must report that cause instead.
+        self._screened_out = (
+            bool(examined) and not products and not self._budget_exhausted
+        )
         return products
+
+    def _screen_pair(
+        self,
+        search: Any,
+        collection_key: str,
+        bbox: tuple[float, ...],
+        assets: list[str],
+        probe: int | None,
+        products: list[RemoteProduct],
+    ) -> tuple[int, int]:
+        """Screen one `(collection, bbox)` search, appending what survives.
+
+        Args:
+            search: The search whose items to walk; it pages lazily, so stopping
+                early fetches no page that is not needed.
+            collection_key: The logical collection key, carried on each product.
+            bbox: The AOI bbox this search covers.
+            assets: The asset list the products should request.
+            probe: The item bound the search was given (budget + 1), or `None`.
+            products: The accumulating result list, appended to in place.
+
+        Returns:
+            How many items were kept and how many were examined.
+        """
+        aoi = box(*bbox)
+        kept = 0
+        seen = 0
+        for item in search.items():
+            seen += 1
+            if not _covers_aoi(item, aoi, self._min_overlap_fraction):
+                continue
+            products.append(
+                RemoteProduct(
+                    id=getattr(item, "id", str(item)),
+                    metadata={
+                        "item": item,
+                        "date": _acq_date(item),
+                        "collection_key": collection_key,
+                        "assets": assets,
+                        "bbox": bbox,
+                    },
+                )
+            )
+            kept += 1
+            if self._max_items is not None and kept >= self._max_items:
+                break
+        if probe is not None and seen >= probe:
+            # Consuming budget + 1 candidates means the list did not end here, so
+            # there may be covering items never examined. A collection holding
+            # exactly `max_candidates` items stops one short of this and is
+            # reported as the ordinary case.
+            self._budget_exhausted.append((collection_key, bbox))
+        return kept, seen
+
+    def _report_pair(
+        self,
+        collection_key: str,
+        bbox: tuple[float, ...],
+        kept: int,
+        seen: int,
+        probe: int | None,
+    ) -> None:
+        """Log what the screen did for one `(collection, bbox)` pair.
+
+        Reported per pair rather than once globally: a request whose eastern
+        antimeridian half is wholly dropped still returns the western half, and
+        that partial case is the one most in need of the diagnostic.
+
+        Args:
+            collection_key: The logical collection key.
+            bbox: The AOI bbox this pair covers.
+            kept: How many items survived the screen.
+            seen: How many candidates were examined.
+            probe: The item bound the search was given, or `None`.
+        """
+        if probe is not None and seen >= probe:
+            logger.warning(
+                f"STAC screen: {collection_key} {bbox} stopped after the "
+                f"{self._max_candidates}-candidate budget with {kept} usable "
+                "item(s) found; raise `max_candidates` to examine more, or "
+                "narrow the AOI or date window"
+            )
+        if seen and not kept:
+            logger.warning(
+                f"STAC screen: {collection_key} {bbox} matched {seen} "
+                "candidate(s) on bbox but none covers the AOI (a STAC search "
+                "filters on the item bbox, which for a footprint lying at an "
+                "angle to the lon/lat grid is larger than the scene itself)"
+            )
+        elif seen:
+            logger.debug(
+                f"STAC screen: {collection_key} {bbox} kept {kept}/{seen} candidate(s)"
+            )
 
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
         """Mosaic the matched items per `(collection, date)` and write COGs.
 
         For each group: per requested band, collect the **signed** hrefs of the
-        tiles covering the bbox, reproject mismatched-CRS tiles to a common CRS
+        tiles covering the bbox — resolved through the signer's preferred
+        `alternate-assets` mirror where it has one, since an endpoint's canonical
+        href is not always the copy its credentials can read — reproject
+        mismatched-CRS tiles to a common CRS
         (`merge_rasters` does not reproject), mosaic, stack the bands, crop to
         the AOI, and write one COG. The merge / stack calls run inside
         `CloudConfig(extra=signer.gdal_env())` because those helpers read URLs
@@ -329,6 +590,8 @@ class STAC(LazyClientMixin, AbstractDataSource):
         from pyramids.dataset.merge import merge_rasters
         from pyramids.stac import resolved_href
 
+        from earthlens.stac.signers import alternate_preference_for
+
         out: list[Path] = []
         # (collection_key, date, half index, path) for each written COG, so
         # download(aggregate=) can group + window them without re-parsing names.
@@ -340,6 +603,13 @@ class STAC(LazyClientMixin, AbstractDataSource):
             # Per-collection signer (e.g. requester-pays for usgs-landsat) — its
             # GDAL env must be active for the remote reads inside merge_rasters.
             signer = self._signer_for(collection_key)
+            # Which `alternate-assets` mirror this signer must read instead of the
+            # asset's canonical href. Requester-pays Landsat publishes a canonical
+            # HTTPS href that 302s to the EROS login (unreadable with an AWS key
+            # pair) alongside a readable `s3://` alternate; `None` keeps the
+            # canonical href, and resolved_href falls back to it for any asset
+            # that publishes no such alternate.
+            alternate = alternate_preference_for(signer)
             with CloudConfig(extra=signer.gdal_env()):
                 idx = self._aoi_bboxes.index(bbox_key) if multi else 0
                 assets = group[0].metadata["assets"]
@@ -364,7 +634,12 @@ class STAC(LazyClientMixin, AbstractDataSource):
                     # left-over s3:// to the GDAL /vsis3/ path.
                     hrefs = [
                         _to_vsi(
-                            resolved_href(p.metadata["item"], item_key, signer=signer)
+                            resolved_href(
+                                p.metadata["item"],
+                                item_key,
+                                signer=signer,
+                                alternate=alternate,
+                            )
                         )
                         for p in group
                     ]
@@ -547,8 +822,36 @@ class STAC(LazyClientMixin, AbstractDataSource):
             The written COG paths: one per `(collection, date)` when `aggregate`
             is `None`, or one per `(collection, window)` when `aggregate` is set.
 
+        Raises:
+            ValueError: When the search matched candidates on their bbox but the
+                footprint screen dropped every one of them, so there are no
+                pixels to write; or when the search stopped at the
+                `max_candidates` budget before finding a covering item, which is
+                reported separately because raising the budget is the remedy
+                there and changing the request is the remedy in the other case. A
+                search the API matched nothing for is not an error and still
+                returns the empty list, and `search` / `count` / `preview` never
+                raise for any of these.
         """
         paths = self._api_via_search_fetch()
+        if not paths and self._budget_exhausted:
+            where = ", ".join(f"{key} {bbox}" for key, bbox in self._budget_exhausted)
+            raise ValueError(
+                f"no item covering the AOI was found within the "
+                f"{self._max_candidates}-candidate budget for {where}. The search "
+                "stopped before the list ended, so a covering item may simply not "
+                "have been reached: raise `max_candidates` to examine more, or "
+                "narrow the AOI or date window so fewer candidates match."
+            )
+        if self._screened_out:
+            raise ValueError(
+                "every item the search matched was dropped because none covers "
+                "the requested AOI: a STAC search filters on the item bbox, "
+                "which for a footprint lying at an angle to the lon/lat grid is "
+                "larger than the scene itself. Move the date window, or pick a "
+                "collection whose footprints cover the AOI. The per-collection "
+                "warnings name the bbox(es) concerned."
+            )
         if aggregate is not None:
             return self._aggregate_cogs(aggregate)
         return paths
@@ -686,6 +989,160 @@ def _acq_date(item: Any) -> str:
     if isinstance(value, str) and len(value) >= 10:
         return value[:10]
     return "unknown"
+
+
+def _covers_aoi(
+    item: Any, aoi: Any, min_fraction: float = _MIN_OVERLAP_FRACTION
+) -> bool:
+    """Return whether `item`'s footprint covers enough of `aoi` to be read.
+
+    Args:
+        item: A STAC item; its `geometry` is the acquisition footprint.
+        aoi: The AOI as a shapely geometry.
+        min_fraction: Smallest share of the *smaller* of the footprint and `aoi`
+            that their intersection may cover and still count. Defaults to
+            `0.0001`; `0` keeps every item.
+
+    Returns:
+        True when the footprint covers at least `min_fraction` of whichever of the
+        footprint and `aoi` is smaller. The keep cases, in the order they apply:
+
+        - `min_fraction` of `0` keeps everything, which is the documented way to
+          turn the screen off;
+        - a geometry that is absent, empty or unparseable is kept, so a footprint
+          we cannot judge never silently drops data that may well overlap;
+        - a footprint whose longitudes fall outside `[-180, 180]` is shifted by
+          360 degrees into range and then judged, so a `0`-`360`-convention
+          footprint is neither lost nor exempted from the screen;
+        - an invalid ring is repaired with `make_valid` and then judged;
+        - a footprint with no area to take a fraction of — a Point or a
+          LineString, or a degenerate AOI — is judged topologically, so one
+          touching the AOI is kept and one away from it is not.
+
+    Examples:
+        - A footprint spanning the AOI covers it:
+            ```python
+            >>> from shapely.geometry import box
+            >>> from earthlens.stac.backend import _covers_aoi
+            >>> aoi = box(-4.0, 40.0, -3.0, 41.0)
+            >>> scene = {"geometry": box(-4.5, 39.5, -2.5, 41.5).__geo_interface__}
+            >>> _covers_aoi(scene, aoi)
+            True
+
+            ```
+        - A footprint rotated 45 degrees can match the AOI on its bbox while
+          covering none of it, which is what a STAC search cannot filter out:
+            ```python
+            >>> from shapely.geometry import Polygon, box
+            >>> from earthlens.stac.backend import _covers_aoi
+            >>> aoi = box(-4.0, 40.0, -3.0, 41.0)
+            >>> diamond = Polygon(
+            ...     [(-3.9, 42.0), (-2.0, 43.9), (-0.1, 42.0), (-2.0, 40.1)]
+            ... )
+            >>> round(box(*diamond.bounds).intersection(aoi).area / aoi.area, 2)
+            0.81
+            >>> _covers_aoi({"geometry": diamond.__geo_interface__}, aoi)
+            False
+
+            ```
+        - An item publishing no footprint is kept, so nothing is dropped for a
+          missing geometry:
+            ```python
+            >>> from shapely.geometry import box
+            >>> from earthlens.stac.backend import _covers_aoi
+            >>> _covers_aoi({"id": "no-geometry"}, box(-4.0, 40.0, -3.0, 41.0))
+            True
+
+            ```
+
+    See Also:
+        STAC._search: Applies this screen before `max_items` caps the results.
+    """
+    geometry = getattr(item, "geometry", None)
+    if geometry is None and isinstance(item, dict):
+        geometry = item.get("geometry")
+    result = True
+    # A zero floor is the documented off-switch, so it must short-circuit the
+    # whole screen rather than every individual rule below -- the zero-area rule
+    # ignores `min_fraction` entirely, which used to leave the off-switch working
+    # for polygons and silently failing for Point and LineString footprints.
+    if geometry and min_fraction > 0:
+        # The parse and the overlay are both inside the guard. An unknown `type`
+        # raises ShapelyError (GeometryTypeError) and a missing `coordinates`
+        # raises KeyError at parse time, but a self-intersecting or non-noded ring
+        # -- common in real catalogs -- parses fine and raises GEOSException
+        # (also a ShapelyError) from `intersection`, which is the step most likely
+        # to throw. Neither should cost us a usable scene.
+        try:
+            footprint = shape(geometry)
+            if not footprint.is_valid:
+                # Repair before measuring, not only after a raise: a symmetric
+                # self-intersecting ring has an `area` that cancels to 0, so it
+                # would otherwise reach the zero-scale rule below and be kept
+                # without ever being judged.
+                footprint = make_valid(footprint)
+            result = _overlaps(_normalise_longitudes(footprint), aoi, min_fraction)
+        except (AttributeError, KeyError, TypeError, ValueError, ShapelyError):
+            result = True
+    return result
+
+
+def _normalise_longitudes(footprint: Any) -> Any:
+    """Shift a footprint whose longitudes leave `[-180, 180]` back into range.
+
+    Some providers publish a `0`-`360` longitude, emitting `181.5` where RFC 7946
+    wants `-178.5`. The AOI bboxes are always normalised, so such a footprint
+    intersects none of them and would be dropped wherever it really is. Shifting
+    it by a whole turn puts it back on the same meridian as the AOI, after which
+    the ordinary measurement applies — which matters because exempting these
+    footprints from the screen instead would keep a Pacific scene for a European
+    AOI, let it consume the item cap and have it fetched for nothing.
+
+    Args:
+        footprint: The item's footprint as a shapely geometry.
+
+    Returns:
+        The footprint shifted by -360, +360 or not at all, whichever brings its
+        longitudes inside `[-180, 180]`. A footprint already in range, one with
+        no bounds to read (an empty geometry's are `nan`), or one too wide for any
+        shift to help is returned unchanged.
+    """
+    min_x, _, max_x, _ = footprint.bounds
+    shift = 0.0
+    if min_x >= 180.0:
+        shift = -360.0
+    elif max_x <= -180.0:
+        shift = 360.0
+    return translate(footprint, xoff=shift) if shift else footprint
+
+
+def _overlaps(footprint: Any, aoi: Any, min_fraction: float) -> bool:
+    """Return whether `footprint` shares enough area with `aoi` to be worth reading.
+
+    Args:
+        footprint: The item's footprint as a shapely geometry.
+        aoi: The AOI as a shapely geometry.
+        min_fraction: Smallest share of the smaller geometry the intersection may
+            cover and still count.
+
+    Returns:
+        True when the intersection covers at least `min_fraction` of whichever of
+        the two geometries is smaller, or when the footprint is empty (which
+        cannot be judged, so it is kept).
+    """
+    result = True
+    if not footprint.is_empty:
+        # Scale by the smaller geometry so the measure does not invert for an AOI
+        # larger than one scene; see `_MIN_OVERLAP_FRACTION`.
+        scale = min(aoi.area, footprint.area)
+        if scale <= 0.0:
+            # A Point or LineString footprint -- or a degenerate AOI -- has no
+            # area to take a fraction of, so judge it topologically instead of
+            # letting a zero floor keep everything, however far away it is.
+            result = footprint.intersects(aoi)
+        else:
+            result = footprint.intersection(aoi).area >= min_fraction * scale
+    return result
 
 
 def _to_vsi(href: str) -> str:

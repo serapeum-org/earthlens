@@ -566,6 +566,161 @@ class TestSignerOverride:
         )
         assert fake_pyramids.merge_calls[0][0][0].startswith("/vsis3/usgs-landsat/")
 
+    def test_requester_pays_reads_the_s3_alternate_not_the_https_href(
+        self, fake_pyramids, tmp_path
+    ):
+        """A requester-pays read takes the asset's s3 mirror over its canonical href."""
+        fake_pyramids.items_by_collection["landsat-c2-l2"] = [
+            make_item(
+                "a",
+                "2024-01-05",
+                {"red": "https://landsatlook.usgs.gov/data/x/red.tif"},
+                alternates={"red": {"s3": "s3://usgs-landsat/x/red.tif"}},
+            )
+        ]
+        stac = _build_stac(
+            tmp_path,
+            endpoint="earth-search",
+            variables={"earth-search/landsat-c2-l2": ["red"]},
+        )
+        stac._fetch(stac._search())
+        read = fake_pyramids.merge_calls[0][0][0]
+        assert read == "/vsis3/usgs-landsat/x/red.tif"
+        assert "landsatlook.usgs.gov" not in read
+
+    def test_asset_without_an_s3_alternate_keeps_its_canonical_href(
+        self, fake_pyramids, tmp_path
+    ):
+        """With no s3 mirror published, the requester-pays read falls back to the href."""
+        fake_pyramids.items_by_collection["landsat-c2-l2"] = [
+            make_item("a", "2024-01-05", {"red": "https://landsatlook.usgs.gov/x.tif"})
+        ]
+        stac = _build_stac(
+            tmp_path,
+            endpoint="earth-search",
+            variables={"earth-search/landsat-c2-l2": ["red"]},
+        )
+        stac._fetch(stac._search())
+        assert (
+            fake_pyramids.merge_calls[0][0][0] == "https://landsatlook.usgs.gov/x.tif"
+        )
+
+    def test_usgs_landsat_reads_the_s3_mirror_of_its_https_canonical(
+        self, fake_pyramids, tmp_path
+    ):
+        """The endpoint that really publishes an s3 mirror resolves to it.
+
+        `usgs-landsat` is the only endpoint in the catalog whose canonical href is
+        the login-gated HTTPS copy; the hrefs here are the shapes a live
+        `landsat-c2l2-sr` item carries.
+        """
+        fake_pyramids.items_by_collection["landsat-c2l2-sr"] = [
+            make_item(
+                "LC09_L2SP_044034_20240828_20240829_02_T1",
+                "2024-08-28",
+                {
+                    "red": (
+                        "https://landsatlook.usgs.gov/data/collection02/level-2/"
+                        "standard/oli-tirs/2024/044/034/"
+                        "LC09_L2SP_044034_20240828_20240829_02_T1/"
+                        "LC09_L2SP_044034_20240828_20240829_02_T1_SR_B4.TIF"
+                    )
+                },
+                alternates={
+                    "red": {
+                        "s3": (
+                            "s3://usgs-landsat/collection02/level-2/standard/"
+                            "oli-tirs/2024/044/034/"
+                            "LC09_L2SP_044034_20240828_20240829_02_T1/"
+                            "LC09_L2SP_044034_20240828_20240829_02_T1_SR_B4.TIF"
+                        )
+                    }
+                },
+            )
+        ]
+        stac = _build_stac(
+            tmp_path,
+            endpoint="usgs-landsat",
+            variables={"usgs-landsat/landsat-c2l2-sr": ["red"]},
+        )
+        assert stac._signer_for("usgs-landsat/landsat-c2l2-sr").name == (
+            "aws-requester-pays"
+        )
+        stac._fetch(stac._search())
+        read = fake_pyramids.merge_calls[0][0][0]
+        assert read.startswith("/vsis3/usgs-landsat/collection02/")
+        assert "landsatlook.usgs.gov" not in read
+
+    def test_an_alternate_spelled_as_an_attribute_is_ignored(
+        self, fake_pyramids, tmp_path
+    ):
+        """Only the extension-field spelling counts, as in pyramids' own resolver.
+
+        `pyramids.stac._item.asset_field` reads a raw dict's top-level key or a
+        `pystac.Asset`'s `extra_fields`, never an attribute, so an asset carrying
+        `alternate` as an attribute must resolve to its canonical href.
+        """
+        item = make_item(
+            "a", "2024-01-05", {"red": "https://landsatlook.usgs.gov/x.tif"}
+        )
+        item.assets["red"].alternate = {"s3": {"href": "s3://nope/x.tif"}}
+        fake_pyramids.items_by_collection["landsat-c2-l2"] = [item]
+        stac = _build_stac(
+            tmp_path,
+            endpoint="earth-search",
+            variables={"earth-search/landsat-c2-l2": ["red"]},
+        )
+        stac._fetch(stac._search())
+        assert fake_pyramids.merge_calls[0][0][0] == (
+            "https://landsatlook.usgs.gov/x.tif"
+        )
+
+    def test_requester_pays_passes_the_s3_preference_to_resolved_href(
+        self, fake_pyramids, tmp_path
+    ):
+        """The signer's preference reaches resolved_href rather than being implied."""
+        fake_pyramids.items_by_collection["landsat-c2-l2"] = [
+            make_item("a", "2024-01-05", {"red": "s3://usgs-landsat/x/red.tif"})
+        ]
+        stac = _build_stac(
+            tmp_path,
+            endpoint="earth-search",
+            variables={"earth-search/landsat-c2-l2": ["red"]},
+        )
+        stac._fetch(stac._search())
+        assert [c["alternate"] for c in fake_pyramids.resolved_href_calls] == [("s3",)]
+
+    def test_anonymous_collection_passes_no_preference_to_resolved_href(
+        self, fake_pyramids, tmp_path
+    ):
+        """An anonymous collection resolves with alternate=None."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item("a", "2024-01-05", {"B04": "https://h/a_b04.tif"})
+        ]
+        stac = _build_stac(
+            tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]}
+        )
+        stac._fetch(stac._search())
+        assert [c["alternate"] for c in fake_pyramids.resolved_href_calls] == [None]
+
+    def test_anonymous_collection_is_not_given_an_alternate(
+        self, fake_pyramids, tmp_path
+    ):
+        """An anonymous collection keeps the canonical href even when a mirror exists."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item(
+                "a",
+                "2024-01-05",
+                {"B04": "https://h/a_b04.tif"},
+                alternates={"B04": {"s3": "s3://nope/a_b04.tif"}},
+            )
+        ]
+        stac = _build_stac(
+            tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]}
+        )
+        stac._fetch(stac._search())
+        assert fake_pyramids.merge_calls[0][0][0] == "https://h/a_b04.tif"
+
 
 @pytest.mark.stac
 class TestSignerCredentials:

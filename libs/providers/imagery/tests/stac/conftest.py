@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import sys
 import types
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
@@ -20,46 +21,110 @@ import pytest
 
 
 class _FakeAsset:
-    """A STAC asset stand-in carrying just an href."""
+    """A STAC asset stand-in carrying an href and optional `alternate` mirrors.
 
-    def __init__(self, href: str) -> None:
+    The mirrors live in `extra_fields`, which is where `pystac.Asset` keeps
+    extension fields and the only place `pyramids.stac` looks on a non-dict asset
+    (`_item.asset_field`: a raw dict's top-level key, else `asset.extra_fields`).
+    An `alternate` attribute is never consulted, so modelling it as one would make
+    the fake honour a spelling the real resolver ignores.
+    """
+
+    def __init__(self, href: str, alternate: dict[str, str] | None = None) -> None:
         self.href = href
+        self.extra_fields: dict[str, Any] = {}
+        if alternate is not None:
+            self.extra_fields["alternate"] = {
+                k: {"href": v} for k, v in alternate.items()
+            }
 
 
 class _FakeItem:
-    """A STAC item stand-in with id, datetime, and an assets map."""
+    """A STAC item stand-in with id, datetime, assets and an optional footprint."""
 
     def __init__(
         self,
         item_id: str,
         date: str,
         asset_hrefs: dict[str, str],
+        *,
         proj_epsg: int | None = None,
+        geometry: dict[str, Any] | None = None,
+        alternates: dict[str, dict[str, str]] | None = None,
     ) -> None:
         import datetime as dt
 
         self.id = item_id
         self.datetime = dt.datetime.strptime(date, "%Y-%m-%d")
-        self.assets = {k: _FakeAsset(v) for k, v in asset_hrefs.items()}
+        self.assets = {
+            k: _FakeAsset(v, (alternates or {}).get(k)) for k, v in asset_hrefs.items()
+        }
         self.properties = {"proj:epsg": proj_epsg} if proj_epsg is not None else {}
+        if geometry is not None:
+            self.geometry = geometry
 
 
 def make_item(
-    item_id: str, date: str, asset_hrefs: dict[str, str], proj_epsg: int | None = None
+    item_id: str,
+    date: str,
+    asset_hrefs: dict[str, str],
+    *,
+    proj_epsg: int | None = None,
+    geometry: dict[str, Any] | None = None,
+    alternates: dict[str, dict[str, str]] | None = None,
 ) -> _FakeItem:
-    """Build a fake STAC item for a search result (optional `proj:epsg`)."""
-    return _FakeItem(item_id, date, asset_hrefs, proj_epsg)
+    """Build a fake STAC item for a search result (optional epsg/footprint/mirrors)."""
+    return _FakeItem(
+        item_id,
+        date,
+        asset_hrefs,
+        proj_epsg=proj_epsg,
+        geometry=geometry,
+        alternates=alternates,
+    )
+
+
+def make_bbox_geometry(
+    minx: float, miny: float, maxx: float, maxy: float
+) -> dict[str, Any]:
+    """Build a GeoJSON polygon footprint spanning the given bounds."""
+    return {
+        "type": "Polygon",
+        "coordinates": [
+            [
+                [minx, miny],
+                [maxx, miny],
+                [maxx, maxy],
+                [minx, maxy],
+                [minx, miny],
+            ]
+        ],
+    }
 
 
 class _FakeSearch:
-    """A pystac-client search stand-in yielding a fixed item list."""
+    """A pystac-client search stand-in that truncates at `max_items` as it does.
 
-    def __init__(self, items: list[_FakeItem]) -> None:
+    `pystac_client.ItemSearch.pages_as_dicts` stops yielding once `max_items`
+    items have been produced (`item_search.py`, the `if self._max_items and
+    num_items >= self._max_items: return` branch), so a fake that ignores the
+    argument cannot show whether a bound actually bounds anything. `yielded`
+    records how many items were consumed, which is the only way to tell a search
+    that stopped early from one that ran out of data.
+    """
+
+    def __init__(self, items: list[_FakeItem], max_items: int | None = None) -> None:
         self._items = items
+        self._max_items = max_items
+        self.yielded = 0
 
     def items(self):
-        """Yield the configured items."""
-        return iter(self._items)
+        """Yield items up to `max_items`, counting what the caller consumed."""
+        for item in self._items:
+            if self._max_items is not None and self.yielded >= self._max_items:
+                return
+            self.yielded += 1
+            yield item
 
 
 class _FakeClient:
@@ -68,12 +133,18 @@ class _FakeClient:
     def __init__(self, items_by_collection: dict[str, list[_FakeItem]]) -> None:
         self._items_by_collection = items_by_collection
         self.search_calls: list[dict[str, Any]] = []
+        self.searches: list[_FakeSearch] = []
 
     def search(self, **kwargs: Any) -> _FakeSearch:
         """Record the search kwargs and return the items for the collection."""
         self.search_calls.append(dict(kwargs))
         collection = kwargs.get("collections", [None])[0]
-        return _FakeSearch(self._items_by_collection.get(collection, []))
+        search = _FakeSearch(
+            self._items_by_collection.get(collection, []),
+            max_items=kwargs.get("max_items"),
+        )
+        self.searches.append(search)
+        return search
 
 
 class _FakeDataset:
@@ -179,6 +250,7 @@ class FakePyramids:
         self.client = _FakeClient(self.items_by_collection)
         self.open_client_calls: list[dict[str, Any]] = []
         self.merge_calls: list[tuple[list[str], str]] = []
+        self.resolved_href_calls: list[dict[str, Any]] = []
         self.stack_calls: list[dict[str, Any]] = []
         self.write_calls: list[str] = []
         self.write_data: list = []
@@ -224,10 +296,37 @@ class _PlanetaryComputerSigner(_AnonymousSigner):
         return href + "?sas=token"
 
 
+def _asset_field(asset: Any, key: str) -> Any:
+    """Read an extension field the way `pyramids.stac._item.asset_field` does.
+
+    A raw dict carries extension fields as top-level keys; a `pystac.Asset` keeps
+    them in `extra_fields`. Nothing reads an attribute of that name, so neither
+    does this.
+
+    The `dict` checks are deliberate, not an oversight: the real `asset_field`
+    uses `isinstance(..., dict)`, while `asset_alternate_entry` uses `Mapping` for
+    the entry it pulls out. A fake that is looser than production in one place and
+    stricter in the other cannot catch a regression in either.
+    """
+    if isinstance(asset, dict):
+        return asset.get(key)
+    extra = getattr(asset, "extra_fields", None)
+    return extra.get(key) if isinstance(extra, dict) else None
+
+
 def _resolved_href(
-    item_or_asset: Any, asset_key: Any = None, *, signer: Any = None
+    item_or_asset: Any,
+    asset_key: Any = None,
+    *,
+    signer: Any = None,
+    alternate: Any = None,
 ) -> str:
-    """Stand-in for pyramids.stac.resolved_href: resolve href + apply sign_href."""
+    """Stand-in for pyramids.stac.resolved_href: resolve href + apply sign_href.
+
+    Mirrors the real `alternate=` preference: the first named `alternate-assets`
+    key the asset publishes wins, and an asset with none falls back to its
+    canonical href.
+    """
     if asset_key is None:
         asset = item_or_asset
     else:
@@ -244,6 +343,13 @@ def _resolved_href(
         href = asset.get("href")
     if href is None:
         raise KeyError(f"asset {asset_key!r} has no 'href'")
+    alternates = _asset_field(asset, "alternate")
+    for key in (alternate,) if isinstance(alternate, str) else (alternate or ()):
+        entry = (alternates or {}).get(key)
+        mirror = entry.get("href") if isinstance(entry, dict) else None
+        if mirror:
+            href = mirror
+            break
     href = str(href)
     return signer.sign_href(href) if signer is not None else href
 
@@ -258,6 +364,21 @@ def _read_extension_metadata(item: Any, asset_key: Any = None) -> dict[str, Any]
 
 
 @pytest.fixture
+def warnings_buffer():
+    """Collect loguru's WARNING output, which pytest's `caplog` never sees.
+
+    loguru writes through its own handler set, bound to the original stderr at
+    registration time, so a dedicated sink is the only way to read it back.
+    """
+    from loguru import logger
+
+    buffer: list[str] = []
+    sink_id = logger.add(buffer.append, level="WARNING")
+    yield buffer
+    logger.remove(sink_id)
+
+
+@pytest.fixture
 def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> FakePyramids:
     """Inject fake pyramids submodules into `sys.modules` and return the recorder."""
     fp = FakePyramids()
@@ -269,7 +390,18 @@ def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> FakePyramids:
     stac_mod.AnonymousSigner = _AnonymousSigner
     stac_mod.AWSRequesterPaysSigner = _AWSRequesterPaysSigner
     stac_mod.PlanetaryComputerSigner = _PlanetaryComputerSigner
-    stac_mod.resolved_href = _resolved_href
+
+    def _recording_resolved_href(*args: Any, **kwargs: Any) -> str:
+        """Record the asset key and alternate preference, then resolve the href."""
+        fp.resolved_href_calls.append(
+            {
+                "asset_key": args[1] if len(args) > 1 else kwargs.get("asset_key"),
+                "alternate": kwargs.get("alternate"),
+            }
+        )
+        return _resolved_href(*args, **kwargs)
+
+    stac_mod.resolved_href = _recording_resolved_href
     stac_mod.read_extension_metadata = _read_extension_metadata
 
     def _open_client(url: str, *, signer: Any = None, **kwargs: Any):

@@ -39,6 +39,17 @@ dependencies = [
     # gate before the extra is consulted, so a projected request imports pyproj
     # whether or not the reader is installed.
     "pyproj >=3.7.0",
+    # shapely: imported eagerly by five modules in this distribution, so it is a
+    # declared direct dependency rather than one left to arrive through
+    # `earthlens-core` (which also depends on it). Do not remove it with only one
+    # of these in mind:
+    #   - `stac/backend.py` (`box` / `shape` / `make_valid`) screens each
+    #     candidate item's footprint against the AOI, because a STAC search can
+    #     only filter on the item bbox;
+    #   - `asf/_helpers.py`, `gee/features.py`, `gee/io.py` and
+    #     `gee/vector/geometry.py` already imported it before that screen existed,
+    #     undeclared -- declaring it here closes that standing gap too.
+    "shapely >=2.0.0",
     # pyramids-eo: the EO tier on top of pyramids. A base dependency, not an
     # extra, because `earthlens.gee.analysis.TasseledCap` ships in the analysis
     # surface and applies pyramids-eo's per-sensor tasseled-cap coefficients
