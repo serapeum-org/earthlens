@@ -24,6 +24,20 @@ The output GeoTIFF is north-up, EPSG:4326, with one band per request
 
 ## Quick start: ALOS-2 PALSAR-2 product (credentialed SFTP)
 
+!!! warning "The G-Portal CSW catalogue search is retired"
+
+    JAXA decommissioned the CSW catalogue-search endpoint the `gportal` SDK
+    uses. Its `BASE_URL` now permanently (`301`) redirects every `/csw/csw`
+    request to the portal landing page, so a search returns HTML and the SDK
+    fails to parse it. The `gportal` protocol depends on this search to
+    enumerate products, so the credentialed SFTP example below **cannot run
+    today** — `download()` raises `GportalEndpointRetiredError` (a
+    `GportalUnavailableError` subclass, so existing handlers still catch it,
+    but distinct so you can tell a retired endpoint from a transient outage).
+    This is tracked in earthlens issue #1415; a successor endpoint has to be
+    found before the `gportal` protocol works again. The authless `jaxa-earth`
+    path above (AW3D30 and the other STAC collections) is unaffected.
+
 ```python
 from earthlens.core import EarthLens
 
@@ -43,7 +57,8 @@ written = lens.download()  # SFTP fetch via the gportal SDK
 ```
 
 Search is anonymous but `download()` needs credentials. Empty time / AOI
-windows return `[]` rather than raising.
+windows return `[]` rather than raising. (As noted above, the search endpoint
+this relies on is currently retired — see issue #1415.)
 
 ## Request shape
 
