@@ -30,22 +30,19 @@ installed. Install with `pip install earthlens[cmems]`.
 Each backend's SDK is optional and imported lazily. Install the extra named in the message, or `earthlens[all]`
 for everything. The [provider matrix](reference/providers.md) lists the extra for every backend.
 
-### `uv sync --all-extras` fails with a conflict
+### Prefer `uv sync --extra all` over `--all-extras`
 
-```
-Extras `openeo` and `argo` are incompatible with the declared conflicts
-```
-
-(That one is uv's message, not earthlens'.)
-
-`argopy` needs `xarray>=2025.7` and `openeo` needs `xarray<2025.1.2` — mutually unsatisfiable. Use the curated
-extra instead:
+The old `argo` ⊥ `openeo` xarray conflict was removed in
+[#789](https://github.com/serapeum-org/earthlens/issues/789), so `uv sync --all-extras` no longer errors — but
+use the curated extra:
 
 ```bash
-uv sync --extra all --group dev      # includes openeo and osm (with pbf/osmium); omits argo / eedai
+uv sync --extra all --group dev      # argo, openeo and osm (with pbf/osmium) — omits only eedai
 ```
 
-To work on the argo side, prune the conflicting extra: `uv sync --all-extras --no-extra openeo`.
+`--all-extras` additionally activates `eedai`, which flips the GEE backend's default `engine="auto"` onto the
+`pyramids-eo` reader — a different sampling/gridding path (see the [GEE usage page](reference/gee/usage.md)).
+`--extra all` leaves it out so an environment never silently changes GEE's pixels.
 
 ## Request construction
 

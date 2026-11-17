@@ -13,10 +13,6 @@ resolution-markers = [
     "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32'",
     "(python_full_version < '3.12' and platform_machine != 'ARM64') or (python_full_version < '3.12' and sys_platform != 'win32')",
 ]
-conflicts = [[
-    { package = "earthlens-imagery", extra = "openeo" },
-    { package = "earthlens-ocean", extra = "argo" },
-]]
 
 [manifest]
 members = [
@@ -456,10 +452,10 @@ dependencies = [
     { name = "h5netcdf" },
     { name = "netcdf4" },
     { name = "requests" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.12' and extra == 'extra-15-earthlens-ocean-argo') or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
-    { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.12' and extra == 'extra-15-earthlens-ocean-argo') or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "toolz" },
-    { name = "xarray", version = "2025.9.0", source = { registry = "https://pypi.org/simple" } },
+    { name = "xarray" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/5c/22/d23218296e149343bf77776a7f5181decf3f9ec31558414ec9708aace7da/argopy-1.5.0.tar.gz", hash = "sha256:6cea4f07ee411eeeaa101787015118484d68dcfc1d2a7d8c90d2723a8d6cdd3a", size = 2032483, upload-time = "2026-10-12T12:22:23.234Z" }
 wheels = [
@@ -1669,8 +1665,7 @@ dependencies = [
     { name = "requests" },
     { name = "semver" },
     { name = "tqdm" },
-    { name = "xarray", version = "2025.1.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-17-earthlens-imagery-openeo'" },
-    { name = "xarray", version = "2025.9.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-earthlens-ocean-argo' or extra != 'extra-17-earthlens-imagery-openeo'" },
+    { name = "xarray" },
     { name = "zarr", version = "3.1.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "zarr", version = "3.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
@@ -1916,8 +1911,7 @@ dependencies = [
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "toolz" },
-    { name = "xarray", version = "2025.1.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-17-earthlens-imagery-openeo'" },
-    { name = "xarray", version = "2025.9.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-earthlens-ocean-argo' or extra != 'extra-17-earthlens-imagery-openeo'" },
+    { name = "xarray" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/53/4b/a9141f286f0c01685e9715ba3404769a6138e74575c4d5ccbaa95a22c3bd/datashader-0.19.1.tar.gz", hash = "sha256:f62d880a4a431813f9bb3959e565feda79c1634f889aaadcf948cb0d0c114cdd", size = 10581968, upload-time = "2026-05-19T07:53:06.574Z" }
 wheels = [
@@ -2263,13 +2257,12 @@ dependencies = [
 all = [
     { name = "earthlens-atmosphere", extra = ["ecmwf", "ecmwf-modern", "eea-aq", "goes", "isimip", "mswep", "nwp", "radar", "s3", "tropycal"] },
     { name = "earthlens-hazards", extra = ["emdat", "fdsn", "hdx", "osm", "overture"] },
-    { name = "earthlens-imagery", extra = ["asf", "earthdata", "eumetsat", "gee", "jaxa", "sentinel-hub", "stac", "viz"] },
-    { name = "earthlens-imagery", extra = ["openeo"], marker = "extra == 'extra-17-earthlens-imagery-openeo'" },
+    { name = "earthlens-imagery", extra = ["asf", "earthdata", "eumetsat", "gee", "jaxa", "openeo", "sentinel-hub", "stac", "viz"] },
     { name = "earthlens-land", extra = ["dem", "gbif", "worldpop"] },
-    { name = "earthlens-ocean", extra = ["cmems", "erddap", "nwm", "obis", "usgs-water"] },
+    { name = "earthlens-ocean", extra = ["argo", "cmems", "erddap", "nwm", "obis", "usgs-water"] },
 ]
 argo = [
-    { name = "earthlens-ocean", extra = ["argo"], marker = "extra == 'extra-15-earthlens-ocean-argo'" },
+    { name = "earthlens-ocean", extra = ["argo"] },
 ]
 asf = [
     { name = "earthlens-imagery", extra = ["asf"] },
@@ -2344,7 +2337,7 @@ obis = [
     { name = "earthlens-ocean", extra = ["obis"] },
 ]
 openeo = [
-    { name = "earthlens-imagery", extra = ["openeo"], marker = "extra == 'extra-17-earthlens-imagery-openeo'" },
+    { name = "earthlens-imagery", extra = ["openeo"] },
 ]
 osm = [
     { name = "earthlens-hazards", extra = ["osm"] },
@@ -2445,6 +2438,7 @@ notebooks = [
 
 [package.metadata]
 requires-dist = [
+    { name = "earthlens", extras = ["argo"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["asf"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["cmems"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["cmip6"], marker = "extra == 'all'" },
@@ -2823,7 +2817,7 @@ requires-dist = [
     { name = "google-cloud-storage", marker = "extra == 'gee'", specifier = ">=2.0" },
     { name = "gportal", marker = "extra == 'jaxa'", specifier = ">=0.4,<0.5" },
     { name = "jaxa-earth", marker = "extra == 'jaxa'", specifier = ">=0.1.6,<0.2" },
-    { name = "openeo", marker = "extra == 'openeo'", specifier = ">=0.47,<0.52" },
+    { name = "openeo", marker = "extra == 'openeo'", specifier = ">=0.54" },
     { name = "paramiko", marker = "extra == 'jaxa'", specifier = ">=3.1,<4" },
     { name = "pyproj", specifier = ">=3.7.0" },
     { name = "pyramids-core", specifier = ">=0.80.0" },
@@ -2899,7 +2893,7 @@ usgs-water = [
 
 [package.metadata]
 requires-dist = [
-    { name = "argopy", marker = "extra == 'argo'", specifier = ">=1.4" },
+    { name = "argopy", marker = "extra == 'argo'", specifier = ">=1.5" },
     { name = "copernicusmarine", marker = "extra == 'cmems'", specifier = ">=2.0.0,<3" },
     { name = "dataretrieval", marker = "extra == 'usgs-water'", specifier = ">=1.1.4" },
     { name = "earthlens-core", editable = "libs/core" },
@@ -3854,8 +3848,7 @@ dependencies = [
     { name = "pandas" },
     { name = "pyproj" },
     { name = "requests" },
-    { name = "xarray", version = "2025.1.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-17-earthlens-imagery-openeo'" },
-    { name = "xarray", version = "2025.9.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-earthlens-ocean-argo' or extra != 'extra-17-earthlens-imagery-openeo'" },
+    { name = "xarray" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/76/5f/96bcd98f1aeb26400f81595a2a0100c0940f3d2f6a301e92cf6e04b366ba/herbie_data-2026.3.0.tar.gz", hash = "sha256:092d6e521c529c3d40ab039950bae104c70e7eb2eda0c16afde8799247df3184", size = 10808938, upload-time = "2026-03-07T16:05:09.781Z" }
 wheels = [
@@ -6568,23 +6561,23 @@ wheels = [
 
 [[package]]
 name = "openeo"
-version = "0.51.0"
+version = "0.54.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "deprecated" },
     { name = "geopandas" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.12' and extra == 'extra-17-earthlens-imagery-openeo') or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
-    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.12' and extra == 'extra-17-earthlens-imagery-openeo') or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "oschmod", marker = "sys_platform == 'win32'" },
     { name = "pandas" },
-    { name = "pystac" },
+    { name = "pystac", extra = ["validation"] },
     { name = "requests" },
     { name = "shapely" },
     { name = "urllib3" },
-    { name = "xarray", version = "2025.1.1", source = { registry = "https://pypi.org/simple" } },
+    { name = "xarray" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a8/8f/cfcaeaefa88ba2a7f06ac5ece862b272b10645f72e5f3a9a27325c8499fd/openeo-0.51.0-py3-none-any.whl", hash = "sha256:93e62ac67a3741863a796127db85c4336315b050038e9da946b01c718d923e02", size = 349236, upload-time = "2026-07-16T16:02:42.058Z" },
+    { url = "https://files.pythonhosted.org/packages/e7/d2/dade27bc993ab8ce522972133063e35c3b6cd1d1be5752a3caba78ca25ad/openeo-0.54.0-py3-none-any.whl", hash = "sha256:ae16af87c635d214fffd93cbc597803c8591d27a01abafd540e65b29110af613", size = 358637, upload-time = "2026-10-28T21:41:11.843Z" },
 ]
 
 [[package]]
@@ -6672,7 +6665,7 @@ name = "oschmod"
 version = "0.3.12"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pywin32", marker = "sys_platform == 'win32'" },
+    { name = "pywin32" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/9d/64/6e522f0a1b500470ae14dcd1a4bb8f8751f5cf441e85e9fee7dfc712cb7b/oschmod-0.3.12.tar.gz", hash = "sha256:bec99216f31615ee653b2a5c87cacfb4e4b6184c0e9f71da186300dacae974f3", size = 20064, upload-time = "2020-10-30T00:38:42.409Z" }
 wheels = [
@@ -9356,8 +9349,7 @@ dependencies = [
     { name = "packaging" },
     { name = "pyproj" },
     { name = "rasterio", version = "1.4.4", source = { registry = "https://pypi.org/simple" } },
-    { name = "xarray", version = "2025.1.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-17-earthlens-imagery-openeo'" },
-    { name = "xarray", version = "2025.9.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-earthlens-ocean-argo' or extra != 'extra-17-earthlens-imagery-openeo'" },
+    { name = "xarray" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/3d/8e/fe4e87460f8c62d8d5c683e09f19fbde5d9cfcfd0342d02df1f452999b5d/rioxarray-0.19.0.tar.gz", hash = "sha256:7819a0036fd874c8c8e280447cbbe43d8dc72fc4a14ac7852a665b1bdb7d4b04", size = 54600, upload-time = "2025-04-21T17:46:54.183Z" }
 wheels = [
@@ -9383,8 +9375,7 @@ dependencies = [
     { name = "packaging" },
     { name = "pyproj" },
     { name = "rasterio", version = "1.5.0", source = { registry = "https://pypi.org/simple" } },
-    { name = "xarray", version = "2025.1.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-17-earthlens-imagery-openeo'" },
-    { name = "xarray", version = "2025.9.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-earthlens-ocean-argo' or extra != 'extra-17-earthlens-imagery-openeo'" },
+    { name = "xarray" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/68/ba/9b70c0e33159244b264aed7b331ff349bc0a3a4ac50e8bea08729bf6ae53/rioxarray-0.21.0.tar.gz", hash = "sha256:a292d96f4d6412c05ff09629b72523ae2e9c42598183f5e9c555fc368f867c0f", size = 56555, upload-time = "2026-01-26T17:15:46.783Z" }
 wheels = [
@@ -10590,8 +10581,7 @@ dependencies = [
     { name = "requests" },
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
-    { name = "xarray", version = "2025.1.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-17-earthlens-imagery-openeo'" },
-    { name = "xarray", version = "2025.9.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-earthlens-ocean-argo' or extra != 'extra-17-earthlens-imagery-openeo'" },
+    { name = "xarray" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/e9/d2/fda4e62c0358a1c5fda3019e90e07cdd6e40554d4883c1ebd985f52410c0/tropycal-1.5.2.tar.gz", hash = "sha256:95e24604d4644e192a534126a512b8f063a98a35ea5ab659e83c21be24ca36a8", size = 10084306, upload-time = "2026-09-22T22:07:44.991Z" }
 wheels = [
@@ -11040,8 +11030,7 @@ dependencies = [
     { name = "shapely" },
     { name = "tabulate" },
     { name = "tqdm" },
-    { name = "xarray", version = "2025.1.1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-17-earthlens-imagery-openeo'" },
-    { name = "xarray", version = "2025.9.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-15-earthlens-ocean-argo' or extra != 'extra-17-earthlens-imagery-openeo'" },
+    { name = "xarray" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/71/5e/7d0cb86420bcf05ed7640017f1c5193a3920b82782a732c9eed1b7a462bc/worldpoppy-0.4.1.tar.gz", hash = "sha256:2fae13e8284b36a0e78ba6c937a99de200ce2c097021761f839f772a7d597b03", size = 10836430, upload-time = "2025-12-20T22:16:41.659Z" }
 wheels = [
@@ -11138,52 +11127,13 @@ wheels = [
 
 [[package]]
 name = "xarray"
-version = "2025.1.1"
-source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32'",
-    "(python_full_version >= '3.15' and platform_machine != 'ARM64') or (python_full_version >= '3.15' and sys_platform != 'win32')",
-    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
-    "(python_full_version == '3.14.*' and platform_machine != 'ARM64') or (python_full_version == '3.14.*' and sys_platform != 'win32')",
-    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
-    "(python_full_version == '3.13.*' and platform_machine != 'ARM64') or (python_full_version == '3.13.*' and sys_platform != 'win32')",
-    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
-    "(python_full_version == '3.12.*' and platform_machine != 'ARM64') or (python_full_version == '3.12.*' and sys_platform != 'win32')",
-    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32'",
-    "(python_full_version < '3.12' and platform_machine != 'ARM64') or (python_full_version < '3.12' and sys_platform != 'win32')",
-]
-dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.12' and extra == 'extra-17-earthlens-imagery-openeo') or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
-    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.12' and extra == 'extra-17-earthlens-imagery-openeo') or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
-    { name = "packaging", marker = "extra == 'extra-17-earthlens-imagery-openeo'" },
-    { name = "pandas", marker = "extra == 'extra-17-earthlens-imagery-openeo'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/c5/e7/e42216792114b13db0f026ca3485ce163145df9cea8b5b81ff296b113869/xarray-2025.1.1.tar.gz", hash = "sha256:1a3011d00ca92a94ba31b297c2eccd310b87a7dacf5acc8d0468385d4a834342", size = 3257038, upload-time = "2025-01-09T16:27:33.182Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/14/78/cd4d5294e0a7294243d332fdd00a020942faa41472e694f2552976a5fe39/xarray-2025.1.1-py3-none-any.whl", hash = "sha256:8a69d17c1e4ad09664fd0bc2dbb398e7368eda25bd19456fb919a6eb6490fb72", size = 1241687, upload-time = "2025-01-09T16:27:30.669Z" },
-]
-
-[[package]]
-name = "xarray"
 version = "2025.9.0"
 source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32'",
-    "(python_full_version >= '3.15' and platform_machine != 'ARM64') or (python_full_version >= '3.15' and sys_platform != 'win32')",
-    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
-    "(python_full_version == '3.14.*' and platform_machine != 'ARM64') or (python_full_version == '3.14.*' and sys_platform != 'win32')",
-    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
-    "(python_full_version == '3.13.*' and platform_machine != 'ARM64') or (python_full_version == '3.13.*' and sys_platform != 'win32')",
-    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32'",
-    "(python_full_version == '3.12.*' and platform_machine != 'ARM64') or (python_full_version == '3.12.*' and sys_platform != 'win32')",
-    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32'",
-    "(python_full_version < '3.12' and platform_machine != 'ARM64') or (python_full_version < '3.12' and sys_platform != 'win32')",
-]
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.12' and extra != 'extra-17-earthlens-imagery-openeo') or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
-    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.12' and extra != 'extra-17-earthlens-imagery-openeo') or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
-    { name = "packaging", marker = "extra == 'extra-15-earthlens-ocean-argo' or extra != 'extra-17-earthlens-imagery-openeo'" },
-    { name = "pandas", marker = "extra == 'extra-15-earthlens-ocean-argo' or extra != 'extra-17-earthlens-imagery-openeo'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "packaging" },
+    { name = "pandas" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/4e/0b/bbb76e05c8e2099baf90e259c29cafe6a525524b1d1da8bfbc39577c043e/xarray-2025.9.0.tar.gz", hash = "sha256:7dd6816fe0062c49c5e9370dd483843bc13e5ed80a47a9ff10baff2b51e070fb", size = 3040318, upload-time = "2025-09-04T04:20:26.296Z" }
 wheels = [

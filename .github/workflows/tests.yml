@@ -34,8 +34,9 @@ jobs:
   # One lane per distribution (#785): each member's tests run against its own
   # `pyproject.toml` config and report coverage only for its own `src`, tagged
   # with a Codecov flag. The union of the six members is the whole non-e2e
-  # suite. `extras: all` installs every backend SDK except argo, which stays
-  # excluded from the meta `all` extra (its unit tests fake the SDK). osm is in
+  # suite. `extras: all` installs every backend SDK — argo joined it once the
+  # argo/openeo xarray conflict was resolved (#789); its unit tests still fake
+  # the SDK. osm is in
   # `all` and now carries the bulk-pbf SDK (osmium) too, so the hazards lane
   # installs overpy/ohsome/osmium, though its tests still fake them via
   # monkeypatch. `verify-lock` is the `uv.lock` up-to-date check.
@@ -124,7 +125,7 @@ jobs:
   # The third declared environment. The matrix above installs `extras: all`
   # everywhere, so "the SDK is missing" is a state it structurally cannot
   # reach — yet it is the state every `pip install earthlens` starts in, and
-  # three backends (argo, osm-pbf, eedai) are never installed in CI at all.
+  # two backends (osm-pbf, eedai) are never installed in CI at all.
   # This lane installs the providers with no SDK extras and asserts each
   # backend either imports or raises an ImportError that names the extra,
   # rather than letting a raw `No module named 'ee'` reach the user.

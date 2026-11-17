@@ -39,7 +39,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-argo = ["argopy >=1.4"]
+# argopy >=1.5: 1.4 imports the private `erddapy.erddapy._quote_string_constraints`
+# that erddapy 3.x removed, so argopy 1.4 + the erddap backend's `erddapy>=3.0`
+# resolves but breaks at import (euroargodev/argopy#657, fixed in 1.5). Both share
+# the meta `all` extra now, so the floor must exclude the broken 1.4.
+argo = ["argopy >=1.5"]
 cmems = ["copernicusmarine >=2.0.0,<3"]
 erddap = ["erddapy >=3.0"]
 nwm = ["earthlens-core[s3]", "pyramids-core[parquet] >=0.80.0"]

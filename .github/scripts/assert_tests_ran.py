@@ -72,8 +72,10 @@ _EXPECTED_EMPTY = {
     # backend that needs none.
     "osm": "the pyrosm pbf engine is opt-in and outside [all], so the osm lane "
     "always carries one skip that is not an availability skip",
-    "argo": "argopy pins xarray>=2025.7 and openeo pins <2025.1.2, so the argo "
-    "extra cannot join [all] and its SDK is never installed",
+    "argo": "the argo extra now installs in [all] and its e2e runs in the ocean "
+    "catch-all lane, but argopy's realise step is environment-fragile (the live "
+    "tests treat OSError/RecursionError/AttributeError as skips) and a live Argo "
+    "window can be empty, so the lane is not failed when argo yields only skips",
     "mswep": "the GloH2O share is granted per person; CI cannot hold one",
     "airnow": "AIRNOW_API_KEY has never been issued for this repository",
 }

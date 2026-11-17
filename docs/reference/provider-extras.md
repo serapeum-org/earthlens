@@ -3,7 +3,7 @@
 Which pip **extra** (if any) each earthlens backend needs, the **SDK** it pulls, its **distribution**, and whether
 it is bundled in `earthlens[all]`.
 
-**At a glance:** **61 backends** · **34 extras** (31 in `all`, 3 held out) · **30 backends are SDK-free** (no extra
+**At a glance:** **61 backends** · **34 extras** (32 in `all`, 2 held out) · **30 backends are SDK-free** (no extra
 — they ship with their thematic distribution and just work).
 
 - **SDK-bearing backend** → `pip install "earthlens[<extra>]"`.
@@ -17,7 +17,7 @@ it is bundled in `earthlens[all]`.
 | Backend | Distribution | Extra (`pip install "earthlens[…]"`) | SDK / dependency it adds | In `all`? |
 |---|---|---|---|:---:|
 | `asf` | imagery | `asf` | `asf_search` (+ the `earthdata` extra) | ✅ |
-| `argo` | ocean | `argo` | `argopy` | ❌ held out |
+| `argo` | ocean | `argo` | `argopy` | ✅ |
 | `cmems` | ocean | `cmems` | `copernicusmarine` | ✅ |
 | `cmip6` | atmosphere | `cmip6` | *(empty — no SDK; works without it)* | ✅ |
 | `dem` | land | `dem` | `earthlens-core[s3]` (boto3) | ✅ |
@@ -75,12 +75,13 @@ with their thematic distribution and work out of the box.
 
 ## Notes
 
-- **`all` bundles 31 of the 33 extras.** Two are deliberately held out (still installable on their own):
-  - **`argo`** — `argopy` pins `xarray>=2025.7` while `openeo` pins `xarray<2025.1.2`; the two can't co-resolve
-    (see `#789`).
+- **`all` bundles 32 of the 33 extras.** One is deliberately held out (still installable on its own):
   - **`eedai`** — installing it flips the GEE backend's default `engine="auto"` onto the `pyramids-eo` EEDAI
     reader, which samples and grids differently from Earth Engine. It resolves cleanly; it is held out so an
     `all` upgrade never changes an existing user's pixels.
+
+  (`argo` was held out until `#789`: `openeo 0.54` dropped its `xarray<2025.1.2` cap and `argopy 1.5` fixed its
+  `erddapy 3.x` import break, so it now co-resolves inside `all`.)
 - **The `osm` extra covers all three OSM protocols and is in `all`** — `overpy` + `ohsome` (live queries) plus
   `osmium` (the wheel-clean `pyosmium` engine, the `pbf` default), all wheels. The richer in-memory `pyrosm` pbf
   engine is opt-in via a manual `pip install pyrosm` (which builds the sdist-only `cykhash` from source); see `#1186`.

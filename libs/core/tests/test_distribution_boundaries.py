@@ -2823,7 +2823,7 @@ class TestOptionalSdkAbsenceIsASkip:
             f"{[f'line {line}: {root}' for line, root in offenders]}. A missing extra "
             "then interrupts collection for the whole directory instead of skipping "
             "one module -- which is what any environment narrower than `extras: all` "
-            "gets, including the only resolution the `argo` backend installs in. Use "
+            "gets. Use "
             "`pytest.importorskip(\"<sdk>\")`"
         )
 

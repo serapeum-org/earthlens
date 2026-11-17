@@ -80,8 +80,11 @@ viz = ["earthlens-imagery[viz]"]
 worldpop = ["earthlens-land[worldpop]"]
 
 # The self-referential "everything" extra: each entry re-activates one backend's
-# own extra on earthlens itself. `argo` (xarray clash with openeo -- see #789) is
-# the only backend held out for a true conflict; `osm` is included because openeo
+# own extra on earthlens itself. `argo` now joins too: openeo 0.54 dropped its
+# `xarray<2025.1.2` cap and argopy 1.5 fixed its erddapy 3.x import break, so
+# argopy's `xarray>=2025.7` floor, openeo, and the `erddap` backend's
+# `erddapy>=3.0` finally share one resolution and the `[tool.uv] conflicts` fork
+# is retired (see #789). `osm` is included because openeo
 # already pins pandas<3, so ohsome's pandas<3 no longer collides. `osm` now also
 # carries the bulk-pbf SDK (`osmium`), all wheels, so the whole OSM backend is in
 # `all` with no source build (see #1186). pyrosm (the in-memory pbf engine) is
@@ -92,6 +95,7 @@ worldpop = ["earthlens-land[worldpop]"]
 # prefers it whenever it can serve a raw fetch. `engine="ee"` still forces Earth
 # Engine's exact sampling, and `[eedai]` is kept only as a no-op alias.
 all = [
+    "earthlens[argo]",
     "earthlens[asf]",
     "earthlens[cmems]",
     "earthlens[cmip6]",
@@ -516,24 +520,6 @@ addopts = "--import-mode=importlib --strict-markers"
 # develops editable from one place while each member can also be locked and
 # built on its own (its own uv.lock).
 [tool.uv]
-# Some backend SDKs cannot coexist in one resolution, so the universal lock is
-# told to fork rather than fail:
-#   * argopy (earthlens-ocean[argo]) needs xarray>=2025.7 while openeo
-#     (earthlens-imagery[openeo]) needs xarray<2025.1.2 — no version satisfies
-#     both. Declaring the extras conflicting makes uv resolve them in separate
-#     forks of uv.lock instead of trying to install both at once.
-conflicts = [
-    # argopy (earthlens-ocean[argo]) needs xarray>=2025.7; openeo
-    # (earthlens-imagery[openeo]) needs xarray<2025.1.2 -- no version satisfies
-    # both. Declaring the two leaf extras conflicting makes uv fork the
-    # universal lock instead of failing, and (with no member-level `all` extra
-    # to collide) `uv sync --extra <x>` stays unambiguous.
-    [
-        { package = "earthlens-ocean", extra = "argo" },
-        { package = "earthlens-imagery", extra = "openeo" },
-    ],
-]
-
 # Security floor: pin the transitive `oauthlib` at/above 4.0.0, which fixes the
 # PKCE timing side-channel CVE-2026-49265. earthlens uses oauthlib only as an
 # OAuth *client* (earthengine-api -> requests-oauthlib, the Earth Engine auth
