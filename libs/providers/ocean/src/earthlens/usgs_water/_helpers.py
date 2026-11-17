@@ -572,9 +572,9 @@ def _site_coordinates(df: pd.DataFrame) -> tuple[pd.Series, pd.Series]:
     Prefers the scalar `dec_lat_va` / `dec_long_va` columns the legacy
     `nwis` frames carry. The modern monitoring-locations endpoint omits
     those and returns a GeoDataFrame whose coordinates live only in a
-    `geometry` column of shapely points, so when an axis resolves to
-    all-`NA` and a `geometry` column is present, that axis falls back to
-    the matching geometry ordinate.
+    `geometry` column of shapely points, so when a `geometry` column is
+    present, any row still missing an ordinate is back-filled from the
+    matching geometry point (`y` for latitude, `x` for longitude).
 
     Args:
         df: The site-metadata frame (legacy wide, or modern with a
@@ -586,12 +586,16 @@ def _site_coordinates(df: pd.DataFrame) -> tuple[pd.Series, pd.Series]:
     """
     latitude = pd.to_numeric(_first_column(df, ["dec_lat_va"]), errors="coerce")
     longitude = pd.to_numeric(_first_column(df, ["dec_long_va"]), errors="coerce")
-    if (latitude.isna().all() or longitude.isna().all()) and "geometry" in df.columns:
+    if "geometry" in df.columns and (latitude.isna().any() or longitude.isna().any()):
         geometry = df["geometry"]
-        if latitude.isna().all():
-            latitude = pd.to_numeric(geometry.map(_point_y), errors="coerce")
-        if longitude.isna().all():
-            longitude = pd.to_numeric(geometry.map(_point_x), errors="coerce")
+        if latitude.isna().any():
+            latitude = latitude.fillna(
+                pd.to_numeric(geometry.map(_point_y), errors="coerce")
+            )
+        if longitude.isna().any():
+            longitude = longitude.fillna(
+                pd.to_numeric(geometry.map(_point_x), errors="coerce")
+            )
     return latitude, longitude
 
 

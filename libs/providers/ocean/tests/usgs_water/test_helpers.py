@@ -691,6 +691,28 @@ class TestSiteCoordinates:
         assert latitude.isna().all(), "latitude should be all-NA"
         assert longitude.isna().all(), "longitude should be all-NA"
 
+    def test_partial_scalar_backfilled_from_geometry(self):
+        """A row whose scalar coordinate is NA is back-filled from geometry.
+
+        Test scenario:
+            `dec_lat_va` is present for one row and NA for another while a
+            `geometry` column is available; the NA row is back-filled from
+            the geometry's `y` rather than left empty.
+        """
+        import pandas as pd
+        from shapely.geometry import Point
+
+        df = pd.DataFrame(
+            {
+                "dec_lat_va": [38.9, pd.NA],
+                "geometry": [Point(-77.1, 0.0), Point(-77.2, 39.0)],
+            }
+        )
+        latitude, longitude = _helpers._site_coordinates(df)
+        assert latitude.iloc[0] == 38.9, "present scalar row should be kept"
+        assert latitude.iloc[1] == 39.0, "NA scalar row should be back-filled"
+        assert longitude.iloc[0] == -77.1, "longitude should come from geometry.x"
+
     def test_mixed_geometry_rows_resolve_per_row(self):
         """A `None` geometry row maps to `NA` while valid rows resolve.
 
