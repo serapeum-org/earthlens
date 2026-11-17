@@ -839,10 +839,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#uv-sync-all-extras-fails-with-a-conflict" class="md-nav__link">
+  <a href="#prefer-uv-sync-extra-all-over-all-extras" class="md-nav__link">
     <span class="md-ellipsis">
       
-        uv sync --all-extras fails with a conflict
+        Prefer uv sync --extra all over --all-extras
       
     </span>
   </a>
@@ -24134,10 +24134,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#uv-sync-all-extras-fails-with-a-conflict" class="md-nav__link">
+  <a href="#prefer-uv-sync-extra-all-over-all-extras" class="md-nav__link">
     <span class="md-ellipsis">
       
-        uv sync --all-extras fails with a conflict
+        Prefer uv sync --extra all over --all-extras
       
     </span>
   </a>
@@ -24494,38 +24494,38 @@ use <code>earthlens.core</code>.</p>
 </code></pre></div>
 <p>Each backend's SDK is optional and imported lazily. Install the extra named in the message, or <code>earthlens[all]</code>
 for everything. The <a href="../reference/providers/">provider matrix</a> lists the extra for every backend.</p>
-<h3 id="uv-sync-all-extras-fails-with-a-conflict"><a class="toclink" href="#uv-sync-all-extras-fails-with-a-conflict"><code>uv sync --all-extras</code> fails with a conflict</a><a class="headerlink" href="#uv-sync-all-extras-fails-with-a-conflict" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Extras `openeo` and `argo` are incompatible with the declared conflicts
+<h3 id="prefer-uv-sync-extra-all-over-all-extras"><a class="toclink" href="#prefer-uv-sync-extra-all-over-all-extras">Prefer <code>uv sync --extra all</code> over <code>--all-extras</code></a><a class="headerlink" href="#prefer-uv-sync-extra-all-over-all-extras" title="Permanent link">#</a></h3>
+<p>The old <code>argo</code> ⊥ <code>openeo</code> xarray conflict was removed in
+<a href="https://github.com/serapeum-org/earthlens/issues/789">#789</a>, so <code>uv sync --all-extras</code> no longer errors — but
+use the curated extra:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>--group<span class="w"> </span>dev<span class="w">      </span><span class="c1"># argo, openeo and osm (with pbf/osmium) — omits only eedai</span>
 </code></pre></div>
-<p>(That one is uv's message, not earthlens'.)</p>
-<p><code>argopy</code> needs <code>xarray&gt;=2025.7</code> and <code>openeo</code> needs <code>xarray&lt;2025.1.2</code> — mutually unsatisfiable. Use the curated
-extra instead:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>--group<span class="w"> </span>dev<span class="w">      </span><span class="c1"># includes openeo and osm (with pbf/osmium); omits argo / eedai</span>
-</code></pre></div>
-<p>To work on the argo side, prune the conflicting extra: <code>uv sync --all-extras --no-extra openeo</code>.</p>
+<p><code>--all-extras</code> additionally activates <code>eedai</code>, which flips the GEE backend's default <code>engine="auto"</code> onto the
+<code>pyramids-eo</code> reader — a different sampling/gridding path (see the <a href="../reference/gee/usage/">GEE usage page</a>).
+<code>--extra all</code> leaves it out so an environment never silently changes GEE's pixels.</p>
 <h2 id="request-construction"><a class="toclink" href="#request-construction">Request construction</a><a class="headerlink" href="#request-construction" title="Permanent link">#</a></h2>
 <h3 id="x-is-not-a-supported-data-source"><a class="toclink" href="#x-is-not-a-supported-data-source"><code>'x' is not a supported data source</code></a><a class="headerlink" href="#x-is-not-a-supported-data-source" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>ValueError: &#39;not-a-provider&#39; is not a supported data source. Known: [&#39;admin&#39;, &#39;admin-boundaries&#39;, ...]
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>ValueError: &#39;not-a-provider&#39; is not a supported data source. Known: [&#39;admin&#39;, &#39;admin-boundaries&#39;, ...]
 </code></pre></div>
 <p>The key is wrong. <code>sources()</code> lists the 48 canonical keys; aliases also work. See
 <a href="../discovery/">Discovering datasets</a>.</p>
 <h3 id="variables-is-required"><a class="toclink" href="#variables-is-required"><code>variables= is required</code></a><a class="headerlink" href="#variables-is-required" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ValueError: variables= is required (or pass dataset= for a dataset-keyed backend),
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>e.g. EarthLens(&#39;chc&#39;, variables=[&#39;precipitation&#39;]).
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>ValueError: variables= is required (or pass dataset= for a dataset-keyed backend),
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>e.g. EarthLens(&#39;chc&#39;, variables=[&#39;precipitation&#39;]).
 </code></pre></div>
 <p>Catalog-driven backends (ECMWF, GEE, STAC, NWP, …) want either a <code>{dataset: [variable, …]}</code> mapping or an
 explicit <code>dataset=</code>. A bare list only works for backends with a single implicit dataset.</p>
 <h3 id="temporal_resolution-hourly-is-not-supported"><a class="toclink" href="#temporal_resolution-hourly-is-not-supported"><code>temporal_resolution 'hourly' is not supported</code></a><a class="headerlink" href="#temporal_resolution-hourly-is-not-supported" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>ValueError: temporal_resolution &#39;hourly&#39; is not supported by the list-shape `variables` API.
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>Either pass a dict like `variables={&#39;&lt;dataset-key&gt;&#39;: [...]}` or use one of [&#39;daily&#39;, &#39;monthly&#39;].
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ValueError: temporal_resolution &#39;hourly&#39; is not supported by the list-shape `variables` API.
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>Either pass a dict like `variables={&#39;&lt;dataset-key&gt;&#39;: [...]}` or use one of [&#39;daily&#39;, &#39;monthly&#39;].
 </code></pre></div>
 <p>Before 0.12.0 this silently downloaded <strong>daily</strong> data. If this started failing after an upgrade, the old run was
 giving you daily data under a label that claimed otherwise — see the <a href="../migration/">migration guide</a>.</p>
 <h3 id="notimplementederror-on-aggregate"><a class="toclink" href="#notimplementederror-on-aggregate"><code>NotImplementedError</code> on <code>aggregate=</code></a><a class="headerlink" href="#notimplementederror-on-aggregate" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>NotImplementedError: aggregate= is not supported by GDACS (OUTPUT_KIND=&#39;vector&#39;):
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>disaster alerts are vector features, not gridded rasters, so there is no meaningful
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>gridded reduction. Call download() without aggregate= and post-process the returned
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>FeatureCollection.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>NotImplementedError: aggregate= is not supported by GDACS (OUTPUT_KIND=&#39;vector&#39;):
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>disaster alerts are vector features, not gridded rasters, so there is no meaningful
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>gridded reduction. Call download() without aggregate= and post-process the returned
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>FeatureCollection.
 </code></pre></div>
 <p>The wording after the colon is the backend's own <code>AGGREGATE_REFUSAL_REASON</code>, so it names why <em>that</em> provider
 refuses rather than repeating a generic sentence.</p>
@@ -24540,21 +24540,21 @@ to its bounding box and say so. Check <code>SUPPORTS_POLYGON_AOI</code>, and cli
 <h2 id="authentication"><a class="toclink" href="#authentication">Authentication</a><a class="headerlink" href="#authentication" title="Permanent link">#</a></h2>
 <h3 id="authenticationerror"><a class="toclink" href="#authenticationerror"><code>AuthenticationError</code></a><a class="headerlink" href="#authenticationerror" title="Permanent link">#</a></h3>
 <p>Credentials are missing, wrong, or expired. <strong>Where they go is backend-specific</strong> — there is no single rule:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># CMEMS takes them as constructor keywords, forwarded to the backend</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;cmems&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="n">service_username</span><span class="o">=</span><span class="s2">&quot;…&quot;</span><span class="p">,</span> <span class="n">service_password</span><span class="o">=</span><span class="s2">&quot;…&quot;</span><span class="p">,</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="p">)</span>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="c1"># GEE and FIRMS take theirs in authenticate()</span>
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gee&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span>
-<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>    <span class="n">service_account</span><span class="o">=</span><span class="s2">&quot;my-sa@my-project.iam.gserviceaccount.com&quot;</span><span class="p">,</span>
-<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>    <span class="n">service_key</span><span class="o">=</span><span class="s2">&quot;/path/to/key.json&quot;</span><span class="p">,</span>
-<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># CMEMS takes them as constructor keywords, forwarded to the backend</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;cmems&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="n">service_username</span><span class="o">=</span><span class="s2">&quot;…&quot;</span><span class="p">,</span> <span class="n">service_password</span><span class="o">=</span><span class="s2">&quot;…&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="p">)</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1"># GEE and FIRMS take theirs in authenticate()</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gee&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>    <span class="n">service_account</span><span class="o">=</span><span class="s2">&quot;my-sa@my-project.iam.gserviceaccount.com&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>    <span class="n">service_key</span><span class="o">=</span><span class="s2">&quot;/path/to/key.json&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="p">)</span>
 </code></pre></div>
 <p><code>authenticate(**credentials)</code> forwards its keywords verbatim to the backend's own <code>authenticate</code>, so passing one
 the backend does not accept raises <code>TypeError</code> rather than <code>AuthenticationError</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>TypeError: AbstractDataSource.authenticate() got an unexpected keyword argument &#39;service_username&#39;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>TypeError: AbstractDataSource.authenticate() got an unexpected keyword argument &#39;service_username&#39;
 </code></pre></div>
 <p>If you see that, the credential belongs in the constructor instead. Most backends also read an environment
 variable when the keyword is omitted.</p>
@@ -24605,9 +24605,9 @@ and otherwise backing off exponentially:</p>
 harder.</p>
 <h3 id="a-batch-dies-on-one-bad-item"><a class="toclink" href="#a-batch-dies-on-one-bad-item">A batch dies on one bad item</a><a class="headerlink" href="#a-batch-dies-on-one-bad-item" title="Permanent link">#</a></h3>
 <p>Backends that process a batch honour <code>errors=</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s2">&quot;warn&quot;</span><span class="p">)</span>     <span class="c1"># default — log the failure and continue</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>   <span class="c1"># drop it and continue, without logging</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">)</span>    <span class="c1"># abort on the first failure</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s2">&quot;warn&quot;</span><span class="p">)</span>     <span class="c1"># default — log the failure and continue</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>   <span class="c1"># drop it and continue, without logging</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">)</span>    <span class="c1"># abort on the first failure</span>
 </code></pre></div>
 <p><code>"skip"</code> is accepted as an alias of <code>"ignore"</code>.</p>
 <p>A failure of the <em>service</em> rather than of one item is exempt from all three: it propagates even under
@@ -24616,8 +24616,8 @@ backend that is <code>CadsUnavailableError</code> — see
 <a href="../reference/ecmwf/datastores/#when-a-store-is-throttling">when a store is throttling</a>.</p>
 <h3 id="a-vector-or-tabular-request-exhausts-memory"><a class="toclink" href="#a-vector-or-tabular-request-exhausts-memory">A vector or tabular request exhausts memory</a><a class="headerlink" href="#a-vector-or-tabular-request-exhausts-memory" title="Permanent link">#</a></h3>
 <p>Cap it. <code>limit=</code> is an exact cap that stops the work rather than truncating at the end:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">lens</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">iter_download</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">lens</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">iter_download</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="o">...</span>
 </code></pre></div>
 <p>Only backends implementing the <code>_search</code> / <code>_fetch_one</code> split can stream — twelve do: <code>openaq</code>, <code>firms</code>,
 <code>usgs-water</code>, <code>argo</code>, <code>glaciers</code>, <code>climate-indices</code>, <code>sensor-community</code>, <code>gfw</code>, <code>cop-dem</code>, <code>soilgrids</code>, <code>nwm</code>
@@ -24627,7 +24627,7 @@ and <code>nwp</code>. On one whose fetch is a single whole-batch request, such a
 <h2 id="output"><a class="toclink" href="#output">Output</a><a class="headerlink" href="#output" title="Permanent link">#</a></h2>
 <h3 id="where-did-my-files-go"><a class="toclink" href="#where-did-my-files-go">Where did my files go?</a><a class="headerlink" href="#where-did-my-files-go" title="Permanent link">#</a></h3>
 <p>If you omit <code>path=</code>, earthlens logs where it wrote:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>No `path` given; download() writes &#39;chc&#39; output under ~/.earthlens/data/chc/ (load() uses a temp dir).
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>No `path` given; download() writes &#39;chc&#39; output under ~/.earthlens/data/chc/ (load() uses a temp dir).
 </code></pre></div>
 <p>An omitted <code>path=</code> resolves to the configured output directory — <code>set_output_dir()</code>, else <code>EARTHLENS_DATA_DIR</code>,
 else <code>~/.earthlens/data</code> — and the facade adds a per-source subdirectory, with a qualified <code>source:topic</code>
@@ -24657,7 +24657,7 @@ pre-existing tree and any partially written data are left alone.</p>
 <p>Warnings are errors. The usual causes are a nav entry pointing at a missing file, a dangling <code>#anchor</code>, or a
 griffe docstring complaint (a missing <code>-&gt;</code> annotation, or continuation lines indented off the 4-space grid). Build
 locally before pushing:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>uv<span class="w"> </span>run<span class="w"> </span>--group<span class="w"> </span>docs<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>mkdocs<span class="w"> </span>build<span class="w"> </span>--strict
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>uv<span class="w"> </span>run<span class="w"> </span>--group<span class="w"> </span>docs<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>mkdocs<span class="w"> </span>build<span class="w"> </span>--strict
 </code></pre></div>
 <h3 id="a-notebook-renders-with-no-output"><a class="toclink" href="#a-notebook-renders-with-no-output">A notebook renders with no output</a><a class="headerlink" href="#a-notebook-renders-with-no-output" title="Permanent link">#</a></h3>
 <p>Expected for most example pages. The docs build does <strong>not</strong> execute notebooks — it renders whatever outputs are
@@ -24668,7 +24668,7 @@ under <code>docs/examples/showcases/</code>, which is excluded from the hook.</p
 <h2 id="still-stuck"><a class="toclink" href="#still-stuck">Still stuck</a><a class="headerlink" href="#still-stuck" title="Permanent link">#</a></h2>
 <p>Open an issue at <a href="https://github.com/serapeum-org/earthlens/issues">github.com/serapeum-org/earthlens/issues</a> with
 the provider key, the full traceback, and your earthlens version:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">__version__</span><span class="p">;</span> <span class="nb">print</span><span class="p">(</span><span class="n">__version__</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">__version__</span><span class="p">;</span> <span class="nb">print</span><span class="p">(</span><span class="n">__version__</span><span class="p">)</span>
 </code></pre></div>
 
 

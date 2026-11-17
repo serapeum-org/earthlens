@@ -23857,7 +23857,7 @@
 <h1 id="provider-extra-mapping"><a class="toclink" href="#provider-extra-mapping">Provider → extra mapping</a><a class="headerlink" href="#provider-extra-mapping" title="Permanent link">#</a></h1>
 <p>Which pip <strong>extra</strong> (if any) each earthlens backend needs, the <strong>SDK</strong> it pulls, its <strong>distribution</strong>, and whether
 it is bundled in <code>earthlens[all]</code>.</p>
-<p><strong>At a glance:</strong> <strong>61 backends</strong> · <strong>34 extras</strong> (31 in <code>all</code>, 3 held out) · <strong>30 backends are SDK-free</strong> (no extra
+<p><strong>At a glance:</strong> <strong>61 backends</strong> · <strong>34 extras</strong> (32 in <code>all</code>, 2 held out) · <strong>30 backends are SDK-free</strong> (no extra
 — they ship with their thematic distribution and just work).</p>
 <ul>
 <li><strong>SDK-bearing backend</strong> → <code>pip install "earthlens[&lt;extra&gt;]"</code>.</li>
@@ -23890,7 +23890,7 @@ it is bundled in <code>earthlens[all]</code>.</p>
 <td>ocean</td>
 <td><code>argo</code></td>
 <td><code>argopy</code></td>
-<td style="text-align: center;">❌ held out</td>
+<td style="text-align: center;">✅</td>
 </tr>
 <tr>
 <td><code>cmems</code></td>
@@ -24218,25 +24218,25 @@ with their thematic distribution and work out of the box.</p>
 </table>
 <h2 id="notes"><a class="toclink" href="#notes">Notes</a><a class="headerlink" href="#notes" title="Permanent link">#</a></h2>
 <ul>
-<li><strong><code>all</code> bundles 31 of the 33 extras.</strong> Two are deliberately held out (still installable on their own):</li>
-<li><strong><code>argo</code></strong> — <code>argopy</code> pins <code>xarray&gt;=2025.7</code> while <code>openeo</code> pins <code>xarray&lt;2025.1.2</code>; the two can't co-resolve
-    (see <code>#789</code>).</li>
+<li><strong><code>all</code> bundles 32 of the 33 extras.</strong> One is deliberately held out (still installable on its own):</li>
 <li><strong><code>eedai</code></strong> — installing it flips the GEE backend's default <code>engine="auto"</code> onto the <code>pyramids-eo</code> EEDAI
     reader, which samples and grids differently from Earth Engine. It resolves cleanly; it is held out so an
     <code>all</code> upgrade never changes an existing user's pixels.</li>
-<li><strong>The <code>osm</code> extra covers all three OSM protocols and is in <code>all</code></strong> — <code>overpy</code> + <code>ohsome</code> (live queries) plus
-  <code>osmium</code> (the wheel-clean <code>pyosmium</code> engine, the <code>pbf</code> default), all wheels. The richer in-memory <code>pyrosm</code> pbf
-  engine is opt-in via a manual <code>pip install pyrosm</code> (which builds the sdist-only <code>cykhash</code> from source); see <code>#1186</code>.</li>
-<li><strong>Two empty extras</strong> — <code>cmip6</code> and <code>ghsl</code> are declared (<code>= []</code>) but pull <strong>no</strong> dependency; the backend works
-  without the extra. They exist for API/CLI symmetry.</li>
-<li><strong>Extras that reuse the S3 client</strong> — <code>s3</code>, <code>radar</code>, <code>goes</code>, <code>dem</code>, <code>nwm</code> pull <code>earthlens-core[s3]</code> (boto3) rather
-  than a bespoke SDK.</li>
-<li><strong><code>ecmwf</code> and <code>gee</code> each have more than one extra</strong> — a base one and a variant (<code>ecmwf-modern</code>, <code>eedai</code>) —
-  which is why 33 extras cover 31 backends.</li>
-<li><strong>Distributions:</strong> <code>earthlens-atmosphere</code>, <code>-ocean</code>, <code>-imagery</code>, <code>-land</code>, <code>-hazards</code>. The meta-package
-  <code>earthlens</code> depends on all five; installing a single distribution gives you that theme's backends (SDK-free ones
-  usable immediately; SDK-bearing ones after their extra).</li>
 </ul>
+<p>(<code>argo</code> was held out until <code>#789</code>: <code>openeo 0.54</code> dropped its <code>xarray&lt;2025.1.2</code> cap and <code>argopy 1.5</code> fixed its
+  <code>erddapy 3.x</code> import break, so it now co-resolves inside <code>all</code>.)
+- <strong>The <code>osm</code> extra covers all three OSM protocols and is in <code>all</code></strong> — <code>overpy</code> + <code>ohsome</code> (live queries) plus
+  <code>osmium</code> (the wheel-clean <code>pyosmium</code> engine, the <code>pbf</code> default), all wheels. The richer in-memory <code>pyrosm</code> pbf
+  engine is opt-in via a manual <code>pip install pyrosm</code> (which builds the sdist-only <code>cykhash</code> from source); see <code>#1186</code>.
+- <strong>Two empty extras</strong> — <code>cmip6</code> and <code>ghsl</code> are declared (<code>= []</code>) but pull <strong>no</strong> dependency; the backend works
+  without the extra. They exist for API/CLI symmetry.
+- <strong>Extras that reuse the S3 client</strong> — <code>s3</code>, <code>radar</code>, <code>goes</code>, <code>dem</code>, <code>nwm</code> pull <code>earthlens-core[s3]</code> (boto3) rather
+  than a bespoke SDK.
+- <strong><code>ecmwf</code> and <code>gee</code> each have more than one extra</strong> — a base one and a variant (<code>ecmwf-modern</code>, <code>eedai</code>) —
+  which is why 33 extras cover 31 backends.
+- <strong>Distributions:</strong> <code>earthlens-atmosphere</code>, <code>-ocean</code>, <code>-imagery</code>, <code>-land</code>, <code>-hazards</code>. The meta-package
+  <code>earthlens</code> depends on all five; installing a single distribution gives you that theme's backends (SDK-free ones
+  usable immediately; SDK-bearing ones after their extra).</p>
 
 
 

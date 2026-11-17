@@ -23904,9 +23904,11 @@
 <p>The <code>argo</code> backend needs the <code>argopy</code> SDK:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>argo<span class="o">]</span>
 </code></pre></div>
-<p><code>argopy</code> pins a newer <code>xarray</code> than some other backends (notably
-<code>openeo</code>), so it is intentionally <strong>not</strong> part of the <code>[all]</code> extra —
-install <code>[argo]</code> into its own environment.</p>
+<p><code>argo</code> is part of the <code>[all]</code> extra, so <code>pip install earthlens[all]</code>
+includes it alongside every other backend. It co-resolves with the rest
+of the stack as of
+<a href="https://github.com/serapeum-org/earthlens/issues/789">#789</a> (<code>openeo 0.54</code>
+dropped the <code>xarray</code> cap that used to force <code>argo</code> into its own environment).</p>
 <p>All examples return a long-format <code>pandas.DataFrame</code> (one row per
 measured level); there are no credentials.</p>
 <h2 id="region-selection-bbox-time"><a class="toclink" href="#region-selection-bbox-time">Region selection (bbox + time)</a><a class="headerlink" href="#region-selection-bbox-time" title="Permanent link">#</a></h2>

@@ -23895,11 +23895,13 @@ JSON, and <code>aggregate=</code> is a <strong>native</strong> openEO process
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>openeo<span class="o">]</span>
 </code></pre></div>
 <blockquote>
-<p><strong>Dependency note.</strong> earthlens pins <code>openeo &gt;=0.47,&lt;0.52</code> (currently 0.51).
-openeo 0.51 caps <strong>both</strong> <code>xarray&lt;2025.01.2</code> and <code>pandas&lt;3.0.0</code>, so
-installing <code>earthlens[openeo]</code> (or <code>earthlens[all]</code>) constrains <code>xarray</code> and
-holds the environment to <strong>pandas 2.x</strong> — pandas 3 is published, but openeo's
-<code>&lt;3</code> cap excludes it.</p>
+<p><strong>Dependency note.</strong> earthlens pins <code>openeo &gt;=0.54</code>. openeo 0.54 no longer caps
+<code>xarray</code> (it requires <code>xarray&gt;=2024.7.0</code>), which is what lets the <code>openeo</code> and
+<code>argo</code> backends finally share one environment (see
+<a href="https://github.com/serapeum-org/earthlens/issues/789">#789</a>). It still caps
+<code>pandas&lt;3.0.0</code>, so installing <code>earthlens[openeo]</code> (or <code>earthlens[all]</code>) holds the
+environment to <strong>pandas 2.x</strong> — pandas 3 is published, but openeo's <code>&lt;3</code> cap
+excludes it.</p>
 </blockquote>
 <h2 id="endpoints"><a class="toclink" href="#endpoints">Endpoints</a><a class="headerlink" href="#endpoints" title="Permanent link">#</a></h2>
 <p>The backend defaults to <strong>CDSE openEO</strong> (free with a Copernicus Data Space
