@@ -566,17 +566,33 @@ def _point_y(geometry: Any) -> Any:
     return result
 
 
-def _has_geographic_geometry(df: pd.DataFrame) -> bool:
-    """Whether `df` carries a `geometry` column in geographic lon/lat coords.
+def _geometry_crs_is_geographic(df: pd.DataFrame) -> bool:
+    """Whether `df`'s geometry CRS is geographic lon/lat (or absent).
 
-    The geometry fallback reads longitude from each point's `x` and
-    latitude from its `y`, which is only correct for a geographic CRS in
-    lon/lat axis order — EPSG:4326 / OGC:CRS84, as the USGS OGC API
-    Features endpoint returns. A projected CRS (ordinates in metres) would
-    be silently mislocated, so a frame whose CRS is present and not
-    geographic is rejected (with a `UserWarning`) and its coordinates are
-    left unresolved rather than read as lon/lat. A frame with no CRS (a
-    plain `DataFrame` carrying a `geometry` column) is assumed geographic.
+    A frame with no CRS (a plain `DataFrame` carrying a `geometry` column,
+    or a GeoDataFrame whose `crs` is unset) is treated as geographic. A
+    `pyproj.CRS` exposes `is_geographic`; anything without that attribute
+    degrades to `True` so an unknown CRS object is not wrongly rejected.
+
+    Args:
+        df: The site-metadata frame.
+
+    Returns:
+        bool: `True` when the geometry may be read as lon/lat.
+    """
+    crs = getattr(df, "crs", None)
+    return crs is None or bool(getattr(crs, "is_geographic", True))
+
+
+def _has_geographic_geometry(df: pd.DataFrame) -> bool:
+    """Whether `df` carries a geometry column usable as geographic lon/lat.
+
+    Pure predicate (no side effects). The geometry fallback reads longitude
+    from each point's `x` and latitude from its `y`, which is only correct
+    for a geographic CRS in lon/lat axis order — EPSG:4326 / OGC:CRS84, as
+    the USGS OGC API Features endpoint returns. A projected CRS (ordinates
+    in metres) would be silently mislocated, so such a frame is not treated
+    as a usable geometry source; `_warn_all_na_columns` reports why.
 
     Args:
         df: The site-metadata frame.
@@ -584,18 +600,7 @@ def _has_geographic_geometry(df: pd.DataFrame) -> bool:
     Returns:
         bool: `True` when a usable geographic `geometry` column is present.
     """
-    result = False
-    if "geometry" in df.columns:
-        crs = getattr(df, "crs", None)
-        result = crs is None or bool(getattr(crs, "is_geographic", True))
-        if not result:
-            warnings.warn(
-                f"usgs-water sites: geometry CRS {crs!r} is not geographic "
-                "lon/lat, so coordinates were not read from geometry.",
-                UserWarning,
-                stacklevel=2,
-            )
-    return result
+    return "geometry" in df.columns and _geometry_crs_is_geographic(df)
 
 
 def _site_coordinates(df: pd.DataFrame) -> tuple[pd.Series, pd.Series]:
@@ -620,44 +625,55 @@ def _site_coordinates(df: pd.DataFrame) -> tuple[pd.Series, pd.Series]:
     """
     latitude = pd.to_numeric(_first_column(df, ["dec_lat_va"]), errors="coerce")
     longitude = pd.to_numeric(_first_column(df, ["dec_long_va"]), errors="coerce")
-    if (latitude.isna().any() or longitude.isna().any()) and _has_geographic_geometry(
-        df
-    ):
+    latitude_missing = latitude.isna().any()
+    longitude_missing = longitude.isna().any()
+    if (latitude_missing or longitude_missing) and _has_geographic_geometry(df):
         geometry = df["geometry"]
-        if latitude.isna().any():
+        if latitude_missing:
             latitude = latitude.fillna(
                 pd.to_numeric(geometry.map(_point_y), errors="coerce")
             )
-        if longitude.isna().any():
+        if longitude_missing:
             longitude = longitude.fillna(
                 pd.to_numeric(geometry.map(_point_x), errors="coerce")
             )
     return latitude, longitude
 
 
-def _warn_all_na_columns(out: pd.DataFrame, columns: list[str], flavour: str) -> None:
-    """Warn when a required `columns` entry is all-`NA` over a non-empty frame.
+def _warn_all_na_columns(
+    out: pd.DataFrame, columns: list[str], flavour: str, source: pd.DataFrame
+) -> None:
+    """Warn once when a required `columns` entry is all-`NA`, naming the cause.
 
-    A geocoding column (latitude / longitude) that resolves to 100 %
-    `NA` is never a legitimate result — it means the source frame carried
-    the value under a schema this normalizer does not map. Surfacing it as
-    a `UserWarning` keeps `_first_column`'s `pd.NA` default from turning a
-    schema mismatch into silently empty output. An empty frame has no rows
-    to judge, so it is skipped rather than warned on.
+    A geocoding column (latitude / longitude) that resolves to 100 % `NA`
+    is never a legitimate result. The cause is read from `source`: a
+    `geometry` column in a non-geographic (projected) CRS was deliberately
+    skipped (so the fix is a CRS, not a schema, problem); otherwise no
+    mappable lon/lat source column was present. Surfacing a single accurate
+    `UserWarning` keeps `_first_column`'s `pd.NA` default from turning the
+    gap into silently empty output. An empty frame has no rows to judge, so
+    it is skipped.
 
     Args:
         out: The normalized frame.
         columns: The required column names to check.
         flavour: `"waterdata"` or `"nwis"`, named in the warning.
+        source: The pre-normalization frame, inspected for the cause.
     """
     if out.empty:
         return
     empty = [column for column in columns if out[column].isna().all()]
     if empty:
+        if "geometry" in source.columns and not _geometry_crs_is_geographic(source):
+            cause = (
+                f"the geometry CRS {getattr(source, 'crs', None)!r} is not "
+                "geographic lon/lat"
+            )
+        else:
+            cause = "no mappable lon/lat source column was present"
         warnings.warn(
             f"usgs-water sites ({flavour}): {empty} resolved to all-NA over "
-            f"{len(out)} rows; the source schema likely changed, so these "
-            "columns could not be mapped.",
+            f"{len(out)} rows; {cause}, so these columns could not be mapped.",
             UserWarning,
             stacklevel=2,
         )
@@ -783,8 +799,8 @@ def normalize_sites(df: pd.DataFrame, flavour: str) -> pd.DataFrame:
     Coordinates are resolved by `_site_coordinates`: from the scalar
     `dec_lat_va` / `dec_long_va` columns the legacy frame carries, or
     from the modern frame's `geometry` points when those are absent. A
-    coordinate column that still resolves to all-`NA` triggers a
-    `RuntimeWarning` rather than passing silently.
+    coordinate column that still resolves to all-`NA` triggers a single
+    `UserWarning` naming the cause rather than passing silently.
 
     Args:
         df: The site-metadata frame.
@@ -809,7 +825,7 @@ def normalize_sites(df: pd.DataFrame, flavour: str) -> pd.DataFrame:
         out["huc"] = _first_column(df, ["huc_cd"])
         out["site_type"] = _first_column(df, ["site_tp_cd"])
     out["latitude"], out["longitude"] = _site_coordinates(df)
-    _warn_all_na_columns(out, ["latitude", "longitude"], flavour)
+    _warn_all_na_columns(out, ["latitude", "longitude"], flavour, df)
     return out.reset_index(drop=True)[SITE_COLUMNS]
 
 

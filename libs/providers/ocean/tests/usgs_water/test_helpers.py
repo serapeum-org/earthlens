@@ -590,7 +590,31 @@ def test_warn_all_na_columns_skips_empty_frame():
     out = pd.DataFrame({"latitude": [], "longitude": []})
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        _helpers._warn_all_na_columns(out, ["latitude", "longitude"], "waterdata")
+        _helpers._warn_all_na_columns(
+            out, ["latitude", "longitude"], "waterdata", pd.DataFrame()
+        )
+
+
+def test_normalize_sites_projected_crs_warns_once():
+    """A projected-CRS sites frame warns exactly once, naming the CRS."""
+    import geopandas as gpd
+    from shapely.geometry import Point
+
+    gdf = gpd.GeoDataFrame(
+        {
+            "monitoring_location_id": ["USGS-01646500"],
+            "monitoring_location_name": ["POTOMAC"],
+            "hydrologic_unit_code": ["02070008"],
+            "site_type": ["Stream"],
+        },
+        geometry=[Point(-8585000.0, 4700000.0)],
+        crs="EPSG:3857",
+    )
+    with pytest.warns(UserWarning, match="not geographic") as record:
+        out = _helpers.normalize(gdf, "waterdata", "sites", CODE_META)
+    assert len(record) == 1, f"expected one warning, got {len(record)}"
+    assert "schema" not in str(record[0].message), "must not blame a schema change"
+    assert out["latitude"].isna().all(), "projected coordinates stay NA"
 
 
 class TestPointOrdinate:
@@ -695,7 +719,9 @@ class TestSiteCoordinates:
         assert longitude.iloc[0] == -77.1, "longitude should be the geometry x"
 
     def test_projected_crs_is_not_misread(self):
-        """A projected GeoDataFrame is left NA and warns instead of mislocating."""
+        """A projected GeoDataFrame yields NA from _site_coordinates, silently."""
+        import warnings
+
         import geopandas as gpd
         import pandas as pd
         from shapely.geometry import Point
@@ -705,7 +731,8 @@ class TestSiteCoordinates:
             geometry=[Point(-8585000.0, 4700000.0)],
             crs="EPSG:3857",
         )
-        with pytest.warns(UserWarning, match="not geographic"):
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
             latitude, longitude = _helpers._site_coordinates(gdf)
         assert pd.isna(latitude.iloc[0]), "projected latitude should stay NA"
         assert pd.isna(longitude.iloc[0]), "projected longitude should stay NA"
