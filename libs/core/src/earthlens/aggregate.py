@@ -104,6 +104,7 @@ Examples:
 
 from __future__ import annotations
 
+import re
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from pathlib import Path
@@ -133,6 +134,102 @@ __all__ = [
 
 _TIME_VAR_CANDIDATES: tuple[str, ...] = ("valid_time", "time")
 
+#: A CF time `units` string reads `"<unit> since <epoch>"`
+#: (e.g. `"seconds since 1970-01-01T00:00:00Z"`). This splits the leading
+#: unit word from the epoch so the raw offsets can be decoded.
+_CF_UNITS_PATTERN = re.compile(
+    r"^\s*(?P<unit>\w+)\s+since\s+(?P<epoch>.+?)\s*$", re.IGNORECASE
+)
+
+#: Map each spelling of a CF time unit to the alias `pandas.to_datetime`
+#: accepts through its `unit=` argument.
+_CF_UNIT_ALIASES: dict[str, str] = {
+    "seconds": "s",
+    "second": "s",
+    "secs": "s",
+    "sec": "s",
+    "s": "s",
+    "minutes": "m",
+    "minute": "m",
+    "mins": "m",
+    "min": "m",
+    "hours": "h",
+    "hour": "h",
+    "hrs": "h",
+    "hr": "h",
+    "h": "h",
+    "days": "D",
+    "day": "D",
+    "d": "D",
+}
+
+
+def _decode_cf_offsets(
+    values: np.typing.NDArray[Any], units: str | None
+) -> pd.DatetimeIndex | None:
+    """Decode raw CF time offsets into a tz-naive `pandas.DatetimeIndex`.
+
+    `pyramids.netcdf.NetCDF.get_time_values` returns the time axis as raw
+    numeric offsets without applying the CF `units`. This parses a
+    `"<unit> since <epoch>"` units string and adds the offsets to the epoch,
+    so the unit is read from the file rather than assumed. A tz-aware epoch
+    (a trailing `Z`) is normalised to tz-naive UTC to match the strings the
+    `get_time_variable` branch returns.
+
+    Args:
+        values: The raw offsets, as returned by `get_time_values`.
+        units: The dimension's CF `units` string, or `None` when absent.
+
+    Returns:
+        pd.DatetimeIndex: The decoded axis, or `None` when `units` is missing
+        or not a recognised `"<unit> since <epoch>"` string.
+    """
+    match = _CF_UNITS_PATTERN.match(units) if units else None
+    alias = _CF_UNIT_ALIASES.get(match.group("unit").lower()) if match else None
+    result: pd.DatetimeIndex | None = None
+    if match is not None and alias is not None:
+        origin = pd.Timestamp(match.group("epoch"))
+        if origin.tz is not None:
+            origin = origin.tz_convert("UTC").tz_localize(None)
+        stamps = pd.to_datetime(np.asarray(values), unit=alias, origin=origin)
+        result = pd.DatetimeIndex(stamps)
+    return result
+
+
+def _read_raw_time_axis(nc: NetCDF) -> pd.DatetimeIndex | None:
+    """Decode a time axis reachable only through `get_time_values`.
+
+    Some stores — an ERDDAP griddap NetCDF, some cloud Zarr — expose `time`
+    as a coordinate whose CF `units` `get_time_variable` cannot parse, so it
+    returns `None` even though `get_time_values` reads the axis. This tries
+    each `_TIME_VAR_CANDIDATES` name through `get_time_values` and decodes the
+    offsets with the dimension's own `units`.
+
+    Args:
+        nc: An open `pyramids.netcdf.NetCDF` instance pointed at the source
+            file.
+
+    Returns:
+        pd.DatetimeIndex: The decoded axis, or `None` when no candidate yields
+        decodable offsets.
+    """
+    result: pd.DatetimeIndex | None = None
+    for name in _TIME_VAR_CANDIDATES:
+        values = nc.get_time_values(var_name=name)
+        if values is None or len(values) == 0:
+            continue
+        try:
+            dimension = nc.meta_data.get_dimension(name)
+            attrs = getattr(dimension, "attrs", None) or {}
+            units = attrs.get("units")
+        except (KeyError, AttributeError):
+            units = None
+        decoded = _decode_cf_offsets(values, units)
+        if decoded is not None:
+            result = decoded
+            break
+    return result
+
 
 def _read_time_axis(nc: NetCDF) -> pd.DatetimeIndex:
     """Return a NetCDF's time coordinate as a `pandas.DatetimeIndex`.
@@ -148,7 +245,11 @@ def _read_time_axis(nc: NetCDF) -> pd.DatetimeIndex:
     `"<unit> since <epoch>"` units string for us through
     `create_time_conversion_func`; this helper just chooses the
     candidate name and converts the formatted strings back to
-    timestamps with `pandas.to_datetime`.
+    timestamps with `pandas.to_datetime`. When no candidate resolves
+    that way — e.g. an ERDDAP griddap file whose `time` coordinate
+    `get_time_variable` cannot parse — it falls back to decoding the
+    raw offsets from `get_time_values` (see `_read_raw_time_axis`),
+    and only raises when that is empty too.
 
     Args:
         nc: An open `pyramids.netcdf.NetCDF` instance pointed
@@ -159,18 +260,26 @@ def _read_time_axis(nc: NetCDF) -> pd.DatetimeIndex:
         time dimension.
 
     Raises:
-        KeyError: If none of `_TIME_VAR_CANDIDATES` is present
-            on the NetCDF as a parseable time variable.
+        KeyError: When neither `get_time_variable` nor `get_time_values`
+            yields a readable time axis for any `_TIME_VAR_CANDIDATES` name.
     """
+    result: pd.DatetimeIndex | None = None
     for name in _TIME_VAR_CANDIDATES:
         time_strs = nc.get_time_variable(var_name=name)
         if time_strs:
-            return pd.to_datetime(time_strs)
-    raise KeyError(
-        f"NetCDF has no recognised time variable; tried "
-        f"{list(_TIME_VAR_CANDIDATES)!r}. Re-check the file's time "
-        "dimension name and CF `units` attribute."
-    )
+            result = pd.DatetimeIndex(pd.to_datetime(time_strs))
+            break
+    if result is None:
+        result = _read_raw_time_axis(nc)
+    if result is None:
+        raise KeyError(
+            "NetCDF has no readable time axis: none of "
+            f"{list(_TIME_VAR_CANDIDATES)!r} resolved through "
+            "`get_time_variable`, and `get_time_values` returned no decodable "
+            "offsets. Re-check the time dimension name, its CF `units`, or "
+            "whether the file carries a time axis at all."
+        )
+    return result
 
 
 _LEVEL_DIM_CANDIDATES: tuple[str, ...] = ("pressure_level", "level")

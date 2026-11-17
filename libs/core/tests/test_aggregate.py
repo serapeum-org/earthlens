@@ -56,6 +56,8 @@ pytestmark = [pytest.mark.unit]
 def _make_nc(
     *,
     time_strs_by_var: dict[str, list[str] | None] | None = None,
+    time_values_by_var: dict[str, object] | None = None,
+    time_units_by_var: dict[str, str | None] | None = None,
     dimension_names: list[str] | None = None,
     sel_result: object | None = None,
 ) -> MagicMock:
@@ -65,6 +67,12 @@ def _make_nc(
         time_strs_by_var: Map from variable name to the list returned
             by `nc.get_time_variable(var_name=name)`. Names not in
             the map return `None`.
+        time_values_by_var: Map from variable name to the raw offsets
+            returned by `nc.get_time_values(var_name=name)`. Names not
+            in the map return `None`.
+        time_units_by_var: Map from dimension name to the CF `units`
+            string exposed at `nc.meta_data.get_dimension(name).attrs`.
+            Names not in the map return `None`.
         dimension_names: Value returned by the `dimension_names`
             property.
         sel_result: Object returned by `nc.sel(...)`. Defaults to a
@@ -73,6 +81,14 @@ def _make_nc(
     nc = MagicMock()
     table = time_strs_by_var or {}
     nc.get_time_variable = MagicMock(side_effect=lambda var_name: table.get(var_name))
+    values_table = time_values_by_var or {}
+    nc.get_time_values = MagicMock(
+        side_effect=lambda var_name: values_table.get(var_name)
+    )
+    units_table = time_units_by_var or {}
+    nc.meta_data.get_dimension = MagicMock(
+        side_effect=lambda name: SimpleNamespace(attrs={"units": units_table.get(name)})
+    )
     nc.dimension_names = dimension_names
     nc.sel = MagicMock(
         return_value=sel_result if sel_result is not None else MagicMock()
@@ -254,6 +270,53 @@ class TestReadTimeAxis:
             assert name in msg, (
                 f"KeyError message should list candidate {name!r}, got: {msg}"
             )
+
+    def test_falls_back_to_get_time_values_when_no_variable_resolves(self):
+        """The raw `get_time_values` axis is decoded when no candidate parses."""
+        nc = _make_nc(
+            time_strs_by_var={"valid_time": None, "time": None},
+            time_values_by_var={"time": np.array([1.6856208e9, 1.6857072e9])},
+            time_units_by_var={"time": "seconds since 1970-01-01T00:00:00Z"},
+        )
+        result = _read_time_axis(nc)
+        assert list(result) == [
+            pd.Timestamp("2023-06-01 12:00:00"),
+            pd.Timestamp("2023-06-02 12:00:00"),
+        ], f"Expected the epoch-second axis decoded, got {list(result)}"
+        assert result.tz is None, f"Expected a tz-naive axis, got tz={result.tz}"
+
+    def test_raw_fallback_reads_the_declared_unit(self):
+        """The fallback honours the file's unit instead of assuming seconds."""
+        nc = _make_nc(
+            time_strs_by_var={"time": None},
+            time_values_by_var={"time": np.array([0, 1, 2])},
+            time_units_by_var={"time": "days since 1979-01-01"},
+        )
+        result = _read_time_axis(nc)
+        assert list(result) == [
+            pd.Timestamp("1979-01-01"),
+            pd.Timestamp("1979-01-02"),
+            pd.Timestamp("1979-01-03"),
+        ], f"Expected days-since decoding, got {list(result)}"
+
+    def test_keyerror_mentions_the_get_time_values_fallback(self):
+        """With no variable and no raw values, the message names both probes."""
+        nc = _make_nc(time_strs_by_var={"valid_time": None, "time": None})
+        with pytest.raises(KeyError) as excinfo:
+            _read_time_axis(nc)
+        assert "get_time_values" in str(excinfo.value), (
+            f"Message should mention the get_time_values fallback, got: {excinfo.value}"
+        )
+
+    def test_raw_fallback_raises_when_unit_is_missing(self):
+        """Raw values with no `units` attribute raise rather than guess."""
+        nc = _make_nc(
+            time_strs_by_var={"time": None},
+            time_values_by_var={"time": np.array([0, 1])},
+            time_units_by_var={"time": None},
+        )
+        with pytest.raises(KeyError):
+            _read_time_axis(nc)
 
     def test_get_time_variable_called_with_var_name_kwarg(self):
         """The helper passes each candidate as a keyword argument."""
@@ -920,6 +983,14 @@ class _FakeNetCDF:
     def get_time_variable(self, var_name: str) -> list[str] | None:
         """Look up the time strings registered for `var_name`."""
         return self._times.get(var_name)
+
+    def get_time_values(self, var_name: str) -> np.ndarray | None:
+        """No raw offsets in these fixtures; the string path is used instead.
+
+        A real `NetCDF` always exposes this; these round-trip cases drive the
+        axis through `get_time_variable`, so the raw fallback is never needed.
+        """
+        return None
 
     def sel(self, **kwargs):
         """Return the configured `_on_sel` instance to simulate level pinning."""
