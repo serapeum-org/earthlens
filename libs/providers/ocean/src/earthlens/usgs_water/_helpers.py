@@ -641,21 +641,24 @@ def _warn_all_na_columns(out: pd.DataFrame, columns: list[str], flavour: str) ->
     A geocoding column (latitude / longitude) that resolves to 100 %
     `NA` is never a legitimate result — it means the source frame carried
     the value under a schema this normalizer does not map. Surfacing it as
-    a `RuntimeWarning` keeps `_first_column`'s `pd.NA` default from turning
-    a schema mismatch into silently empty output.
+    a `UserWarning` keeps `_first_column`'s `pd.NA` default from turning a
+    schema mismatch into silently empty output. An empty frame has no rows
+    to judge, so it is skipped rather than warned on.
 
     Args:
         out: The normalized frame.
         columns: The required column names to check.
         flavour: `"waterdata"` or `"nwis"`, named in the warning.
     """
+    if out.empty:
+        return
     empty = [column for column in columns if out[column].isna().all()]
     if empty:
         warnings.warn(
             f"usgs-water sites ({flavour}): {empty} resolved to all-NA over "
             f"{len(out)} rows; the source schema likely changed, so these "
             "columns could not be mapped.",
-            RuntimeWarning,
+            UserWarning,
             stacklevel=2,
         )
 

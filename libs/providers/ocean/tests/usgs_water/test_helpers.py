@@ -575,10 +575,22 @@ def test_normalize_sites_all_na_coordinates_warns():
             "site_type": ["Stream"],
         }
     )
-    with pytest.warns(RuntimeWarning, match="latitude"):
+    with pytest.warns(UserWarning, match="latitude"):
         out = _helpers.normalize(frame, "waterdata", "sites", CODE_META)
     assert out["latitude"].isna().all()
     assert out["longitude"].isna().all()
+
+
+def test_warn_all_na_columns_skips_empty_frame():
+    """An empty frame is not warned on (no rows to judge)."""
+    import warnings
+
+    import pandas as pd
+
+    out = pd.DataFrame({"latitude": [], "longitude": []})
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        _helpers._warn_all_na_columns(out, ["latitude", "longitude"], "waterdata")
 
 
 class TestPointOrdinate:
