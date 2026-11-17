@@ -26,6 +26,7 @@ The canonical output columns are `CANONICAL_COLUMNS`.
 from __future__ import annotations
 
 import re
+import warnings
 from typing import Any
 
 import pandas as pd
@@ -526,6 +527,96 @@ def _first_column(
     return pd.Series(default, index=df.index)
 
 
+def _point_x(geometry: Any) -> Any:
+    """Return a shapely point's longitude (`x`), or `pd.NA` when unusable.
+
+    A `None` cell, an empty geometry, or any object without the shapely
+    point interface yields `pd.NA` rather than raising, so the mapping is
+    safe across a mixed or sparse `geometry` column.
+
+    Args:
+        geometry: A cell of a `geometry` column (a shapely point or any
+            other value).
+
+    Returns:
+        The point's `x` ordinate, or `pd.NA`.
+    """
+    if geometry is None or getattr(geometry, "is_empty", True):
+        return pd.NA
+    return geometry.x
+
+
+def _point_y(geometry: Any) -> Any:
+    """Return a shapely point's latitude (`y`), or `pd.NA` when unusable.
+
+    The empty / non-geometry handling mirrors `_point_x`.
+
+    Args:
+        geometry: A cell of a `geometry` column (a shapely point or any
+            other value).
+
+    Returns:
+        The point's `y` ordinate, or `pd.NA`.
+    """
+    if geometry is None or getattr(geometry, "is_empty", True):
+        return pd.NA
+    return geometry.y
+
+
+def _site_coordinates(df: pd.DataFrame) -> tuple[pd.Series, pd.Series]:
+    """Resolve `(latitude, longitude)` numeric Series from a site frame.
+
+    Prefers the scalar `dec_lat_va` / `dec_long_va` columns the legacy
+    `nwis` frames carry. The modern monitoring-locations endpoint omits
+    those and returns a GeoDataFrame whose coordinates live only in a
+    `geometry` column of shapely points, so when an axis resolves to
+    all-`NA` and a `geometry` column is present, that axis falls back to
+    the matching geometry ordinate.
+
+    Args:
+        df: The site-metadata frame (legacy wide, or modern with a
+            `geometry` column).
+
+    Returns:
+        tuple[pd.Series, pd.Series]: Index-aligned `latitude` and
+            `longitude` Series, numeric (`NaN` where unresolved).
+    """
+    latitude = pd.to_numeric(_first_column(df, ["dec_lat_va"]), errors="coerce")
+    longitude = pd.to_numeric(_first_column(df, ["dec_long_va"]), errors="coerce")
+    if (latitude.isna().all() or longitude.isna().all()) and "geometry" in df.columns:
+        geometry = df["geometry"]
+        if latitude.isna().all():
+            latitude = pd.to_numeric(geometry.map(_point_y), errors="coerce")
+        if longitude.isna().all():
+            longitude = pd.to_numeric(geometry.map(_point_x), errors="coerce")
+    return latitude, longitude
+
+
+def _warn_all_na_columns(out: pd.DataFrame, columns: list[str], flavour: str) -> None:
+    """Warn when a required `columns` entry is all-`NA` over a non-empty frame.
+
+    A geocoding column (latitude / longitude) that resolves to 100 %
+    `NA` is never a legitimate result — it means the source frame carried
+    the value under a schema this normalizer does not map. Surfacing it as
+    a `RuntimeWarning` keeps `_first_column`'s `pd.NA` default from turning
+    a schema mismatch into silently empty output.
+
+    Args:
+        out: The normalized frame.
+        columns: The required column names to check.
+        flavour: `"waterdata"` or `"nwis"`, named in the warning.
+    """
+    empty = [column for column in columns if out[column].isna().all()]
+    if empty:
+        warnings.warn(
+            f"usgs-water sites ({flavour}): {empty} resolved to all-NA over "
+            f"{len(out)} rows; the source schema likely changed, so these "
+            "columns could not be mapped.",
+            RuntimeWarning,
+            stacklevel=2,
+        )
+
+
 def normalize_samples(
     df: pd.DataFrame, code_meta: dict[str, tuple[str, str]]
 ) -> pd.DataFrame:
@@ -658,25 +749,15 @@ def normalize_sites(df: pd.DataFrame, flavour: str) -> pd.DataFrame:
             _strip_site_prefix
         )
         out["station_name"] = _first_column(df, ["monitoring_location_name"])
-        out["latitude"] = pd.to_numeric(
-            _first_column(df, ["dec_lat_va"]), errors="coerce"
-        )
-        out["longitude"] = pd.to_numeric(
-            _first_column(df, ["dec_long_va"]), errors="coerce"
-        )
         out["huc"] = _first_column(df, ["hydrologic_unit_code"])
         out["site_type"] = _first_column(df, ["site_type"])
     else:
         out["site_no"] = _first_column(df, ["site_no"])
         out["station_name"] = _first_column(df, ["station_nm"])
-        out["latitude"] = pd.to_numeric(
-            _first_column(df, ["dec_lat_va"]), errors="coerce"
-        )
-        out["longitude"] = pd.to_numeric(
-            _first_column(df, ["dec_long_va"]), errors="coerce"
-        )
         out["huc"] = _first_column(df, ["huc_cd"])
         out["site_type"] = _first_column(df, ["site_tp_cd"])
+    out["latitude"], out["longitude"] = _site_coordinates(df)
+    _warn_all_na_columns(out, ["latitude", "longitude"], flavour)
     return out.reset_index(drop=True)[SITE_COLUMNS]
 
 

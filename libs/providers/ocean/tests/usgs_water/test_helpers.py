@@ -519,15 +519,18 @@ def test_normalize_peaks_modern():
 
 
 def test_normalize_sites_modern():
-    """Modern sites normalize maps monitoring-location columns."""
+    """Modern sites normalize reads coordinates from the geometry column."""
     import pandas as pd
+    from shapely.geometry import Point
 
+    # The real `get_monitoring_locations` returns a GeoDataFrame whose
+    # coordinates live only in a `geometry` column of shapely points — it
+    # carries no `dec_lat_va` / `dec_long_va` scalars.
     frame = pd.DataFrame(
         {
             "monitoring_location_id": ["USGS-01646500"],
             "monitoring_location_name": ["POTOMAC"],
-            "dec_lat_va": [38.9],
-            "dec_long_va": [-77.1],
+            "geometry": [Point(-77.1, 38.9)],
             "hydrologic_unit_code": ["02070008"],
             "site_type": ["Stream"],
         }
@@ -535,6 +538,47 @@ def test_normalize_sites_modern():
     out = _helpers.normalize(frame, "waterdata", "sites", CODE_META)
     assert out["site_no"].iloc[0] == "01646500"
     assert out["station_name"].iloc[0] == "POTOMAC"
+    assert out["latitude"].iloc[0] == 38.9
+    assert out["longitude"].iloc[0] == -77.1
+
+
+def test_normalize_sites_modern_prefers_scalar_over_geometry():
+    """Explicit dec_lat_va / dec_long_va win over the geometry fallback."""
+    import pandas as pd
+    from shapely.geometry import Point
+
+    frame = pd.DataFrame(
+        {
+            "monitoring_location_id": ["USGS-01646500"],
+            "monitoring_location_name": ["POTOMAC"],
+            "dec_lat_va": [38.9],
+            "dec_long_va": [-77.1],
+            "geometry": [Point(0.0, 0.0)],
+            "hydrologic_unit_code": ["02070008"],
+            "site_type": ["Stream"],
+        }
+    )
+    out = _helpers.normalize(frame, "waterdata", "sites", CODE_META)
+    assert out["latitude"].iloc[0] == 38.9
+    assert out["longitude"].iloc[0] == -77.1
+
+
+def test_normalize_sites_all_na_coordinates_warns():
+    """A sites frame with no resolvable coordinates warns instead of passing silently."""
+    import pandas as pd
+
+    frame = pd.DataFrame(
+        {
+            "monitoring_location_id": ["USGS-01646500"],
+            "monitoring_location_name": ["POTOMAC"],
+            "hydrologic_unit_code": ["02070008"],
+            "site_type": ["Stream"],
+        }
+    )
+    with pytest.warns(RuntimeWarning, match="latitude"):
+        out = _helpers.normalize(frame, "waterdata", "sites", CODE_META)
+    assert out["latitude"].isna().all()
+    assert out["longitude"].isna().all()
 
 
 @pytest.mark.parametrize(
