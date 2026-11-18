@@ -180,7 +180,7 @@ dev = [
     # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
     # It arrives transitively through pyramids-core[viz], but an imported package
     # is declared here rather than relied on to come in sideways.
-    "cleopatra[tiles] >=0.43.0",
+    "cleopatra[tiles] >=0.46.0",
     # digitalearth: the visualisation layer the example notebooks compose their
     # maps, charts and animations with. It sits on top of pyramids + cleopatra --
     # `quickmap` auto-styles a pyramids Dataset/FeatureCollection into a finished
@@ -291,7 +291,7 @@ docs = [
     # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
     # It arrives transitively through pyramids-core[viz], but an imported package
     # is declared here rather than relied on to come in sideways.
-    "cleopatra[tiles] >=0.43.0",
+    "cleopatra[tiles] >=0.46.0",
     # digitalearth: mkdocs-jupyter renders the example notebooks, which import it
     # for their maps, charts and animations. Also in `dev` -- see the comment there.
     "digitalearth >=0.13.0",

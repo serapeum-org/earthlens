@@ -2521,7 +2521,7 @@ provides-extras = ["argo", "asf", "cmems", "cmip6", "dem", "earthdata", "ecmwf",
 [package.metadata.requires-dev]
 dev = [
     { name = "build", specifier = ">=1.0.0" },
-    { name = "cleopatra", extras = ["tiles"], specifier = ">=0.43.0" },
+    { name = "cleopatra", extras = ["tiles"], specifier = ">=0.46.0" },
     { name = "commitizen", specifier = ">=4.8.4" },
     { name = "coverage" },
     { name = "digitalearth", specifier = ">=0.13.0" },
@@ -2547,7 +2547,7 @@ dev = [
     { name = "vcrpy", specifier = ">=6.0.2" },
 ]
 docs = [
-    { name = "cleopatra", extras = ["tiles"], specifier = ">=0.43.0" },
+    { name = "cleopatra", extras = ["tiles"], specifier = ">=0.46.0" },
     { name = "digitalearth", specifier = ">=0.13.0" },
     { name = "imageio-ffmpeg", specifier = ">=0.5" },
     { name = "matplotlib", specifier = ">=3.5" },
