@@ -522,7 +522,8 @@ class TestReadRawTimeAxis:
             time_calendars_by_var={"time": b"standard"},
         )
         result = _read_raw_time_axis(nc)
-        assert result is not None and list(result) == [
+        assert result is not None, "A bytes standard calendar should decode, got None"
+        assert list(result) == [
             pd.Timestamp("2000-01-01"),
             pd.Timestamp("2000-01-02"),
         ], f"Expected a bytes standard calendar to decode, got {result}"
