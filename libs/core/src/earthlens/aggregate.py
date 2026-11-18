@@ -214,18 +214,27 @@ def _decode_cf_offsets(
             origin = pd.Timestamp(epoch)
             if origin.tz is not None:
                 origin = origin.tz_convert("UTC").tz_localize(None)
-            # Reject an epoch outside pandas' representable range: a pre-1677 or
-            # year-0 epoch either overflows or constructs a nonsense origin
-            # (pandas shifts year 0 into 1972), which would mis-bucket every
-            # sample. In range, a too-large offset still overflows in
-            # `to_datetime` and is caught below.
+            # Reject an epoch outside pandas' representable range: a pre-1677
+            # (including year-0) epoch falls below `pd.Timestamp.min`, so the
+            # range check rejects it rather than mis-dating every sample. In
+            # range, a too-large offset still overflows in `to_datetime` and is
+            # caught below. `atleast_1d` keeps a single-step (0-D) axis a
+            # collection so `DatetimeIndex` accepts it.
             if pd.Timestamp.min <= origin <= pd.Timestamp.max:
-                stamps = pd.to_datetime(np.asarray(values), unit=alias, origin=origin)
-                result = pd.DatetimeIndex(stamps)
-        except (ValueError, OverflowError):
+                offsets = np.atleast_1d(np.asarray(values))
+                stamps = pd.DatetimeIndex(
+                    pd.to_datetime(offsets, unit=alias, origin=origin)
+                )
+                # A fill/NaN offset decodes to `NaT`, which `window_groups`
+                # would silently drop from every window; refuse the whole axis
+                # instead of losing a timestep without a trace.
+                if not stamps.isna().any():
+                    result = stamps
+        except (TypeError, ValueError, OverflowError):
             # An epoch or offset outside pandas' nanosecond range
-            # (`OutOfBoundsDatetime` is a `ValueError`) is undecodable here; fall
-            # through to `None` so the caller raises its honest `KeyError`.
+            # (`OutOfBoundsDatetime` is a `ValueError`), or an offset dtype
+            # `to_datetime` rejects, is undecodable here; fall through to `None`
+            # so the caller raises its honest `KeyError`.
             result = None
     return result
 
@@ -265,6 +274,8 @@ def _read_raw_time_axis(nc: NetCDF) -> pd.DatetimeIndex | None:
         except AttributeError:
             attrs = {}
         calendar = attrs.get("calendar")
+        if isinstance(calendar, bytes):
+            calendar = calendar.decode("ascii", "ignore")
         if calendar and str(calendar).lower() not in _STANDARD_CALENDARS:
             continue
         decoded = _decode_cf_offsets(values, attrs.get("units"))

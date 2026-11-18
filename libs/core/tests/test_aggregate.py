@@ -415,10 +415,24 @@ class TestDecodeCfOffsets:
         result = _decode_cf_offsets(np.array(values), units)
         assert result is None, f"Expected None for {units!r}+{values}, got {result}"
 
-    def test_year_zero_epoch_is_not_silently_misdecoded(self):
-        """A year-0 epoch pandas misparses is rejected rather than returned wrong."""
+    def test_year_zero_epoch_is_rejected_as_out_of_range(self):
+        """A year-0 epoch falls below `Timestamp.min`, so the range check rejects it."""
         result = _decode_cf_offsets(np.array([0]), "days since 0000-01-01")
         assert result is None, f"Expected None for a year-0 epoch, got {result}"
+
+    def test_scalar_offset_is_coerced_and_decoded(self):
+        """A 0-D (single-step) offset is coerced to a one-element index, not a crash."""
+        result = _decode_cf_offsets(np.asarray(86400), "seconds since 1970-01-01")
+        assert list(result) == [pd.Timestamp("1970-01-02")], (
+            f"Expected a one-element decoded index, got {result}"
+        )
+
+    def test_nan_offset_axis_is_rejected(self):
+        """An axis with a NaN/fill offset is undecodable (None), not silently dropped."""
+        result = _decode_cf_offsets(
+            np.array([0.0, float("nan"), 86400.0]), "seconds since 1970-01-01"
+        )
+        assert result is None, f"Expected None for a NaN-bearing axis, got {result}"
 
 
 class TestReadRawTimeAxis:
@@ -498,6 +512,20 @@ class TestReadRawTimeAxis:
             pd.Timestamp("2000-01-01"),
             pd.Timestamp("2000-01-02"),
         ], f"Expected a standard calendar to decode, got {result}"
+
+    def test_bytes_standard_calendar_is_decoded(self):
+        """A bytes-encoded `standard` calendar decodes like its `str` form."""
+        nc = _make_nc(
+            time_strs_by_var={"time": None},
+            time_values_by_var={"time": np.array([0, 1])},
+            time_units_by_var={"time": "days since 2000-01-01"},
+            time_calendars_by_var={"time": b"standard"},
+        )
+        result = _read_raw_time_axis(nc)
+        assert result is not None and list(result) == [
+            pd.Timestamp("2000-01-01"),
+            pd.Timestamp("2000-01-02"),
+        ], f"Expected a bytes standard calendar to decode, got {result}"
 
 
 class TestFindLevelDim:
