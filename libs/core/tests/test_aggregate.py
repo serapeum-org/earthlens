@@ -37,8 +37,10 @@ from earthlens.aggregate import (
     _REDUCERS_STRICT,
     _TIME_VAR_CANDIDATES,
     AggregationConfig,
+    _decode_cf_offsets,
     _find_level_dim,
     _output_stem,
+    _read_raw_time_axis,
     _read_time_axis,
     _read_window,
     _reduce_window,
@@ -56,6 +58,9 @@ pytestmark = [pytest.mark.unit]
 def _make_nc(
     *,
     time_strs_by_var: dict[str, list[str] | None] | None = None,
+    time_values_by_var: dict[str, object] | None = None,
+    time_units_by_var: dict[str, str | None] | None = None,
+    time_calendars_by_var: dict[str, str | None] | None = None,
     dimension_names: list[str] | None = None,
     sel_result: object | None = None,
 ) -> MagicMock:
@@ -65,6 +70,15 @@ def _make_nc(
         time_strs_by_var: Map from variable name to the list returned
             by `nc.get_time_variable(var_name=name)`. Names not in
             the map return `None`.
+        time_values_by_var: Map from variable name to the raw offsets
+            returned by `nc.get_time_values(var_name=name)`. Names not
+            in the map return `None`.
+        time_units_by_var: Map from dimension name to the CF `units`
+            string exposed at `nc.metadata.get_dimension(name).attrs`.
+            Names not in the map return `None`.
+        time_calendars_by_var: Map from dimension name to the CF `calendar`
+            string exposed alongside `units`. Names not in the map return
+            `None` (no calendar attribute).
         dimension_names: Value returned by the `dimension_names`
             property.
         sel_result: Object returned by `nc.sel(...)`. Defaults to a
@@ -73,6 +87,20 @@ def _make_nc(
     nc = MagicMock()
     table = time_strs_by_var or {}
     nc.get_time_variable = MagicMock(side_effect=lambda var_name: table.get(var_name))
+    values_table = time_values_by_var or {}
+    nc.get_time_values = MagicMock(
+        side_effect=lambda var_name: values_table.get(var_name)
+    )
+    units_table = time_units_by_var or {}
+    calendars_table = time_calendars_by_var or {}
+    nc.metadata.get_dimension = MagicMock(
+        side_effect=lambda name: SimpleNamespace(
+            attrs={
+                "units": units_table.get(name),
+                "calendar": calendars_table.get(name),
+            }
+        )
+    )
     nc.dimension_names = dimension_names
     nc.sel = MagicMock(
         return_value=sel_result if sel_result is not None else MagicMock()
@@ -255,6 +283,53 @@ class TestReadTimeAxis:
                 f"KeyError message should list candidate {name!r}, got: {msg}"
             )
 
+    def test_falls_back_to_get_time_values_when_no_variable_resolves(self):
+        """The raw `get_time_values` axis is decoded when no candidate parses."""
+        nc = _make_nc(
+            time_strs_by_var={"valid_time": None, "time": None},
+            time_values_by_var={"time": np.array([1.6856208e9, 1.6857072e9])},
+            time_units_by_var={"time": "seconds since 1970-01-01T00:00:00Z"},
+        )
+        result = _read_time_axis(nc)
+        assert list(result) == [
+            pd.Timestamp("2023-06-01 12:00:00"),
+            pd.Timestamp("2023-06-02 12:00:00"),
+        ], f"Expected the epoch-second axis decoded, got {list(result)}"
+        assert result.tz is None, f"Expected a tz-naive axis, got tz={result.tz}"
+
+    def test_raw_fallback_reads_the_declared_unit(self):
+        """The fallback honours the file's unit instead of assuming seconds."""
+        nc = _make_nc(
+            time_strs_by_var={"time": None},
+            time_values_by_var={"time": np.array([0, 1, 2])},
+            time_units_by_var={"time": "days since 1979-01-01"},
+        )
+        result = _read_time_axis(nc)
+        assert list(result) == [
+            pd.Timestamp("1979-01-01"),
+            pd.Timestamp("1979-01-02"),
+            pd.Timestamp("1979-01-03"),
+        ], f"Expected days-since decoding, got {list(result)}"
+
+    def test_keyerror_mentions_the_get_time_values_fallback(self):
+        """With no variable and no raw values, the message names both probes."""
+        nc = _make_nc(time_strs_by_var={"valid_time": None, "time": None})
+        with pytest.raises(KeyError) as excinfo:
+            _read_time_axis(nc)
+        assert "get_time_values" in str(excinfo.value), (
+            f"Message should mention the get_time_values fallback, got: {excinfo.value}"
+        )
+
+    def test_raw_fallback_raises_when_unit_is_missing(self):
+        """Raw values with no `units` attribute raise rather than guess."""
+        nc = _make_nc(
+            time_strs_by_var={"time": None},
+            time_values_by_var={"time": np.array([0, 1])},
+            time_units_by_var={"time": None},
+        )
+        with pytest.raises(KeyError):
+            _read_time_axis(nc)
+
     def test_get_time_variable_called_with_var_name_kwarg(self):
         """The helper passes each candidate as a keyword argument."""
         nc = _make_nc(time_strs_by_var={"time": ["2022-01-01"]})
@@ -263,6 +338,195 @@ class TestReadTimeAxis:
         assert all("var_name" in kwargs for kwargs in call_kwargs), (
             f"All calls should pass var_name as kwarg, got: {call_kwargs}"
         )
+
+
+class TestDecodeCfOffsets:
+    """Tests for `_decode_cf_offsets` (CF `<unit> since <epoch>` decoding)."""
+
+    @pytest.mark.parametrize(
+        "unit_word, offsets, epoch, expected",
+        [
+            ("seconds", [0, 86400], "1970-01-01", ["1970-01-01", "1970-01-02"]),
+            ("minutes", [0, 60], "2000-01-01", ["2000-01-01", "2000-01-01 01:00:00"]),
+            ("hours", [0, 24], "2000-01-01", ["2000-01-01", "2000-01-02"]),
+            ("days", [0, 1], "1979-01-01", ["1979-01-01", "1979-01-02"]),
+            (
+                "milliseconds",
+                [0, 1000],
+                "2000-01-01",
+                ["2000-01-01", "2000-01-01 00:00:01"],
+            ),
+            (
+                "microseconds",
+                [0, 1000000],
+                "2000-01-01",
+                ["2000-01-01", "2000-01-01 00:00:01"],
+            ),
+        ],
+    )
+    def test_decodes_each_unit_family(self, unit_word, offsets, epoch, expected):
+        """Each CF unit family is added to its epoch to recover timestamps."""
+        result = _decode_cf_offsets(np.array(offsets), f"{unit_word} since {epoch}")
+        assert list(result) == [pd.Timestamp(e) for e in expected], (
+            f"Expected {expected} for {unit_word!r}, got {list(result)}"
+        )
+
+    def test_tz_aware_epoch_is_normalised_to_naive(self):
+        """A trailing `Z` epoch yields a tz-naive index, not a tz-aware one."""
+        result = _decode_cf_offsets(np.array([0]), "seconds since 1970-01-01T00:00:00Z")
+        assert result.tz is None, f"Expected tz-naive, got tz={result.tz}"
+        assert result[0] == pd.Timestamp("1970-01-01"), f"Got {result[0]}"
+
+    def test_non_utc_offset_epoch_is_converted_to_utc(self):
+        """An epoch with a `+HH:MM` offset is normalised to tz-naive UTC."""
+        result = _decode_cf_offsets(
+            np.array([0, 1]), "hours since 2000-01-01T00:00:00+05:00"
+        )
+        assert result.tz is None, f"Expected tz-naive, got tz={result.tz}"
+        assert result[0] == pd.Timestamp("1999-12-31 19:00:00"), (
+            f"Expected the +05:00 epoch shifted to UTC, got {result[0]}"
+        )
+
+    @pytest.mark.parametrize(
+        "units",
+        [
+            None,
+            "",
+            "garbage",
+            "fortnights since 1970-01-01",
+            "weeks since 2000-01-01",
+            "months since 2000-01-01",
+        ],
+    )
+    def test_returns_none_for_unusable_units(self, units):
+        """Missing, malformed, or unsupported-unit strings decode to `None`."""
+        result = _decode_cf_offsets(np.array([0, 1]), units)
+        assert result is None, f"Expected None for units={units!r}, got {result}"
+
+    @pytest.mark.parametrize(
+        "values, units",
+        [
+            ([0, 1], "days since 0001-01-01"),
+            ([10**19], "seconds since 1970-01-01"),
+        ],
+    )
+    def test_unrepresentable_epoch_or_offset_decodes_to_none(self, values, units):
+        """An epoch/offset outside pandas' range degrades to `None`, not a raise."""
+        result = _decode_cf_offsets(np.array(values), units)
+        assert result is None, f"Expected None for {units!r}+{values}, got {result}"
+
+    def test_year_zero_epoch_is_rejected_as_out_of_range(self):
+        """A year-0 epoch falls below `Timestamp.min`, so the range check rejects it."""
+        result = _decode_cf_offsets(np.array([0]), "days since 0000-01-01")
+        assert result is None, f"Expected None for a year-0 epoch, got {result}"
+
+    def test_scalar_offset_is_coerced_and_decoded(self):
+        """A 0-D (single-step) offset is coerced to a one-element index, not a crash."""
+        result = _decode_cf_offsets(np.asarray(86400), "seconds since 1970-01-01")
+        assert list(result) == [pd.Timestamp("1970-01-02")], (
+            f"Expected a one-element decoded index, got {result}"
+        )
+
+    def test_nan_offset_axis_is_rejected(self):
+        """An axis with a NaN/fill offset is undecodable (None), not silently dropped."""
+        result = _decode_cf_offsets(
+            np.array([0.0, float("nan"), 86400.0]), "seconds since 1970-01-01"
+        )
+        assert result is None, f"Expected None for a NaN-bearing axis, got {result}"
+
+
+class TestReadRawTimeAxis:
+    """Tests for the `_read_raw_time_axis` fallback (H2)."""
+
+    def test_empty_values_array_is_skipped(self):
+        """A zero-length offsets array is treated as absence, yielding None."""
+        nc = _make_nc(
+            time_strs_by_var={"valid_time": None, "time": None},
+            time_values_by_var={"time": np.array([])},
+            time_units_by_var={"time": "seconds since 1970-01-01"},
+        )
+        assert _read_raw_time_axis(nc) is None, "Empty offsets should give None"
+
+    def test_valid_time_offsets_are_used_before_time(self):
+        """The first candidate with decodable offsets wins over later ones."""
+        nc = _make_nc(
+            time_strs_by_var={"valid_time": None, "time": None},
+            time_values_by_var={
+                "valid_time": np.array([0]),
+                "time": np.array([86400]),
+            },
+            time_units_by_var={
+                "valid_time": "seconds since 2022-01-01",
+                "time": "seconds since 2022-01-01",
+            },
+        )
+        result = _read_raw_time_axis(nc)
+        assert list(result) == [pd.Timestamp("2022-01-01")], (
+            f"Expected valid_time offsets to win, got {list(result)}"
+        )
+
+    def test_absent_dimension_yields_no_units(self):
+        """A dimension `metadata.get_dimension` reports as `None` decodes to None."""
+        nc = _make_nc(
+            time_strs_by_var={"time": None},
+            time_values_by_var={"time": np.array([0, 1])},
+        )
+        nc.metadata.get_dimension = MagicMock(return_value=None)
+        assert _read_raw_time_axis(nc) is None, (
+            "A missing dimension (None) should give None, not raise"
+        )
+
+    def test_metadata_attribute_error_is_tolerated(self):
+        """A raising metadata accessor degrades to no units rather than propagating."""
+        nc = _make_nc(
+            time_strs_by_var={"time": None},
+            time_values_by_var={"time": np.array([0, 1])},
+        )
+        nc.metadata.get_dimension = MagicMock(side_effect=AttributeError("gone"))
+        assert _read_raw_time_axis(nc) is None, (
+            "A metadata AttributeError should be tolerated as missing units"
+        )
+
+    def test_non_standard_calendar_is_not_decoded(self):
+        """A non-Gregorian calendar bails rather than silently mis-decoding."""
+        nc = _make_nc(
+            time_strs_by_var={"time": None},
+            time_values_by_var={"time": np.array([0, 1])},
+            time_units_by_var={"time": "days since 2000-01-01"},
+            time_calendars_by_var={"time": "360_day"},
+        )
+        assert _read_raw_time_axis(nc) is None, (
+            "A 360_day calendar should not be decoded with the Gregorian path"
+        )
+
+    def test_standard_calendar_is_decoded(self):
+        """An explicit `standard` calendar decodes like no calendar at all."""
+        nc = _make_nc(
+            time_strs_by_var={"time": None},
+            time_values_by_var={"time": np.array([0, 1])},
+            time_units_by_var={"time": "days since 2000-01-01"},
+            time_calendars_by_var={"time": "standard"},
+        )
+        result = _read_raw_time_axis(nc)
+        assert list(result) == [
+            pd.Timestamp("2000-01-01"),
+            pd.Timestamp("2000-01-02"),
+        ], f"Expected a standard calendar to decode, got {result}"
+
+    def test_bytes_standard_calendar_is_decoded(self):
+        """A bytes-encoded `standard` calendar decodes like its `str` form."""
+        nc = _make_nc(
+            time_strs_by_var={"time": None},
+            time_values_by_var={"time": np.array([0, 1])},
+            time_units_by_var={"time": "days since 2000-01-01"},
+            time_calendars_by_var={"time": b"standard"},
+        )
+        result = _read_raw_time_axis(nc)
+        assert result is not None, "A bytes standard calendar should decode, got None"
+        assert list(result) == [
+            pd.Timestamp("2000-01-01"),
+            pd.Timestamp("2000-01-02"),
+        ], f"Expected a bytes standard calendar to decode, got {result}"
 
 
 class TestFindLevelDim:
@@ -868,6 +1132,8 @@ class _FakeNetCDF:
         *,
         array: np.ndarray,
         time_strs_by_var: dict[str, list[str] | None],
+        time_values_by_var: dict[str, object] | None = None,
+        time_units_by_var: dict[str, str | None] | None = None,
         dimension_names: list[str] | None = None,
         geotransform: tuple = (0.0, 1.0, 0.0, 1.0, 0.0, -1.0),
         variable_geotransform: tuple | None = None,
@@ -875,6 +1141,8 @@ class _FakeNetCDF:
     ):
         self._array = array
         self._times = time_strs_by_var
+        self._time_values = time_values_by_var or {}
+        self._time_units = time_units_by_var or {}
         self.dimension_names = dimension_names
         self.geotransform = geotransform
         # A real container is not a raster, so its geotransform is a
@@ -892,6 +1160,8 @@ class _FakeNetCDF:
         cube = _FakeNetCDF(
             array=self._array,
             time_strs_by_var=self._times,
+            time_values_by_var=self._time_values,
+            time_units_by_var=self._time_units,
             dimension_names=self.dimension_names,
             geotransform=self._variable_geotransform,
             on_sel=self._on_sel,
@@ -920,6 +1190,25 @@ class _FakeNetCDF:
     def get_time_variable(self, var_name: str) -> list[str] | None:
         """Look up the time strings registered for `var_name`."""
         return self._times.get(var_name)
+
+    def get_time_values(self, var_name: str) -> np.ndarray | None:
+        """Return raw offsets for `var_name`, or `None` when none were set.
+
+        Round-trip cases that drive the axis through `get_time_variable` leave
+        this empty; the raw-fallback cases register offsets here instead.
+        """
+        values = self._time_values.get(var_name)
+        return None if values is None else np.asarray(values)
+
+    @property
+    def metadata(self):
+        """Expose CF `units` per dimension like `pyramids` `NetCDFMetadata`."""
+        units = self._time_units
+        return SimpleNamespace(
+            get_dimension=lambda name: SimpleNamespace(
+                attrs={"units": units.get(name), "calendar": None}
+            )
+        )
 
     def sel(self, **kwargs):
         """Return the configured `_on_sel` instance to simulate level pinning."""
@@ -1023,6 +1312,13 @@ class TestAggregateNetcdfRoundTrip:
         idx = pd.date_range("2022-01-01", periods=n_days * 4, freq="6h")
         return [t.strftime("%Y-%m-%d %H:%M:%S") for t in idx]
 
+    def _epoch_seconds_six_hourly(self, n_days: int = 2) -> np.ndarray:
+        """Epoch-second offsets matching `_date_strings_six_hourly`."""
+        idx = pd.date_range("2022-01-01", periods=n_days * 4, freq="6h")
+        return (
+            (idx - pd.Timestamp("1970-01-01")) // pd.Timedelta(seconds=1)
+        ).to_numpy()
+
     def test_daily_mean_collapses_to_one_slice_per_day(
         self, monkeypatch, tmp_path, state_var
     ):
@@ -1055,6 +1351,44 @@ class TestAggregateNetcdfRoundTrip:
             f"Day 2 mean should be (5+6+7+8)/4 = 6.5, got {second_arr[0, 0]}"
         )
         assert len(writes) == 2, f"Expected 2 GeoTIFFs to be written, got {len(writes)}"
+
+    def test_raw_offset_axis_aggregates_end_to_end(
+        self, monkeypatch, tmp_path, state_var
+    ):
+        """A cube whose only time handle is `get_time_values` buckets like strings."""
+        cube = self._daily_six_hourly_array(n_days=2)
+        nc = _FakeNetCDF(
+            array=cube,
+            time_strs_by_var={"valid_time": None, "time": None},
+            time_values_by_var={"time": self._epoch_seconds_six_hourly(2)},
+            time_units_by_var={"time": "seconds since 1970-01-01T00:00:00Z"},
+            dimension_names=["time", "lat", "lon"],
+        )
+        _patch_netcdf_read(monkeypatch, nc)
+        writes = _patch_geotiff_write(monkeypatch)
+
+        results = aggregate_netcdf(
+            tmp_path / "fake.nc",
+            state_var,
+            AggregationConfig(freq="1D", op="mean", out_dir=tmp_path),
+        )
+
+        assert len(results) == 2, (
+            f"Expected 2 daily windows via the raw path, got {len(results)}"
+        )
+        first_label, first_arr, _ = results[0]
+        assert first_label == pd.Timestamp("2022-01-01"), (
+            f"First label should be 2022-01-01, got {first_label}"
+        )
+        assert first_arr[0, 0] == pytest.approx(2.5), (
+            f"Day 1 mean should be 2.5, got {first_arr[0, 0]}"
+        )
+        assert results[1][1][0, 0] == pytest.approx(6.5), (
+            f"Day 2 mean should be 6.5, got {results[1][1][0, 0]}"
+        )
+        assert len(writes) == 2, (
+            f"Expected 2 GeoTIFFs via the raw path, got {len(writes)}"
+        )
 
     def test_op_auto_routes_state_to_mean(self, monkeypatch, tmp_path, state_var):
         """`op="auto"` + `is_flux=False` → mean over the window."""

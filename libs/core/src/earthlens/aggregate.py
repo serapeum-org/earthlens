@@ -133,6 +133,159 @@ __all__ = [
 
 _TIME_VAR_CANDIDATES: tuple[str, ...] = ("valid_time", "time")
 
+#: Map each spelling of a CF time unit to the alias `pandas.to_datetime`
+#: accepts through its `unit=` argument.
+_CF_UNIT_ALIASES: dict[str, str] = {
+    "seconds": "s",
+    "second": "s",
+    "secs": "s",
+    "sec": "s",
+    "s": "s",
+    "minutes": "m",
+    "minute": "m",
+    "mins": "m",
+    "min": "m",
+    "hours": "h",
+    "hour": "h",
+    "hrs": "h",
+    "hr": "h",
+    "h": "h",
+    "days": "D",
+    "day": "D",
+    "d": "D",
+    "milliseconds": "ms",
+    "millisecond": "ms",
+    "msecs": "ms",
+    "msec": "ms",
+    "ms": "ms",
+    "microseconds": "us",
+    "microsecond": "us",
+    "usecs": "us",
+    "usec": "us",
+    "us": "us",
+}
+
+#: CF `calendar` values the Gregorian `pandas` decoder reproduces faithfully. A
+#: non-standard calendar (`360_day`, `noleap`, `julian`, …) needs cftime, so the
+#: fallback bails rather than silently mis-dating.
+_STANDARD_CALENDARS: frozenset[str] = frozenset(
+    {"standard", "gregorian", "proleptic_gregorian"}
+)
+
+
+def _decode_cf_offsets(
+    values: np.typing.NDArray[Any], units: str | None
+) -> pd.DatetimeIndex | None:
+    """Decode raw CF time offsets into a tz-naive `pandas.DatetimeIndex`.
+
+    `pyramids.netcdf.NetCDF.get_time_values` returns the time axis as raw
+    numeric offsets without applying the CF `units`. This splits a
+    `"<unit> since <epoch>"` units string on its `since` token and adds the
+    offsets to the epoch, so the unit is read from the file rather than
+    assumed. The split uses `str.split`, not a regex, to keep it linear. A
+    tz-aware epoch
+    (a trailing `Z` or a `+HH:MM` offset) is normalised to tz-naive UTC to
+    match the strings the `get_time_variable` branch returns. Anything that
+    cannot be decoded faithfully degrades to `None` rather than raising or
+    guessing, so the caller can fall through to its honest `KeyError`.
+
+    Args:
+        values: The raw offsets, as returned by `get_time_values`.
+        units: The dimension's CF `units` string, or `None` when absent.
+
+    Returns:
+        pd.DatetimeIndex: The decoded axis, or `None` when `units` is missing,
+        is not a recognised `"<unit> since <epoch>"` string, names a unit
+        outside `_CF_UNIT_ALIASES` (e.g. `weeks`, `months`), the epoch and
+        offsets fall outside pandas' representable nanosecond range, or any
+        offset is a fill/NaN value (which would decode to `NaT`).
+    """
+    # A CF units string is "<unit> since <epoch>" (e.g.
+    # "seconds since 1970-01-01T00:00:00Z"); split on whitespace and match the
+    # `since` token rather than a backtracking-prone regex.
+    tokens = units.split() if units else []
+    alias = (
+        _CF_UNIT_ALIASES.get(tokens[0].lower())
+        if len(tokens) >= 3 and tokens[1].lower() == "since"
+        else None
+    )
+    result: pd.DatetimeIndex | None = None
+    if alias is not None:
+        epoch = " ".join(tokens[2:])
+        try:
+            origin = pd.Timestamp(epoch)
+            if origin.tz is not None:
+                origin = origin.tz_convert("UTC").tz_localize(None)
+            # Reject an epoch outside pandas' representable range: a pre-1677
+            # (including year-0) epoch falls below `pd.Timestamp.min`, so the
+            # range check rejects it rather than mis-dating every sample. In
+            # range, a too-large offset still overflows in `to_datetime` and is
+            # caught below. `atleast_1d` keeps a single-step (0-D) axis a
+            # collection so `DatetimeIndex` accepts it.
+            if pd.Timestamp.min <= origin <= pd.Timestamp.max:
+                offsets = np.atleast_1d(np.asarray(values))
+                stamps = pd.DatetimeIndex(
+                    pd.to_datetime(offsets, unit=alias, origin=origin)
+                )
+                # A fill/NaN offset decodes to `NaT`, which `window_groups`
+                # would silently drop from every window; refuse the whole axis
+                # instead of losing a timestep without a trace.
+                if not stamps.isna().any():
+                    result = stamps
+        except (TypeError, ValueError, OverflowError):
+            # An epoch or offset outside pandas' nanosecond range
+            # (`OutOfBoundsDatetime` is a `ValueError`), or an offset dtype
+            # `to_datetime` rejects, is undecodable here; fall through to `None`
+            # so the caller raises its honest `KeyError`.
+            result = None
+    return result
+
+
+def _read_raw_time_axis(nc: NetCDF) -> pd.DatetimeIndex | None:
+    """Decode a time axis reachable only through `get_time_values`.
+
+    Some stores — an ERDDAP griddap NetCDF, some cloud Zarr — expose `time`
+    as a coordinate whose CF `units` `get_time_variable` cannot parse, so it
+    returns `None` even though `get_time_values` reads the axis. This tries
+    each `_TIME_VAR_CANDIDATES` name through `get_time_values` and decodes the
+    offsets with the dimension's own `units`. A candidate whose CF `calendar`
+    is non-standard (`360_day`, `noleap`, …) is skipped rather than decoded
+    with the Gregorian `pandas` path, which would silently mis-date it.
+
+    Args:
+        nc: An open `pyramids.netcdf.NetCDF` instance pointed at the source
+            file.
+
+    Returns:
+        pd.DatetimeIndex: The decoded axis, or `None` when no candidate yields
+        decodable offsets (including when every candidate's calendar is
+        non-standard or its epoch is unrepresentable).
+    """
+    result: pd.DatetimeIndex | None = None
+    for name in _TIME_VAR_CANDIDATES:
+        values = nc.get_time_values(var_name=name)
+        if values is None or np.asarray(values).size == 0:
+            continue
+        # `get_dimension` returns `None` for a name it does not know (handled by
+        # the `or {}` below), so this never raises for the real metadata object.
+        # The guard is purely defensive against a future/renamed accessor that
+        # drops the attribute or method entirely.
+        try:
+            dimension = nc.metadata.get_dimension(name)
+            attrs = getattr(dimension, "attrs", None) or {}
+        except AttributeError:
+            attrs = {}
+        calendar = attrs.get("calendar")
+        if isinstance(calendar, bytes):
+            calendar = calendar.decode("ascii", "ignore")
+        if calendar and str(calendar).lower() not in _STANDARD_CALENDARS:
+            continue
+        decoded = _decode_cf_offsets(values, attrs.get("units"))
+        if decoded is not None:
+            result = decoded
+            break
+    return result
+
 
 def _read_time_axis(nc: NetCDF) -> pd.DatetimeIndex:
     """Return a NetCDF's time coordinate as a `pandas.DatetimeIndex`.
@@ -148,7 +301,11 @@ def _read_time_axis(nc: NetCDF) -> pd.DatetimeIndex:
     `"<unit> since <epoch>"` units string for us through
     `create_time_conversion_func`; this helper just chooses the
     candidate name and converts the formatted strings back to
-    timestamps with `pandas.to_datetime`.
+    timestamps with `pandas.to_datetime`. When no candidate resolves
+    that way — e.g. an ERDDAP griddap file whose `time` coordinate
+    `get_time_variable` cannot parse — it falls back to decoding the
+    raw offsets from `get_time_values` (see `_read_raw_time_axis`),
+    and only raises when that is empty too.
 
     Args:
         nc: An open `pyramids.netcdf.NetCDF` instance pointed
@@ -159,18 +316,26 @@ def _read_time_axis(nc: NetCDF) -> pd.DatetimeIndex:
         time dimension.
 
     Raises:
-        KeyError: If none of `_TIME_VAR_CANDIDATES` is present
-            on the NetCDF as a parseable time variable.
+        KeyError: When neither `get_time_variable` nor `get_time_values`
+            yields a readable time axis for any `_TIME_VAR_CANDIDATES` name.
     """
+    result: pd.DatetimeIndex | None = None
     for name in _TIME_VAR_CANDIDATES:
         time_strs = nc.get_time_variable(var_name=name)
         if time_strs:
-            return pd.to_datetime(time_strs)
-    raise KeyError(
-        f"NetCDF has no recognised time variable; tried "
-        f"{list(_TIME_VAR_CANDIDATES)!r}. Re-check the file's time "
-        "dimension name and CF `units` attribute."
-    )
+            result = pd.DatetimeIndex(pd.to_datetime(time_strs))
+            break
+    if result is None:
+        result = _read_raw_time_axis(nc)
+    if result is None:
+        raise KeyError(
+            "NetCDF has no readable time axis: none of "
+            f"{list(_TIME_VAR_CANDIDATES)!r} resolved through "
+            "`get_time_variable`, and `get_time_values` returned no decodable "
+            "offsets. Re-check the time dimension name, its CF `units`, or "
+            "whether the file carries a time axis at all."
+        )
+    return result
 
 
 _LEVEL_DIM_CANDIDATES: tuple[str, ...] = ("pressure_level", "level")
