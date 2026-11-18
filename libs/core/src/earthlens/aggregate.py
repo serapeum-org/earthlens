@@ -138,7 +138,7 @@ _TIME_VAR_CANDIDATES: tuple[str, ...] = ("valid_time", "time")
 #: (e.g. `"seconds since 1970-01-01T00:00:00Z"`). This splits the leading
 #: unit word from the epoch so the raw offsets can be decoded.
 _CF_UNITS_PATTERN = re.compile(
-    r"^\s*(?P<unit>\w+)\s+since\s+(?P<epoch>.+?)\s*$", re.IGNORECASE
+    r"^\s*(?P<unit>\w+)\s+since\s+(?P<epoch>.+)$", re.IGNORECASE
 )
 
 #: Map each spelling of a CF time unit to the alias `pandas.to_datetime`
@@ -210,7 +210,7 @@ def _decode_cf_offsets(
     alias = _CF_UNIT_ALIASES.get(match.group("unit").lower()) if match else None
     result: pd.DatetimeIndex | None = None
     if match is not None and alias is not None:
-        epoch = match.group("epoch")
+        epoch = match.group("epoch").strip()
         try:
             origin = pd.Timestamp(epoch)
             if origin.tz is not None:
