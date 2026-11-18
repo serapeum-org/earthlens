@@ -202,8 +202,9 @@ def _decode_cf_offsets(
     Returns:
         pd.DatetimeIndex: The decoded axis, or `None` when `units` is missing,
         is not a recognised `"<unit> since <epoch>"` string, names a unit
-        outside `_CF_UNIT_ALIASES` (e.g. `weeks`, `months`), or the epoch and
-        offsets fall outside pandas' representable nanosecond range.
+        outside `_CF_UNIT_ALIASES` (e.g. `weeks`, `months`), the epoch and
+        offsets fall outside pandas' representable nanosecond range, or any
+        offset is a fill/NaN value (which would decode to `NaT`).
     """
     match = _CF_UNITS_PATTERN.match(units) if units else None
     alias = _CF_UNIT_ALIASES.get(match.group("unit").lower()) if match else None
