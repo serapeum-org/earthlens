@@ -26,6 +26,7 @@ The canonical output columns are `CANONICAL_COLUMNS`.
 from __future__ import annotations
 
 import re
+import warnings
 from typing import Any
 
 import pandas as pd
@@ -526,6 +527,158 @@ def _first_column(
     return pd.Series(default, index=df.index)
 
 
+def _point_x(geometry: Any) -> Any:
+    """Return a shapely point's longitude (`x`), or `pd.NA` when unusable.
+
+    A `None` cell, an empty geometry, or any value without a scalar `x`
+    ordinate — including a non-point geometry such as a `MultiPoint`,
+    `LineString`, or `Polygon` — yields `pd.NA` rather than raising, so
+    the mapping is safe across a mixed or sparse `geometry` column.
+
+    Args:
+        geometry: A cell of a `geometry` column (a shapely point or any
+            other value).
+
+    Returns:
+        The point's `x` ordinate, or `pd.NA`.
+    """
+    result: Any = pd.NA
+    if geometry is not None and not getattr(geometry, "is_empty", True):
+        result = getattr(geometry, "x", pd.NA)
+    return result
+
+
+def _point_y(geometry: Any) -> Any:
+    """Return a shapely point's latitude (`y`), or `pd.NA` when unusable.
+
+    The empty / non-point / non-geometry handling mirrors `_point_x`.
+
+    Args:
+        geometry: A cell of a `geometry` column (a shapely point or any
+            other value).
+
+    Returns:
+        The point's `y` ordinate, or `pd.NA`.
+    """
+    result: Any = pd.NA
+    if geometry is not None and not getattr(geometry, "is_empty", True):
+        result = getattr(geometry, "y", pd.NA)
+    return result
+
+
+def _geometry_crs_is_geographic(df: pd.DataFrame) -> bool:
+    """Whether `df`'s geometry CRS is geographic lon/lat (or absent).
+
+    A frame with no CRS (a plain `DataFrame` carrying a `geometry` column,
+    or a GeoDataFrame whose `crs` is unset) is treated as geographic. A
+    `pyproj.CRS` exposes `is_geographic`; anything without that attribute
+    degrades to `True` so an unknown CRS object is not wrongly rejected.
+
+    Args:
+        df: The site-metadata frame.
+
+    Returns:
+        bool: `True` when the geometry may be read as lon/lat.
+    """
+    crs = getattr(df, "crs", None)
+    return crs is None or bool(getattr(crs, "is_geographic", True))
+
+
+def _has_geographic_geometry(df: pd.DataFrame) -> bool:
+    """Whether `df` carries a geometry column usable as geographic lon/lat.
+
+    Pure predicate (no side effects). The geometry fallback reads longitude
+    from each point's `x` and latitude from its `y`, which is only correct
+    for a geographic CRS in lon/lat axis order — EPSG:4326 / OGC:CRS84, as
+    the USGS OGC API Features endpoint returns. A projected CRS (ordinates
+    in metres) would be silently mislocated, so such a frame is not treated
+    as a usable geometry source; `_warn_all_na_columns` reports why.
+
+    Args:
+        df: The site-metadata frame.
+
+    Returns:
+        bool: `True` when a usable geographic `geometry` column is present.
+    """
+    return "geometry" in df.columns and _geometry_crs_is_geographic(df)
+
+
+def _site_coordinates(df: pd.DataFrame) -> tuple[pd.Series, pd.Series]:
+    """Resolve `(latitude, longitude)` numeric Series from a site frame.
+
+    Prefers the scalar `dec_lat_va` / `dec_long_va` columns the legacy
+    `nwis` frames carry. The modern monitoring-locations endpoint omits
+    those and returns a GeoDataFrame whose coordinates live only in a
+    `geometry` column of geographic (EPSG:4326 / CRS84) shapely points, so
+    when a usable geographic `geometry` column is present, any row still
+    missing an ordinate is back-filled from the matching geometry point
+    (`y` for latitude, `x` for longitude). See `_has_geographic_geometry`
+    for the CRS guard.
+
+    Args:
+        df: The site-metadata frame (legacy wide, or modern with a
+            `geometry` column).
+
+    Returns:
+        tuple[pd.Series, pd.Series]: Index-aligned `latitude` and
+            `longitude` Series, numeric (`NaN` where unresolved).
+    """
+    latitude = pd.to_numeric(_first_column(df, ["dec_lat_va"]), errors="coerce")
+    longitude = pd.to_numeric(_first_column(df, ["dec_long_va"]), errors="coerce")
+    latitude_missing = latitude.isna().any()
+    longitude_missing = longitude.isna().any()
+    if (latitude_missing or longitude_missing) and _has_geographic_geometry(df):
+        geometry = df["geometry"]
+        if latitude_missing:
+            latitude = latitude.fillna(
+                pd.to_numeric(geometry.map(_point_y), errors="coerce")
+            )
+        if longitude_missing:
+            longitude = longitude.fillna(
+                pd.to_numeric(geometry.map(_point_x), errors="coerce")
+            )
+    return latitude, longitude
+
+
+def _warn_all_na_columns(
+    out: pd.DataFrame, columns: list[str], flavour: str, source: pd.DataFrame
+) -> None:
+    """Warn once when a required `columns` entry is all-`NA`, naming the cause.
+
+    A geocoding column (latitude / longitude) that resolves to 100 % `NA`
+    is never a legitimate result. The cause is read from `source`: a
+    `geometry` column in a non-geographic (projected) CRS was deliberately
+    skipped (so the fix is a CRS, not a schema, problem); otherwise no
+    mappable lon/lat source column was present. Surfacing a single accurate
+    `UserWarning` keeps `_first_column`'s `pd.NA` default from turning the
+    gap into silently empty output. An empty frame has no rows to judge, so
+    it is skipped.
+
+    Args:
+        out: The normalized frame.
+        columns: The required column names to check.
+        flavour: `"waterdata"` or `"nwis"`, named in the warning.
+        source: The pre-normalization frame, inspected for the cause.
+    """
+    if out.empty:
+        return
+    empty = [column for column in columns if out[column].isna().all()]
+    if empty:
+        if "geometry" in source.columns and not _geometry_crs_is_geographic(source):
+            cause = (
+                f"the geometry CRS {getattr(source, 'crs', None)!r} is not "
+                "geographic lon/lat"
+            )
+        else:
+            cause = "no mappable lon/lat source column was present"
+        warnings.warn(
+            f"usgs-water sites ({flavour}): {empty} resolved to all-NA over "
+            f"{len(out)} rows; {cause}, so these columns could not be mapped.",
+            UserWarning,
+            stacklevel=2,
+        )
+
+
 def normalize_samples(
     df: pd.DataFrame, code_meta: dict[str, tuple[str, str]]
 ) -> pd.DataFrame:
@@ -643,6 +796,12 @@ def _format_time_of_year(year: Any, month: Any) -> str:
 def normalize_sites(df: pd.DataFrame, flavour: str) -> pd.DataFrame:
     """Fold a site frame (modern monitoring-locations / legacy what_sites).
 
+    Coordinates are resolved by `_site_coordinates`: from the scalar
+    `dec_lat_va` / `dec_long_va` columns the legacy frame carries, or
+    from the modern frame's `geometry` points when those are absent. A
+    coordinate column that still resolves to all-`NA` triggers a single
+    `UserWarning` naming the cause rather than passing silently.
+
     Args:
         df: The site-metadata frame.
         flavour: `"waterdata"` or `"nwis"`.
@@ -658,25 +817,15 @@ def normalize_sites(df: pd.DataFrame, flavour: str) -> pd.DataFrame:
             _strip_site_prefix
         )
         out["station_name"] = _first_column(df, ["monitoring_location_name"])
-        out["latitude"] = pd.to_numeric(
-            _first_column(df, ["dec_lat_va"]), errors="coerce"
-        )
-        out["longitude"] = pd.to_numeric(
-            _first_column(df, ["dec_long_va"]), errors="coerce"
-        )
         out["huc"] = _first_column(df, ["hydrologic_unit_code"])
         out["site_type"] = _first_column(df, ["site_type"])
     else:
         out["site_no"] = _first_column(df, ["site_no"])
         out["station_name"] = _first_column(df, ["station_nm"])
-        out["latitude"] = pd.to_numeric(
-            _first_column(df, ["dec_lat_va"]), errors="coerce"
-        )
-        out["longitude"] = pd.to_numeric(
-            _first_column(df, ["dec_long_va"]), errors="coerce"
-        )
         out["huc"] = _first_column(df, ["huc_cd"])
         out["site_type"] = _first_column(df, ["site_tp_cd"])
+    out["latitude"], out["longitude"] = _site_coordinates(df)
+    _warn_all_na_columns(out, ["latitude", "longitude"], flavour, df)
     return out.reset_index(drop=True)[SITE_COLUMNS]
 
 

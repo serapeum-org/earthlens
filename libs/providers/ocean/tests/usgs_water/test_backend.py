@@ -300,6 +300,8 @@ def test_sites_discovery_calls_monitoring_locations(fake_usgs, usgs_kwargs):
     df = USGSWater(**usgs_kwargs(service="sites")).download(progress_bar=False)
     assert fake_usgs.called() == ["get_monitoring_locations"]
     assert "latitude" in df.columns
+    assert df["latitude"].notna().all()
+    assert df["longitude"].notna().all()
 
 
 def _samples_frame():
@@ -369,16 +371,24 @@ def _peaks_legacy_frame():
 
 
 def _sites_modern_frame():
-    """A minimal modern monitoring-locations frame."""
-    return pd.DataFrame(
+    """A minimal modern monitoring-locations frame.
+
+    Mirrors the real `get_monitoring_locations` return: an EPSG:4326
+    GeoDataFrame whose coordinates live only in a `geometry` point column —
+    it carries no `dec_lat_va` / `dec_long_va` scalars.
+    """
+    import geopandas as gpd
+    from shapely.geometry import Point
+
+    return gpd.GeoDataFrame(
         {
             "monitoring_location_id": ["USGS-01646500"],
             "monitoring_location_name": ["POTOMAC RIVER"],
-            "dec_lat_va": [38.94],
-            "dec_long_va": [-77.12],
             "hydrologic_unit_code": ["02070008"],
             "site_type": ["Stream"],
-        }
+        },
+        geometry=[Point(-77.12, 38.94)],
+        crs="EPSG:4326",
     )
 
 

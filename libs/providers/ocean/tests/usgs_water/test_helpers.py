@@ -519,15 +519,18 @@ def test_normalize_peaks_modern():
 
 
 def test_normalize_sites_modern():
-    """Modern sites normalize maps monitoring-location columns."""
+    """Modern sites normalize reads coordinates from the geometry column."""
     import pandas as pd
+    from shapely.geometry import Point
 
+    # The real `get_monitoring_locations` returns a GeoDataFrame whose
+    # coordinates live only in a `geometry` column of shapely points — it
+    # carries no `dec_lat_va` / `dec_long_va` scalars.
     frame = pd.DataFrame(
         {
             "monitoring_location_id": ["USGS-01646500"],
             "monitoring_location_name": ["POTOMAC"],
-            "dec_lat_va": [38.9],
-            "dec_long_va": [-77.1],
+            "geometry": [Point(-77.1, 38.9)],
             "hydrologic_unit_code": ["02070008"],
             "site_type": ["Stream"],
         }
@@ -535,6 +538,216 @@ def test_normalize_sites_modern():
     out = _helpers.normalize(frame, "waterdata", "sites", CODE_META)
     assert out["site_no"].iloc[0] == "01646500"
     assert out["station_name"].iloc[0] == "POTOMAC"
+    assert out["latitude"].iloc[0] == 38.9
+    assert out["longitude"].iloc[0] == -77.1
+
+
+def test_normalize_sites_modern_prefers_scalar_over_geometry():
+    """Explicit dec_lat_va / dec_long_va win over the geometry fallback."""
+    import pandas as pd
+    from shapely.geometry import Point
+
+    frame = pd.DataFrame(
+        {
+            "monitoring_location_id": ["USGS-01646500"],
+            "monitoring_location_name": ["POTOMAC"],
+            "dec_lat_va": [38.9],
+            "dec_long_va": [-77.1],
+            "geometry": [Point(0.0, 0.0)],
+            "hydrologic_unit_code": ["02070008"],
+            "site_type": ["Stream"],
+        }
+    )
+    out = _helpers.normalize(frame, "waterdata", "sites", CODE_META)
+    assert out["latitude"].iloc[0] == 38.9
+    assert out["longitude"].iloc[0] == -77.1
+
+
+def test_normalize_sites_all_na_coordinates_warns():
+    """A sites frame with no resolvable coordinates warns instead of passing silently."""
+    import pandas as pd
+
+    frame = pd.DataFrame(
+        {
+            "monitoring_location_id": ["USGS-01646500"],
+            "monitoring_location_name": ["POTOMAC"],
+            "hydrologic_unit_code": ["02070008"],
+            "site_type": ["Stream"],
+        }
+    )
+    with pytest.warns(UserWarning, match="latitude"):
+        out = _helpers.normalize(frame, "waterdata", "sites", CODE_META)
+    assert out["latitude"].isna().all()
+    assert out["longitude"].isna().all()
+
+
+def test_warn_all_na_columns_skips_empty_frame():
+    """An empty frame is not warned on (no rows to judge)."""
+    import warnings
+
+    import pandas as pd
+
+    out = pd.DataFrame({"latitude": [], "longitude": []})
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        _helpers._warn_all_na_columns(
+            out, ["latitude", "longitude"], "waterdata", pd.DataFrame()
+        )
+
+
+def test_normalize_sites_projected_crs_warns_once():
+    """A projected-CRS sites frame warns exactly once, naming the CRS."""
+    import geopandas as gpd
+    from shapely.geometry import Point
+
+    gdf = gpd.GeoDataFrame(
+        {
+            "monitoring_location_id": ["USGS-01646500"],
+            "monitoring_location_name": ["POTOMAC"],
+            "hydrologic_unit_code": ["02070008"],
+            "site_type": ["Stream"],
+        },
+        geometry=[Point(-8585000.0, 4700000.0)],
+        crs="EPSG:3857",
+    )
+    with pytest.warns(UserWarning, match="not geographic") as record:
+        out = _helpers.normalize(gdf, "waterdata", "sites", CODE_META)
+    assert len(record) == 1, f"expected one warning, got {len(record)}"
+    assert "schema" not in str(record[0].message), "must not blame a schema change"
+    assert out["latitude"].isna().all(), "projected coordinates stay NA"
+
+
+class TestPointOrdinate:
+    """Tests for the `_point_x` / `_point_y` geometry-ordinate extractors."""
+
+    def test_valid_point_returns_ordinates(self):
+        """A shapely point yields its x (longitude) and y (latitude)."""
+        from shapely.geometry import Point
+
+        point = Point(-77.1, 38.9)
+        assert _helpers._point_x(point) == -77.1, "x should be the longitude"
+        assert _helpers._point_y(point) == 38.9, "y should be the latitude"
+
+    @pytest.mark.parametrize("value", [None, "not-a-geometry", 42])
+    def test_non_geometry_returns_na(self, value):
+        """A None or non-geometry cell yields NA rather than raising."""
+        import pandas as pd
+
+        assert pd.isna(_helpers._point_x(value)), f"_point_x({value!r}) should be NA"
+        assert pd.isna(_helpers._point_y(value)), f"_point_y({value!r}) should be NA"
+
+    def test_empty_geometry_returns_na(self):
+        """An empty point yields NA instead of an invalid ordinate."""
+        import pandas as pd
+        from shapely.geometry import Point
+
+        empty = Point()
+        assert pd.isna(_helpers._point_x(empty)), "empty point x should be NA"
+        assert pd.isna(_helpers._point_y(empty)), "empty point y should be NA"
+
+    def test_non_point_geometry_returns_na(self):
+        """A non-point geometry yields NA rather than raising AttributeError."""
+        import pandas as pd
+        from shapely.geometry import MultiPoint, Polygon
+
+        multipoint = MultiPoint([(1.0, 2.0), (3.0, 4.0)])
+        polygon = Polygon([(0.0, 0.0), (1.0, 0.0), (1.0, 1.0)])
+        assert pd.isna(_helpers._point_x(multipoint)), "MultiPoint x should be NA"
+        assert pd.isna(_helpers._point_y(polygon)), "Polygon y should be NA"
+
+
+class TestSiteCoordinates:
+    """Tests for `_site_coordinates` scalar/geometry resolution."""
+
+    def test_scalar_latitude_geometry_longitude(self):
+        """Longitude falls back to geometry while latitude stays scalar."""
+        import pandas as pd
+        from shapely.geometry import Point
+
+        df = pd.DataFrame({"dec_lat_va": [38.9], "geometry": [Point(-77.1, 0.0)]})
+        latitude, longitude = _helpers._site_coordinates(df)
+        assert latitude.iloc[0] == 38.9, "latitude should come from dec_lat_va"
+        assert longitude.iloc[0] == -77.1, "longitude should come from geometry.x"
+
+    def test_scalar_longitude_geometry_latitude(self):
+        """Latitude falls back to geometry while longitude stays scalar."""
+        import pandas as pd
+        from shapely.geometry import Point
+
+        df = pd.DataFrame({"dec_long_va": [-77.1], "geometry": [Point(0.0, 38.9)]})
+        latitude, longitude = _helpers._site_coordinates(df)
+        assert longitude.iloc[0] == -77.1, "longitude should come from dec_long_va"
+        assert latitude.iloc[0] == 38.9, "latitude should come from geometry.y"
+
+    def test_no_scalars_no_geometry_stays_na(self):
+        """With neither scalars nor a geometry column, both axes stay all-NA."""
+        import pandas as pd
+
+        df = pd.DataFrame({"monitoring_location_id": ["USGS-01646500"]})
+        latitude, longitude = _helpers._site_coordinates(df)
+        assert latitude.isna().all(), "latitude should be all-NA"
+        assert longitude.isna().all(), "longitude should be all-NA"
+
+    def test_partial_scalar_backfilled_from_geometry(self):
+        """A row whose scalar coordinate is NA is back-filled from geometry."""
+        import pandas as pd
+        from shapely.geometry import Point
+
+        df = pd.DataFrame(
+            {
+                "dec_lat_va": [38.9, pd.NA],
+                "geometry": [Point(-77.1, 0.0), Point(-77.2, 39.0)],
+            }
+        )
+        latitude, longitude = _helpers._site_coordinates(df)
+        assert latitude.iloc[0] == 38.9, "present scalar row should be kept"
+        assert latitude.iloc[1] == 39.0, "NA scalar row should be back-filled"
+        assert longitude.iloc[0] == -77.1, "longitude should come from geometry.x"
+
+    def test_geographic_geodataframe_axis_order(self):
+        """A real EPSG:4326 GeoDataFrame reads x as longitude and y as latitude."""
+        import geopandas as gpd
+        from shapely.geometry import Point
+
+        gdf = gpd.GeoDataFrame(
+            {"monitoring_location_id": ["USGS-01646500"]},
+            geometry=[Point(-77.1, 38.9)],
+            crs="EPSG:4326",
+        )
+        latitude, longitude = _helpers._site_coordinates(gdf)
+        assert latitude.iloc[0] == 38.9, "latitude should be the geometry y"
+        assert longitude.iloc[0] == -77.1, "longitude should be the geometry x"
+
+    def test_projected_crs_is_not_misread(self):
+        """A projected GeoDataFrame yields NA from _site_coordinates, silently."""
+        import warnings
+
+        import geopandas as gpd
+        import pandas as pd
+        from shapely.geometry import Point
+
+        gdf = gpd.GeoDataFrame(
+            {"monitoring_location_id": ["USGS-01646500"]},
+            geometry=[Point(-8585000.0, 4700000.0)],
+            crs="EPSG:3857",
+        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            latitude, longitude = _helpers._site_coordinates(gdf)
+        assert pd.isna(latitude.iloc[0]), "projected latitude should stay NA"
+        assert pd.isna(longitude.iloc[0]), "projected longitude should stay NA"
+
+    def test_mixed_geometry_rows_resolve_per_row(self):
+        """A None geometry row maps to NA while valid rows resolve."""
+        import pandas as pd
+        from shapely.geometry import Point
+
+        df = pd.DataFrame({"geometry": [Point(-77.1, 38.9), None]})
+        latitude, longitude = _helpers._site_coordinates(df)
+        assert latitude.iloc[0] == 38.9, "first row latitude should resolve"
+        assert longitude.iloc[0] == -77.1, "first row longitude should resolve"
+        assert pd.isna(latitude.iloc[1]), "None geometry latitude should be NA"
+        assert pd.isna(longitude.iloc[1]), "None geometry longitude should be NA"
 
 
 @pytest.mark.parametrize(
