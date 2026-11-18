@@ -377,6 +377,16 @@ class TestDecodeCfOffsets:
         assert result.tz is None, f"Expected tz-naive, got tz={result.tz}"
         assert result[0] == pd.Timestamp("1970-01-01"), f"Got {result[0]}"
 
+    def test_non_utc_offset_epoch_is_converted_to_utc(self):
+        """An epoch with a `+HH:MM` offset is normalised to tz-naive UTC."""
+        result = _decode_cf_offsets(
+            np.array([0, 1]), "hours since 2000-01-01T00:00:00+05:00"
+        )
+        assert result.tz is None, f"Expected tz-naive, got tz={result.tz}"
+        assert result[0] == pd.Timestamp("1999-12-31 19:00:00"), (
+            f"Expected the +05:00 epoch shifted to UTC, got {result[0]}"
+        )
+
     @pytest.mark.parametrize(
         "units",
         [
@@ -1093,6 +1103,8 @@ class _FakeNetCDF:
         *,
         array: np.ndarray,
         time_strs_by_var: dict[str, list[str] | None],
+        time_values_by_var: dict[str, object] | None = None,
+        time_units_by_var: dict[str, str | None] | None = None,
         dimension_names: list[str] | None = None,
         geotransform: tuple = (0.0, 1.0, 0.0, 1.0, 0.0, -1.0),
         variable_geotransform: tuple | None = None,
@@ -1100,6 +1112,8 @@ class _FakeNetCDF:
     ):
         self._array = array
         self._times = time_strs_by_var
+        self._time_values = time_values_by_var or {}
+        self._time_units = time_units_by_var or {}
         self.dimension_names = dimension_names
         self.geotransform = geotransform
         # A real container is not a raster, so its geotransform is a
@@ -1117,6 +1131,8 @@ class _FakeNetCDF:
         cube = _FakeNetCDF(
             array=self._array,
             time_strs_by_var=self._times,
+            time_values_by_var=self._time_values,
+            time_units_by_var=self._time_units,
             dimension_names=self.dimension_names,
             geotransform=self._variable_geotransform,
             on_sel=self._on_sel,
@@ -1147,12 +1163,23 @@ class _FakeNetCDF:
         return self._times.get(var_name)
 
     def get_time_values(self, var_name: str) -> np.ndarray | None:
-        """No raw offsets in these fixtures; the string path is used instead.
+        """Return raw offsets for `var_name`, or `None` when none were set.
 
-        A real `NetCDF` always exposes this; these round-trip cases drive the
-        axis through `get_time_variable`, so the raw fallback is never needed.
+        Round-trip cases that drive the axis through `get_time_variable` leave
+        this empty; the raw-fallback cases register offsets here instead.
         """
-        return None
+        values = self._time_values.get(var_name)
+        return None if values is None else np.asarray(values)
+
+    @property
+    def metadata(self):
+        """Expose CF `units` per dimension like `pyramids` `NetCDFMetadata`."""
+        units = self._time_units
+        return SimpleNamespace(
+            get_dimension=lambda name: SimpleNamespace(
+                attrs={"units": units.get(name), "calendar": None}
+            )
+        )
 
     def sel(self, **kwargs):
         """Return the configured `_on_sel` instance to simulate level pinning."""
@@ -1256,6 +1283,13 @@ class TestAggregateNetcdfRoundTrip:
         idx = pd.date_range("2022-01-01", periods=n_days * 4, freq="6h")
         return [t.strftime("%Y-%m-%d %H:%M:%S") for t in idx]
 
+    def _epoch_seconds_six_hourly(self, n_days: int = 2) -> np.ndarray:
+        """Epoch-second offsets matching `_date_strings_six_hourly`."""
+        idx = pd.date_range("2022-01-01", periods=n_days * 4, freq="6h")
+        return (
+            (idx - pd.Timestamp("1970-01-01")) // pd.Timedelta(seconds=1)
+        ).to_numpy()
+
     def test_daily_mean_collapses_to_one_slice_per_day(
         self, monkeypatch, tmp_path, state_var
     ):
@@ -1288,6 +1322,44 @@ class TestAggregateNetcdfRoundTrip:
             f"Day 2 mean should be (5+6+7+8)/4 = 6.5, got {second_arr[0, 0]}"
         )
         assert len(writes) == 2, f"Expected 2 GeoTIFFs to be written, got {len(writes)}"
+
+    def test_raw_offset_axis_aggregates_end_to_end(
+        self, monkeypatch, tmp_path, state_var
+    ):
+        """A cube whose only time handle is `get_time_values` buckets like strings."""
+        cube = self._daily_six_hourly_array(n_days=2)
+        nc = _FakeNetCDF(
+            array=cube,
+            time_strs_by_var={"valid_time": None, "time": None},
+            time_values_by_var={"time": self._epoch_seconds_six_hourly(2)},
+            time_units_by_var={"time": "seconds since 1970-01-01T00:00:00Z"},
+            dimension_names=["time", "lat", "lon"],
+        )
+        _patch_netcdf_read(monkeypatch, nc)
+        writes = _patch_geotiff_write(monkeypatch)
+
+        results = aggregate_netcdf(
+            tmp_path / "fake.nc",
+            state_var,
+            AggregationConfig(freq="1D", op="mean", out_dir=tmp_path),
+        )
+
+        assert len(results) == 2, (
+            f"Expected 2 daily windows via the raw path, got {len(results)}"
+        )
+        first_label, first_arr, _ = results[0]
+        assert first_label == pd.Timestamp("2022-01-01"), (
+            f"First label should be 2022-01-01, got {first_label}"
+        )
+        assert first_arr[0, 0] == pytest.approx(2.5), (
+            f"Day 1 mean should be 2.5, got {first_arr[0, 0]}"
+        )
+        assert results[1][1][0, 0] == pytest.approx(6.5), (
+            f"Day 2 mean should be 6.5, got {results[1][1][0, 0]}"
+        )
+        assert len(writes) == 2, (
+            f"Expected 2 GeoTIFFs via the raw path, got {len(writes)}"
+        )
 
     def test_op_auto_routes_state_to_mean(self, monkeypatch, tmp_path, state_var):
         """`op="auto"` + `is_flux=False` → mean over the window."""
