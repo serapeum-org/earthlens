@@ -1,5 +1,26 @@
 # Change Log
 
+## 0.33.0 (2026-11-17)
+
+### BREAKING CHANGE
+
+- max_items=0 now raises ValueError; it previously
+reached pystac_client, where it was falsy
+STAC.download() now raises ValueError when every matched candidate was
+dropped by the footprint screen, or when
+before a covering item was found, where it previously returned the
+empty list. search(), count() and preview
+empty result and do not raise.
+
+### Feat
+
+- **tropycal**: read NHC operational best-track with wind radii (#1425)
+
+### Fix
+
+- **stac**: screen items by footprint and read the s3 alternate href (#1422)
+- **jaxa**: distinguish the retired G-Portal CSW endpoint from a transient outage (#1420)
+
 ## 0.32.0 (2026-11-14)
 
 ### Feat
