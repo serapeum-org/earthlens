@@ -104,7 +104,6 @@ Examples:
 
 from __future__ import annotations
 
-import re
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from pathlib import Path
@@ -133,13 +132,6 @@ __all__ = [
 
 
 _TIME_VAR_CANDIDATES: tuple[str, ...] = ("valid_time", "time")
-
-#: A CF time `units` string reads `"<unit> since <epoch>"`
-#: (e.g. `"seconds since 1970-01-01T00:00:00Z"`). This splits the leading
-#: unit word from the epoch so the raw offsets can be decoded.
-_CF_UNITS_PATTERN = re.compile(
-    r"^\s*(?P<unit>\w+)\s+since\s+(?P<epoch>.+)$", re.IGNORECASE
-)
 
 #: Map each spelling of a CF time unit to the alias `pandas.to_datetime`
 #: accepts through its `unit=` argument.
@@ -187,9 +179,11 @@ def _decode_cf_offsets(
     """Decode raw CF time offsets into a tz-naive `pandas.DatetimeIndex`.
 
     `pyramids.netcdf.NetCDF.get_time_values` returns the time axis as raw
-    numeric offsets without applying the CF `units`. This parses a
-    `"<unit> since <epoch>"` units string and adds the offsets to the epoch,
-    so the unit is read from the file rather than assumed. A tz-aware epoch
+    numeric offsets without applying the CF `units`. This splits a
+    `"<unit> since <epoch>"` units string on its `since` token and adds the
+    offsets to the epoch, so the unit is read from the file rather than
+    assumed. The split uses `str.split`, not a regex, to keep it linear. A
+    tz-aware epoch
     (a trailing `Z` or a `+HH:MM` offset) is normalised to tz-naive UTC to
     match the strings the `get_time_variable` branch returns. Anything that
     cannot be decoded faithfully degrades to `None` rather than raising or
@@ -206,11 +200,18 @@ def _decode_cf_offsets(
         offsets fall outside pandas' representable nanosecond range, or any
         offset is a fill/NaN value (which would decode to `NaT`).
     """
-    match = _CF_UNITS_PATTERN.match(units) if units else None
-    alias = _CF_UNIT_ALIASES.get(match.group("unit").lower()) if match else None
+    # A CF units string is "<unit> since <epoch>" (e.g.
+    # "seconds since 1970-01-01T00:00:00Z"); split on whitespace and match the
+    # `since` token rather than a backtracking-prone regex.
+    tokens = units.split() if units else []
+    alias = (
+        _CF_UNIT_ALIASES.get(tokens[0].lower())
+        if len(tokens) >= 3 and tokens[1].lower() == "since"
+        else None
+    )
     result: pd.DatetimeIndex | None = None
-    if match is not None and alias is not None:
-        epoch = match.group("epoch").strip()
+    if alias is not None:
+        epoch = " ".join(tokens[2:])
         try:
             origin = pd.Timestamp(epoch)
             if origin.tz is not None:
