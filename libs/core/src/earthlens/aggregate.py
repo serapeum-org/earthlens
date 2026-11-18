@@ -190,16 +190,20 @@ def _decode_cf_offsets(
     numeric offsets without applying the CF `units`. This parses a
     `"<unit> since <epoch>"` units string and adds the offsets to the epoch,
     so the unit is read from the file rather than assumed. A tz-aware epoch
-    (a trailing `Z`) is normalised to tz-naive UTC to match the strings the
-    `get_time_variable` branch returns.
+    (a trailing `Z` or a `+HH:MM` offset) is normalised to tz-naive UTC to
+    match the strings the `get_time_variable` branch returns. Anything that
+    cannot be decoded faithfully degrades to `None` rather than raising or
+    guessing, so the caller can fall through to its honest `KeyError`.
 
     Args:
         values: The raw offsets, as returned by `get_time_values`.
         units: The dimension's CF `units` string, or `None` when absent.
 
     Returns:
-        pd.DatetimeIndex: The decoded axis, or `None` when `units` is missing
-        or not a recognised `"<unit> since <epoch>"` string.
+        pd.DatetimeIndex: The decoded axis, or `None` when `units` is missing,
+        is not a recognised `"<unit> since <epoch>"` string, names a unit
+        outside `_CF_UNIT_ALIASES` (e.g. `weeks`, `months`), or the epoch and
+        offsets fall outside pandas' representable nanosecond range.
     """
     match = _CF_UNITS_PATTERN.match(units) if units else None
     alias = _CF_UNIT_ALIASES.get(match.group("unit").lower()) if match else None
@@ -233,7 +237,9 @@ def _read_raw_time_axis(nc: NetCDF) -> pd.DatetimeIndex | None:
     as a coordinate whose CF `units` `get_time_variable` cannot parse, so it
     returns `None` even though `get_time_values` reads the axis. This tries
     each `_TIME_VAR_CANDIDATES` name through `get_time_values` and decodes the
-    offsets with the dimension's own `units`.
+    offsets with the dimension's own `units`. A candidate whose CF `calendar`
+    is non-standard (`360_day`, `noleap`, …) is skipped rather than decoded
+    with the Gregorian `pandas` path, which would silently mis-date it.
 
     Args:
         nc: An open `pyramids.netcdf.NetCDF` instance pointed at the source
@@ -241,7 +247,8 @@ def _read_raw_time_axis(nc: NetCDF) -> pd.DatetimeIndex | None:
 
     Returns:
         pd.DatetimeIndex: The decoded axis, or `None` when no candidate yields
-        decodable offsets.
+        decodable offsets (including when every candidate's calendar is
+        non-standard or its epoch is unrepresentable).
     """
     result: pd.DatetimeIndex | None = None
     for name in _TIME_VAR_CANDIDATES:
