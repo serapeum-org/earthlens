@@ -153,3 +153,106 @@ class TestGuards:
             progress_bar=False
         )
         assert list(tmp_path.glob("sensor_community_*.parquet"))
+
+
+class _RaiseFromCall:
+    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from `from_call`.
+
+    Hoisted to module scope (no nested-function definitions); holds its own call
+    counter. `from_call=2` fails the second sensor (a partial failure);
+    `from_call=1` fails every sensor (a whole-service failure).
+    """
+
+    def __init__(self, real_fetch, exc, from_call=2):
+        self._real = real_fetch
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, product):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(product)
+
+
+@pytest.mark.sensor_community
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent sensors (ARC-9a)."""
+
+    def _two_sensor_backend(self, client, tmp_path, monkeypatch, from_call=2):
+        """A backend whose search yields two sensors, raising from `from_call`."""
+        backend = _backend(client, tmp_path)
+        products = backend._search()
+        products = products * 2 if len(products) < 2 else products[:2]
+        monkeypatch.setattr(backend, "_search", lambda: list(products))
+        monkeypatch.setattr(
+            backend,
+            "_fetch_one",
+            _RaiseFromCall(backend._fetch_one, RuntimeError("sensor boom"), from_call),
+        )
+        return backend
+
+    def test_raise_propagates_first_failure(self, tmp_path, fake_client, monkeypatch):
+        """errors="raise" surfaces the sensor exception, not the batch summary."""
+        backend = self._two_sensor_backend(fake_client, tmp_path, monkeypatch)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", LicenseWarning)
+            with pytest.raises(RuntimeError, match="sensor boom"):
+                backend.download(progress_bar=False, errors="raise")
+
+    def test_warn_returns_the_surviving_sensor(
+        self, tmp_path, fake_client, monkeypatch
+    ):
+        """errors="warn" drops the failed sensor and returns the survivor's rows."""
+        backend = self._two_sensor_backend(fake_client, tmp_path, monkeypatch)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", LicenseWarning)
+            result = backend.download(progress_bar=False, errors="warn")
+        assert not result.empty, (
+            "expected the surviving sensor's readings, got an empty frame"
+        )
+
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, tmp_path, fake_client, monkeypatch
+    ):
+        """errors="ignore" drops the failed sensor silently and returns the survivor."""
+        backend = self._two_sensor_backend(fake_client, tmp_path, monkeypatch)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", LicenseWarning)
+            result = backend.download(progress_bar=False, errors="ignore")
+        assert not result.empty, (
+            "expected the surviving sensor's readings, got an empty frame"
+        )
+
+    def test_default_policy_is_warn(self, tmp_path, fake_client, monkeypatch):
+        """Omitting errors= defaults to "warn" — the failed sensor is survived, not raised."""
+        backend = self._two_sensor_backend(fake_client, tmp_path, monkeypatch)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", LicenseWarning)
+            result = backend.download(progress_bar=False)
+        assert not result.empty, (
+            "default should keep the surviving sensor's readings, got empty"
+        )
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_sensor_failing_raises(
+        self, tmp_path, fake_client, monkeypatch, policy
+    ):
+        """A total archive outage (every sensor fails) raises — never a silent empty."""
+        backend = self._two_sensor_backend(
+            fake_client, tmp_path, monkeypatch, from_call=1
+        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", LicenseWarning)
+            with pytest.raises(RuntimeError, match="sensor boom"):
+                backend.download(progress_bar=False, errors=policy)
+
+    def test_invalid_policy_rejected(self, tmp_path, fake_client):
+        """An unrecognised errors= value is refused before any request."""
+        backend = _backend(fake_client, tmp_path)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", LicenseWarning)
+            with pytest.raises(ValueError, match="errors"):
+                backend.download(progress_bar=False, errors="explode")

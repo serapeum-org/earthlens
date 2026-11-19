@@ -542,12 +542,17 @@ class FIRMS(AbstractDataSource):
                 when nothing matched.
         """
         return self._search_fetch_each(
-            progress_bar=progress_bar, desc="FIRMS chunks", unit="chunk"
+            progress_bar=progress_bar,
+            desc="FIRMS chunks",
+            unit="chunk",
+            errors=self._errors,
+            raise_if_all_failed=True,
         )
 
     def download(
         self,
         progress_bar: bool = True,
+        errors: str = "warn",
     ) -> FeatureCollection:
         """Query FIRMS and return the matched detections.
 
@@ -561,11 +566,26 @@ class FIRMS(AbstractDataSource):
         Args:
             progress_bar: Show a per-chunk progress bar. Defaults to
                 `True`.
+            errors: Partial-failure policy across the independent chunks:
+
+                * `"warn"` (default) — log each failed chunk and return the
+                  detections from the chunks that succeeded, with a summary.
+                * `"raise"` — propagate the first chunk failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed chunks silently.
+
+                A whole-service failure — a rejected MAP_KEY, an exhausted
+                quota, a dead host — fails every chunk identically, so when
+                every chunk fails the first error is re-raised under every
+                policy rather than returned as an empty result. A partial
+                failure (some chunks succeed) still returns the survivors
+                under `"warn"`/`"ignore"`.
 
         Returns:
             FeatureCollection: The matched detections, CRS `EPSG:4326`.
                 Empty (schema-only) when nothing matched.
         """
+        self._errors = self.check_errors_policy(errors)
         # Resolve the MAP_KEY from FIRMS_MAP_KEY if authenticate() was not
         # called explicitly, so EarthLens(...).download() still works when
         # the key lives in the environment.

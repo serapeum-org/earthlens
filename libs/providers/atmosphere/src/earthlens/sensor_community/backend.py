@@ -306,9 +306,16 @@ class SensorCommunity(AbstractDataSource):
 
         Contract-only: `download` overrides the write path and calls
         `_search_fetch_each` directly (to concat + window itself), mirroring
-        the `earthlens.openaq` sibling, so this is not on the live path.
+        the `earthlens.openaq` sibling, so this is not on the live path. It
+        forwards `self._errors` for symmetry with `download`, so a future
+        caller wiring `_api` live would get the same policy.
         """
-        return self._search_fetch_each(desc="Sensor.Community sensors", unit="sensor")
+        return self._search_fetch_each(
+            desc="Sensor.Community sensors",
+            unit="sensor",
+            errors=self._errors,
+            raise_if_all_failed=True,
+        )
 
     def _window(self) -> tuple[pd.Timestamp, pd.Timestamp]:
         """Return the `[lower, upper)` UTC filter bounds for the request.
@@ -337,6 +344,7 @@ class SensorCommunity(AbstractDataSource):
         self,
         progress_bar: bool = True,
         limit: int | None = None,
+        errors: str = "warn",
     ) -> pd.DataFrame:
         """Discover + fetch readings, write them to `path`, return the frame.
 
@@ -355,6 +363,18 @@ class SensorCommunity(AbstractDataSource):
                 `None` (the default) fetches everything. The cap is on rows
                 *fetched*, before the window filter, so the returned frame can
                 be shorter than the cap.
+            errors: Partial-failure policy across the independent sensors:
+
+                * `"warn"` (default) — log each failed sensor and return the
+                  readings from the sensors that succeeded, with a summary.
+                * `"raise"` — propagate the first sensor failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed sensors silently.
+
+                When every sensor fails — a dead archive host, not a per-sensor
+                gap — the first error is re-raised under every policy rather
+                than returned as an empty frame; a partial failure still
+                returns the survivors under `"warn"`/`"ignore"`.
 
         Returns:
             pd.DataFrame: The long-format readings (schema columns,
@@ -362,10 +382,15 @@ class SensorCommunity(AbstractDataSource):
                 nothing matched.
         """
         self._limit = self.check_limit(limit)
+        self._errors = self.check_errors_policy(errors)
         warnings.warn(_LICENSE_TEXT, LicenseWarning, stacklevel=2)
 
         frames = self._search_fetch_each(
-            progress_bar=progress_bar, desc="Sensor.Community sensors", unit="sensor"
+            progress_bar=progress_bar,
+            desc="Sensor.Community sensors",
+            unit="sensor",
+            errors=self._errors,
+            raise_if_all_failed=True,
         )
         non_empty = [frame for frame in frames if not frame.empty]
         # Release the per-sensor frames as we go: `concat` copies, so holding
