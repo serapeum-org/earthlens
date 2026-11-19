@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.34.0 (2026-11-18)
+
+### Fix
+
+- **aggregate**: fall back to get_time_values() when no time variable resolves (#1427)
+- **usgs-water**: read sites coordinates from the geometry column (#1426)
+
 ## 0.33.0 (2026-11-17)
 
 ### BREAKING CHANGE
