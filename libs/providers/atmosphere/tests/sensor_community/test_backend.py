@@ -251,9 +251,8 @@ class TestErrorsPolicy:
 
     def test_invalid_policy_rejected(self, tmp_path, fake_client):
         """An unrecognised errors= value is refused before any request."""
+        backend = _backend(fake_client, tmp_path)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", LicenseWarning)
             with pytest.raises(ValueError, match="errors"):
-                _backend(fake_client, tmp_path).download(
-                    progress_bar=False, errors="explode"
-                )
+                backend.download(progress_bar=False, errors="explode")

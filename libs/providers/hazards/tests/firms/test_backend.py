@@ -555,5 +555,6 @@ class TestErrorsPolicy:
 
     def test_invalid_policy_rejected(self, tmp_path: Path, fake_firms: _FakeFirms):
         """An unrecognised errors= value is refused before any request."""
+        backend = _make_backend(tmp_path)
         with pytest.raises(ValueError, match="errors"):
-            _make_backend(tmp_path).download(progress_bar=False, errors="explode")
+            backend.download(progress_bar=False, errors="explode")
