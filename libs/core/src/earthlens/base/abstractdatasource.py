@@ -2337,6 +2337,7 @@ class AbstractDataSource(ABC):
         desc: str | None = None,
         unit: str = "item",
         errors: str | None = None,
+        fatal: tuple[type[Exception], ...] = (),
         label: str = "product",
     ) -> list[Any]:
         """C3 composition with an optional per-product `tqdm` progress bar.
@@ -2358,6 +2359,11 @@ class AbstractDataSource(ABC):
                 `download` accepts `errors=`. `None` — the default —
                 propagates the first failure, which is what a caller that
                 never opted into a policy already expects.
+            fatal: Exception classes that always propagate, whatever
+                `errors` is — a whole-service failure (a rejected
+                credential, an exhausted quota) fails every product
+                identically, so continuing would report an upstream outage
+                as a set of empty results. Mirrors `_run_items`' `fatal=`.
             label: Noun for the `_run_items` log lines when a policy
                 is in force.
 
@@ -2401,6 +2407,7 @@ class AbstractDataSource(ABC):
                     iterator,
                     self._fetch_one,
                     errors=policy,
+                    fatal=fatal,
                     label=label,
                     describe=_describe_remote_product,
                     on_failure=None,

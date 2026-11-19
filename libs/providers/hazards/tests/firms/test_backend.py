@@ -210,7 +210,7 @@ class TestFetch:
         fake_firms.responses = [FakeResponse(text="server error", status_code=500)]
         backend = _make_backend(tmp_path)
         with pytest.raises(requests.HTTPError):
-            backend.download(progress_bar=False, errors="raise")
+            backend.download(progress_bar=False)
 
     def test_http_error_does_not_leak_map_key(
         self, tmp_path: Path, fake_firms: _FakeFirms
@@ -219,7 +219,7 @@ class TestFetch:
         fake_firms.responses = [FakeResponse(text="bad request", status_code=400)]
         backend = _make_backend(tmp_path, api_key="SUPERSECRETKEY123")
         with pytest.raises(requests.HTTPError) as exc:
-            backend.download(progress_bar=False, errors="raise")
+            backend.download(progress_bar=False)
         assert "SUPERSECRETKEY123" not in str(exc.value)
         assert "MAP_KEY" in str(exc.value)
 
@@ -230,7 +230,7 @@ class TestFetch:
         fake_firms.text = "Invalid MAP_KEY."
         backend = _make_backend(tmp_path)
         with pytest.raises(AuthenticationError, match="MAP_KEY"):
-            backend.download(progress_bar=False, errors="raise")
+            backend.download(progress_bar=False)
 
     def test_persistent_quota_body_raises_runtime(
         self, tmp_path: Path, fake_firms: _FakeFirms
@@ -240,7 +240,7 @@ class TestFetch:
         backend = _make_backend(tmp_path)
         backend._max_retries = 2
         with pytest.raises(RuntimeError, match="quota"):
-            backend.download(progress_bar=False, errors="raise")
+            backend.download(progress_bar=False)
 
     def test_other_error_body_raises_runtime(
         self, tmp_path: Path, fake_firms: _FakeFirms
@@ -249,7 +249,7 @@ class TestFetch:
         fake_firms.text = "Invalid coordinates given"
         backend = _make_backend(tmp_path)
         with pytest.raises(RuntimeError, match="non-CSV"):
-            backend.download(progress_bar=False, errors="raise")
+            backend.download(progress_bar=False)
 
 
 @pytest.mark.firms
@@ -433,41 +433,58 @@ class TestApiComposition:
         assert len(collections[0]) == 1
 
 
+class _RaiseOnSecondCall:
+    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from call 2.
+
+    Hoisted to module scope (no nested-function definitions); holds its own call
+    counter so the second product in a two-item search fails.
+    """
+
+    def __init__(self, real_fetch, exc):
+        self._real = real_fetch
+        self._exc = exc
+        self._calls = 0
+
+    def __call__(self, product):
+        """Return the real fetch for the first product, raise `exc` thereafter."""
+        self._calls += 1
+        if self._calls >= 2:
+            raise self._exc
+        return self._real(product)
+
+
 class TestErrorsPolicy:
     """`errors=` partial-failure policy across the independent chunks (ARC-9a)."""
 
-    def _two_chunk_backend(self, tmp_path, monkeypatch):
-        """A backend whose search yields two chunks, the second failing to fetch."""
+    def _two_chunk_backend(self, tmp_path, monkeypatch, exc):
+        """A backend whose search yields two chunks, the second raising `exc`."""
         backend = _make_backend(tmp_path)
         backend.authenticate()
         products = backend._search()
         products = products * 2 if len(products) < 2 else products[:2]
         monkeypatch.setattr(backend, "_search", lambda: list(products))
-        real_fetch = backend._fetch_one
-        seen: list[object] = []
-
-        def _fetch_one(product):
-            seen.append(product)
-            if len(seen) >= 2:
-                raise RuntimeError("chunk boom")
-            return real_fetch(product)
-
-        monkeypatch.setattr(backend, "_fetch_one", _fetch_one)
+        monkeypatch.setattr(
+            backend, "_fetch_one", _RaiseOnSecondCall(backend._fetch_one, exc)
+        )
         return backend
 
     def test_raise_propagates_first_failure(
         self, tmp_path: Path, fake_firms: _FakeFirms, monkeypatch
     ):
-        """errors="raise" surfaces the chunk exception, not the batch summary."""
-        backend = self._two_chunk_backend(tmp_path, monkeypatch)
-        with pytest.raises(RuntimeError, match="chunk boom"):
+        """errors="raise" surfaces a per-chunk exception, not the batch summary."""
+        backend = self._two_chunk_backend(
+            tmp_path, monkeypatch, ValueError("chunk boom")
+        )
+        with pytest.raises(ValueError, match="chunk boom"):
             backend.download(progress_bar=False, errors="raise")
 
     def test_warn_returns_the_surviving_chunk(
         self, tmp_path: Path, fake_firms: _FakeFirms, monkeypatch
     ):
-        """errors="warn" drops the failed chunk and returns the survivor's rows."""
-        backend = self._two_chunk_backend(tmp_path, monkeypatch)
+        """errors="warn" drops a non-fatal per-chunk failure and returns survivors."""
+        backend = self._two_chunk_backend(
+            tmp_path, monkeypatch, ValueError("chunk boom")
+        )
         result = backend.download(progress_bar=False, errors="warn")
         assert isinstance(result, GeoDataFrame), (
             f"expected a FeatureCollection, got {type(result)}"
@@ -479,8 +496,10 @@ class TestErrorsPolicy:
     def test_ignore_drops_failures_and_returns_survivor(
         self, tmp_path: Path, fake_firms: _FakeFirms, monkeypatch
     ):
-        """errors="ignore" drops the failed chunk silently and returns the survivor."""
-        backend = self._two_chunk_backend(tmp_path, monkeypatch)
+        """errors="ignore" drops a non-fatal per-chunk failure silently."""
+        backend = self._two_chunk_backend(
+            tmp_path, monkeypatch, ValueError("chunk boom")
+        )
         result = backend.download(progress_bar=False, errors="ignore")
         assert len(result) == 1, (
             f"expected the one surviving chunk's row, got {len(result)}"
@@ -489,12 +508,24 @@ class TestErrorsPolicy:
     def test_default_policy_is_warn(
         self, tmp_path: Path, fake_firms: _FakeFirms, monkeypatch
     ):
-        """Omitting errors= defaults to "warn" — the failed chunk is survived, not raised."""
-        backend = self._two_chunk_backend(tmp_path, monkeypatch)
+        """Omitting errors= defaults to warn — a non-fatal chunk failure is survived."""
+        backend = self._two_chunk_backend(
+            tmp_path, monkeypatch, ValueError("chunk boom")
+        )
         result = backend.download(progress_bar=False)
         assert len(result) == 1, (
             f"default should keep the surviving chunk, got {len(result)}"
         )
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_whole_service_error_propagates_under_any_policy(
+        self, tmp_path: Path, fake_firms: _FakeFirms, policy: str
+    ):
+        """A rejected MAP_KEY propagates even under warn/ignore — never silently empty."""
+        fake_firms.text = "Invalid MAP_KEY."
+        backend = _make_backend(tmp_path)
+        with pytest.raises(AuthenticationError, match="MAP_KEY"):
+            backend.download(progress_bar=False, errors=policy)
 
     def test_invalid_policy_rejected(self, tmp_path: Path, fake_firms: _FakeFirms):
         """An unrecognised errors= value is refused before any request."""

@@ -58,6 +58,18 @@ if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
 
 
+#: Failures that are whole-service, not per-chunk: a request is one MAP_KEY
+#: against one service split into date/area chunks, so a rejected key, an
+#: exhausted quota, or a persistent HTTP error fails every chunk identically.
+#: These always propagate, even under `errors="warn"`/`"ignore"` — continuing
+#: would report a credential/quota/outage failure as an empty result.
+_WHOLE_SERVICE_ERRORS: tuple[type[Exception], ...] = (
+    AuthenticationError,
+    requests.HTTPError,
+    RuntimeError,
+)
+
+
 #: FIRMS area-CSV endpoint. Filled with the MAP_KEY, sensor, bbox
 #: (W,S,E,N), day_range, and start_date path segments.
 AREA_URL_TEMPLATE = (
@@ -546,6 +558,7 @@ class FIRMS(AbstractDataSource):
             desc="FIRMS chunks",
             unit="chunk",
             errors=self._errors,
+            fatal=_WHOLE_SERVICE_ERRORS,
         )
 
     def download(
@@ -572,6 +585,12 @@ class FIRMS(AbstractDataSource):
                 * `"raise"` — propagate the first chunk failure, for a
                   pipeline that must fail fast.
                 * `"ignore"` — drop failed chunks silently.
+
+                A whole-service failure — a rejected MAP_KEY, an exhausted
+                quota, or a persistent HTTP error — propagates under every
+                policy (see `_WHOLE_SERVICE_ERRORS`): it fails every chunk
+                identically, so it is reported as an error, never as an
+                empty result.
 
         Returns:
             FeatureCollection: The matched detections, CRS `EPSG:4326`.
