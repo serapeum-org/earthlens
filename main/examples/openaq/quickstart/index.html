@@ -24712,12 +24712,14 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.primitives.line_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">LineGlyph</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os
 
 import matplotlib.pyplot as plt
+from cleopatra.glyphs.primitives.line_glyph import LineGlyph
 
 from earthlens.core import EarthLens</div>
 </div>
@@ -24946,10 +24948,11 @@ else:
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">"axes.prop_cycle"</span><span class="p">]</span><span class="o">.</span><span class="n">by_key</span><span class="p">()[</span><span class="s2">"color"</span><span class="p">]</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">station_id</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"station_id"</span><span class="p">):</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-            <span class="n">group</span><span class="p">[</span><span class="s2">"datetime_utc"</span><span class="p">],</span> <span class="n">group</span><span class="p">[</span><span class="s2">"value"</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">"."</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">station_id</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">station_id</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"station_id"</span><span class="p">)):</span>
+        <span class="n">LineGlyph</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s2">"datetime_utc"</span><span class="p">],</span> <span class="n">group</span><span class="p">[</span><span class="s2">"value"</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">"."</span><span class="p">)</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)],</span> <span class="n">label</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">station_id</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"PM2.5 (µg/m³)"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"date (UTC)"</span><span class="p">)</span>
@@ -24959,10 +24962,11 @@ else:
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">if df is not None and not df.empty:
+    colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
     fig, ax = plt.subplots(figsize=(10, 4))
-    for station_id, group in df.groupby("station_id"):
-        ax.plot(
-            group["datetime_utc"], group["value"], marker=".", label=str(station_id)
+    for i, (station_id, group) in enumerate(df.groupby("station_id")):
+        LineGlyph(group["datetime_utc"], group["value"], marker=".").line(
+            ax=ax, color=colors[i % len(colors)], label=str(station_id)
         )
     ax.set_ylabel("PM2.5 (µg/m³)")
     ax.set_xlabel("date (UTC)")

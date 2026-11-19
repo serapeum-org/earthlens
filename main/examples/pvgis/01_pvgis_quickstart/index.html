@@ -24612,6 +24612,7 @@ single point (northern Italy) and inspects the returned <code>pandas.DataFrame</
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.primitives.line_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">LineGlyph</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
@@ -24620,6 +24621,7 @@ single point (northern Italy) and inspects the returned <code>pandas.DataFrame</
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
 
 import matplotlib.pyplot as plt
+from cleopatra.glyphs.primitives.line_glyph import LineGlyph
 
 from earthlens.core import EarthLens
 
@@ -24763,7 +24765,7 @@ sampled point. The <code>time</code> column is a parsed <code>datetime64</code>.
 <span class="n">window</span> <span class="o">=</span> <span class="n">window</span><span class="p">[</span><span class="n">window</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="s2">"2020-06-01"</span><span class="p">]</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">window</span><span class="p">[</span><span class="s2">"time"</span><span class="p">],</span> <span class="n">window</span><span class="p">[</span><span class="s2">"G(i)"</span><span class="p">])</span>
+<span class="n">LineGlyph</span><span class="p">(</span><span class="n">window</span><span class="p">[</span><span class="s2">"time"</span><span class="p">],</span> <span class="n">window</span><span class="p">[</span><span class="s2">"G(i)"</span><span class="p">])</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"G(i)  [W/m²]"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"PVGIS seriescalc — in-plane irradiance, 1–3 June 2020 (45°N, 8°E)"</span><span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">()</span>
@@ -24773,7 +24775,7 @@ sampled point. The <code>time</code> column is a parsed <code>datetime64</code>.
 window = window[window["time"] &gt;= "2020-06-01"]
 
 fig, ax = plt.subplots(figsize=(9, 3))
-ax.plot(window["time"], window["G(i)"])
+LineGlyph(window["time"], window["G(i)"]).line(ax=ax)
 ax.set_ylabel("G(i)  [W/m²]")
 ax.set_title("PVGIS seriescalc — in-plane irradiance, 1–3 June 2020 (45°N, 8°E)")
 fig.autofmt_xdate()

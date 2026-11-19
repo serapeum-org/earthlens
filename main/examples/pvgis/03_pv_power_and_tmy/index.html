@@ -24611,6 +24611,7 @@ for <code>seriescalc</code> and pulls a TMY for the same point.</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.primitives.line_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">LineGlyph</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
@@ -24619,6 +24620,7 @@ for <code>seriescalc</code> and pulls a TMY for the same point.</p>
 <div class="clipboard-copy-txt" id="cell-1">import tempfile
 
 import matplotlib.pyplot as plt
+from cleopatra.glyphs.primitives.line_glyph import LineGlyph
 
 from earthlens.core import EarthLens
 
@@ -24731,7 +24733,7 @@ pv[["time", "P", "G(i)"]].head()</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">day</span> <span class="o">=</span> <span class="n">pv</span><span class="p">[(</span><span class="n">pv</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="s2">"2020-06-15"</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">pv</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="s2">"2020-06-16"</span><span class="p">)]</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">day</span><span class="p">[</span><span class="s2">"time"</span><span class="p">],</span> <span class="n">day</span><span class="p">[</span><span class="s2">"P"</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"tab:orange"</span><span class="p">)</span>
+<span class="n">LineGlyph</span><span class="p">(</span><span class="n">day</span><span class="p">[</span><span class="s2">"time"</span><span class="p">],</span> <span class="n">day</span><span class="p">[</span><span class="s2">"P"</span><span class="p">])</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"tab:orange"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"P  [W]"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"PVGIS PV power — 1 kWp, 35° tilt, south, 15 June 2020"</span><span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">()</span>
@@ -24740,7 +24742,7 @@ pv[["time", "P", "G(i)"]].head()</div>
 <div class="clipboard-copy-txt" id="cell-3">day = pv[(pv["time"] &gt;= "2020-06-15") &amp; (pv["time"] &lt; "2020-06-16")]
 
 fig, ax = plt.subplots(figsize=(9, 3))
-ax.plot(day["time"], day["P"], color="tab:orange")
+LineGlyph(day["time"], day["P"]).line(ax=ax, color="tab:orange")
 ax.set_ylabel("P  [W]")
 ax.set_title("PVGIS PV power — 1 kWp, 35° tilt, south, 15 June 2020")
 fig.autofmt_xdate()

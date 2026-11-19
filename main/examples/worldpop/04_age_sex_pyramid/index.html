@@ -24718,9 +24718,10 @@ left/right population pyramid with matplotlib.</li>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>The imports for the whole notebook in one place. <code>EarthLens</code> is the
-unified entry point; <code>pandas</code> reads the tidy table back; matplotlib draws
-the pyramid (the <code>Agg</code> backend keeps it headless-safe). We also make a
-scratch directory for the downloaded rasters and CSV.</p>
+unified entry point; <code>pandas</code> reads the tidy table back; cleopatra's
+<code>BarGlyph</code> draws the pyramid (matplotlib's <code>Agg</code> backend keeps it
+headless-safe). We also make a scratch directory for the downloaded
+rasters and CSV.</p>
 </div>
 </div>
 </div>
@@ -24750,6 +24751,7 @@ scratch directory for the downloaded rasters and CSV.</p>
 <span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">'Agg'</span><span class="p">)</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.stats.bar_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">BarGlyph</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
@@ -24762,6 +24764,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd
+from cleopatra.glyphs.stats.bar_glyph import BarGlyph
 
 from earthlens.core import EarthLens
 
@@ -24949,29 +24952,53 @@ at its age band's lower bound.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">piv</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span>
-    <span class="n">index</span><span class="o">=</span><span class="s1">'age_low'</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s1">'sex'</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s1">'population'</span><span class="p">,</span> <span class="n">aggfunc</span><span class="o">=</span><span class="s1">'sum'</span>
-<span class="p">)</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">piv</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">'age_low'</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s1">'sex'</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s1">'population'</span><span class="p">,</span> <span class="n">aggfunc</span><span class="o">=</span><span class="s1">'sum'</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># a missing age/sex cell is zero population; BarGlyph rejects NaN</span>
+<span class="p">)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">piv</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">piv</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="o">-</span><span class="n">piv</span><span class="p">[</span><span class="s1">'m'</span><span class="p">],</span> <span class="n">height</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'male'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">piv</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">piv</span><span class="p">[</span><span class="s1">'f'</span><span class="p">],</span> <span class="n">height</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'female'</span><span class="p">)</span>
+<span class="c1"># BarGlyph places the age bands as evenly-spaced categories (labelled by their</span>
+<span class="c1"># lower bound), so width is a fraction of the one-unit slot: 0.8 leaves the same</span>
+<span class="c1"># bar/gap ratio the 5-year bands had on the original numeric axis.</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">male_bars</span> <span class="o">=</span> <span class="n">BarGlyph</span><span class="p">(</span>
+    <span class="n">piv</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="o">-</span><span class="n">piv</span><span class="p">[</span><span class="s1">'m'</span><span class="p">],</span> <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s1">'tab:blue'</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.8</span>
+<span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="c1"># compose=True draws the female series over the male one; the default</span>
+<span class="c1"># (compose=False) clears the axes' prior bars, which would wipe the male half.</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">female_bars</span> <span class="o">=</span> <span class="n">BarGlyph</span><span class="p">(</span>
+    <span class="n">piv</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">piv</span><span class="p">[</span><span class="s1">'f'</span><span class="p">],</span> <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s1">'tab:orange'</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.8</span>
+<span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">compose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'population'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'age band (lower bound)'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Comoros 2020 population pyramid'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="n">male_bars</span><span class="p">,</span> <span class="n">female_bars</span><span class="p">],</span> <span class="p">[</span><span class="s1">'male'</span><span class="p">,</span> <span class="s1">'female'</span><span class="p">])</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">piv = df.pivot_table(
-    index='age_low', columns='sex', values='population', aggfunc='sum'
-).sort_index()
+<div class="clipboard-copy-txt" id="cell-5">piv = (
+    df.pivot_table(index='age_low', columns='sex', values='population', aggfunc='sum')
+    .sort_index()
+    .fillna(0)  # a missing age/sex cell is zero population; BarGlyph rejects NaN
+)
+n = len(piv.index)
 fig, ax = plt.subplots(figsize=(5, 5))
-ax.barh(piv.index, -piv['m'], height=4, label='male')
-ax.barh(piv.index, piv['f'], height=4, label='female')
+# BarGlyph places the age bands as evenly-spaced categories (labelled by their
+# lower bound), so width is a fraction of the one-unit slot: 0.8 leaves the same
+# bar/gap ratio the 5-year bands had on the original numeric axis.
+_, _, male_bars = BarGlyph(
+    piv.index, -piv['m'], colors=['tab:blue'] * n, horizontal=True, width=0.8
+).plot(ax=ax)
+# compose=True draws the female series over the male one; the default
+# (compose=False) clears the axes' prior bars, which would wipe the male half.
+_, _, female_bars = BarGlyph(
+    piv.index, piv['f'], colors=['tab:orange'] * n, horizontal=True, width=0.8
+).plot(ax=ax, compose=True)
 ax.set_xlabel('population')
 ax.set_ylabel('age band (lower bound)')
 ax.set_title('Comoros 2020 population pyramid')
-ax.legend()
+ax.legend([male_bars, female_bars], ['male', 'female'])
 plt.tight_layout()
 plt.show()</div>
 </div>
