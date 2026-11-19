@@ -2337,7 +2337,7 @@ class AbstractDataSource(ABC):
         desc: str | None = None,
         unit: str = "item",
         errors: str | None = None,
-        fatal: tuple[type[Exception], ...] = (),
+        raise_if_all_failed: bool = False,
         label: str = "product",
     ) -> list[Any]:
         """C3 composition with an optional per-product `tqdm` progress bar.
@@ -2359,11 +2359,14 @@ class AbstractDataSource(ABC):
                 `download` accepts `errors=`. `None` — the default —
                 propagates the first failure, which is what a caller that
                 never opted into a policy already expects.
-            fatal: Exception classes that always propagate, whatever
-                `errors` is — a whole-service failure (a rejected
-                credential, an exhausted quota) fails every product
-                identically, so continuing would report an upstream outage
-                as a set of empty results. Mirrors `_run_items`' `fatal=`.
+            raise_if_all_failed: When `True`, re-raise the first failure if
+                `errors` let the batch continue (`"warn"`/`"ignore"`) but
+                **every** attempted product failed and none survived. This
+                is the type-agnostic way to tell a whole-service failure (a
+                rejected credential, an exhausted quota, a dead host — which
+                fails every product identically) from a per-product gap:
+                partial failures still return the survivors, but a total
+                failure is reported as the error, never as an empty result.
             label: Noun for the `_run_items` log lines when a policy
                 is in force.
 
@@ -2407,7 +2410,6 @@ class AbstractDataSource(ABC):
                     iterator,
                     self._fetch_one,
                     errors=policy,
-                    fatal=fatal,
                     label=label,
                     describe=_describe_remote_product,
                     on_failure=None,
@@ -2418,6 +2420,13 @@ class AbstractDataSource(ABC):
             )
         finally:
             iterator.close()
+        if raise_if_all_failed and failures and not results:
+            # A whole-service failure (bad credential, quota, dead host) fails
+            # every product identically, so `warn`/`ignore` would otherwise
+            # report the outage as an empty result. Re-raise the first failure
+            # rather than return nothing; a partial failure (some survived) is
+            # left to the policy.
+            raise failures[0][1]
         if failures and policy == "warn":
             # Counted against the products actually attempted, not the whole
             # planned list: a cap can end the sweep early, and "3 of 400 failed"

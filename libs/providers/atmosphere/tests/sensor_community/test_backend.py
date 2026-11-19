@@ -155,32 +155,34 @@ class TestGuards:
         assert list(tmp_path.glob("sensor_community_*.parquet"))
 
 
-@pytest.mark.sensor_community
-class _RaiseOnSecondCall:
-    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from call 2.
+class _RaiseFromCall:
+    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from `from_call`.
 
     Hoisted to module scope (no nested-function definitions); holds its own call
-    counter so the second sensor in a two-item search fails.
+    counter. `from_call=2` fails the second sensor (a partial failure);
+    `from_call=1` fails every sensor (a whole-service failure).
     """
 
-    def __init__(self, real_fetch, exc):
+    def __init__(self, real_fetch, exc, from_call=2):
         self._real = real_fetch
         self._exc = exc
+        self._from_call = from_call
         self._calls = 0
 
     def __call__(self, product):
-        """Return the real fetch for the first sensor, raise `exc` thereafter."""
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
         self._calls += 1
-        if self._calls >= 2:
+        if self._calls >= self._from_call:
             raise self._exc
         return self._real(product)
 
 
+@pytest.mark.sensor_community
 class TestErrorsPolicy:
     """`errors=` partial-failure policy across the independent sensors (ARC-9a)."""
 
-    def _two_sensor_backend(self, client, tmp_path, monkeypatch):
-        """A backend whose search yields two sensors, the second failing to fetch."""
+    def _two_sensor_backend(self, client, tmp_path, monkeypatch, from_call=2):
+        """A backend whose search yields two sensors, raising from `from_call`."""
         backend = _backend(client, tmp_path)
         products = backend._search()
         products = products * 2 if len(products) < 2 else products[:2]
@@ -188,7 +190,7 @@ class TestErrorsPolicy:
         monkeypatch.setattr(
             backend,
             "_fetch_one",
-            _RaiseOnSecondCall(backend._fetch_one, RuntimeError("sensor boom")),
+            _RaiseFromCall(backend._fetch_one, RuntimeError("sensor boom"), from_call),
         )
         return backend
 
@@ -233,6 +235,19 @@ class TestErrorsPolicy:
         assert not result.empty, (
             "default should keep the surviving sensor's readings, got empty"
         )
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_sensor_failing_raises(
+        self, tmp_path, fake_client, monkeypatch, policy
+    ):
+        """A total archive outage (every sensor fails) raises — never a silent empty."""
+        backend = self._two_sensor_backend(
+            fake_client, tmp_path, monkeypatch, from_call=1
+        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", LicenseWarning)
+            with pytest.raises(RuntimeError, match="sensor boom"):
+                backend.download(progress_bar=False, errors=policy)
 
     def test_invalid_policy_rejected(self, tmp_path, fake_client):
         """An unrecognised errors= value is refused before any request."""

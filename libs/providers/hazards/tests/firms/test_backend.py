@@ -433,22 +433,24 @@ class TestApiComposition:
         assert len(collections[0]) == 1
 
 
-class _RaiseOnSecondCall:
-    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from call 2.
+class _RaiseFromCall:
+    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from `from_call`.
 
     Hoisted to module scope (no nested-function definitions); holds its own call
-    counter so the second product in a two-item search fails.
+    counter. `from_call=2` fails the second product (a partial failure);
+    `from_call=1` fails every product (a whole-service failure).
     """
 
-    def __init__(self, real_fetch, exc):
+    def __init__(self, real_fetch, exc, from_call=2):
         self._real = real_fetch
         self._exc = exc
+        self._from_call = from_call
         self._calls = 0
 
     def __call__(self, product):
-        """Return the real fetch for the first product, raise `exc` thereafter."""
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
         self._calls += 1
-        if self._calls >= 2:
+        if self._calls >= self._from_call:
             raise self._exc
         return self._real(product)
 
@@ -456,15 +458,15 @@ class _RaiseOnSecondCall:
 class TestErrorsPolicy:
     """`errors=` partial-failure policy across the independent chunks (ARC-9a)."""
 
-    def _two_chunk_backend(self, tmp_path, monkeypatch, exc):
-        """A backend whose search yields two chunks, the second raising `exc`."""
+    def _two_chunk_backend(self, tmp_path, monkeypatch, exc, from_call=2):
+        """A backend whose search yields two chunks, raising `exc` from `from_call`."""
         backend = _make_backend(tmp_path)
         backend.authenticate()
         products = backend._search()
         products = products * 2 if len(products) < 2 else products[:2]
         monkeypatch.setattr(backend, "_search", lambda: list(products))
         monkeypatch.setattr(
-            backend, "_fetch_one", _RaiseOnSecondCall(backend._fetch_one, exc)
+            backend, "_fetch_one", _RaiseFromCall(backend._fetch_one, exc, from_call)
         )
         return backend
 
@@ -516,6 +518,30 @@ class TestErrorsPolicy:
         assert len(result) == 1, (
             f"default should keep the surviving chunk, got {len(result)}"
         )
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_transient_http_on_one_chunk_survives(
+        self, tmp_path: Path, fake_firms: _FakeFirms, policy: str, monkeypatch
+    ):
+        """A per-chunk HTTPError no longer aborts the batch — survivors are kept."""
+        backend = self._two_chunk_backend(
+            tmp_path, monkeypatch, requests.HTTPError("502 on one chunk")
+        )
+        result = backend.download(progress_bar=False, errors=policy)
+        assert len(result) == 1, (
+            f"a transient per-chunk HTTPError should leave the survivor, got {len(result)}"
+        )
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_chunk_failing_raises(
+        self, tmp_path: Path, fake_firms: _FakeFirms, policy: str, monkeypatch
+    ):
+        """When every chunk fails, the first error is raised — never a silent empty."""
+        backend = self._two_chunk_backend(
+            tmp_path, monkeypatch, ValueError("all chunks down"), from_call=1
+        )
+        with pytest.raises(ValueError, match="all chunks down"):
+            backend.download(progress_bar=False, errors=policy)
 
     @pytest.mark.parametrize("policy", ["warn", "ignore"])
     def test_whole_service_error_propagates_under_any_policy(

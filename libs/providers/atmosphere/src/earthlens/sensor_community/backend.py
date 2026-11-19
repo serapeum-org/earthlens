@@ -311,7 +311,10 @@ class SensorCommunity(AbstractDataSource):
         caller wiring `_api` live would get the same policy.
         """
         return self._search_fetch_each(
-            desc="Sensor.Community sensors", unit="sensor", errors=self._errors
+            desc="Sensor.Community sensors",
+            unit="sensor",
+            errors=self._errors,
+            raise_if_all_failed=True,
         )
 
     def _window(self) -> tuple[pd.Timestamp, pd.Timestamp]:
@@ -368,6 +371,11 @@ class SensorCommunity(AbstractDataSource):
                   pipeline that must fail fast.
                 * `"ignore"` — drop failed sensors silently.
 
+                When every sensor fails — a dead archive host, not a per-sensor
+                gap — the first error is re-raised under every policy rather
+                than returned as an empty frame; a partial failure still
+                returns the survivors under `"warn"`/`"ignore"`.
+
         Returns:
             pd.DataFrame: The long-format readings (schema columns,
                 `datetime_utc` tz-aware UTC). Empty (schema-only) when
@@ -382,6 +390,7 @@ class SensorCommunity(AbstractDataSource):
             desc="Sensor.Community sensors",
             unit="sensor",
             errors=self._errors,
+            raise_if_all_failed=True,
         )
         non_empty = [frame for frame in frames if not frame.empty]
         # Release the per-sensor frames as we go: `concat` copies, so holding
