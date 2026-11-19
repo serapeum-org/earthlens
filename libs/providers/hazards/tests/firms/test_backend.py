@@ -210,7 +210,7 @@ class TestFetch:
         fake_firms.responses = [FakeResponse(text="server error", status_code=500)]
         backend = _make_backend(tmp_path)
         with pytest.raises(requests.HTTPError):
-            backend.download(progress_bar=False)
+            backend.download(progress_bar=False, errors="raise")
 
     def test_http_error_does_not_leak_map_key(
         self, tmp_path: Path, fake_firms: _FakeFirms
@@ -219,7 +219,7 @@ class TestFetch:
         fake_firms.responses = [FakeResponse(text="bad request", status_code=400)]
         backend = _make_backend(tmp_path, api_key="SUPERSECRETKEY123")
         with pytest.raises(requests.HTTPError) as exc:
-            backend.download(progress_bar=False)
+            backend.download(progress_bar=False, errors="raise")
         assert "SUPERSECRETKEY123" not in str(exc.value)
         assert "MAP_KEY" in str(exc.value)
 
@@ -230,7 +230,7 @@ class TestFetch:
         fake_firms.text = "Invalid MAP_KEY."
         backend = _make_backend(tmp_path)
         with pytest.raises(AuthenticationError, match="MAP_KEY"):
-            backend.download(progress_bar=False)
+            backend.download(progress_bar=False, errors="raise")
 
     def test_persistent_quota_body_raises_runtime(
         self, tmp_path: Path, fake_firms: _FakeFirms
@@ -240,7 +240,7 @@ class TestFetch:
         backend = _make_backend(tmp_path)
         backend._max_retries = 2
         with pytest.raises(RuntimeError, match="quota"):
-            backend.download(progress_bar=False)
+            backend.download(progress_bar=False, errors="raise")
 
     def test_other_error_body_raises_runtime(
         self, tmp_path: Path, fake_firms: _FakeFirms
@@ -249,7 +249,7 @@ class TestFetch:
         fake_firms.text = "Invalid coordinates given"
         backend = _make_backend(tmp_path)
         with pytest.raises(RuntimeError, match="non-CSV"):
-            backend.download(progress_bar=False)
+            backend.download(progress_bar=False, errors="raise")
 
 
 @pytest.mark.firms
@@ -431,3 +431,52 @@ class TestApiComposition:
         collections = backend._api()
         assert len(collections) == 1
         assert len(collections[0]) == 1
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent chunks (ARC-9a)."""
+
+    def _two_chunk_backend(self, tmp_path, monkeypatch):
+        """A backend whose search yields two chunks, the second failing to fetch."""
+        backend = _make_backend(tmp_path)
+        backend.authenticate()
+        products = backend._search()
+        products = products * 2 if len(products) < 2 else products[:2]
+        monkeypatch.setattr(backend, "_search", lambda: list(products))
+        real_fetch = backend._fetch_one
+        seen: list[object] = []
+
+        def _fetch_one(product):
+            seen.append(product)
+            if len(seen) >= 2:
+                raise RuntimeError("chunk boom")
+            return real_fetch(product)
+
+        monkeypatch.setattr(backend, "_fetch_one", _fetch_one)
+        return backend
+
+    def test_raise_propagates_first_failure(
+        self, tmp_path: Path, fake_firms: _FakeFirms, monkeypatch
+    ):
+        """errors="raise" surfaces the chunk exception, not the batch summary."""
+        backend = self._two_chunk_backend(tmp_path, monkeypatch)
+        with pytest.raises(RuntimeError, match="chunk boom"):
+            backend.download(progress_bar=False, errors="raise")
+
+    def test_warn_returns_the_surviving_chunk(
+        self, tmp_path: Path, fake_firms: _FakeFirms, monkeypatch
+    ):
+        """errors="warn" drops the failed chunk and returns the survivor's rows."""
+        backend = self._two_chunk_backend(tmp_path, monkeypatch)
+        result = backend.download(progress_bar=False, errors="warn")
+        assert isinstance(result, GeoDataFrame), (
+            f"expected a FeatureCollection, got {type(result)}"
+        )
+        assert len(result) == 1, (
+            f"expected the one surviving chunk's row, got {len(result)}"
+        )
+
+    def test_invalid_policy_rejected(self, tmp_path: Path, fake_firms: _FakeFirms):
+        """An unrecognised errors= value is refused before any request."""
+        with pytest.raises(ValueError, match="errors"):
+            _make_backend(tmp_path).download(progress_bar=False, errors="explode")

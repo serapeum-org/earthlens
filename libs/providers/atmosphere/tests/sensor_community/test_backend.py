@@ -153,3 +153,55 @@ class TestGuards:
             progress_bar=False
         )
         assert list(tmp_path.glob("sensor_community_*.parquet"))
+
+
+@pytest.mark.sensor_community
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent sensors (ARC-9a)."""
+
+    def _two_sensor_backend(self, client, tmp_path, monkeypatch):
+        """A backend whose search yields two sensors, the second failing to fetch."""
+        backend = _backend(client, tmp_path)
+        products = backend._search()
+        products = products * 2 if len(products) < 2 else products[:2]
+        monkeypatch.setattr(backend, "_search", lambda: list(products))
+        real_fetch = backend._fetch_one
+        seen: list[object] = []
+
+        def _fetch_one(product):
+            seen.append(product)
+            if len(seen) >= 2:
+                raise RuntimeError("sensor boom")
+            return real_fetch(product)
+
+        monkeypatch.setattr(backend, "_fetch_one", _fetch_one)
+        return backend
+
+    def test_raise_propagates_first_failure(self, tmp_path, fake_client, monkeypatch):
+        """errors="raise" surfaces the sensor exception, not the batch summary."""
+        backend = self._two_sensor_backend(fake_client, tmp_path, monkeypatch)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", LicenseWarning)
+            with pytest.raises(RuntimeError, match="sensor boom"):
+                backend.download(progress_bar=False, errors="raise")
+
+    def test_warn_returns_the_surviving_sensor(
+        self, tmp_path, fake_client, monkeypatch
+    ):
+        """errors="warn" drops the failed sensor and returns the survivor's rows."""
+        backend = self._two_sensor_backend(fake_client, tmp_path, monkeypatch)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", LicenseWarning)
+            result = backend.download(progress_bar=False, errors="warn")
+        assert not result.empty, (
+            "expected the surviving sensor's readings, got an empty frame"
+        )
+
+    def test_invalid_policy_rejected(self, tmp_path, fake_client):
+        """An unrecognised errors= value is refused before any request."""
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", LicenseWarning)
+            with pytest.raises(ValueError, match="errors"):
+                _backend(fake_client, tmp_path).download(
+                    progress_bar=False, errors="explode"
+                )

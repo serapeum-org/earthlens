@@ -1652,16 +1652,18 @@ class AbstractDataSource(ABC):
         — while single-shot backends propagate the error.
 
         The backends whose batch is a genuine loop over independent items
-        (`chc`, `cmems`, `ecmwf`, `fdsn`, `nwp`, `radar`, `soilgrids`) make
-        that policy caller-controllable with an explicit
+        make that policy caller-controllable with an explicit
         `errors="warn" | "raise" | "ignore"` argument, routed through
-        `check_errors_policy` and `_run_items`. A backend whose
-        `download` does not take `errors=` has nothing to apply it to — it
-        issues one request, or its loop needs per-failure recovery the
-        shared helper cannot express (chc re-opens its FTP session between
-        failed dates). So **check the backend's own `download` signature**
-        rather than assuming; `_search_fetch_each` also takes
-        `errors=` for backends composed from it.
+        `check_errors_policy` and one of the two shared loops: the eager
+        `_run_items` (`chc`, `cmems`, `ecmwf`, `fdsn`, `nwp`, `radar`,
+        `soilgrids`) or the search-and-fetch-each `_search_fetch_each`
+        (`firms`, `sensor_community`). A backend whose `download` does not
+        take `errors=` has nothing to apply it to — it issues one request,
+        or its loop needs per-failure recovery the shared helper cannot
+        express (chc re-opens its FTP session between failed dates). So
+        **check the backend's own `download` signature** rather than
+        assuming; `_search_fetch_each` takes `errors=` for backends
+        composed from it.
         """
 
     def _api(self, *args: Any, **kwargs: Any) -> Any:
