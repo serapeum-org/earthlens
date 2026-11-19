@@ -197,6 +197,28 @@ class TestErrorsPolicy:
             "expected the surviving sensor's readings, got an empty frame"
         )
 
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, tmp_path, fake_client, monkeypatch
+    ):
+        """errors="ignore" drops the failed sensor silently and returns the survivor."""
+        backend = self._two_sensor_backend(fake_client, tmp_path, monkeypatch)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", LicenseWarning)
+            result = backend.download(progress_bar=False, errors="ignore")
+        assert not result.empty, (
+            "expected the surviving sensor's readings, got an empty frame"
+        )
+
+    def test_default_policy_is_warn(self, tmp_path, fake_client, monkeypatch):
+        """Omitting errors= defaults to "warn" — the failed sensor is survived, not raised."""
+        backend = self._two_sensor_backend(fake_client, tmp_path, monkeypatch)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", LicenseWarning)
+            result = backend.download(progress_bar=False)
+        assert not result.empty, (
+            "default should keep the surviving sensor's readings, got empty"
+        )
+
     def test_invalid_policy_rejected(self, tmp_path, fake_client):
         """An unrecognised errors= value is refused before any request."""
         with warnings.catch_warnings():

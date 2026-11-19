@@ -476,6 +476,26 @@ class TestErrorsPolicy:
             f"expected the one surviving chunk's row, got {len(result)}"
         )
 
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, tmp_path: Path, fake_firms: _FakeFirms, monkeypatch
+    ):
+        """errors="ignore" drops the failed chunk silently and returns the survivor."""
+        backend = self._two_chunk_backend(tmp_path, monkeypatch)
+        result = backend.download(progress_bar=False, errors="ignore")
+        assert len(result) == 1, (
+            f"expected the one surviving chunk's row, got {len(result)}"
+        )
+
+    def test_default_policy_is_warn(
+        self, tmp_path: Path, fake_firms: _FakeFirms, monkeypatch
+    ):
+        """Omitting errors= defaults to "warn" — the failed chunk is survived, not raised."""
+        backend = self._two_chunk_backend(tmp_path, monkeypatch)
+        result = backend.download(progress_bar=False)
+        assert len(result) == 1, (
+            f"default should keep the surviving chunk, got {len(result)}"
+        )
+
     def test_invalid_policy_rejected(self, tmp_path: Path, fake_firms: _FakeFirms):
         """An unrecognised errors= value is refused before any request."""
         with pytest.raises(ValueError, match="errors"):
