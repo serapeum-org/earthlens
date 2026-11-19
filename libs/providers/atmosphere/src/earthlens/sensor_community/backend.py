@@ -306,9 +306,13 @@ class SensorCommunity(AbstractDataSource):
 
         Contract-only: `download` overrides the write path and calls
         `_search_fetch_each` directly (to concat + window itself), mirroring
-        the `earthlens.openaq` sibling, so this is not on the live path.
+        the `earthlens.openaq` sibling, so this is not on the live path. It
+        forwards `self._errors` for symmetry with `download`, so a future
+        caller wiring `_api` live would get the same policy.
         """
-        return self._search_fetch_each(desc="Sensor.Community sensors", unit="sensor")
+        return self._search_fetch_each(
+            desc="Sensor.Community sensors", unit="sensor", errors=self._errors
+        )
 
     def _window(self) -> tuple[pd.Timestamp, pd.Timestamp]:
         """Return the `[lower, upper)` UTC filter bounds for the request.

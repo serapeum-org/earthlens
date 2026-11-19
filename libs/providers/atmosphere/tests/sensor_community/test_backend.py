@@ -156,6 +156,26 @@ class TestGuards:
 
 
 @pytest.mark.sensor_community
+class _RaiseOnSecondCall:
+    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from call 2.
+
+    Hoisted to module scope (no nested-function definitions); holds its own call
+    counter so the second sensor in a two-item search fails.
+    """
+
+    def __init__(self, real_fetch, exc):
+        self._real = real_fetch
+        self._exc = exc
+        self._calls = 0
+
+    def __call__(self, product):
+        """Return the real fetch for the first sensor, raise `exc` thereafter."""
+        self._calls += 1
+        if self._calls >= 2:
+            raise self._exc
+        return self._real(product)
+
+
 class TestErrorsPolicy:
     """`errors=` partial-failure policy across the independent sensors (ARC-9a)."""
 
@@ -165,16 +185,11 @@ class TestErrorsPolicy:
         products = backend._search()
         products = products * 2 if len(products) < 2 else products[:2]
         monkeypatch.setattr(backend, "_search", lambda: list(products))
-        real_fetch = backend._fetch_one
-        seen: list[object] = []
-
-        def _fetch_one(product):
-            seen.append(product)
-            if len(seen) >= 2:
-                raise RuntimeError("sensor boom")
-            return real_fetch(product)
-
-        monkeypatch.setattr(backend, "_fetch_one", _fetch_one)
+        monkeypatch.setattr(
+            backend,
+            "_fetch_one",
+            _RaiseOnSecondCall(backend._fetch_one, RuntimeError("sensor boom")),
+        )
         return backend
 
     def test_raise_propagates_first_failure(self, tmp_path, fake_client, monkeypatch):
