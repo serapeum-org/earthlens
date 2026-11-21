@@ -148,3 +148,96 @@ class TestFetchAndDownload:
         fc = backend.download()
         assert len(fc) == 1
         assert not any(tmp_path.glob("*.parquet"))
+
+
+class _RaiseFromCall:
+    """A `_fetch_selector` stand-in: delegate, then raise `exc` from `from_call`.
+
+    Hoisted to module scope (no nested-function definitions); holds its own
+    call counter. `from_call=2` fails the second selector (a partial failure);
+    `from_call=1` fails every selector.
+    """
+
+    def __init__(self, real, exc, from_call=2):
+        self._real = real
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, selector):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(selector)
+
+
+@pytest.mark.obis
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent species selectors."""
+
+    def _two_selector_backend(self, tmp_path, fake_obis, monkeypatch, exc, from_call=2):
+        """A backend over two selectors whose fetch raises `exc` from `from_call`."""
+        fake_obis.occurrences.set_frame(fake_obis.frame([fake_obis.row()]))
+        backend = _backend(tmp_path, variables=["blue-whale", "common-dolphin"])
+        monkeypatch.setattr(
+            backend,
+            "_fetch_selector",
+            _RaiseFromCall(backend._fetch_selector, exc, from_call),
+        )
+        return backend
+
+    def test_raise_propagates_first_failure(self, tmp_path, fake_obis, monkeypatch):
+        """errors="raise" surfaces a per-selector exception, not a batch summary."""
+        backend = self._two_selector_backend(
+            tmp_path, fake_obis, monkeypatch, ValueError("selector boom")
+        )
+        with pytest.raises(ValueError, match="selector boom"):
+            backend.download(errors="raise")
+
+    def test_warn_returns_the_surviving_selector(
+        self, tmp_path, fake_obis, monkeypatch
+    ):
+        """errors="warn" drops a non-fatal per-selector failure, keeps survivors."""
+        backend = self._two_selector_backend(
+            tmp_path, fake_obis, monkeypatch, ValueError("selector boom")
+        )
+        fc = backend.download(errors="warn")
+        assert isinstance(fc, GeoDataFrame)
+        assert len(fc) == 1
+
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, tmp_path, fake_obis, monkeypatch
+    ):
+        """errors="ignore" drops a non-fatal per-selector failure silently."""
+        backend = self._two_selector_backend(
+            tmp_path, fake_obis, monkeypatch, ValueError("selector boom")
+        )
+        assert len(backend.download(errors="ignore")) == 1
+
+    def test_default_policy_is_warn(self, tmp_path, fake_obis, monkeypatch):
+        """Omitting errors= defaults to warn — a non-fatal failure is survived."""
+        backend = self._two_selector_backend(
+            tmp_path, fake_obis, monkeypatch, ValueError("selector boom")
+        )
+        assert len(backend.download()) == 1
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_selector_failing_raises(
+        self, tmp_path, fake_obis, monkeypatch, policy
+    ):
+        """Every selector failing re-raises the first error, never an empty FC."""
+        backend = self._two_selector_backend(
+            tmp_path,
+            fake_obis,
+            monkeypatch,
+            RuntimeError("all selectors down"),
+            from_call=1,
+        )
+        with pytest.raises(RuntimeError, match="all selectors down"):
+            backend.download(errors=policy)
+
+    def test_invalid_policy_rejected(self, tmp_path):
+        """An unrecognised errors= value is refused before any request."""
+        with pytest.raises(ValueError, match="errors"):
+            _backend(tmp_path).download(errors="explode")

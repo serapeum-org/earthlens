@@ -477,6 +477,9 @@ class ERDDAP(AbstractDataSource):
     ) -> pd.DataFrame | list[Path]:
         """Fetch the dataset and return its artifact (frame or NetCDF paths).
 
+        ERDDAP issues a single request per call, so there is no per-item
+        partial-failure policy (no `errors=` argument).
+
         Args:
             progress_bar: Accepted for signature parity; ERDDAP issues a
                 single request per call, so there is no per-item bar.
