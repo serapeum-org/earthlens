@@ -6,9 +6,42 @@ from pathlib import Path
 
 import pytest
 
+from earthlens.base import RemoteProduct
 from earthlens.dem import DEM
 
 pytestmark = [pytest.mark.dem, pytest.mark.unit]
+
+
+class _RaiseFromCall:
+    """A `_fetch_one` stand-in: return `survivor` until `from_call`, then raise.
+
+    Module-level (no nested defs); holds its own call counter. `from_call=2`
+    fails the second tile (a partial failure); `from_call=1` fails every tile.
+    """
+
+    def __init__(self, survivor, exc, from_call=2):
+        self._survivor = survivor
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, product):
+        """Return the survivor path, then raise `exc` from `from_call` onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._survivor
+
+
+class _ConstantFetch:
+    """A `_fetch_one` stand-in that returns a fixed value for every tile."""
+
+    def __init__(self, value):
+        self._value = value
+
+    def __call__(self, product):
+        """Return the fixed value regardless of the product."""
+        return self._value
 
 
 def _install_fake_client(backend: DEM, fake) -> None:
@@ -359,3 +392,73 @@ class TestNoDecodeImports:
         assert offending == [], (
             f"earthlens.dem must not import decode libraries: {offending}"
         )
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent tiles."""
+
+    def _two_tile_backend(self, tmp_path, monkeypatch, stub):
+        """A DEM whose search yields two tiles, each fetched through `stub`."""
+        src = DEM(
+            variables=[],
+            lat_lim=[30.2, 30.8],
+            lon_lim=[31.2, 31.8],
+            path=tmp_path,
+        )
+        products = [
+            RemoteProduct(id="N30_E031", href="a.tif"),
+            RemoteProduct(id="N31_E031", href="b.tif"),
+        ]
+        monkeypatch.setattr(src, "_search", lambda: list(products))
+        monkeypatch.setattr(src, "_fetch_one", stub)
+        return src
+
+    def test_raise_propagates_first_failure(self, tmp_path, monkeypatch):
+        """errors="raise" surfaces a per-tile exception, not the batch summary."""
+        stub = _RaiseFromCall(tmp_path / "a.tif", ValueError("tile boom"))
+        src = self._two_tile_backend(tmp_path, monkeypatch, stub)
+        with pytest.raises(ValueError, match="tile boom"):
+            src.download(progress_bar=False, errors="raise")
+
+    def test_warn_returns_surviving_tile(self, tmp_path, monkeypatch):
+        """errors="warn" drops the failed tile and returns the survivor."""
+        survivor = tmp_path / "a.tif"
+        stub = _RaiseFromCall(survivor, ValueError("tile boom"))
+        src = self._two_tile_backend(tmp_path, monkeypatch, stub)
+        assert src.download(progress_bar=False, errors="warn") == [survivor]
+
+    def test_ignore_returns_surviving_tile(self, tmp_path, monkeypatch):
+        """errors="ignore" drops the failed tile silently and returns the survivor."""
+        survivor = tmp_path / "a.tif"
+        stub = _RaiseFromCall(survivor, ValueError("tile boom"))
+        src = self._two_tile_backend(tmp_path, monkeypatch, stub)
+        assert src.download(progress_bar=False, errors="ignore") == [survivor]
+
+    def test_default_policy_is_warn(self, tmp_path, monkeypatch):
+        """Omitting errors= defaults to warn — the failed tile is survived."""
+        survivor = tmp_path / "a.tif"
+        stub = _RaiseFromCall(survivor, ValueError("tile boom"))
+        src = self._two_tile_backend(tmp_path, monkeypatch, stub)
+        assert src.download(progress_bar=False) == [survivor]
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_tile_failing_raises(self, tmp_path, monkeypatch, policy):
+        """When every tile fails, the first error is raised — never a silent empty."""
+        stub = _RaiseFromCall(
+            tmp_path / "a.tif", ValueError("all tiles down"), from_call=1
+        )
+        src = self._two_tile_backend(tmp_path, monkeypatch, stub)
+        with pytest.raises(ValueError, match="all tiles down"):
+            src.download(progress_bar=False, errors=policy)
+
+    def test_absent_tiles_are_not_failures(self, tmp_path, monkeypatch):
+        """An absent (ocean) tile returns None, which is skipped — never a failure."""
+        src = self._two_tile_backend(tmp_path, monkeypatch, _ConstantFetch(None))
+        assert src.download(progress_bar=False, errors="warn") == []
+
+    def test_invalid_policy_rejected(self, tmp_path, monkeypatch):
+        """An unrecognised errors= value is refused."""
+        stub = _ConstantFetch(tmp_path / "a.tif")
+        src = self._two_tile_backend(tmp_path, monkeypatch, stub)
+        with pytest.raises(ValueError, match="errors"):
+            src.download(progress_bar=False, errors="explode")

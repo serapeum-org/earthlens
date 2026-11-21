@@ -257,6 +257,91 @@ class TestFetchAndDownload:
         assert not [w for w in recwarn.list if issubclass(w.category, LicenseWarning)]
 
 
+#: One assessment row keyed by `IUCN_COLUMNS`, for the surviving selector.
+_IUCN_ROW = {
+    "scientific_name": "Panthera leo",
+    "assessment_id": 1,
+    "category": "VU",
+    "criteria": None,
+    "population_trend": None,
+    "year_published": "2016",
+    "latest": True,
+    "possibly_extinct": False,
+    "url": "https://example.org/1",
+}
+
+
+class _RaiseFromCall:
+    """A `_fetch_selector` stand-in: return a row until `from_call`, then raise.
+
+    Module-level (no nested defs); holds its own call counter. `from_call=2`
+    fails the second selector; `from_call=1` fails every selector.
+    """
+
+    def __init__(self, exc, from_call=2):
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, token, selector):
+        """Return one assessment row, then raise `exc` from `from_call` onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return [dict(_IUCN_ROW)]
+
+
+@pytest.mark.iucn
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent selectors."""
+
+    def _two_selector_backend(self, tmp_path, monkeypatch, stub):
+        """An IUCN whose two selectors are fetched through `stub`."""
+        backend = _backend(tmp_path, variables=["country:KE", "country:UG"])
+        monkeypatch.setattr(backend, "_fetch_selector", stub)
+        return backend
+
+    def test_raise_propagates_first_failure(self, tmp_path, monkeypatch):
+        """errors="raise" surfaces a per-selector exception."""
+        stub = _RaiseFromCall(ValueError("selector boom"))
+        backend = self._two_selector_backend(tmp_path, monkeypatch, stub)
+        with pytest.raises(ValueError, match="selector boom"):
+            backend.download(errors="raise")
+
+    def test_warn_returns_surviving_selector(self, tmp_path, monkeypatch):
+        """errors="warn" drops the failed selector and returns the survivor's rows."""
+        stub = _RaiseFromCall(ValueError("selector boom"))
+        backend = self._two_selector_backend(tmp_path, monkeypatch, stub)
+        assert len(backend.download(errors="warn")) == 1
+
+    def test_ignore_returns_surviving_selector(self, tmp_path, monkeypatch):
+        """errors="ignore" drops the failed selector silently."""
+        stub = _RaiseFromCall(ValueError("selector boom"))
+        backend = self._two_selector_backend(tmp_path, monkeypatch, stub)
+        assert len(backend.download(errors="ignore")) == 1
+
+    def test_default_policy_is_warn(self, tmp_path, monkeypatch):
+        """Omitting errors= defaults to warn — the failed selector is survived."""
+        stub = _RaiseFromCall(ValueError("selector boom"))
+        backend = self._two_selector_backend(tmp_path, monkeypatch, stub)
+        assert len(backend.download()) == 1
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_selector_failing_raises(self, tmp_path, monkeypatch, policy):
+        """When every selector fails, the first error is raised — never a silent empty."""
+        stub = _RaiseFromCall(ValueError("all selectors down"), from_call=1)
+        backend = self._two_selector_backend(tmp_path, monkeypatch, stub)
+        with pytest.raises(ValueError, match="all selectors down"):
+            backend.download(errors=policy)
+
+    def test_invalid_policy_rejected(self, tmp_path, monkeypatch):
+        """An unrecognised errors= value is refused."""
+        stub = _RaiseFromCall(ValueError("selector boom"))
+        backend = self._two_selector_backend(tmp_path, monkeypatch, stub)
+        with pytest.raises(ValueError, match="errors"):
+            backend.download(errors="explode")
+
+
 @pytest.mark.iucn
 class TestRestRetry:
     """The REST shim retries on transient failures and exposes a clean ValueError on 404."""

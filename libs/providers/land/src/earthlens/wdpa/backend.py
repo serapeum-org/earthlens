@@ -262,6 +262,9 @@ class WDPA(AbstractDataSource):
     ) -> FeatureCollection:
         """Fetch the protected-area polygons and return the FeatureCollection.
 
+        This backend issues a single request, so it exposes no `errors=`
+        partial-failure policy.
+
         Args:
             progress_bar: Accepted for signature parity; the REST client
                 has no progress bar, so this is a no-op.

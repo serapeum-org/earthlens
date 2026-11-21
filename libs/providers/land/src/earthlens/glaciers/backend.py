@@ -362,6 +362,9 @@ class Glaciers(AbstractDataSource):
     ) -> FeatureCollection | pd.DataFrame:
         """Fetch the dataset and return its per-instance shape.
 
+        This backend issues a single request, so it exposes no `errors=`
+        partial-failure policy.
+
         Args:
             progress_bar: Accepted for signature parity; the per-region RGI
                 fetch is a small loop, so this is a no-op.

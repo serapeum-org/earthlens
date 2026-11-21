@@ -205,7 +205,8 @@ class FABDEM(AbstractDataSource):
         """Fetch the FABDEM DEM subset as one AOI-cropped GeoTIFF.
 
         Emits a `LicenseWarning` (FABDEM is CC-BY-NC-SA 4.0, non-commercial)
-        before any download.
+        before any download. This backend issues a single request, so it
+        exposes no `errors=` partial-failure policy.
 
         Args:
             progress_bar: Accepted for signature parity; one request per call.
