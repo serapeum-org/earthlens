@@ -339,7 +339,9 @@ class Aqueduct(AbstractDataSource):
         Issues the (cached) download, reads and filters the shapefile, writes the
         result to one vector file under `path` (when `geometry=True`), and
         returns the in-memory collection — or a geometry-dropped `DataFrame`
-        when the backend was built with `geometry=False`.
+        when the backend was built with `geometry=False`. It issues a single
+        request, so it has no partial-failure policy and takes no `errors=`
+        argument.
 
         Args:
             progress_bar: Accepted for signature parity; one file is fetched, so

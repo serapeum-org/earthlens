@@ -408,6 +408,9 @@ class NSI(AbstractDataSource):
     ) -> pd.DataFrame | FeatureCollection:
         """Fetch the selected source and return its per-instance shape.
 
+        It issues one logical request (paged for `nfip`), so it has no
+        partial-failure policy and takes no `errors=` argument.
+
         Args:
             progress_bar: Accepted for signature parity; one logical request is
                 issued (paged for `nfip`), so this is a no-op.

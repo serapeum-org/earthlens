@@ -916,7 +916,8 @@ class OSM(AbstractDataSource):
         Routes each named query to its protocol, combines the results into
         one `FeatureCollection`, emits an ODbL `LicenseWarning` (`G5`),
         writes the collection to one vector file under `path` when non-empty,
-        and returns the in-memory collection.
+        and returns the in-memory collection. This backend has no
+        partial-failure policy and takes no `errors=` argument.
 
         Args:
             progress_bar: Accepted for signature parity with the other

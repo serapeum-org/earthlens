@@ -736,3 +736,92 @@ class TestRequireOverturemaps:
         monkeypatch.setitem(sys.modules, "overturemaps", None)
         with pytest.raises(ImportError, match=r"earthlens\[overture\]"):
             _require_overturemaps()
+
+
+class _RaiseFromCall:
+    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from `from_call`.
+
+    Hoisted to module scope (no nested-function definitions); holds its own call
+    counter. `from_call=2` fails the second type (a partial failure);
+    `from_call=1` fails every type.
+    """
+
+    def __init__(self, real, exc, from_call: int = 2):
+        self._real = real
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, product, **kwargs):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(product, **kwargs)
+
+
+@pytest.mark.overture
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent `(theme, type)` fetches."""
+
+    def _two_type_backend(self, tmp_path, monkeypatch, exc, from_call: int = 2):
+        """A backend over two types whose fetch raises `exc` from `from_call`."""
+        backend = _make_backend(
+            tmp_path,
+            variables={"transportation": ["segment", "connector"]},
+            lat_lim=[40.757, 40.759],
+            lon_lim=[-73.987, -73.984],
+        )
+        monkeypatch.setattr(
+            backend, "_fetch_one", _RaiseFromCall(backend._fetch_one, exc, from_call)
+        )
+        return backend
+
+    def test_raise_propagates_first_failure(
+        self, tmp_path: Path, fake_overture, monkeypatch
+    ):
+        """errors="raise" surfaces a per-type exception, not the summary."""
+        backend = self._two_type_backend(tmp_path, monkeypatch, ValueError("type boom"))
+        with pytest.raises(ValueError, match="type boom"):
+            backend.download(errors="raise")
+
+    def test_warn_returns_the_surviving_type(
+        self, tmp_path: Path, fake_overture, monkeypatch
+    ):
+        """errors="warn" drops a failed type and returns the survivor's path."""
+        backend = self._two_type_backend(tmp_path, monkeypatch, ValueError("type boom"))
+        paths = backend.download(errors="warn")
+        assert [p.name for p in paths] == [
+            "overture_transportation_segment_latest.parquet"
+        ]
+
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, tmp_path: Path, fake_overture, monkeypatch
+    ):
+        """errors="ignore" drops a failed type silently."""
+        backend = self._two_type_backend(tmp_path, monkeypatch, ValueError("type boom"))
+        paths = backend.download(errors="ignore")
+        assert len(paths) == 1
+
+    def test_default_policy_is_warn(self, tmp_path: Path, fake_overture, monkeypatch):
+        """Omitting errors= defaults to warn — a failed type is survived."""
+        backend = self._two_type_backend(tmp_path, monkeypatch, ValueError("type boom"))
+        paths = backend.download()
+        assert len(paths) == 1
+
+    def test_invalid_policy_rejected(self, tmp_path: Path):
+        """An unrecognised errors= value is refused before any request."""
+        backend = _make_backend(tmp_path)
+        with pytest.raises(ValueError, match="errors"):
+            backend.download(errors="explode")
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_type_failing_raises(
+        self, tmp_path: Path, fake_overture, policy, monkeypatch
+    ):
+        """When every type fails, the first error is raised — never a silent empty."""
+        backend = self._two_type_backend(
+            tmp_path, monkeypatch, ValueError("all types down"), from_call=1
+        )
+        with pytest.raises(ValueError, match="all types down"):
+            backend.download(errors=policy)

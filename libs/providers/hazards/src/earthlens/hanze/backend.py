@@ -640,7 +640,9 @@ class HANZE(AbstractDataSource):
         """Fetch HANZE and return the per-instance shape.
 
         Runs the download + filter, writes the result to `path` (a CSV for the
-        tabular default, a GeoPackage for `with_geometry`), and returns it.
+        tabular default, a GeoPackage for `with_geometry`), and returns it. It
+        issues a single request, so it has no partial-failure policy and takes
+        no `errors=` argument.
 
         Args:
             progress_bar: Whether to draw a download progress bar. Passed through

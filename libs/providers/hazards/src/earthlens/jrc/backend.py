@@ -481,6 +481,9 @@ class JRC(AbstractDataSource):
     ) -> list[Path] | pd.DataFrame:
         """Fetch the resolved dataset's subset(s).
 
+        This backend has no partial-failure policy and takes no `errors=`
+        argument.
+
         Args:
             progress_bar: Accepted for signature parity.
             force: Re-fetch even when a complete output already exists.

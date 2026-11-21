@@ -373,3 +373,118 @@ class TestRetries:
         products = backend._search()
         assert [p.metadata["name"] for p in products] == ["a.csv"]
         assert state["n"] == 2
+
+
+class _RaiseFromCall:
+    """A `_download_one` stand-in: delegate to the real one, raise `exc` from `from_call`.
+
+    Hoisted to module scope (no nested-function definitions); holds its own call
+    counter. `from_call=2` fails the second resource (a partial failure);
+    `from_call=1` fails every resource.
+    """
+
+    def __init__(self, real, exc, from_call: int = 2):
+        self._real = real
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, product):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(product)
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent resources."""
+
+    def _two_resource_backend(
+        self, fake_hdx, tmp_path, monkeypatch, exc, from_call: int = 2
+    ):
+        """A backend over two resources whose download raises `exc` from `from_call`."""
+        fake_hdx.add_dataset(
+            "d", [FakeResource("a.csv", "CSV"), FakeResource("b.csv", "CSV")]
+        )
+        backend = HDX(hdx_id="d", path=tmp_path)
+        monkeypatch.setattr(
+            backend,
+            "_download_one",
+            _RaiseFromCall(backend._download_one, exc, from_call),
+        )
+        return backend
+
+    def test_raise_propagates_first_failure(self, fake_hdx, tmp_path, monkeypatch):
+        """errors="raise" surfaces a per-resource exception, not the summary."""
+        backend = self._two_resource_backend(
+            fake_hdx, tmp_path, monkeypatch, ValueError("resource boom")
+        )
+        with pytest.raises(ValueError, match="resource boom"):
+            backend.download(errors="raise")
+
+    def test_warn_returns_the_surviving_resource(self, fake_hdx, tmp_path, monkeypatch):
+        """errors="warn" drops a failed resource and returns the survivor's path."""
+        backend = self._two_resource_backend(
+            fake_hdx, tmp_path, monkeypatch, ValueError("resource boom")
+        )
+        paths = backend.download(errors="warn")
+        assert [p.name for p in paths] == ["a.csv"]
+
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, fake_hdx, tmp_path, monkeypatch
+    ):
+        """errors="ignore" drops a failed resource silently."""
+        backend = self._two_resource_backend(
+            fake_hdx, tmp_path, monkeypatch, ValueError("resource boom")
+        )
+        paths = backend.download(errors="ignore")
+        assert [p.name for p in paths] == ["a.csv"]
+
+    def test_default_policy_is_warn(self, fake_hdx, tmp_path, monkeypatch):
+        """Omitting errors= defaults to warn — a failed resource is survived."""
+        backend = self._two_resource_backend(
+            fake_hdx, tmp_path, monkeypatch, ValueError("resource boom")
+        )
+        paths = backend.download()
+        assert [p.name for p in paths] == ["a.csv"]
+
+    def test_invalid_policy_rejected(self, fake_hdx, tmp_path):
+        """An unrecognised errors= value is refused before any request."""
+        fake_hdx.add_dataset("d", [FakeResource("a.csv", "CSV")])
+        backend = HDX(hdx_id="d", path=tmp_path)
+        with pytest.raises(ValueError, match="errors"):
+            backend.download(errors="explode")
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_resource_failing_raises(
+        self, fake_hdx, tmp_path, policy, monkeypatch
+    ):
+        """When every resource fails, the first error is raised — never a silent empty."""
+        backend = self._two_resource_backend(
+            fake_hdx,
+            tmp_path,
+            monkeypatch,
+            ValueError("all resources down"),
+            from_call=1,
+        )
+        with pytest.raises(ValueError, match="all resources down"):
+            backend.download(errors=policy)
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_resource_failing_raises_on_read_path(
+        self, fake_hdx, tmp_path, policy, monkeypatch
+    ):
+        """read=True also re-raises when every resource fails, not a silent empty."""
+        monkeypatch.setattr(
+            "pyramids.read_resource", lambda path, fmt=None: None, raising=False
+        )
+        backend = self._two_resource_backend(
+            fake_hdx,
+            tmp_path,
+            monkeypatch,
+            ValueError("all resources down"),
+            from_call=1,
+        )
+        with pytest.raises(ValueError, match="all resources down"):
+            backend.download(read=True, errors=policy)

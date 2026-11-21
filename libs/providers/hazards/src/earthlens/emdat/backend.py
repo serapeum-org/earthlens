@@ -638,6 +638,9 @@ class EMDAT(AbstractDataSource):
     def download(self, progress_bar: bool = True) -> pd.DataFrame | FeatureCollection:
         """Fetch the dataset and return its per-instance shape.
 
+        It issues a single request, so it has no partial-failure policy and
+        takes no `errors=` argument.
+
         Args:
             progress_bar: Whether to draw a download progress bar. Passed
                 through to the transport, so `False` really does silence it.
