@@ -44,6 +44,11 @@ _FILE_RANGE_RE = re.compile(r"_(\d{4})_(\d{4})\.nc$")
 _OPEN_RIGHTS = frozenset({"cc0 1.0", "cc by 4.0"})
 
 
+def _describe_dataset(product: RemoteProduct) -> str:
+    """Render a dataset product for the `_run_items` log lines (its id)."""
+    return repr(product.id)
+
+
 class ISIMIP(AbstractDataSource):
     """ISIMIP bias-adjusted climate-forcing backend (repository REST API + cutout).
 
@@ -344,45 +349,77 @@ class ISIMIP(AbstractDataSource):
 
         For a bbox request: submit a cutout job per product (`cutout_bbox`), poll
         to `finished`, then download + extract the cut NetCDFs. For a
-        `whole_globe` request: download the raw granules directly.
+        `whole_globe` request: download the raw granules directly. The
+        per-dataset cutouts are independent, so each is run under the
+        `self._errors` partial-failure policy.
 
         Args:
             products: The products from `_search`.
 
         Returns:
-            list[Path]: The written NetCDF paths, in product order.
+            list[Path]: The written NetCDF paths of the datasets that
+                succeeded, in product order.
 
         Raises:
             RuntimeError: If a cutout job does not reach `finished`.
+            Exception: The first dataset's error when `errors="raise"`, or —
+                under any policy — when **every** dataset fails (a whole-service
+                failure re-raised rather than returned as an empty list).
+        """
+        results, failures = self._run_items(
+            tqdm(
+                products,
+                disable=not self._show_progress,
+                desc="isimip",
+                unit="dataset",
+            ),
+            self._fetch_one,
+            errors=self._errors,
+            label="dataset",
+            describe=_describe_dataset,
+        )
+        if failures and not results:
+            # Every dataset failed — a dead ISIMIP service, not a per-dataset
+            # gap. Re-raise the first error rather than return an empty list.
+            raise failures[0][1]
+        # Each product contributes a list of granules; flatten to one path list.
+        return [path for granules in results for path in granules]
+
+    def _fetch_one(self, product: RemoteProduct) -> list[Path]:
+        """Cut (or download whole) one resolved dataset to NetCDF granule(s).
+
+        Args:
+            product: One `RemoteProduct` from `_search`.
+
+        Returns:
+            list[Path]: The written NetCDF paths for this dataset.
+
+        Raises:
+            RuntimeError: If a cutout job does not reach `finished`, or finishes
+                without a downloadable `file_url`.
         """
         client = self._client_or_build()
-        out: list[Path] = []
-        for product in tqdm(
-            products, disable=not self._show_progress, desc="isimip", unit="dataset"
-        ):
-            self._warn_license(product)
-            if self._whole_globe:
-                out.extend(self._download_whole(client, product))
-                continue
-            bbox = self._bbox()
-            assert bbox is not None  # the constructor requires a bbox here
-            west, east, south, north = bbox
-            job = client.cutout_bbox(
-                product.metadata["paths"], west, east, south, north, poll=self._poll
+        self._warn_license(product)
+        if self._whole_globe:
+            return self._download_whole(client, product)
+        bbox = self._bbox()
+        assert bbox is not None  # the constructor requires a bbox here
+        west, east, south, north = bbox
+        job = client.cutout_bbox(
+            product.metadata["paths"], west, east, south, north, poll=self._poll
+        )
+        if not job or job.get("status") != "finished":
+            raise RuntimeError(
+                f"ISIMIP cutout job for {product.id!r} did not finish: "
+                f"status={None if not job else job.get('status')!r}."
             )
-            if not job or job.get("status") != "finished":
-                raise RuntimeError(
-                    f"ISIMIP cutout job for {product.id!r} did not finish: "
-                    f"status={None if not job else job.get('status')!r}."
-                )
-            file_url = job.get("file_url")
-            if not file_url:
-                raise RuntimeError(
-                    f"ISIMIP cutout job for {product.id!r} finished without a "
-                    "file_url to download."
-                )
-            out.extend(self._download_extract(client, product, file_url))
-        return out
+        file_url = job.get("file_url")
+        if not file_url:
+            raise RuntimeError(
+                f"ISIMIP cutout job for {product.id!r} finished without a "
+                "file_url to download."
+            )
+        return self._download_extract(client, product, file_url)
 
     def _product_dir(self, product: RemoteProduct) -> Path:
         """Return a per-product, per-window, per-region output subdirectory.
@@ -508,7 +545,7 @@ class ISIMIP(AbstractDataSource):
         """
         return self._catalog.get_round(self._round).default_license
 
-    def download(self, progress_bar: bool = True) -> list[Path]:
+    def download(self, progress_bar: bool = True, errors: str = "warn") -> list[Path]:
         """Fetch the requested bias-adjusted granules and return the written paths.
 
         Runs the cheap `_search` (facet -> dataset resolution) then
@@ -517,14 +554,27 @@ class ISIMIP(AbstractDataSource):
 
         Args:
             progress_bar: Show a per-dataset progress bar. Defaults to `True`.
+            errors: Partial-failure policy across the independent datasets:
+
+                * `"warn"` (default) — log each failed dataset and return the
+                  paths of the datasets that succeeded, with a summary.
+                * `"raise"` — propagate the first dataset failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed datasets silently.
+
+                When every dataset fails — a dead ISIMIP service, not a
+                per-dataset gap — the first error is re-raised under every policy
+                rather than returned as an empty list; a partial failure still
+                returns the survivors under `"warn"`/`"ignore"`.
 
         Returns:
-            list[Path]: The written NetCDF paths (never empty — a facet set that
-                matches nothing raises rather than returning an empty list).
+            list[Path]: The written NetCDF paths (a facet set that matches
+                nothing raises rather than returning an empty list).
 
         Raises:
             ValueError: If the facet set matches no dataset / granule.
             RuntimeError: If a cutout job does not finish.
         """
         self._show_progress = progress_bar
+        self._errors = self.check_errors_policy(errors)
         return self._api_via_search_fetch()

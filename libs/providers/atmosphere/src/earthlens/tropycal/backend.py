@@ -33,6 +33,7 @@ carries the sentinel `"all"`.
 from __future__ import annotations
 
 import datetime as dt
+import functools
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, cast
 
@@ -50,6 +51,11 @@ from earthlens.tropycal.catalog import Catalog
 
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
+
+
+def _describe_item(item: Any) -> str:
+    """Render a basin / storm / product for the `_iter_items` log lines."""
+    return repr(getattr(item, "id", item))
 
 
 FileFormat = Literal["gpkg", "geojson"]
@@ -417,7 +423,11 @@ class TropicalCyclone(AbstractDataSource):
 
         Widens the inherited `-> list[Path]` contract: a vector backend
         returns in-memory `FeatureCollection`s, not file paths. One
-        collection per product, in request order.
+        collection per product, in request order. The per-basin (or per-storm,
+        for `recon`) loads are independent, so each is run under the
+        `self._errors` partial-failure policy; a failed item contributes an
+        empty collection so the result stays positionally aligned with
+        `products` (the download writer pairs them by index).
 
         Args:
             products: The list returned by `_search`.
@@ -425,13 +435,97 @@ class TropicalCyclone(AbstractDataSource):
         Returns:
             list[FeatureCollection]: One collection per basin, same order.
                 Truncated when `limit=` was passed to `download`.
+
+        Raises:
+            Exception: The first item's error when `errors="raise"`, or — under
+                any policy — when **every** item fails (a whole-service failure
+                re-raised rather than returned as all-empty collections).
         """
-        # Lazy so a `limit=` stops the work: a basin past the cap never has its
-        # TrackDataset loaded, rather than being loaded and then trimmed away.
-        return self._take_limited(
-            (self._query_one(product) for product in products),
-            limit=self._limit,
+        placeholder = (
+            self._placeholder_recon
+            if self._product == "recon"
+            else self._placeholder_fc
         )
+        label = "storm" if self._product == "recon" else "basin"
+        return self._fetch_with_policy(
+            products, self._query_one, label=label, on_failure=placeholder
+        )
+
+    def _fetch_with_policy(
+        self,
+        items: list[Any],
+        fn: Any,
+        *,
+        label: str,
+        on_failure: Any = None,
+        drop_none: bool = False,
+    ) -> list[Any]:
+        """Map `fn` over `items` lazily under the `self._errors` policy.
+
+        The lazy (cap-aware) counterpart to `_run_items` shared by every
+        tropycal product path: it threads `self._errors` through
+        `_iter_items`, honours `self._limit` via `_take_limited`, and
+        re-raises the first failure when every attempted item fails (a
+        whole-service outage, never returned as an empty result).
+
+        Args:
+            items: The work items — products, basin codes, or storm ids.
+            fn: Called once per item; its return value is collected.
+            label: Noun for the log lines (e.g. `"basin"`, `"storm"`).
+            on_failure: Optional `(item, exc) -> placeholder` kept so a failed
+                item still occupies its slot (the zip-aligned FC paths pass one);
+                `None` drops failures from the result.
+            drop_none: When `True`, a `None` result (a legitimately absent item,
+                e.g. a storm with no SHIPS guidance) is filtered out before the
+                row cap — it is neither a collected result nor a failure.
+
+        Returns:
+            list[Any]: The collected per-item results, in order.
+
+        Raises:
+            Exception: The first failure when `errors="raise"`, or when every
+                attempted item fails under any policy.
+        """
+        failures: list[tuple[str, BaseException]] = []
+        iterated = self._iter_items(
+            items,
+            fn,
+            errors=self._errors,
+            label=label,
+            describe=_describe_item,
+            on_failure=on_failure,
+            failures=failures,
+        )
+        if drop_none:
+            iterated = (value for value in iterated if value is not None)
+        results = self._take_limited(
+            iterated, limit=self._limit, size=self._fragment_rows
+        )
+        successes = len(results) - (len(failures) if on_failure is not None else 0)
+        if failures and successes <= 0:
+            # Every attempted item failed — a whole-service outage, not a
+            # per-item gap. Re-raise the first rather than return empty.
+            raise failures[0][1]
+        if failures and self._errors == "warn":
+            logger.warning(
+                f"{type(self).__name__}: {len(failures)} of {len(items)} "
+                f"{label}(s) failed."
+            )
+        return results
+
+    def _placeholder_fc(self, item: Any, exc: BaseException) -> FeatureCollection:
+        """Empty FeatureCollection standing in for a failed best-track/realtime item."""
+        return events.empty_fc(self._geometry)
+
+    def _placeholder_recon(self, item: Any, exc: BaseException) -> FeatureCollection:
+        """Empty FeatureCollection standing in for a failed recon item."""
+        return events.empty_recon_fc()
+
+    def _placeholder_btk(self, item: Any, exc: BaseException) -> FeatureCollection:
+        """Empty FeatureCollection standing in for a failed NHC best-track item."""
+        if self._geometry == "track":
+            return events.empty_fc("track")
+        return events.empty_btk_fc()
 
     def _query_one(self, product: RemoteProduct) -> FeatureCollection:
         """Load one basin's TrackDataset and map its storms to features.
@@ -674,6 +768,7 @@ class TropicalCyclone(AbstractDataSource):
         self,
         progress_bar: bool = True,
         limit: int | None = None,
+        errors: str = "warn",
     ) -> FeatureCollection | pd.DataFrame:
         """Load every requested basin and return the unioned tracks.
 
@@ -694,6 +789,19 @@ class TropicalCyclone(AbstractDataSource):
                 parsed whole before any of its storms can be filtered, so a
                 one-basin request (the default) pays the full load whatever the
                 cap. `None` (the default) loads everything.
+            errors: Partial-failure policy across the independent basins /
+                storms:
+
+                * `"warn"` (default) — log each failed item and return the
+                  features from the items that succeeded, with a summary.
+                * `"raise"` — propagate the first item failure, for a pipeline
+                  that must fail fast.
+                * `"ignore"` — drop failed items silently.
+
+                When every item fails — a dead NCEI / NHC host, not a per-item
+                gap — the first error is re-raised under every policy rather than
+                returned as an empty result; a partial failure still returns the
+                survivors under `"warn"`/`"ignore"`.
 
         Returns:
             FeatureCollection: The row-wise union of every requested
@@ -704,6 +812,7 @@ class TropicalCyclone(AbstractDataSource):
             ImportError: If the `[tropycal]` extra is not installed.
         """
         self._limit = self.check_limit(limit)
+        self._errors = self.check_errors_policy(errors)
         if self._product == "ships":
             return self._download_ships()
         if self._product == "realtime":
@@ -768,9 +877,11 @@ class TropicalCyclone(AbstractDataSource):
         # untrimmed fragment on disk while returning the trimmed one, so for
         # the storm the cap lands inside the file and the return value would
         # disagree.
-        collections = self._take_limited(
-            (self._realtime_one(realtime, storm_id, bbox) for storm_id in ids),
-            limit=self._limit,
+        collections = self._fetch_with_policy(
+            ids,
+            functools.partial(self._realtime_one, realtime, bbox=bbox),
+            label="storm",
+            on_failure=self._placeholder_fc,
         )
         written = [
             self._write(storm_id, collection)
@@ -879,12 +990,17 @@ class TropicalCyclone(AbstractDataSource):
         # fetched (one basin is the common case, so this mostly bounds the
         # returned feature count).
         collections = (
-            self._take_limited(
-                (
-                    self._nhc_btk_one(basin, years, window, bbox, listing)
-                    for basin in self.vars
+            self._fetch_with_policy(
+                list(self.vars),
+                functools.partial(
+                    self._nhc_btk_one,
+                    years=years,
+                    window=window,
+                    bbox=bbox,
+                    listing=listing,
                 ),
-                limit=self._limit,
+                label="basin",
+                on_failure=self._placeholder_btk,
             )
             if listing is not None
             else []
@@ -961,13 +1077,11 @@ class TropicalCyclone(AbstractDataSource):
         # Lazy so a `limit=` stops the work: a storm past the cap never has its
         # guidance pulled. Storms with no guidance are dropped before the cap
         # counts them, so `limit` bounds returned rows only.
-        frames = self._take_limited(
-            (
-                frame
-                for frame in (self._ships_one(product, init) for product in products)
-                if frame is not None
-            ),
-            limit=self._limit,
+        frames = self._fetch_with_policy(
+            products,
+            functools.partial(self._ships_one, init=init),
+            label="storm",
+            drop_none=True,
         )
         # Written after the cap, so a storm the cap lands inside has the same
         # rows on disk as in the returned frame. Each frame carries its own

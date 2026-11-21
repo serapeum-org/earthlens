@@ -47,7 +47,22 @@ if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
     from earthlens.ecmwf import Variable
 
-__all__ = ["S3"]
+__all__ = ["S3", "BucketNotFoundError"]
+
+
+class BucketNotFoundError(RuntimeError):
+    """The requested S3 bucket does not exist (a `NoSuchBucket` error).
+
+    A subclass of `RuntimeError` (so existing `except RuntimeError` callers keep
+    working) given its own type so the partial-failure policy can treat it as
+    `fatal`: a missing bucket is a whole-request problem — a dataset / bucket
+    typo — not the per-object gap that `errors="warn"` exists to absorb.
+    """
+
+
+def _describe_object(product: RemoteProduct) -> str:
+    """Render an S3 product for the `_run_items` log lines (its key / id)."""
+    return repr(product.href or product.id)
 
 
 @dataclass(frozen=True)
@@ -299,7 +314,7 @@ class S3(AbstractDataSource):
                     f"access denied for s3://{bucket}/{product.href}.{hint}"
                 ) from exc
             if code == "NoSuchBucket":
-                raise RuntimeError(
+                raise BucketNotFoundError(
                     f"bucket not found: s3://{bucket} (check the dataset / bucket name)."
                 ) from exc
             raise RuntimeError(
@@ -311,27 +326,71 @@ class S3(AbstractDataSource):
         """Download each product (idempotent) and crop it to the AOI.
 
         Objects that are absent (e.g. Copernicus DEM / WorldCover tiles
-        over ocean) are skipped; if every product is missing, a
-        `RuntimeError` is raised so a wholly empty result is not silently
-        returned.
+        over ocean) are skipped — an absent item, not a failure. The
+        per-object downloads are otherwise independent, so each is run under
+        the `self._errors` partial-failure policy. A whole-request problem
+        (denied credentials, a missing bucket) is `fatal` and always
+        propagates, whatever the policy.
+
+        Args:
+            products: The planned products from `_search`.
+
+        Returns:
+            list[Path]: The cropped output paths of the objects that
+                succeeded.
+
+        Raises:
+            PermissionError: If access is denied (fatal — a credential
+                problem, not a per-object gap).
+            BucketNotFoundError: If the bucket does not exist (fatal).
+            RuntimeError: If every planned object is absent (a wholly empty
+                result is raised rather than returned), or — under any policy —
+                when every attempted object fails with a transport error.
         """
-        client = self._auth.client()
-        raw_dir = self._raw_dir()
         self._warn_cross_region_egress(products)
-        written: list[Path] = []
-        missing = 0
-        for product in tqdm(products, desc="amazon-s3", disable=not products):
-            raw = self._download_raw(client, product, raw_dir)
-            if raw is None:
-                missing += 1
-                continue
-            written.append(self._localise(raw, product))
+        results, failures = self._run_items(
+            tqdm(products, desc="amazon-s3", disable=not products),
+            self._fetch_one,
+            errors=self._errors,
+            label="object",
+            describe=_describe_object,
+            fatal=(PermissionError, BucketNotFoundError),
+        )
+        # `_fetch_one` returns `None` for an absent object (404 / NoSuchKey),
+        # which is a skip, not a failure.
+        written = [path for path in results if path is not None]
+        missing = len(results) - len(written)
+        if failures and not written:
+            # Every attempted object failed with a (non-fatal) transport error
+            # and nothing was written — re-raise the first rather than return
+            # an empty list.
+            raise failures[0][1]
         if not written and missing:
             raise RuntimeError(
                 f"none of the {missing} planned object(s) exist for this "
                 "request; check the bbox / date window / variables."
             )
         return written
+
+    def _fetch_one(self, product: RemoteProduct) -> Path | None:
+        """Download and localise one S3 object, or `None` when it is absent.
+
+        Args:
+            product: One `RemoteProduct` from `_search`.
+
+        Returns:
+            Path | None: The cropped output path, or `None` when the object
+                is absent (404 / NoSuchKey).
+
+        Raises:
+            PermissionError: If access is denied (fatal).
+            BucketNotFoundError: If the bucket does not exist (fatal).
+            RuntimeError: On any other download failure.
+        """
+        raw = self._download_raw(self._auth.client(), product, self._raw_dir())
+        if raw is None:
+            return None
+        return self._localise(raw, product)
 
     def _warn_cross_region_egress(self, products: list[RemoteProduct]) -> None:
         """Warn once before a large cross-region pull, when sizes are known.
@@ -509,7 +568,10 @@ class S3(AbstractDataSource):
     # -- public API ----------------------------------------------------
 
     def download(
-        self, progress_bar: bool = True, aggregate: AggregationConfig | None = None
+        self,
+        progress_bar: bool = True,
+        aggregate: AggregationConfig | None = None,
+        errors: str = "warn",
     ) -> list[Path]:
         """Download every planned product, cropped to the AOI.
 
@@ -519,6 +581,22 @@ class S3(AbstractDataSource):
                 datasets (currently ERA5) — each raw granule is run through
                 `aggregate_netcdf` to emit per-window GeoTIFFs. Rejected for
                 COG datasets.
+            errors: Partial-failure policy across the independent objects:
+
+                * `"warn"` (default) — log each failed object and return the
+                  paths of the objects that succeeded, with a summary.
+                * `"raise"` — propagate the first object failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed objects silently.
+
+                An absent object (404 / NoSuchKey) is always skipped, under
+                every policy. A whole-request failure — denied credentials
+                (`PermissionError`) or a missing bucket (`BucketNotFoundError`)
+                — always propagates, whatever the policy. When every attempted
+                object fails with a transport error, or every planned object is
+                absent, a wholly empty result is raised rather than returned.
+                The policy applies to the direct-download path only, not to
+                `aggregate=`.
 
         Returns:
             The cropped output paths, or — when `aggregate` is set — the
@@ -527,6 +605,7 @@ class S3(AbstractDataSource):
         Raises:
             NotImplementedError: If `aggregate` is given for a COG dataset.
         """
+        self._errors = self.check_errors_policy(errors)
         if aggregate is not None and self._dataset.format != "netcdf":
             raise NotImplementedError(
                 "aggregate= is only supported for NetCDF datasets "

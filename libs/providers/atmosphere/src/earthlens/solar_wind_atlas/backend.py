@@ -47,6 +47,11 @@ from earthlens.solar_wind_atlas.catalog import Catalog, Layer
 _GSA_DOWNLOAD_NOTE = "~2.7 GB per variable (1 km)"
 
 
+def _describe_layer(product: RemoteProduct) -> str:
+    """Render a layer product for the `_run_items` log lines (its id)."""
+    return repr(product.id)
+
+
 class SolarWindAtlas(AbstractDataSource):
     """Global Solar Atlas + Global Wind Atlas layers, bbox-subset to GeoTIFF.
 
@@ -207,15 +212,35 @@ class SolarWindAtlas(AbstractDataSource):
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
         """Fetch every product by its transport, writing one GeoTIFF each.
 
+        The per-layer fetches are independent, so each is run under the
+        `self._errors` partial-failure policy.
+
         Args:
             products: The list from `_search`.
 
         Returns:
-            list[Path]: The written GeoTIFF path(s), in `products` order.
-        """
-        return [self._fetch_one_layer(product) for product in products]
+            list[Path]: The written GeoTIFF path(s) of the layers that
+                succeeded, in `products` order.
 
-    def _fetch_one_layer(self, product: RemoteProduct) -> Path:
+        Raises:
+            Exception: The first layer's error when `errors="raise"`, or —
+                under any policy — when **every** layer fails (a whole-service
+                failure re-raised rather than returned as an empty list).
+        """
+        results, failures = self._run_items(
+            products,
+            self._fetch_one,
+            errors=self._errors,
+            label="layer",
+            describe=_describe_layer,
+        )
+        if failures and not results:
+            # Every layer failed — a dead atlas host, not a per-layer gap.
+            # Re-raise the first error rather than return an empty list.
+            raise failures[0][1]
+        return results
+
+    def _fetch_one(self, product: RemoteProduct) -> Path:
         """Fetch one layer's bbox window as a GeoTIFF by its declared transport.
 
         Wind layers (`transport="vsicurl"`) are read windowed from the remote
@@ -245,15 +270,30 @@ class SolarWindAtlas(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
+        errors: str = "warn",
     ) -> list[Path]:
         """Fetch every requested layer's bbox subset as a written GeoTIFF.
 
         Args:
             progress_bar: Accepted for signature parity; one fetch per layer.
+            errors: Partial-failure policy across the independent layers:
+
+                * `"warn"` (default) — log each failed layer and return the
+                  paths of the layers that succeeded, with a summary.
+                * `"raise"` — propagate the first layer failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed layers silently.
+
+                When every layer fails — a dead atlas host, not a per-layer gap
+                — the first error is re-raised under every policy rather than
+                returned as an empty list; a partial failure still returns the
+                survivors under `"warn"`/`"ignore"`.
 
         Returns:
-            list[Path]: The written GeoTIFF path(s), one per requested layer.
+            list[Path]: The written GeoTIFF path(s), one per requested layer
+                that succeeded.
         """
+        self._errors = self.check_errors_policy(errors)
         self._warn_large_downloads()
         paths = cast("list[Path]", self._api())
         self._log_attribution()

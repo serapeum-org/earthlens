@@ -900,3 +900,90 @@ class TestNhcBtkLimit:
         assert frames_spy.basins_seen == ["north_atlantic"]
         written = gpd.read_file(tmp_path / "tropycal_nhc_btk_north_atlantic_point.gpkg")
         assert len(written) == 2
+
+
+class _RaiseFromCall:
+    """A `_query_one` stand-in: delegate to the real one, raise `exc` from `from_call`.
+
+    Hoisted to module scope (no nested functions); holds its own call counter.
+    `from_call=2` fails the second basin (a partial failure); `from_call=1`
+    fails every basin (a whole-service failure).
+    """
+
+    def __init__(self, real_fetch, exc, from_call=2):
+        self._real = real_fetch
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, product):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(product)
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent basins."""
+
+    def _two_basin_backend(self, tmp_path, monkeypatch, exc, from_call=2):
+        """A besttrack backend over two basins, failing `_query_one` from `from_call`."""
+        backend = _backend(tmp_path, variables=["north_atlantic", "east_pacific"])
+        assert len(backend._search()) == 2, "two basins should plan two products"
+        monkeypatch.setattr(
+            backend, "_query_one", _RaiseFromCall(backend._query_one, exc, from_call)
+        )
+        return backend
+
+    def test_raise_propagates_first_failure(self, tmp_path, fake_tropycal, monkeypatch):
+        """errors="raise" surfaces a per-basin exception, not the batch summary."""
+        backend = self._two_basin_backend(
+            tmp_path, monkeypatch, ValueError("basin boom")
+        )
+        with pytest.raises(ValueError, match="basin boom"):
+            backend.download(errors="raise")
+
+    def test_warn_returns_the_surviving_basin(
+        self, tmp_path, fake_tropycal, monkeypatch
+    ):
+        """errors="warn" drops a per-basin failure and returns the survivor's features."""
+        backend = self._two_basin_backend(
+            tmp_path, monkeypatch, ValueError("basin boom")
+        )
+        result = backend.download(errors="warn")
+        assert isinstance(result, gpd.GeoDataFrame)
+        assert len(result) > 0, "the surviving basin's tracks should be returned"
+
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, tmp_path, fake_tropycal, monkeypatch
+    ):
+        """errors="ignore" drops a per-basin failure silently."""
+        backend = self._two_basin_backend(
+            tmp_path, monkeypatch, ValueError("basin boom")
+        )
+        assert len(backend.download(errors="ignore")) > 0
+
+    def test_default_policy_is_warn(self, tmp_path, fake_tropycal, monkeypatch):
+        """Omitting errors= defaults to warn — a per-basin failure is survived."""
+        backend = self._two_basin_backend(
+            tmp_path, monkeypatch, ValueError("basin boom")
+        )
+        assert len(backend.download()) > 0
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_basin_failing_raises(
+        self, tmp_path, fake_tropycal, policy, monkeypatch
+    ):
+        """When every basin fails, the first error is raised — never a silent empty."""
+        backend = self._two_basin_backend(
+            tmp_path, monkeypatch, ValueError("all basins down"), from_call=1
+        )
+        with pytest.raises(ValueError, match="all basins down"):
+            backend.download(errors=policy)
+
+    def test_invalid_policy_rejected(self, tmp_path):
+        """An unrecognised errors= value is refused before any request."""
+        backend = _backend(tmp_path)
+        with pytest.raises(ValueError, match="errors"):
+            backend.download(errors="explode")
