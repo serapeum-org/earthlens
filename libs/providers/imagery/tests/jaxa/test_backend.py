@@ -169,3 +169,107 @@ def test_unknown_temporal_resolution_rejected(base_kwargs) -> None:
     kwargs = {k: v for k, v in base_kwargs.items() if k != "temporal_resolution"}
     with pytest.raises(ValueError, match="is not supported by JAXA"):
         JAXA(variables=["elevation"], temporal_resolution="nonsense", **kwargs)
+
+
+class _StubFetch:
+    """A `_fetch_dataset` stand-in: return a dummy path, raise `exc` from `from_call`.
+
+    Holds its own call counter; `from_call=2` fails the second dataset (a
+    partial failure), `from_call=1` fails every dataset (a whole-service
+    failure).
+    """
+
+    def __init__(self, exc, from_call=2):
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, dataset):
+        """Return one fabricated path per dataset until `from_call`, then raise."""
+        from pathlib import Path
+
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return [Path(f"{dataset.key}.tif")]
+
+
+@pytest.mark.jaxa
+@pytest.mark.unit
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent datasets."""
+
+    _TWO = ["alos2-fnf", "amsr2-seaice-north-daily"]
+
+    def _two_dataset_backend(self, base_kwargs, monkeypatch, exc, from_call=2):
+        """A jaxa-earth backend over two datasets, raising `exc` from `from_call`."""
+        backend = JAXA(variables=list(self._TWO), **base_kwargs)
+        assert len(backend._resolved) == 2
+        monkeypatch.setattr(backend, "_fetch_dataset", _StubFetch(exc, from_call))
+        return backend
+
+    def test_raise_propagates_first_failure(self, base_kwargs, monkeypatch) -> None:
+        """errors="raise" surfaces a per-dataset exception, not the batch summary."""
+        backend = self._two_dataset_backend(
+            base_kwargs, monkeypatch, ValueError("dataset boom")
+        )
+        with pytest.raises(ValueError, match="dataset boom"):
+            backend.download(errors="raise")
+
+    def test_warn_returns_the_surviving_dataset(self, base_kwargs, monkeypatch) -> None:
+        """errors="warn" drops a non-fatal per-dataset failure and returns survivors."""
+        backend = self._two_dataset_backend(
+            base_kwargs, monkeypatch, ValueError("dataset boom")
+        )
+        written = backend.download(errors="warn")
+        assert [p.name for p in written] == ["alos2-fnf.tif"], (
+            f"expected the surviving dataset's path, got {written}"
+        )
+
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, base_kwargs, monkeypatch
+    ) -> None:
+        """errors="ignore" drops a non-fatal per-dataset failure silently."""
+        backend = self._two_dataset_backend(
+            base_kwargs, monkeypatch, ValueError("dataset boom")
+        )
+        written = backend.download(errors="ignore")
+        assert [p.name for p in written] == ["alos2-fnf.tif"]
+
+    def test_default_policy_is_warn(self, base_kwargs, monkeypatch) -> None:
+        """Omitting errors= defaults to warn — a non-fatal dataset failure survives."""
+        backend = self._two_dataset_backend(
+            base_kwargs, monkeypatch, ValueError("dataset boom")
+        )
+        written = backend.download()
+        assert [p.name for p in written] == ["alos2-fnf.tif"]
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_auth_error_propagates_under_any_policy(
+        self, base_kwargs, monkeypatch, policy
+    ) -> None:
+        """A whole-service AuthenticationError propagates even under warn/ignore."""
+        from earthlens.jaxa import AuthenticationError
+
+        backend = self._two_dataset_backend(
+            base_kwargs, monkeypatch, AuthenticationError("creds revoked"), from_call=1
+        )
+        with pytest.raises(AuthenticationError, match="creds revoked"):
+            backend.download(errors=policy)
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_dataset_failing_raises_non_fatal(
+        self, base_kwargs, monkeypatch, policy
+    ) -> None:
+        """When every dataset fails, the first error is raised, never empty."""
+        backend = self._two_dataset_backend(
+            base_kwargs, monkeypatch, ValueError("all datasets down"), from_call=1
+        )
+        with pytest.raises(ValueError, match="all datasets down"):
+            backend.download(errors=policy)
+
+    def test_invalid_policy_rejected(self, base_kwargs) -> None:
+        """An unrecognised errors= value is refused before any fetch."""
+        backend = JAXA(variables=["elevation"], **base_kwargs)
+        with pytest.raises(ValueError, match="errors"):
+            backend.download(errors="explode")

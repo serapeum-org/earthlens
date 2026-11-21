@@ -215,7 +215,7 @@ class TestReaderRefusalTypes:
         monkeypatch.setitem(sys.modules, "pyramids_eo.earthengine", None)
         gee = make_gee(engine="eedai")
         with pytest.raises(ImportError, match=r"pip install earthlens\[eedai\]"):
-            gee.download(progress_bar=False)
+            gee.download(progress_bar=False, errors="raise")
 
 
 class TestEeEngine:

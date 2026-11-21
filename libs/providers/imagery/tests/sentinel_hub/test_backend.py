@@ -222,7 +222,7 @@ class TestProcessFetch:
             api="process",
         )
         with pytest.raises(ValueError, match="plain collection"):
-            backend.download()
+            backend.download(errors="raise")
 
     def test_forced_process_on_oversized_raises(self, fake_sh, output_dir: Path):
         """Forcing `api='process'` on an oversized render raises the size guard."""
@@ -240,3 +240,110 @@ class TestProcessFetch:
         )
         with pytest.raises(ValueError, match="Process API caps"):
             backend.download()
+
+
+class _RaiseFromCall:
+    """A `_process_one` stand-in: delegate to the real one, raise `exc` from `from_call`.
+
+    Holds its own call counter; `from_call=2` fails the second product (a
+    partial failure), `from_call=1` fails every product (a whole-service
+    failure).
+    """
+
+    def __init__(self, real, exc, from_call=2):
+        self._real = real
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, product, **kwargs):
+        """Delegate until `from_call`, then raise `exc` on that product onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(product, **kwargs)
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent products (process plane)."""
+
+    def _two_product_backend(self, fake_sh, output_dir, monkeypatch, exc, from_call=2):
+        """A process-plane backend over two products, raising `exc` from `from_call`."""
+        backend = _make_backend(
+            {"sentinel-2-l2a-ndvi": []}, output_dir, client_id="a", client_secret="b"
+        )
+        products = backend._search()
+        products = products * 2
+        monkeypatch.setattr(backend, "_search", lambda: list(products))
+        monkeypatch.setattr(
+            backend,
+            "_process_one",
+            _RaiseFromCall(backend._process_one, exc, from_call),
+        )
+        return backend
+
+    def test_raise_propagates_first_failure(self, fake_sh, output_dir, monkeypatch):
+        """errors="raise" surfaces a per-product exception, not the batch summary."""
+        backend = self._two_product_backend(
+            fake_sh, output_dir, monkeypatch, ValueError("product boom")
+        )
+        with pytest.raises(ValueError, match="product boom"):
+            backend.download(errors="raise")
+
+    def test_warn_returns_the_surviving_product(self, fake_sh, output_dir, monkeypatch):
+        """errors="warn" drops a non-fatal per-product failure and returns survivors."""
+        backend = self._two_product_backend(
+            fake_sh, output_dir, monkeypatch, ValueError("product boom")
+        )
+        paths = backend.download(errors="warn")
+        assert len(paths) == 1, f"expected the one surviving product, got {paths}"
+
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, fake_sh, output_dir, monkeypatch
+    ):
+        """errors="ignore" drops a non-fatal per-product failure silently."""
+        backend = self._two_product_backend(
+            fake_sh, output_dir, monkeypatch, ValueError("product boom")
+        )
+        paths = backend.download(errors="ignore")
+        assert len(paths) == 1
+
+    def test_default_policy_is_warn(self, fake_sh, output_dir, monkeypatch):
+        """Omitting errors= defaults to warn — a non-fatal product failure survives."""
+        backend = self._two_product_backend(
+            fake_sh, output_dir, monkeypatch, ValueError("product boom")
+        )
+        paths = backend.download()
+        assert len(paths) == 1
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_auth_error_propagates_under_any_policy(
+        self, fake_sh, output_dir, monkeypatch, policy
+    ):
+        """A whole-service AuthenticationError propagates even under warn/ignore."""
+        from earthlens.base import AuthenticationError
+
+        backend = self._two_product_backend(
+            fake_sh, output_dir, monkeypatch, AuthenticationError("creds revoked"), 1
+        )
+        with pytest.raises(AuthenticationError, match="creds revoked"):
+            backend.download(errors=policy)
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_product_failing_raises_non_fatal(
+        self, fake_sh, output_dir, monkeypatch, policy
+    ):
+        """When every process product fails, the first error is raised, never empty."""
+        backend = self._two_product_backend(
+            fake_sh, output_dir, monkeypatch, ValueError("all products down"), 1
+        )
+        with pytest.raises(ValueError, match="all products down"):
+            backend.download(errors=policy)
+
+    def test_invalid_policy_rejected(self, fake_sh, output_dir):
+        """An unrecognised errors= value is refused before any request."""
+        backend = _make_backend(
+            {"sentinel-2-l2a-ndvi": []}, output_dir, client_id="a", client_secret="b"
+        )
+        with pytest.raises(ValueError, match="errors"):
+            backend.download(errors="explode")

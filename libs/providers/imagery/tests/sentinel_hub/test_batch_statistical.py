@@ -16,6 +16,8 @@ import pytest
 
 from earthlens.sentinel_hub.backend import SentinelHub
 
+from .test_backend import _RaiseFromCall
+
 pytestmark = pytest.mark.sentinel_hub
 
 _BATCH = {
@@ -72,3 +74,18 @@ class TestBatchStatistical:
         client = fake_sh.SentinelHubBatchStatistical.instances[-1]
         assert client.created["input_features"]["url"] == "s3://bkt/farms.gpkg"
         assert client.created["output"]["url"] == "s3://bkt/out"
+
+
+@pytest.mark.parametrize("policy", ["warn", "ignore"])
+def test_every_product_failing_raises_non_fatal(
+    fake_sh, output_dir: Path, monkeypatch, policy
+):
+    """When every batch-statistical product fails, the first error is raised, never empty."""
+    backend = _bstat_backend(output_dir)
+    monkeypatch.setattr(
+        backend,
+        "_batch_statistical_one",
+        _RaiseFromCall(backend._batch_statistical_one, ValueError("all bstat down"), 1),
+    )
+    with pytest.raises(ValueError, match="all bstat down"):
+        backend.download(errors=policy)

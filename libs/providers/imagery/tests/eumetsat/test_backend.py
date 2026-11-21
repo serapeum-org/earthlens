@@ -6,14 +6,16 @@ from pathlib import Path
 
 import pytest
 
-from earthlens.eumetsat import EUMETSAT
+from earthlens.base import AuthenticationError
+from earthlens.eumetsat import EUMETSAT, TailorConfig
 from earthlens.eumetsat.catalog import DataStoreGroup
 
-from .conftest import _FakeProduct
+from .conftest import _FakeCustomisation, _FakeProduct
 
 pytestmark = pytest.mark.eumetsat
 
 _CREDS = {"consumer_key": "k", "consumer_secret": "s"}
+_OLCI = "EO:EUM:DAT:0409"  # s3-olci-l1-efr, tailor_product_type OLL1EFR
 
 
 def _make_backend(fake_eumdac, tmp_path, variables, **kwargs):
@@ -260,3 +262,130 @@ def test_search_without_eumdac_raises_friendly_import_error(tmp_path, monkeypatc
     monkeypatch.setitem(sys.modules, "eumdac", None)  # force ImportError on re-import
     with pytest.raises(ImportError, match=r"earthlens\[eumetsat\]"):
         backend._search()
+
+
+class _RaiseFromCall:
+    """A `_fetch_one` / `_tailor_one` stand-in raising `exc` from `from_call`.
+
+    Holds its own call counter; `from_call=2` fails the second product (a
+    partial failure), `from_call=1` fails every product (a whole-service
+    failure).
+    """
+
+    def __init__(self, real, exc, from_call=2):
+        self._real = real
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, *args, **kwargs):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(*args, **kwargs)
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent products."""
+
+    def _two_product_backend(
+        self, fake_eumdac, tmp_path, monkeypatch, exc, from_call=2
+    ):
+        """A native backend over two products, raising `exc` from `from_call`."""
+        fake_eumdac.store.products_for["EO:EUM:DAT:MSG:HRSEVIRI"] = [
+            _FakeProduct("alpha", b"AAAA"),
+            _FakeProduct("beta", b"BBBB"),
+        ]
+        backend = _make_backend(fake_eumdac, tmp_path, {"msg-hrseviri": ["HRSEVIRI"]})
+        monkeypatch.setattr(
+            backend, "_fetch_one", _RaiseFromCall(backend._fetch_one, exc, from_call)
+        )
+        return backend
+
+    def test_raise_propagates_first_failure(self, fake_eumdac, tmp_path, monkeypatch):
+        """errors="raise" surfaces a per-product exception, not the batch summary."""
+        backend = self._two_product_backend(
+            fake_eumdac, tmp_path, monkeypatch, ValueError("product boom")
+        )
+        with pytest.raises(ValueError, match="product boom"):
+            backend.download(progress_bar=False, errors="raise")
+
+    def test_warn_returns_the_surviving_product(
+        self, fake_eumdac, tmp_path, monkeypatch
+    ):
+        """errors="warn" drops a non-fatal per-product failure and returns survivors."""
+        backend = self._two_product_backend(
+            fake_eumdac, tmp_path, monkeypatch, ValueError("product boom")
+        )
+        paths = backend.download(progress_bar=False, errors="warn")
+        assert [p.name for p in paths] == ["alpha"], (
+            f"expected the one surviving product, got {[p.name for p in paths]}"
+        )
+
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, fake_eumdac, tmp_path, monkeypatch
+    ):
+        """errors="ignore" drops a non-fatal per-product failure silently."""
+        backend = self._two_product_backend(
+            fake_eumdac, tmp_path, monkeypatch, ValueError("product boom")
+        )
+        paths = backend.download(progress_bar=False, errors="ignore")
+        assert [p.name for p in paths] == ["alpha"]
+
+    def test_default_policy_is_warn(self, fake_eumdac, tmp_path, monkeypatch):
+        """Omitting errors= defaults to warn — a non-fatal product failure survives."""
+        backend = self._two_product_backend(
+            fake_eumdac, tmp_path, monkeypatch, ValueError("product boom")
+        )
+        paths = backend.download(progress_bar=False)
+        assert [p.name for p in paths] == ["alpha"]
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_product_failing_raises(
+        self, fake_eumdac, tmp_path, monkeypatch, policy
+    ):
+        """When every native product fails, the first error is raised, never empty."""
+        backend = self._two_product_backend(
+            fake_eumdac, tmp_path, monkeypatch, ValueError("all down"), from_call=1
+        )
+        with pytest.raises(ValueError, match="all down"):
+            backend.download(progress_bar=False, errors=policy)
+
+    def test_invalid_policy_rejected(self, fake_eumdac, tmp_path):
+        """An unrecognised errors= value is refused before any request."""
+        backend = _make_backend(fake_eumdac, tmp_path, {"msg-hrseviri": ["HRSEVIRI"]})
+        with pytest.raises(ValueError, match="errors"):
+            backend.download(progress_bar=False, errors="explode")
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_tailor_auth_error_propagates_under_any_policy(
+        self, fake_eumdac, tmp_path, monkeypatch, policy
+    ):
+        """A whole-service AuthenticationError on the tailor path is fatal under any policy."""
+        fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1"), _FakeProduct("p2")]
+        fake_eumdac.tailor.customisation = _FakeCustomisation(statuses=["DONE"])
+        backend = _make_backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+        monkeypatch.setattr(
+            backend,
+            "_tailor_one",
+            _RaiseFromCall(backend._tailor_one, AuthenticationError("key revoked"), 1),
+        )
+        with pytest.raises(AuthenticationError, match="key revoked"):
+            backend.download(progress_bar=False, tailor=TailorConfig(), errors=policy)
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_tailor_every_product_failing_raises_non_fatal(
+        self, fake_eumdac, tmp_path, monkeypatch, policy
+    ):
+        """When every tailor product fails, the first error is raised, never empty."""
+        fake_eumdac.store.products_for[_OLCI] = [_FakeProduct("p1"), _FakeProduct("p2")]
+        fake_eumdac.tailor.customisation = _FakeCustomisation(statuses=["DONE"])
+        backend = _make_backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
+        monkeypatch.setattr(
+            backend,
+            "_tailor_one",
+            _RaiseFromCall(backend._tailor_one, ValueError("all tailors down"), 1),
+        )
+        with pytest.raises(ValueError, match="all tailors down"):
+            backend.download(progress_bar=False, tailor=TailorConfig(), errors=policy)
