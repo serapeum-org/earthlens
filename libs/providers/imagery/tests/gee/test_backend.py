@@ -293,10 +293,12 @@ class _FakePyramidsHandle:
 
         _Path(path).write_bytes(self._body)
 
-    @property
-    def cog(self):
-        """Stand in for `Dataset.cog`, which the pixel path writes through."""
-        return _FakeCogWriter(self)
+    def to_cog(self, path, **kwargs):
+        """Stand in for the `Dataset.to_cog` facade the pixel path writes through."""
+        self.written = str(path)
+        self.wrote_cog = True
+        Path(path).write_bytes(self._body)
+        return Path(path)
 
     opened_handles: list[_FakePyramidsHandle] = []
     closed_handles: list[_FakePyramidsHandle] = []
@@ -2408,28 +2410,19 @@ class _FakePolygonAoi:
         return out
 
 
-class _FakeCogWriter:
-    """Stand-in for `Dataset.cog`, recording `to_cog` writes."""
-
-    def __init__(self, dataset):
-        self._dataset = dataset
-
-    def to_cog(self, path, **kwargs):
-        self._dataset.written = str(path)
-        self._dataset.wrote_cog = True
-        # The pixel path's handle carries the fetched bytes, so write those when
-        # there are any; the EEDAI dataset has none and keeps its marker.
-        Path(path).write_bytes(getattr(self._dataset, "_body", b"eedai-cog"))
-        return Path(path)
-
-
 class _FakeEedaiDataset:
     """Stand-in for the pyramids `Dataset` the EEDAI reader returns."""
 
     def __init__(self):
         self.written: str | None = None
         self.wrote_cog = False
-        self.cog = _FakeCogWriter(self)
+
+    def to_cog(self, path, **kwargs):
+        """Stand in for the `Dataset.to_cog` facade, recording the COG write."""
+        self.written = str(path)
+        self.wrote_cog = True
+        Path(path).write_bytes(b"eedai-cog")
+        return Path(path)
 
     def to_file(self, path):
         self.written = str(path)
@@ -4050,7 +4043,7 @@ class TestExportViaEedai:
         assert fake_reader.dataset.wrote_cog is False
 
     def test_cog_option_writes_a_cloud_optimized_geotiff(self, make_gee, fake_reader):
-        """`cog=True` routes the write through `Dataset.cog.to_cog`."""
+        """`cog=True` routes the write through the `Dataset.to_cog` facade."""
         gee = make_gee(cog=True)
         assert gee.cog is True
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
@@ -4265,7 +4258,7 @@ class TestExportViaEedai:
         """
         gee = make_gee(cog=True)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        fake_reader.dataset.cog.to_cog = _cog_then_fail
+        fake_reader.dataset.to_cog = _cog_then_fail
         plan = _plan_for(gee, var_info)
         with pytest.raises(RuntimeError, match="cog conversion failed"):
             gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev", plan)
