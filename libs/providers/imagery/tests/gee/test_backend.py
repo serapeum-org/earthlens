@@ -277,6 +277,10 @@ class _FakePyramidsHandle:
     def __init__(self, body: bytes, no_data_value=(None,)):
         _FakePyramidsHandle.opened_handles.append(self)
         self._body = body
+        # Declared up front (symmetric with _FakeEedaiDataset) so the COG-write
+        # markers read as "not written yet" before to_cog runs, not AttributeError.
+        self.written: str | None = None
+        self.wrote_cog = False
         # Real getDownloadURL tiles declare no no-data; the backend reads this
         # to inherit it rather than letting merge_rasters stamp its 0 default.
         self.no_data_value = no_data_value
