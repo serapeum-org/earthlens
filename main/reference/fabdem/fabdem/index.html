@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -25815,7 +25815,8 @@ facade reads it to gate <code>aggregate=</code> (rejected — FABDEM is static).
 <span class="normal"><a href="#__codelineno-0-388">388</a></span>
 <span class="normal"><a href="#__codelineno-0-389">389</a></span>
 <span class="normal"><a href="#__codelineno-0-390">390</a></span>
-<span class="normal"><a href="#__codelineno-0-391">391</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="k">class</span><span class="w"> </span><span class="nc">FABDEM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-391">391</a></span>
+<span class="normal"><a href="#__codelineno-0-392">392</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="k">class</span><span class="w"> </span><span class="nc">FABDEM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;FABDEM V1-2 bare-earth DEM backend (raster GeoTIFF output).</span>
 <a id="__codelineno-0-54" name="__codelineno-0-54"></a>
 <a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">    Fetches the ~30 m global bare-earth DEM subset to the request bbox from the</span>
@@ -25971,190 +25972,191 @@ facade reads it to gate <code>aggregate=</code> (rejected — FABDEM is static).
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the FABDEM DEM subset as one AOI-cropped GeoTIFF.</span>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a>
 <a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        Emits a `LicenseWarning` (FABDEM is CC-BY-NC-SA 4.0, non-commercial)</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        before any download.</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            progress_bar: Accepted for signature parity; one request per call.</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            force: Re-fetch even when a complete output already exists,</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">                bypassing the skip-if-exists check. Defaults to `False`.</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">            list[Path]: The single written GeoTIFF path (`fabdem_&lt;version&gt;.tif`).</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">            ValueError: If the AOI intersects no published FABDEM land tile</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">                (an ocean-only area).</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_force</span> <span class="o">=</span> <span class="n">force</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a>        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>        <span class="c1"># Warn about the non-commercial licence only once the data has actually</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>        <span class="c1"># been fetched, so a request that resolves to nothing (e.g. an ocean-only</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>        <span class="c1"># AOI, which raises in `_fetch`) does not print a spurious warning.</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a>        <span class="n">warn_license</span><span class="p">(</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">license_id</span><span class="p">,</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a>            <span class="s2">&quot;fabdem&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>            <span class="n">detail</span><span class="o">=</span><span class="p">(</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a>                <span class="s2">&quot;FABDEM V1-2 is CC-BY-NC-SA 4.0: non-commercial use only, &quot;</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>                <span class="sa">f</span><span class="s2">&quot;and every product must cite </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">commercial_contact</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>            <span class="p">),</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>        <span class="p">)</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>        <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve the AOI to one `RemoteProduct` per intersecting 10° bundle.</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        No network: each product carries its bundle `.zip` URL and the 1° tile</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        member names to extract in `metadata`.</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            list[RemoteProduct]: The download plan, one per bundle.</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            ValueError: If the AOI intersects no FABDEM land cell. (An</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">                antimeridian-crossing `west &gt; east` AOI is already rejected by</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">                `SpatialExtent` at construction.)</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>        <span class="n">plan</span> <span class="o">=</span> <span class="n">bundles_for_bbox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="p">)</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">plan</span><span class="p">:</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>                <span class="sa">f</span><span class="s2">&quot;no FABDEM land tiles intersect the AOI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="si">}</span><span class="s2">; the area &quot;</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>                <span class="s2">&quot;may be entirely ocean or outside the -90..90 / -180..180 grid.&quot;</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a>            <span class="p">)</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>        <span class="k">return</span> <span class="p">[</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>            <span class="n">RemoteProduct</span><span class="p">(</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a>                <span class="nb">id</span><span class="o">=</span><span class="n">bundle</span><span class="p">,</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a>                <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;bundle&quot;</span><span class="p">:</span> <span class="n">bundle</span><span class="p">,</span> <span class="s2">&quot;tiles&quot;</span><span class="p">:</span> <span class="n">tiles</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">bundle_url</span><span class="p">(</span><span class="n">bundle</span><span class="p">)},</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>            <span class="p">)</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>            <span class="k">for</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">tiles</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="p">]</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download the bundles, extract the tiles, mosaic + crop to one GeoTIFF.</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">        Idempotent: a complete output for this AOI is returned without</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        re-downloading (unless `force`). Downloaded bundle `.zip`s are **kept**</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        in the cache (`.fabdem_cache/`), so a later AOI in the same 10° block</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">        extracts the tiles it needs from the cached zip without re-fetching, and</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        an ocean-only 1° cell absent from the archive simply stays absent.</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        Ocean-only bundles (`404`) are skipped; an AOI that yields no tile at all</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        raises rather than writing an empty raster.</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">            products: The plan from `_search`.</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">            list[Path]: The single written GeoTIFF path.</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">            ValueError: If no tile could be fetched for the AOI.</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_cached</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>                <span class="sa">f</span><span class="s2">&quot;FABDEM: </span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> already holds this AOI; skipping download.&quot;</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>            <span class="p">)</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>            <span class="k">return</span> <span class="p">[</span><span class="n">target</span><span class="p">]</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="n">tifs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="k">for</span> <span class="n">rp</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>            <span class="n">bundle</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;bundle&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="n">tiles</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;tiles&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>            <span class="c1"># Only the tiles this AOI needs and does not already have are</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>            <span class="c1"># extracted; the 0.8-2.4 GB bundle `.zip` is kept in the cache (not</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>            <span class="c1"># deleted), so a later AOI in the same 10° block extracts the tiles</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>            <span class="c1"># it needs from the cached zip without re-downloading — and an</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>            <span class="c1"># ocean-only 1° cell absent from the archive simply stays absent</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>            <span class="c1"># rather than forcing a re-fetch.</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>            <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">tiles</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()]</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>            <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>                <span class="n">zip_path</span> <span class="o">=</span> <span class="n">download_bundle</span><span class="p">(</span><span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="p">)</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>                <span class="k">if</span> <span class="n">zip_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>                        <span class="sa">f</span><span class="s2">&quot;FABDEM: bundle </span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2"> is not published (ocean-only &quot;</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>                        <span class="s2">&quot;block); skipping.&quot;</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>                    <span class="k">continue</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>                <span class="n">extract_tiles</span><span class="p">(</span><span class="n">zip_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="p">,</span> <span class="n">missing</span><span class="p">)</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>            <span class="n">tifs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">tiles</span> <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>            <span class="p">)</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">tifs</span><span class="p">:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>                <span class="sa">f</span><span class="s2">&quot;FABDEM: the AOI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="si">}</span><span class="s2"> intersects no published 1° tile &quot;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>                <span class="s2">&quot;(ocean-only area); nothing to write.&quot;</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>            <span class="p">)</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_localise</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">tifs</span><span class="p">),</span> <span class="n">target</span><span class="p">)]</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_localise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tifs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">target</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Mosaic the 1° tiles and crop to the AOI, writing one GeoTIFF.</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        The pyramids-consuming core: `merge_rasters` mosaics the intersecting 1°</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        COGs (FABDEM is already EPSG:4326, so no reprojection), then</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        `crop_to_aoi` clips to the AOI bbox — or to the exact polygon when the</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        request carried an `aoi=` polygon. The source no-data value is stamped on</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        the mosaic (`merge_rasters` otherwise defaults it to `0`, which would</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        wrongly mark every genuine 0 m sea-level cell as missing).</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">            tifs: The extracted 1° `.tif` tiles (WGS84).</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">            target: The destination GeoTIFF path.</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">            pathlib.Path: The AOI-cropped GeoTIFF at `target`.</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span> <span class="k">as</span> <span class="n">PyramidsDataset</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.merge</span><span class="w"> </span><span class="kn">import</span> <span class="n">merge_rasters</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="n">merged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="s2">&quot;fabdem_merged.tif&quot;</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="c1"># The 1° tiles share FABDEM&#39;s grid and CRS, so the mosaic is a straight</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="c1"># composite with no reprojection; nearest-neighbour keeps the exact</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>        <span class="c1"># source elevations and never blends real values with the -9999 no-data.</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>        <span class="n">merge_rasters</span><span class="p">(</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>            <span class="n">src</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tifs</span><span class="p">],</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>            <span class="n">dst</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">merged</span><span class="p">),</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>            <span class="n">dst_crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>            <span class="n">resampling</span><span class="o">=</span><span class="s2">&quot;nearest neighbor&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>            <span class="n">no_data_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">nodata</span><span class="p">,</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>        <span class="p">)</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="n">PyramidsDataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">merged</span><span class="p">))</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="n">cropped</span> <span class="o">=</span> <span class="n">crop_to_aoi</span><span class="p">(</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>            <span class="n">dataset</span><span class="p">,</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a>            <span class="n">bbox</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="p">],</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>            <span class="n">touch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="p">)</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>        <span class="c1"># Write through a sibling and rename, so a crash mid-write cannot leave a</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>        <span class="c1"># partial file the skip-if-exists check would accept. The real suffix is</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="c1"># kept — pyramids picks its driver from the extension.</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="n">staged</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">.part</span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>            <span class="n">cropped</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">staged</span><span class="p">))</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>            <span class="c1"># pyramids keeps the written dataset&#39;s GDAL handle open, which holds a</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>            <span class="c1"># Windows lock and blocks the rename; release it first.</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">cropped</span><span class="p">)</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>            <span class="n">staged</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">cropped</span><span class="p">)</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>            <span class="n">staged</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>            <span class="k">raise</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="k">finally</span><span class="p">:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>            <span class="c1"># Always drop the handle + the multi-GB merge intermediate, so a</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>            <span class="c1"># failed write does not strand `fabdem_merged.tif` in the cache. On</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>            <span class="c1"># Windows the GDAL handle can briefly outlive the Python object, so a</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>            <span class="c1"># still-locked file is left rather than raising.</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>                <span class="n">merged</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>                <span class="k">pass</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="n">write_sidecar</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">aoi_tag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">))</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="k">return</span> <span class="n">target</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        before any download. This backend issues a single request, so it</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        exposes no `errors=` partial-failure policy.</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            progress_bar: Accepted for signature parity; one request per call.</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            force: Re-fetch even when a complete output already exists,</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">                bypassing the skip-if-exists check. Defaults to `False`.</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            list[Path]: The single written GeoTIFF path (`fabdem_&lt;version&gt;.tif`).</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">            ValueError: If the AOI intersects no published FABDEM land tile</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">                (an ocean-only area).</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_force</span> <span class="o">=</span> <span class="n">force</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>        <span class="c1"># Warn about the non-commercial licence only once the data has actually</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>        <span class="c1"># been fetched, so a request that resolves to nothing (e.g. an ocean-only</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>        <span class="c1"># AOI, which raises in `_fetch`) does not print a spurious warning.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>        <span class="n">warn_license</span><span class="p">(</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">license_id</span><span class="p">,</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>            <span class="s2">&quot;fabdem&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>            <span class="n">detail</span><span class="o">=</span><span class="p">(</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>                <span class="s2">&quot;FABDEM V1-2 is CC-BY-NC-SA 4.0: non-commercial use only, &quot;</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>                <span class="sa">f</span><span class="s2">&quot;and every product must cite </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">commercial_contact</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a>            <span class="p">),</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>        <span class="p">)</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>        <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve the AOI to one `RemoteProduct` per intersecting 10° bundle.</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        No network: each product carries its bundle `.zip` URL and the 1° tile</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        member names to extract in `metadata`.</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            list[RemoteProduct]: The download plan, one per bundle.</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            ValueError: If the AOI intersects no FABDEM land cell. (An</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">                antimeridian-crossing `west &gt; east` AOI is already rejected by</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">                `SpatialExtent` at construction.)</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>        <span class="n">plan</span> <span class="o">=</span> <span class="n">bundles_for_bbox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="p">)</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">plan</span><span class="p">:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>                <span class="sa">f</span><span class="s2">&quot;no FABDEM land tiles intersect the AOI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="si">}</span><span class="s2">; the area &quot;</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>                <span class="s2">&quot;may be entirely ocean or outside the -90..90 / -180..180 grid.&quot;</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>            <span class="p">)</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>        <span class="k">return</span> <span class="p">[</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>            <span class="n">RemoteProduct</span><span class="p">(</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>                <span class="nb">id</span><span class="o">=</span><span class="n">bundle</span><span class="p">,</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>                <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;bundle&quot;</span><span class="p">:</span> <span class="n">bundle</span><span class="p">,</span> <span class="s2">&quot;tiles&quot;</span><span class="p">:</span> <span class="n">tiles</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">bundle_url</span><span class="p">(</span><span class="n">bundle</span><span class="p">)},</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>            <span class="p">)</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>            <span class="k">for</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">tiles</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="p">]</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download the bundles, extract the tiles, mosaic + crop to one GeoTIFF.</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        Idempotent: a complete output for this AOI is returned without</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        re-downloading (unless `force`). Downloaded bundle `.zip`s are **kept**</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">        in the cache (`.fabdem_cache/`), so a later AOI in the same 10° block</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        extracts the tiles it needs from the cached zip without re-fetching, and</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        an ocean-only 1° cell absent from the archive simply stays absent.</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        Ocean-only bundles (`404`) are skipped; an AOI that yields no tile at all</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        raises rather than writing an empty raster.</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            products: The plan from `_search`.</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">            list[Path]: The single written GeoTIFF path.</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">            ValueError: If no tile could be fetched for the AOI.</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_cached</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>                <span class="sa">f</span><span class="s2">&quot;FABDEM: </span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> already holds this AOI; skipping download.&quot;</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>            <span class="p">)</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>            <span class="k">return</span> <span class="p">[</span><span class="n">target</span><span class="p">]</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="n">tifs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="k">for</span> <span class="n">rp</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="n">bundle</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;bundle&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>            <span class="n">tiles</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;tiles&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>            <span class="c1"># Only the tiles this AOI needs and does not already have are</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>            <span class="c1"># extracted; the 0.8-2.4 GB bundle `.zip` is kept in the cache (not</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>            <span class="c1"># deleted), so a later AOI in the same 10° block extracts the tiles</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>            <span class="c1"># it needs from the cached zip without re-downloading — and an</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>            <span class="c1"># ocean-only 1° cell absent from the archive simply stays absent</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>            <span class="c1"># rather than forcing a re-fetch.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>            <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">tiles</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()]</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>            <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>                <span class="n">zip_path</span> <span class="o">=</span> <span class="n">download_bundle</span><span class="p">(</span><span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="p">)</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>                <span class="k">if</span> <span class="n">zip_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>                        <span class="sa">f</span><span class="s2">&quot;FABDEM: bundle </span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2"> is not published (ocean-only &quot;</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>                        <span class="s2">&quot;block); skipping.&quot;</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>                    <span class="k">continue</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>                <span class="n">extract_tiles</span><span class="p">(</span><span class="n">zip_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="p">,</span> <span class="n">missing</span><span class="p">)</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>            <span class="n">tifs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">tiles</span> <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>            <span class="p">)</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">tifs</span><span class="p">:</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>                <span class="sa">f</span><span class="s2">&quot;FABDEM: the AOI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="si">}</span><span class="s2"> intersects no published 1° tile &quot;</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>                <span class="s2">&quot;(ocean-only area); nothing to write.&quot;</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>            <span class="p">)</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_localise</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">tifs</span><span class="p">),</span> <span class="n">target</span><span class="p">)]</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_localise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tifs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">target</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Mosaic the 1° tiles and crop to the AOI, writing one GeoTIFF.</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        The pyramids-consuming core: `merge_rasters` mosaics the intersecting 1°</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        COGs (FABDEM is already EPSG:4326, so no reprojection), then</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        `crop_to_aoi` clips to the AOI bbox — or to the exact polygon when the</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        request carried an `aoi=` polygon. The source no-data value is stamped on</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        the mosaic (`merge_rasters` otherwise defaults it to `0`, which would</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        wrongly mark every genuine 0 m sea-level cell as missing).</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">            tifs: The extracted 1° `.tif` tiles (WGS84).</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">            target: The destination GeoTIFF path.</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">            pathlib.Path: The AOI-cropped GeoTIFF at `target`.</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span> <span class="k">as</span> <span class="n">PyramidsDataset</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.merge</span><span class="w"> </span><span class="kn">import</span> <span class="n">merge_rasters</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="n">merged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="s2">&quot;fabdem_merged.tif&quot;</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="c1"># The 1° tiles share FABDEM&#39;s grid and CRS, so the mosaic is a straight</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>        <span class="c1"># composite with no reprojection; nearest-neighbour keeps the exact</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>        <span class="c1"># source elevations and never blends real values with the -9999 no-data.</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="n">merge_rasters</span><span class="p">(</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>            <span class="n">src</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tifs</span><span class="p">],</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>            <span class="n">dst</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">merged</span><span class="p">),</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>            <span class="n">dst_crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>            <span class="n">resampling</span><span class="o">=</span><span class="s2">&quot;nearest neighbor&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>            <span class="n">no_data_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">nodata</span><span class="p">,</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>        <span class="p">)</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="n">PyramidsDataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">merged</span><span class="p">))</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>        <span class="n">cropped</span> <span class="o">=</span> <span class="n">crop_to_aoi</span><span class="p">(</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>            <span class="n">dataset</span><span class="p">,</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>            <span class="n">bbox</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="p">],</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>            <span class="n">touch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>        <span class="p">)</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>        <span class="c1"># Write through a sibling and rename, so a crash mid-write cannot leave a</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="c1"># partial file the skip-if-exists check would accept. The real suffix is</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="c1"># kept — pyramids picks its driver from the extension.</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="n">staged</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">.part</span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>            <span class="n">cropped</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">staged</span><span class="p">))</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>            <span class="c1"># pyramids keeps the written dataset&#39;s GDAL handle open, which holds a</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>            <span class="c1"># Windows lock and blocks the rename; release it first.</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">cropped</span><span class="p">)</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>            <span class="n">staged</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">cropped</span><span class="p">)</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>            <span class="n">staged</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>            <span class="k">raise</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="k">finally</span><span class="p">:</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>            <span class="c1"># Always drop the handle + the multi-GB merge intermediate, so a</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>            <span class="c1"># failed write does not strand `fabdem_merged.tif` in the cache. On</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>            <span class="c1"># Windows the GDAL handle can briefly outlive the Python object, so a</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>            <span class="c1"># still-locked file is left rather than raising.</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>                <span class="n">merged</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>                <span class="k">pass</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="n">write_sidecar</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">aoi_tag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">))</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="k">return</span> <span class="n">target</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -26466,7 +26468,8 @@ defaults to the bundled catalog.</p>
 
         <p>Fetch the FABDEM DEM subset as one AOI-cropped GeoTIFF.</p>
 <p>Emits a <code>LicenseWarning</code> (FABDEM is CC-BY-NC-SA 4.0, non-commercial)
-before any download.</p>
+before any download. This backend issues a single request, so it
+exposes no <code>errors=</code> partial-failure policy.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -26604,7 +26607,8 @@ bypassing the skip-if-exists check. Defaults to <code>False</code>.</p>
 <span class="normal"><a href="#__codelineno-0-234">234</a></span>
 <span class="normal"><a href="#__codelineno-0-235">235</a></span>
 <span class="normal"><a href="#__codelineno-0-236">236</a></span>
-<span class="normal"><a href="#__codelineno-0-237">237</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-237">237</a></span>
+<span class="normal"><a href="#__codelineno-0-238">238</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a>    <span class="o">*</span><span class="p">,</span>
@@ -26613,36 +26617,37 @@ bypassing the skip-if-exists check. Defaults to <code>False</code>.</p>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the FABDEM DEM subset as one AOI-cropped GeoTIFF.</span>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a>
 <a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">    Emits a `LicenseWarning` (FABDEM is CC-BY-NC-SA 4.0, non-commercial)</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">    before any download.</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        progress_bar: Accepted for signature parity; one request per call.</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        force: Re-fetch even when a complete output already exists,</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            bypassing the skip-if-exists check. Defaults to `False`.</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">        list[Path]: The single written GeoTIFF path (`fabdem_&lt;version&gt;.tif`).</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">        ValueError: If the AOI intersects no published FABDEM land tile</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">            (an ocean-only area).</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_force</span> <span class="o">=</span> <span class="n">force</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="c1"># Warn about the non-commercial licence only once the data has actually</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>    <span class="c1"># been fetched, so a request that resolves to nothing (e.g. an ocean-only</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="c1"># AOI, which raises in `_fetch`) does not print a spurious warning.</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a>    <span class="n">warn_license</span><span class="p">(</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">license_id</span><span class="p">,</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a>        <span class="s2">&quot;fabdem&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>        <span class="n">detail</span><span class="o">=</span><span class="p">(</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a>            <span class="s2">&quot;FABDEM V1-2 is CC-BY-NC-SA 4.0: non-commercial use only, &quot;</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>            <span class="sa">f</span><span class="s2">&quot;and every product must cite </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">commercial_contact</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="p">),</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>    <span class="p">)</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">    before any download. This backend issues a single request, so it</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">    exposes no `errors=` partial-failure policy.</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        progress_bar: Accepted for signature parity; one request per call.</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        force: Re-fetch even when a complete output already exists,</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            bypassing the skip-if-exists check. Defaults to `False`.</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">        list[Path]: The single written GeoTIFF path (`fabdem_&lt;version&gt;.tif`).</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        ValueError: If the AOI intersects no published FABDEM land tile</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">            (an ocean-only area).</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_force</span> <span class="o">=</span> <span class="n">force</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>    <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>    <span class="c1"># Warn about the non-commercial licence only once the data has actually</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="c1"># been fetched, so a request that resolves to nothing (e.g. an ocean-only</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>    <span class="c1"># AOI, which raises in `_fetch`) does not print a spurious warning.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>    <span class="n">warn_license</span><span class="p">(</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">license_id</span><span class="p">,</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>        <span class="s2">&quot;fabdem&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>        <span class="n">detail</span><span class="o">=</span><span class="p">(</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>            <span class="s2">&quot;FABDEM V1-2 is CC-BY-NC-SA 4.0: non-commercial use only, &quot;</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>            <span class="sa">f</span><span class="s2">&quot;and every product must cite </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">commercial_contact</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a>        <span class="p">),</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="p">)</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -27159,7 +27164,8 @@ facade reads it to gate <code>aggregate=</code> (rejected — FABDEM is static).
 <span class="normal"><a href="#__codelineno-0-388">388</a></span>
 <span class="normal"><a href="#__codelineno-0-389">389</a></span>
 <span class="normal"><a href="#__codelineno-0-390">390</a></span>
-<span class="normal"><a href="#__codelineno-0-391">391</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="k">class</span><span class="w"> </span><span class="nc">FABDEM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-391">391</a></span>
+<span class="normal"><a href="#__codelineno-0-392">392</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="k">class</span><span class="w"> </span><span class="nc">FABDEM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;FABDEM V1-2 bare-earth DEM backend (raster GeoTIFF output).</span>
 <a id="__codelineno-0-54" name="__codelineno-0-54"></a>
 <a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">    Fetches the ~30 m global bare-earth DEM subset to the request bbox from the</span>
@@ -27315,190 +27321,191 @@ facade reads it to gate <code>aggregate=</code> (rejected — FABDEM is static).
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the FABDEM DEM subset as one AOI-cropped GeoTIFF.</span>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a>
 <a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        Emits a `LicenseWarning` (FABDEM is CC-BY-NC-SA 4.0, non-commercial)</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        before any download.</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            progress_bar: Accepted for signature parity; one request per call.</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            force: Re-fetch even when a complete output already exists,</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">                bypassing the skip-if-exists check. Defaults to `False`.</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">            list[Path]: The single written GeoTIFF path (`fabdem_&lt;version&gt;.tif`).</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">            ValueError: If the AOI intersects no published FABDEM land tile</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">                (an ocean-only area).</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_force</span> <span class="o">=</span> <span class="n">force</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a>        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>        <span class="c1"># Warn about the non-commercial licence only once the data has actually</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>        <span class="c1"># been fetched, so a request that resolves to nothing (e.g. an ocean-only</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>        <span class="c1"># AOI, which raises in `_fetch`) does not print a spurious warning.</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a>        <span class="n">warn_license</span><span class="p">(</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">license_id</span><span class="p">,</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a>            <span class="s2">&quot;fabdem&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>            <span class="n">detail</span><span class="o">=</span><span class="p">(</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a>                <span class="s2">&quot;FABDEM V1-2 is CC-BY-NC-SA 4.0: non-commercial use only, &quot;</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>                <span class="sa">f</span><span class="s2">&quot;and every product must cite </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">commercial_contact</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>            <span class="p">),</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>        <span class="p">)</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>        <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve the AOI to one `RemoteProduct` per intersecting 10° bundle.</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        No network: each product carries its bundle `.zip` URL and the 1° tile</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        member names to extract in `metadata`.</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            list[RemoteProduct]: The download plan, one per bundle.</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            ValueError: If the AOI intersects no FABDEM land cell. (An</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">                antimeridian-crossing `west &gt; east` AOI is already rejected by</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">                `SpatialExtent` at construction.)</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>        <span class="n">plan</span> <span class="o">=</span> <span class="n">bundles_for_bbox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="p">)</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">plan</span><span class="p">:</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>                <span class="sa">f</span><span class="s2">&quot;no FABDEM land tiles intersect the AOI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="si">}</span><span class="s2">; the area &quot;</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>                <span class="s2">&quot;may be entirely ocean or outside the -90..90 / -180..180 grid.&quot;</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a>            <span class="p">)</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>        <span class="k">return</span> <span class="p">[</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>            <span class="n">RemoteProduct</span><span class="p">(</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a>                <span class="nb">id</span><span class="o">=</span><span class="n">bundle</span><span class="p">,</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a>                <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;bundle&quot;</span><span class="p">:</span> <span class="n">bundle</span><span class="p">,</span> <span class="s2">&quot;tiles&quot;</span><span class="p">:</span> <span class="n">tiles</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">bundle_url</span><span class="p">(</span><span class="n">bundle</span><span class="p">)},</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>            <span class="p">)</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>            <span class="k">for</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">tiles</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="p">]</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download the bundles, extract the tiles, mosaic + crop to one GeoTIFF.</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">        Idempotent: a complete output for this AOI is returned without</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        re-downloading (unless `force`). Downloaded bundle `.zip`s are **kept**</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        in the cache (`.fabdem_cache/`), so a later AOI in the same 10° block</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">        extracts the tiles it needs from the cached zip without re-fetching, and</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        an ocean-only 1° cell absent from the archive simply stays absent.</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        Ocean-only bundles (`404`) are skipped; an AOI that yields no tile at all</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        raises rather than writing an empty raster.</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">            products: The plan from `_search`.</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">            list[Path]: The single written GeoTIFF path.</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">            ValueError: If no tile could be fetched for the AOI.</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_cached</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>                <span class="sa">f</span><span class="s2">&quot;FABDEM: </span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> already holds this AOI; skipping download.&quot;</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>            <span class="p">)</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>            <span class="k">return</span> <span class="p">[</span><span class="n">target</span><span class="p">]</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="n">tifs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="k">for</span> <span class="n">rp</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>            <span class="n">bundle</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;bundle&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="n">tiles</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;tiles&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>            <span class="c1"># Only the tiles this AOI needs and does not already have are</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>            <span class="c1"># extracted; the 0.8-2.4 GB bundle `.zip` is kept in the cache (not</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>            <span class="c1"># deleted), so a later AOI in the same 10° block extracts the tiles</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>            <span class="c1"># it needs from the cached zip without re-downloading — and an</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>            <span class="c1"># ocean-only 1° cell absent from the archive simply stays absent</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>            <span class="c1"># rather than forcing a re-fetch.</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>            <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">tiles</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()]</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>            <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>                <span class="n">zip_path</span> <span class="o">=</span> <span class="n">download_bundle</span><span class="p">(</span><span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="p">)</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>                <span class="k">if</span> <span class="n">zip_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>                        <span class="sa">f</span><span class="s2">&quot;FABDEM: bundle </span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2"> is not published (ocean-only &quot;</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>                        <span class="s2">&quot;block); skipping.&quot;</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>                    <span class="k">continue</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>                <span class="n">extract_tiles</span><span class="p">(</span><span class="n">zip_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="p">,</span> <span class="n">missing</span><span class="p">)</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>            <span class="n">tifs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">tiles</span> <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>            <span class="p">)</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">tifs</span><span class="p">:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>                <span class="sa">f</span><span class="s2">&quot;FABDEM: the AOI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="si">}</span><span class="s2"> intersects no published 1° tile &quot;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>                <span class="s2">&quot;(ocean-only area); nothing to write.&quot;</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>            <span class="p">)</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_localise</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">tifs</span><span class="p">),</span> <span class="n">target</span><span class="p">)]</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_localise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tifs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">target</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Mosaic the 1° tiles and crop to the AOI, writing one GeoTIFF.</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        The pyramids-consuming core: `merge_rasters` mosaics the intersecting 1°</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        COGs (FABDEM is already EPSG:4326, so no reprojection), then</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        `crop_to_aoi` clips to the AOI bbox — or to the exact polygon when the</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        request carried an `aoi=` polygon. The source no-data value is stamped on</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        the mosaic (`merge_rasters` otherwise defaults it to `0`, which would</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        wrongly mark every genuine 0 m sea-level cell as missing).</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">            tifs: The extracted 1° `.tif` tiles (WGS84).</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">            target: The destination GeoTIFF path.</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">            pathlib.Path: The AOI-cropped GeoTIFF at `target`.</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span> <span class="k">as</span> <span class="n">PyramidsDataset</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.merge</span><span class="w"> </span><span class="kn">import</span> <span class="n">merge_rasters</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="n">merged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="s2">&quot;fabdem_merged.tif&quot;</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="c1"># The 1° tiles share FABDEM&#39;s grid and CRS, so the mosaic is a straight</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="c1"># composite with no reprojection; nearest-neighbour keeps the exact</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>        <span class="c1"># source elevations and never blends real values with the -9999 no-data.</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>        <span class="n">merge_rasters</span><span class="p">(</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>            <span class="n">src</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tifs</span><span class="p">],</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>            <span class="n">dst</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">merged</span><span class="p">),</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>            <span class="n">dst_crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>            <span class="n">resampling</span><span class="o">=</span><span class="s2">&quot;nearest neighbor&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>            <span class="n">no_data_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">nodata</span><span class="p">,</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>        <span class="p">)</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="n">PyramidsDataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">merged</span><span class="p">))</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="n">cropped</span> <span class="o">=</span> <span class="n">crop_to_aoi</span><span class="p">(</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>            <span class="n">dataset</span><span class="p">,</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a>            <span class="n">bbox</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="p">],</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>            <span class="n">touch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="p">)</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>        <span class="c1"># Write through a sibling and rename, so a crash mid-write cannot leave a</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>        <span class="c1"># partial file the skip-if-exists check would accept. The real suffix is</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="c1"># kept — pyramids picks its driver from the extension.</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="n">staged</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">.part</span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>            <span class="n">cropped</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">staged</span><span class="p">))</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>            <span class="c1"># pyramids keeps the written dataset&#39;s GDAL handle open, which holds a</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>            <span class="c1"># Windows lock and blocks the rename; release it first.</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">cropped</span><span class="p">)</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>            <span class="n">staged</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">cropped</span><span class="p">)</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>            <span class="n">staged</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>            <span class="k">raise</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="k">finally</span><span class="p">:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>            <span class="c1"># Always drop the handle + the multi-GB merge intermediate, so a</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>            <span class="c1"># failed write does not strand `fabdem_merged.tif` in the cache. On</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>            <span class="c1"># Windows the GDAL handle can briefly outlive the Python object, so a</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>            <span class="c1"># still-locked file is left rather than raising.</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>                <span class="n">merged</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>                <span class="k">pass</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="n">write_sidecar</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">aoi_tag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">))</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="k">return</span> <span class="n">target</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        before any download. This backend issues a single request, so it</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        exposes no `errors=` partial-failure policy.</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            progress_bar: Accepted for signature parity; one request per call.</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            force: Re-fetch even when a complete output already exists,</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">                bypassing the skip-if-exists check. Defaults to `False`.</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            list[Path]: The single written GeoTIFF path (`fabdem_&lt;version&gt;.tif`).</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">            ValueError: If the AOI intersects no published FABDEM land tile</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">                (an ocean-only area).</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_force</span> <span class="o">=</span> <span class="n">force</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>        <span class="c1"># Warn about the non-commercial licence only once the data has actually</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>        <span class="c1"># been fetched, so a request that resolves to nothing (e.g. an ocean-only</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>        <span class="c1"># AOI, which raises in `_fetch`) does not print a spurious warning.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>        <span class="n">warn_license</span><span class="p">(</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">license_id</span><span class="p">,</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>            <span class="s2">&quot;fabdem&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>            <span class="n">detail</span><span class="o">=</span><span class="p">(</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>                <span class="s2">&quot;FABDEM V1-2 is CC-BY-NC-SA 4.0: non-commercial use only, &quot;</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>                <span class="sa">f</span><span class="s2">&quot;and every product must cite </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">commercial_contact</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a>            <span class="p">),</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>        <span class="p">)</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>        <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">]:</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve the AOI to one `RemoteProduct` per intersecting 10° bundle.</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        No network: each product carries its bundle `.zip` URL and the 1° tile</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        member names to extract in `metadata`.</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            list[RemoteProduct]: The download plan, one per bundle.</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            ValueError: If the AOI intersects no FABDEM land cell. (An</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">                antimeridian-crossing `west &gt; east` AOI is already rejected by</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">                `SpatialExtent` at construction.)</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>        <span class="n">plan</span> <span class="o">=</span> <span class="n">bundles_for_bbox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="p">)</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">plan</span><span class="p">:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>                <span class="sa">f</span><span class="s2">&quot;no FABDEM land tiles intersect the AOI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="si">}</span><span class="s2">; the area &quot;</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>                <span class="s2">&quot;may be entirely ocean or outside the -90..90 / -180..180 grid.&quot;</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>            <span class="p">)</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>        <span class="k">return</span> <span class="p">[</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>            <span class="n">RemoteProduct</span><span class="p">(</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>                <span class="nb">id</span><span class="o">=</span><span class="n">bundle</span><span class="p">,</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>                <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;bundle&quot;</span><span class="p">:</span> <span class="n">bundle</span><span class="p">,</span> <span class="s2">&quot;tiles&quot;</span><span class="p">:</span> <span class="n">tiles</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">bundle_url</span><span class="p">(</span><span class="n">bundle</span><span class="p">)},</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>            <span class="p">)</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>            <span class="k">for</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">tiles</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="p">]</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">products</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RemoteProduct</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download the bundles, extract the tiles, mosaic + crop to one GeoTIFF.</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        Idempotent: a complete output for this AOI is returned without</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        re-downloading (unless `force`). Downloaded bundle `.zip`s are **kept**</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">        in the cache (`.fabdem_cache/`), so a later AOI in the same 10° block</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        extracts the tiles it needs from the cached zip without re-fetching, and</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        an ocean-only 1° cell absent from the archive simply stays absent.</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        Ocean-only bundles (`404`) are skipped; an AOI that yields no tile at all</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        raises rather than writing an empty raster.</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            products: The plan from `_search`.</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">            list[Path]: The single written GeoTIFF path.</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">            ValueError: If no tile could be fetched for the AOI.</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_cached</span><span class="p">(</span><span class="n">target</span><span class="p">):</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>                <span class="sa">f</span><span class="s2">&quot;FABDEM: </span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> already holds this AOI; skipping download.&quot;</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>            <span class="p">)</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>            <span class="k">return</span> <span class="p">[</span><span class="n">target</span><span class="p">]</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="n">tifs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="k">for</span> <span class="n">rp</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="n">bundle</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;bundle&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>            <span class="n">tiles</span> <span class="o">=</span> <span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;tiles&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>            <span class="c1"># Only the tiles this AOI needs and does not already have are</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>            <span class="c1"># extracted; the 0.8-2.4 GB bundle `.zip` is kept in the cache (not</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>            <span class="c1"># deleted), so a later AOI in the same 10° block extracts the tiles</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>            <span class="c1"># it needs from the cached zip without re-downloading — and an</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>            <span class="c1"># ocean-only 1° cell absent from the archive simply stays absent</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>            <span class="c1"># rather than forcing a re-fetch.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>            <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">tiles</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()]</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>            <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>                <span class="n">zip_path</span> <span class="o">=</span> <span class="n">download_bundle</span><span class="p">(</span><span class="n">rp</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="p">)</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>                <span class="k">if</span> <span class="n">zip_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>                        <span class="sa">f</span><span class="s2">&quot;FABDEM: bundle </span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2"> is not published (ocean-only &quot;</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>                        <span class="s2">&quot;block); skipping.&quot;</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>                    <span class="k">continue</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>                <span class="n">extract_tiles</span><span class="p">(</span><span class="n">zip_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="p">,</span> <span class="n">missing</span><span class="p">)</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>            <span class="n">tifs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">tiles</span> <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>            <span class="p">)</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">tifs</span><span class="p">:</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>                <span class="sa">f</span><span class="s2">&quot;FABDEM: the AOI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="si">}</span><span class="s2"> intersects no published 1° tile &quot;</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>                <span class="s2">&quot;(ocean-only area); nothing to write.&quot;</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>            <span class="p">)</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_localise</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">tifs</span><span class="p">),</span> <span class="n">target</span><span class="p">)]</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_localise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tifs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">target</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Mosaic the 1° tiles and crop to the AOI, writing one GeoTIFF.</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        The pyramids-consuming core: `merge_rasters` mosaics the intersecting 1°</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        COGs (FABDEM is already EPSG:4326, so no reprojection), then</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        `crop_to_aoi` clips to the AOI bbox — or to the exact polygon when the</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        request carried an `aoi=` polygon. The source no-data value is stamped on</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        the mosaic (`merge_rasters` otherwise defaults it to `0`, which would</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        wrongly mark every genuine 0 m sea-level cell as missing).</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">            tifs: The extracted 1° `.tif` tiles (WGS84).</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">            target: The destination GeoTIFF path.</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">            pathlib.Path: The AOI-cropped GeoTIFF at `target`.</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span> <span class="k">as</span> <span class="n">PyramidsDataset</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.merge</span><span class="w"> </span><span class="kn">import</span> <span class="n">merge_rasters</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="n">merged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_dir</span> <span class="o">/</span> <span class="s2">&quot;fabdem_merged.tif&quot;</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="c1"># The 1° tiles share FABDEM&#39;s grid and CRS, so the mosaic is a straight</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>        <span class="c1"># composite with no reprojection; nearest-neighbour keeps the exact</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>        <span class="c1"># source elevations and never blends real values with the -9999 no-data.</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="n">merge_rasters</span><span class="p">(</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>            <span class="n">src</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tifs</span><span class="p">],</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>            <span class="n">dst</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">merged</span><span class="p">),</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>            <span class="n">dst_crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>            <span class="n">resampling</span><span class="o">=</span><span class="s2">&quot;nearest neighbor&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>            <span class="n">no_data_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">nodata</span><span class="p">,</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>        <span class="p">)</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="n">PyramidsDataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">merged</span><span class="p">))</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>        <span class="n">cropped</span> <span class="o">=</span> <span class="n">crop_to_aoi</span><span class="p">(</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>            <span class="n">dataset</span><span class="p">,</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>            <span class="n">bbox</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="p">],</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>            <span class="n">touch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>        <span class="p">)</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>        <span class="c1"># Write through a sibling and rename, so a crash mid-write cannot leave a</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="c1"># partial file the skip-if-exists check would accept. The real suffix is</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="c1"># kept — pyramids picks its driver from the extension.</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="n">staged</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">.part</span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>            <span class="n">cropped</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">staged</span><span class="p">))</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>            <span class="c1"># pyramids keeps the written dataset&#39;s GDAL handle open, which holds a</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>            <span class="c1"># Windows lock and blocks the rename; release it first.</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">cropped</span><span class="p">)</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>            <span class="n">staged</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">cropped</span><span class="p">)</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>            <span class="n">staged</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>            <span class="k">raise</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="k">finally</span><span class="p">:</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>            <span class="c1"># Always drop the handle + the multi-GB merge intermediate, so a</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>            <span class="c1"># failed write does not strand `fabdem_merged.tif` in the cache. On</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>            <span class="c1"># Windows the GDAL handle can briefly outlive the Python object, so a</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>            <span class="c1"># still-locked file is left rather than raising.</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>                <span class="n">merged</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>                <span class="k">pass</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="n">write_sidecar</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">aoi_tag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">))</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="k">return</span> <span class="n">target</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -27810,7 +27817,8 @@ defaults to the bundled catalog.</p>
 
         <p>Fetch the FABDEM DEM subset as one AOI-cropped GeoTIFF.</p>
 <p>Emits a <code>LicenseWarning</code> (FABDEM is CC-BY-NC-SA 4.0, non-commercial)
-before any download.</p>
+before any download. This backend issues a single request, so it
+exposes no <code>errors=</code> partial-failure policy.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -27948,7 +27956,8 @@ bypassing the skip-if-exists check. Defaults to <code>False</code>.</p>
 <span class="normal"><a href="#__codelineno-0-234">234</a></span>
 <span class="normal"><a href="#__codelineno-0-235">235</a></span>
 <span class="normal"><a href="#__codelineno-0-236">236</a></span>
-<span class="normal"><a href="#__codelineno-0-237">237</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-237">237</a></span>
+<span class="normal"><a href="#__codelineno-0-238">238</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a>    <span class="o">*</span><span class="p">,</span>
@@ -27957,36 +27966,37 @@ bypassing the skip-if-exists check. Defaults to <code>False</code>.</p>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the FABDEM DEM subset as one AOI-cropped GeoTIFF.</span>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a>
 <a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">    Emits a `LicenseWarning` (FABDEM is CC-BY-NC-SA 4.0, non-commercial)</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">    before any download.</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        progress_bar: Accepted for signature parity; one request per call.</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        force: Re-fetch even when a complete output already exists,</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            bypassing the skip-if-exists check. Defaults to `False`.</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">        list[Path]: The single written GeoTIFF path (`fabdem_&lt;version&gt;.tif`).</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">        ValueError: If the AOI intersects no published FABDEM land tile</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">            (an ocean-only area).</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_force</span> <span class="o">=</span> <span class="n">force</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="c1"># Warn about the non-commercial licence only once the data has actually</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>    <span class="c1"># been fetched, so a request that resolves to nothing (e.g. an ocean-only</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="c1"># AOI, which raises in `_fetch`) does not print a spurious warning.</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a>    <span class="n">warn_license</span><span class="p">(</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">license_id</span><span class="p">,</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a>        <span class="s2">&quot;fabdem&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>        <span class="n">detail</span><span class="o">=</span><span class="p">(</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a>            <span class="s2">&quot;FABDEM V1-2 is CC-BY-NC-SA 4.0: non-commercial use only, &quot;</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>            <span class="sa">f</span><span class="s2">&quot;and every product must cite </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">commercial_contact</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="p">),</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>    <span class="p">)</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">    before any download. This backend issues a single request, so it</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">    exposes no `errors=` partial-failure policy.</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        progress_bar: Accepted for signature parity; one request per call.</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        force: Re-fetch even when a complete output already exists,</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            bypassing the skip-if-exists check. Defaults to `False`.</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">        list[Path]: The single written GeoTIFF path (`fabdem_&lt;version&gt;.tif`).</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        ValueError: If the AOI intersects no published FABDEM land tile</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">            (an ocean-only area).</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_force</span> <span class="o">=</span> <span class="n">force</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>    <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>    <span class="c1"># Warn about the non-commercial licence only once the data has actually</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="c1"># been fetched, so a request that resolves to nothing (e.g. an ocean-only</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>    <span class="c1"># AOI, which raises in `_fetch`) does not print a spurious warning.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>    <span class="n">warn_license</span><span class="p">(</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">license_id</span><span class="p">,</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>        <span class="s2">&quot;fabdem&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>        <span class="n">detail</span><span class="o">=</span><span class="p">(</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>            <span class="s2">&quot;FABDEM V1-2 is CC-BY-NC-SA 4.0: non-commercial use only, &quot;</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>            <span class="sa">f</span><span class="s2">&quot;and every product must cite </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">commercial_contact</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a>        <span class="p">),</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="p">)</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

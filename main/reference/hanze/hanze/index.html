@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -27200,7 +27200,9 @@ year the record covers.</p>
 <span class="normal"><a href="#__codelineno-0-729">729</a></span>
 <span class="normal"><a href="#__codelineno-0-730">730</a></span>
 <span class="normal"><a href="#__codelineno-0-731">731</a></span>
-<span class="normal"><a href="#__codelineno-0-732">732</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="k">class</span><span class="w"> </span><span class="nc">HANZE</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-732">732</a></span>
+<span class="normal"><a href="#__codelineno-0-733">733</a></span>
+<span class="normal"><a href="#__codelineno-0-734">734</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="k">class</span><span class="w"> </span><span class="nc">HANZE</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;HANZE historical-flood-impacts backend (per-instance output kind).</span>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">    Downloads the HANZE events / impacts table from its pinned Zenodo release,</span>
@@ -27708,96 +27710,98 @@ year the record covers.</p>
 <a id="__codelineno-0-640" name="__codelineno-0-640"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch HANZE and return the per-instance shape.</span>
 <a id="__codelineno-0-641" name="__codelineno-0-641"></a>
 <a id="__codelineno-0-642" name="__codelineno-0-642"></a><span class="sd">        Runs the download + filter, writes the result to `path` (a CSV for the</span>
-<a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">        tabular default, a GeoPackage for `with_geometry`), and returns it.</span>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">            progress_bar: Whether to draw a download progress bar. Passed through</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">                to the transport, so `False` really does silence it.</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">            A `pandas.DataFrame` of events + impacts (the default), or a</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">            `pyramids.feature.collection.FeatureCollection` of the</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">            affected NUTS-3 regions (`with_geometry=True`). Both are also written</span>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">            under `root_dir`.</span>
-<a id="__codelineno-0-654" name="__codelineno-0-654"></a>
-<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-656" name="__codelineno-0-656"></a><span class="sd">            requests.HTTPError: If a Zenodo download returns a non-2xx status.</span>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="sd">            ValueError: If a download&#39;s body fails its content guard (an HTML</span>
-<a id="__codelineno-0-658" name="__codelineno-0-658"></a><span class="sd">                error page served with a 200 status), or `with_geometry=True` and</span>
-<a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">                the region archive has no `&lt;member_stem&gt;.shp` member.</span>
-<a id="__codelineno-0-660" name="__codelineno-0-660"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-661" name="__codelineno-0-661"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-662" name="__codelineno-0-662"></a>        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-663" name="__codelineno-0-663"></a>        <span class="c1"># `_search` always yields one product, so `_fetch` returns a single</span>
-<a id="__codelineno-0-664" name="__codelineno-0-664"></a>        <span class="c1"># element (a 0-row DataFrame / empty FC is still one element); the</span>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a>        <span class="c1"># `_empty_result()` fallback is a defensive guard for a future `_search`</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a>        <span class="c1"># that could return nothing, not a path this backend reaches today.</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">results</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_empty_result</span><span class="p">()</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">(</span><span class="s2">&quot;hanze_regions&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.gpkg&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a>            <span class="c1"># Written unconditionally — an empty result still writes a schema-only</span>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a>            <span class="c1"># GeoPackage, so the vector path matches the tabular one (which always</span>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a>            <span class="c1"># writes a header-only CSV) and a caller globbing `path` finds a file.</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a>            <span class="n">result</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a>                <span class="sa">f</span><span class="s2">&quot;HANZE: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> affected region(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a>            <span class="p">)</span>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a>            <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">(</span><span class="s2">&quot;hanze_events&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a>        <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HANZE: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> event(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a>        <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_empty_result</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the empty result matching the instance&#39;s output kind.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_geometry</span><span class="p">:</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a>            <span class="k">return</span> <span class="n">geometry_module</span><span class="o">.</span><span class="n">empty_region_fc</span><span class="p">()</span>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a>        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_result_stem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose an output file stem that encodes the request&#39;s filters.</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a><span class="sd">        A plain `base` for an unfiltered request; otherwise `base-&lt;digest&gt;` so</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a><span class="sd">        two differently-filtered queries into one `path=` do not overwrite each</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a><span class="sd">        other. The digest is order-insensitive in the multi-value filters.</span>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a><span class="sd">            base: The stem prefix (`&quot;hanze_events&quot;` / `&quot;hanze_regions&quot;`).</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a><span class="sd">            str: `base`, or `base-&lt;8-hex-digest&gt;` when any filter is active.</span>
-<a id="__codelineno-0-704" name="__codelineno-0-704"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-705" name="__codelineno-0-705"></a>        <span class="n">first_year</span><span class="p">,</span> <span class="n">last_year</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span>
-<a id="__codelineno-0-706" name="__codelineno-0-706"></a>        <span class="n">applied</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-707" name="__codelineno-0-707"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">),</span>
-<a id="__codelineno-0-708" name="__codelineno-0-708"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_region</span><span class="p">),</span>
-<a id="__codelineno-0-709" name="__codelineno-0-709"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flood_types</span><span class="p">),</span>
-<a id="__codelineno-0-710" name="__codelineno-0-710"></a>            <span class="n">first_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-711" name="__codelineno-0-711"></a>            <span class="n">last_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-712" name="__codelineno-0-712"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-713" name="__codelineno-0-713"></a>        <span class="p">)</span>
-<a id="__codelineno-0-714" name="__codelineno-0-714"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">applied</span><span class="p">):</span>
-<a id="__codelineno-0-715" name="__codelineno-0-715"></a>            <span class="k">return</span> <span class="n">base</span>
-<a id="__codelineno-0-716" name="__codelineno-0-716"></a>        <span class="n">request</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-717" name="__codelineno-0-717"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">)),</span>
-<a id="__codelineno-0-718" name="__codelineno-0-718"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_region</span><span class="p">)),</span>
-<a id="__codelineno-0-719" name="__codelineno-0-719"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flood_types</span><span class="p">)),</span>
-<a id="__codelineno-0-720" name="__codelineno-0-720"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span><span class="p">,</span>
-<a id="__codelineno-0-721" name="__codelineno-0-721"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="p">,</span>
-<a id="__codelineno-0-722" name="__codelineno-0-722"></a>        <span class="p">)</span>
-<a id="__codelineno-0-723" name="__codelineno-0-723"></a>        <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span>
-<a id="__codelineno-0-724" name="__codelineno-0-724"></a>            <span class="nb">repr</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">usedforsecurity</span><span class="o">=</span><span class="kc">False</span>
-<a id="__codelineno-0-725" name="__codelineno-0-725"></a>        <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>
-<a id="__codelineno-0-726" name="__codelineno-0-726"></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-727" name="__codelineno-0-727"></a>
-<a id="__codelineno-0-728" name="__codelineno-0-728"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-729" name="__codelineno-0-729"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the CC-BY attribution once (info, not a warning).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-730" name="__codelineno-0-730"></a>        <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span>
-<a id="__codelineno-0-731" name="__codelineno-0-731"></a>        <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">attribution</span><span class="p">:</span>
-<a id="__codelineno-0-732" name="__codelineno-0-732"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HANZE source citation: </span><span class="si">{</span><span class="n">record</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">        tabular default, a GeoPackage for `with_geometry`), and returns it. It</span>
+<a id="__codelineno-0-644" name="__codelineno-0-644"></a><span class="sd">        issues a single request, so it has no partial-failure policy and takes</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">        no `errors=` argument.</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">            progress_bar: Whether to draw a download progress bar. Passed through</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">                to the transport, so `False` really does silence it.</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">            A `pandas.DataFrame` of events + impacts (the default), or a</span>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">            `pyramids.feature.collection.FeatureCollection` of the</span>
+<a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="sd">            affected NUTS-3 regions (`with_geometry=True`). Both are also written</span>
+<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">            under `root_dir`.</span>
+<a id="__codelineno-0-656" name="__codelineno-0-656"></a>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-658" name="__codelineno-0-658"></a><span class="sd">            requests.HTTPError: If a Zenodo download returns a non-2xx status.</span>
+<a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">            ValueError: If a download&#39;s body fails its content guard (an HTML</span>
+<a id="__codelineno-0-660" name="__codelineno-0-660"></a><span class="sd">                error page served with a 200 status), or `with_geometry=True` and</span>
+<a id="__codelineno-0-661" name="__codelineno-0-661"></a><span class="sd">                the region archive has no `&lt;member_stem&gt;.shp` member.</span>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-663" name="__codelineno-0-663"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-664" name="__codelineno-0-664"></a>        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a>        <span class="c1"># `_search` always yields one product, so `_fetch` returns a single</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a>        <span class="c1"># element (a 0-row DataFrame / empty FC is still one element); the</span>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a>        <span class="c1"># `_empty_result()` fallback is a defensive guard for a future `_search`</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a>        <span class="c1"># that could return nothing, not a path this backend reaches today.</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">results</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_empty_result</span><span class="p">()</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-673" name="__codelineno-0-673"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">(</span><span class="s2">&quot;hanze_regions&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.gpkg&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a>            <span class="c1"># Written unconditionally — an empty result still writes a schema-only</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a>            <span class="c1"># GeoPackage, so the vector path matches the tabular one (which always</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a>            <span class="c1"># writes a header-only CSV) and a caller globbing `path` finds a file.</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a>            <span class="n">result</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-678" name="__codelineno-0-678"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-679" name="__codelineno-0-679"></a>                <span class="sa">f</span><span class="s2">&quot;HANZE: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> affected region(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a>            <span class="p">)</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a>            <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">(</span><span class="s2">&quot;hanze_events&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a>        <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HANZE: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> event(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>        <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_empty_result</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the empty result matching the instance&#39;s output kind.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_geometry</span><span class="p">:</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a>            <span class="k">return</span> <span class="n">geometry_module</span><span class="o">.</span><span class="n">empty_region_fc</span><span class="p">()</span>
+<a id="__codelineno-0-692" name="__codelineno-0-692"></a>        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<a id="__codelineno-0-693" name="__codelineno-0-693"></a>
+<a id="__codelineno-0-694" name="__codelineno-0-694"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_result_stem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-695" name="__codelineno-0-695"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose an output file stem that encodes the request&#39;s filters.</span>
+<a id="__codelineno-0-696" name="__codelineno-0-696"></a>
+<a id="__codelineno-0-697" name="__codelineno-0-697"></a><span class="sd">        A plain `base` for an unfiltered request; otherwise `base-&lt;digest&gt;` so</span>
+<a id="__codelineno-0-698" name="__codelineno-0-698"></a><span class="sd">        two differently-filtered queries into one `path=` do not overwrite each</span>
+<a id="__codelineno-0-699" name="__codelineno-0-699"></a><span class="sd">        other. The digest is order-insensitive in the multi-value filters.</span>
+<a id="__codelineno-0-700" name="__codelineno-0-700"></a>
+<a id="__codelineno-0-701" name="__codelineno-0-701"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-702" name="__codelineno-0-702"></a><span class="sd">            base: The stem prefix (`&quot;hanze_events&quot;` / `&quot;hanze_regions&quot;`).</span>
+<a id="__codelineno-0-703" name="__codelineno-0-703"></a>
+<a id="__codelineno-0-704" name="__codelineno-0-704"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-705" name="__codelineno-0-705"></a><span class="sd">            str: `base`, or `base-&lt;8-hex-digest&gt;` when any filter is active.</span>
+<a id="__codelineno-0-706" name="__codelineno-0-706"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-707" name="__codelineno-0-707"></a>        <span class="n">first_year</span><span class="p">,</span> <span class="n">last_year</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span>
+<a id="__codelineno-0-708" name="__codelineno-0-708"></a>        <span class="n">applied</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-709" name="__codelineno-0-709"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">),</span>
+<a id="__codelineno-0-710" name="__codelineno-0-710"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_region</span><span class="p">),</span>
+<a id="__codelineno-0-711" name="__codelineno-0-711"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flood_types</span><span class="p">),</span>
+<a id="__codelineno-0-712" name="__codelineno-0-712"></a>            <span class="n">first_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-713" name="__codelineno-0-713"></a>            <span class="n">last_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-714" name="__codelineno-0-714"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-715" name="__codelineno-0-715"></a>        <span class="p">)</span>
+<a id="__codelineno-0-716" name="__codelineno-0-716"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">applied</span><span class="p">):</span>
+<a id="__codelineno-0-717" name="__codelineno-0-717"></a>            <span class="k">return</span> <span class="n">base</span>
+<a id="__codelineno-0-718" name="__codelineno-0-718"></a>        <span class="n">request</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-719" name="__codelineno-0-719"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">)),</span>
+<a id="__codelineno-0-720" name="__codelineno-0-720"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_region</span><span class="p">)),</span>
+<a id="__codelineno-0-721" name="__codelineno-0-721"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flood_types</span><span class="p">)),</span>
+<a id="__codelineno-0-722" name="__codelineno-0-722"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span><span class="p">,</span>
+<a id="__codelineno-0-723" name="__codelineno-0-723"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="p">,</span>
+<a id="__codelineno-0-724" name="__codelineno-0-724"></a>        <span class="p">)</span>
+<a id="__codelineno-0-725" name="__codelineno-0-725"></a>        <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span>
+<a id="__codelineno-0-726" name="__codelineno-0-726"></a>            <span class="nb">repr</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">usedforsecurity</span><span class="o">=</span><span class="kc">False</span>
+<a id="__codelineno-0-727" name="__codelineno-0-727"></a>        <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>
+<a id="__codelineno-0-728" name="__codelineno-0-728"></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-729" name="__codelineno-0-729"></a>
+<a id="__codelineno-0-730" name="__codelineno-0-730"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-731" name="__codelineno-0-731"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the CC-BY attribution once (info, not a warning).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-732" name="__codelineno-0-732"></a>        <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span>
+<a id="__codelineno-0-733" name="__codelineno-0-733"></a>        <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">attribution</span><span class="p">:</span>
+<a id="__codelineno-0-734" name="__codelineno-0-734"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HANZE source citation: </span><span class="si">{</span><span class="n">record</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -28276,7 +28280,9 @@ regions instead of the events <code>DataFrame</code> (sets
 
         <p>Fetch HANZE and return the per-instance shape.</p>
 <p>Runs the download + filter, writes the result to <code>path</code> (a CSV for the
-tabular default, a GeoPackage for <code>with_geometry</code>), and returns it.</p>
+tabular default, a GeoPackage for <code>with_geometry</code>), and returns it. It
+issues a single request, so it has no partial-failure policy and takes
+no <code>errors=</code> argument.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -28446,52 +28452,56 @@ the region archive has no <code>&lt;member_stem&gt;.shp</code> member.</p>
 <span class="normal"><a href="#__codelineno-0-681">681</a></span>
 <span class="normal"><a href="#__codelineno-0-682">682</a></span>
 <span class="normal"><a href="#__codelineno-0-683">683</a></span>
-<span class="normal"><a href="#__codelineno-0-684">684</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-684">684</a></span>
+<span class="normal"><a href="#__codelineno-0-685">685</a></span>
+<span class="normal"><a href="#__codelineno-0-686">686</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-640" name="__codelineno-0-640"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch HANZE and return the per-instance shape.</span>
 <a id="__codelineno-0-641" name="__codelineno-0-641"></a>
 <a id="__codelineno-0-642" name="__codelineno-0-642"></a><span class="sd">    Runs the download + filter, writes the result to `path` (a CSV for the</span>
-<a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">    tabular default, a GeoPackage for `with_geometry`), and returns it.</span>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">        progress_bar: Whether to draw a download progress bar. Passed through</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">            to the transport, so `False` really does silence it.</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">        A `pandas.DataFrame` of events + impacts (the default), or a</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        `pyramids.feature.collection.FeatureCollection` of the</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">        affected NUTS-3 regions (`with_geometry=True`). Both are also written</span>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">        under `root_dir`.</span>
-<a id="__codelineno-0-654" name="__codelineno-0-654"></a>
-<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-656" name="__codelineno-0-656"></a><span class="sd">        requests.HTTPError: If a Zenodo download returns a non-2xx status.</span>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="sd">        ValueError: If a download&#39;s body fails its content guard (an HTML</span>
-<a id="__codelineno-0-658" name="__codelineno-0-658"></a><span class="sd">            error page served with a 200 status), or `with_geometry=True` and</span>
-<a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">            the region archive has no `&lt;member_stem&gt;.shp` member.</span>
-<a id="__codelineno-0-660" name="__codelineno-0-660"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-661" name="__codelineno-0-661"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-662" name="__codelineno-0-662"></a>    <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-663" name="__codelineno-0-663"></a>    <span class="c1"># `_search` always yields one product, so `_fetch` returns a single</span>
-<a id="__codelineno-0-664" name="__codelineno-0-664"></a>    <span class="c1"># element (a 0-row DataFrame / empty FC is still one element); the</span>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a>    <span class="c1"># `_empty_result()` fallback is a defensive guard for a future `_search`</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a>    <span class="c1"># that could return nothing, not a path this backend reaches today.</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">results</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_empty_result</span><span class="p">()</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">(</span><span class="s2">&quot;hanze_regions&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.gpkg&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a>        <span class="c1"># Written unconditionally — an empty result still writes a schema-only</span>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a>        <span class="c1"># GeoPackage, so the vector path matches the tabular one (which always</span>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a>        <span class="c1"># writes a header-only CSV) and a caller globbing `path` finds a file.</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a>        <span class="n">result</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a>            <span class="sa">f</span><span class="s2">&quot;HANZE: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> affected region(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a>        <span class="p">)</span>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a>        <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">(</span><span class="s2">&quot;hanze_events&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a>    <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HANZE: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> event(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a>    <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">    tabular default, a GeoPackage for `with_geometry`), and returns it. It</span>
+<a id="__codelineno-0-644" name="__codelineno-0-644"></a><span class="sd">    issues a single request, so it has no partial-failure policy and takes</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">    no `errors=` argument.</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">        progress_bar: Whether to draw a download progress bar. Passed through</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">            to the transport, so `False` really does silence it.</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">        A `pandas.DataFrame` of events + impacts (the default), or a</span>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">        `pyramids.feature.collection.FeatureCollection` of the</span>
+<a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="sd">        affected NUTS-3 regions (`with_geometry=True`). Both are also written</span>
+<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">        under `root_dir`.</span>
+<a id="__codelineno-0-656" name="__codelineno-0-656"></a>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-658" name="__codelineno-0-658"></a><span class="sd">        requests.HTTPError: If a Zenodo download returns a non-2xx status.</span>
+<a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">        ValueError: If a download&#39;s body fails its content guard (an HTML</span>
+<a id="__codelineno-0-660" name="__codelineno-0-660"></a><span class="sd">            error page served with a 200 status), or `with_geometry=True` and</span>
+<a id="__codelineno-0-661" name="__codelineno-0-661"></a><span class="sd">            the region archive has no `&lt;member_stem&gt;.shp` member.</span>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-663" name="__codelineno-0-663"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-664" name="__codelineno-0-664"></a>    <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a>    <span class="c1"># `_search` always yields one product, so `_fetch` returns a single</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a>    <span class="c1"># element (a 0-row DataFrame / empty FC is still one element); the</span>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a>    <span class="c1"># `_empty_result()` fallback is a defensive guard for a future `_search`</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a>    <span class="c1"># that could return nothing, not a path this backend reaches today.</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">results</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_empty_result</span><span class="p">()</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-673" name="__codelineno-0-673"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">(</span><span class="s2">&quot;hanze_regions&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.gpkg&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a>        <span class="c1"># Written unconditionally — an empty result still writes a schema-only</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a>        <span class="c1"># GeoPackage, so the vector path matches the tabular one (which always</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a>        <span class="c1"># writes a header-only CSV) and a caller globbing `path` finds a file.</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a>        <span class="n">result</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-678" name="__codelineno-0-678"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-679" name="__codelineno-0-679"></a>            <span class="sa">f</span><span class="s2">&quot;HANZE: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> affected region(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a>        <span class="p">)</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a>        <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">(</span><span class="s2">&quot;hanze_events&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a>    <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HANZE: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> event(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>    <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -30281,7 +30291,9 @@ year the record covers.</p>
 <span class="normal"><a href="#__codelineno-0-729">729</a></span>
 <span class="normal"><a href="#__codelineno-0-730">730</a></span>
 <span class="normal"><a href="#__codelineno-0-731">731</a></span>
-<span class="normal"><a href="#__codelineno-0-732">732</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="k">class</span><span class="w"> </span><span class="nc">HANZE</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-732">732</a></span>
+<span class="normal"><a href="#__codelineno-0-733">733</a></span>
+<span class="normal"><a href="#__codelineno-0-734">734</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="k">class</span><span class="w"> </span><span class="nc">HANZE</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;HANZE historical-flood-impacts backend (per-instance output kind).</span>
 <a id="__codelineno-0-137" name="__codelineno-0-137"></a>
 <a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">    Downloads the HANZE events / impacts table from its pinned Zenodo release,</span>
@@ -30789,96 +30801,98 @@ year the record covers.</p>
 <a id="__codelineno-0-640" name="__codelineno-0-640"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch HANZE and return the per-instance shape.</span>
 <a id="__codelineno-0-641" name="__codelineno-0-641"></a>
 <a id="__codelineno-0-642" name="__codelineno-0-642"></a><span class="sd">        Runs the download + filter, writes the result to `path` (a CSV for the</span>
-<a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">        tabular default, a GeoPackage for `with_geometry`), and returns it.</span>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">            progress_bar: Whether to draw a download progress bar. Passed through</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">                to the transport, so `False` really does silence it.</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">            A `pandas.DataFrame` of events + impacts (the default), or a</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">            `pyramids.feature.collection.FeatureCollection` of the</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">            affected NUTS-3 regions (`with_geometry=True`). Both are also written</span>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">            under `root_dir`.</span>
-<a id="__codelineno-0-654" name="__codelineno-0-654"></a>
-<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-656" name="__codelineno-0-656"></a><span class="sd">            requests.HTTPError: If a Zenodo download returns a non-2xx status.</span>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="sd">            ValueError: If a download&#39;s body fails its content guard (an HTML</span>
-<a id="__codelineno-0-658" name="__codelineno-0-658"></a><span class="sd">                error page served with a 200 status), or `with_geometry=True` and</span>
-<a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">                the region archive has no `&lt;member_stem&gt;.shp` member.</span>
-<a id="__codelineno-0-660" name="__codelineno-0-660"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-661" name="__codelineno-0-661"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-662" name="__codelineno-0-662"></a>        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-663" name="__codelineno-0-663"></a>        <span class="c1"># `_search` always yields one product, so `_fetch` returns a single</span>
-<a id="__codelineno-0-664" name="__codelineno-0-664"></a>        <span class="c1"># element (a 0-row DataFrame / empty FC is still one element); the</span>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a>        <span class="c1"># `_empty_result()` fallback is a defensive guard for a future `_search`</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a>        <span class="c1"># that could return nothing, not a path this backend reaches today.</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">results</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_empty_result</span><span class="p">()</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">(</span><span class="s2">&quot;hanze_regions&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.gpkg&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a>            <span class="c1"># Written unconditionally — an empty result still writes a schema-only</span>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a>            <span class="c1"># GeoPackage, so the vector path matches the tabular one (which always</span>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a>            <span class="c1"># writes a header-only CSV) and a caller globbing `path` finds a file.</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a>            <span class="n">result</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a>                <span class="sa">f</span><span class="s2">&quot;HANZE: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> affected region(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a>            <span class="p">)</span>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a>            <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">(</span><span class="s2">&quot;hanze_events&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a>        <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HANZE: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> event(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a>        <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_empty_result</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the empty result matching the instance&#39;s output kind.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_geometry</span><span class="p">:</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a>            <span class="k">return</span> <span class="n">geometry_module</span><span class="o">.</span><span class="n">empty_region_fc</span><span class="p">()</span>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a>        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_result_stem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose an output file stem that encodes the request&#39;s filters.</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a><span class="sd">        A plain `base` for an unfiltered request; otherwise `base-&lt;digest&gt;` so</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a><span class="sd">        two differently-filtered queries into one `path=` do not overwrite each</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a><span class="sd">        other. The digest is order-insensitive in the multi-value filters.</span>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a><span class="sd">            base: The stem prefix (`&quot;hanze_events&quot;` / `&quot;hanze_regions&quot;`).</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a><span class="sd">            str: `base`, or `base-&lt;8-hex-digest&gt;` when any filter is active.</span>
-<a id="__codelineno-0-704" name="__codelineno-0-704"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-705" name="__codelineno-0-705"></a>        <span class="n">first_year</span><span class="p">,</span> <span class="n">last_year</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span>
-<a id="__codelineno-0-706" name="__codelineno-0-706"></a>        <span class="n">applied</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-707" name="__codelineno-0-707"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">),</span>
-<a id="__codelineno-0-708" name="__codelineno-0-708"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_region</span><span class="p">),</span>
-<a id="__codelineno-0-709" name="__codelineno-0-709"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flood_types</span><span class="p">),</span>
-<a id="__codelineno-0-710" name="__codelineno-0-710"></a>            <span class="n">first_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-711" name="__codelineno-0-711"></a>            <span class="n">last_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-712" name="__codelineno-0-712"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-713" name="__codelineno-0-713"></a>        <span class="p">)</span>
-<a id="__codelineno-0-714" name="__codelineno-0-714"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">applied</span><span class="p">):</span>
-<a id="__codelineno-0-715" name="__codelineno-0-715"></a>            <span class="k">return</span> <span class="n">base</span>
-<a id="__codelineno-0-716" name="__codelineno-0-716"></a>        <span class="n">request</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-717" name="__codelineno-0-717"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">)),</span>
-<a id="__codelineno-0-718" name="__codelineno-0-718"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_region</span><span class="p">)),</span>
-<a id="__codelineno-0-719" name="__codelineno-0-719"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flood_types</span><span class="p">)),</span>
-<a id="__codelineno-0-720" name="__codelineno-0-720"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span><span class="p">,</span>
-<a id="__codelineno-0-721" name="__codelineno-0-721"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="p">,</span>
-<a id="__codelineno-0-722" name="__codelineno-0-722"></a>        <span class="p">)</span>
-<a id="__codelineno-0-723" name="__codelineno-0-723"></a>        <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span>
-<a id="__codelineno-0-724" name="__codelineno-0-724"></a>            <span class="nb">repr</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">usedforsecurity</span><span class="o">=</span><span class="kc">False</span>
-<a id="__codelineno-0-725" name="__codelineno-0-725"></a>        <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>
-<a id="__codelineno-0-726" name="__codelineno-0-726"></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-727" name="__codelineno-0-727"></a>
-<a id="__codelineno-0-728" name="__codelineno-0-728"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-729" name="__codelineno-0-729"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the CC-BY attribution once (info, not a warning).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-730" name="__codelineno-0-730"></a>        <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span>
-<a id="__codelineno-0-731" name="__codelineno-0-731"></a>        <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">attribution</span><span class="p">:</span>
-<a id="__codelineno-0-732" name="__codelineno-0-732"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HANZE source citation: </span><span class="si">{</span><span class="n">record</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">        tabular default, a GeoPackage for `with_geometry`), and returns it. It</span>
+<a id="__codelineno-0-644" name="__codelineno-0-644"></a><span class="sd">        issues a single request, so it has no partial-failure policy and takes</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">        no `errors=` argument.</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">            progress_bar: Whether to draw a download progress bar. Passed through</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">                to the transport, so `False` really does silence it.</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">            A `pandas.DataFrame` of events + impacts (the default), or a</span>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">            `pyramids.feature.collection.FeatureCollection` of the</span>
+<a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="sd">            affected NUTS-3 regions (`with_geometry=True`). Both are also written</span>
+<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">            under `root_dir`.</span>
+<a id="__codelineno-0-656" name="__codelineno-0-656"></a>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-658" name="__codelineno-0-658"></a><span class="sd">            requests.HTTPError: If a Zenodo download returns a non-2xx status.</span>
+<a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">            ValueError: If a download&#39;s body fails its content guard (an HTML</span>
+<a id="__codelineno-0-660" name="__codelineno-0-660"></a><span class="sd">                error page served with a 200 status), or `with_geometry=True` and</span>
+<a id="__codelineno-0-661" name="__codelineno-0-661"></a><span class="sd">                the region archive has no `&lt;member_stem&gt;.shp` member.</span>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-663" name="__codelineno-0-663"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-664" name="__codelineno-0-664"></a>        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a>        <span class="c1"># `_search` always yields one product, so `_fetch` returns a single</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a>        <span class="c1"># element (a 0-row DataFrame / empty FC is still one element); the</span>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a>        <span class="c1"># `_empty_result()` fallback is a defensive guard for a future `_search`</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a>        <span class="c1"># that could return nothing, not a path this backend reaches today.</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">results</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_empty_result</span><span class="p">()</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-673" name="__codelineno-0-673"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">(</span><span class="s2">&quot;hanze_regions&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.gpkg&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a>            <span class="c1"># Written unconditionally — an empty result still writes a schema-only</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a>            <span class="c1"># GeoPackage, so the vector path matches the tabular one (which always</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a>            <span class="c1"># writes a header-only CSV) and a caller globbing `path` finds a file.</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a>            <span class="n">result</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-678" name="__codelineno-0-678"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-679" name="__codelineno-0-679"></a>                <span class="sa">f</span><span class="s2">&quot;HANZE: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> affected region(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a>            <span class="p">)</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a>            <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">(</span><span class="s2">&quot;hanze_events&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a>        <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HANZE: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> event(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>        <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_empty_result</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the empty result matching the instance&#39;s output kind.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_geometry</span><span class="p">:</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a>            <span class="k">return</span> <span class="n">geometry_module</span><span class="o">.</span><span class="n">empty_region_fc</span><span class="p">()</span>
+<a id="__codelineno-0-692" name="__codelineno-0-692"></a>        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<a id="__codelineno-0-693" name="__codelineno-0-693"></a>
+<a id="__codelineno-0-694" name="__codelineno-0-694"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_result_stem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-695" name="__codelineno-0-695"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose an output file stem that encodes the request&#39;s filters.</span>
+<a id="__codelineno-0-696" name="__codelineno-0-696"></a>
+<a id="__codelineno-0-697" name="__codelineno-0-697"></a><span class="sd">        A plain `base` for an unfiltered request; otherwise `base-&lt;digest&gt;` so</span>
+<a id="__codelineno-0-698" name="__codelineno-0-698"></a><span class="sd">        two differently-filtered queries into one `path=` do not overwrite each</span>
+<a id="__codelineno-0-699" name="__codelineno-0-699"></a><span class="sd">        other. The digest is order-insensitive in the multi-value filters.</span>
+<a id="__codelineno-0-700" name="__codelineno-0-700"></a>
+<a id="__codelineno-0-701" name="__codelineno-0-701"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-702" name="__codelineno-0-702"></a><span class="sd">            base: The stem prefix (`&quot;hanze_events&quot;` / `&quot;hanze_regions&quot;`).</span>
+<a id="__codelineno-0-703" name="__codelineno-0-703"></a>
+<a id="__codelineno-0-704" name="__codelineno-0-704"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-705" name="__codelineno-0-705"></a><span class="sd">            str: `base`, or `base-&lt;8-hex-digest&gt;` when any filter is active.</span>
+<a id="__codelineno-0-706" name="__codelineno-0-706"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-707" name="__codelineno-0-707"></a>        <span class="n">first_year</span><span class="p">,</span> <span class="n">last_year</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span>
+<a id="__codelineno-0-708" name="__codelineno-0-708"></a>        <span class="n">applied</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-709" name="__codelineno-0-709"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">),</span>
+<a id="__codelineno-0-710" name="__codelineno-0-710"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_region</span><span class="p">),</span>
+<a id="__codelineno-0-711" name="__codelineno-0-711"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flood_types</span><span class="p">),</span>
+<a id="__codelineno-0-712" name="__codelineno-0-712"></a>            <span class="n">first_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-713" name="__codelineno-0-713"></a>            <span class="n">last_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-714" name="__codelineno-0-714"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-715" name="__codelineno-0-715"></a>        <span class="p">)</span>
+<a id="__codelineno-0-716" name="__codelineno-0-716"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">applied</span><span class="p">):</span>
+<a id="__codelineno-0-717" name="__codelineno-0-717"></a>            <span class="k">return</span> <span class="n">base</span>
+<a id="__codelineno-0-718" name="__codelineno-0-718"></a>        <span class="n">request</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-719" name="__codelineno-0-719"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">)),</span>
+<a id="__codelineno-0-720" name="__codelineno-0-720"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_region</span><span class="p">)),</span>
+<a id="__codelineno-0-721" name="__codelineno-0-721"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flood_types</span><span class="p">)),</span>
+<a id="__codelineno-0-722" name="__codelineno-0-722"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span><span class="p">,</span>
+<a id="__codelineno-0-723" name="__codelineno-0-723"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="p">,</span>
+<a id="__codelineno-0-724" name="__codelineno-0-724"></a>        <span class="p">)</span>
+<a id="__codelineno-0-725" name="__codelineno-0-725"></a>        <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span>
+<a id="__codelineno-0-726" name="__codelineno-0-726"></a>            <span class="nb">repr</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">usedforsecurity</span><span class="o">=</span><span class="kc">False</span>
+<a id="__codelineno-0-727" name="__codelineno-0-727"></a>        <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>
+<a id="__codelineno-0-728" name="__codelineno-0-728"></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-729" name="__codelineno-0-729"></a>
+<a id="__codelineno-0-730" name="__codelineno-0-730"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-731" name="__codelineno-0-731"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the CC-BY attribution once (info, not a warning).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-732" name="__codelineno-0-732"></a>        <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span>
+<a id="__codelineno-0-733" name="__codelineno-0-733"></a>        <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">attribution</span><span class="p">:</span>
+<a id="__codelineno-0-734" name="__codelineno-0-734"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HANZE source citation: </span><span class="si">{</span><span class="n">record</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -31357,7 +31371,9 @@ regions instead of the events <code>DataFrame</code> (sets
 
         <p>Fetch HANZE and return the per-instance shape.</p>
 <p>Runs the download + filter, writes the result to <code>path</code> (a CSV for the
-tabular default, a GeoPackage for <code>with_geometry</code>), and returns it.</p>
+tabular default, a GeoPackage for <code>with_geometry</code>), and returns it. It
+issues a single request, so it has no partial-failure policy and takes
+no <code>errors=</code> argument.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -31527,52 +31543,56 @@ the region archive has no <code>&lt;member_stem&gt;.shp</code> member.</p>
 <span class="normal"><a href="#__codelineno-0-681">681</a></span>
 <span class="normal"><a href="#__codelineno-0-682">682</a></span>
 <span class="normal"><a href="#__codelineno-0-683">683</a></span>
-<span class="normal"><a href="#__codelineno-0-684">684</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-684">684</a></span>
+<span class="normal"><a href="#__codelineno-0-685">685</a></span>
+<span class="normal"><a href="#__codelineno-0-686">686</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-640" name="__codelineno-0-640"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch HANZE and return the per-instance shape.</span>
 <a id="__codelineno-0-641" name="__codelineno-0-641"></a>
 <a id="__codelineno-0-642" name="__codelineno-0-642"></a><span class="sd">    Runs the download + filter, writes the result to `path` (a CSV for the</span>
-<a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">    tabular default, a GeoPackage for `with_geometry`), and returns it.</span>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">        progress_bar: Whether to draw a download progress bar. Passed through</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">            to the transport, so `False` really does silence it.</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">        A `pandas.DataFrame` of events + impacts (the default), or a</span>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        `pyramids.feature.collection.FeatureCollection` of the</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">        affected NUTS-3 regions (`with_geometry=True`). Both are also written</span>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">        under `root_dir`.</span>
-<a id="__codelineno-0-654" name="__codelineno-0-654"></a>
-<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-656" name="__codelineno-0-656"></a><span class="sd">        requests.HTTPError: If a Zenodo download returns a non-2xx status.</span>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="sd">        ValueError: If a download&#39;s body fails its content guard (an HTML</span>
-<a id="__codelineno-0-658" name="__codelineno-0-658"></a><span class="sd">            error page served with a 200 status), or `with_geometry=True` and</span>
-<a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">            the region archive has no `&lt;member_stem&gt;.shp` member.</span>
-<a id="__codelineno-0-660" name="__codelineno-0-660"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-661" name="__codelineno-0-661"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-662" name="__codelineno-0-662"></a>    <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-663" name="__codelineno-0-663"></a>    <span class="c1"># `_search` always yields one product, so `_fetch` returns a single</span>
-<a id="__codelineno-0-664" name="__codelineno-0-664"></a>    <span class="c1"># element (a 0-row DataFrame / empty FC is still one element); the</span>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a>    <span class="c1"># `_empty_result()` fallback is a defensive guard for a future `_search`</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a>    <span class="c1"># that could return nothing, not a path this backend reaches today.</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">results</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_empty_result</span><span class="p">()</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">(</span><span class="s2">&quot;hanze_regions&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.gpkg&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a>        <span class="c1"># Written unconditionally — an empty result still writes a schema-only</span>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a>        <span class="c1"># GeoPackage, so the vector path matches the tabular one (which always</span>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a>        <span class="c1"># writes a header-only CSV) and a caller globbing `path` finds a file.</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a>        <span class="n">result</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a>            <span class="sa">f</span><span class="s2">&quot;HANZE: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> affected region(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a>        <span class="p">)</span>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a>        <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">(</span><span class="s2">&quot;hanze_events&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a>    <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HANZE: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> event(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a>    <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">    tabular default, a GeoPackage for `with_geometry`), and returns it. It</span>
+<a id="__codelineno-0-644" name="__codelineno-0-644"></a><span class="sd">    issues a single request, so it has no partial-failure policy and takes</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">    no `errors=` argument.</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">        progress_bar: Whether to draw a download progress bar. Passed through</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">            to the transport, so `False` really does silence it.</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">        A `pandas.DataFrame` of events + impacts (the default), or a</span>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">        `pyramids.feature.collection.FeatureCollection` of the</span>
+<a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="sd">        affected NUTS-3 regions (`with_geometry=True`). Both are also written</span>
+<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">        under `root_dir`.</span>
+<a id="__codelineno-0-656" name="__codelineno-0-656"></a>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-658" name="__codelineno-0-658"></a><span class="sd">        requests.HTTPError: If a Zenodo download returns a non-2xx status.</span>
+<a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">        ValueError: If a download&#39;s body fails its content guard (an HTML</span>
+<a id="__codelineno-0-660" name="__codelineno-0-660"></a><span class="sd">            error page served with a 200 status), or `with_geometry=True` and</span>
+<a id="__codelineno-0-661" name="__codelineno-0-661"></a><span class="sd">            the region archive has no `&lt;member_stem&gt;.shp` member.</span>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-663" name="__codelineno-0-663"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-664" name="__codelineno-0-664"></a>    <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a>    <span class="c1"># `_search` always yields one product, so `_fetch` returns a single</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a>    <span class="c1"># element (a 0-row DataFrame / empty FC is still one element); the</span>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a>    <span class="c1"># `_empty_result()` fallback is a defensive guard for a future `_search`</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a>    <span class="c1"># that could return nothing, not a path this backend reaches today.</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">results</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_empty_result</span><span class="p">()</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-673" name="__codelineno-0-673"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">(</span><span class="s2">&quot;hanze_regions&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.gpkg&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a>        <span class="c1"># Written unconditionally — an empty result still writes a schema-only</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a>        <span class="c1"># GeoPackage, so the vector path matches the tabular one (which always</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a>        <span class="c1"># writes a header-only CSV) and a caller globbing `path` finds a file.</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a>        <span class="n">result</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-678" name="__codelineno-0-678"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-679" name="__codelineno-0-679"></a>            <span class="sa">f</span><span class="s2">&quot;HANZE: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> affected region(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a>        <span class="p">)</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a>        <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">(</span><span class="s2">&quot;hanze_events&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a>    <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HANZE: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> event(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>    <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

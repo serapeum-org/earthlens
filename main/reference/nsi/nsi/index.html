@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -25672,7 +25672,10 @@ to know the return shape.</p>
 <span class="normal"><a href="#__codelineno-0-471">471</a></span>
 <span class="normal"><a href="#__codelineno-0-472">472</a></span>
 <span class="normal"><a href="#__codelineno-0-473">473</a></span>
-<span class="normal"><a href="#__codelineno-0-474">474</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="k">class</span><span class="w"> </span><span class="nc">NSI</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-474">474</a></span>
+<span class="normal"><a href="#__codelineno-0-475">475</a></span>
+<span class="normal"><a href="#__codelineno-0-476">476</a></span>
+<span class="normal"><a href="#__codelineno-0-477">477</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="k">class</span><span class="w"> </span><span class="nc">NSI</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;US flood exposure / loss backend (per-instance output).</span>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    Resolves `source=` to its catalog row, issues the one bounded request that</span>
@@ -26009,70 +26012,73 @@ to know the return shape.</p>
 <a id="__codelineno-0-408" name="__codelineno-0-408"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the selected source and return its per-instance shape.</span>
 <a id="__codelineno-0-410" name="__codelineno-0-410"></a>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">            progress_bar: Accepted for signature parity; one logical request is</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">                issued (paged for `nfip`), so this is a no-op.</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            A `pyramids.feature.collection.FeatureCollection` for</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            `structures`/`nfhl`, or a `pandas.DataFrame` (also written to</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">            `root_dir`) for `nfip`.</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">            requests.HTTPError: If the upstream source returns a non-2xx status.</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>                <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: returned a FeatureCollection &quot;</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s)).&quot;</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>            <span class="p">)</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>            <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>                <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>            <span class="p">)</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>                <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: no rows matched; wrote an empty &quot;</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>                <span class="sa">f</span><span class="s2">&quot;(schema-only) table to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>            <span class="p">)</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>        <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write a tabular result to `root_dir` and return the path.</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        It issues one logical request (paged for `nfip`), so it has no</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        partial-failure policy and takes no `errors=` argument.</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">            progress_bar: Accepted for signature parity; one logical request is</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">                issued (paged for `nfip`), so this is a no-op.</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">            A `pyramids.feature.collection.FeatureCollection` for</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">            `structures`/`nfhl`, or a `pandas.DataFrame` (also written to</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">            `root_dir`) for `nfip`.</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">            requests.HTTPError: If the upstream source returns a non-2xx status.</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>                <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: returned a FeatureCollection &quot;</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s)).&quot;</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>            <span class="p">)</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>            <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>                <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>            <span class="p">)</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>                <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: no rows matched; wrote an empty &quot;</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>                <span class="sa">f</span><span class="s2">&quot;(schema-only) table to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>            <span class="p">)</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>        <span class="k">return</span> <span class="n">result</span>
 <a id="__codelineno-0-446" name="__codelineno-0-446"></a>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">            df: The result frame.</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write a tabular result to `root_dir` and return the path.</span>
 <a id="__codelineno-0-449" name="__codelineno-0-449"></a>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">            Path: The written CSV / Parquet file path.</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">            df: The result frame.</span>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">            ImportError: If `output_format=&quot;parquet&quot;` but `pyarrow` is missing.</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>        <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">else</span> <span class="s2">&quot;csv&quot;</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;nsi_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a>                <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a>            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># pragma: no cover - depends on env</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>                    <span class="s2">&quot;Writing Parquet requires &#39;pyarrow&#39;. Install it (pip &quot;</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>                    <span class="s2">&quot;install pyarrow) or use output_format=&#39;csv&#39;.&quot;</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a>        <span class="k">return</span> <span class="n">out_path</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the resolved source&#39;s citation once (info, not a warning).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>        <span class="n">citation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">citation</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>        <span class="k">if</span> <span class="n">citation</span><span class="p">:</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;NSI source citation: </span><span class="si">{</span><span class="n">citation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">            Path: The written CSV / Parquet file path.</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">            ImportError: If `output_format=&quot;parquet&quot;` but `pyarrow` is missing.</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>        <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">else</span> <span class="s2">&quot;csv&quot;</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;nsi_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>                <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># pragma: no cover - depends on env</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>                    <span class="s2">&quot;Writing Parquet requires &#39;pyarrow&#39;. Install it (pip &quot;</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>                    <span class="s2">&quot;install pyarrow) or use output_format=&#39;csv&#39;.&quot;</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the resolved source&#39;s citation once (info, not a warning).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>        <span class="n">citation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">citation</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>        <span class="k">if</span> <span class="n">citation</span><span class="p">:</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;NSI source citation: </span><span class="si">{</span><span class="n">citation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -26559,6 +26565,8 @@ unrecognised, or the source's required bound is missing (<code>G3</code>).</p>
     <div class="doc doc-contents ">
 
         <p>Fetch the selected source and return its per-instance shape.</p>
+<p>It issues one logical request (paged for <code>nfip</code>), so it has no
+partial-failure policy and takes no <code>errors=</code> argument.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -26698,44 +26706,50 @@ issued (paged for <code>nfip</code>), so this is a no-op.</p>
 <span class="normal"><a href="#__codelineno-0-439">439</a></span>
 <span class="normal"><a href="#__codelineno-0-440">440</a></span>
 <span class="normal"><a href="#__codelineno-0-441">441</a></span>
-<span class="normal"><a href="#__codelineno-0-442">442</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-442">442</a></span>
+<span class="normal"><a href="#__codelineno-0-443">443</a></span>
+<span class="normal"><a href="#__codelineno-0-444">444</a></span>
+<span class="normal"><a href="#__codelineno-0-445">445</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-406" name="__codelineno-0-406"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-407" name="__codelineno-0-407"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the selected source and return its per-instance shape.</span>
 <a id="__codelineno-0-410" name="__codelineno-0-410"></a>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        progress_bar: Accepted for signature parity; one logical request is</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            issued (paged for `nfip`), so this is a no-op.</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        A `pyramids.feature.collection.FeatureCollection` for</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        `structures`/`nfhl`, or a `pandas.DataFrame` (also written to</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">        `root_dir`) for `nfip`.</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">        requests.HTTPError: If the upstream source returns a non-2xx status.</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>            <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: returned a FeatureCollection &quot;</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s)).&quot;</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>        <span class="p">)</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>        <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>            <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>        <span class="p">)</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>            <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: no rows matched; wrote an empty &quot;</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>            <span class="sa">f</span><span class="s2">&quot;(schema-only) table to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>        <span class="p">)</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>    <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">    It issues one logical request (paged for `nfip`), so it has no</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">    partial-failure policy and takes no `errors=` argument.</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        progress_bar: Accepted for signature parity; one logical request is</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            issued (paged for `nfip`), so this is a no-op.</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">        A `pyramids.feature.collection.FeatureCollection` for</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">        `structures`/`nfhl`, or a `pandas.DataFrame` (also written to</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">        `root_dir`) for `nfip`.</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">        requests.HTTPError: If the upstream source returns a non-2xx status.</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>            <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: returned a FeatureCollection &quot;</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s)).&quot;</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>        <span class="p">)</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>        <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>            <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>        <span class="p">)</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>            <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: no rows matched; wrote an empty &quot;</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>            <span class="sa">f</span><span class="s2">&quot;(schema-only) table to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>        <span class="p">)</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>    <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -28573,7 +28587,10 @@ to know the return shape.</p>
 <span class="normal"><a href="#__codelineno-0-471">471</a></span>
 <span class="normal"><a href="#__codelineno-0-472">472</a></span>
 <span class="normal"><a href="#__codelineno-0-473">473</a></span>
-<span class="normal"><a href="#__codelineno-0-474">474</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="k">class</span><span class="w"> </span><span class="nc">NSI</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-474">474</a></span>
+<span class="normal"><a href="#__codelineno-0-475">475</a></span>
+<span class="normal"><a href="#__codelineno-0-476">476</a></span>
+<span class="normal"><a href="#__codelineno-0-477">477</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="k">class</span><span class="w"> </span><span class="nc">NSI</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;US flood exposure / loss backend (per-instance output).</span>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    Resolves `source=` to its catalog row, issues the one bounded request that</span>
@@ -28910,70 +28927,73 @@ to know the return shape.</p>
 <a id="__codelineno-0-408" name="__codelineno-0-408"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the selected source and return its per-instance shape.</span>
 <a id="__codelineno-0-410" name="__codelineno-0-410"></a>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">            progress_bar: Accepted for signature parity; one logical request is</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">                issued (paged for `nfip`), so this is a no-op.</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            A `pyramids.feature.collection.FeatureCollection` for</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            `structures`/`nfhl`, or a `pandas.DataFrame` (also written to</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">            `root_dir`) for `nfip`.</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">            requests.HTTPError: If the upstream source returns a non-2xx status.</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>                <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: returned a FeatureCollection &quot;</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s)).&quot;</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>            <span class="p">)</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>            <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>                <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>            <span class="p">)</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>                <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: no rows matched; wrote an empty &quot;</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>                <span class="sa">f</span><span class="s2">&quot;(schema-only) table to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>            <span class="p">)</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>        <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write a tabular result to `root_dir` and return the path.</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        It issues one logical request (paged for `nfip`), so it has no</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        partial-failure policy and takes no `errors=` argument.</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">            progress_bar: Accepted for signature parity; one logical request is</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">                issued (paged for `nfip`), so this is a no-op.</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">            A `pyramids.feature.collection.FeatureCollection` for</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">            `structures`/`nfhl`, or a `pandas.DataFrame` (also written to</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">            `root_dir`) for `nfip`.</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">            requests.HTTPError: If the upstream source returns a non-2xx status.</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>                <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: returned a FeatureCollection &quot;</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s)).&quot;</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>            <span class="p">)</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>            <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>                <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>            <span class="p">)</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>                <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: no rows matched; wrote an empty &quot;</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>                <span class="sa">f</span><span class="s2">&quot;(schema-only) table to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>            <span class="p">)</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>        <span class="k">return</span> <span class="n">result</span>
 <a id="__codelineno-0-446" name="__codelineno-0-446"></a>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">            df: The result frame.</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write a tabular result to `root_dir` and return the path.</span>
 <a id="__codelineno-0-449" name="__codelineno-0-449"></a>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">            Path: The written CSV / Parquet file path.</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">            df: The result frame.</span>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">            ImportError: If `output_format=&quot;parquet&quot;` but `pyarrow` is missing.</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>        <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">else</span> <span class="s2">&quot;csv&quot;</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;nsi_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a>                <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a>            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># pragma: no cover - depends on env</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>                    <span class="s2">&quot;Writing Parquet requires &#39;pyarrow&#39;. Install it (pip &quot;</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>                    <span class="s2">&quot;install pyarrow) or use output_format=&#39;csv&#39;.&quot;</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a>        <span class="k">return</span> <span class="n">out_path</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the resolved source&#39;s citation once (info, not a warning).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>        <span class="n">citation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">citation</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>        <span class="k">if</span> <span class="n">citation</span><span class="p">:</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;NSI source citation: </span><span class="si">{</span><span class="n">citation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">            Path: The written CSV / Parquet file path.</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">            ImportError: If `output_format=&quot;parquet&quot;` but `pyarrow` is missing.</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>        <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">else</span> <span class="s2">&quot;csv&quot;</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;nsi_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>                <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># pragma: no cover - depends on env</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>                    <span class="s2">&quot;Writing Parquet requires &#39;pyarrow&#39;. Install it (pip &quot;</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>                    <span class="s2">&quot;install pyarrow) or use output_format=&#39;csv&#39;.&quot;</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the resolved source&#39;s citation once (info, not a warning).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>        <span class="n">citation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">citation</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>        <span class="k">if</span> <span class="n">citation</span><span class="p">:</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;NSI source citation: </span><span class="si">{</span><span class="n">citation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -29460,6 +29480,8 @@ unrecognised, or the source's required bound is missing (<code>G3</code>).</p>
     <div class="doc doc-contents ">
 
         <p>Fetch the selected source and return its per-instance shape.</p>
+<p>It issues one logical request (paged for <code>nfip</code>), so it has no
+partial-failure policy and takes no <code>errors=</code> argument.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -29599,44 +29621,50 @@ issued (paged for <code>nfip</code>), so this is a no-op.</p>
 <span class="normal"><a href="#__codelineno-0-439">439</a></span>
 <span class="normal"><a href="#__codelineno-0-440">440</a></span>
 <span class="normal"><a href="#__codelineno-0-441">441</a></span>
-<span class="normal"><a href="#__codelineno-0-442">442</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-442">442</a></span>
+<span class="normal"><a href="#__codelineno-0-443">443</a></span>
+<span class="normal"><a href="#__codelineno-0-444">444</a></span>
+<span class="normal"><a href="#__codelineno-0-445">445</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-406" name="__codelineno-0-406"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-407" name="__codelineno-0-407"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the selected source and return its per-instance shape.</span>
 <a id="__codelineno-0-410" name="__codelineno-0-410"></a>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        progress_bar: Accepted for signature parity; one logical request is</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            issued (paged for `nfip`), so this is a no-op.</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        A `pyramids.feature.collection.FeatureCollection` for</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        `structures`/`nfhl`, or a `pandas.DataFrame` (also written to</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">        `root_dir`) for `nfip`.</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">        requests.HTTPError: If the upstream source returns a non-2xx status.</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>            <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: returned a FeatureCollection &quot;</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s)).&quot;</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>        <span class="p">)</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>        <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>            <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>        <span class="p">)</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>            <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: no rows matched; wrote an empty &quot;</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>            <span class="sa">f</span><span class="s2">&quot;(schema-only) table to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>        <span class="p">)</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>    <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">    It issues one logical request (paged for `nfip`), so it has no</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">    partial-failure policy and takes no `errors=` argument.</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        progress_bar: Accepted for signature parity; one logical request is</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            issued (paged for `nfip`), so this is a no-op.</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">        A `pyramids.feature.collection.FeatureCollection` for</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">        `structures`/`nfhl`, or a `pandas.DataFrame` (also written to</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">        `root_dir`) for `nfip`.</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">        requests.HTTPError: If the upstream source returns a non-2xx status.</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>            <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: returned a FeatureCollection &quot;</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s)).&quot;</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>        <span class="p">)</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>        <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>            <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>        <span class="p">)</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>            <span class="sa">f</span><span class="s2">&quot;NSI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: no rows matched; wrote an empty &quot;</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>            <span class="sa">f</span><span class="s2">&quot;(schema-only) table to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>        <span class="p">)</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>    <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

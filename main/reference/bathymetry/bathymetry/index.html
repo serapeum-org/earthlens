@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -25089,7 +25089,10 @@ are static).</p>
 <span class="normal"><a href="#__codelineno-0-564">564</a></span>
 <span class="normal"><a href="#__codelineno-0-565">565</a></span>
 <span class="normal"><a href="#__codelineno-0-566">566</a></span>
-<span class="normal"><a href="#__codelineno-0-567">567</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="k">class</span><span class="w"> </span><span class="nc">Bathymetry</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-567">567</a></span>
+<span class="normal"><a href="#__codelineno-0-568">568</a></span>
+<span class="normal"><a href="#__codelineno-0-569">569</a></span>
+<span class="normal"><a href="#__codelineno-0-570">570</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="k">class</span><span class="w"> </span><span class="nc">Bathymetry</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Global topography / bathymetry DEM backend (raster GeoTIFF output).</span>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    Fetches a curated static DEM (GEBCO 2020, ETOPO1 ice / bedrock via ERDDAP</span>
@@ -25582,17 +25585,20 @@ are static).</p>
 <a id="__codelineno-0-554" name="__codelineno-0-554"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the DEM subset(s) as written GeoTIFF(s).</span>
 <a id="__codelineno-0-556" name="__codelineno-0-556"></a>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">            progress_bar: Accepted for signature parity; one request per call.</span>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">        This backend issues a single request, so it exposes no `errors=`</span>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">        partial-failure policy.</span>
 <a id="__codelineno-0-559" name="__codelineno-0-559"></a>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">            list[Path]: The written GeoTIFF DEM subset path(s).</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">            progress_bar: Accepted for signature parity; one request per call.</span>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">            ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">                (from `_download`).</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">            list[Path]: The written GeoTIFF DEM subset path(s).</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a><span class="sd">            ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">                (from `_download`).</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -26041,6 +26047,8 @@ bounding box is missing.</p>
     <div class="doc doc-contents ">
 
         <p>Fetch the DEM subset(s) as written GeoTIFF(s).</p>
+<p>This backend issues a single request, so it exposes no <code>errors=</code>
+partial-failure policy.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -26139,23 +26147,29 @@ bounding box is missing.</p>
 <span class="normal"><a href="#__codelineno-0-564">564</a></span>
 <span class="normal"><a href="#__codelineno-0-565">565</a></span>
 <span class="normal"><a href="#__codelineno-0-566">566</a></span>
-<span class="normal"><a href="#__codelineno-0-567">567</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-567">567</a></span>
+<span class="normal"><a href="#__codelineno-0-568">568</a></span>
+<span class="normal"><a href="#__codelineno-0-569">569</a></span>
+<span class="normal"><a href="#__codelineno-0-570">570</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-552" name="__codelineno-0-552"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-553" name="__codelineno-0-553"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the DEM subset(s) as written GeoTIFF(s).</span>
 <a id="__codelineno-0-556" name="__codelineno-0-556"></a>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">        progress_bar: Accepted for signature parity; one request per call.</span>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">    This backend issues a single request, so it exposes no `errors=`</span>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">    partial-failure policy.</span>
 <a id="__codelineno-0-559" name="__codelineno-0-559"></a>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">        list[Path]: The written GeoTIFF DEM subset path(s).</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">        progress_bar: Accepted for signature parity; one request per call.</span>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">        ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">            (from `_download`).</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">        list[Path]: The written GeoTIFF DEM subset path(s).</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a><span class="sd">        ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">            (from `_download`).</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -27911,7 +27925,10 @@ are static).</p>
 <span class="normal"><a href="#__codelineno-0-564">564</a></span>
 <span class="normal"><a href="#__codelineno-0-565">565</a></span>
 <span class="normal"><a href="#__codelineno-0-566">566</a></span>
-<span class="normal"><a href="#__codelineno-0-567">567</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="k">class</span><span class="w"> </span><span class="nc">Bathymetry</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-567">567</a></span>
+<span class="normal"><a href="#__codelineno-0-568">568</a></span>
+<span class="normal"><a href="#__codelineno-0-569">569</a></span>
+<span class="normal"><a href="#__codelineno-0-570">570</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="k">class</span><span class="w"> </span><span class="nc">Bathymetry</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Global topography / bathymetry DEM backend (raster GeoTIFF output).</span>
 <a id="__codelineno-0-66" name="__codelineno-0-66"></a>
 <a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    Fetches a curated static DEM (GEBCO 2020, ETOPO1 ice / bedrock via ERDDAP</span>
@@ -28404,17 +28421,20 @@ are static).</p>
 <a id="__codelineno-0-554" name="__codelineno-0-554"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the DEM subset(s) as written GeoTIFF(s).</span>
 <a id="__codelineno-0-556" name="__codelineno-0-556"></a>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">            progress_bar: Accepted for signature parity; one request per call.</span>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">        This backend issues a single request, so it exposes no `errors=`</span>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">        partial-failure policy.</span>
 <a id="__codelineno-0-559" name="__codelineno-0-559"></a>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">            list[Path]: The written GeoTIFF DEM subset path(s).</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">            progress_bar: Accepted for signature parity; one request per call.</span>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">            ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">                (from `_download`).</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">            list[Path]: The written GeoTIFF DEM subset path(s).</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a><span class="sd">            ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">                (from `_download`).</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -28863,6 +28883,8 @@ bounding box is missing.</p>
     <div class="doc doc-contents ">
 
         <p>Fetch the DEM subset(s) as written GeoTIFF(s).</p>
+<p>This backend issues a single request, so it exposes no <code>errors=</code>
+partial-failure policy.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -28961,23 +28983,29 @@ bounding box is missing.</p>
 <span class="normal"><a href="#__codelineno-0-564">564</a></span>
 <span class="normal"><a href="#__codelineno-0-565">565</a></span>
 <span class="normal"><a href="#__codelineno-0-566">566</a></span>
-<span class="normal"><a href="#__codelineno-0-567">567</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-567">567</a></span>
+<span class="normal"><a href="#__codelineno-0-568">568</a></span>
+<span class="normal"><a href="#__codelineno-0-569">569</a></span>
+<span class="normal"><a href="#__codelineno-0-570">570</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-552" name="__codelineno-0-552"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-553" name="__codelineno-0-553"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
 <a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the DEM subset(s) as written GeoTIFF(s).</span>
 <a id="__codelineno-0-556" name="__codelineno-0-556"></a>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">        progress_bar: Accepted for signature parity; one request per call.</span>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">    This backend issues a single request, so it exposes no `errors=`</span>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">    partial-failure policy.</span>
 <a id="__codelineno-0-559" name="__codelineno-0-559"></a>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">        list[Path]: The written GeoTIFF DEM subset path(s).</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">        progress_bar: Accepted for signature parity; one request per call.</span>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">        ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">            (from `_download`).</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">        list[Path]: The written GeoTIFF DEM subset path(s).</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a><span class="sd">        ValueError: If a request is outside the DEM&#39;s coverage / oversize</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">            (from `_download`).</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

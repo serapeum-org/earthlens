@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -25207,7 +25207,9 @@ rejected — the data is an admin-aggregated table, not a gridded raster.</p>
 <span class="normal"><a href="#__codelineno-0-336">336</a></span>
 <span class="normal"><a href="#__codelineno-0-337">337</a></span>
 <span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="k">class</span><span class="w"> </span><span class="nc">FLOPROS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-339">339</a></span>
+<span class="normal"><a href="#__codelineno-0-340">340</a></span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="k">class</span><span class="w"> </span><span class="nc">FLOPROS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;FLOPROS flood-protection-standard backend (vector admin-polygon output).</span>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a>
 <a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    Downloads and caches the single FLOPROS shapefile, reads it with pyramids,</span>
@@ -25425,70 +25427,72 @@ rejected — the data is an admin-aggregated table, not a gridded raster.</p>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">        Issues the (cached) download, reads and filters the shapefile, writes the</span>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        result to one vector file under `path` (when `geometry=True`), and</span>
 <a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        returns the in-memory collection — or a geometry-dropped `DataFrame`</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        when the backend was built with `geometry=False`.</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">            progress_bar: Accepted for signature parity; one file is fetched, so</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">                this is a no-op.</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">            A `pyramids.feature.collection.FeatureCollection` (also</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">            written to `root_dir`) or, when `geometry=False`, a</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">            `pandas.DataFrame` of the units and their protection-standard</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">            columns.</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">            requests.HTTPError: If the download returns a non-2xx status.</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLOPROS </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layers</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> unit(s).&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>            <span class="sa">f</span><span class="s2">&quot;FLOPROS source: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>            <span class="sa">f</span><span class="s2">&quot;(licence </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">license</span><span class="si">}</span><span class="s2">).&quot;</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="p">)</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="p">:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>            <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>            <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;FLOPROS: no unit matched the request (empty table).&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>            <span class="k">return</span> <span class="n">frame</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;FLOPROS: no unit matched the request; nothing written.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>            <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLOPROS: wrote </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> unit(s) to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the collection to one GeoPackage under `root_dir`.</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        The filename embeds the selected layers (and a `country` / bbox tag)</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        so distinct requests do not overwrite one another.</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            collection: The collection to write.</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            Path: The written file path.</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="n">layer_tag</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layers</span><span class="p">))</span> <span class="ow">or</span> <span class="s2">&quot;all&quot;</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>        <span class="n">country_tag</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">:</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>            <span class="n">slug</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>                <span class="n">ch</span> <span class="k">if</span> <span class="n">ch</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>            <span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>            <span class="n">country_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">slug</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="n">bbox_tag</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">_is_global</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">):</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>            <span class="n">box</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>            <span class="n">bbox_tag</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>                <span class="sa">f</span><span class="s2">&quot;_bbox</span><span class="si">{</span><span class="n">box</span><span class="o">.</span><span class="n">latitude_min</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">box</span><span class="o">.</span><span class="n">longitude_min</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">_&quot;</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">box</span><span class="o">.</span><span class="n">latitude_max</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">box</span><span class="o">.</span><span class="n">longitude_max</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="p">)</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;flopros_</span><span class="si">{</span><span class="n">layer_tag</span><span class="si">}{</span><span class="n">country_tag</span><span class="si">}{</span><span class="n">bbox_tag</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.gpkg&quot;</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        when the backend was built with `geometry=False`. It issues a single</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        request, so it has no partial-failure policy and takes no `errors=`</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        argument.</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">            progress_bar: Accepted for signature parity; one file is fetched, so</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">                this is a no-op.</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">            A `pyramids.feature.collection.FeatureCollection` (also</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">            written to `root_dir`) or, when `geometry=False`, a</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            `pandas.DataFrame` of the units and their protection-standard</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">            columns.</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            requests.HTTPError: If the download returns a non-2xx status.</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLOPROS </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layers</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> unit(s).&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>            <span class="sa">f</span><span class="s2">&quot;FLOPROS source: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="sa">f</span><span class="s2">&quot;(licence </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">license</span><span class="si">}</span><span class="s2">).&quot;</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="p">)</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="p">:</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>            <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>            <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;FLOPROS: no unit matched the request (empty table).&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>            <span class="k">return</span> <span class="n">frame</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;FLOPROS: no unit matched the request; nothing written.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>            <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLOPROS: wrote </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> unit(s) to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the collection to one GeoPackage under `root_dir`.</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        The filename embeds the selected layers (and a `country` / bbox tag)</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        so distinct requests do not overwrite one another.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            collection: The collection to write.</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            Path: The written file path.</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>        <span class="n">layer_tag</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layers</span><span class="p">))</span> <span class="ow">or</span> <span class="s2">&quot;all&quot;</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="n">country_tag</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">:</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>            <span class="n">slug</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>                <span class="n">ch</span> <span class="k">if</span> <span class="n">ch</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>            <span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>            <span class="n">country_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">slug</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="n">bbox_tag</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">_is_global</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">):</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="n">box</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="n">bbox_tag</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>                <span class="sa">f</span><span class="s2">&quot;_bbox</span><span class="si">{</span><span class="n">box</span><span class="o">.</span><span class="n">latitude_min</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">box</span><span class="o">.</span><span class="n">longitude_min</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">_&quot;</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">box</span><span class="o">.</span><span class="n">latitude_max</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">box</span><span class="o">.</span><span class="n">longitude_max</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="p">)</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;flopros_</span><span class="si">{</span><span class="n">layer_tag</span><span class="si">}{</span><span class="n">country_tag</span><span class="si">}{</span><span class="n">bbox_tag</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.gpkg&quot;</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>        <span class="k">return</span> <span class="n">out_path</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -25918,7 +25922,9 @@ returns a geometry-dropped <code>DataFrame</code> (<code>OUTPUT_KIND="tabular"</
 <p>Issues the (cached) download, reads and filters the shapefile, writes the
 result to one vector file under <code>path</code> (when <code>geometry=True</code>), and
 returns the in-memory collection — or a geometry-dropped <code>DataFrame</code>
-when the backend was built with <code>geometry=False</code>.</p>
+when the backend was built with <code>geometry=False</code>. It issues a single
+request, so it has no partial-failure policy and takes no <code>errors=</code>
+argument.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -26072,7 +26078,9 @@ this is a no-op.</p>
 <span class="normal"><a href="#__codelineno-0-305">305</a></span>
 <span class="normal"><a href="#__codelineno-0-306">306</a></span>
 <span class="normal"><a href="#__codelineno-0-307">307</a></span>
-<span class="normal"><a href="#__codelineno-0-308">308</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-308">308</a></span>
+<span class="normal"><a href="#__codelineno-0-309">309</a></span>
+<span class="normal"><a href="#__codelineno-0-310">310</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
@@ -26081,39 +26089,41 @@ this is a no-op.</p>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">    Issues the (cached) download, reads and filters the shapefile, writes the</span>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">    result to one vector file under `path` (when `geometry=True`), and</span>
 <a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">    returns the in-memory collection — or a geometry-dropped `DataFrame`</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">    when the backend was built with `geometry=False`.</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        progress_bar: Accepted for signature parity; one file is fetched, so</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            this is a no-op.</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        A `pyramids.feature.collection.FeatureCollection` (also</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        written to `root_dir`) or, when `geometry=False`, a</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        `pandas.DataFrame` of the units and their protection-standard</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        columns.</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        requests.HTTPError: If the download returns a non-2xx status.</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLOPROS </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layers</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> unit(s).&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="sa">f</span><span class="s2">&quot;FLOPROS source: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="sa">f</span><span class="s2">&quot;(licence </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">license</span><span class="si">}</span><span class="s2">).&quot;</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="p">)</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="p">:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;FLOPROS: no unit matched the request (empty table).&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="k">return</span> <span class="n">frame</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;FLOPROS: no unit matched the request; nothing written.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLOPROS: wrote </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> unit(s) to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">    when the backend was built with `geometry=False`. It issues a single</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    request, so it has no partial-failure policy and takes no `errors=`</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">    argument.</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">        progress_bar: Accepted for signature parity; one file is fetched, so</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">            this is a no-op.</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        A `pyramids.feature.collection.FeatureCollection` (also</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        written to `root_dir`) or, when `geometry=False`, a</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        `pandas.DataFrame` of the units and their protection-standard</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        columns.</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        requests.HTTPError: If the download returns a non-2xx status.</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLOPROS </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layers</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> unit(s).&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="sa">f</span><span class="s2">&quot;FLOPROS source: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="sa">f</span><span class="s2">&quot;(licence </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">license</span><span class="si">}</span><span class="s2">).&quot;</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="p">)</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="p">:</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;FLOPROS: no unit matched the request (empty table).&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>        <span class="k">return</span> <span class="n">frame</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;FLOPROS: no unit matched the request; nothing written.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>        <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLOPROS: wrote </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> unit(s) to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="k">return</span> <span class="n">collection</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26743,7 +26753,9 @@ rejected — the data is an admin-aggregated table, not a gridded raster.</p>
 <span class="normal"><a href="#__codelineno-0-336">336</a></span>
 <span class="normal"><a href="#__codelineno-0-337">337</a></span>
 <span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="k">class</span><span class="w"> </span><span class="nc">FLOPROS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-339">339</a></span>
+<span class="normal"><a href="#__codelineno-0-340">340</a></span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="k">class</span><span class="w"> </span><span class="nc">FLOPROS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;FLOPROS flood-protection-standard backend (vector admin-polygon output).</span>
 <a id="__codelineno-0-60" name="__codelineno-0-60"></a>
 <a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    Downloads and caches the single FLOPROS shapefile, reads it with pyramids,</span>
@@ -26961,70 +26973,72 @@ rejected — the data is an admin-aggregated table, not a gridded raster.</p>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">        Issues the (cached) download, reads and filters the shapefile, writes the</span>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">        result to one vector file under `path` (when `geometry=True`), and</span>
 <a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">        returns the in-memory collection — or a geometry-dropped `DataFrame`</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        when the backend was built with `geometry=False`.</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">            progress_bar: Accepted for signature parity; one file is fetched, so</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">                this is a no-op.</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">            A `pyramids.feature.collection.FeatureCollection` (also</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">            written to `root_dir`) or, when `geometry=False`, a</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">            `pandas.DataFrame` of the units and their protection-standard</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">            columns.</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">            requests.HTTPError: If the download returns a non-2xx status.</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLOPROS </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layers</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> unit(s).&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>            <span class="sa">f</span><span class="s2">&quot;FLOPROS source: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>            <span class="sa">f</span><span class="s2">&quot;(licence </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">license</span><span class="si">}</span><span class="s2">).&quot;</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="p">)</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="p">:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>            <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>            <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;FLOPROS: no unit matched the request (empty table).&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>            <span class="k">return</span> <span class="n">frame</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;FLOPROS: no unit matched the request; nothing written.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>            <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLOPROS: wrote </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> unit(s) to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the collection to one GeoPackage under `root_dir`.</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        The filename embeds the selected layers (and a `country` / bbox tag)</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        so distinct requests do not overwrite one another.</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            collection: The collection to write.</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            Path: The written file path.</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="n">layer_tag</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layers</span><span class="p">))</span> <span class="ow">or</span> <span class="s2">&quot;all&quot;</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>        <span class="n">country_tag</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">:</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>            <span class="n">slug</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>                <span class="n">ch</span> <span class="k">if</span> <span class="n">ch</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>            <span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>            <span class="n">country_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">slug</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="n">bbox_tag</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">_is_global</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">):</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>            <span class="n">box</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>            <span class="n">bbox_tag</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>                <span class="sa">f</span><span class="s2">&quot;_bbox</span><span class="si">{</span><span class="n">box</span><span class="o">.</span><span class="n">latitude_min</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">box</span><span class="o">.</span><span class="n">longitude_min</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">_&quot;</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">box</span><span class="o">.</span><span class="n">latitude_max</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">box</span><span class="o">.</span><span class="n">longitude_max</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="p">)</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;flopros_</span><span class="si">{</span><span class="n">layer_tag</span><span class="si">}{</span><span class="n">country_tag</span><span class="si">}{</span><span class="n">bbox_tag</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.gpkg&quot;</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">        when the backend was built with `geometry=False`. It issues a single</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        request, so it has no partial-failure policy and takes no `errors=`</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        argument.</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">            progress_bar: Accepted for signature parity; one file is fetched, so</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">                this is a no-op.</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">            A `pyramids.feature.collection.FeatureCollection` (also</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">            written to `root_dir`) or, when `geometry=False`, a</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">            `pandas.DataFrame` of the units and their protection-standard</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">            columns.</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">            requests.HTTPError: If the download returns a non-2xx status.</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLOPROS </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layers</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> unit(s).&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>            <span class="sa">f</span><span class="s2">&quot;FLOPROS source: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="sa">f</span><span class="s2">&quot;(licence </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">license</span><span class="si">}</span><span class="s2">).&quot;</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="p">)</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="p">:</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>            <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>            <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;FLOPROS: no unit matched the request (empty table).&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>            <span class="k">return</span> <span class="n">frame</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;FLOPROS: no unit matched the request; nothing written.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>            <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLOPROS: wrote </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> unit(s) to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the collection to one GeoPackage under `root_dir`.</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        The filename embeds the selected layers (and a `country` / bbox tag)</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        so distinct requests do not overwrite one another.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            collection: The collection to write.</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            Path: The written file path.</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>        <span class="n">layer_tag</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layers</span><span class="p">))</span> <span class="ow">or</span> <span class="s2">&quot;all&quot;</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="n">country_tag</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">:</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>            <span class="n">slug</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>                <span class="n">ch</span> <span class="k">if</span> <span class="n">ch</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>            <span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>            <span class="n">country_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">slug</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="n">bbox_tag</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">_is_global</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">):</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="n">box</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="n">bbox_tag</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>                <span class="sa">f</span><span class="s2">&quot;_bbox</span><span class="si">{</span><span class="n">box</span><span class="o">.</span><span class="n">latitude_min</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">box</span><span class="o">.</span><span class="n">longitude_min</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">_&quot;</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">box</span><span class="o">.</span><span class="n">latitude_max</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">box</span><span class="o">.</span><span class="n">longitude_max</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="p">)</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;flopros_</span><span class="si">{</span><span class="n">layer_tag</span><span class="si">}{</span><span class="n">country_tag</span><span class="si">}{</span><span class="n">bbox_tag</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.gpkg&quot;</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>        <span class="k">return</span> <span class="n">out_path</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -27454,7 +27468,9 @@ returns a geometry-dropped <code>DataFrame</code> (<code>OUTPUT_KIND="tabular"</
 <p>Issues the (cached) download, reads and filters the shapefile, writes the
 result to one vector file under <code>path</code> (when <code>geometry=True</code>), and
 returns the in-memory collection — or a geometry-dropped <code>DataFrame</code>
-when the backend was built with <code>geometry=False</code>.</p>
+when the backend was built with <code>geometry=False</code>. It issues a single
+request, so it has no partial-failure policy and takes no <code>errors=</code>
+argument.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -27608,7 +27624,9 @@ this is a no-op.</p>
 <span class="normal"><a href="#__codelineno-0-305">305</a></span>
 <span class="normal"><a href="#__codelineno-0-306">306</a></span>
 <span class="normal"><a href="#__codelineno-0-307">307</a></span>
-<span class="normal"><a href="#__codelineno-0-308">308</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-308">308</a></span>
+<span class="normal"><a href="#__codelineno-0-309">309</a></span>
+<span class="normal"><a href="#__codelineno-0-310">310</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
@@ -27617,39 +27635,41 @@ this is a no-op.</p>
 <a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">    Issues the (cached) download, reads and filters the shapefile, writes the</span>
 <a id="__codelineno-0-274" name="__codelineno-0-274"></a><span class="sd">    result to one vector file under `path` (when `geometry=True`), and</span>
 <a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">    returns the in-memory collection — or a geometry-dropped `DataFrame`</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">    when the backend was built with `geometry=False`.</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        progress_bar: Accepted for signature parity; one file is fetched, so</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            this is a no-op.</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        A `pyramids.feature.collection.FeatureCollection` (also</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        written to `root_dir`) or, when `geometry=False`, a</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        `pandas.DataFrame` of the units and their protection-standard</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        columns.</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        requests.HTTPError: If the download returns a non-2xx status.</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLOPROS </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layers</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> unit(s).&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="sa">f</span><span class="s2">&quot;FLOPROS source: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="sa">f</span><span class="s2">&quot;(licence </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">license</span><span class="si">}</span><span class="s2">).&quot;</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="p">)</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="p">:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;FLOPROS: no unit matched the request (empty table).&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="k">return</span> <span class="n">frame</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;FLOPROS: no unit matched the request; nothing written.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLOPROS: wrote </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> unit(s) to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">    when the backend was built with `geometry=False`. It issues a single</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    request, so it has no partial-failure policy and takes no `errors=`</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">    argument.</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">        progress_bar: Accepted for signature parity; one file is fetched, so</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">            this is a no-op.</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        A `pyramids.feature.collection.FeatureCollection` (also</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">        written to `root_dir`) or, when `geometry=False`, a</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        `pandas.DataFrame` of the units and their protection-standard</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        columns.</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        requests.HTTPError: If the download returns a non-2xx status.</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLOPROS </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layers</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> unit(s).&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="sa">f</span><span class="s2">&quot;FLOPROS source: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="sa">f</span><span class="s2">&quot;(licence </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">license</span><span class="si">}</span><span class="s2">).&quot;</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="p">)</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="p">:</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">collection</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;FLOPROS: no unit matched the request (empty table).&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>        <span class="k">return</span> <span class="n">frame</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;FLOPROS: no unit matched the request; nothing written.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>        <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLOPROS: wrote </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> unit(s) to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="k">return</span> <span class="n">collection</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

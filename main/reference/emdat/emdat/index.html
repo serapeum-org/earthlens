@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -27790,7 +27790,10 @@ shape.</p>
 <span class="normal"><a href="#__codelineno-0-750">750</a></span>
 <span class="normal"><a href="#__codelineno-0-751">751</a></span>
 <span class="normal"><a href="#__codelineno-0-752">752</a></span>
-<span class="normal"><a href="#__codelineno-0-753">753</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="k">class</span><span class="w"> </span><span class="nc">EMDAT</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-753">753</a></span>
+<span class="normal"><a href="#__codelineno-0-754">754</a></span>
+<span class="normal"><a href="#__codelineno-0-755">755</a></span>
+<span class="normal"><a href="#__codelineno-0-756">756</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="k">class</span><span class="w"> </span><span class="nc">EMDAT</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;EM-DAT disaster event / location backend (per-instance output kind).</span>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    Resolves one dataset id to its catalog row, fetches it from that row&#39;s</span>
@@ -28307,119 +28310,122 @@ shape.</p>
 <a id="__codelineno-0-638" name="__codelineno-0-638"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the dataset and return its per-instance shape.</span>
 <a id="__codelineno-0-640" name="__codelineno-0-640"></a>
-<a id="__codelineno-0-641" name="__codelineno-0-641"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-642" name="__codelineno-0-642"></a><span class="sd">            progress_bar: Whether to draw a download progress bar. Passed</span>
-<a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">                through to the transport, so `False` really does silence it.</span>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">            A `pandas.DataFrame` for `emdat:events` (also written to</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">            `root_dir`), or an in-memory</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">            `pyramids.feature.collection.FeatureCollection` for a</span>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">            `gdis:*` dataset.</span>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">            AuthenticationError: When a `gdis:*` request has no usable</span>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">                Earthdata Login credentials.</span>
-<a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="sd">            requests.HTTPError: If an upstream source returns a non-2xx status.</span>
-<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-656" name="__codelineno-0-656"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a>        <span class="c1"># Warn before the fetch: a user who is not eligible should learn that</span>
-<a id="__codelineno-0-658" name="__codelineno-0-658"></a>        <span class="c1"># before an 8 MB download, not after it.</span>
-<a id="__codelineno-0-659" name="__codelineno-0-659"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_warn_license</span><span class="p">()</span>
-<a id="__codelineno-0-660" name="__codelineno-0-660"></a>        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-661" name="__codelineno-0-661"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-662" name="__codelineno-0-662"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
-<a id="__codelineno-0-663" name="__codelineno-0-663"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-664" name="__codelineno-0-664"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a>                <span class="sa">f</span><span class="s2">&quot;EMDAT </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: returned a FeatureCollection &quot;</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a>                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s)).&quot;</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a>            <span class="p">)</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a>            <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result_filename</span><span class="p">()</span>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a>        <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a>            <span class="sa">f</span><span class="s2">&quot;EMDAT </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a>        <span class="p">)</span>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a>        <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_result_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the output CSV name, which encodes the request&#39;s filters.</span>
+<a id="__codelineno-0-641" name="__codelineno-0-641"></a><span class="sd">        It issues a single request, so it has no partial-failure policy and</span>
+<a id="__codelineno-0-642" name="__codelineno-0-642"></a><span class="sd">        takes no `errors=` argument.</span>
+<a id="__codelineno-0-643" name="__codelineno-0-643"></a>
+<a id="__codelineno-0-644" name="__codelineno-0-644"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">            progress_bar: Whether to draw a download progress bar. Passed</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">                through to the transport, so `False` really does silence it.</span>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">            A `pandas.DataFrame` for `emdat:events` (also written to</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">            `root_dir`), or an in-memory</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">            `pyramids.feature.collection.FeatureCollection` for a</span>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">            `gdis:*` dataset.</span>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a>
+<a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">            AuthenticationError: When a `gdis:*` request has no usable</span>
+<a id="__codelineno-0-656" name="__codelineno-0-656"></a><span class="sd">                Earthdata Login credentials.</span>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="sd">            requests.HTTPError: If an upstream source returns a non-2xx status.</span>
+<a id="__codelineno-0-658" name="__codelineno-0-658"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-659" name="__codelineno-0-659"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-660" name="__codelineno-0-660"></a>        <span class="c1"># Warn before the fetch: a user who is not eligible should learn that</span>
+<a id="__codelineno-0-661" name="__codelineno-0-661"></a>        <span class="c1"># before an 8 MB download, not after it.</span>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_warn_license</span><span class="p">()</span>
+<a id="__codelineno-0-663" name="__codelineno-0-663"></a>        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-664" name="__codelineno-0-664"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a>                <span class="sa">f</span><span class="s2">&quot;EMDAT </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: returned a FeatureCollection &quot;</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a>                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s)).&quot;</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a>            <span class="p">)</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a>            <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result_filename</span><span class="p">()</span>
+<a id="__codelineno-0-673" name="__codelineno-0-673"></a>        <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a>            <span class="sa">f</span><span class="s2">&quot;EMDAT </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a>        <span class="p">)</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a>        <span class="k">return</span> <span class="n">result</span>
 <a id="__codelineno-0-678" name="__codelineno-0-678"></a>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a><span class="sd">        The workbook cache is shared across requests by design, so two</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">        differently-filtered queries into one `path=` are a normal pattern. A</span>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">        name carrying only the dataset id would let the second silently</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a><span class="sd">        overwrite the first, and the docs advertise that file by name. An</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">        unfiltered request keeps the plain name; any filter adds a short digest</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">        of the whole request. The digest is order-insensitive in `hazard=`, so</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">        the same set of hazards always resolves to the same file.</span>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">            str: `emdat_events.csv`, or `emdat_events-&lt;digest&gt;.csv` when the</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="sd">                request is filtered.</span>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a>        <span class="n">first_year</span><span class="p">,</span> <span class="n">last_year</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a>        <span class="c1"># Each filter listed separately: a `(None, None)` year range is a</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a>        <span class="c1"># non-empty tuple and therefore truthy, so testing the tuple itself</span>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a>        <span class="c1"># would make every request look filtered.</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a>        <span class="n">applied</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hazards</span><span class="p">),</span>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_country</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a>            <span class="n">first_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a>            <span class="n">last_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a>        <span class="p">)</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">applied</span><span class="p">):</span>
-<a id="__codelineno-0-704" name="__codelineno-0-704"></a>            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.csv&quot;</span>
-<a id="__codelineno-0-705" name="__codelineno-0-705"></a>        <span class="c1"># Sorted: hazard=[&#39;flood&#39;, &#39;storm&#39;] and [&#39;storm&#39;, &#39;flood&#39;] are the same</span>
-<a id="__codelineno-0-706" name="__codelineno-0-706"></a>        <span class="c1"># request and must resolve to the same file.</span>
-<a id="__codelineno-0-707" name="__codelineno-0-707"></a>        <span class="n">request</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-708" name="__codelineno-0-708"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hazards</span><span class="p">)),</span>
-<a id="__codelineno-0-709" name="__codelineno-0-709"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">,</span>
-<a id="__codelineno-0-710" name="__codelineno-0-710"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span><span class="p">,</span>
-<a id="__codelineno-0-711" name="__codelineno-0-711"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="p">,</span>
-<a id="__codelineno-0-712" name="__codelineno-0-712"></a>        <span class="p">)</span>
-<a id="__codelineno-0-713" name="__codelineno-0-713"></a>        <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span>
-<a id="__codelineno-0-714" name="__codelineno-0-714"></a>            <span class="nb">repr</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">usedforsecurity</span><span class="o">=</span><span class="kc">False</span>
-<a id="__codelineno-0-715" name="__codelineno-0-715"></a>        <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>
-<a id="__codelineno-0-716" name="__codelineno-0-716"></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">.csv&quot;</span>
-<a id="__codelineno-0-717" name="__codelineno-0-717"></a>
-<a id="__codelineno-0-718" name="__codelineno-0-718"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_warn_license</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-719" name="__codelineno-0-719"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Emit a `LicenseWarning` when the dataset&#39;s use is restricted.</span>
+<a id="__codelineno-0-679" name="__codelineno-0-679"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_result_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the output CSV name, which encodes the request&#39;s filters.</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a><span class="sd">        The workbook cache is shared across requests by design, so two</span>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">        differently-filtered queries into one `path=` are a normal pattern. A</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">        name carrying only the dataset id would let the second silently</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">        overwrite the first, and the docs advertise that file by name. An</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a><span class="sd">        unfiltered request keeps the plain name; any filter adds a short digest</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">        of the whole request. The digest is order-insensitive in `hazard=`, so</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">        the same set of hazards always resolves to the same file.</span>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a><span class="sd">            str: `emdat_events.csv`, or `emdat_events-&lt;digest&gt;.csv` when the</span>
+<a id="__codelineno-0-692" name="__codelineno-0-692"></a><span class="sd">                request is filtered.</span>
+<a id="__codelineno-0-693" name="__codelineno-0-693"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-694" name="__codelineno-0-694"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-695" name="__codelineno-0-695"></a>        <span class="n">first_year</span><span class="p">,</span> <span class="n">last_year</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span>
+<a id="__codelineno-0-696" name="__codelineno-0-696"></a>        <span class="c1"># Each filter listed separately: a `(None, None)` year range is a</span>
+<a id="__codelineno-0-697" name="__codelineno-0-697"></a>        <span class="c1"># non-empty tuple and therefore truthy, so testing the tuple itself</span>
+<a id="__codelineno-0-698" name="__codelineno-0-698"></a>        <span class="c1"># would make every request look filtered.</span>
+<a id="__codelineno-0-699" name="__codelineno-0-699"></a>        <span class="n">applied</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-700" name="__codelineno-0-700"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hazards</span><span class="p">),</span>
+<a id="__codelineno-0-701" name="__codelineno-0-701"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_country</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-702" name="__codelineno-0-702"></a>            <span class="n">first_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-703" name="__codelineno-0-703"></a>            <span class="n">last_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-704" name="__codelineno-0-704"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-705" name="__codelineno-0-705"></a>        <span class="p">)</span>
+<a id="__codelineno-0-706" name="__codelineno-0-706"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">applied</span><span class="p">):</span>
+<a id="__codelineno-0-707" name="__codelineno-0-707"></a>            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.csv&quot;</span>
+<a id="__codelineno-0-708" name="__codelineno-0-708"></a>        <span class="c1"># Sorted: hazard=[&#39;flood&#39;, &#39;storm&#39;] and [&#39;storm&#39;, &#39;flood&#39;] are the same</span>
+<a id="__codelineno-0-709" name="__codelineno-0-709"></a>        <span class="c1"># request and must resolve to the same file.</span>
+<a id="__codelineno-0-710" name="__codelineno-0-710"></a>        <span class="n">request</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-711" name="__codelineno-0-711"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hazards</span><span class="p">)),</span>
+<a id="__codelineno-0-712" name="__codelineno-0-712"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">,</span>
+<a id="__codelineno-0-713" name="__codelineno-0-713"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span><span class="p">,</span>
+<a id="__codelineno-0-714" name="__codelineno-0-714"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="p">,</span>
+<a id="__codelineno-0-715" name="__codelineno-0-715"></a>        <span class="p">)</span>
+<a id="__codelineno-0-716" name="__codelineno-0-716"></a>        <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span>
+<a id="__codelineno-0-717" name="__codelineno-0-717"></a>            <span class="nb">repr</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">usedforsecurity</span><span class="o">=</span><span class="kc">False</span>
+<a id="__codelineno-0-718" name="__codelineno-0-718"></a>        <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>
+<a id="__codelineno-0-719" name="__codelineno-0-719"></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">.csv&quot;</span>
 <a id="__codelineno-0-720" name="__codelineno-0-720"></a>
-<a id="__codelineno-0-721" name="__codelineno-0-721"></a><span class="sd">        GDIS is CC-BY-4.0 and needs only attribution, so it warns about</span>
-<a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="sd">        nothing. The EM-DAT archive is CC-BY-NC-ND under terms that also limit</span>
-<a id="__codelineno-0-723" name="__codelineno-0-723"></a><span class="sd">        *who* may use it for free, which is the part a user is most likely to</span>
-<a id="__codelineno-0-724" name="__codelineno-0-724"></a><span class="sd">        miss.</span>
-<a id="__codelineno-0-725" name="__codelineno-0-725"></a>
-<a id="__codelineno-0-726" name="__codelineno-0-726"></a><span class="sd">        The `stacklevel` targets a call through</span>
-<a id="__codelineno-0-727" name="__codelineno-0-727"></a><span class="sd">        `earthlens.earthlens.EarthLens`, which is what every doc</span>
-<a id="__codelineno-0-728" name="__codelineno-0-728"></a><span class="sd">        example, both notebooks and the e2e tests use: `_warn_license` -&gt;</span>
-<a id="__codelineno-0-729" name="__codelineno-0-729"></a><span class="sd">        `download` -&gt; the `_wrap_download` wrapper -&gt; the facade -&gt; the caller.</span>
-<a id="__codelineno-0-730" name="__codelineno-0-730"></a><span class="sd">        A direct `EMDAT(...).download()` is one frame shorter, so the warning</span>
-<a id="__codelineno-0-731" name="__codelineno-0-731"></a><span class="sd">        is attributed to earthlens rather than to that caller. No single value</span>
-<a id="__codelineno-0-732" name="__codelineno-0-732"></a><span class="sd">        suits both paths, and the facade is the documented one.</span>
-<a id="__codelineno-0-733" name="__codelineno-0-733"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-734" name="__codelineno-0-734"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span>
-<a id="__codelineno-0-735" name="__codelineno-0-735"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">dataset</span><span class="o">.</span><span class="n">restricted_use</span><span class="p">:</span>
-<a id="__codelineno-0-736" name="__codelineno-0-736"></a>            <span class="k">return</span>
-<a id="__codelineno-0-737" name="__codelineno-0-737"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-<a id="__codelineno-0-738" name="__codelineno-0-738"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> is licensed </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">licence</span><span class="si">}</span><span class="s2">: free use is limited to &quot;</span>
-<a id="__codelineno-0-739" name="__codelineno-0-739"></a>            <span class="s2">&quot;academic organisations, universities, non-profit research &quot;</span>
-<a id="__codelineno-0-740" name="__codelineno-0-740"></a>            <span class="s2">&quot;institutions, international public organisations and media, for &quot;</span>
-<a id="__codelineno-0-741" name="__codelineno-0-741"></a>            <span class="s2">&quot;research, teaching or information purposes. Any other use is &quot;</span>
-<a id="__codelineno-0-742" name="__codelineno-0-742"></a>            <span class="s2">&quot;commercial and needs a separate agreement with CRED/UCLouvain. The &quot;</span>
-<a id="__codelineno-0-743" name="__codelineno-0-743"></a>            <span class="s2">&quot;terms also forbid redistributing the database or building a &quot;</span>
-<a id="__codelineno-0-744" name="__codelineno-0-744"></a>            <span class="s2">&quot;derivative database from it, so treat this result as fetched for &quot;</span>
-<a id="__codelineno-0-745" name="__codelineno-0-745"></a>            <span class="sa">f</span><span class="s2">&quot;you alone. See </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">terms_url</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a>            <span class="n">LicenseWarning</span><span class="p">,</span>
-<a id="__codelineno-0-747" name="__codelineno-0-747"></a>            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-<a id="__codelineno-0-748" name="__codelineno-0-748"></a>        <span class="p">)</span>
-<a id="__codelineno-0-749" name="__codelineno-0-749"></a>
-<a id="__codelineno-0-750" name="__codelineno-0-750"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-751" name="__codelineno-0-751"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the resolved dataset&#39;s source citation once (info, not a warning).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-752" name="__codelineno-0-752"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">citation</span><span class="p">:</span>
-<a id="__codelineno-0-753" name="__codelineno-0-753"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;EMDAT source citation: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">citation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-721" name="__codelineno-0-721"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_warn_license</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Emit a `LicenseWarning` when the dataset&#39;s use is restricted.</span>
+<a id="__codelineno-0-723" name="__codelineno-0-723"></a>
+<a id="__codelineno-0-724" name="__codelineno-0-724"></a><span class="sd">        GDIS is CC-BY-4.0 and needs only attribution, so it warns about</span>
+<a id="__codelineno-0-725" name="__codelineno-0-725"></a><span class="sd">        nothing. The EM-DAT archive is CC-BY-NC-ND under terms that also limit</span>
+<a id="__codelineno-0-726" name="__codelineno-0-726"></a><span class="sd">        *who* may use it for free, which is the part a user is most likely to</span>
+<a id="__codelineno-0-727" name="__codelineno-0-727"></a><span class="sd">        miss.</span>
+<a id="__codelineno-0-728" name="__codelineno-0-728"></a>
+<a id="__codelineno-0-729" name="__codelineno-0-729"></a><span class="sd">        The `stacklevel` targets a call through</span>
+<a id="__codelineno-0-730" name="__codelineno-0-730"></a><span class="sd">        `earthlens.earthlens.EarthLens`, which is what every doc</span>
+<a id="__codelineno-0-731" name="__codelineno-0-731"></a><span class="sd">        example, both notebooks and the e2e tests use: `_warn_license` -&gt;</span>
+<a id="__codelineno-0-732" name="__codelineno-0-732"></a><span class="sd">        `download` -&gt; the `_wrap_download` wrapper -&gt; the facade -&gt; the caller.</span>
+<a id="__codelineno-0-733" name="__codelineno-0-733"></a><span class="sd">        A direct `EMDAT(...).download()` is one frame shorter, so the warning</span>
+<a id="__codelineno-0-734" name="__codelineno-0-734"></a><span class="sd">        is attributed to earthlens rather than to that caller. No single value</span>
+<a id="__codelineno-0-735" name="__codelineno-0-735"></a><span class="sd">        suits both paths, and the facade is the documented one.</span>
+<a id="__codelineno-0-736" name="__codelineno-0-736"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-737" name="__codelineno-0-737"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span>
+<a id="__codelineno-0-738" name="__codelineno-0-738"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">dataset</span><span class="o">.</span><span class="n">restricted_use</span><span class="p">:</span>
+<a id="__codelineno-0-739" name="__codelineno-0-739"></a>            <span class="k">return</span>
+<a id="__codelineno-0-740" name="__codelineno-0-740"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="__codelineno-0-741" name="__codelineno-0-741"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> is licensed </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">licence</span><span class="si">}</span><span class="s2">: free use is limited to &quot;</span>
+<a id="__codelineno-0-742" name="__codelineno-0-742"></a>            <span class="s2">&quot;academic organisations, universities, non-profit research &quot;</span>
+<a id="__codelineno-0-743" name="__codelineno-0-743"></a>            <span class="s2">&quot;institutions, international public organisations and media, for &quot;</span>
+<a id="__codelineno-0-744" name="__codelineno-0-744"></a>            <span class="s2">&quot;research, teaching or information purposes. Any other use is &quot;</span>
+<a id="__codelineno-0-745" name="__codelineno-0-745"></a>            <span class="s2">&quot;commercial and needs a separate agreement with CRED/UCLouvain. The &quot;</span>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a>            <span class="s2">&quot;terms also forbid redistributing the database or building a &quot;</span>
+<a id="__codelineno-0-747" name="__codelineno-0-747"></a>            <span class="s2">&quot;derivative database from it, so treat this result as fetched for &quot;</span>
+<a id="__codelineno-0-748" name="__codelineno-0-748"></a>            <span class="sa">f</span><span class="s2">&quot;you alone. See </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">terms_url</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-749" name="__codelineno-0-749"></a>            <span class="n">LicenseWarning</span><span class="p">,</span>
+<a id="__codelineno-0-750" name="__codelineno-0-750"></a>            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<a id="__codelineno-0-751" name="__codelineno-0-751"></a>        <span class="p">)</span>
+<a id="__codelineno-0-752" name="__codelineno-0-752"></a>
+<a id="__codelineno-0-753" name="__codelineno-0-753"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-754" name="__codelineno-0-754"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the resolved dataset&#39;s source citation once (info, not a warning).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-755" name="__codelineno-0-755"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">citation</span><span class="p">:</span>
+<a id="__codelineno-0-756" name="__codelineno-0-756"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;EMDAT source citation: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">citation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -29015,6 +29021,8 @@ dataset (the two sources have different vocabularies), or if
     <div class="doc doc-contents ">
 
         <p>Fetch the dataset and return its per-instance shape.</p>
+<p>It issues a single request, so it has no partial-failure policy and
+takes no <code>errors=</code> argument.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -29174,43 +29182,49 @@ Earthdata Login credentials.</p>
 <span class="normal"><a href="#__codelineno-0-671">671</a></span>
 <span class="normal"><a href="#__codelineno-0-672">672</a></span>
 <span class="normal"><a href="#__codelineno-0-673">673</a></span>
-<span class="normal"><a href="#__codelineno-0-674">674</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-674">674</a></span>
+<span class="normal"><a href="#__codelineno-0-675">675</a></span>
+<span class="normal"><a href="#__codelineno-0-676">676</a></span>
+<span class="normal"><a href="#__codelineno-0-677">677</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the dataset and return its per-instance shape.</span>
 <a id="__codelineno-0-640" name="__codelineno-0-640"></a>
-<a id="__codelineno-0-641" name="__codelineno-0-641"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-642" name="__codelineno-0-642"></a><span class="sd">        progress_bar: Whether to draw a download progress bar. Passed</span>
-<a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">            through to the transport, so `False` really does silence it.</span>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">        A `pandas.DataFrame` for `emdat:events` (also written to</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">        `root_dir`), or an in-memory</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">        `pyramids.feature.collection.FeatureCollection` for a</span>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">        `gdis:*` dataset.</span>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">        AuthenticationError: When a `gdis:*` request has no usable</span>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">            Earthdata Login credentials.</span>
-<a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="sd">        requests.HTTPError: If an upstream source returns a non-2xx status.</span>
-<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-656" name="__codelineno-0-656"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a>    <span class="c1"># Warn before the fetch: a user who is not eligible should learn that</span>
-<a id="__codelineno-0-658" name="__codelineno-0-658"></a>    <span class="c1"># before an 8 MB download, not after it.</span>
-<a id="__codelineno-0-659" name="__codelineno-0-659"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_warn_license</span><span class="p">()</span>
-<a id="__codelineno-0-660" name="__codelineno-0-660"></a>    <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-661" name="__codelineno-0-661"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-662" name="__codelineno-0-662"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
-<a id="__codelineno-0-663" name="__codelineno-0-663"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-664" name="__codelineno-0-664"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a>            <span class="sa">f</span><span class="s2">&quot;EMDAT </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: returned a FeatureCollection &quot;</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a>            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s)).&quot;</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a>        <span class="p">)</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a>        <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result_filename</span><span class="p">()</span>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a>    <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a>        <span class="sa">f</span><span class="s2">&quot;EMDAT </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a>    <span class="p">)</span>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a>    <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-641" name="__codelineno-0-641"></a><span class="sd">    It issues a single request, so it has no partial-failure policy and</span>
+<a id="__codelineno-0-642" name="__codelineno-0-642"></a><span class="sd">    takes no `errors=` argument.</span>
+<a id="__codelineno-0-643" name="__codelineno-0-643"></a>
+<a id="__codelineno-0-644" name="__codelineno-0-644"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">        progress_bar: Whether to draw a download progress bar. Passed</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">            through to the transport, so `False` really does silence it.</span>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">        A `pandas.DataFrame` for `emdat:events` (also written to</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">        `root_dir`), or an in-memory</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        `pyramids.feature.collection.FeatureCollection` for a</span>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">        `gdis:*` dataset.</span>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a>
+<a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">        AuthenticationError: When a `gdis:*` request has no usable</span>
+<a id="__codelineno-0-656" name="__codelineno-0-656"></a><span class="sd">            Earthdata Login credentials.</span>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="sd">        requests.HTTPError: If an upstream source returns a non-2xx status.</span>
+<a id="__codelineno-0-658" name="__codelineno-0-658"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-659" name="__codelineno-0-659"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-660" name="__codelineno-0-660"></a>    <span class="c1"># Warn before the fetch: a user who is not eligible should learn that</span>
+<a id="__codelineno-0-661" name="__codelineno-0-661"></a>    <span class="c1"># before an 8 MB download, not after it.</span>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_warn_license</span><span class="p">()</span>
+<a id="__codelineno-0-663" name="__codelineno-0-663"></a>    <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-664" name="__codelineno-0-664"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a>            <span class="sa">f</span><span class="s2">&quot;EMDAT </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: returned a FeatureCollection &quot;</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a>            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s)).&quot;</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a>        <span class="p">)</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a>        <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result_filename</span><span class="p">()</span>
+<a id="__codelineno-0-673" name="__codelineno-0-673"></a>    <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a>        <span class="sa">f</span><span class="s2">&quot;EMDAT </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a>    <span class="p">)</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a>    <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -31192,7 +31206,10 @@ shape.</p>
 <span class="normal"><a href="#__codelineno-0-750">750</a></span>
 <span class="normal"><a href="#__codelineno-0-751">751</a></span>
 <span class="normal"><a href="#__codelineno-0-752">752</a></span>
-<span class="normal"><a href="#__codelineno-0-753">753</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="k">class</span><span class="w"> </span><span class="nc">EMDAT</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-753">753</a></span>
+<span class="normal"><a href="#__codelineno-0-754">754</a></span>
+<span class="normal"><a href="#__codelineno-0-755">755</a></span>
+<span class="normal"><a href="#__codelineno-0-756">756</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="k">class</span><span class="w"> </span><span class="nc">EMDAT</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;EM-DAT disaster event / location backend (per-instance output kind).</span>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    Resolves one dataset id to its catalog row, fetches it from that row&#39;s</span>
@@ -31709,119 +31726,122 @@ shape.</p>
 <a id="__codelineno-0-638" name="__codelineno-0-638"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the dataset and return its per-instance shape.</span>
 <a id="__codelineno-0-640" name="__codelineno-0-640"></a>
-<a id="__codelineno-0-641" name="__codelineno-0-641"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-642" name="__codelineno-0-642"></a><span class="sd">            progress_bar: Whether to draw a download progress bar. Passed</span>
-<a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">                through to the transport, so `False` really does silence it.</span>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">            A `pandas.DataFrame` for `emdat:events` (also written to</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">            `root_dir`), or an in-memory</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">            `pyramids.feature.collection.FeatureCollection` for a</span>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">            `gdis:*` dataset.</span>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">            AuthenticationError: When a `gdis:*` request has no usable</span>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">                Earthdata Login credentials.</span>
-<a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="sd">            requests.HTTPError: If an upstream source returns a non-2xx status.</span>
-<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-656" name="__codelineno-0-656"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a>        <span class="c1"># Warn before the fetch: a user who is not eligible should learn that</span>
-<a id="__codelineno-0-658" name="__codelineno-0-658"></a>        <span class="c1"># before an 8 MB download, not after it.</span>
-<a id="__codelineno-0-659" name="__codelineno-0-659"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_warn_license</span><span class="p">()</span>
-<a id="__codelineno-0-660" name="__codelineno-0-660"></a>        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-661" name="__codelineno-0-661"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-662" name="__codelineno-0-662"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
-<a id="__codelineno-0-663" name="__codelineno-0-663"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-664" name="__codelineno-0-664"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a>                <span class="sa">f</span><span class="s2">&quot;EMDAT </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: returned a FeatureCollection &quot;</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a>                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s)).&quot;</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a>            <span class="p">)</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a>            <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result_filename</span><span class="p">()</span>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a>        <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a>            <span class="sa">f</span><span class="s2">&quot;EMDAT </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a>        <span class="p">)</span>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a>        <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_result_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the output CSV name, which encodes the request&#39;s filters.</span>
+<a id="__codelineno-0-641" name="__codelineno-0-641"></a><span class="sd">        It issues a single request, so it has no partial-failure policy and</span>
+<a id="__codelineno-0-642" name="__codelineno-0-642"></a><span class="sd">        takes no `errors=` argument.</span>
+<a id="__codelineno-0-643" name="__codelineno-0-643"></a>
+<a id="__codelineno-0-644" name="__codelineno-0-644"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">            progress_bar: Whether to draw a download progress bar. Passed</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">                through to the transport, so `False` really does silence it.</span>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">            A `pandas.DataFrame` for `emdat:events` (also written to</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">            `root_dir`), or an in-memory</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">            `pyramids.feature.collection.FeatureCollection` for a</span>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">            `gdis:*` dataset.</span>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a>
+<a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">            AuthenticationError: When a `gdis:*` request has no usable</span>
+<a id="__codelineno-0-656" name="__codelineno-0-656"></a><span class="sd">                Earthdata Login credentials.</span>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="sd">            requests.HTTPError: If an upstream source returns a non-2xx status.</span>
+<a id="__codelineno-0-658" name="__codelineno-0-658"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-659" name="__codelineno-0-659"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-660" name="__codelineno-0-660"></a>        <span class="c1"># Warn before the fetch: a user who is not eligible should learn that</span>
+<a id="__codelineno-0-661" name="__codelineno-0-661"></a>        <span class="c1"># before an 8 MB download, not after it.</span>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_warn_license</span><span class="p">()</span>
+<a id="__codelineno-0-663" name="__codelineno-0-663"></a>        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-664" name="__codelineno-0-664"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a>                <span class="sa">f</span><span class="s2">&quot;EMDAT </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: returned a FeatureCollection &quot;</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a>                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s)).&quot;</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a>            <span class="p">)</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a>            <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result_filename</span><span class="p">()</span>
+<a id="__codelineno-0-673" name="__codelineno-0-673"></a>        <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a>            <span class="sa">f</span><span class="s2">&quot;EMDAT </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a>        <span class="p">)</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a>        <span class="k">return</span> <span class="n">result</span>
 <a id="__codelineno-0-678" name="__codelineno-0-678"></a>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a><span class="sd">        The workbook cache is shared across requests by design, so two</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">        differently-filtered queries into one `path=` are a normal pattern. A</span>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">        name carrying only the dataset id would let the second silently</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a><span class="sd">        overwrite the first, and the docs advertise that file by name. An</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">        unfiltered request keeps the plain name; any filter adds a short digest</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">        of the whole request. The digest is order-insensitive in `hazard=`, so</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">        the same set of hazards always resolves to the same file.</span>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">            str: `emdat_events.csv`, or `emdat_events-&lt;digest&gt;.csv` when the</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a><span class="sd">                request is filtered.</span>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a>        <span class="n">first_year</span><span class="p">,</span> <span class="n">last_year</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a>        <span class="c1"># Each filter listed separately: a `(None, None)` year range is a</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a>        <span class="c1"># non-empty tuple and therefore truthy, so testing the tuple itself</span>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a>        <span class="c1"># would make every request look filtered.</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a>        <span class="n">applied</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hazards</span><span class="p">),</span>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_country</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a>            <span class="n">first_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a>            <span class="n">last_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a>        <span class="p">)</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">applied</span><span class="p">):</span>
-<a id="__codelineno-0-704" name="__codelineno-0-704"></a>            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.csv&quot;</span>
-<a id="__codelineno-0-705" name="__codelineno-0-705"></a>        <span class="c1"># Sorted: hazard=[&#39;flood&#39;, &#39;storm&#39;] and [&#39;storm&#39;, &#39;flood&#39;] are the same</span>
-<a id="__codelineno-0-706" name="__codelineno-0-706"></a>        <span class="c1"># request and must resolve to the same file.</span>
-<a id="__codelineno-0-707" name="__codelineno-0-707"></a>        <span class="n">request</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-708" name="__codelineno-0-708"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hazards</span><span class="p">)),</span>
-<a id="__codelineno-0-709" name="__codelineno-0-709"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">,</span>
-<a id="__codelineno-0-710" name="__codelineno-0-710"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span><span class="p">,</span>
-<a id="__codelineno-0-711" name="__codelineno-0-711"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="p">,</span>
-<a id="__codelineno-0-712" name="__codelineno-0-712"></a>        <span class="p">)</span>
-<a id="__codelineno-0-713" name="__codelineno-0-713"></a>        <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span>
-<a id="__codelineno-0-714" name="__codelineno-0-714"></a>            <span class="nb">repr</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">usedforsecurity</span><span class="o">=</span><span class="kc">False</span>
-<a id="__codelineno-0-715" name="__codelineno-0-715"></a>        <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>
-<a id="__codelineno-0-716" name="__codelineno-0-716"></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">.csv&quot;</span>
-<a id="__codelineno-0-717" name="__codelineno-0-717"></a>
-<a id="__codelineno-0-718" name="__codelineno-0-718"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_warn_license</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-719" name="__codelineno-0-719"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Emit a `LicenseWarning` when the dataset&#39;s use is restricted.</span>
+<a id="__codelineno-0-679" name="__codelineno-0-679"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_result_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the output CSV name, which encodes the request&#39;s filters.</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a><span class="sd">        The workbook cache is shared across requests by design, so two</span>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">        differently-filtered queries into one `path=` are a normal pattern. A</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">        name carrying only the dataset id would let the second silently</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">        overwrite the first, and the docs advertise that file by name. An</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a><span class="sd">        unfiltered request keeps the plain name; any filter adds a short digest</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">        of the whole request. The digest is order-insensitive in `hazard=`, so</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">        the same set of hazards always resolves to the same file.</span>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a><span class="sd">            str: `emdat_events.csv`, or `emdat_events-&lt;digest&gt;.csv` when the</span>
+<a id="__codelineno-0-692" name="__codelineno-0-692"></a><span class="sd">                request is filtered.</span>
+<a id="__codelineno-0-693" name="__codelineno-0-693"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-694" name="__codelineno-0-694"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-695" name="__codelineno-0-695"></a>        <span class="n">first_year</span><span class="p">,</span> <span class="n">last_year</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span>
+<a id="__codelineno-0-696" name="__codelineno-0-696"></a>        <span class="c1"># Each filter listed separately: a `(None, None)` year range is a</span>
+<a id="__codelineno-0-697" name="__codelineno-0-697"></a>        <span class="c1"># non-empty tuple and therefore truthy, so testing the tuple itself</span>
+<a id="__codelineno-0-698" name="__codelineno-0-698"></a>        <span class="c1"># would make every request look filtered.</span>
+<a id="__codelineno-0-699" name="__codelineno-0-699"></a>        <span class="n">applied</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-700" name="__codelineno-0-700"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hazards</span><span class="p">),</span>
+<a id="__codelineno-0-701" name="__codelineno-0-701"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_country</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-702" name="__codelineno-0-702"></a>            <span class="n">first_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-703" name="__codelineno-0-703"></a>            <span class="n">last_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-704" name="__codelineno-0-704"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-705" name="__codelineno-0-705"></a>        <span class="p">)</span>
+<a id="__codelineno-0-706" name="__codelineno-0-706"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">applied</span><span class="p">):</span>
+<a id="__codelineno-0-707" name="__codelineno-0-707"></a>            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.csv&quot;</span>
+<a id="__codelineno-0-708" name="__codelineno-0-708"></a>        <span class="c1"># Sorted: hazard=[&#39;flood&#39;, &#39;storm&#39;] and [&#39;storm&#39;, &#39;flood&#39;] are the same</span>
+<a id="__codelineno-0-709" name="__codelineno-0-709"></a>        <span class="c1"># request and must resolve to the same file.</span>
+<a id="__codelineno-0-710" name="__codelineno-0-710"></a>        <span class="n">request</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-711" name="__codelineno-0-711"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hazards</span><span class="p">)),</span>
+<a id="__codelineno-0-712" name="__codelineno-0-712"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">,</span>
+<a id="__codelineno-0-713" name="__codelineno-0-713"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span><span class="p">,</span>
+<a id="__codelineno-0-714" name="__codelineno-0-714"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_bbox</span><span class="p">,</span>
+<a id="__codelineno-0-715" name="__codelineno-0-715"></a>        <span class="p">)</span>
+<a id="__codelineno-0-716" name="__codelineno-0-716"></a>        <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span>
+<a id="__codelineno-0-717" name="__codelineno-0-717"></a>            <span class="nb">repr</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">usedforsecurity</span><span class="o">=</span><span class="kc">False</span>
+<a id="__codelineno-0-718" name="__codelineno-0-718"></a>        <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>
+<a id="__codelineno-0-719" name="__codelineno-0-719"></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">.csv&quot;</span>
 <a id="__codelineno-0-720" name="__codelineno-0-720"></a>
-<a id="__codelineno-0-721" name="__codelineno-0-721"></a><span class="sd">        GDIS is CC-BY-4.0 and needs only attribution, so it warns about</span>
-<a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="sd">        nothing. The EM-DAT archive is CC-BY-NC-ND under terms that also limit</span>
-<a id="__codelineno-0-723" name="__codelineno-0-723"></a><span class="sd">        *who* may use it for free, which is the part a user is most likely to</span>
-<a id="__codelineno-0-724" name="__codelineno-0-724"></a><span class="sd">        miss.</span>
-<a id="__codelineno-0-725" name="__codelineno-0-725"></a>
-<a id="__codelineno-0-726" name="__codelineno-0-726"></a><span class="sd">        The `stacklevel` targets a call through</span>
-<a id="__codelineno-0-727" name="__codelineno-0-727"></a><span class="sd">        `earthlens.earthlens.EarthLens`, which is what every doc</span>
-<a id="__codelineno-0-728" name="__codelineno-0-728"></a><span class="sd">        example, both notebooks and the e2e tests use: `_warn_license` -&gt;</span>
-<a id="__codelineno-0-729" name="__codelineno-0-729"></a><span class="sd">        `download` -&gt; the `_wrap_download` wrapper -&gt; the facade -&gt; the caller.</span>
-<a id="__codelineno-0-730" name="__codelineno-0-730"></a><span class="sd">        A direct `EMDAT(...).download()` is one frame shorter, so the warning</span>
-<a id="__codelineno-0-731" name="__codelineno-0-731"></a><span class="sd">        is attributed to earthlens rather than to that caller. No single value</span>
-<a id="__codelineno-0-732" name="__codelineno-0-732"></a><span class="sd">        suits both paths, and the facade is the documented one.</span>
-<a id="__codelineno-0-733" name="__codelineno-0-733"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-734" name="__codelineno-0-734"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span>
-<a id="__codelineno-0-735" name="__codelineno-0-735"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">dataset</span><span class="o">.</span><span class="n">restricted_use</span><span class="p">:</span>
-<a id="__codelineno-0-736" name="__codelineno-0-736"></a>            <span class="k">return</span>
-<a id="__codelineno-0-737" name="__codelineno-0-737"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-<a id="__codelineno-0-738" name="__codelineno-0-738"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> is licensed </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">licence</span><span class="si">}</span><span class="s2">: free use is limited to &quot;</span>
-<a id="__codelineno-0-739" name="__codelineno-0-739"></a>            <span class="s2">&quot;academic organisations, universities, non-profit research &quot;</span>
-<a id="__codelineno-0-740" name="__codelineno-0-740"></a>            <span class="s2">&quot;institutions, international public organisations and media, for &quot;</span>
-<a id="__codelineno-0-741" name="__codelineno-0-741"></a>            <span class="s2">&quot;research, teaching or information purposes. Any other use is &quot;</span>
-<a id="__codelineno-0-742" name="__codelineno-0-742"></a>            <span class="s2">&quot;commercial and needs a separate agreement with CRED/UCLouvain. The &quot;</span>
-<a id="__codelineno-0-743" name="__codelineno-0-743"></a>            <span class="s2">&quot;terms also forbid redistributing the database or building a &quot;</span>
-<a id="__codelineno-0-744" name="__codelineno-0-744"></a>            <span class="s2">&quot;derivative database from it, so treat this result as fetched for &quot;</span>
-<a id="__codelineno-0-745" name="__codelineno-0-745"></a>            <span class="sa">f</span><span class="s2">&quot;you alone. See </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">terms_url</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a>            <span class="n">LicenseWarning</span><span class="p">,</span>
-<a id="__codelineno-0-747" name="__codelineno-0-747"></a>            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-<a id="__codelineno-0-748" name="__codelineno-0-748"></a>        <span class="p">)</span>
-<a id="__codelineno-0-749" name="__codelineno-0-749"></a>
-<a id="__codelineno-0-750" name="__codelineno-0-750"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-751" name="__codelineno-0-751"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the resolved dataset&#39;s source citation once (info, not a warning).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-752" name="__codelineno-0-752"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">citation</span><span class="p">:</span>
-<a id="__codelineno-0-753" name="__codelineno-0-753"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;EMDAT source citation: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">citation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-721" name="__codelineno-0-721"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_warn_license</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-722" name="__codelineno-0-722"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Emit a `LicenseWarning` when the dataset&#39;s use is restricted.</span>
+<a id="__codelineno-0-723" name="__codelineno-0-723"></a>
+<a id="__codelineno-0-724" name="__codelineno-0-724"></a><span class="sd">        GDIS is CC-BY-4.0 and needs only attribution, so it warns about</span>
+<a id="__codelineno-0-725" name="__codelineno-0-725"></a><span class="sd">        nothing. The EM-DAT archive is CC-BY-NC-ND under terms that also limit</span>
+<a id="__codelineno-0-726" name="__codelineno-0-726"></a><span class="sd">        *who* may use it for free, which is the part a user is most likely to</span>
+<a id="__codelineno-0-727" name="__codelineno-0-727"></a><span class="sd">        miss.</span>
+<a id="__codelineno-0-728" name="__codelineno-0-728"></a>
+<a id="__codelineno-0-729" name="__codelineno-0-729"></a><span class="sd">        The `stacklevel` targets a call through</span>
+<a id="__codelineno-0-730" name="__codelineno-0-730"></a><span class="sd">        `earthlens.earthlens.EarthLens`, which is what every doc</span>
+<a id="__codelineno-0-731" name="__codelineno-0-731"></a><span class="sd">        example, both notebooks and the e2e tests use: `_warn_license` -&gt;</span>
+<a id="__codelineno-0-732" name="__codelineno-0-732"></a><span class="sd">        `download` -&gt; the `_wrap_download` wrapper -&gt; the facade -&gt; the caller.</span>
+<a id="__codelineno-0-733" name="__codelineno-0-733"></a><span class="sd">        A direct `EMDAT(...).download()` is one frame shorter, so the warning</span>
+<a id="__codelineno-0-734" name="__codelineno-0-734"></a><span class="sd">        is attributed to earthlens rather than to that caller. No single value</span>
+<a id="__codelineno-0-735" name="__codelineno-0-735"></a><span class="sd">        suits both paths, and the facade is the documented one.</span>
+<a id="__codelineno-0-736" name="__codelineno-0-736"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-737" name="__codelineno-0-737"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span>
+<a id="__codelineno-0-738" name="__codelineno-0-738"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">dataset</span><span class="o">.</span><span class="n">restricted_use</span><span class="p">:</span>
+<a id="__codelineno-0-739" name="__codelineno-0-739"></a>            <span class="k">return</span>
+<a id="__codelineno-0-740" name="__codelineno-0-740"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="__codelineno-0-741" name="__codelineno-0-741"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> is licensed </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">licence</span><span class="si">}</span><span class="s2">: free use is limited to &quot;</span>
+<a id="__codelineno-0-742" name="__codelineno-0-742"></a>            <span class="s2">&quot;academic organisations, universities, non-profit research &quot;</span>
+<a id="__codelineno-0-743" name="__codelineno-0-743"></a>            <span class="s2">&quot;institutions, international public organisations and media, for &quot;</span>
+<a id="__codelineno-0-744" name="__codelineno-0-744"></a>            <span class="s2">&quot;research, teaching or information purposes. Any other use is &quot;</span>
+<a id="__codelineno-0-745" name="__codelineno-0-745"></a>            <span class="s2">&quot;commercial and needs a separate agreement with CRED/UCLouvain. The &quot;</span>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a>            <span class="s2">&quot;terms also forbid redistributing the database or building a &quot;</span>
+<a id="__codelineno-0-747" name="__codelineno-0-747"></a>            <span class="s2">&quot;derivative database from it, so treat this result as fetched for &quot;</span>
+<a id="__codelineno-0-748" name="__codelineno-0-748"></a>            <span class="sa">f</span><span class="s2">&quot;you alone. See </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">terms_url</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-749" name="__codelineno-0-749"></a>            <span class="n">LicenseWarning</span><span class="p">,</span>
+<a id="__codelineno-0-750" name="__codelineno-0-750"></a>            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<a id="__codelineno-0-751" name="__codelineno-0-751"></a>        <span class="p">)</span>
+<a id="__codelineno-0-752" name="__codelineno-0-752"></a>
+<a id="__codelineno-0-753" name="__codelineno-0-753"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-754" name="__codelineno-0-754"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the resolved dataset&#39;s source citation once (info, not a warning).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-755" name="__codelineno-0-755"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">citation</span><span class="p">:</span>
+<a id="__codelineno-0-756" name="__codelineno-0-756"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;EMDAT source citation: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">citation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -32417,6 +32437,8 @@ dataset (the two sources have different vocabularies), or if
     <div class="doc doc-contents ">
 
         <p>Fetch the dataset and return its per-instance shape.</p>
+<p>It issues a single request, so it has no partial-failure policy and
+takes no <code>errors=</code> argument.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -32576,43 +32598,49 @@ Earthdata Login credentials.</p>
 <span class="normal"><a href="#__codelineno-0-671">671</a></span>
 <span class="normal"><a href="#__codelineno-0-672">672</a></span>
 <span class="normal"><a href="#__codelineno-0-673">673</a></span>
-<span class="normal"><a href="#__codelineno-0-674">674</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-674">674</a></span>
+<span class="normal"><a href="#__codelineno-0-675">675</a></span>
+<span class="normal"><a href="#__codelineno-0-676">676</a></span>
+<span class="normal"><a href="#__codelineno-0-677">677</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the dataset and return its per-instance shape.</span>
 <a id="__codelineno-0-640" name="__codelineno-0-640"></a>
-<a id="__codelineno-0-641" name="__codelineno-0-641"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-642" name="__codelineno-0-642"></a><span class="sd">        progress_bar: Whether to draw a download progress bar. Passed</span>
-<a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">            through to the transport, so `False` really does silence it.</span>
-<a id="__codelineno-0-644" name="__codelineno-0-644"></a>
-<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">        A `pandas.DataFrame` for `emdat:events` (also written to</span>
-<a id="__codelineno-0-647" name="__codelineno-0-647"></a><span class="sd">        `root_dir`), or an in-memory</span>
-<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">        `pyramids.feature.collection.FeatureCollection` for a</span>
-<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">        `gdis:*` dataset.</span>
-<a id="__codelineno-0-650" name="__codelineno-0-650"></a>
-<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">        AuthenticationError: When a `gdis:*` request has no usable</span>
-<a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">            Earthdata Login credentials.</span>
-<a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="sd">        requests.HTTPError: If an upstream source returns a non-2xx status.</span>
-<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-656" name="__codelineno-0-656"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a>    <span class="c1"># Warn before the fetch: a user who is not eligible should learn that</span>
-<a id="__codelineno-0-658" name="__codelineno-0-658"></a>    <span class="c1"># before an 8 MB download, not after it.</span>
-<a id="__codelineno-0-659" name="__codelineno-0-659"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_warn_license</span><span class="p">()</span>
-<a id="__codelineno-0-660" name="__codelineno-0-660"></a>    <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-661" name="__codelineno-0-661"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-662" name="__codelineno-0-662"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
-<a id="__codelineno-0-663" name="__codelineno-0-663"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-664" name="__codelineno-0-664"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-665" name="__codelineno-0-665"></a>            <span class="sa">f</span><span class="s2">&quot;EMDAT </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: returned a FeatureCollection &quot;</span>
-<a id="__codelineno-0-666" name="__codelineno-0-666"></a>            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s)).&quot;</span>
-<a id="__codelineno-0-667" name="__codelineno-0-667"></a>        <span class="p">)</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a>        <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result_filename</span><span class="p">()</span>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a>    <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a>        <span class="sa">f</span><span class="s2">&quot;EMDAT </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a>    <span class="p">)</span>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a>    <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-641" name="__codelineno-0-641"></a><span class="sd">    It issues a single request, so it has no partial-failure policy and</span>
+<a id="__codelineno-0-642" name="__codelineno-0-642"></a><span class="sd">    takes no `errors=` argument.</span>
+<a id="__codelineno-0-643" name="__codelineno-0-643"></a>
+<a id="__codelineno-0-644" name="__codelineno-0-644"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-645" name="__codelineno-0-645"></a><span class="sd">        progress_bar: Whether to draw a download progress bar. Passed</span>
+<a id="__codelineno-0-646" name="__codelineno-0-646"></a><span class="sd">            through to the transport, so `False` really does silence it.</span>
+<a id="__codelineno-0-647" name="__codelineno-0-647"></a>
+<a id="__codelineno-0-648" name="__codelineno-0-648"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">        A `pandas.DataFrame` for `emdat:events` (also written to</span>
+<a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">        `root_dir`), or an in-memory</span>
+<a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">        `pyramids.feature.collection.FeatureCollection` for a</span>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">        `gdis:*` dataset.</span>
+<a id="__codelineno-0-653" name="__codelineno-0-653"></a>
+<a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">        AuthenticationError: When a `gdis:*` request has no usable</span>
+<a id="__codelineno-0-656" name="__codelineno-0-656"></a><span class="sd">            Earthdata Login credentials.</span>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="sd">        requests.HTTPError: If an upstream source returns a non-2xx status.</span>
+<a id="__codelineno-0-658" name="__codelineno-0-658"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-659" name="__codelineno-0-659"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-660" name="__codelineno-0-660"></a>    <span class="c1"># Warn before the fetch: a user who is not eligible should learn that</span>
+<a id="__codelineno-0-661" name="__codelineno-0-661"></a>    <span class="c1"># before an 8 MB download, not after it.</span>
+<a id="__codelineno-0-662" name="__codelineno-0-662"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_warn_license</span><span class="p">()</span>
+<a id="__codelineno-0-663" name="__codelineno-0-663"></a>    <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-664" name="__codelineno-0-664"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-665" name="__codelineno-0-665"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
+<a id="__codelineno-0-666" name="__codelineno-0-666"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUTPUT_KIND</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-667" name="__codelineno-0-667"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-668" name="__codelineno-0-668"></a>            <span class="sa">f</span><span class="s2">&quot;EMDAT </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: returned a FeatureCollection &quot;</span>
+<a id="__codelineno-0-669" name="__codelineno-0-669"></a>            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s)).&quot;</span>
+<a id="__codelineno-0-670" name="__codelineno-0-670"></a>        <span class="p">)</span>
+<a id="__codelineno-0-671" name="__codelineno-0-671"></a>        <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-672" name="__codelineno-0-672"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result_filename</span><span class="p">()</span>
+<a id="__codelineno-0-673" name="__codelineno-0-673"></a>    <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-674" name="__codelineno-0-674"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-675" name="__codelineno-0-675"></a>        <span class="sa">f</span><span class="s2">&quot;EMDAT </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-676" name="__codelineno-0-676"></a>    <span class="p">)</span>
+<a id="__codelineno-0-677" name="__codelineno-0-677"></a>    <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

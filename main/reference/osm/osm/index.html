@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -28503,7 +28503,8 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <span class="normal"><a href="#__codelineno-0-993">993</a></span>
 <span class="normal"><a href="#__codelineno-0-994">994</a></span>
 <span class="normal"><a href="#__codelineno-0-995">995</a></span>
-<span class="normal"><a href="#__codelineno-0-996">996</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="k">class</span><span class="w"> </span><span class="nc">OSM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-996">996</a></span>
+<span class="normal"><a href="#__codelineno-0-997">997</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="k">class</span><span class="w"> </span><span class="nc">OSM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;OpenStreetMap feature backend (vector FeatureCollection output).</span>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">    Wraps the public Overpass + ohsome services so a user can pull a</span>
@@ -29262,84 +29263,85 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-916" name="__codelineno-0-916"></a><span class="sd">        Routes each named query to its protocol, combines the results into</span>
 <a id="__codelineno-0-917" name="__codelineno-0-917"></a><span class="sd">        one `FeatureCollection`, emits an ODbL `LicenseWarning` (`G5`),</span>
 <a id="__codelineno-0-918" name="__codelineno-0-918"></a><span class="sd">        writes the collection to one vector file under `path` when non-empty,</span>
-<a id="__codelineno-0-919" name="__codelineno-0-919"></a><span class="sd">        and returns the in-memory collection.</span>
-<a id="__codelineno-0-920" name="__codelineno-0-920"></a>
-<a id="__codelineno-0-921" name="__codelineno-0-921"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-922" name="__codelineno-0-922"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-923" name="__codelineno-0-923"></a><span class="sd">                backends; OSM issues one query per named id, so this is a</span>
-<a id="__codelineno-0-924" name="__codelineno-0-924"></a><span class="sd">                no-op.</span>
-<a id="__codelineno-0-925" name="__codelineno-0-925"></a><span class="sd">            limit: Cap on the total features returned, across every named</span>
-<a id="__codelineno-0-926" name="__codelineno-0-926"></a><span class="sd">                query. Applied as each query&#39;s result arrives, so a query past</span>
-<a id="__codelineno-0-927" name="__codelineno-0-927"></a><span class="sd">                the cap is never issued — which also means the rate limit is</span>
-<a id="__codelineno-0-928" name="__codelineno-0-928"></a><span class="sd">                not spent on it. `None` (the default) runs every query.</span>
-<a id="__codelineno-0-929" name="__codelineno-0-929"></a>
-<a id="__codelineno-0-930" name="__codelineno-0-930"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-931" name="__codelineno-0-931"></a><span class="sd">            FeatureCollection: The matched features, CRS `EPSG:4326`. Empty</span>
-<a id="__codelineno-0-932" name="__codelineno-0-932"></a><span class="sd">                (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-933" name="__codelineno-0-933"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-934" name="__codelineno-0-934"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
-<a id="__codelineno-0-935" name="__codelineno-0-935"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
-<a id="__codelineno-0-936" name="__codelineno-0-936"></a>        <span class="c1"># OSM is ODbL — warn on every result, even an empty one (the query</span>
-<a id="__codelineno-0-937" name="__codelineno-0-937"></a>        <span class="c1"># itself succeeded and the obligation rides with any data downloaded).</span>
-<a id="__codelineno-0-938" name="__codelineno-0-938"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">ODBL_NOTICE</span><span class="p">,</span> <span class="n">LicenseWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<a id="__codelineno-0-939" name="__codelineno-0-939"></a>
-<a id="__codelineno-0-940" name="__codelineno-0-940"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-941" name="__codelineno-0-941"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-942" name="__codelineno-0-942"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-943" name="__codelineno-0-943"></a>                <span class="sa">f</span><span class="s2">&quot;OSM download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s) written to &quot;</span>
-<a id="__codelineno-0-944" name="__codelineno-0-944"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-945" name="__codelineno-0-945"></a>            <span class="p">)</span>
-<a id="__codelineno-0-946" name="__codelineno-0-946"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-947" name="__codelineno-0-947"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-948" name="__codelineno-0-948"></a>                <span class="s2">&quot;OSM download summary: no features matched the request, nothing written&quot;</span>
-<a id="__codelineno-0-949" name="__codelineno-0-949"></a>            <span class="p">)</span>
-<a id="__codelineno-0-950" name="__codelineno-0-950"></a>        <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-951" name="__codelineno-0-951"></a>
-<a id="__codelineno-0-952" name="__codelineno-0-952"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collections</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-953" name="__codelineno-0-953"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Concatenate per-query FeatureCollections into one (union of columns).</span>
-<a id="__codelineno-0-954" name="__codelineno-0-954"></a>
-<a id="__codelineno-0-955" name="__codelineno-0-955"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-956" name="__codelineno-0-956"></a><span class="sd">            collections: The per-query collections from `_fetch` (possibly</span>
-<a id="__codelineno-0-957" name="__codelineno-0-957"></a><span class="sd">                empty).</span>
-<a id="__codelineno-0-958" name="__codelineno-0-958"></a>
-<a id="__codelineno-0-959" name="__codelineno-0-959"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-960" name="__codelineno-0-960"></a><span class="sd">            FeatureCollection: A single collection — the lone input when</span>
-<a id="__codelineno-0-961" name="__codelineno-0-961"></a><span class="sd">                there is exactly one, the row-wise concatenation when there</span>
-<a id="__codelineno-0-962" name="__codelineno-0-962"></a><span class="sd">                are several, or a schema-only empty collection when there are</span>
-<a id="__codelineno-0-963" name="__codelineno-0-963"></a><span class="sd">                none.</span>
-<a id="__codelineno-0-964" name="__codelineno-0-964"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-965" name="__codelineno-0-965"></a>        <span class="n">non_empty</span> <span class="o">=</span> <span class="p">[</span><span class="n">fc</span> <span class="k">for</span> <span class="n">fc</span> <span class="ow">in</span> <span class="n">collections</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fc</span><span class="p">)]</span>
-<a id="__codelineno-0-966" name="__codelineno-0-966"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">non_empty</span><span class="p">:</span>
-<a id="__codelineno-0-967" name="__codelineno-0-967"></a>            <span class="k">return</span> <span class="n">empty_fc</span><span class="p">()</span>
-<a id="__codelineno-0-968" name="__codelineno-0-968"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_empty</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-969" name="__codelineno-0-969"></a>            <span class="k">return</span> <span class="n">non_empty</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-970" name="__codelineno-0-970"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
-<a id="__codelineno-0-971" name="__codelineno-0-971"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.feature.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">FeatureCollection</span>
-<a id="__codelineno-0-972" name="__codelineno-0-972"></a>
-<a id="__codelineno-0-973" name="__codelineno-0-973"></a>        <span class="n">merged</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">non_empty</span><span class="p">),</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-974" name="__codelineno-0-974"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span>
-<a id="__codelineno-0-975" name="__codelineno-0-975"></a>            <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-976" name="__codelineno-0-976"></a>        <span class="p">)</span>
-<a id="__codelineno-0-977" name="__codelineno-0-977"></a>
-<a id="__codelineno-0-978" name="__codelineno-0-978"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-979" name="__codelineno-0-979"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the features to one vector file under `root_dir`.</span>
-<a id="__codelineno-0-980" name="__codelineno-0-980"></a>
-<a id="__codelineno-0-981" name="__codelineno-0-981"></a><span class="sd">        The filename embeds the requested query ids (`osm_&lt;ids&gt;.&lt;ext&gt;`), so</span>
-<a id="__codelineno-0-982" name="__codelineno-0-982"></a><span class="sd">        requests for different named queries land in distinct files. The bbox</span>
-<a id="__codelineno-0-983" name="__codelineno-0-983"></a><span class="sd">        and time window are *not* part of the name, so two requests for the same</span>
-<a id="__codelineno-0-984" name="__codelineno-0-984"></a><span class="sd">        query ids over different areas/times overwrite the same file.</span>
-<a id="__codelineno-0-985" name="__codelineno-0-985"></a>
-<a id="__codelineno-0-986" name="__codelineno-0-986"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-987" name="__codelineno-0-987"></a><span class="sd">            collection: The features to write.</span>
-<a id="__codelineno-0-988" name="__codelineno-0-988"></a>
-<a id="__codelineno-0-989" name="__codelineno-0-989"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-990" name="__codelineno-0-990"></a><span class="sd">            Path: Absolute path of the file written.</span>
-<a id="__codelineno-0-991" name="__codelineno-0-991"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-992" name="__codelineno-0-992"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
-<a id="__codelineno-0-993" name="__codelineno-0-993"></a>        <span class="n">slug</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">qid</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">qid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
-<a id="__codelineno-0-994" name="__codelineno-0-994"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;osm_</span><span class="si">{</span><span class="n">slug</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-995" name="__codelineno-0-995"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
-<a id="__codelineno-0-996" name="__codelineno-0-996"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-919" name="__codelineno-0-919"></a><span class="sd">        and returns the in-memory collection. This backend has no</span>
+<a id="__codelineno-0-920" name="__codelineno-0-920"></a><span class="sd">        partial-failure policy and takes no `errors=` argument.</span>
+<a id="__codelineno-0-921" name="__codelineno-0-921"></a>
+<a id="__codelineno-0-922" name="__codelineno-0-922"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-923" name="__codelineno-0-923"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-924" name="__codelineno-0-924"></a><span class="sd">                backends; OSM issues one query per named id, so this is a</span>
+<a id="__codelineno-0-925" name="__codelineno-0-925"></a><span class="sd">                no-op.</span>
+<a id="__codelineno-0-926" name="__codelineno-0-926"></a><span class="sd">            limit: Cap on the total features returned, across every named</span>
+<a id="__codelineno-0-927" name="__codelineno-0-927"></a><span class="sd">                query. Applied as each query&#39;s result arrives, so a query past</span>
+<a id="__codelineno-0-928" name="__codelineno-0-928"></a><span class="sd">                the cap is never issued — which also means the rate limit is</span>
+<a id="__codelineno-0-929" name="__codelineno-0-929"></a><span class="sd">                not spent on it. `None` (the default) runs every query.</span>
+<a id="__codelineno-0-930" name="__codelineno-0-930"></a>
+<a id="__codelineno-0-931" name="__codelineno-0-931"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-932" name="__codelineno-0-932"></a><span class="sd">            FeatureCollection: The matched features, CRS `EPSG:4326`. Empty</span>
+<a id="__codelineno-0-933" name="__codelineno-0-933"></a><span class="sd">                (schema-only) when nothing matched.</span>
+<a id="__codelineno-0-934" name="__codelineno-0-934"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-935" name="__codelineno-0-935"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+<a id="__codelineno-0-936" name="__codelineno-0-936"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
+<a id="__codelineno-0-937" name="__codelineno-0-937"></a>        <span class="c1"># OSM is ODbL — warn on every result, even an empty one (the query</span>
+<a id="__codelineno-0-938" name="__codelineno-0-938"></a>        <span class="c1"># itself succeeded and the obligation rides with any data downloaded).</span>
+<a id="__codelineno-0-939" name="__codelineno-0-939"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">ODBL_NOTICE</span><span class="p">,</span> <span class="n">LicenseWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<a id="__codelineno-0-940" name="__codelineno-0-940"></a>
+<a id="__codelineno-0-941" name="__codelineno-0-941"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-942" name="__codelineno-0-942"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-943" name="__codelineno-0-943"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-944" name="__codelineno-0-944"></a>                <span class="sa">f</span><span class="s2">&quot;OSM download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s) written to &quot;</span>
+<a id="__codelineno-0-945" name="__codelineno-0-945"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-946" name="__codelineno-0-946"></a>            <span class="p">)</span>
+<a id="__codelineno-0-947" name="__codelineno-0-947"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-948" name="__codelineno-0-948"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-949" name="__codelineno-0-949"></a>                <span class="s2">&quot;OSM download summary: no features matched the request, nothing written&quot;</span>
+<a id="__codelineno-0-950" name="__codelineno-0-950"></a>            <span class="p">)</span>
+<a id="__codelineno-0-951" name="__codelineno-0-951"></a>        <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-952" name="__codelineno-0-952"></a>
+<a id="__codelineno-0-953" name="__codelineno-0-953"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collections</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-954" name="__codelineno-0-954"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Concatenate per-query FeatureCollections into one (union of columns).</span>
+<a id="__codelineno-0-955" name="__codelineno-0-955"></a>
+<a id="__codelineno-0-956" name="__codelineno-0-956"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-957" name="__codelineno-0-957"></a><span class="sd">            collections: The per-query collections from `_fetch` (possibly</span>
+<a id="__codelineno-0-958" name="__codelineno-0-958"></a><span class="sd">                empty).</span>
+<a id="__codelineno-0-959" name="__codelineno-0-959"></a>
+<a id="__codelineno-0-960" name="__codelineno-0-960"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-961" name="__codelineno-0-961"></a><span class="sd">            FeatureCollection: A single collection — the lone input when</span>
+<a id="__codelineno-0-962" name="__codelineno-0-962"></a><span class="sd">                there is exactly one, the row-wise concatenation when there</span>
+<a id="__codelineno-0-963" name="__codelineno-0-963"></a><span class="sd">                are several, or a schema-only empty collection when there are</span>
+<a id="__codelineno-0-964" name="__codelineno-0-964"></a><span class="sd">                none.</span>
+<a id="__codelineno-0-965" name="__codelineno-0-965"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-966" name="__codelineno-0-966"></a>        <span class="n">non_empty</span> <span class="o">=</span> <span class="p">[</span><span class="n">fc</span> <span class="k">for</span> <span class="n">fc</span> <span class="ow">in</span> <span class="n">collections</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fc</span><span class="p">)]</span>
+<a id="__codelineno-0-967" name="__codelineno-0-967"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">non_empty</span><span class="p">:</span>
+<a id="__codelineno-0-968" name="__codelineno-0-968"></a>            <span class="k">return</span> <span class="n">empty_fc</span><span class="p">()</span>
+<a id="__codelineno-0-969" name="__codelineno-0-969"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_empty</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-970" name="__codelineno-0-970"></a>            <span class="k">return</span> <span class="n">non_empty</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-971" name="__codelineno-0-971"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<a id="__codelineno-0-972" name="__codelineno-0-972"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.feature.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">FeatureCollection</span>
+<a id="__codelineno-0-973" name="__codelineno-0-973"></a>
+<a id="__codelineno-0-974" name="__codelineno-0-974"></a>        <span class="n">merged</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">non_empty</span><span class="p">),</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-975" name="__codelineno-0-975"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span>
+<a id="__codelineno-0-976" name="__codelineno-0-976"></a>            <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-977" name="__codelineno-0-977"></a>        <span class="p">)</span>
+<a id="__codelineno-0-978" name="__codelineno-0-978"></a>
+<a id="__codelineno-0-979" name="__codelineno-0-979"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-980" name="__codelineno-0-980"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the features to one vector file under `root_dir`.</span>
+<a id="__codelineno-0-981" name="__codelineno-0-981"></a>
+<a id="__codelineno-0-982" name="__codelineno-0-982"></a><span class="sd">        The filename embeds the requested query ids (`osm_&lt;ids&gt;.&lt;ext&gt;`), so</span>
+<a id="__codelineno-0-983" name="__codelineno-0-983"></a><span class="sd">        requests for different named queries land in distinct files. The bbox</span>
+<a id="__codelineno-0-984" name="__codelineno-0-984"></a><span class="sd">        and time window are *not* part of the name, so two requests for the same</span>
+<a id="__codelineno-0-985" name="__codelineno-0-985"></a><span class="sd">        query ids over different areas/times overwrite the same file.</span>
+<a id="__codelineno-0-986" name="__codelineno-0-986"></a>
+<a id="__codelineno-0-987" name="__codelineno-0-987"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-988" name="__codelineno-0-988"></a><span class="sd">            collection: The features to write.</span>
+<a id="__codelineno-0-989" name="__codelineno-0-989"></a>
+<a id="__codelineno-0-990" name="__codelineno-0-990"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-991" name="__codelineno-0-991"></a><span class="sd">            Path: Absolute path of the file written.</span>
+<a id="__codelineno-0-992" name="__codelineno-0-992"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-993" name="__codelineno-0-993"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
+<a id="__codelineno-0-994" name="__codelineno-0-994"></a>        <span class="n">slug</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">qid</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">qid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
+<a id="__codelineno-0-995" name="__codelineno-0-995"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;osm_</span><span class="si">{</span><span class="n">slug</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-996" name="__codelineno-0-996"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
+<a id="__codelineno-0-997" name="__codelineno-0-997"></a>        <span class="k">return</span> <span class="n">out_path</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -30045,7 +30047,8 @@ of named-query ids.</p>
 <p>Routes each named query to its protocol, combines the results into
 one <code>FeatureCollection</code>, emits an ODbL <code>LicenseWarning</code> (<code>G5</code>),
 writes the collection to one vector file under <code>path</code> when non-empty,
-and returns the in-memory collection.</p>
+and returns the in-memory collection. This backend has no
+partial-failure policy and takes no <code>errors=</code> argument.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -30167,7 +30170,8 @@ not spent on it. <code>None</code> (the default) runs every query.</p>
 <span class="normal"><a href="#__codelineno-0-947">947</a></span>
 <span class="normal"><a href="#__codelineno-0-948">948</a></span>
 <span class="normal"><a href="#__codelineno-0-949">949</a></span>
-<span class="normal"><a href="#__codelineno-0-950">950</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-909" name="__codelineno-0-909"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-950">950</a></span>
+<span class="normal"><a href="#__codelineno-0-951">951</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-909" name="__codelineno-0-909"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-910" name="__codelineno-0-910"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-911" name="__codelineno-0-911"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-912" name="__codelineno-0-912"></a>    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -30177,38 +30181,39 @@ not spent on it. <code>None</code> (the default) runs every query.</p>
 <a id="__codelineno-0-916" name="__codelineno-0-916"></a><span class="sd">    Routes each named query to its protocol, combines the results into</span>
 <a id="__codelineno-0-917" name="__codelineno-0-917"></a><span class="sd">    one `FeatureCollection`, emits an ODbL `LicenseWarning` (`G5`),</span>
 <a id="__codelineno-0-918" name="__codelineno-0-918"></a><span class="sd">    writes the collection to one vector file under `path` when non-empty,</span>
-<a id="__codelineno-0-919" name="__codelineno-0-919"></a><span class="sd">    and returns the in-memory collection.</span>
-<a id="__codelineno-0-920" name="__codelineno-0-920"></a>
-<a id="__codelineno-0-921" name="__codelineno-0-921"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-922" name="__codelineno-0-922"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-923" name="__codelineno-0-923"></a><span class="sd">            backends; OSM issues one query per named id, so this is a</span>
-<a id="__codelineno-0-924" name="__codelineno-0-924"></a><span class="sd">            no-op.</span>
-<a id="__codelineno-0-925" name="__codelineno-0-925"></a><span class="sd">        limit: Cap on the total features returned, across every named</span>
-<a id="__codelineno-0-926" name="__codelineno-0-926"></a><span class="sd">            query. Applied as each query&#39;s result arrives, so a query past</span>
-<a id="__codelineno-0-927" name="__codelineno-0-927"></a><span class="sd">            the cap is never issued — which also means the rate limit is</span>
-<a id="__codelineno-0-928" name="__codelineno-0-928"></a><span class="sd">            not spent on it. `None` (the default) runs every query.</span>
-<a id="__codelineno-0-929" name="__codelineno-0-929"></a>
-<a id="__codelineno-0-930" name="__codelineno-0-930"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-931" name="__codelineno-0-931"></a><span class="sd">        FeatureCollection: The matched features, CRS `EPSG:4326`. Empty</span>
-<a id="__codelineno-0-932" name="__codelineno-0-932"></a><span class="sd">            (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-933" name="__codelineno-0-933"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-934" name="__codelineno-0-934"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
-<a id="__codelineno-0-935" name="__codelineno-0-935"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
-<a id="__codelineno-0-936" name="__codelineno-0-936"></a>    <span class="c1"># OSM is ODbL — warn on every result, even an empty one (the query</span>
-<a id="__codelineno-0-937" name="__codelineno-0-937"></a>    <span class="c1"># itself succeeded and the obligation rides with any data downloaded).</span>
-<a id="__codelineno-0-938" name="__codelineno-0-938"></a>    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">ODBL_NOTICE</span><span class="p">,</span> <span class="n">LicenseWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<a id="__codelineno-0-939" name="__codelineno-0-939"></a>
-<a id="__codelineno-0-940" name="__codelineno-0-940"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-941" name="__codelineno-0-941"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-942" name="__codelineno-0-942"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-943" name="__codelineno-0-943"></a>            <span class="sa">f</span><span class="s2">&quot;OSM download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s) written to &quot;</span>
-<a id="__codelineno-0-944" name="__codelineno-0-944"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-945" name="__codelineno-0-945"></a>        <span class="p">)</span>
-<a id="__codelineno-0-946" name="__codelineno-0-946"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-947" name="__codelineno-0-947"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-948" name="__codelineno-0-948"></a>            <span class="s2">&quot;OSM download summary: no features matched the request, nothing written&quot;</span>
-<a id="__codelineno-0-949" name="__codelineno-0-949"></a>        <span class="p">)</span>
-<a id="__codelineno-0-950" name="__codelineno-0-950"></a>    <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-919" name="__codelineno-0-919"></a><span class="sd">    and returns the in-memory collection. This backend has no</span>
+<a id="__codelineno-0-920" name="__codelineno-0-920"></a><span class="sd">    partial-failure policy and takes no `errors=` argument.</span>
+<a id="__codelineno-0-921" name="__codelineno-0-921"></a>
+<a id="__codelineno-0-922" name="__codelineno-0-922"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-923" name="__codelineno-0-923"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-924" name="__codelineno-0-924"></a><span class="sd">            backends; OSM issues one query per named id, so this is a</span>
+<a id="__codelineno-0-925" name="__codelineno-0-925"></a><span class="sd">            no-op.</span>
+<a id="__codelineno-0-926" name="__codelineno-0-926"></a><span class="sd">        limit: Cap on the total features returned, across every named</span>
+<a id="__codelineno-0-927" name="__codelineno-0-927"></a><span class="sd">            query. Applied as each query&#39;s result arrives, so a query past</span>
+<a id="__codelineno-0-928" name="__codelineno-0-928"></a><span class="sd">            the cap is never issued — which also means the rate limit is</span>
+<a id="__codelineno-0-929" name="__codelineno-0-929"></a><span class="sd">            not spent on it. `None` (the default) runs every query.</span>
+<a id="__codelineno-0-930" name="__codelineno-0-930"></a>
+<a id="__codelineno-0-931" name="__codelineno-0-931"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-932" name="__codelineno-0-932"></a><span class="sd">        FeatureCollection: The matched features, CRS `EPSG:4326`. Empty</span>
+<a id="__codelineno-0-933" name="__codelineno-0-933"></a><span class="sd">            (schema-only) when nothing matched.</span>
+<a id="__codelineno-0-934" name="__codelineno-0-934"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-935" name="__codelineno-0-935"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+<a id="__codelineno-0-936" name="__codelineno-0-936"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
+<a id="__codelineno-0-937" name="__codelineno-0-937"></a>    <span class="c1"># OSM is ODbL — warn on every result, even an empty one (the query</span>
+<a id="__codelineno-0-938" name="__codelineno-0-938"></a>    <span class="c1"># itself succeeded and the obligation rides with any data downloaded).</span>
+<a id="__codelineno-0-939" name="__codelineno-0-939"></a>    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">ODBL_NOTICE</span><span class="p">,</span> <span class="n">LicenseWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<a id="__codelineno-0-940" name="__codelineno-0-940"></a>
+<a id="__codelineno-0-941" name="__codelineno-0-941"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-942" name="__codelineno-0-942"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-943" name="__codelineno-0-943"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-944" name="__codelineno-0-944"></a>            <span class="sa">f</span><span class="s2">&quot;OSM download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s) written to &quot;</span>
+<a id="__codelineno-0-945" name="__codelineno-0-945"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-946" name="__codelineno-0-946"></a>        <span class="p">)</span>
+<a id="__codelineno-0-947" name="__codelineno-0-947"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-948" name="__codelineno-0-948"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-949" name="__codelineno-0-949"></a>            <span class="s2">&quot;OSM download summary: no features matched the request, nothing written&quot;</span>
+<a id="__codelineno-0-950" name="__codelineno-0-950"></a>        <span class="p">)</span>
+<a id="__codelineno-0-951" name="__codelineno-0-951"></a>    <span class="k">return</span> <span class="n">collection</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -34028,7 +34033,8 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <span class="normal"><a href="#__codelineno-0-993">993</a></span>
 <span class="normal"><a href="#__codelineno-0-994">994</a></span>
 <span class="normal"><a href="#__codelineno-0-995">995</a></span>
-<span class="normal"><a href="#__codelineno-0-996">996</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="k">class</span><span class="w"> </span><span class="nc">OSM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-996">996</a></span>
+<span class="normal"><a href="#__codelineno-0-997">997</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="k">class</span><span class="w"> </span><span class="nc">OSM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;OpenStreetMap feature backend (vector FeatureCollection output).</span>
 <a id="__codelineno-0-162" name="__codelineno-0-162"></a>
 <a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">    Wraps the public Overpass + ohsome services so a user can pull a</span>
@@ -34787,84 +34793,85 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-916" name="__codelineno-0-916"></a><span class="sd">        Routes each named query to its protocol, combines the results into</span>
 <a id="__codelineno-0-917" name="__codelineno-0-917"></a><span class="sd">        one `FeatureCollection`, emits an ODbL `LicenseWarning` (`G5`),</span>
 <a id="__codelineno-0-918" name="__codelineno-0-918"></a><span class="sd">        writes the collection to one vector file under `path` when non-empty,</span>
-<a id="__codelineno-0-919" name="__codelineno-0-919"></a><span class="sd">        and returns the in-memory collection.</span>
-<a id="__codelineno-0-920" name="__codelineno-0-920"></a>
-<a id="__codelineno-0-921" name="__codelineno-0-921"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-922" name="__codelineno-0-922"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-923" name="__codelineno-0-923"></a><span class="sd">                backends; OSM issues one query per named id, so this is a</span>
-<a id="__codelineno-0-924" name="__codelineno-0-924"></a><span class="sd">                no-op.</span>
-<a id="__codelineno-0-925" name="__codelineno-0-925"></a><span class="sd">            limit: Cap on the total features returned, across every named</span>
-<a id="__codelineno-0-926" name="__codelineno-0-926"></a><span class="sd">                query. Applied as each query&#39;s result arrives, so a query past</span>
-<a id="__codelineno-0-927" name="__codelineno-0-927"></a><span class="sd">                the cap is never issued — which also means the rate limit is</span>
-<a id="__codelineno-0-928" name="__codelineno-0-928"></a><span class="sd">                not spent on it. `None` (the default) runs every query.</span>
-<a id="__codelineno-0-929" name="__codelineno-0-929"></a>
-<a id="__codelineno-0-930" name="__codelineno-0-930"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-931" name="__codelineno-0-931"></a><span class="sd">            FeatureCollection: The matched features, CRS `EPSG:4326`. Empty</span>
-<a id="__codelineno-0-932" name="__codelineno-0-932"></a><span class="sd">                (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-933" name="__codelineno-0-933"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-934" name="__codelineno-0-934"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
-<a id="__codelineno-0-935" name="__codelineno-0-935"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
-<a id="__codelineno-0-936" name="__codelineno-0-936"></a>        <span class="c1"># OSM is ODbL — warn on every result, even an empty one (the query</span>
-<a id="__codelineno-0-937" name="__codelineno-0-937"></a>        <span class="c1"># itself succeeded and the obligation rides with any data downloaded).</span>
-<a id="__codelineno-0-938" name="__codelineno-0-938"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">ODBL_NOTICE</span><span class="p">,</span> <span class="n">LicenseWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<a id="__codelineno-0-939" name="__codelineno-0-939"></a>
-<a id="__codelineno-0-940" name="__codelineno-0-940"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-941" name="__codelineno-0-941"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-942" name="__codelineno-0-942"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-943" name="__codelineno-0-943"></a>                <span class="sa">f</span><span class="s2">&quot;OSM download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s) written to &quot;</span>
-<a id="__codelineno-0-944" name="__codelineno-0-944"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-945" name="__codelineno-0-945"></a>            <span class="p">)</span>
-<a id="__codelineno-0-946" name="__codelineno-0-946"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-947" name="__codelineno-0-947"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-948" name="__codelineno-0-948"></a>                <span class="s2">&quot;OSM download summary: no features matched the request, nothing written&quot;</span>
-<a id="__codelineno-0-949" name="__codelineno-0-949"></a>            <span class="p">)</span>
-<a id="__codelineno-0-950" name="__codelineno-0-950"></a>        <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-951" name="__codelineno-0-951"></a>
-<a id="__codelineno-0-952" name="__codelineno-0-952"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collections</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-953" name="__codelineno-0-953"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Concatenate per-query FeatureCollections into one (union of columns).</span>
-<a id="__codelineno-0-954" name="__codelineno-0-954"></a>
-<a id="__codelineno-0-955" name="__codelineno-0-955"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-956" name="__codelineno-0-956"></a><span class="sd">            collections: The per-query collections from `_fetch` (possibly</span>
-<a id="__codelineno-0-957" name="__codelineno-0-957"></a><span class="sd">                empty).</span>
-<a id="__codelineno-0-958" name="__codelineno-0-958"></a>
-<a id="__codelineno-0-959" name="__codelineno-0-959"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-960" name="__codelineno-0-960"></a><span class="sd">            FeatureCollection: A single collection — the lone input when</span>
-<a id="__codelineno-0-961" name="__codelineno-0-961"></a><span class="sd">                there is exactly one, the row-wise concatenation when there</span>
-<a id="__codelineno-0-962" name="__codelineno-0-962"></a><span class="sd">                are several, or a schema-only empty collection when there are</span>
-<a id="__codelineno-0-963" name="__codelineno-0-963"></a><span class="sd">                none.</span>
-<a id="__codelineno-0-964" name="__codelineno-0-964"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-965" name="__codelineno-0-965"></a>        <span class="n">non_empty</span> <span class="o">=</span> <span class="p">[</span><span class="n">fc</span> <span class="k">for</span> <span class="n">fc</span> <span class="ow">in</span> <span class="n">collections</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fc</span><span class="p">)]</span>
-<a id="__codelineno-0-966" name="__codelineno-0-966"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">non_empty</span><span class="p">:</span>
-<a id="__codelineno-0-967" name="__codelineno-0-967"></a>            <span class="k">return</span> <span class="n">empty_fc</span><span class="p">()</span>
-<a id="__codelineno-0-968" name="__codelineno-0-968"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_empty</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-969" name="__codelineno-0-969"></a>            <span class="k">return</span> <span class="n">non_empty</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-970" name="__codelineno-0-970"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
-<a id="__codelineno-0-971" name="__codelineno-0-971"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.feature.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">FeatureCollection</span>
-<a id="__codelineno-0-972" name="__codelineno-0-972"></a>
-<a id="__codelineno-0-973" name="__codelineno-0-973"></a>        <span class="n">merged</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">non_empty</span><span class="p">),</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-974" name="__codelineno-0-974"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span>
-<a id="__codelineno-0-975" name="__codelineno-0-975"></a>            <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-976" name="__codelineno-0-976"></a>        <span class="p">)</span>
-<a id="__codelineno-0-977" name="__codelineno-0-977"></a>
-<a id="__codelineno-0-978" name="__codelineno-0-978"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-979" name="__codelineno-0-979"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the features to one vector file under `root_dir`.</span>
-<a id="__codelineno-0-980" name="__codelineno-0-980"></a>
-<a id="__codelineno-0-981" name="__codelineno-0-981"></a><span class="sd">        The filename embeds the requested query ids (`osm_&lt;ids&gt;.&lt;ext&gt;`), so</span>
-<a id="__codelineno-0-982" name="__codelineno-0-982"></a><span class="sd">        requests for different named queries land in distinct files. The bbox</span>
-<a id="__codelineno-0-983" name="__codelineno-0-983"></a><span class="sd">        and time window are *not* part of the name, so two requests for the same</span>
-<a id="__codelineno-0-984" name="__codelineno-0-984"></a><span class="sd">        query ids over different areas/times overwrite the same file.</span>
-<a id="__codelineno-0-985" name="__codelineno-0-985"></a>
-<a id="__codelineno-0-986" name="__codelineno-0-986"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-987" name="__codelineno-0-987"></a><span class="sd">            collection: The features to write.</span>
-<a id="__codelineno-0-988" name="__codelineno-0-988"></a>
-<a id="__codelineno-0-989" name="__codelineno-0-989"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-990" name="__codelineno-0-990"></a><span class="sd">            Path: Absolute path of the file written.</span>
-<a id="__codelineno-0-991" name="__codelineno-0-991"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-992" name="__codelineno-0-992"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
-<a id="__codelineno-0-993" name="__codelineno-0-993"></a>        <span class="n">slug</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">qid</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">qid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
-<a id="__codelineno-0-994" name="__codelineno-0-994"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;osm_</span><span class="si">{</span><span class="n">slug</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-995" name="__codelineno-0-995"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
-<a id="__codelineno-0-996" name="__codelineno-0-996"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-919" name="__codelineno-0-919"></a><span class="sd">        and returns the in-memory collection. This backend has no</span>
+<a id="__codelineno-0-920" name="__codelineno-0-920"></a><span class="sd">        partial-failure policy and takes no `errors=` argument.</span>
+<a id="__codelineno-0-921" name="__codelineno-0-921"></a>
+<a id="__codelineno-0-922" name="__codelineno-0-922"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-923" name="__codelineno-0-923"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-924" name="__codelineno-0-924"></a><span class="sd">                backends; OSM issues one query per named id, so this is a</span>
+<a id="__codelineno-0-925" name="__codelineno-0-925"></a><span class="sd">                no-op.</span>
+<a id="__codelineno-0-926" name="__codelineno-0-926"></a><span class="sd">            limit: Cap on the total features returned, across every named</span>
+<a id="__codelineno-0-927" name="__codelineno-0-927"></a><span class="sd">                query. Applied as each query&#39;s result arrives, so a query past</span>
+<a id="__codelineno-0-928" name="__codelineno-0-928"></a><span class="sd">                the cap is never issued — which also means the rate limit is</span>
+<a id="__codelineno-0-929" name="__codelineno-0-929"></a><span class="sd">                not spent on it. `None` (the default) runs every query.</span>
+<a id="__codelineno-0-930" name="__codelineno-0-930"></a>
+<a id="__codelineno-0-931" name="__codelineno-0-931"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-932" name="__codelineno-0-932"></a><span class="sd">            FeatureCollection: The matched features, CRS `EPSG:4326`. Empty</span>
+<a id="__codelineno-0-933" name="__codelineno-0-933"></a><span class="sd">                (schema-only) when nothing matched.</span>
+<a id="__codelineno-0-934" name="__codelineno-0-934"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-935" name="__codelineno-0-935"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+<a id="__codelineno-0-936" name="__codelineno-0-936"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
+<a id="__codelineno-0-937" name="__codelineno-0-937"></a>        <span class="c1"># OSM is ODbL — warn on every result, even an empty one (the query</span>
+<a id="__codelineno-0-938" name="__codelineno-0-938"></a>        <span class="c1"># itself succeeded and the obligation rides with any data downloaded).</span>
+<a id="__codelineno-0-939" name="__codelineno-0-939"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">ODBL_NOTICE</span><span class="p">,</span> <span class="n">LicenseWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<a id="__codelineno-0-940" name="__codelineno-0-940"></a>
+<a id="__codelineno-0-941" name="__codelineno-0-941"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-942" name="__codelineno-0-942"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-943" name="__codelineno-0-943"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-944" name="__codelineno-0-944"></a>                <span class="sa">f</span><span class="s2">&quot;OSM download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s) written to &quot;</span>
+<a id="__codelineno-0-945" name="__codelineno-0-945"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-946" name="__codelineno-0-946"></a>            <span class="p">)</span>
+<a id="__codelineno-0-947" name="__codelineno-0-947"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-948" name="__codelineno-0-948"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-949" name="__codelineno-0-949"></a>                <span class="s2">&quot;OSM download summary: no features matched the request, nothing written&quot;</span>
+<a id="__codelineno-0-950" name="__codelineno-0-950"></a>            <span class="p">)</span>
+<a id="__codelineno-0-951" name="__codelineno-0-951"></a>        <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-952" name="__codelineno-0-952"></a>
+<a id="__codelineno-0-953" name="__codelineno-0-953"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collections</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-954" name="__codelineno-0-954"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Concatenate per-query FeatureCollections into one (union of columns).</span>
+<a id="__codelineno-0-955" name="__codelineno-0-955"></a>
+<a id="__codelineno-0-956" name="__codelineno-0-956"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-957" name="__codelineno-0-957"></a><span class="sd">            collections: The per-query collections from `_fetch` (possibly</span>
+<a id="__codelineno-0-958" name="__codelineno-0-958"></a><span class="sd">                empty).</span>
+<a id="__codelineno-0-959" name="__codelineno-0-959"></a>
+<a id="__codelineno-0-960" name="__codelineno-0-960"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-961" name="__codelineno-0-961"></a><span class="sd">            FeatureCollection: A single collection — the lone input when</span>
+<a id="__codelineno-0-962" name="__codelineno-0-962"></a><span class="sd">                there is exactly one, the row-wise concatenation when there</span>
+<a id="__codelineno-0-963" name="__codelineno-0-963"></a><span class="sd">                are several, or a schema-only empty collection when there are</span>
+<a id="__codelineno-0-964" name="__codelineno-0-964"></a><span class="sd">                none.</span>
+<a id="__codelineno-0-965" name="__codelineno-0-965"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-966" name="__codelineno-0-966"></a>        <span class="n">non_empty</span> <span class="o">=</span> <span class="p">[</span><span class="n">fc</span> <span class="k">for</span> <span class="n">fc</span> <span class="ow">in</span> <span class="n">collections</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fc</span><span class="p">)]</span>
+<a id="__codelineno-0-967" name="__codelineno-0-967"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">non_empty</span><span class="p">:</span>
+<a id="__codelineno-0-968" name="__codelineno-0-968"></a>            <span class="k">return</span> <span class="n">empty_fc</span><span class="p">()</span>
+<a id="__codelineno-0-969" name="__codelineno-0-969"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_empty</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-970" name="__codelineno-0-970"></a>            <span class="k">return</span> <span class="n">non_empty</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-971" name="__codelineno-0-971"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<a id="__codelineno-0-972" name="__codelineno-0-972"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.feature.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">FeatureCollection</span>
+<a id="__codelineno-0-973" name="__codelineno-0-973"></a>
+<a id="__codelineno-0-974" name="__codelineno-0-974"></a>        <span class="n">merged</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">non_empty</span><span class="p">),</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-975" name="__codelineno-0-975"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span>
+<a id="__codelineno-0-976" name="__codelineno-0-976"></a>            <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-977" name="__codelineno-0-977"></a>        <span class="p">)</span>
+<a id="__codelineno-0-978" name="__codelineno-0-978"></a>
+<a id="__codelineno-0-979" name="__codelineno-0-979"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-980" name="__codelineno-0-980"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the features to one vector file under `root_dir`.</span>
+<a id="__codelineno-0-981" name="__codelineno-0-981"></a>
+<a id="__codelineno-0-982" name="__codelineno-0-982"></a><span class="sd">        The filename embeds the requested query ids (`osm_&lt;ids&gt;.&lt;ext&gt;`), so</span>
+<a id="__codelineno-0-983" name="__codelineno-0-983"></a><span class="sd">        requests for different named queries land in distinct files. The bbox</span>
+<a id="__codelineno-0-984" name="__codelineno-0-984"></a><span class="sd">        and time window are *not* part of the name, so two requests for the same</span>
+<a id="__codelineno-0-985" name="__codelineno-0-985"></a><span class="sd">        query ids over different areas/times overwrite the same file.</span>
+<a id="__codelineno-0-986" name="__codelineno-0-986"></a>
+<a id="__codelineno-0-987" name="__codelineno-0-987"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-988" name="__codelineno-0-988"></a><span class="sd">            collection: The features to write.</span>
+<a id="__codelineno-0-989" name="__codelineno-0-989"></a>
+<a id="__codelineno-0-990" name="__codelineno-0-990"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-991" name="__codelineno-0-991"></a><span class="sd">            Path: Absolute path of the file written.</span>
+<a id="__codelineno-0-992" name="__codelineno-0-992"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-993" name="__codelineno-0-993"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
+<a id="__codelineno-0-994" name="__codelineno-0-994"></a>        <span class="n">slug</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">qid</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">qid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
+<a id="__codelineno-0-995" name="__codelineno-0-995"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;osm_</span><span class="si">{</span><span class="n">slug</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-996" name="__codelineno-0-996"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
+<a id="__codelineno-0-997" name="__codelineno-0-997"></a>        <span class="k">return</span> <span class="n">out_path</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -35570,7 +35577,8 @@ of named-query ids.</p>
 <p>Routes each named query to its protocol, combines the results into
 one <code>FeatureCollection</code>, emits an ODbL <code>LicenseWarning</code> (<code>G5</code>),
 writes the collection to one vector file under <code>path</code> when non-empty,
-and returns the in-memory collection.</p>
+and returns the in-memory collection. This backend has no
+partial-failure policy and takes no <code>errors=</code> argument.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -35692,7 +35700,8 @@ not spent on it. <code>None</code> (the default) runs every query.</p>
 <span class="normal"><a href="#__codelineno-0-947">947</a></span>
 <span class="normal"><a href="#__codelineno-0-948">948</a></span>
 <span class="normal"><a href="#__codelineno-0-949">949</a></span>
-<span class="normal"><a href="#__codelineno-0-950">950</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-909" name="__codelineno-0-909"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-950">950</a></span>
+<span class="normal"><a href="#__codelineno-0-951">951</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-909" name="__codelineno-0-909"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-910" name="__codelineno-0-910"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-911" name="__codelineno-0-911"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-912" name="__codelineno-0-912"></a>    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -35702,38 +35711,39 @@ not spent on it. <code>None</code> (the default) runs every query.</p>
 <a id="__codelineno-0-916" name="__codelineno-0-916"></a><span class="sd">    Routes each named query to its protocol, combines the results into</span>
 <a id="__codelineno-0-917" name="__codelineno-0-917"></a><span class="sd">    one `FeatureCollection`, emits an ODbL `LicenseWarning` (`G5`),</span>
 <a id="__codelineno-0-918" name="__codelineno-0-918"></a><span class="sd">    writes the collection to one vector file under `path` when non-empty,</span>
-<a id="__codelineno-0-919" name="__codelineno-0-919"></a><span class="sd">    and returns the in-memory collection.</span>
-<a id="__codelineno-0-920" name="__codelineno-0-920"></a>
-<a id="__codelineno-0-921" name="__codelineno-0-921"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-922" name="__codelineno-0-922"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-923" name="__codelineno-0-923"></a><span class="sd">            backends; OSM issues one query per named id, so this is a</span>
-<a id="__codelineno-0-924" name="__codelineno-0-924"></a><span class="sd">            no-op.</span>
-<a id="__codelineno-0-925" name="__codelineno-0-925"></a><span class="sd">        limit: Cap on the total features returned, across every named</span>
-<a id="__codelineno-0-926" name="__codelineno-0-926"></a><span class="sd">            query. Applied as each query&#39;s result arrives, so a query past</span>
-<a id="__codelineno-0-927" name="__codelineno-0-927"></a><span class="sd">            the cap is never issued — which also means the rate limit is</span>
-<a id="__codelineno-0-928" name="__codelineno-0-928"></a><span class="sd">            not spent on it. `None` (the default) runs every query.</span>
-<a id="__codelineno-0-929" name="__codelineno-0-929"></a>
-<a id="__codelineno-0-930" name="__codelineno-0-930"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-931" name="__codelineno-0-931"></a><span class="sd">        FeatureCollection: The matched features, CRS `EPSG:4326`. Empty</span>
-<a id="__codelineno-0-932" name="__codelineno-0-932"></a><span class="sd">            (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-933" name="__codelineno-0-933"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-934" name="__codelineno-0-934"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
-<a id="__codelineno-0-935" name="__codelineno-0-935"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
-<a id="__codelineno-0-936" name="__codelineno-0-936"></a>    <span class="c1"># OSM is ODbL — warn on every result, even an empty one (the query</span>
-<a id="__codelineno-0-937" name="__codelineno-0-937"></a>    <span class="c1"># itself succeeded and the obligation rides with any data downloaded).</span>
-<a id="__codelineno-0-938" name="__codelineno-0-938"></a>    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">ODBL_NOTICE</span><span class="p">,</span> <span class="n">LicenseWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<a id="__codelineno-0-939" name="__codelineno-0-939"></a>
-<a id="__codelineno-0-940" name="__codelineno-0-940"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-941" name="__codelineno-0-941"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-942" name="__codelineno-0-942"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-943" name="__codelineno-0-943"></a>            <span class="sa">f</span><span class="s2">&quot;OSM download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s) written to &quot;</span>
-<a id="__codelineno-0-944" name="__codelineno-0-944"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-945" name="__codelineno-0-945"></a>        <span class="p">)</span>
-<a id="__codelineno-0-946" name="__codelineno-0-946"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-947" name="__codelineno-0-947"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-948" name="__codelineno-0-948"></a>            <span class="s2">&quot;OSM download summary: no features matched the request, nothing written&quot;</span>
-<a id="__codelineno-0-949" name="__codelineno-0-949"></a>        <span class="p">)</span>
-<a id="__codelineno-0-950" name="__codelineno-0-950"></a>    <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-919" name="__codelineno-0-919"></a><span class="sd">    and returns the in-memory collection. This backend has no</span>
+<a id="__codelineno-0-920" name="__codelineno-0-920"></a><span class="sd">    partial-failure policy and takes no `errors=` argument.</span>
+<a id="__codelineno-0-921" name="__codelineno-0-921"></a>
+<a id="__codelineno-0-922" name="__codelineno-0-922"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-923" name="__codelineno-0-923"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-924" name="__codelineno-0-924"></a><span class="sd">            backends; OSM issues one query per named id, so this is a</span>
+<a id="__codelineno-0-925" name="__codelineno-0-925"></a><span class="sd">            no-op.</span>
+<a id="__codelineno-0-926" name="__codelineno-0-926"></a><span class="sd">        limit: Cap on the total features returned, across every named</span>
+<a id="__codelineno-0-927" name="__codelineno-0-927"></a><span class="sd">            query. Applied as each query&#39;s result arrives, so a query past</span>
+<a id="__codelineno-0-928" name="__codelineno-0-928"></a><span class="sd">            the cap is never issued — which also means the rate limit is</span>
+<a id="__codelineno-0-929" name="__codelineno-0-929"></a><span class="sd">            not spent on it. `None` (the default) runs every query.</span>
+<a id="__codelineno-0-930" name="__codelineno-0-930"></a>
+<a id="__codelineno-0-931" name="__codelineno-0-931"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-932" name="__codelineno-0-932"></a><span class="sd">        FeatureCollection: The matched features, CRS `EPSG:4326`. Empty</span>
+<a id="__codelineno-0-933" name="__codelineno-0-933"></a><span class="sd">            (schema-only) when nothing matched.</span>
+<a id="__codelineno-0-934" name="__codelineno-0-934"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-935" name="__codelineno-0-935"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+<a id="__codelineno-0-936" name="__codelineno-0-936"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
+<a id="__codelineno-0-937" name="__codelineno-0-937"></a>    <span class="c1"># OSM is ODbL — warn on every result, even an empty one (the query</span>
+<a id="__codelineno-0-938" name="__codelineno-0-938"></a>    <span class="c1"># itself succeeded and the obligation rides with any data downloaded).</span>
+<a id="__codelineno-0-939" name="__codelineno-0-939"></a>    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">ODBL_NOTICE</span><span class="p">,</span> <span class="n">LicenseWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<a id="__codelineno-0-940" name="__codelineno-0-940"></a>
+<a id="__codelineno-0-941" name="__codelineno-0-941"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-942" name="__codelineno-0-942"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-943" name="__codelineno-0-943"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-944" name="__codelineno-0-944"></a>            <span class="sa">f</span><span class="s2">&quot;OSM download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s) written to &quot;</span>
+<a id="__codelineno-0-945" name="__codelineno-0-945"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-946" name="__codelineno-0-946"></a>        <span class="p">)</span>
+<a id="__codelineno-0-947" name="__codelineno-0-947"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-948" name="__codelineno-0-948"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-949" name="__codelineno-0-949"></a>            <span class="s2">&quot;OSM download summary: no features matched the request, nothing written&quot;</span>
+<a id="__codelineno-0-950" name="__codelineno-0-950"></a>        <span class="p">)</span>
+<a id="__codelineno-0-951" name="__codelineno-0-951"></a>    <span class="k">return</span> <span class="n">collection</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -35846,8 +35856,7 @@ DEFAULT_PBF_CACHE_DIR</code> working rather than failing with a bare ImportError
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/osm/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-999"> 999</a></span>
-<span class="normal"><a href="#__codelineno-0-1000">1000</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1000">1000</a></span>
 <span class="normal"><a href="#__codelineno-0-1001">1001</a></span>
 <span class="normal"><a href="#__codelineno-0-1002">1002</a></span>
 <span class="normal"><a href="#__codelineno-0-1003">1003</a></span>
@@ -35871,32 +35880,33 @@ DEFAULT_PBF_CACHE_DIR</code> working rather than failing with a bare ImportError
 <span class="normal"><a href="#__codelineno-0-1021">1021</a></span>
 <span class="normal"><a href="#__codelineno-0-1022">1022</a></span>
 <span class="normal"><a href="#__codelineno-0-1023">1023</a></span>
-<span class="normal"><a href="#__codelineno-0-1024">1024</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-999" name="__codelineno-0-999"></a><span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-1000" name="__codelineno-0-1000"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep the removed `DEFAULT_PBF_CACHE_DIR` constant importable.</span>
-<a id="__codelineno-0-1001" name="__codelineno-0-1001"></a>
-<a id="__codelineno-0-1002" name="__codelineno-0-1002"></a><span class="sd">    It became `default_pbf_cache_dir()` so the location follows a later</span>
-<a id="__codelineno-0-1003" name="__codelineno-0-1003"></a><span class="sd">    `set_cache_dir()` instead of freezing at import. Returning the resolved</span>
-<a id="__codelineno-0-1004" name="__codelineno-0-1004"></a><span class="sd">    directory keeps an existing `from earthlens.osm.backend import</span>
-<a id="__codelineno-0-1005" name="__codelineno-0-1005"></a><span class="sd">    DEFAULT_PBF_CACHE_DIR` working rather than failing with a bare ImportError.</span>
-<a id="__codelineno-0-1006" name="__codelineno-0-1006"></a>
-<a id="__codelineno-0-1007" name="__codelineno-0-1007"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-1008" name="__codelineno-0-1008"></a><span class="sd">        name: The attribute being looked up.</span>
-<a id="__codelineno-0-1009" name="__codelineno-0-1009"></a>
-<a id="__codelineno-0-1010" name="__codelineno-0-1010"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-1011" name="__codelineno-0-1011"></a><span class="sd">        Path: The current default `.osm.pbf` cache directory.</span>
-<a id="__codelineno-0-1012" name="__codelineno-0-1012"></a>
-<a id="__codelineno-0-1013" name="__codelineno-0-1013"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-1014" name="__codelineno-0-1014"></a><span class="sd">        AttributeError: For any other name.</span>
-<a id="__codelineno-0-1015" name="__codelineno-0-1015"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-1016" name="__codelineno-0-1016"></a>    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;DEFAULT_PBF_CACHE_DIR&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-1017" name="__codelineno-0-1017"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-<a id="__codelineno-0-1018" name="__codelineno-0-1018"></a>            <span class="s2">&quot;DEFAULT_PBF_CACHE_DIR is deprecated; call default_pbf_cache_dir() &quot;</span>
-<a id="__codelineno-0-1019" name="__codelineno-0-1019"></a>            <span class="s2">&quot;instead, which follows set_cache_dir() / EARTHLENS_CACHE.&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-1020" name="__codelineno-0-1020"></a>            <span class="ne">DeprecationWarning</span><span class="p">,</span>
-<a id="__codelineno-0-1021" name="__codelineno-0-1021"></a>            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-<a id="__codelineno-0-1022" name="__codelineno-0-1022"></a>        <span class="p">)</span>
-<a id="__codelineno-0-1023" name="__codelineno-0-1023"></a>        <span class="k">return</span> <span class="n">default_pbf_cache_dir</span><span class="p">()</span>
-<a id="__codelineno-0-1024" name="__codelineno-0-1024"></a>    <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;module </span><span class="si">{</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> has no attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-1024">1024</a></span>
+<span class="normal"><a href="#__codelineno-0-1025">1025</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1000" name="__codelineno-0-1000"></a><span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-1001" name="__codelineno-0-1001"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep the removed `DEFAULT_PBF_CACHE_DIR` constant importable.</span>
+<a id="__codelineno-0-1002" name="__codelineno-0-1002"></a>
+<a id="__codelineno-0-1003" name="__codelineno-0-1003"></a><span class="sd">    It became `default_pbf_cache_dir()` so the location follows a later</span>
+<a id="__codelineno-0-1004" name="__codelineno-0-1004"></a><span class="sd">    `set_cache_dir()` instead of freezing at import. Returning the resolved</span>
+<a id="__codelineno-0-1005" name="__codelineno-0-1005"></a><span class="sd">    directory keeps an existing `from earthlens.osm.backend import</span>
+<a id="__codelineno-0-1006" name="__codelineno-0-1006"></a><span class="sd">    DEFAULT_PBF_CACHE_DIR` working rather than failing with a bare ImportError.</span>
+<a id="__codelineno-0-1007" name="__codelineno-0-1007"></a>
+<a id="__codelineno-0-1008" name="__codelineno-0-1008"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-1009" name="__codelineno-0-1009"></a><span class="sd">        name: The attribute being looked up.</span>
+<a id="__codelineno-0-1010" name="__codelineno-0-1010"></a>
+<a id="__codelineno-0-1011" name="__codelineno-0-1011"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-1012" name="__codelineno-0-1012"></a><span class="sd">        Path: The current default `.osm.pbf` cache directory.</span>
+<a id="__codelineno-0-1013" name="__codelineno-0-1013"></a>
+<a id="__codelineno-0-1014" name="__codelineno-0-1014"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-1015" name="__codelineno-0-1015"></a><span class="sd">        AttributeError: For any other name.</span>
+<a id="__codelineno-0-1016" name="__codelineno-0-1016"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-1017" name="__codelineno-0-1017"></a>    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;DEFAULT_PBF_CACHE_DIR&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-1018" name="__codelineno-0-1018"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="__codelineno-0-1019" name="__codelineno-0-1019"></a>            <span class="s2">&quot;DEFAULT_PBF_CACHE_DIR is deprecated; call default_pbf_cache_dir() &quot;</span>
+<a id="__codelineno-0-1020" name="__codelineno-0-1020"></a>            <span class="s2">&quot;instead, which follows set_cache_dir() / EARTHLENS_CACHE.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-1021" name="__codelineno-0-1021"></a>            <span class="ne">DeprecationWarning</span><span class="p">,</span>
+<a id="__codelineno-0-1022" name="__codelineno-0-1022"></a>            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-0-1023" name="__codelineno-0-1023"></a>        <span class="p">)</span>
+<a id="__codelineno-0-1024" name="__codelineno-0-1024"></a>        <span class="k">return</span> <span class="n">default_pbf_cache_dir</span><span class="p">()</span>
+<a id="__codelineno-0-1025" name="__codelineno-0-1025"></a>    <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;module </span><span class="si">{</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> has no attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -25554,7 +25554,39 @@ one); defaults to the bundled catalog.</p>
 <span class="normal"><a href="#__codelineno-0-308">308</a></span>
 <span class="normal"><a href="#__codelineno-0-309">309</a></span>
 <span class="normal"><a href="#__codelineno-0-310">310</a></span>
-<span class="normal"><a href="#__codelineno-0-311">311</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="k">class</span><span class="w"> </span><span class="nc">DEM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-311">311</a></span>
+<span class="normal"><a href="#__codelineno-0-312">312</a></span>
+<span class="normal"><a href="#__codelineno-0-313">313</a></span>
+<span class="normal"><a href="#__codelineno-0-314">314</a></span>
+<span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
+<span class="normal"><a href="#__codelineno-0-318">318</a></span>
+<span class="normal"><a href="#__codelineno-0-319">319</a></span>
+<span class="normal"><a href="#__codelineno-0-320">320</a></span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span>
+<span class="normal"><a href="#__codelineno-0-322">322</a></span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span>
+<span class="normal"><a href="#__codelineno-0-326">326</a></span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span>
+<span class="normal"><a href="#__codelineno-0-330">330</a></span>
+<span class="normal"><a href="#__codelineno-0-331">331</a></span>
+<span class="normal"><a href="#__codelineno-0-332">332</a></span>
+<span class="normal"><a href="#__codelineno-0-333">333</a></span>
+<span class="normal"><a href="#__codelineno-0-334">334</a></span>
+<span class="normal"><a href="#__codelineno-0-335">335</a></span>
+<span class="normal"><a href="#__codelineno-0-336">336</a></span>
+<span class="normal"><a href="#__codelineno-0-337">337</a></span>
+<span class="normal"><a href="#__codelineno-0-338">338</a></span>
+<span class="normal"><a href="#__codelineno-0-339">339</a></span>
+<span class="normal"><a href="#__codelineno-0-340">340</a></span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span>
+<span class="normal"><a href="#__codelineno-0-342">342</a></span>
+<span class="normal"><a href="#__codelineno-0-343">343</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="k">class</span><span class="w"> </span><span class="nc">DEM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Anonymous Copernicus DEM backend (raw COG tiles).</span>
 <a id="__codelineno-0-49" name="__codelineno-0-49"></a>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    Args:</span>
@@ -25800,25 +25832,57 @@ one); defaults to the bundled catalog.</p>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>        <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch every 1° Copernicus DEM tile the bbox intersects.</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            progress_bar: Show a per-tile progress bar. Defaults to</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">                `True`.</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">            force: Re-fetch even when a complete output already exists,</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">                bypassing the skip-if-exists check. Defaults to `False`.</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>        <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch every 1° Copernicus DEM tile the bbox intersects.</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">            progress_bar: Show a per-tile progress bar. Defaults to</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">                `True`.</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            errors: Partial-failure policy across the independent tiles:</span>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">            list[Path]: The local paths of the downloaded COG tiles, in</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">                bbox row-major order. Empty when every candidate tile is</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">                absent from the bucket.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_force</span> <span class="o">=</span> <span class="n">force</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">                * `&quot;warn&quot;` (default) — log each failed tile and return the</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">                  tiles that downloaded, with a summary.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">                * `&quot;raise&quot;` — propagate the first tile failure, for a</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">                  pipeline that must fail fast.</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">                * `&quot;ignore&quot;` — drop failed tiles silently.</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">                A whole-service failure — bad credentials, a dead host —</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">                fails every tile identically, so when every attempted tile</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">                fails the first error is re-raised under every policy rather</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">                than returned as an empty result. An absent ocean /</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">                outside-coverage tile is a `None` from `_fetch_one`, not a</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">                failure: it is skipped as before and never triggers that</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">                re-raise.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            force: Re-fetch even when a complete output already exists,</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">                bypassing the skip-if-exists check. Defaults to `False`.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            list[Path]: The local paths of the downloaded COG tiles, in</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">                bbox row-major order. Empty when every candidate tile is</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                absent from the bucket.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_errors_policy</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_force</span> <span class="o">=</span> <span class="n">force</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search_fetch_each</span><span class="p">(</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>            <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>            <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;dem/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;tile&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>            <span class="n">errors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">,</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="n">raise_if_all_failed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;tile&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="p">)</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="n">written</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="n">missing</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">written</span><span class="p">)</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>                <span class="sa">f</span><span class="s2">&quot;dem: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">written</span><span class="p">)</span><span class="si">}</span><span class="s2"> tile(s) downloaded; </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2"> absent &quot;</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>                <span class="s2">&quot;(ocean / outside coverage).&quot;</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>            <span class="p">)</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>        <span class="k">return</span> <span class="n">written</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -25957,7 +26021,7 @@ one); defaults to the bundled catalog.</p>
 
 
 <h4 id="earthlens.dem.DEM.download" class="doc doc-heading"><a href="#earthlens.dem.DEM.download" class="toclink">
-            <code class="highlight language-python"><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.dem.DEM.download" class="headerlink" title="Permanent link">#</a></h4>
 
@@ -25993,6 +26057,36 @@ one); defaults to the bundled catalog.</p>
             </td>
             <td>
                   <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>errors</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Partial-failure policy across the independent tiles:</p>
+<ul>
+<li><code>"warn"</code> (default) — log each failed tile and return the
+  tiles that downloaded, with a summary.</li>
+<li><code>"raise"</code> — propagate the first tile failure, for a
+  pipeline that must fail fast.</li>
+<li><code>"ignore"</code> — drop failed tiles silently.</li>
+</ul>
+<p>A whole-service failure — bad credentials, a dead host —
+fails every tile identically, so when every attempted tile
+fails the first error is re-raised under every policy rather
+than returned as an empty result. An absent ocean /
+outside-coverage tile is a <code>None</code> from <code>_fetch_one</code>, not a
+failure: it is skipped as before and never triggers that
+re-raise.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;warn&#39;</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -26064,28 +26158,92 @@ absent from the bucket.</p>
 <span class="normal"><a href="#__codelineno-0-308">308</a></span>
 <span class="normal"><a href="#__codelineno-0-309">309</a></span>
 <span class="normal"><a href="#__codelineno-0-310">310</a></span>
-<span class="normal"><a href="#__codelineno-0-311">311</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-311">311</a></span>
+<span class="normal"><a href="#__codelineno-0-312">312</a></span>
+<span class="normal"><a href="#__codelineno-0-313">313</a></span>
+<span class="normal"><a href="#__codelineno-0-314">314</a></span>
+<span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
+<span class="normal"><a href="#__codelineno-0-318">318</a></span>
+<span class="normal"><a href="#__codelineno-0-319">319</a></span>
+<span class="normal"><a href="#__codelineno-0-320">320</a></span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span>
+<span class="normal"><a href="#__codelineno-0-322">322</a></span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span>
+<span class="normal"><a href="#__codelineno-0-326">326</a></span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span>
+<span class="normal"><a href="#__codelineno-0-330">330</a></span>
+<span class="normal"><a href="#__codelineno-0-331">331</a></span>
+<span class="normal"><a href="#__codelineno-0-332">332</a></span>
+<span class="normal"><a href="#__codelineno-0-333">333</a></span>
+<span class="normal"><a href="#__codelineno-0-334">334</a></span>
+<span class="normal"><a href="#__codelineno-0-335">335</a></span>
+<span class="normal"><a href="#__codelineno-0-336">336</a></span>
+<span class="normal"><a href="#__codelineno-0-337">337</a></span>
+<span class="normal"><a href="#__codelineno-0-338">338</a></span>
+<span class="normal"><a href="#__codelineno-0-339">339</a></span>
+<span class="normal"><a href="#__codelineno-0-340">340</a></span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span>
+<span class="normal"><a href="#__codelineno-0-342">342</a></span>
+<span class="normal"><a href="#__codelineno-0-343">343</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>    <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch every 1° Copernicus DEM tile the bbox intersects.</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        progress_bar: Show a per-tile progress bar. Defaults to</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">            `True`.</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        force: Re-fetch even when a complete output already exists,</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            bypassing the skip-if-exists check. Defaults to `False`.</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>    <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch every 1° Copernicus DEM tile the bbox intersects.</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        progress_bar: Show a per-tile progress bar. Defaults to</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">            `True`.</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        errors: Partial-failure policy across the independent tiles:</span>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        list[Path]: The local paths of the downloaded COG tiles, in</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            bbox row-major order. Empty when every candidate tile is</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            absent from the bucket.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_force</span> <span class="o">=</span> <span class="n">force</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            * `&quot;warn&quot;` (default) — log each failed tile and return the</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">              tiles that downloaded, with a summary.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            * `&quot;raise&quot;` — propagate the first tile failure, for a</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">              pipeline that must fail fast.</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            * `&quot;ignore&quot;` — drop failed tiles silently.</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            A whole-service failure — bad credentials, a dead host —</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            fails every tile identically, so when every attempted tile</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            fails the first error is re-raised under every policy rather</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            than returned as an empty result. An absent ocean /</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            outside-coverage tile is a `None` from `_fetch_one`, not a</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            failure: it is skipped as before and never triggers that</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">            re-raise.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        force: Re-fetch even when a complete output already exists,</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            bypassing the skip-if-exists check. Defaults to `False`.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        list[Path]: The local paths of the downloaded COG tiles, in</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            bbox row-major order. Empty when every candidate tile is</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            absent from the bucket.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_errors_policy</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_force</span> <span class="o">=</span> <span class="n">force</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>    <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search_fetch_each</span><span class="p">(</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;dem/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;tile&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="n">errors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">,</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="n">raise_if_all_failed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;tile&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="p">)</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="n">written</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="n">missing</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">written</span><span class="p">)</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>            <span class="sa">f</span><span class="s2">&quot;dem: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">written</span><span class="p">)</span><span class="si">}</span><span class="s2"> tile(s) downloaded; </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2"> absent &quot;</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>            <span class="s2">&quot;(ocean / outside coverage).&quot;</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>        <span class="p">)</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>    <span class="k">return</span> <span class="n">written</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -27192,7 +27350,39 @@ one); defaults to the bundled catalog.</p>
 <span class="normal"><a href="#__codelineno-0-308">308</a></span>
 <span class="normal"><a href="#__codelineno-0-309">309</a></span>
 <span class="normal"><a href="#__codelineno-0-310">310</a></span>
-<span class="normal"><a href="#__codelineno-0-311">311</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="k">class</span><span class="w"> </span><span class="nc">DEM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-311">311</a></span>
+<span class="normal"><a href="#__codelineno-0-312">312</a></span>
+<span class="normal"><a href="#__codelineno-0-313">313</a></span>
+<span class="normal"><a href="#__codelineno-0-314">314</a></span>
+<span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
+<span class="normal"><a href="#__codelineno-0-318">318</a></span>
+<span class="normal"><a href="#__codelineno-0-319">319</a></span>
+<span class="normal"><a href="#__codelineno-0-320">320</a></span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span>
+<span class="normal"><a href="#__codelineno-0-322">322</a></span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span>
+<span class="normal"><a href="#__codelineno-0-326">326</a></span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span>
+<span class="normal"><a href="#__codelineno-0-330">330</a></span>
+<span class="normal"><a href="#__codelineno-0-331">331</a></span>
+<span class="normal"><a href="#__codelineno-0-332">332</a></span>
+<span class="normal"><a href="#__codelineno-0-333">333</a></span>
+<span class="normal"><a href="#__codelineno-0-334">334</a></span>
+<span class="normal"><a href="#__codelineno-0-335">335</a></span>
+<span class="normal"><a href="#__codelineno-0-336">336</a></span>
+<span class="normal"><a href="#__codelineno-0-337">337</a></span>
+<span class="normal"><a href="#__codelineno-0-338">338</a></span>
+<span class="normal"><a href="#__codelineno-0-339">339</a></span>
+<span class="normal"><a href="#__codelineno-0-340">340</a></span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span>
+<span class="normal"><a href="#__codelineno-0-342">342</a></span>
+<span class="normal"><a href="#__codelineno-0-343">343</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="k">class</span><span class="w"> </span><span class="nc">DEM</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Anonymous Copernicus DEM backend (raw COG tiles).</span>
 <a id="__codelineno-0-49" name="__codelineno-0-49"></a>
 <a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    Args:</span>
@@ -27438,25 +27628,57 @@ one); defaults to the bundled catalog.</p>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>        <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch every 1° Copernicus DEM tile the bbox intersects.</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            progress_bar: Show a per-tile progress bar. Defaults to</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">                `True`.</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">            force: Re-fetch even when a complete output already exists,</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">                bypassing the skip-if-exists check. Defaults to `False`.</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>        <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch every 1° Copernicus DEM tile the bbox intersects.</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">            progress_bar: Show a per-tile progress bar. Defaults to</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">                `True`.</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            errors: Partial-failure policy across the independent tiles:</span>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">            list[Path]: The local paths of the downloaded COG tiles, in</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">                bbox row-major order. Empty when every candidate tile is</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">                absent from the bucket.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_force</span> <span class="o">=</span> <span class="n">force</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">                * `&quot;warn&quot;` (default) — log each failed tile and return the</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">                  tiles that downloaded, with a summary.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">                * `&quot;raise&quot;` — propagate the first tile failure, for a</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">                  pipeline that must fail fast.</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">                * `&quot;ignore&quot;` — drop failed tiles silently.</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">                A whole-service failure — bad credentials, a dead host —</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">                fails every tile identically, so when every attempted tile</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">                fails the first error is re-raised under every policy rather</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">                than returned as an empty result. An absent ocean /</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">                outside-coverage tile is a `None` from `_fetch_one`, not a</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">                failure: it is skipped as before and never triggers that</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">                re-raise.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            force: Re-fetch even when a complete output already exists,</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">                bypassing the skip-if-exists check. Defaults to `False`.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            list[Path]: The local paths of the downloaded COG tiles, in</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">                bbox row-major order. Empty when every candidate tile is</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                absent from the bucket.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_errors_policy</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_force</span> <span class="o">=</span> <span class="n">force</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search_fetch_each</span><span class="p">(</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>            <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>            <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;dem/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;tile&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>            <span class="n">errors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">,</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="n">raise_if_all_failed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;tile&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="p">)</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="n">written</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="n">missing</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">written</span><span class="p">)</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>                <span class="sa">f</span><span class="s2">&quot;dem: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">written</span><span class="p">)</span><span class="si">}</span><span class="s2"> tile(s) downloaded; </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2"> absent &quot;</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>                <span class="s2">&quot;(ocean / outside coverage).&quot;</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>            <span class="p">)</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>        <span class="k">return</span> <span class="n">written</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -27595,7 +27817,7 @@ one); defaults to the bundled catalog.</p>
 
 
 <h4 id="earthlens.dem.backend.DEM.download" class="doc doc-heading"><a href="#earthlens.dem.backend.DEM.download" class="toclink">
-            <code class="highlight language-python"><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.dem.backend.DEM.download" class="headerlink" title="Permanent link">#</a></h4>
 
@@ -27631,6 +27853,36 @@ one); defaults to the bundled catalog.</p>
             </td>
             <td>
                   <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>errors</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Partial-failure policy across the independent tiles:</p>
+<ul>
+<li><code>"warn"</code> (default) — log each failed tile and return the
+  tiles that downloaded, with a summary.</li>
+<li><code>"raise"</code> — propagate the first tile failure, for a
+  pipeline that must fail fast.</li>
+<li><code>"ignore"</code> — drop failed tiles silently.</li>
+</ul>
+<p>A whole-service failure — bad credentials, a dead host —
+fails every tile identically, so when every attempted tile
+fails the first error is re-raised under every policy rather
+than returned as an empty result. An absent ocean /
+outside-coverage tile is a <code>None</code> from <code>_fetch_one</code>, not a
+failure: it is skipped as before and never triggers that
+re-raise.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;warn&#39;</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -27702,28 +27954,92 @@ absent from the bucket.</p>
 <span class="normal"><a href="#__codelineno-0-308">308</a></span>
 <span class="normal"><a href="#__codelineno-0-309">309</a></span>
 <span class="normal"><a href="#__codelineno-0-310">310</a></span>
-<span class="normal"><a href="#__codelineno-0-311">311</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-311">311</a></span>
+<span class="normal"><a href="#__codelineno-0-312">312</a></span>
+<span class="normal"><a href="#__codelineno-0-313">313</a></span>
+<span class="normal"><a href="#__codelineno-0-314">314</a></span>
+<span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
+<span class="normal"><a href="#__codelineno-0-318">318</a></span>
+<span class="normal"><a href="#__codelineno-0-319">319</a></span>
+<span class="normal"><a href="#__codelineno-0-320">320</a></span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span>
+<span class="normal"><a href="#__codelineno-0-322">322</a></span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span>
+<span class="normal"><a href="#__codelineno-0-326">326</a></span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span>
+<span class="normal"><a href="#__codelineno-0-330">330</a></span>
+<span class="normal"><a href="#__codelineno-0-331">331</a></span>
+<span class="normal"><a href="#__codelineno-0-332">332</a></span>
+<span class="normal"><a href="#__codelineno-0-333">333</a></span>
+<span class="normal"><a href="#__codelineno-0-334">334</a></span>
+<span class="normal"><a href="#__codelineno-0-335">335</a></span>
+<span class="normal"><a href="#__codelineno-0-336">336</a></span>
+<span class="normal"><a href="#__codelineno-0-337">337</a></span>
+<span class="normal"><a href="#__codelineno-0-338">338</a></span>
+<span class="normal"><a href="#__codelineno-0-339">339</a></span>
+<span class="normal"><a href="#__codelineno-0-340">340</a></span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span>
+<span class="normal"><a href="#__codelineno-0-342">342</a></span>
+<span class="normal"><a href="#__codelineno-0-343">343</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>    <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch every 1° Copernicus DEM tile the bbox intersects.</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        progress_bar: Show a per-tile progress bar. Defaults to</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">            `True`.</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">        force: Re-fetch even when a complete output already exists,</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">            bypassing the skip-if-exists check. Defaults to `False`.</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="n">errors</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>    <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch every 1° Copernicus DEM tile the bbox intersects.</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        progress_bar: Show a per-tile progress bar. Defaults to</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">            `True`.</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        errors: Partial-failure policy across the independent tiles:</span>
 <a id="__codelineno-0-303" name="__codelineno-0-303"></a>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">        list[Path]: The local paths of the downloaded COG tiles, in</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            bbox row-major order. Empty when every candidate tile is</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            absent from the bucket.</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_force</span> <span class="o">=</span> <span class="n">force</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">            * `&quot;warn&quot;` (default) — log each failed tile and return the</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">              tiles that downloaded, with a summary.</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">            * `&quot;raise&quot;` — propagate the first tile failure, for a</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">              pipeline that must fail fast.</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">            * `&quot;ignore&quot;` — drop failed tiles silently.</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            A whole-service failure — bad credentials, a dead host —</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">            fails every tile identically, so when every attempted tile</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            fails the first error is re-raised under every policy rather</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            than returned as an empty result. An absent ocean /</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">            outside-coverage tile is a `None` from `_fetch_one`, not a</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            failure: it is skipped as before and never triggers that</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">            re-raise.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        force: Re-fetch even when a complete output already exists,</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            bypassing the skip-if-exists check. Defaults to `False`.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        list[Path]: The local paths of the downloaded COG tiles, in</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            bbox row-major order. Empty when every candidate tile is</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            absent from the bucket.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_errors_policy</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_force</span> <span class="o">=</span> <span class="n">force</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>    <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search_fetch_each</span><span class="p">(</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;dem/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;tile&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="n">errors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">,</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="n">raise_if_all_failed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;tile&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="p">)</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="n">written</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="n">missing</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">written</span><span class="p">)</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>            <span class="sa">f</span><span class="s2">&quot;dem: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">written</span><span class="p">)</span><span class="si">}</span><span class="s2"> tile(s) downloaded; </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2"> absent &quot;</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>            <span class="s2">&quot;(ocean / outside coverage).&quot;</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>        <span class="p">)</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>    <span class="k">return</span> <span class="n">written</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

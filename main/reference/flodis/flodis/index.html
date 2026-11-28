@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -26082,7 +26082,8 @@ year the record covers (2000-2018).</p>
 <span class="normal"><a href="#__codelineno-0-590">590</a></span>
 <span class="normal"><a href="#__codelineno-0-591">591</a></span>
 <span class="normal"><a href="#__codelineno-0-592">592</a></span>
-<span class="normal"><a href="#__codelineno-0-593">593</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="k">class</span><span class="w"> </span><span class="nc">FLODIS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-593">593</a></span>
+<span class="normal"><a href="#__codelineno-0-594">594</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="k">class</span><span class="w"> </span><span class="nc">FLODIS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;FLODIS observed-flood impacts backend (tabular).</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    Downloads the selected FLODIS table from its pinned Zenodo release, filters</span>
@@ -26419,70 +26420,71 @@ year the record covers (2000-2018).</p>
 <a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the selected FLODIS table and return it.</span>
 <a id="__codelineno-0-528" name="__codelineno-0-528"></a>
 <a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">        Runs the download + filter, writes the result to `path` as a CSV, and</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">        returns it.</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">            progress_bar: Whether to draw a download progress bar. Passed through</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">                to the transport, so `False` really does silence it.</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">            pandas.DataFrame: The filtered per-event impact rows, carrying the</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">                join keys (`disasterno` for `damages`, `GID_1` / `GID_2` for</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">                `displacement`). Also written under `root_dir`.</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">            requests.HTTPError: If the Zenodo download returns a non-2xx status.</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">            ValueError: If the download&#39;s body fails its content guard (an HTML</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">                error page served with a 200 status).</span>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a>        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">,</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a>        <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-553" name="__codelineno-0-553"></a>            <span class="sa">f</span><span class="s2">&quot;FLODIS </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a>        <span class="p">)</span>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a>        <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_result_stem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose an output file stem that encodes the table and its filters.</span>
-<a id="__codelineno-0-559" name="__codelineno-0-559"></a>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">        A plain `flodis_&lt;table&gt;` for an unfiltered request; otherwise</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">        `flodis_&lt;table&gt;-&lt;digest&gt;` so two differently-filtered queries into one</span>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">        `path=` do not overwrite each other. The digest is order-insensitive in</span>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        the multi-value filters.</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">            str: `flodis_&lt;table&gt;`, or `flodis_&lt;table&gt;-&lt;8-hex-digest&gt;` when any</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a><span class="sd">                filter is active.</span>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a>        <span class="n">base</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;flodis_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_name</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a>        <span class="n">first_year</span><span class="p">,</span> <span class="n">last_year</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a>        <span class="n">applied</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">),</span>
-<a id="__codelineno-0-573" name="__codelineno-0-573"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gid</span><span class="p">),</span>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a>            <span class="n">first_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a>            <span class="n">last_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a>        <span class="p">)</span>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">applied</span><span class="p">):</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a>            <span class="k">return</span> <span class="n">base</span>
-<a id="__codelineno-0-579" name="__codelineno-0-579"></a>        <span class="n">request</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">)),</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gid</span><span class="p">)),</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span><span class="p">,</span>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a>        <span class="p">)</span>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a>        <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a>            <span class="nb">repr</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">usedforsecurity</span><span class="o">=</span><span class="kc">False</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a>        <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the CC-BY attribution once (info, not a warning).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-591" name="__codelineno-0-591"></a>        <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a>        <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">attribution</span><span class="p">:</span>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLODIS source citation: </span><span class="si">{</span><span class="n">record</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">        returns it. It issues a single request, so it has no partial-failure</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">        policy and takes no `errors=` argument.</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">            progress_bar: Whether to draw a download progress bar. Passed through</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">                to the transport, so `False` really does silence it.</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">            pandas.DataFrame: The filtered per-event impact rows, carrying the</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">                join keys (`disasterno` for `damages`, `GID_1` / `GID_2` for</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">                `displacement`). Also written under `root_dir`.</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">            requests.HTTPError: If the Zenodo download returns a non-2xx status.</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">            ValueError: If the download&#39;s body fails its content guard (an HTML</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">                error page served with a 200 status).</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-547" name="__codelineno-0-547"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a>        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">,</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a>        <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a>            <span class="sa">f</span><span class="s2">&quot;FLODIS </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a>        <span class="p">)</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>        <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_result_stem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose an output file stem that encodes the table and its filters.</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">        A plain `flodis_&lt;table&gt;` for an unfiltered request; otherwise</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">        `flodis_&lt;table&gt;-&lt;digest&gt;` so two differently-filtered queries into one</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        `path=` do not overwrite each other. The digest is order-insensitive in</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">        the multi-value filters.</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a><span class="sd">            str: `flodis_&lt;table&gt;`, or `flodis_&lt;table&gt;-&lt;8-hex-digest&gt;` when any</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">                filter is active.</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a>        <span class="n">base</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;flodis_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_name</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-571" name="__codelineno-0-571"></a>        <span class="n">first_year</span><span class="p">,</span> <span class="n">last_year</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a>        <span class="n">applied</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-573" name="__codelineno-0-573"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">),</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gid</span><span class="p">),</span>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a>            <span class="n">first_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a>            <span class="n">last_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a>        <span class="p">)</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">applied</span><span class="p">):</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a>            <span class="k">return</span> <span class="n">base</span>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a>        <span class="n">request</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-581" name="__codelineno-0-581"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">)),</span>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gid</span><span class="p">)),</span>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span><span class="p">,</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a>        <span class="p">)</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a>        <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a>            <span class="nb">repr</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">usedforsecurity</span><span class="o">=</span><span class="kc">False</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a>        <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a>
+<a id="__codelineno-0-590" name="__codelineno-0-590"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the CC-BY attribution once (info, not a warning).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a>        <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a>        <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">attribution</span><span class="p">:</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLODIS source citation: </span><span class="si">{</span><span class="n">record</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -26945,7 +26947,8 @@ non-empty, a <code>country</code> value is not a 3-letter ISO3 code, or
 
         <p>Fetch the selected FLODIS table and return it.</p>
 <p>Runs the download + filter, writes the result to <code>path</code> as a CSV, and
-returns it.</p>
+returns it. It issues a single request, so it has no partial-failure
+policy and takes no <code>errors=</code> argument.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -27070,36 +27073,38 @@ error page served with a 200 status).</p>
 <span class="normal"><a href="#__codelineno-0-552">552</a></span>
 <span class="normal"><a href="#__codelineno-0-553">553</a></span>
 <span class="normal"><a href="#__codelineno-0-554">554</a></span>
-<span class="normal"><a href="#__codelineno-0-555">555</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-555">555</a></span>
+<span class="normal"><a href="#__codelineno-0-556">556</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the selected FLODIS table and return it.</span>
 <a id="__codelineno-0-528" name="__codelineno-0-528"></a>
 <a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">    Runs the download + filter, writes the result to `path` as a CSV, and</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">    returns it.</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">        progress_bar: Whether to draw a download progress bar. Passed through</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">            to the transport, so `False` really does silence it.</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">        pandas.DataFrame: The filtered per-event impact rows, carrying the</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">            join keys (`disasterno` for `damages`, `GID_1` / `GID_2` for</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            `displacement`). Also written under `root_dir`.</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">        requests.HTTPError: If the Zenodo download returns a non-2xx status.</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">        ValueError: If the download&#39;s body fails its content guard (an HTML</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">            error page served with a 200 status).</span>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a>    <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">,</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a>    <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-553" name="__codelineno-0-553"></a>        <span class="sa">f</span><span class="s2">&quot;FLODIS </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a>    <span class="p">)</span>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a>    <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">    returns it. It issues a single request, so it has no partial-failure</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">    policy and takes no `errors=` argument.</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">        progress_bar: Whether to draw a download progress bar. Passed through</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">            to the transport, so `False` really does silence it.</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">        pandas.DataFrame: The filtered per-event impact rows, carrying the</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            join keys (`disasterno` for `damages`, `GID_1` / `GID_2` for</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">            `displacement`). Also written under `root_dir`.</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">        requests.HTTPError: If the Zenodo download returns a non-2xx status.</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">        ValueError: If the download&#39;s body fails its content guard (an HTML</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">            error page served with a 200 status).</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-547" name="__codelineno-0-547"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a>    <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">,</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a>    <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a>        <span class="sa">f</span><span class="s2">&quot;FLODIS </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a>    <span class="p">)</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>    <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -28254,7 +28259,8 @@ year the record covers (2000-2018).</p>
 <span class="normal"><a href="#__codelineno-0-590">590</a></span>
 <span class="normal"><a href="#__codelineno-0-591">591</a></span>
 <span class="normal"><a href="#__codelineno-0-592">592</a></span>
-<span class="normal"><a href="#__codelineno-0-593">593</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="k">class</span><span class="w"> </span><span class="nc">FLODIS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-593">593</a></span>
+<span class="normal"><a href="#__codelineno-0-594">594</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="k">class</span><span class="w"> </span><span class="nc">FLODIS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;FLODIS observed-flood impacts backend (tabular).</span>
 <a id="__codelineno-0-195" name="__codelineno-0-195"></a>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    Downloads the selected FLODIS table from its pinned Zenodo release, filters</span>
@@ -28591,70 +28597,71 @@ year the record covers (2000-2018).</p>
 <a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the selected FLODIS table and return it.</span>
 <a id="__codelineno-0-528" name="__codelineno-0-528"></a>
 <a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">        Runs the download + filter, writes the result to `path` as a CSV, and</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">        returns it.</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">            progress_bar: Whether to draw a download progress bar. Passed through</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">                to the transport, so `False` really does silence it.</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">            pandas.DataFrame: The filtered per-event impact rows, carrying the</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">                join keys (`disasterno` for `damages`, `GID_1` / `GID_2` for</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">                `displacement`). Also written under `root_dir`.</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">            requests.HTTPError: If the Zenodo download returns a non-2xx status.</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">            ValueError: If the download&#39;s body fails its content guard (an HTML</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">                error page served with a 200 status).</span>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a>        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">,</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a>        <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-553" name="__codelineno-0-553"></a>            <span class="sa">f</span><span class="s2">&quot;FLODIS </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a>        <span class="p">)</span>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a>        <span class="k">return</span> <span class="n">result</span>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_result_stem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose an output file stem that encodes the table and its filters.</span>
-<a id="__codelineno-0-559" name="__codelineno-0-559"></a>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">        A plain `flodis_&lt;table&gt;` for an unfiltered request; otherwise</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">        `flodis_&lt;table&gt;-&lt;digest&gt;` so two differently-filtered queries into one</span>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">        `path=` do not overwrite each other. The digest is order-insensitive in</span>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        the multi-value filters.</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">            str: `flodis_&lt;table&gt;`, or `flodis_&lt;table&gt;-&lt;8-hex-digest&gt;` when any</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a><span class="sd">                filter is active.</span>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a>        <span class="n">base</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;flodis_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_name</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a>        <span class="n">first_year</span><span class="p">,</span> <span class="n">last_year</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a>        <span class="n">applied</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">),</span>
-<a id="__codelineno-0-573" name="__codelineno-0-573"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gid</span><span class="p">),</span>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a>            <span class="n">first_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a>            <span class="n">last_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a>        <span class="p">)</span>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">applied</span><span class="p">):</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a>            <span class="k">return</span> <span class="n">base</span>
-<a id="__codelineno-0-579" name="__codelineno-0-579"></a>        <span class="n">request</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">)),</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gid</span><span class="p">)),</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span><span class="p">,</span>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a>        <span class="p">)</span>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a>        <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a>            <span class="nb">repr</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">usedforsecurity</span><span class="o">=</span><span class="kc">False</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a>        <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-590" name="__codelineno-0-590"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the CC-BY attribution once (info, not a warning).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-591" name="__codelineno-0-591"></a>        <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a>        <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">attribution</span><span class="p">:</span>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLODIS source citation: </span><span class="si">{</span><span class="n">record</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">        returns it. It issues a single request, so it has no partial-failure</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">        policy and takes no `errors=` argument.</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">            progress_bar: Whether to draw a download progress bar. Passed through</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">                to the transport, so `False` really does silence it.</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">            pandas.DataFrame: The filtered per-event impact rows, carrying the</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">                join keys (`disasterno` for `damages`, `GID_1` / `GID_2` for</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">                `displacement`). Also written under `root_dir`.</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">            requests.HTTPError: If the Zenodo download returns a non-2xx status.</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">            ValueError: If the download&#39;s body fails its content guard (an HTML</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">                error page served with a 200 status).</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-547" name="__codelineno-0-547"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a>        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">,</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a>        <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a>            <span class="sa">f</span><span class="s2">&quot;FLODIS </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a>        <span class="p">)</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>        <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_result_stem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose an output file stem that encodes the table and its filters.</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">        A plain `flodis_&lt;table&gt;` for an unfiltered request; otherwise</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">        `flodis_&lt;table&gt;-&lt;digest&gt;` so two differently-filtered queries into one</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        `path=` do not overwrite each other. The digest is order-insensitive in</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">        the multi-value filters.</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a><span class="sd">            str: `flodis_&lt;table&gt;`, or `flodis_&lt;table&gt;-&lt;8-hex-digest&gt;` when any</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">                filter is active.</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a>        <span class="n">base</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;flodis_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_name</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-571" name="__codelineno-0-571"></a>        <span class="n">first_year</span><span class="p">,</span> <span class="n">last_year</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a>        <span class="n">applied</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-573" name="__codelineno-0-573"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">),</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>            <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gid</span><span class="p">),</span>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a>            <span class="n">first_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a>            <span class="n">last_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a>        <span class="p">)</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">applied</span><span class="p">):</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a>            <span class="k">return</span> <span class="n">base</span>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a>        <span class="n">request</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-581" name="__codelineno-0-581"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">)),</span>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a>            <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gid</span><span class="p">)),</span>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_year_range</span><span class="p">,</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a>        <span class="p">)</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a>        <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a>            <span class="nb">repr</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">usedforsecurity</span><span class="o">=</span><span class="kc">False</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a>        <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a>
+<a id="__codelineno-0-590" name="__codelineno-0-590"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log the CC-BY attribution once (info, not a warning).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a>        <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a>        <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">attribution</span><span class="p">:</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLODIS source citation: </span><span class="si">{</span><span class="n">record</span><span class="o">.</span><span class="n">attribution</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -29117,7 +29124,8 @@ non-empty, a <code>country</code> value is not a 3-letter ISO3 code, or
 
         <p>Fetch the selected FLODIS table and return it.</p>
 <p>Runs the download + filter, writes the result to <code>path</code> as a CSV, and
-returns it.</p>
+returns it. It issues a single request, so it has no partial-failure
+policy and takes no <code>errors=</code> argument.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -29242,36 +29250,38 @@ error page served with a 200 status).</p>
 <span class="normal"><a href="#__codelineno-0-552">552</a></span>
 <span class="normal"><a href="#__codelineno-0-553">553</a></span>
 <span class="normal"><a href="#__codelineno-0-554">554</a></span>
-<span class="normal"><a href="#__codelineno-0-555">555</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-555">555</a></span>
+<span class="normal"><a href="#__codelineno-0-556">556</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the selected FLODIS table and return it.</span>
 <a id="__codelineno-0-528" name="__codelineno-0-528"></a>
 <a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">    Runs the download + filter, writes the result to `path` as a CSV, and</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">    returns it.</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">        progress_bar: Whether to draw a download progress bar. Passed through</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">            to the transport, so `False` really does silence it.</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">        pandas.DataFrame: The filtered per-event impact rows, carrying the</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">            join keys (`disasterno` for `damages`, `GID_1` / `GID_2` for</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            `displacement`). Also written under `root_dir`.</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">        requests.HTTPError: If the Zenodo download returns a non-2xx status.</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">        ValueError: If the download&#39;s body fails its content guard (an HTML</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">            error page served with a 200 status).</span>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a>    <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">,</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a>    <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-553" name="__codelineno-0-553"></a>        <span class="sa">f</span><span class="s2">&quot;FLODIS </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a>    <span class="p">)</span>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a>    <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">    returns it. It issues a single request, so it has no partial-failure</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">    policy and takes no `errors=` argument.</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">        progress_bar: Whether to draw a download progress bar. Passed through</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">            to the transport, so `False` really does silence it.</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="sd">        pandas.DataFrame: The filtered per-event impact rows, carrying the</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="sd">            join keys (`disasterno` for `damages`, `GID_1` / `GID_2` for</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a><span class="sd">            `displacement`). Also written under `root_dir`.</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="sd">        requests.HTTPError: If the Zenodo download returns a non-2xx status.</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">        ValueError: If the download&#39;s body fails its content guard (an HTML</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">            error page served with a 200 status).</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-547" name="__codelineno-0-547"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a>    <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">,</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citation</span><span class="p">()</span>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_result_stem</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a>    <span class="n">result</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a>        <span class="sa">f</span><span class="s2">&quot;FLODIS </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a>    <span class="p">)</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>    <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

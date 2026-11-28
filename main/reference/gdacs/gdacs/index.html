@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -25610,7 +25610,8 @@ features, so the facade rejects <code>aggregate=</code> with
 <span class="normal"><a href="#__codelineno-0-421">421</a></span>
 <span class="normal"><a href="#__codelineno-0-422">422</a></span>
 <span class="normal"><a href="#__codelineno-0-423">423</a></span>
-<span class="normal"><a href="#__codelineno-0-424">424</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="k">class</span><span class="w"> </span><span class="nc">GDACS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-424">424</a></span>
+<span class="normal"><a href="#__codelineno-0-425">425</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="k">class</span><span class="w"> </span><span class="nc">GDACS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;GDACS multi-hazard alert backend (vector point-feature output).</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a>
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">    Wraps the public GDACS SEARCH feed so a user can pull a</span>
@@ -25896,55 +25897,56 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        result, writes it to one vector file under `path`, and returns</span>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        the in-memory `FeatureCollection`. An empty result</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        returns a schema-correct empty FeatureCollection and writes</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        nothing.</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">                backends; GDACS is a single request, so this is a no-op.</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">            FeatureCollection: The matched alerts, CRS `EPSG:4326`.</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">                Empty (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">collections</span> <span class="k">else</span> <span class="n">events</span><span class="o">.</span><span class="n">empty_fc</span><span class="p">()</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>                <span class="sa">f</span><span class="s2">&quot;GDACS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> alert(s) written &quot;</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                <span class="sa">f</span><span class="s2">&quot;to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>            <span class="p">)</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>                <span class="s2">&quot;GDACS download summary: no alerts matched the request, nothing written&quot;</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>            <span class="p">)</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>        <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the alerts to one vector file under `root_dir`.</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        The filename embeds the query&#39;s date window</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        (`gdacs_alerts_&lt;from&gt;_&lt;to&gt;.&lt;ext&gt;`), so downloading successive</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">        windows into the same `path` — the recommended way to page past</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        the 100-event cap — yields distinct files instead of silently</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        overwriting one another. Two downloads of the *same* window do</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        overwrite, which is the intended idempotent behaviour.</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">            collection: The alerts to write.</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">            Path: Absolute path of the file written.</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>            <span class="sa">f</span><span class="s2">&quot;gdacs_alerts_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="si">:</span><span class="s2">%Y-%m-%d</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>            <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="si">:</span><span class="s2">%Y-%m-%d</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>        <span class="p">)</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        nothing. It issues a single request, so it has no partial-failure</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">        policy and takes no `errors=` argument.</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">                backends; GDACS is a single request, so this is a no-op.</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">            FeatureCollection: The matched alerts, CRS `EPSG:4326`.</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">                Empty (schema-only) when nothing matched.</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">collections</span> <span class="k">else</span> <span class="n">events</span><span class="o">.</span><span class="n">empty_fc</span><span class="p">()</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                <span class="sa">f</span><span class="s2">&quot;GDACS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> alert(s) written &quot;</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>                <span class="sa">f</span><span class="s2">&quot;to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>            <span class="p">)</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>                <span class="s2">&quot;GDACS download summary: no alerts matched the request, nothing written&quot;</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>            <span class="p">)</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>        <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the alerts to one vector file under `root_dir`.</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        The filename embeds the query&#39;s date window</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">        (`gdacs_alerts_&lt;from&gt;_&lt;to&gt;.&lt;ext&gt;`), so downloading successive</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        windows into the same `path` — the recommended way to page past</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        the 100-event cap — yields distinct files instead of silently</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        overwriting one another. Two downloads of the *same* window do</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        overwrite, which is the intended idempotent behaviour.</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            collection: The alerts to write.</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            Path: Absolute path of the file written.</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>            <span class="sa">f</span><span class="s2">&quot;gdacs_alerts_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="si">:</span><span class="s2">%Y-%m-%d</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>            <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="si">:</span><span class="s2">%Y-%m-%d</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="p">)</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="k">return</span> <span class="n">out_path</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -26380,7 +26382,8 @@ hazard codes.</p>
 result, writes it to one vector file under <code>path</code>, and returns
 the in-memory <code>FeatureCollection</code>. An empty result
 returns a schema-correct empty FeatureCollection and writes
-nothing.</p>
+nothing. It issues a single request, so it has no partial-failure
+policy and takes no <code>errors=</code> argument.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -26474,7 +26477,8 @@ Empty (schema-only) when nothing matched.</p>
 <span class="normal"><a href="#__codelineno-0-396">396</a></span>
 <span class="normal"><a href="#__codelineno-0-397">397</a></span>
 <span class="normal"><a href="#__codelineno-0-398">398</a></span>
-<span class="normal"><a href="#__codelineno-0-399">399</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-399">399</a></span>
+<span class="normal"><a href="#__codelineno-0-400">400</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
@@ -26484,30 +26488,31 @@ Empty (schema-only) when nothing matched.</p>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">    result, writes it to one vector file under `path`, and returns</span>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">    the in-memory `FeatureCollection`. An empty result</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">    returns a schema-correct empty FeatureCollection and writes</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">    nothing.</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">            backends; GDACS is a single request, so this is a no-op.</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        FeatureCollection: The matched alerts, CRS `EPSG:4326`.</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">            Empty (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">collections</span> <span class="k">else</span> <span class="n">events</span><span class="o">.</span><span class="n">empty_fc</span><span class="p">()</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>            <span class="sa">f</span><span class="s2">&quot;GDACS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> alert(s) written &quot;</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>            <span class="sa">f</span><span class="s2">&quot;to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="p">)</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>            <span class="s2">&quot;GDACS download summary: no alerts matched the request, nothing written&quot;</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>        <span class="p">)</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">    nothing. It issues a single request, so it has no partial-failure</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">    policy and takes no `errors=` argument.</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">            backends; GDACS is a single request, so this is a no-op.</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        FeatureCollection: The matched alerts, CRS `EPSG:4326`.</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">            Empty (schema-only) when nothing matched.</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">collections</span> <span class="k">else</span> <span class="n">events</span><span class="o">.</span><span class="n">empty_fc</span><span class="p">()</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>            <span class="sa">f</span><span class="s2">&quot;GDACS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> alert(s) written &quot;</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>            <span class="sa">f</span><span class="s2">&quot;to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>        <span class="p">)</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>            <span class="s2">&quot;GDACS download summary: no alerts matched the request, nothing written&quot;</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>        <span class="p">)</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>    <span class="k">return</span> <span class="n">collection</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -27757,7 +27762,8 @@ features, so the facade rejects <code>aggregate=</code> with
 <span class="normal"><a href="#__codelineno-0-421">421</a></span>
 <span class="normal"><a href="#__codelineno-0-422">422</a></span>
 <span class="normal"><a href="#__codelineno-0-423">423</a></span>
-<span class="normal"><a href="#__codelineno-0-424">424</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="k">class</span><span class="w"> </span><span class="nc">GDACS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-424">424</a></span>
+<span class="normal"><a href="#__codelineno-0-425">425</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="k">class</span><span class="w"> </span><span class="nc">GDACS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;GDACS multi-hazard alert backend (vector point-feature output).</span>
 <a id="__codelineno-0-92" name="__codelineno-0-92"></a>
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">    Wraps the public GDACS SEARCH feed so a user can pull a</span>
@@ -28043,55 +28049,56 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        result, writes it to one vector file under `path`, and returns</span>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        the in-memory `FeatureCollection`. An empty result</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        returns a schema-correct empty FeatureCollection and writes</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        nothing.</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">                backends; GDACS is a single request, so this is a no-op.</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">            FeatureCollection: The matched alerts, CRS `EPSG:4326`.</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">                Empty (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">collections</span> <span class="k">else</span> <span class="n">events</span><span class="o">.</span><span class="n">empty_fc</span><span class="p">()</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>                <span class="sa">f</span><span class="s2">&quot;GDACS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> alert(s) written &quot;</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                <span class="sa">f</span><span class="s2">&quot;to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>            <span class="p">)</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>                <span class="s2">&quot;GDACS download summary: no alerts matched the request, nothing written&quot;</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>            <span class="p">)</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>        <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the alerts to one vector file under `root_dir`.</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        The filename embeds the query&#39;s date window</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        (`gdacs_alerts_&lt;from&gt;_&lt;to&gt;.&lt;ext&gt;`), so downloading successive</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">        windows into the same `path` — the recommended way to page past</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        the 100-event cap — yields distinct files instead of silently</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        overwriting one another. Two downloads of the *same* window do</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        overwrite, which is the intended idempotent behaviour.</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">            collection: The alerts to write.</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">            Path: Absolute path of the file written.</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>            <span class="sa">f</span><span class="s2">&quot;gdacs_alerts_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="si">:</span><span class="s2">%Y-%m-%d</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>            <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="si">:</span><span class="s2">%Y-%m-%d</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>        <span class="p">)</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        nothing. It issues a single request, so it has no partial-failure</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">        policy and takes no `errors=` argument.</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">                backends; GDACS is a single request, so this is a no-op.</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">            FeatureCollection: The matched alerts, CRS `EPSG:4326`.</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">                Empty (schema-only) when nothing matched.</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">collections</span> <span class="k">else</span> <span class="n">events</span><span class="o">.</span><span class="n">empty_fc</span><span class="p">()</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                <span class="sa">f</span><span class="s2">&quot;GDACS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> alert(s) written &quot;</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>                <span class="sa">f</span><span class="s2">&quot;to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>            <span class="p">)</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>                <span class="s2">&quot;GDACS download summary: no alerts matched the request, nothing written&quot;</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>            <span class="p">)</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>        <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the alerts to one vector file under `root_dir`.</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        The filename embeds the query&#39;s date window</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">        (`gdacs_alerts_&lt;from&gt;_&lt;to&gt;.&lt;ext&gt;`), so downloading successive</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        windows into the same `path` — the recommended way to page past</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        the 100-event cap — yields distinct files instead of silently</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        overwriting one another. Two downloads of the *same* window do</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        overwrite, which is the intended idempotent behaviour.</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            collection: The alerts to write.</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            Path: Absolute path of the file written.</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>            <span class="sa">f</span><span class="s2">&quot;gdacs_alerts_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="si">:</span><span class="s2">%Y-%m-%d</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>            <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="si">:</span><span class="s2">%Y-%m-%d</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="p">)</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="k">return</span> <span class="n">out_path</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -28527,7 +28534,8 @@ hazard codes.</p>
 result, writes it to one vector file under <code>path</code>, and returns
 the in-memory <code>FeatureCollection</code>. An empty result
 returns a schema-correct empty FeatureCollection and writes
-nothing.</p>
+nothing. It issues a single request, so it has no partial-failure
+policy and takes no <code>errors=</code> argument.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -28621,7 +28629,8 @@ Empty (schema-only) when nothing matched.</p>
 <span class="normal"><a href="#__codelineno-0-396">396</a></span>
 <span class="normal"><a href="#__codelineno-0-397">397</a></span>
 <span class="normal"><a href="#__codelineno-0-398">398</a></span>
-<span class="normal"><a href="#__codelineno-0-399">399</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-399">399</a></span>
+<span class="normal"><a href="#__codelineno-0-400">400</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
@@ -28631,30 +28640,31 @@ Empty (schema-only) when nothing matched.</p>
 <a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">    result, writes it to one vector file under `path`, and returns</span>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">    the in-memory `FeatureCollection`. An empty result</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">    returns a schema-correct empty FeatureCollection and writes</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">    nothing.</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">            backends; GDACS is a single request, so this is a no-op.</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        FeatureCollection: The matched alerts, CRS `EPSG:4326`.</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">            Empty (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">collections</span> <span class="k">else</span> <span class="n">events</span><span class="o">.</span><span class="n">empty_fc</span><span class="p">()</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>            <span class="sa">f</span><span class="s2">&quot;GDACS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> alert(s) written &quot;</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>            <span class="sa">f</span><span class="s2">&quot;to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="p">)</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>            <span class="s2">&quot;GDACS download summary: no alerts matched the request, nothing written&quot;</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>        <span class="p">)</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">    nothing. It issues a single request, so it has no partial-failure</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">    policy and takes no `errors=` argument.</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">            backends; GDACS is a single request, so this is a no-op.</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        FeatureCollection: The matched alerts, CRS `EPSG:4326`.</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">            Empty (schema-only) when nothing matched.</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">collections</span> <span class="k">else</span> <span class="n">events</span><span class="o">.</span><span class="n">empty_fc</span><span class="p">()</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>            <span class="sa">f</span><span class="s2">&quot;GDACS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> alert(s) written &quot;</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>            <span class="sa">f</span><span class="s2">&quot;to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>        <span class="p">)</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>            <span class="s2">&quot;GDACS download summary: no alerts matched the request, nothing written&quot;</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>        <span class="p">)</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>    <span class="k">return</span> <span class="n">collection</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
