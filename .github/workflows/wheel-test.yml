@@ -61,6 +61,14 @@ jobs:
         # backends in the one lane that exercises the built wheels is not
         # worth saving a pin.
         #
+        # `pyramids-lazy` is pinned for the same reason: pyramids split its
+        # lazy/dask operations out of `pyramids-core` into this optional backend,
+        # so the gee reducer / temporal / EEDAI composites and worldpop's
+        # cross-year aggregate — which the locked dev env still gets from the
+        # pre-split pyramids — raise `OptionalPackageDoesNotExist` here, where the
+        # wheel lane resolves the newest pyramids afresh. It is not an earthlens
+        # dependency, so it is added here rather than pulled by `earthlens[all]`.
+        #
         # `uv pip compile`, not `uv export`: `compile` performs one ordinary
         # resolution, so there is exactly one version per package, which is what
         # pip installs here. (`export` emits every branch of a *forked* lock
@@ -74,7 +82,7 @@ jobs:
         run: |
           set -euo pipefail
           version=$(ls dist/earthlens-[0-9]*.whl | sed -E 's|.*/earthlens-([^-]+)-py3.*|\1|')
-          printf 'earthlens[all]==%s\npytest\npytest-cov\npytest-socket\nhypothesis\npsutil\nmoto\npytest-recording\n' "${version}" \
+          printf 'earthlens[all]==%s\npyramids-lazy\npytest\npytest-cov\npytest-socket\nhypothesis\npsutil\nmoto\npytest-recording\n' "${version}" \
             > dist/requirements.in
           uv pip compile --generate-hashes --universal --python-version 3.11.5 \
             --find-links dist \
