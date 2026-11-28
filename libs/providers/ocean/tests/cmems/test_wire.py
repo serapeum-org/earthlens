@@ -54,16 +54,25 @@ def test_a_real_request_parses(tmp_path, monkeypatch, seed_cmems_s3):
     ):
         monkeypatch.setenv(name, os.environ.get(name) or "placeholder")
 
-    paths = EarthLens(
-        data_source="cmems",
-        start=_DATE,
-        end=_DATE,
-        variables={_DATASET: ["analysed_sst"]},
-        lat_lim=[55.0, 55.1],
-        lon_lim=[15.0, 15.1],
-        temporal_resolution="daily",
-        path=str(tmp_path),
-    ).download(progress_bar=False)
+    try:
+        paths = EarthLens(
+            data_source="cmems",
+            start=_DATE,
+            end=_DATE,
+            variables={_DATASET: ["analysed_sst"]},
+            lat_lim=[55.0, 55.1],
+            lon_lim=[15.0, 15.1],
+            temporal_resolution="daily",
+            path=str(tmp_path),
+        ).download(progress_bar=False)
+    except RuntimeError as exc:
+        # The copernicusmarine toolbox resolves the dataset against the live
+        # CMEMS catalog even on a cassette replay, so a CMEMS outage raises
+        # NoServiceAvailable (wrapped here). Skip on that transient upstream
+        # failure rather than redden the gating lane; any other error still fails.
+        if "NoServiceAvailable" in str(exc):
+            pytest.skip(f"CMEMS service unavailable: {exc}")
+        raise
 
     assert paths, "a file-writing backend returns the paths it wrote"
     assert paths[0].suffix == ".nc", f"expected a NetCDF, got {paths}"
