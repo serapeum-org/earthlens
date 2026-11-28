@@ -33,6 +33,7 @@ import os
 import pytest
 
 from earthlens.core import EarthLens
+from earthlens.testing import skip_live_unavailable
 
 #: Baltic/North Sea reprocessed L4 SST: a fixed, long-closed day.
 _DATASET = "cmems_obs-sst_bal_phy-temp_my_l4_P1D-m"
@@ -68,10 +69,12 @@ def test_a_real_request_parses(tmp_path, monkeypatch, seed_cmems_s3):
     except RuntimeError as exc:
         # The copernicusmarine toolbox resolves the dataset against the live
         # CMEMS catalog even on a cassette replay, so a CMEMS outage raises
-        # NoServiceAvailable (wrapped here). Skip on that transient upstream
-        # failure rather than redden the gating lane; any other error still fails.
+        # NoServiceAvailable (wrapped here). `is_upstream_unavailable` does not
+        # recognise that message, so classify it here and route through the
+        # shared helper, which stamps the masked-lane guard prefix; any other
+        # error re-raises and still fails the test.
         if "NoServiceAvailable" in str(exc):
-            pytest.skip(f"CMEMS service unavailable: {exc}")
+            skip_live_unavailable(f"CMEMS service unavailable: {exc}")
         raise
 
     assert paths, "a file-writing backend returns the paths it wrote"
