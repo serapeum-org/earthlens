@@ -1252,7 +1252,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             credentials: the request is built through `ee` before the pixels
             are fetched.
         cog: Write the raster as a Cloud Optimized GeoTIFF (tiled, with
-            overviews) via `Dataset.cog.to_cog` instead of a plain GeoTIFF.
+            overviews) via `Dataset.to_cog` instead of a plain GeoTIFF.
             Applies to the paths that write the file themselves — the EEDAI
             reader and `engine="pixels"`. `getDownloadURL` streams Earth
             Engine's own bytes and the batch sinks write server-side, so both
@@ -3331,7 +3331,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 writer = reader if nodata is None else _declaring(reader, nodata)
                 try:
                     if write_cog:
-                        writer.cog.to_cog(str(target))
+                        writer.to_cog(str(target))
                     else:
                         writer.to_file(str(target))
                 finally:
@@ -3352,7 +3352,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         Shared by both tiled paths, which differ only in how a tile is fetched
         and in whether the result is a COG. `merge_rasters` writes a plain
         GeoTIFF, so a mosaic that has to be cloud-optimised is merged to a
-        staged file and rewritten through `Dataset.cog` - otherwise `cog=True`
+        staged file and rewritten through `Dataset.to_cog` - otherwise `cog=True`
         would be honoured for every tile and then lost in the stitch.
 
         `as_cog` is passed rather than read from `self.cog` so each path keeps
@@ -3390,7 +3390,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             try:
                 reader = PyramidsDataset.read_file(merged)
                 try:
-                    reader.cog.to_cog(str(target))
+                    reader.to_cog(str(target))
                 finally:
                     # Release before the unlink: a live handle holds a Windows
                     # lock, the same reason the no-data probe above closes.
@@ -4597,7 +4597,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 )
             try:
                 if self.cog:
-                    dataset.cog.to_cog(str(cog_staged))
+                    dataset.to_cog(str(cog_staged))
                 elif tile_size is None:
                     dataset.to_file(str(staged))
             finally:

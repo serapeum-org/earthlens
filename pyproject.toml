@@ -158,7 +158,7 @@ dev = [
     # pyramids-core[viz] (cleopatra): the showcase notebooks render rasters and
     # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
     # runtime dep of earthlens itself.
-    "pyramids-core[viz] >=0.80.0,<0.81.0",
+    "pyramids-core[viz] >=0.80.0,<0.81.0",  # <0.81.0: pyramids-core#1655
     # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
     # animation.embed_gif, ArrayGlyph.save_animation); add_reference_map /
     # save_animation(crf=...) landed in 0.22.0, the animate() default
@@ -286,7 +286,7 @@ docs = [
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
     # pyramids-core[viz] (cleopatra): showcase notebooks plot/animate Datasets.
-    "pyramids-core[viz] >=0.80.0,<0.81.0",
+    "pyramids-core[viz] >=0.80.0,<0.81.0",  # <0.81.0: pyramids-core#1655
     # [tiles] (pyproj, xyzservices): the satellite showcase textures its globe from
     # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
     # It arrives transitively through pyramids-core[viz], but an imported package
@@ -550,12 +550,16 @@ addopts = "--import-mode=importlib --strict-markers"
 #     (CVE-2026-126190/126191/126192/126193); 126190's fix only landed in 4.0.
 #     BeautifulSoup only needs `soupsieve>=1.6.1`, so the major bump is safe.
 #   * tornado >=6.6.1 completes the open-redirect fix (CVE-2026-126347).
+#   * virtualenv >=21.14.13 clears PYSEC-2026-4402; virtualenv arrives only via
+#     the dev tooling (pre-commit / build), the fix landed in 21.14.13.
 constraint-dependencies = [
     "oauthlib>=4.0.0",
     "pyramids-gis>=0.70.0",
     "aiohttp>=3.14.4",
     "soupsieve>=4.0.0",
     "tornado>=6.6.1",
+    "mistune>=3.3.4",
+    "virtualenv>=21.14.13",
 ]
 
 [tool.uv.workspace]
