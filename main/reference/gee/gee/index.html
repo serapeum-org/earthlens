@@ -77417,7 +77417,7 @@ are fetched.</p>
             <td>
               <div class="doc-md-description">
                 <p>Write the raster as a Cloud Optimized GeoTIFF (tiled, with
-overviews) via <code>Dataset.cog.to_cog</code> instead of a plain GeoTIFF.
+overviews) via <code>Dataset.to_cog</code> instead of a plain GeoTIFF.
 Applies to the paths that write the file themselves — the EEDAI
 reader and <code>engine="pixels"</code>. <code>getDownloadURL</code> streams Earth
 Engine's own bytes and the batch sinks write server-side, so both
@@ -81794,7 +81794,7 @@ task does not complete.</p>
 <a id="__codelineno-0-1252" name="__codelineno-0-1252"></a><span class="sd">            credentials: the request is built through `ee` before the pixels</span>
 <a id="__codelineno-0-1253" name="__codelineno-0-1253"></a><span class="sd">            are fetched.</span>
 <a id="__codelineno-0-1254" name="__codelineno-0-1254"></a><span class="sd">        cog: Write the raster as a Cloud Optimized GeoTIFF (tiled, with</span>
-<a id="__codelineno-0-1255" name="__codelineno-0-1255"></a><span class="sd">            overviews) via `Dataset.cog.to_cog` instead of a plain GeoTIFF.</span>
+<a id="__codelineno-0-1255" name="__codelineno-0-1255"></a><span class="sd">            overviews) via `Dataset.to_cog` instead of a plain GeoTIFF.</span>
 <a id="__codelineno-0-1256" name="__codelineno-0-1256"></a><span class="sd">            Applies to the paths that write the file themselves — the EEDAI</span>
 <a id="__codelineno-0-1257" name="__codelineno-0-1257"></a><span class="sd">            reader and `engine=&quot;pixels&quot;`. `getDownloadURL` streams Earth</span>
 <a id="__codelineno-0-1258" name="__codelineno-0-1258"></a><span class="sd">            Engine&#39;s own bytes and the batch sinks write server-side, so both</span>
@@ -83873,7 +83873,7 @@ task does not complete.</p>
 <a id="__codelineno-0-3331" name="__codelineno-0-3331"></a>                <span class="n">writer</span> <span class="o">=</span> <span class="n">reader</span> <span class="k">if</span> <span class="n">nodata</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_declaring</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span> <span class="n">nodata</span><span class="p">)</span>
 <a id="__codelineno-0-3332" name="__codelineno-0-3332"></a>                <span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-0-3333" name="__codelineno-0-3333"></a>                    <span class="k">if</span> <span class="n">write_cog</span><span class="p">:</span>
-<a id="__codelineno-0-3334" name="__codelineno-0-3334"></a>                        <span class="n">writer</span><span class="o">.</span><span class="n">cog</span><span class="o">.</span><span class="n">to_cog</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
+<a id="__codelineno-0-3334" name="__codelineno-0-3334"></a>                        <span class="n">writer</span><span class="o">.</span><span class="n">to_cog</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
 <a id="__codelineno-0-3335" name="__codelineno-0-3335"></a>                    <span class="k">else</span><span class="p">:</span>
 <a id="__codelineno-0-3336" name="__codelineno-0-3336"></a>                        <span class="n">writer</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
 <a id="__codelineno-0-3337" name="__codelineno-0-3337"></a>                <span class="k">finally</span><span class="p">:</span>
@@ -83894,7 +83894,7 @@ task does not complete.</p>
 <a id="__codelineno-0-3352" name="__codelineno-0-3352"></a><span class="sd">        Shared by both tiled paths, which differ only in how a tile is fetched</span>
 <a id="__codelineno-0-3353" name="__codelineno-0-3353"></a><span class="sd">        and in whether the result is a COG. `merge_rasters` writes a plain</span>
 <a id="__codelineno-0-3354" name="__codelineno-0-3354"></a><span class="sd">        GeoTIFF, so a mosaic that has to be cloud-optimised is merged to a</span>
-<a id="__codelineno-0-3355" name="__codelineno-0-3355"></a><span class="sd">        staged file and rewritten through `Dataset.cog` - otherwise `cog=True`</span>
+<a id="__codelineno-0-3355" name="__codelineno-0-3355"></a><span class="sd">        staged file and rewritten through `Dataset.to_cog` - otherwise `cog=True`</span>
 <a id="__codelineno-0-3356" name="__codelineno-0-3356"></a><span class="sd">        would be honoured for every tile and then lost in the stitch.</span>
 <a id="__codelineno-0-3357" name="__codelineno-0-3357"></a>
 <a id="__codelineno-0-3358" name="__codelineno-0-3358"></a><span class="sd">        `as_cog` is passed rather than read from `self.cog` so each path keeps</span>
@@ -83932,7 +83932,7 @@ task does not complete.</p>
 <a id="__codelineno-0-3390" name="__codelineno-0-3390"></a>            <span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-0-3391" name="__codelineno-0-3391"></a>                <span class="n">reader</span> <span class="o">=</span> <span class="n">PyramidsDataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">merged</span><span class="p">)</span>
 <a id="__codelineno-0-3392" name="__codelineno-0-3392"></a>                <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-3393" name="__codelineno-0-3393"></a>                    <span class="n">reader</span><span class="o">.</span><span class="n">cog</span><span class="o">.</span><span class="n">to_cog</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
+<a id="__codelineno-0-3393" name="__codelineno-0-3393"></a>                    <span class="n">reader</span><span class="o">.</span><span class="n">to_cog</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
 <a id="__codelineno-0-3394" name="__codelineno-0-3394"></a>                <span class="k">finally</span><span class="p">:</span>
 <a id="__codelineno-0-3395" name="__codelineno-0-3395"></a>                    <span class="c1"># Release before the unlink: a live handle holds a Windows</span>
 <a id="__codelineno-0-3396" name="__codelineno-0-3396"></a>                    <span class="c1"># lock, the same reason the no-data probe above closes.</span>
@@ -85139,7 +85139,7 @@ task does not complete.</p>
 <a id="__codelineno-0-4597" name="__codelineno-0-4597"></a>                <span class="p">)</span>
 <a id="__codelineno-0-4598" name="__codelineno-0-4598"></a>            <span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-0-4599" name="__codelineno-0-4599"></a>                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cog</span><span class="p">:</span>
-<a id="__codelineno-0-4600" name="__codelineno-0-4600"></a>                    <span class="n">dataset</span><span class="o">.</span><span class="n">cog</span><span class="o">.</span><span class="n">to_cog</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cog_staged</span><span class="p">))</span>
+<a id="__codelineno-0-4600" name="__codelineno-0-4600"></a>                    <span class="n">dataset</span><span class="o">.</span><span class="n">to_cog</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cog_staged</span><span class="p">))</span>
 <a id="__codelineno-0-4601" name="__codelineno-0-4601"></a>                <span class="k">elif</span> <span class="n">tile_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-4602" name="__codelineno-0-4602"></a>                    <span class="n">dataset</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">staged</span><span class="p">))</span>
 <a id="__codelineno-0-4603" name="__codelineno-0-4603"></a>            <span class="k">finally</span><span class="p">:</span>
@@ -128621,7 +128621,7 @@ are fetched.</p>
             <td>
               <div class="doc-md-description">
                 <p>Write the raster as a Cloud Optimized GeoTIFF (tiled, with
-overviews) via <code>Dataset.cog.to_cog</code> instead of a plain GeoTIFF.
+overviews) via <code>Dataset.to_cog</code> instead of a plain GeoTIFF.
 Applies to the paths that write the file themselves — the EEDAI
 reader and <code>engine="pixels"</code>. <code>getDownloadURL</code> streams Earth
 Engine's own bytes and the batch sinks write server-side, so both
@@ -132998,7 +132998,7 @@ task does not complete.</p>
 <a id="__codelineno-0-1252" name="__codelineno-0-1252"></a><span class="sd">            credentials: the request is built through `ee` before the pixels</span>
 <a id="__codelineno-0-1253" name="__codelineno-0-1253"></a><span class="sd">            are fetched.</span>
 <a id="__codelineno-0-1254" name="__codelineno-0-1254"></a><span class="sd">        cog: Write the raster as a Cloud Optimized GeoTIFF (tiled, with</span>
-<a id="__codelineno-0-1255" name="__codelineno-0-1255"></a><span class="sd">            overviews) via `Dataset.cog.to_cog` instead of a plain GeoTIFF.</span>
+<a id="__codelineno-0-1255" name="__codelineno-0-1255"></a><span class="sd">            overviews) via `Dataset.to_cog` instead of a plain GeoTIFF.</span>
 <a id="__codelineno-0-1256" name="__codelineno-0-1256"></a><span class="sd">            Applies to the paths that write the file themselves — the EEDAI</span>
 <a id="__codelineno-0-1257" name="__codelineno-0-1257"></a><span class="sd">            reader and `engine=&quot;pixels&quot;`. `getDownloadURL` streams Earth</span>
 <a id="__codelineno-0-1258" name="__codelineno-0-1258"></a><span class="sd">            Engine&#39;s own bytes and the batch sinks write server-side, so both</span>
@@ -135077,7 +135077,7 @@ task does not complete.</p>
 <a id="__codelineno-0-3331" name="__codelineno-0-3331"></a>                <span class="n">writer</span> <span class="o">=</span> <span class="n">reader</span> <span class="k">if</span> <span class="n">nodata</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_declaring</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span> <span class="n">nodata</span><span class="p">)</span>
 <a id="__codelineno-0-3332" name="__codelineno-0-3332"></a>                <span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-0-3333" name="__codelineno-0-3333"></a>                    <span class="k">if</span> <span class="n">write_cog</span><span class="p">:</span>
-<a id="__codelineno-0-3334" name="__codelineno-0-3334"></a>                        <span class="n">writer</span><span class="o">.</span><span class="n">cog</span><span class="o">.</span><span class="n">to_cog</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
+<a id="__codelineno-0-3334" name="__codelineno-0-3334"></a>                        <span class="n">writer</span><span class="o">.</span><span class="n">to_cog</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
 <a id="__codelineno-0-3335" name="__codelineno-0-3335"></a>                    <span class="k">else</span><span class="p">:</span>
 <a id="__codelineno-0-3336" name="__codelineno-0-3336"></a>                        <span class="n">writer</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
 <a id="__codelineno-0-3337" name="__codelineno-0-3337"></a>                <span class="k">finally</span><span class="p">:</span>
@@ -135098,7 +135098,7 @@ task does not complete.</p>
 <a id="__codelineno-0-3352" name="__codelineno-0-3352"></a><span class="sd">        Shared by both tiled paths, which differ only in how a tile is fetched</span>
 <a id="__codelineno-0-3353" name="__codelineno-0-3353"></a><span class="sd">        and in whether the result is a COG. `merge_rasters` writes a plain</span>
 <a id="__codelineno-0-3354" name="__codelineno-0-3354"></a><span class="sd">        GeoTIFF, so a mosaic that has to be cloud-optimised is merged to a</span>
-<a id="__codelineno-0-3355" name="__codelineno-0-3355"></a><span class="sd">        staged file and rewritten through `Dataset.cog` - otherwise `cog=True`</span>
+<a id="__codelineno-0-3355" name="__codelineno-0-3355"></a><span class="sd">        staged file and rewritten through `Dataset.to_cog` - otherwise `cog=True`</span>
 <a id="__codelineno-0-3356" name="__codelineno-0-3356"></a><span class="sd">        would be honoured for every tile and then lost in the stitch.</span>
 <a id="__codelineno-0-3357" name="__codelineno-0-3357"></a>
 <a id="__codelineno-0-3358" name="__codelineno-0-3358"></a><span class="sd">        `as_cog` is passed rather than read from `self.cog` so each path keeps</span>
@@ -135136,7 +135136,7 @@ task does not complete.</p>
 <a id="__codelineno-0-3390" name="__codelineno-0-3390"></a>            <span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-0-3391" name="__codelineno-0-3391"></a>                <span class="n">reader</span> <span class="o">=</span> <span class="n">PyramidsDataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">merged</span><span class="p">)</span>
 <a id="__codelineno-0-3392" name="__codelineno-0-3392"></a>                <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-3393" name="__codelineno-0-3393"></a>                    <span class="n">reader</span><span class="o">.</span><span class="n">cog</span><span class="o">.</span><span class="n">to_cog</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
+<a id="__codelineno-0-3393" name="__codelineno-0-3393"></a>                    <span class="n">reader</span><span class="o">.</span><span class="n">to_cog</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
 <a id="__codelineno-0-3394" name="__codelineno-0-3394"></a>                <span class="k">finally</span><span class="p">:</span>
 <a id="__codelineno-0-3395" name="__codelineno-0-3395"></a>                    <span class="c1"># Release before the unlink: a live handle holds a Windows</span>
 <a id="__codelineno-0-3396" name="__codelineno-0-3396"></a>                    <span class="c1"># lock, the same reason the no-data probe above closes.</span>
@@ -136343,7 +136343,7 @@ task does not complete.</p>
 <a id="__codelineno-0-4597" name="__codelineno-0-4597"></a>                <span class="p">)</span>
 <a id="__codelineno-0-4598" name="__codelineno-0-4598"></a>            <span class="k">try</span><span class="p">:</span>
 <a id="__codelineno-0-4599" name="__codelineno-0-4599"></a>                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cog</span><span class="p">:</span>
-<a id="__codelineno-0-4600" name="__codelineno-0-4600"></a>                    <span class="n">dataset</span><span class="o">.</span><span class="n">cog</span><span class="o">.</span><span class="n">to_cog</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cog_staged</span><span class="p">))</span>
+<a id="__codelineno-0-4600" name="__codelineno-0-4600"></a>                    <span class="n">dataset</span><span class="o">.</span><span class="n">to_cog</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cog_staged</span><span class="p">))</span>
 <a id="__codelineno-0-4601" name="__codelineno-0-4601"></a>                <span class="k">elif</span> <span class="n">tile_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-4602" name="__codelineno-0-4602"></a>                    <span class="n">dataset</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">staged</span><span class="p">))</span>
 <a id="__codelineno-0-4603" name="__codelineno-0-4603"></a>            <span class="k">finally</span><span class="p">:</span>
