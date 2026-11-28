@@ -31,6 +31,7 @@ constraints = [
     { name = "pyramids-gis", specifier = ">=0.70.0" },
     { name = "soupsieve", specifier = ">=4.0.0" },
     { name = "tornado", specifier = ">=6.6.1" },
+    { name = "virtualenv", specifier = ">=21.14.13" },
 ]
 
 [[package]]

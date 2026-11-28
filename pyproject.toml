@@ -550,6 +550,8 @@ addopts = "--import-mode=importlib --strict-markers"
 #     (CVE-2026-126190/126191/126192/126193); 126190's fix only landed in 4.0.
 #     BeautifulSoup only needs `soupsieve>=1.6.1`, so the major bump is safe.
 #   * tornado >=6.6.1 completes the open-redirect fix (CVE-2026-126347).
+#   * virtualenv >=21.14.13 clears PYSEC-2026-4402; virtualenv arrives only via
+#     the dev tooling (pre-commit / build), the fix landed in 21.14.13.
 constraint-dependencies = [
     "oauthlib>=4.0.0",
     "pyramids-gis>=0.70.0",
@@ -557,6 +559,7 @@ constraint-dependencies = [
     "soupsieve>=4.0.0",
     "tornado>=6.6.1",
     "mistune>=3.3.4",
+    "virtualenv>=21.14.13",
 ]
 
 [tool.uv.workspace]
