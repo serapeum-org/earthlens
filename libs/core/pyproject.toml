@@ -34,7 +34,9 @@ requires-python = ">=3.11.5,<4"
 # unconditionally-registered console script. No provider SDK belongs here —
 # those live in the thematic provider distributions' own dependencies.
 dependencies = [
-    "pyramids-core >=0.80.0",
+    # <0.81 cap: serapeum-org/pyramids-core#1655 (0.81+ needs an unreleased
+    # pyramids-lazy backend for reduce). Lift when that backend ships.
+    "pyramids-core >=0.80.0,<0.81",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",
