@@ -82,6 +82,11 @@ _SCHEMA: dict[str, str] = {
 }
 
 
+def _describe_remote_product(product: RemoteProduct) -> str:
+    """Render a sensor product for the `_iter_items` log lines (its id)."""
+    return repr(getattr(product, "id", product))
+
+
 class OpenAQ(AbstractDataSource):
     """OpenAQ v3 air-quality backend (long-format tabular output).
 
@@ -433,6 +438,7 @@ class OpenAQ(AbstractDataSource):
         self,
         progress_bar: bool = True,
         limit: int | None = None,
+        errors: str = "warn",
     ) -> pd.DataFrame:
         """Fetch measurements, write them to `path`, and return the frame.
 
@@ -454,18 +460,39 @@ class OpenAQ(AbstractDataSource):
                 `EarthLens(...).download(limit=...)` like every other bounded
                 backend. `None` (the default) keeps whatever the constructor
                 set.
+            errors: Partial-failure policy across the independent sensors:
+
+                * `"warn"` (default) — log each failed sensor and return the
+                  measurements from the sensors that succeeded, with a summary.
+                * `"raise"` — propagate the first sensor failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed sensors silently.
+
+                When every sensor fails — a rejected key or a dead host, not a
+                per-sensor gap — the first error is re-raised under every policy
+                rather than returned as an empty frame; a partial failure still
+                returns the survivors under `"warn"`/`"ignore"`.
 
         Returns:
             pd.DataFrame: The long-format union of every sensor's
                 measurements (schema columns, `datetime_utc` tz-aware
                 UTC). Empty (schema-only) when nothing matched.
         """
+        self._errors = self.check_errors_policy(errors)
         if limit is not None:
             self._limit = self.check_limit(limit)
+        failures: list[tuple[str, BaseException]] = []
         frames = self._take_limited(
-            self._iter_non_empty_frames(progress_bar),
+            self._iter_non_empty_frames(
+                progress_bar, errors=self._errors, failures=failures
+            ),
             limit=self._limit,
         )
+        if failures and not frames:
+            # Every sensor failed and none yielded data — a rejected key or a
+            # dead host, not a per-sensor gap. Re-raise the first error rather
+            # than return an empty frame (matching the FIRMS whole-service rule).
+            raise failures[0][1]
         df = pd.concat(frames, ignore_index=True) if frames else _empty_frame()
         non_empty = frames
 
@@ -517,16 +544,29 @@ class OpenAQ(AbstractDataSource):
             progress_bar=progress_bar, desc="OpenAQ sensors", unit="sensor"
         )
 
-    def _iter_non_empty_frames(self, progress_bar: bool) -> Iterator[pd.DataFrame]:
+    def _iter_non_empty_frames(
+        self,
+        progress_bar: bool,
+        *,
+        errors: str,
+        failures: list[tuple[str, BaseException]],
+    ) -> Iterator[pd.DataFrame]:
         """Yield each sensor's measurements, skipping the sensors with none.
 
         Lazy on purpose: `download()` caps the total row count as the frames
         arrive, so with a `limit=` in force the sensors beyond it are never
         requested — which is the difference between a cap on the result and a
-        cap on the work.
+        cap on the work. The per-sensor fetches are independent, so each runs
+        through the shared `_iter_items` under the `errors` policy; a failed
+        sensor is recorded in `failures` (and, under `"raise"`, propagated) and
+        a sensor that returned no measurements is filtered as before.
 
         Args:
             progress_bar: Show the per-sensor `tqdm` bar when `True`.
+            errors: The already-validated partial-failure policy.
+            failures: Accumulator the caller owns; each failed sensor is
+                appended as `(description, exception)` so `download` can tell a
+                whole-service outage from a run that simply matched nothing.
 
         Yields:
             pd.DataFrame: One non-empty frame per sensor, in `_search` order.
@@ -544,8 +584,15 @@ class OpenAQ(AbstractDataSource):
             desc="OpenAQ sensors",
             unit="sensor",
         ) as iterator:
-            for product in iterator:
-                frame = self._fetch_one(product)
+            for frame in self._iter_items(
+                iterator,
+                self._fetch_one,
+                errors=errors,
+                label="sensor",
+                describe=_describe_remote_product,
+                on_failure=None,
+                failures=failures,
+            ):
                 if not frame.empty:
                     yield frame
 

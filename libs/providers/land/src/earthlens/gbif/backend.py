@@ -311,6 +311,9 @@ class GBIF(AbstractDataSource):
     ) -> FeatureCollection:
         """Run the occurrence search and return the points FeatureCollection.
 
+        This backend issues a single (paginated) request, so it exposes no
+        `errors=` partial-failure policy.
+
         Args:
             progress_bar: Accepted for signature parity; GBIF's paginated
                 search has no progress bar, so this is a no-op.

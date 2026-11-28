@@ -265,6 +265,96 @@ class TestFetchExecution:
         assert {p.stem for p in paths} == {"sentinel-2-l2a", "sentinel-1-grd"}
 
 
+class _RaiseFromCall:
+    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from `from_call`.
+
+    Holds its own call counter; `from_call=2` fails the second recipe (a
+    partial failure), `from_call=1` fails every recipe (a whole-service
+    failure).
+    """
+
+    def __init__(self, real, exc, from_call=2):
+        self._real = real
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, product):
+        """Delegate until `from_call`, then raise `exc` on that recipe onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(product)
+
+
+@pytest.mark.openeo
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent recipe keys."""
+
+    _TWO = {"sentinel-2-l2a": ["B04"], "sentinel-1-grd": ["VV"]}
+
+    def _two_recipe_backend(self, output_dir, monkeypatch, exc, from_call=2):
+        """A backend over two recipe keys, raising `exc` from `from_call`."""
+        backend = _make_backend(dict(self._TWO), output_dir)
+        _bind_fake(backend)
+        monkeypatch.setattr(
+            backend, "_fetch_one", _RaiseFromCall(backend._fetch_one, exc, from_call)
+        )
+        return backend
+
+    def test_raise_propagates_first_failure(self, output_dir: Path, monkeypatch):
+        """errors="raise" surfaces a per-recipe exception, not the batch summary."""
+        backend = self._two_recipe_backend(
+            output_dir, monkeypatch, ValueError("recipe boom")
+        )
+        with pytest.raises(ValueError, match="recipe boom"):
+            backend.download(errors="raise")
+
+    def test_warn_returns_the_surviving_recipe(self, output_dir: Path, monkeypatch):
+        """errors="warn" drops a non-fatal per-recipe failure and returns survivors."""
+        backend = self._two_recipe_backend(
+            output_dir, monkeypatch, ValueError("recipe boom")
+        )
+        paths = backend.download(errors="warn")
+        assert [p.stem for p in paths] == ["sentinel-2-l2a"], (
+            f"expected the one surviving recipe, got {[p.stem for p in paths]}"
+        )
+
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, output_dir: Path, monkeypatch
+    ):
+        """errors="ignore" drops a non-fatal per-recipe failure silently."""
+        backend = self._two_recipe_backend(
+            output_dir, monkeypatch, ValueError("recipe boom")
+        )
+        paths = backend.download(errors="ignore")
+        assert [p.stem for p in paths] == ["sentinel-2-l2a"]
+
+    def test_default_policy_is_warn(self, output_dir: Path, monkeypatch):
+        """Omitting errors= defaults to warn — a non-fatal recipe failure survives."""
+        backend = self._two_recipe_backend(
+            output_dir, monkeypatch, ValueError("recipe boom")
+        )
+        paths = backend.download()
+        assert [p.stem for p in paths] == ["sentinel-2-l2a"]
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_recipe_failing_raises(self, output_dir: Path, monkeypatch, policy):
+        """When every recipe fails, the first error is raised, never a silent empty."""
+        backend = self._two_recipe_backend(
+            output_dir, monkeypatch, ValueError("all down"), from_call=1
+        )
+        with pytest.raises(ValueError, match="all down"):
+            backend.download(errors=policy)
+
+    def test_invalid_policy_rejected(self, output_dir: Path):
+        """An unrecognised errors= value is refused before any execution."""
+        backend = _make_backend({"sentinel-2-l2a": ["B04"]}, output_dir)
+        _bind_fake(backend)
+        with pytest.raises(ValueError, match="errors"):
+            backend.download(errors="explode")
+
+
 @pytest.mark.openeo
 class TestModuleHelpers:
     """`_apply_step` dispatch and `safe_filename` flattening."""

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 
 import pandas as pd
 import pytest
@@ -10,12 +11,34 @@ import requests
 from pyramids.dataset import Dataset
 
 from earthlens.aggregate import AggregationConfig
+from earthlens.base import RemoteProduct
 from earthlens.testing import FakeResponse
 from earthlens.worldpop import WorldPop
 
 from .conftest import age_records, pop_records
 
 pytestmark = pytest.mark.worldpop
+
+
+class _RaiseFromCall:
+    """A `_localise` stand-in: return `survivor` until `from_call`, then raise.
+
+    Module-level (no nested defs); holds its own call counter. `from_call=2`
+    fails the second group (a partial failure); `from_call=1` fails every group.
+    """
+
+    def __init__(self, survivor, exc, from_call=2):
+        self._survivor = survivor
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, group):
+        """Return the survivor path, then raise `exc` from `from_call` onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._survivor
 
 
 def test_empty_variables_raises(wp_kwargs):
@@ -628,3 +651,62 @@ class TestWorldPopStreams:
         self._install(monkeypatch, pop_records(), tiny_tif_bytes, seen)
         WorldPop(**wp_kwargs()).download(progress_bar=False)
         assert seen[0].get("stream") is True, f"got {seen[0]}"
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent localise groups."""
+
+    def _two_group_backend(self, wp_kwargs, monkeypatch, stub):
+        """A WorldPop whose fetch localises two groups, each through `stub`."""
+        backend = WorldPop(**wp_kwargs())
+        groups = {
+            ("pop", 2020, None): [],
+            ("pop", 2021, None): [],
+        }
+        monkeypatch.setattr(backend, "_search", lambda: [RemoteProduct(id="x")])
+        monkeypatch.setattr(backend, "_group_for_mosaic", lambda products: dict(groups))
+        monkeypatch.setattr(backend, "_localise", stub)
+        return backend
+
+    def test_raise_propagates_first_failure(self, wp_kwargs, monkeypatch):
+        """errors="raise" surfaces a per-group exception."""
+        stub = _RaiseFromCall(Path("a.tif"), ValueError("group boom"))
+        backend = self._two_group_backend(wp_kwargs, monkeypatch, stub)
+        with pytest.raises(ValueError, match="group boom"):
+            backend.download(progress_bar=False, errors="raise")
+
+    def test_warn_returns_surviving_group(self, wp_kwargs, monkeypatch):
+        """errors="warn" drops the failed group and returns the survivor."""
+        survivor = Path("a.tif")
+        stub = _RaiseFromCall(survivor, ValueError("group boom"))
+        backend = self._two_group_backend(wp_kwargs, monkeypatch, stub)
+        assert backend.download(progress_bar=False, errors="warn") == [survivor]
+
+    def test_ignore_returns_surviving_group(self, wp_kwargs, monkeypatch):
+        """errors="ignore" drops the failed group silently and returns the survivor."""
+        survivor = Path("a.tif")
+        stub = _RaiseFromCall(survivor, ValueError("group boom"))
+        backend = self._two_group_backend(wp_kwargs, monkeypatch, stub)
+        assert backend.download(progress_bar=False, errors="ignore") == [survivor]
+
+    def test_default_policy_is_warn(self, wp_kwargs, monkeypatch):
+        """Omitting errors= defaults to warn — the failed group is survived."""
+        survivor = Path("a.tif")
+        stub = _RaiseFromCall(survivor, ValueError("group boom"))
+        backend = self._two_group_backend(wp_kwargs, monkeypatch, stub)
+        assert backend.download(progress_bar=False) == [survivor]
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_group_failing_raises(self, wp_kwargs, monkeypatch, policy):
+        """When every group fails, the first error is raised — never a silent empty."""
+        stub = _RaiseFromCall(Path("a.tif"), ValueError("all groups down"), from_call=1)
+        backend = self._two_group_backend(wp_kwargs, monkeypatch, stub)
+        with pytest.raises(ValueError, match="all groups down"):
+            backend.download(progress_bar=False, errors=policy)
+
+    def test_invalid_policy_rejected(self, wp_kwargs, monkeypatch):
+        """An unrecognised errors= value is refused."""
+        stub = _RaiseFromCall(Path("a.tif"), ValueError("group boom"))
+        backend = self._two_group_backend(wp_kwargs, monkeypatch, stub)
+        with pytest.raises(ValueError, match="errors"):
+            backend.download(progress_bar=False, errors="explode")

@@ -145,3 +145,92 @@ def test_cache_dir_override_is_honoured(tmp_path: Path) -> None:
         cache_dir=custom,
     )
     assert backend.cache_dir == custom
+
+
+class _RaiseFromCall:
+    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from `from_call`.
+
+    Hoisted to module scope (no nested functions); holds its own call counter.
+    `from_call=2` fails the second layer (a partial failure); `from_call=1`
+    fails every layer (a whole-service failure).
+    """
+
+    def __init__(self, real_fetch, exc, from_call=2):
+        self._real = real_fetch
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, product):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(product)
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent layers."""
+
+    def _two_layer_backend(self, tmp_path, monkeypatch, exc, from_call=2):
+        """A backend over two vsicurl wind layers, failing `_fetch_one` from `from_call`."""
+        backend = _backend(tmp_path, ["wind_100m", "weibull_k_100m"])
+        assert len(backend._search()) == 2, "two variables should yield two layers"
+        monkeypatch.setattr(
+            backend, "_fetch_one", _RaiseFromCall(backend._fetch_one, exc, from_call)
+        )
+        return backend
+
+    def test_raise_propagates_first_failure(
+        self, fake_pyramids, tmp_path: Path, monkeypatch
+    ):
+        """errors="raise" surfaces a per-layer exception, not the batch summary."""
+        backend = self._two_layer_backend(
+            tmp_path, monkeypatch, ValueError("layer boom")
+        )
+        with pytest.raises(ValueError, match="layer boom"):
+            backend.download(errors="raise")
+
+    def test_warn_returns_the_surviving_layer(
+        self, fake_pyramids, tmp_path: Path, monkeypatch
+    ):
+        """errors="warn" drops a per-layer failure and returns the survivor's path."""
+        backend = self._two_layer_backend(
+            tmp_path, monkeypatch, ValueError("layer boom")
+        )
+        paths = backend.download(errors="warn")
+        assert len(paths) == 1
+        assert paths[0].exists()
+
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, fake_pyramids, tmp_path: Path, monkeypatch
+    ):
+        """errors="ignore" drops a per-layer failure silently."""
+        backend = self._two_layer_backend(
+            tmp_path, monkeypatch, ValueError("layer boom")
+        )
+        assert len(backend.download(errors="ignore")) == 1
+
+    def test_default_policy_is_warn(self, fake_pyramids, tmp_path: Path, monkeypatch):
+        """Omitting errors= defaults to warn — a per-layer failure is survived."""
+        backend = self._two_layer_backend(
+            tmp_path, monkeypatch, ValueError("layer boom")
+        )
+        assert len(backend.download()) == 1
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_layer_failing_raises(
+        self, fake_pyramids, tmp_path: Path, policy: str, monkeypatch
+    ):
+        """When every layer fails, the first error is raised — never a silent empty."""
+        backend = self._two_layer_backend(
+            tmp_path, monkeypatch, ValueError("all layers down"), from_call=1
+        )
+        with pytest.raises(ValueError, match="all layers down"):
+            backend.download(errors=policy)
+
+    def test_invalid_policy_rejected(self, tmp_path: Path) -> None:
+        """An unrecognised errors= value is refused before any request."""
+        backend = _backend(tmp_path, ["wind_100m"])
+        with pytest.raises(ValueError, match="errors"):
+            backend.download(errors="explode")

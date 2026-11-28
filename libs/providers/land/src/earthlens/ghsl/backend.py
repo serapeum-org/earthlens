@@ -56,6 +56,36 @@ _TILING_MODES: frozenset[str] = frozenset({"auto", "global"})
 _DEFAULT_RELEASE: str = "R2023A"
 
 
+def _describe_product(product: RemoteProduct) -> str:
+    """Render a `(product, epoch)` plan item for the `_run_items` log lines.
+
+    Args:
+        product: The `RemoteProduct` whose fetch failed.
+
+    Returns:
+        str: The product `id`, quoted.
+    """
+    return repr(product.id)
+
+
+def _skip_failed_product(product: RemoteProduct, exc: BaseException) -> None:
+    """Placeholder for a failed `(product, epoch)` so results stay aligned.
+
+    Keeps `_fetch`'s output positionally aligned with the `_search` plan under
+    a `"warn"` / `"ignore"` policy — the aggregate path zips products against
+    paths, so a dropped item would misassign rasters to epochs. The failed slot
+    carries `None`, which `download` and `_aggregate_epochs` skip.
+
+    Args:
+        product: The `RemoteProduct` whose fetch failed.
+        exc: The exception it raised (unused; the slot is simply blanked).
+
+    Returns:
+        None: The blank placeholder for the failed slot.
+    """
+    return None
+
+
 class GHSL(AbstractDataSource):
     """Download GHSL products from the JRC over open HTTPS, localised via pyramids.
 
@@ -333,6 +363,7 @@ class GHSL(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
+        errors: str = "warn",
         *,
         force: bool = False,
     ) -> list[Path]:
@@ -346,6 +377,14 @@ class GHSL(AbstractDataSource):
                 reduces the per-epoch raster stack across the epochs in range
                 (`C6`). Rejected for categorical products (averaging class
                 codes is meaningless).
+            errors: Partial-failure policy across the independent
+                `(product, epoch)` items:
+
+                * `"warn"` (default) — log each failed item and return the
+                  rasters that were written, with a summary.
+                * `"raise"` — propagate the first item failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed items silently.
 
         Returns:
             list[Path]: One GeoTIFF per `(product, epoch)`, or — when
@@ -355,6 +394,7 @@ class GHSL(AbstractDataSource):
             ValueError: If `aggregate` is set and any requested product is
                 categorical.
         """
+        self._errors = self.check_errors_policy(errors)
         self._show_progress = progress_bar
         self._force = force
         if aggregate is not None:
@@ -370,13 +410,13 @@ class GHSL(AbstractDataSource):
             return []
         paths = self._fetch(products)
         if aggregate is None:
-            return paths
+            return [path for path in paths if path is not None]
         return self._aggregate_epochs(products, paths, aggregate)
 
     def _aggregate_epochs(
         self,
         products: list[RemoteProduct],
-        paths: list[Path],
+        paths: list[Path | None],
         config: AggregationConfig,
     ) -> list[Path]:
         """Reduce each product's per-epoch raster stack into per-window rasters.
@@ -416,6 +456,9 @@ class GHSL(AbstractDataSource):
         # outputs through unchanged rather than dropping them from the result.
         passthrough: list[Path] = []
         for product, path in zip(products, paths):
+            if path is None:
+                # A slot a non-raising policy blanked; it has no raster to stack.
+                continue
             if product.metadata.get("kind") != "raster":
                 passthrough.append(path)
                 continue
@@ -610,30 +653,55 @@ class GHSL(AbstractDataSource):
                 )
         return plan
 
-    def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
+    def _fetch(self, products: list[RemoteProduct]) -> list[Path | None]:
         """Download + unzip each product's tiles, then localise via pyramids.
 
         The per-tile downloads of a product are run concurrently with a bounded
         `joblib` thread pool (the network is the bottleneck; each
         `download_and_unzip` is idempotent and uses its own request), then the
-        mosaic / reproject / crop runs once per product.
+        mosaic / reproject / crop runs once per product. The per-`(product,
+        epoch)` items run under `self._errors`: a failed item is logged and its
+        slot carries `None` (kept so the aggregate path's product↔path zip stays
+        aligned), unless **every** item failed, in which case the first error is
+        re-raised rather than returning an empty result.
 
         Args:
             products: The plan from `_search`.
 
         Returns:
-            list[Path]: One written GeoTIFF (or table) path per product.
+            list[Path | None]: One written GeoTIFF (or table) path per product,
+                aligned with `products`; `None` in a slot whose fetch failed
+                under a non-raising policy.
         """
         if self._api == "stac":
-            return self._fetch_via_stac(products)
-        written: list[Path] = []
-        for rp in products:
-            if rp.metadata.get("kind") == "tabular":
-                written.append(self._fetch_duc(rp))
-                continue
-            tifs = self._download_tiles(rp.metadata["urls"])
-            written.append(self._localise(tifs, rp))
-        return written
+            return cast("list[Path | None]", self._fetch_via_stac(products))
+        results, failures = self._run_items(
+            products,
+            self._fetch_product,
+            errors=self._errors,
+            label="product",
+            describe=_describe_product,
+            on_failure=_skip_failed_product,
+        )
+        if failures and not any(path is not None for path in results):
+            # A whole-service failure fails every item identically; re-raise the
+            # first rather than report the outage as an empty result.
+            raise failures[0][1]
+        return results
+
+    def _fetch_product(self, rp: RemoteProduct) -> Path:
+        """Fetch one `(product, epoch)` item — the per-item body for `_run_items`.
+
+        Args:
+            rp: One `RemoteProduct` from `_search`.
+
+        Returns:
+            Path: The written GeoTIFF (or extracted table directory) path.
+        """
+        if rp.metadata.get("kind") == "tabular":
+            return self._fetch_duc(rp)
+        tifs = self._download_tiles(rp.metadata["urls"])
+        return self._localise(tifs, rp)
 
     def _download_tiles(self, urls: list[str]) -> list[Path]:
         """Download + unzip a product's tile URLs concurrently (order preserved).

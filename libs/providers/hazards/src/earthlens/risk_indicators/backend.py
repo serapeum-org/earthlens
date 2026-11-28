@@ -531,6 +531,9 @@ class RiskIndicators(AbstractDataSource):
     ) -> pd.DataFrame | FeatureCollection:
         """Fetch the dataset and return its per-instance shape.
 
+        It issues a single request, so it has no partial-failure policy and
+        takes no `errors=` argument.
+
         Args:
             progress_bar: Accepted for signature parity; one request is issued,
                 so this is a no-op.

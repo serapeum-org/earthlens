@@ -373,7 +373,8 @@ class GDACS(AbstractDataSource):
         result, writes it to one vector file under `path`, and returns
         the in-memory `FeatureCollection`. An empty result
         returns a schema-correct empty FeatureCollection and writes
-        nothing.
+        nothing. It issues a single request, so it has no partial-failure
+        policy and takes no `errors=` argument.
 
         Args:
             progress_bar: Accepted for signature parity with the other

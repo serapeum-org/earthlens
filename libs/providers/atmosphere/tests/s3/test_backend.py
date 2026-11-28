@@ -629,3 +629,126 @@ def test_aggregate_resolves_in_file_variable_and_runs(
     results = source._aggregate(products, AggregationConfig(freq="D", op="mean"))
     assert results == [out]
     assert captured["nc_variable"] == "VAR_2T"  # not the native token "128_167_2t"
+
+
+class _WriteDummy:
+    """A fake `_fetch_one` that writes a distinct dummy file and returns its path.
+
+    Hoisted to module scope (no nested functions); each call writes a new
+    `out_<n>.tif` under `directory` so a survivor is a real, existing path.
+    """
+
+    def __init__(self, directory):
+        self._dir = directory
+        self._n = 0
+
+    def __call__(self, product):
+        """Write a new dummy output file and return its path."""
+        self._n += 1
+        path = self._dir / f"out_{self._n}.tif"
+        path.write_bytes(b"x")
+        return path
+
+
+class _RaiseFromCall:
+    """A `_fetch_one` stand-in: delegate to `real`, raise `exc` from `from_call`.
+
+    Hoisted to module scope (no nested functions); holds its own call counter.
+    `from_call=2` fails the second object (a partial failure); `from_call=1`
+    fails every object (a whole-service / fatal failure).
+    """
+
+    def __init__(self, real_fetch, exc, from_call=2):
+        self._real = real_fetch
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, product):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(product)
+
+
+def _two_object_source(tmp_path, monkeypatch, exc, from_call=2):
+    """A DEM source whose search yields two objects, failing fetch from `from_call`."""
+    from earthlens.base import RemoteProduct
+
+    source = _dem_source(tmp_path)
+    products = [
+        RemoteProduct(id="a", href="a.tif", metadata={"bucket": "b"}),
+        RemoteProduct(id="b", href="b.tif", metadata={"bucket": "b"}),
+    ]
+    monkeypatch.setattr(source, "_search", lambda: list(products))
+    monkeypatch.setattr(
+        source, "_fetch_one", _RaiseFromCall(_WriteDummy(tmp_path), exc, from_call)
+    )
+    return source
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent S3 objects."""
+
+    def test_raise_propagates_first_failure(self, tmp_path, monkeypatch):
+        """errors="raise" surfaces a per-object exception, not the batch summary."""
+        source = _two_object_source(tmp_path, monkeypatch, ValueError("object boom"))
+        with pytest.raises(ValueError, match="object boom"):
+            source.download(progress_bar=False, errors="raise")
+
+    def test_warn_returns_the_surviving_object(self, tmp_path, monkeypatch):
+        """errors="warn" drops a per-object failure and returns the survivor's path."""
+        source = _two_object_source(tmp_path, monkeypatch, ValueError("object boom"))
+        out = source.download(progress_bar=False, errors="warn")
+        assert len(out) == 1
+        assert out[0].exists()
+
+    def test_ignore_drops_failures_and_returns_survivor(self, tmp_path, monkeypatch):
+        """errors="ignore" drops a per-object failure silently."""
+        source = _two_object_source(tmp_path, monkeypatch, ValueError("object boom"))
+        assert len(source.download(progress_bar=False, errors="ignore")) == 1
+
+    def test_default_policy_is_warn(self, tmp_path, monkeypatch):
+        """Omitting errors= defaults to warn — a per-object failure is survived."""
+        source = _two_object_source(tmp_path, monkeypatch, ValueError("object boom"))
+        assert len(source.download(progress_bar=False)) == 1
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_object_failing_raises(self, tmp_path, policy, monkeypatch):
+        """When every object fails, the first error is raised — never a silent empty."""
+        source = _two_object_source(
+            tmp_path, monkeypatch, ValueError("all objects down"), from_call=1
+        )
+        with pytest.raises(ValueError, match="all objects down"):
+            source.download(progress_bar=False, errors=policy)
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_permission_error_is_fatal_under_any_policy(
+        self, tmp_path, policy, monkeypatch
+    ):
+        """A denied-access PermissionError propagates even under warn/ignore."""
+        source = _two_object_source(
+            tmp_path, monkeypatch, PermissionError("access denied"), from_call=1
+        )
+        with pytest.raises(PermissionError, match="access denied"):
+            source.download(progress_bar=False, errors=policy)
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_bucket_not_found_is_fatal_under_any_policy(
+        self, tmp_path, policy, monkeypatch
+    ):
+        """A BucketNotFoundError propagates even under warn/ignore."""
+        from earthlens.s3.backend import BucketNotFoundError
+
+        source = _two_object_source(
+            tmp_path, monkeypatch, BucketNotFoundError("bucket not found"), from_call=1
+        )
+        with pytest.raises(BucketNotFoundError, match="bucket not found"):
+            source.download(progress_bar=False, errors=policy)
+
+    def test_invalid_policy_rejected(self, tmp_path):
+        """An unrecognised errors= value is refused before any request."""
+        source = _dem_source(tmp_path)
+        with pytest.raises(ValueError, match="errors"):
+            source.download(progress_bar=False, errors="explode")

@@ -345,6 +345,7 @@ class ClimateIndices(AbstractDataSource):
         self,
         progress_bar: bool = True,
         limit: int | None = None,
+        errors: str = "warn",
     ) -> pd.DataFrame:
         """Fetch every requested index, write the table, and return it.
 
@@ -356,6 +357,18 @@ class ClimateIndices(AbstractDataSource):
                 item. Applied as the per-item results arrive, so an item past
                 the cap is never fetched. `None` (the default) fetches
                 everything, which for a wide request is bounded only by memory.
+            errors: Partial-failure policy across the independent index ids:
+
+                * `"warn"` (default) — log each failed index and return the
+                  rows from the indices that succeeded, with a summary.
+                * `"raise"` — propagate the first index failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed indices silently.
+
+                When every index fails — a dead source host, not a per-index
+                gap — the first error is re-raised under every policy rather
+                than returned as an empty frame; a partial failure still
+                returns the survivors under `"warn"`/`"ignore"`.
 
         Returns:
             pd.DataFrame: The long-format table (`date`, `index`,
@@ -367,7 +380,18 @@ class ClimateIndices(AbstractDataSource):
                 (`G8`).
         """
         self._limit = self.check_limit(limit)
-        frames = [frame for frame in self._api() if len(frame)]
+        self._errors = self.check_errors_policy(errors)
+        frames = [
+            frame
+            for frame in self._search_fetch_each(
+                progress_bar=progress_bar,
+                desc="ClimateIndices",
+                unit="index",
+                errors=self._errors,
+                raise_if_all_failed=True,
+            )
+            if len(frame)
+        ]
         df = (
             pd.concat(frames, ignore_index=True)
             if frames

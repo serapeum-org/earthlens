@@ -290,6 +290,7 @@ class DEM(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
+        errors: str = "warn",
         *,
         force: bool = False,
     ) -> list[Path]:
@@ -298,6 +299,21 @@ class DEM(AbstractDataSource):
         Args:
             progress_bar: Show a per-tile progress bar. Defaults to
                 `True`.
+            errors: Partial-failure policy across the independent tiles:
+
+                * `"warn"` (default) — log each failed tile and return the
+                  tiles that downloaded, with a summary.
+                * `"raise"` — propagate the first tile failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed tiles silently.
+
+                A whole-service failure — bad credentials, a dead host —
+                fails every tile identically, so when every attempted tile
+                fails the first error is re-raised under every policy rather
+                than returned as an empty result. An absent ocean /
+                outside-coverage tile is a `None` from `_fetch_one`, not a
+                failure: it is skipped as before and never triggers that
+                re-raise.
             force: Re-fetch even when a complete output already exists,
                 bypassing the skip-if-exists check. Defaults to `False`.
 
@@ -306,9 +322,25 @@ class DEM(AbstractDataSource):
                 bbox row-major order. Empty when every candidate tile is
                 absent from the bucket.
         """
+        self._errors = self.check_errors_policy(errors)
         self._show_progress = progress_bar
         self._force = force
-        return self._api_via_search_fetch()
+        results = self._search_fetch_each(
+            progress_bar=progress_bar,
+            desc=f"dem/{self._dataset_key}",
+            unit="tile",
+            errors=self._errors,
+            raise_if_all_failed=True,
+            label="tile",
+        )
+        written = [path for path in results if path is not None]
+        missing = len(results) - len(written)
+        if missing:
+            logger.info(
+                f"dem: {len(written)} tile(s) downloaded; {missing} absent "
+                "(ocean / outside coverage)."
+            )
+        return written
 
 
 def _error_code(exc: BaseException) -> str:

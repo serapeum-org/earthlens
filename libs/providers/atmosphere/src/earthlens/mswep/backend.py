@@ -139,6 +139,13 @@ def _safe_destination(root: Path, folder: str, name: str) -> Path:
     return destination
 
 
+def _describe_granule(product: RemoteProduct) -> str:
+    """Render a granule product for the `_run_items` log lines (folder/name)."""
+    folder = product.metadata.get("folder", "")
+    name = product.metadata.get("name", product.id)
+    return repr(f"{folder}/{name}" if folder else name)
+
+
 class MSWEP(LazyClientMixin, AbstractDataSource):
     """Download MSWEP / MSWX NetCDF granules from an approved GloH2O share.
 
@@ -736,29 +743,58 @@ class MSWEP(LazyClientMixin, AbstractDataSource):
         share a tree.
 
         A granule already on disk is reused, **except** inside the NRT
-        revision window, where the local copy is known to be superseded.
+        revision window, where the local copy is known to be superseded. The
+        per-granule downloads are independent, so each is run under the
+        `self._errors` partial-failure policy.
 
         Args:
             products: The plan from `_search`.
 
         Returns:
-            list[Path]: The granules written or already present, in plan
-                order.
+            list[Path]: The granules written or already present, for the
+                granules that succeeded, in plan order.
+
+        Raises:
+            Exception: The first granule's error when `errors="raise"`, or —
+                under any policy — when **every** granule fails (a whole-service
+                failure re-raised rather than returned as an empty list).
+        """
+        self._ensure_root_dir()
+        results, failures = self._run_items(
+            tqdm(products, desc="mswep", disable=not self._progress),
+            self._fetch_one,
+            errors=self._errors,
+            label="granule",
+            describe=_describe_granule,
+        )
+        if failures and not results:
+            # Every granule failed — a dead Drive share, not a per-granule gap.
+            # Re-raise the first error rather than return an empty list.
+            raise failures[0][1]
+        return results
+
+    def _fetch_one(self, product: RemoteProduct) -> Path:
+        """Download (or reuse) one resolved granule, mirroring the share's layout.
+
+        A granule already on disk is reused, except inside the NRT revision
+        window where the local copy is known to be superseded.
+
+        Args:
+            product: One `RemoteProduct` from `_search`.
+
+        Returns:
+            Path: The granule written or already present.
         """
         root = self._ensure_root_dir()
-        written: list[Path] = []
-        for product in tqdm(products, desc="mswep", disable=not self._progress):
-            name = str(product.metadata["name"])
-            folder = str(product.metadata["folder"])
-            destination = _safe_destination(root, folder, name)
-            stamp = product.metadata["timestamp"]
-            if destination.exists() and not self.is_under_revision(stamp, folder):
-                logger.debug(f"mswep: {folder}/{name} already present; skipping.")
-                written.append(destination)
-                continue
-            download_media(self._auth.service, product.id, destination)
-            written.append(destination)
-        return written
+        name = str(product.metadata["name"])
+        folder = str(product.metadata["folder"])
+        destination = _safe_destination(root, folder, name)
+        stamp = product.metadata["timestamp"]
+        if destination.exists() and not self.is_under_revision(stamp, folder):
+            logger.debug(f"mswep: {folder}/{name} already present; skipping.")
+            return destination
+        download_media(self._auth.service, product.id, destination)
+        return destination
 
     def gauge_metadata_folder(self) -> str:
         """Locate the `Gauge_metadata` folder, returning its Drive id.
@@ -854,7 +890,7 @@ class MSWEP(LazyClientMixin, AbstractDataSource):
         """
         return self._api_via_search_fetch()
 
-    def download(self, progress_bar: bool = True) -> list[Path]:
+    def download(self, progress_bar: bool = True, errors: str = "warn") -> list[Path]:
         """Fetch the requested granules and return their paths.
 
         `aggregate=` is deliberately not a parameter: `SUPPORTS_AGGREGATE`
@@ -864,6 +900,18 @@ class MSWEP(LazyClientMixin, AbstractDataSource):
 
         Args:
             progress_bar: Show a per-granule progress bar.
+            errors: Partial-failure policy across the independent granules:
+
+                * `"warn"` (default) — log each failed granule and return the
+                  paths of the granules that succeeded, with a summary.
+                * `"raise"` — propagate the first granule failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed granules silently.
+
+                When every granule fails — a dead Drive share, not a per-granule
+                gap — the first error is re-raised under every policy rather than
+                returned as an empty list; a partial failure still returns the
+                survivors under `"warn"`/`"ignore"`.
 
         Returns:
             list[Path]: The granules written. For MSWEP and any explicit
@@ -884,6 +932,7 @@ class MSWEP(LazyClientMixin, AbstractDataSource):
                 need `variant="NRT"`.
         """
         self._progress = progress_bar
+        self._errors = self.check_errors_policy(errors)
         warn_license(
             self._catalog.license_id,
             "mswep",

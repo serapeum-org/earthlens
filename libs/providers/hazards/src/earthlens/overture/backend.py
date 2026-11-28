@@ -221,6 +221,15 @@ class Overture(AbstractDataSource):
         self._stream = stream
         self._where = where
         self._columns = columns
+        # Per-batch values resolved once by `_fetch` before the per-product
+        # loop, so `_fetch_one(product)` keeps the base signature.
+        self._resolved_bbox: tuple[float, float, float, float] = (
+            -180.0,
+            -90.0,
+            180.0,
+            90.0,
+        )
+        self._resolved_duckdb_release: str | None = None
         self._catalog = Catalog()
         super().__init__(
             start=cast("str", start),
@@ -452,95 +461,127 @@ class Overture(AbstractDataSource):
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
         """Pull each planned type's GeoParquet and write a FeatureCollection.
 
-        For every product, reads the type's GeoParquet (bbox pushdown via
-        PyArrow parquet statistics) — through the SDK's `geodataframe`, or,
-        when `stream=True` / `max_features` is set, the streaming
-        `record_batch_reader` (see `_read_geodataframe`) — tags the result
-        `EPSG:4326`, adds the per-row `license_id` column, warns when
-        ODbL-1.0 rows are present, and writes one vector file under `path`.
-        The SDK's unit is the Overture *type* (passed positionally) — there
-        is no `theme=` kwarg.
+        Maps the per-type `_fetch_one` over the planned products under the
+        `errors=` policy recorded by `download` (`self._errors`), so a type
+        whose fetch fails no longer aborts the others: `"warn"` (the default)
+        logs it and returns the types that succeeded, `"raise"` propagates the
+        first failure, `"ignore"` drops it silently.
 
-        A type that matches no features in the bbox is skipped (a warning
-        is logged and no empty file is written), mirroring the shipped
-        vector backends; its path is therefore absent from the result.
+        A type that matches no features in the bbox is *not* a failure — it is
+        logged and contributes no path (`_fetch_one` returns `None`), kept
+        distinct from a fetch error.
 
         Args:
             products: The products returned by `_search`.
 
         Returns:
-            list[Path]: The written vector file paths, in product order;
-                a product that matched no features contributes no path.
+            list[Path]: The written vector file paths, in product order; a
+                product that matched no features, or whose fetch failed under a
+                non-raising policy, contributes no path.
         """
-        from earthlens.overture.collection import to_feature_collection
-
         bbox = (
             self.space.west,
             self.space.south,
             self.space.east,
             self.space.north,
         )
-        written: list[Path] = []
-        # Resolved once, before the loop: a mid-loop recovery from a failed
+        # Resolved once, before the fetch: a mid-batch recovery from a failed
         # lookup would otherwise read the first types from the bundled release
         # and the rest from the live one, so a single download() could mix two
         # snapshots. Offline callers also pay one connect attempt, not one per
         # requested type. Its name says what it is: the release the DuckDB
         # path will glob, present exactly when that path is taken, which is
         # the only path needing a concrete id.
-        duckdb_release = (
+        self._resolved_bbox = bbox
+        self._resolved_duckdb_release = (
             self._resolve_release() if (self._where or self._columns) else None
         )
-        for product in products:
-            theme_name = product.metadata["theme_name"]
-            overture_type = product.metadata["type"]
-            label = product.id
-            if duckdb_release is not None:
-                from earthlens.overture.query import query_overture
+        results, failures = self._run_items(
+            products,
+            self._fetch_one,
+            errors=self._errors,
+            label="type",
+        )
+        if failures and not results:
+            # Every type failed — a whole-service outage, not a per-type gap;
+            # re-raise rather than report it as an empty download (ARC-9a).
+            raise failures[0][1]
+        return [path for path in results if path is not None]
 
-                logger.info(
-                    f"Querying Overture {overture_type!r} (theme {theme_name!r}) "
-                    f"via DuckDB for bbox {bbox} (release={duckdb_release}, "
-                    f"where={self._where!r})"
-                )
-                gdf = query_overture(
-                    theme_name,
-                    overture_type,
-                    duckdb_release,
-                    bbox,
-                    where=self._where,
-                    columns=self._columns,
-                    limit=self._max_features,
-                )
-            else:
-                mode = (
-                    "streaming" if (self._stream or self._max_features) else "in-memory"
-                )
-                logger.info(
-                    f"Fetching Overture {overture_type!r} (theme {theme_name!r}) "
-                    f"for bbox {bbox} (release={self._release or 'latest'}, {mode})"
-                )
-                gdf = _read_geodataframe(
-                    overture_type,
-                    bbox=bbox,
-                    release=self._release,
-                    max_features=self._max_features,
-                    stream=self._stream,
-                )
-            collection = to_feature_collection(
-                gdf, label=label, max_features=self._max_features
+    def _fetch_one(self, product: RemoteProduct) -> Path | None:
+        """Pull one planned type's GeoParquet and write its FeatureCollection.
+
+        Reads the type's GeoParquet (bbox pushdown via PyArrow parquet
+        statistics) — through the SDK's `geodataframe`, or, when `stream=True`
+        / `max_features` is set, the streaming `record_batch_reader` (see
+        `_read_geodataframe`) — tags the result `EPSG:4326`, adds the per-row
+        `license_id` column, warns when ODbL-1.0 rows are present, and writes
+        one vector file under `path`. The SDK's unit is the Overture *type*
+        (passed positionally) — there is no `theme=` kwarg.
+
+        The per-batch `bbox` and DuckDB release are read from the instance
+        (`_resolved_bbox` / `_resolved_duckdb_release`), set once by `_fetch`
+        before the per-product loop, so this keeps the base `_fetch_one(product)`
+        signature.
+
+        Args:
+            product: One product from `_search`.
+
+        Returns:
+            Path | None: The written vector file, or `None` when the type
+                matched no features in the bbox (logged, no empty file written)
+                — a "no data" outcome kept distinct from a fetch failure.
+        """
+        from earthlens.overture.collection import to_feature_collection
+
+        bbox = self._resolved_bbox
+        duckdb_release = self._resolved_duckdb_release
+        theme_name = product.metadata["theme_name"]
+        overture_type = product.metadata["type"]
+        label = product.id
+        if duckdb_release is not None:
+            from earthlens.overture.query import query_overture
+
+            logger.info(
+                f"Querying Overture {overture_type!r} (theme {theme_name!r}) "
+                f"via DuckDB for bbox {bbox} (release={duckdb_release}, "
+                f"where={self._where!r})"
             )
-            if len(collection) == 0:
-                logger.warning(
-                    f"{label}: no features matched the bbox; nothing written."
-                )
-                continue
+            gdf = query_overture(
+                theme_name,
+                overture_type,
+                duckdb_release,
+                bbox,
+                where=self._where,
+                columns=self._columns,
+                limit=self._max_features,
+            )
+        else:
+            mode = "streaming" if (self._stream or self._max_features) else "in-memory"
+            logger.info(
+                f"Fetching Overture {overture_type!r} (theme {theme_name!r}) "
+                f"for bbox {bbox} (release={self._release or 'latest'}, {mode})"
+            )
+            gdf = _read_geodataframe(
+                overture_type,
+                bbox=bbox,
+                release=self._release,
+                max_features=self._max_features,
+                stream=self._stream,
+            )
+        collection = to_feature_collection(
+            gdf, label=label, max_features=self._max_features
+        )
+        result: Path | None = None
+        if len(collection) == 0:
+            logger.warning(f"{label}: no features matched the bbox; nothing written.")
+        else:
             out_path = self._write(
                 collection, theme_name, overture_type, duckdb_release
             )
             logger.info(f"{label}: wrote {len(collection)} feature(s) to {out_path}")
-            written.append(out_path)
-        return written
+            result = out_path
+        return result
 
     def _write(
         self,
@@ -589,17 +630,32 @@ class Overture(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
+        errors: str = "warn",
     ) -> list[Path]:
         """Fetch the requested Overture themes and return the written paths.
 
         Args:
             progress_bar: Accepted for signature parity with the other
                 backends.
+            errors: Partial-failure policy across the independent
+                `(theme, type)` fetches:
+
+                * `"warn"` (default) — log each type whose fetch fails and
+                  return the paths for the types that succeeded, with a
+                  summary.
+                * `"raise"` — propagate the first type's failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed types silently.
+
+                A type that simply matches no features in the bbox is not a
+                failure — it is logged and contributes no path under every
+                policy.
 
         Returns:
             list[Path]: The vector file(s) written under `path`, one per
-                requested feature type.
+                requested feature type that matched any features.
         """
+        self._errors = self.check_errors_policy(errors)
         return cast("list[Path]", self._api())
 
 

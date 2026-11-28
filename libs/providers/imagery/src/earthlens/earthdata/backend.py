@@ -40,6 +40,7 @@ from pydantic import SecretStr
 from earthlens.base import (
     CADENCE_ALIASES,
     AbstractDataSource,
+    AuthenticationError,
     OutputKind,
     RemoteProduct,
     TemporalExtent,
@@ -52,6 +53,19 @@ from earthlens.earthdata.catalog import Catalog, EarthdataDataset
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
+
+
+def _describe_dataset_group(group: tuple[EarthdataDataset, list[Any]]) -> str:
+    """Render a `(dataset, granules)` group for the `_run_items` log lines.
+
+    Args:
+        group: One `(dataset, granules)` pair from `_group_by_dataset`.
+
+    Returns:
+        str: The dataset short name and its granule count.
+    """
+    dataset, granules = group
+    return f"{dataset.short_name} ({len(granules)} granule(s))"
 
 
 class Earthdata(AbstractDataSource):
@@ -360,33 +374,69 @@ class Earthdata(AbstractDataSource):
         """Fetch every granule `_search` returned to local paths.
 
         Groups the products by dataset (each dataset's granules share
-        one fetch strategy) and, per group, either streams in-region
-        from S3 (`earthaccess.open`) or downloads over HTTPS
-        (`earthaccess.download`). The choice follows `direct_s3`
-        (`G4`): `"always"` forces S3, `"never"` forces HTTPS, and
-        `"auto"` (default) uses S3 only when the dataset is
-        cloud-hosted and the caller runs in the DAAC's region.
+        one fetch strategy) and fetches each group through
+        `_fetch_group`, under the backend's `errors=` partial-failure
+        policy (`self._errors`): a dataset group whose fetch fails is
+        logged and skipped under `"warn"` / `"ignore"`, propagated under
+        `"raise"`, while an `AuthenticationError` (a whole-service EDL
+        failure, not one group's data gap) is `fatal=` and propagates
+        under every policy.
 
         Args:
             products: The products from `_search`.
 
         Returns:
             list[Path]: Local paths of every fetched granule, in
-                dataset/group order.
+                dataset/group order (the failed groups' paths absent).
+        """
+        groups = self._group_by_dataset(products)
+        results, failures = self._run_items(
+            groups,
+            self._fetch_group,
+            errors=self._errors,
+            label="dataset",
+            describe=_describe_dataset_group,
+            fatal=(AuthenticationError,),
+        )
+        if failures and not results:
+            # Every dataset group failed — a whole-service outage, not a
+            # per-group gap; re-raise rather than return an empty download.
+            raise failures[0][1]
+        out_paths: list[Path] = []
+        for group_paths in results:
+            out_paths.extend(group_paths)
+        return out_paths
+
+    def _fetch_group(self, group: tuple[EarthdataDataset, list[Any]]) -> list[Path]:
+        """Fetch one dataset group's granules to local paths (or S3 handles).
+
+        Either streams the group's granules in-region from S3
+        (`earthaccess.open`) or downloads them over HTTPS
+        (`earthaccess.download`). The choice follows `direct_s3`
+        (`G4`): `"always"` forces S3, `"never"` forces HTTPS, and
+        `"auto"` (default) uses S3 only when the dataset is
+        cloud-hosted and the caller runs in the DAAC's region.
+
+        Args:
+            group: One `(dataset, granules)` pair from
+                `_group_by_dataset`.
+
+        Returns:
+            list[Path]: Local paths of this group's fetched granules.
         """
         import earthaccess
 
+        dataset, granules = group
         show_progress = getattr(self, "_show_progress", True)
         out_paths: list[Path] = []
-        for ds, granules in self._group_by_dataset(products):
-            if self._use_s3(ds):
-                files = earthaccess.open(granules, show_progress=show_progress)
-                out_paths.extend(Path(getattr(f, "path", str(f))) for f in files)
-            else:
-                downloaded = earthaccess.download(
-                    granules, str(self.root_dir), show_progress=show_progress
-                )
-                out_paths.extend(Path(p) for p in downloaded)
+        if self._use_s3(dataset):
+            files = earthaccess.open(granules, show_progress=show_progress)
+            out_paths.extend(Path(getattr(f, "path", str(f))) for f in files)
+        else:
+            downloaded = earthaccess.download(
+                granules, str(self.root_dir), show_progress=show_progress
+            )
+            out_paths.extend(Path(p) for p in downloaded)
         return out_paths
 
     @staticmethod
@@ -465,6 +515,7 @@ class Earthdata(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
+        errors: str = "warn",
     ) -> list[Path]:
         """Search CMR, fetch the granules, return their local paths.
 
@@ -483,6 +534,19 @@ class Earthdata(AbstractDataSource):
             aggregate: Optional
                 `earthlens.aggregate.AggregationConfig`. Only
                 reached for a `"raster"` instance.
+            errors: Partial-failure policy across the independent dataset
+                groups:
+
+                * `"warn"` (default) — log each failed dataset group and
+                  return the granules from the groups that succeeded.
+                * `"raise"` — propagate the first group failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed dataset groups silently.
+
+                A whole-service failure — a rejected Earthdata Login, a
+                dead host — surfaces as an `AuthenticationError` that is
+                re-raised under every policy (`fatal=`), never swallowed
+                as an empty result.
 
         Returns:
             list[Path]: The fetched granule paths, or — when
@@ -494,6 +558,7 @@ class Earthdata(AbstractDataSource):
                 installed pyramids exposes no `NetCDF.reduce` /
                 `DatasetCollection.groupby` for the fetched format.
         """
+        self._errors = self.check_errors_policy(errors)
         self._show_progress = progress_bar
         paths = self._api_via_search_fetch()
         if aggregate is not None:

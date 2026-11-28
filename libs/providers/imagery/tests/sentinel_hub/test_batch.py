@@ -14,6 +14,8 @@ import pytest
 
 from earthlens.sentinel_hub.backend import SentinelHub
 
+from .test_backend import _RaiseFromCall
+
 pytestmark = pytest.mark.sentinel_hub
 
 _S3 = {"bucket": "s3://bkt/out", "iam_role_arn": "arn:aws:iam::1:role/r", "grid_id": 2}
@@ -67,7 +69,7 @@ class TestBatchFetch:
         # the fake reports cost_PU=5.0; cap below that to trip the guard
         backend = _batch_backend(output_dir, batch_output={**_S3, "max_cost_pu": 1.0})
         with pytest.raises(ValueError, match="exceeds batch_output"):
-            backend.download()
+            backend.download(errors="raise")
         client = fake_sh.BatchProcessClient.instances[-1]
         assert "start_job" not in client.calls  # aborted after analysis
 
@@ -91,3 +93,18 @@ class TestBatchFetch:
             client_secret="b",
         )
         assert backend._resolve_plane() == "batch"
+
+
+@pytest.mark.parametrize("policy", ["warn", "ignore"])
+def test_every_product_failing_raises_non_fatal(
+    fake_sh, output_dir: Path, monkeypatch, policy
+):
+    """When every batch product fails, the first error is raised, never empty."""
+    backend = _batch_backend(output_dir, batch_output=_S3)
+    monkeypatch.setattr(
+        backend,
+        "_batch_one",
+        _RaiseFromCall(backend._batch_one, ValueError("all batch down"), 1),
+    )
+    with pytest.raises(ValueError, match="all batch down"):
+        backend.download(errors=policy)

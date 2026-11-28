@@ -29,6 +29,7 @@ restricted-redistribution clause.
 from __future__ import annotations
 
 import datetime as dt
+import functools
 import hashlib
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
@@ -65,6 +66,11 @@ SPEIBASE_EPOCH_YEAR: int = 1901
 
 _HTTP_TIMEOUT: int = 90
 _USER_AGENT: str = "earthlens-drought/0.x (https://github.com/serapeum-org/earthlens)"
+
+
+def _describe_period(product: RemoteProduct) -> str:
+    """Render a period product for the policy log lines (its id)."""
+    return repr(product.id)
 
 
 class Drought(AbstractDataSource):
@@ -361,16 +367,32 @@ class Drought(AbstractDataSource):
         # are dropped before the cap counts them, so the cap bounds returned
         # polygons rather than weeks attempted.
         bbox = bbox_from_extent(self.space)
+        # The per-week GeoJSON downloads are independent, so route them through
+        # the shared `_iter_items` under the `self._errors` policy; a failed
+        # week is recorded and (under warn/ignore) skipped, while an empty week
+        # is filtered as before.
+        failures: list[tuple[str, BaseException]] = []
         frames = self._take_limited(
             (
                 frame
-                for frame in (
-                    self._fetch_usdm_period(product, bbox) for product in products
+                for frame in self._iter_items(
+                    products,
+                    functools.partial(self._fetch_usdm_period, bbox=bbox),
+                    errors=self._errors,
+                    label="period",
+                    describe=_describe_period,
+                    on_failure=None,
+                    failures=failures,
                 )
                 if len(frame)
             ),
             limit=self._limit,
         )
+        if failures and not frames:
+            # Every attempted week failed and none yielded polygons — a dead
+            # USDM host, not a per-week gap. Re-raise the first rather than
+            # return an empty FeatureCollection.
+            raise failures[0][1]
         if not frames:
             return self._empty_vector()
         merged = pd.concat(frames, ignore_index=True)
@@ -615,53 +637,75 @@ class Drought(AbstractDataSource):
                 Copernicus error message is surfaced verbatim.
         """
         bbox = bbox_from_extent(self.space)
-        written: list[Path] = []
-        for product in products:
-            period: dt.date = product.metadata["period"]
-            out_path = (
-                self.root_dir / f"{self._dataset.id}_{period.strftime('%Y%m%d')}.tif"
-            )
-            # Write to a sibling temp first and rename only on success, so a
-            # failed write (full disk, GDAL error mid-write) never leaves a
-            # truncated GeoTIFF that a later run would read as valid. `.part`
-            # goes *before* the suffix — GDAL picks its driver from the
-            # extension, so a trailing `.part` is an unknown format.
-            tmp_path = out_path.with_name(f"{out_path.stem}.part{out_path.suffix}")
-            dataset = self._fetch_wcs_coverage(period, bbox)
-            clipped = None
-            try:
-                # The Copernicus EDO/GDO MapServer honours the `Lat` subset but
-                # silently ignores `Long`, returning a full -180..180 strip
-                # (re-verified live 2026-07-17: a Long(-10,5) request still
-                # comes back spanning -25..51), and tags the GeoTIFF with no
-                # embedded SRS — so `Dataset.crop`'s cutline path is a no-op.
-                # Window-crop to the requested bbox by hand so the output
-                # honours the documented extent, mirroring the USDM (`gdf.cx`)
-                # and SPEIbase (`NetCDF.subset`) transports.
-                clipped = self._clip_wcs_raster(dataset, bbox)
-                if clipped is None:
-                    logger.warning(
-                        f"{self._dataset.id}: requested bbox {bbox} fell "
-                        f"entirely outside the downloaded raster's coverage; "
-                        f"writing {out_path} unclipped (full server-returned "
-                        f"extent)."
-                    )
-                (dataset if clipped is None else clipped).to_file(str(tmp_path))
-            except BaseException:
-                tmp_path.unlink(missing_ok=True)
-                raise
-            finally:
-                # Close on every path: `crop` / `to_file` can raise, and
-                # without this the GDAL handles leak for the rest of the batch.
-                if clipped is not None:
-                    clipped.close()
-                dataset.close()
-            # Only now: GDAL keeps the written file open until its source
-            # Dataset is closed, and Windows refuses to rename a file that is
-            # still held open — so the promotion must follow the `finally`.
-            tmp_path.replace(out_path)
-            written.append(out_path)
-        return written
+        # The per-period GeoTIFF downloads are independent, so route them
+        # through the shared `_run_items` under the `self._errors` policy.
+        results, failures = self._run_items(
+            products,
+            functools.partial(self._fetch_wcs_one, bbox=bbox),
+            errors=self._errors,
+            label="period",
+            describe=_describe_period,
+        )
+        if failures and not results:
+            # Every period failed — a dead EDO/GDO host, not a per-period gap.
+            # Re-raise the first error rather than return an empty list.
+            raise failures[0][1]
+        return results
+
+    def _fetch_wcs_one(
+        self, product: RemoteProduct, bbox: tuple[float, float, float, float]
+    ) -> Path:
+        """Fetch and window-crop one period's EDO/GDO GeoTIFF.
+
+        Args:
+            product: One period product from `_search`.
+            bbox: The request's `(west, south, east, north)` filter.
+
+        Returns:
+            Path: The written GeoTIFF for this period.
+        """
+        period: dt.date = product.metadata["period"]
+        out_path = self.root_dir / f"{self._dataset.id}_{period.strftime('%Y%m%d')}.tif"
+        # Write to a sibling temp first and rename only on success, so a
+        # failed write (full disk, GDAL error mid-write) never leaves a
+        # truncated GeoTIFF that a later run would read as valid. `.part`
+        # goes *before* the suffix — GDAL picks its driver from the
+        # extension, so a trailing `.part` is an unknown format.
+        tmp_path = out_path.with_name(f"{out_path.stem}.part{out_path.suffix}")
+        dataset = self._fetch_wcs_coverage(period, bbox)
+        clipped = None
+        try:
+            # The Copernicus EDO/GDO MapServer honours the `Lat` subset but
+            # silently ignores `Long`, returning a full -180..180 strip
+            # (re-verified live 2026-07-17: a Long(-10,5) request still
+            # comes back spanning -25..51), and tags the GeoTIFF with no
+            # embedded SRS — so `Dataset.crop`'s cutline path is a no-op.
+            # Window-crop to the requested bbox by hand so the output
+            # honours the documented extent, mirroring the USDM (`gdf.cx`)
+            # and SPEIbase (`NetCDF.subset`) transports.
+            clipped = self._clip_wcs_raster(dataset, bbox)
+            if clipped is None:
+                logger.warning(
+                    f"{self._dataset.id}: requested bbox {bbox} fell "
+                    f"entirely outside the downloaded raster's coverage; "
+                    f"writing {out_path} unclipped (full server-returned "
+                    f"extent)."
+                )
+            (dataset if clipped is None else clipped).to_file(str(tmp_path))
+        except BaseException:
+            tmp_path.unlink(missing_ok=True)
+            raise
+        finally:
+            # Close on every path: `crop` / `to_file` can raise, and
+            # without this the GDAL handles leak for the rest of the batch.
+            if clipped is not None:
+                clipped.close()
+            dataset.close()
+        # Only now: GDAL keeps the written file open until its source
+        # Dataset is closed, and Windows refuses to rename a file that is
+        # still held open — so the promotion must follow the `finally`.
+        tmp_path.replace(out_path)
+        return out_path
 
     def _fetch_wcs_coverage(
         self, period: dt.date, bbox: tuple[float, float, float, float]
@@ -823,6 +867,7 @@ class Drought(AbstractDataSource):
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
         limit: int | None = None,
+        errors: str = "warn",
     ) -> list[Path] | FeatureCollection:
         """Fetch the requested drought indicator and return its artefacts.
 
@@ -843,6 +888,21 @@ class Drought(AbstractDataSource):
                 only** — the raster transports return written files, which a
                 row cap cannot describe, so passing one there is refused
                 rather than silently ignored.
+            errors: Partial-failure policy across the independent periods (the
+                USDM weeks and the EDO/GDO periods; the single-file SPEIbase
+                transport slices one download and so has no per-period fetch to
+                govern):
+
+                * `"warn"` (default) — log each failed period and return the
+                  artefacts from the periods that succeeded, with a summary.
+                * `"raise"` — propagate the first period failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed periods silently.
+
+                When every period fails — a dead source host, not a per-period
+                gap — the first error is re-raised under every policy rather
+                than returned as an empty result; a partial failure still
+                returns the survivors under `"warn"`/`"ignore"`.
 
         Returns:
             FeatureCollection | list[Path]: For the vector USDM transport,
@@ -860,6 +920,7 @@ class Drought(AbstractDataSource):
                 negative.
         """
         self._limit = self.check_limit(limit)
+        self._errors = self.check_errors_policy(errors)
         if self._limit is not None and self.OUTPUT_KIND != "vector":
             raise ValueError(
                 f"Drought.download(limit=...) applies to the USDM (vector) "

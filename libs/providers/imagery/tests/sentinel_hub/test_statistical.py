@@ -15,6 +15,8 @@ from earthlens.sentinel_hub.backend import (
     _stats_frame,
 )
 
+from .test_backend import _RaiseFromCall
+
 pytestmark = pytest.mark.sentinel_hub
 
 _POLYGON = {
@@ -142,7 +144,7 @@ class TestStatisticalFetch:
         """A render recipe (no dataMask) on the Statistical plane is rejected."""
         backend = _stats_backend(output_dir, variables={"sentinel-2-l2a-ndvi": []})
         with pytest.raises(ValueError, match="dataMask"):
-            backend.download()
+            backend.download(errors="raise")
 
     def test_feature_collection_carries_ids(self, fake_sh, output_dir: Path):
         """A FeatureCollection produces one request per feature, ids carried."""
@@ -165,3 +167,18 @@ class TestStatisticalFetch:
         backend.download(aggregate=AggregationConfig(freq="1MS", op="mean"))
         req = fake_sh.SentinelHubStatistical.instances[-1]
         assert req.aggregation["aggregation_interval"] == "P1M"
+
+
+@pytest.mark.parametrize("policy", ["warn", "ignore"])
+def test_every_product_failing_raises_non_fatal(
+    fake_sh, output_dir: Path, monkeypatch, policy
+):
+    """When every statistical product fails, the first error is raised, never empty."""
+    backend = _stats_backend(output_dir)
+    monkeypatch.setattr(
+        backend,
+        "_statistical_one",
+        _RaiseFromCall(backend._statistical_one, ValueError("all stats down"), 1),
+    )
+    with pytest.raises(ValueError, match="all stats down"):
+        backend.download(errors=policy)

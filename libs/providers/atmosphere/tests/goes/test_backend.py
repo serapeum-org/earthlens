@@ -386,6 +386,99 @@ class TestClient:
         assert calls["n"] == 1, "the unsigned client is built exactly once"
 
 
+class _RaiseFromCall:
+    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from `from_call`.
+
+    Hoisted to module scope (no nested functions); holds its own call counter.
+    `from_call=2` fails the second granule (a partial failure); `from_call=1`
+    fails every granule (a whole-service failure).
+    """
+
+    def __init__(self, real_fetch, exc, from_call=2):
+        self._real = real_fetch
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, product):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(product)
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent granules."""
+
+    def _two_granule_backend(self, make_goes, seed_goes, monkeypatch, exc, from_call=2):
+        """A backend over two in-window granules, failing `_fetch_one` from `from_call`."""
+        goes = make_goes()
+        seed_goes(goes, [_mcmipc("20261841201180"), _mcmipc("20261841205000")])
+        assert len(goes._search()) == 2, "two granules should be planned"
+        monkeypatch.setattr(
+            goes, "_fetch_one", _RaiseFromCall(goes._fetch_one, exc, from_call)
+        )
+        return goes
+
+    def test_raise_propagates_first_failure(self, make_goes, seed_goes, monkeypatch):
+        """errors="raise" surfaces a per-granule exception, not the batch summary."""
+        goes = self._two_granule_backend(
+            make_goes, seed_goes, monkeypatch, ValueError("granule boom")
+        )
+        with pytest.raises(ValueError, match="granule boom"):
+            goes.download(progress_bar=False, errors="raise")
+
+    def test_warn_returns_the_surviving_granule(
+        self, make_goes, seed_goes, monkeypatch
+    ):
+        """errors="warn" drops a per-granule failure and returns the survivor's path."""
+        goes = self._two_granule_backend(
+            make_goes, seed_goes, monkeypatch, ValueError("granule boom")
+        )
+        paths = goes.download(progress_bar=False, errors="warn")
+        assert len(paths) == 1
+        assert paths[0].exists()
+
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, make_goes, seed_goes, monkeypatch
+    ):
+        """errors="ignore" drops a per-granule failure silently."""
+        goes = self._two_granule_backend(
+            make_goes, seed_goes, monkeypatch, ValueError("granule boom")
+        )
+        assert len(goes.download(progress_bar=False, errors="ignore")) == 1
+
+    def test_default_policy_is_warn(self, make_goes, seed_goes, monkeypatch):
+        """Omitting errors= defaults to warn — a per-granule failure is survived."""
+        goes = self._two_granule_backend(
+            make_goes, seed_goes, monkeypatch, ValueError("granule boom")
+        )
+        assert len(goes.download(progress_bar=False)) == 1
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_granule_failing_raises(
+        self, make_goes, seed_goes, policy, monkeypatch
+    ):
+        """When every granule fails, the first error is raised — never a silent empty."""
+        goes = self._two_granule_backend(
+            make_goes,
+            seed_goes,
+            monkeypatch,
+            ValueError("all granules down"),
+            from_call=1,
+        )
+        with pytest.raises(ValueError, match="all granules down"):
+            goes.download(progress_bar=False, errors=policy)
+
+    def test_invalid_policy_rejected(self, make_goes, seed_goes):
+        """An unrecognised errors= value is refused before any request."""
+        goes = make_goes()
+        seed_goes(goes, [_mcmipc("20261841201180")])
+        with pytest.raises(ValueError, match="errors"):
+            goes.download(progress_bar=False, errors="explode")
+
+
 class TestNoForbiddenImports:
     """Tests that the package never imports a decoding SDK (G2 / G5)."""
 

@@ -43,6 +43,7 @@ from __future__ import annotations
 
 import datetime as dt
 import shutil
+from functools import partial
 from pathlib import Path
 from typing import Any, TypeGuard
 
@@ -85,6 +86,18 @@ _GRIDDED_RETRO_MESSAGE = (
     "request is read + cropped), or one of the tabular products (chrtout, "
     "lakeout, coastal) for a retrospective time series."
 )
+
+
+def _describe_granule(product: RemoteProduct) -> str:
+    """Render a product for the `_run_items` log lines.
+
+    Args:
+        product: The granule whose fetch failed.
+
+    Returns:
+        str: The product's id.
+    """
+    return str(product.id)
 
 
 def enumerate_cycles(
@@ -513,14 +526,22 @@ class NWM(AbstractDataSource):
             return self._fetch_retrospective(products)
         if self._wants_subset():
             return self._fetch_operational_subset(products)
-        out: list[Path] = []
-        for product in tqdm(
+        iterator = tqdm(
             products, disable=not self._show_progress, desc="nwm", unit="file"
-        ):
-            fetched = self._fetch_one(product)
-            if fetched is not None:
-                out.append(fetched)
-        return out
+        )
+        fetched, failures = self._run_items(
+            iterator,
+            self._fetch_one,
+            errors=self._errors,
+            label="granule",
+            describe=_describe_granule,
+            fatal=(NotImplementedError,),
+        )
+        # A key not published returns None (absent, kept as a result); a real
+        # download error is a failure governed by `self._errors`. A whole-bucket
+        # outage fails every granule, so re-raise rather than return nothing.
+        self._raise_if_all_failed(fetched, failures)
+        return [path for path in fetched if path is not None]
 
     def _reader(self) -> Any:
         """Return the pyramids `LabeledDataset` reader class (lazy import).
@@ -692,22 +713,45 @@ class NWM(AbstractDataSource):
             NotImplementedError: For a gridded (raster) product.
         """
         reader = self._reader()
-        out: list[Path] = []
-        for rp in tqdm(
+        iterator = tqdm(
             products, disable=not self._show_progress, desc="nwm-retro", unit="store"
-        ):
-            product = self._catalog.get_product(rp.metadata["product"])
-            if product.output_kind != "tabular":
-                raise NotImplementedError(_GRIDDED_RETRO_MESSAGE)
-            cube = reader.read_file(
-                rp.href, anon=True, variables=self._requested[product.product]
-            )
-            stem = (
-                f"{product.product}_retro_"
-                f"{self.time.start_date:%Y%m%d}_{self.time.end_date:%Y%m%d}"
-            )
-            out.append(self._select_and_write(cube, product, stem, slice_time=True))
+        )
+        out, failures = self._run_items(
+            iterator,
+            partial(self._read_retro_one, reader=reader),
+            errors=self._errors,
+            label="granule",
+            describe=_describe_granule,
+            fatal=(NotImplementedError,),
+        )
+        self._raise_if_all_failed(out, failures)
         return out
+
+    def _read_retro_one(self, rp: RemoteProduct, *, reader: Any) -> Path:
+        """Read + slice one retrospective product's Zarr into a Parquet table.
+
+        Args:
+            rp: One retrospective product from `_search`.
+            reader: The pyramids `LabeledDataset` class.
+
+        Returns:
+            Path: The written Parquet table.
+
+        Raises:
+            NotImplementedError: For a gridded (raster) product — always
+                propagated (passed as `fatal=` to `_run_items`).
+        """
+        product = self._catalog.get_product(rp.metadata["product"])
+        if product.output_kind != "tabular":
+            raise NotImplementedError(_GRIDDED_RETRO_MESSAGE)
+        cube = reader.read_file(
+            rp.href, anon=True, variables=self._requested[product.product]
+        )
+        stem = (
+            f"{product.product}_retro_"
+            f"{self.time.start_date:%Y%m%d}_{self.time.end_date:%Y%m%d}"
+        )
+        return self._select_and_write(cube, product, stem, slice_time=True)
 
     def _fetch_operational_subset(self, products: list[RemoteProduct]) -> list[Path]:
         """Download whole operational files, then read + subset each.
@@ -732,14 +776,48 @@ class NWM(AbstractDataSource):
             list[Path]: The written output paths (Parquet for tabular,
                 GeoTIFF for raster), in order.
         """
+        # Built once, before the policy loop, so a missing-reader ImportError
+        # surfaces up front rather than being skipped per granule under warn.
         reader = self._reader() if self.OUTPUT_KIND == "tabular" else None
-        out: list[Path] = []
-        for rp in tqdm(
+        iterator = tqdm(
             products, disable=not self._show_progress, desc="nwm", unit="file"
-        ):
-            downloaded = self._fetch_one(rp)
-            if downloaded is None:
-                continue
+        )
+        results, failures = self._run_items(
+            iterator,
+            partial(self._subset_one, reader=reader),
+            errors=self._errors,
+            label="granule",
+            describe=_describe_granule,
+            fatal=(NotImplementedError,),
+        )
+        self._raise_if_all_failed(results, failures)
+        return [path for group in results for path in group]
+
+    def _subset_one(self, rp: RemoteProduct, *, reader: Any) -> list[Path]:
+        """Download one operational granule, then read + subset it.
+
+        A key not yet published returns an empty list (absent, not a failure).
+        A tabular product writes one Parquet table; a gridded product writes
+        one GeoTIFF per requested variable (so one granule can yield several
+        paths).
+
+        Args:
+            rp: One operational product from `_search`.
+            reader: The pyramids `LabeledDataset` class for a tabular product,
+                else `None`.
+
+        Returns:
+            list[Path]: The paths written for this granule (empty when the key
+                was not published).
+
+        Raises:
+            NotImplementedError: For a gridded variable the reader cannot
+                window (interleaved layer axis) — always propagated.
+            ValueError: When `sites=` was given for a gridded product.
+        """
+        result: list[Path] = []
+        downloaded = self._fetch_one(rp)
+        if downloaded is not None:
             product = self._catalog.get_product(rp.metadata["product"])
             if product.output_kind == "tabular":
                 # reader is built whenever OUTPUT_KIND == "tabular" (above).
@@ -747,15 +825,38 @@ class NWM(AbstractDataSource):
                 cube = reader.read_file(
                     str(downloaded), variables=self._requested[product.product]
                 )
-                out.append(
+                result = [
                     self._select_and_write(
                         cube, product, downloaded.stem, slice_time=False
                     )
-                )
+                ]
                 close_quietly(cube)
             else:
-                out.extend(self._subset_gridded_file(downloaded, product))
-        return out
+                result = self._subset_gridded_file(downloaded, product)
+        return result
+
+    def _raise_if_all_failed(
+        self, results: list[Any], failures: list[tuple[str, BaseException]]
+    ) -> None:
+        """Re-raise the first failure when every granule failed and none survived.
+
+        A whole-service outage (a dead bucket, rejected credentials) fails every
+        S3 key identically, so `"warn"` / `"ignore"` would otherwise report it
+        as an empty result. A key that was simply not published returns a result
+        (a `None`, or an empty path list for a subset), so it is never a failure
+        and never trips this. A partial failure keeps its survivors.
+
+        Args:
+            results: The per-granule results `_run_items` collected.
+            failures: The `(description, exception)` pairs `_run_items`
+                recorded.
+
+        Raises:
+            BaseException: The first recorded failure, when there were failures
+                and no result survived.
+        """
+        if failures and not results:
+            raise failures[0][1]
 
     def _client(self) -> Any:
         """Return the unsigned `boto3` S3 client for the public NWM bucket.
@@ -826,6 +927,7 @@ class NWM(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
+        errors: str = "warn",
     ) -> list[Path]:
         """Fetch the requested NWM data and return the written paths.
 
@@ -842,14 +944,34 @@ class NWM(AbstractDataSource):
         Args:
             progress_bar: Show a per-item progress bar. Defaults to
                 `True`.
+            errors: Partial-failure policy across the independent S3-key
+                granules:
+
+                * `"warn"` (default) — log each failed granule and return the
+                  paths from the granules that succeeded.
+                * `"raise"` — propagate the first granule failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed granules silently.
+
+                A key that is not published returns nothing for that granule
+                (absent, not a failure). A gridded subset / retrospective
+                `NotImplementedError` always propagates regardless of policy
+                (it is a request the backend cannot serve, not a per-granule
+                gap). A whole-service failure — every granule failing — re-
+                raises the first error under every policy rather than returning
+                an empty list.
 
         Returns:
             list[Path]: The written paths — whole-CONUS NetCDFs for a
                 plain operational request, or Parquet tables for a
                 subset / retrospective read. Empty when nothing in the
                 window was available.
+
+        Raises:
+            ValueError: If `errors` is not a recognised policy.
         """
         self._show_progress = progress_bar
+        self._errors = self.check_errors_policy(errors)
         return self._api_via_search_fetch()
 
 

@@ -61,6 +61,11 @@ from earthlens.radklim.catalog import Catalog, RadklimProduct
 GERMANY_ENVELOPE: tuple[float, float, float, float] = (1.0, 45.0, 18.5, 57.5)
 
 
+def _describe_granule(product: RemoteProduct) -> str:
+    """Render a granule product for the `_run_items` log lines (its id)."""
+    return repr(product.id)
+
+
 class RADKLIM(AbstractDataSource):
     """DWD RADKLIM / RADOLAN radar-precipitation backend (anonymous HTTPS).
 
@@ -369,22 +374,42 @@ class RADKLIM(AbstractDataSource):
         Each granule is streamed to `self.root_dir` under its own file name, with
         a leading-bytes check for the format (so a `200` error page never lands
         under a granule name). A `404` (a year not yet published, a granule that
-        rotated out mid-run) is logged and skipped.
+        rotated out mid-run) is logged and skipped — an absent item, not a
+        failure. Any other transport error on an independent granule is routed
+        through the `self._errors` partial-failure policy.
 
         Args:
             products: The granules from `_search`.
 
         Returns:
-            list[Path]: The written granule paths, in order.
+            list[Path]: The written granule paths of the granules that
+                succeeded, in order.
+
+        Raises:
+            Exception: The first granule's error when `errors="raise"`, or —
+                under any policy — when **every** attempted granule fails and
+                none is written (a whole-service failure re-raised rather than
+                returned as an empty list). A window where every granule merely
+                404s is a legitimate empty result, not a failure.
         """
-        out: list[Path] = []
-        for rp in tqdm(
-            products, disable=not self._show_progress, desc="radklim", unit="file"
-        ):
-            fetched = self._fetch_one(rp)
-            if fetched is not None:
-                out.append(fetched)
-        return out
+        results, failures = self._run_items(
+            tqdm(
+                products, disable=not self._show_progress, desc="radklim", unit="file"
+            ),
+            self._fetch_one,
+            errors=self._errors,
+            label="granule",
+            describe=_describe_granule,
+        )
+        # `_fetch_one` returns `None` for a 404 skip (an absent item), so filter
+        # those out — they are neither a written path nor a failure.
+        written = [path for path in results if path is not None]
+        if failures and not written:
+            # Every attempted granule failed with a non-404 transport error and
+            # nothing was written — a whole-service outage, not a per-granule
+            # gap. Re-raise the first error rather than return an empty list.
+            raise failures[0][1]
+        return written
 
     def _fetch_one(self, product: RemoteProduct) -> Path | None:
         """Download one granule, or return `None` when it is not published.
@@ -420,7 +445,7 @@ class RADKLIM(AbstractDataSource):
             raise
         return dest
 
-    def download(self, progress_bar: bool = True) -> list[Path]:
+    def download(self, progress_bar: bool = True, errors: str = "warn") -> list[Path]:
         """Fetch the requested granules and return the written paths.
 
         Runs the cheap `_search` (granule enumeration) then `_fetch`,
@@ -428,6 +453,21 @@ class RADKLIM(AbstractDataSource):
 
         Args:
             progress_bar: Show a per-granule progress bar. Defaults to `True`.
+            errors: Partial-failure policy across the independent granules:
+
+                * `"warn"` (default) — log each failed granule and return the
+                  paths of the granules that succeeded, with a summary.
+                * `"raise"` — propagate the first granule failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed granules silently.
+
+                A granule that merely 404s (not yet published) is always skipped,
+                under every policy — an absent item, not a failure. When every
+                attempted granule fails with a transport error and nothing is
+                written — a dead host, not a per-granule gap — the first error is
+                re-raised under every policy rather than returned as an empty
+                list; a partial failure still returns the survivors under
+                `"warn"`/`"ignore"`.
 
         Returns:
             list[Path]: The written granule paths — RADKLIM yearly NetCDF
@@ -435,6 +475,7 @@ class RADKLIM(AbstractDataSource):
                 nothing in the window was available.
         """
         self._show_progress = progress_bar
+        self._errors = self.check_errors_policy(errors)
         return cast("list[Path]", self._api_via_search_fetch())
 
 

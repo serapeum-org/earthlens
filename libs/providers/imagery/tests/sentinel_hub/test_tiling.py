@@ -10,6 +10,8 @@ import pytest
 
 from earthlens.sentinel_hub.backend import SentinelHub
 
+from .test_backend import _RaiseFromCall
+
 pytestmark = pytest.mark.sentinel_hub
 
 
@@ -126,3 +128,18 @@ class TestTiling:
         )
         backend.download()
         assert len(fake_sh.SentinelHubRequest.instances) == 1
+
+
+@pytest.mark.parametrize("policy", ["warn", "ignore"])
+def test_every_product_failing_raises_non_fatal(
+    fake_sh, output_dir: Path, monkeypatch, policy
+):
+    """When every tiling product fails, the first error is raised, never empty."""
+    backend = _tiling_backend(output_dir)
+    monkeypatch.setattr(
+        backend,
+        "_tiling_one",
+        _RaiseFromCall(backend._tiling_one, ValueError("all tiling down"), 1),
+    )
+    with pytest.raises(ValueError, match="all tiling down"):
+        backend.download(errors=policy)

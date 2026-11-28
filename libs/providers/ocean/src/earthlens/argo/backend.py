@@ -280,6 +280,9 @@ class ARGO(AbstractDataSource):
     ) -> pd.DataFrame:
         """Fetch the profiles, write the table, and return it.
 
+        Argo answers a whole selection in one `argopy` call, so there is no
+        per-item partial-failure policy (no `errors=` argument).
+
         Args:
             progress_bar: Accepted for signature parity with the other
                 backends. Argo issues one bulk `argopy` call, so there is

@@ -91,6 +91,19 @@ _SCOPES: frozenset[str] = frozenset({"countries", "global"})
 _LEVELS: frozenset[str] = frozenset({"national", "subnational"})
 
 
+def _describe_group(item: tuple[Any, Any]) -> str:
+    """Render a `(product, year, cohort)` group for the `_run_items` log lines.
+
+    Args:
+        item: The `(key, tiles)` pair whose localise step failed.
+
+    Returns:
+        str: The group key, rendered as text.
+    """
+    key, _group = item
+    return str(key)
+
+
 class WorldPop(AbstractDataSource):
     """Download WorldPop population + demographic products, localised via pyramids.
 
@@ -615,9 +628,18 @@ class WorldPop(AbstractDataSource):
                 per-window rasters replace per-year rasters when
                 `aggregate=` is set).
         """
-        localised: dict[tuple[str, int, tuple[str, int] | None], Path] = {
-            key: self._localise(group) for key, group in groups.items()
-        }
+        results, failures = self._run_items(
+            list(groups.items()),
+            self._localise_group,
+            errors=self._errors,
+            label="group",
+            describe=_describe_group,
+        )
+        if failures and not results:
+            # A whole-request failure localises nothing; re-raise the first
+            # rather than report it as an empty result.
+            raise failures[0][1]
+        localised: dict[tuple[str, int, tuple[str, int] | None], Path] = dict(results)
         tables = self._write_demographic_tables(localised)
         if self._aggregate_cfg is not None:
             rasters = self._aggregate_years(localised, self._aggregate_cfg)
@@ -625,6 +647,24 @@ class WorldPop(AbstractDataSource):
             rasters = list(localised.values())
         self._sweep_intermediates()
         return rasters + tables
+
+    def _localise_group(
+        self,
+        item: tuple[
+            tuple[str, int, tuple[str, int] | None], list[tuple[Path, RemoteProduct]]
+        ],
+    ) -> tuple[tuple[str, int, tuple[str, int] | None], Path]:
+        """Localise one `(product, year, cohort)` group — the `_run_items` body.
+
+        Args:
+            item: The `(key, tiles)` pair from `groups.items()`.
+
+        Returns:
+            tuple: The `(key, localised_path)` pair, reassembled into the
+                `localised` map by the caller.
+        """
+        key, group = item
+        return key, self._localise(group)
 
     def _sweep_intermediates(self) -> None:
         """Best-effort removal of leftover `*_merged.tif` mosaics.
@@ -903,6 +943,7 @@ class WorldPop(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
+        errors: str = "warn",
         *,
         force: bool = False,
     ) -> list[Path]:
@@ -915,6 +956,20 @@ class WorldPop(AbstractDataSource):
                 the **rasters** only — for demographic products the per-cohort
                 age/sex tables are still written per year (the table column is
                 not aggregated). Ignored by the archive products.
+            errors: Partial-failure policy across the independent
+                `(product, year, cohort)` groups:
+
+                * `"warn"` (default) — log each failed group and return the
+                  outputs from the groups that localised, with a summary.
+                * `"raise"` — propagate the first group failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed groups silently.
+
+                A whole-request failure — one that fails every group
+                identically — re-raises the first error under every policy
+                rather than returning an empty result. (It governs the
+                per-group localise step; the per-country tile download and
+                archive products keep their own error handling.)
             force: Re-fetch every raw file even when a complete one already
                 exists, bypassing the skip-if-exists check. Defaults to
                 `False`.
@@ -922,6 +977,7 @@ class WorldPop(AbstractDataSource):
         Returns:
             list[Path]: The written GeoTIFF / table paths.
         """
+        self._errors = self.check_errors_policy(errors)
         self._show_progress = progress_bar
         self._force = force
         self._aggregate_cfg = aggregate

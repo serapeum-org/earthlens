@@ -370,6 +370,91 @@ class TestFetch:
         assert b.download(progress_bar=False) == []
 
 
+class _RaiseFromCall:
+    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from `from_call`.
+
+    Hoisted to module scope (no nested functions); holds its own call counter.
+    `from_call=2` fails the second granule (a partial failure); `from_call=1`
+    fails every granule (a whole-service failure).
+    """
+
+    def __init__(self, real_fetch, exc, from_call=2):
+        self._real = real_fetch
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, product):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(product)
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent granules."""
+
+    def _two_granule_backend(self, tmp_path, monkeypatch, exc, from_call=2):
+        """A backend over two reproc archives, failing `_fetch_one` from `from_call`."""
+        b = _make(tmp_path, start="2023-01-01", end="2024-01-01", http=FakeHttp())
+        assert len(b._search()) == 2, "the two-year window should plan two archives"
+        monkeypatch.setattr(
+            b, "_fetch_one", _RaiseFromCall(b._fetch_one, exc, from_call)
+        )
+        return b
+
+    def test_raise_propagates_first_failure(self, tmp_path, monkeypatch):
+        """errors="raise" surfaces a per-granule exception, not the batch summary."""
+        b = self._two_granule_backend(tmp_path, monkeypatch, ValueError("granule boom"))
+        with pytest.raises(ValueError, match="granule boom"):
+            b.download(progress_bar=False, errors="raise")
+
+    def test_warn_returns_the_surviving_granule(self, tmp_path, monkeypatch):
+        """errors="warn" drops a per-granule failure and returns the survivor's path."""
+        b = self._two_granule_backend(tmp_path, monkeypatch, ValueError("granule boom"))
+        out = b.download(progress_bar=False, errors="warn")
+        assert len(out) == 1
+        assert out[0].exists()
+
+    def test_ignore_drops_failures_and_returns_survivor(self, tmp_path, monkeypatch):
+        """errors="ignore" drops a per-granule failure silently."""
+        b = self._two_granule_backend(tmp_path, monkeypatch, ValueError("granule boom"))
+        assert len(b.download(progress_bar=False, errors="ignore")) == 1
+
+    def test_default_policy_is_warn(self, tmp_path, monkeypatch):
+        """Omitting errors= defaults to warn — a per-granule failure is survived."""
+        b = self._two_granule_backend(tmp_path, monkeypatch, ValueError("granule boom"))
+        assert len(b.download(progress_bar=False)) == 1
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_granule_failing_raises(self, tmp_path, policy, monkeypatch):
+        """When every granule fails, the first error is raised — never a silent empty."""
+        b = self._two_granule_backend(
+            tmp_path, monkeypatch, ValueError("all granules down"), from_call=1
+        )
+        with pytest.raises(ValueError, match="all granules down"):
+            b.download(progress_bar=False, errors=policy)
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore", "raise"])
+    def test_all_404_is_empty_not_a_failure(self, tmp_path, policy):
+        """A window where every granule 404s is an empty result, never raised."""
+        http = FakeHttp(
+            missing=(
+                "YW2017.002_2023_netcdf.tar.gz",
+                "YW2017.002_2024_netcdf.tar.gz",
+            )
+        )
+        b = _make(tmp_path, start="2023-01-01", end="2024-01-01", http=http)
+        assert b.download(progress_bar=False, errors=policy) == []
+
+    def test_invalid_policy_rejected(self, tmp_path):
+        """An unrecognised errors= value is refused before any request."""
+        b = _make(tmp_path, start="2023-01-01", end="2024-01-01", http=FakeHttp())
+        with pytest.raises(ValueError, match="errors"):
+            b.download(progress_bar=False, errors="explode")
+
+
 class TestHelpers:
     """Tests for the module-level helpers."""
 

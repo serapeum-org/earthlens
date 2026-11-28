@@ -642,3 +642,104 @@ def test_no_xarray_or_zarr_import(name):
     ]
     offenders = [line for line in code_lines if any(line.startswith(b) for b in banned)]
     assert offenders == []
+
+
+# -- errors= partial-failure policy -----------------------------------------
+
+
+class _RaiseFromCall:
+    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from `from_call`.
+
+    Hoisted to module scope (no nested-function definitions); holds its own call
+    counter. `from_call=2` fails the second granule (a partial failure);
+    `from_call=1` fails every granule (a whole-service failure).
+    """
+
+    def __init__(self, real, exc, from_call=2):
+        self._real = real
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, product):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(product)
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent S3-key granules."""
+
+    def _two_granule_backend(self, make_nwm, seed_nwm, monkeypatch, exc, from_call=2):
+        """A two-granule operational backend whose fetch raises `exc` from `from_call`."""
+        nwm = make_nwm(cycles=[0, 12], steps=[1])
+        seed_nwm(nwm)
+        monkeypatch.setattr(
+            nwm, "_fetch_one", _RaiseFromCall(nwm._fetch_one, exc, from_call)
+        )
+        return nwm
+
+    def test_raise_propagates_first_failure(self, make_nwm, seed_nwm, monkeypatch):
+        """errors="raise" surfaces a per-granule exception, not a batch summary."""
+        nwm = self._two_granule_backend(
+            make_nwm, seed_nwm, monkeypatch, ValueError("granule boom")
+        )
+        with pytest.raises(ValueError, match="granule boom"):
+            nwm.download(progress_bar=False, errors="raise")
+
+    def test_warn_returns_the_surviving_granule(self, make_nwm, seed_nwm, monkeypatch):
+        """errors="warn" drops a non-fatal per-granule failure, keeps survivors."""
+        nwm = self._two_granule_backend(
+            make_nwm, seed_nwm, monkeypatch, ValueError("granule boom")
+        )
+        paths = nwm.download(progress_bar=False, errors="warn")
+        assert len(paths) == 1
+
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, make_nwm, seed_nwm, monkeypatch
+    ):
+        """errors="ignore" drops a non-fatal per-granule failure silently."""
+        nwm = self._two_granule_backend(
+            make_nwm, seed_nwm, monkeypatch, ValueError("granule boom")
+        )
+        assert len(nwm.download(progress_bar=False, errors="ignore")) == 1
+
+    def test_default_policy_is_warn(self, make_nwm, seed_nwm, monkeypatch):
+        """Omitting errors= defaults to warn — the surviving granule is kept."""
+        nwm = self._two_granule_backend(
+            make_nwm, seed_nwm, monkeypatch, ValueError("granule boom")
+        )
+        assert len(nwm.download(progress_bar=False)) == 1
+
+    def test_every_granule_failing_raises(self, make_nwm, seed_nwm, monkeypatch):
+        """When every granule fails, the first error is raised, never an empty list."""
+        nwm = self._two_granule_backend(
+            make_nwm,
+            seed_nwm,
+            monkeypatch,
+            ValueError("whole bucket down"),
+            from_call=1,
+        )
+        with pytest.raises(ValueError, match="whole bucket down"):
+            nwm.download(progress_bar=False, errors="warn")
+
+    def test_gridded_not_implemented_is_fatal_under_warn(
+        self, make_nwm, seed_nwm, monkeypatch
+    ):
+        """A NotImplementedError always propagates, even with a surviving granule."""
+        nwm = self._two_granule_backend(
+            make_nwm,
+            seed_nwm,
+            monkeypatch,
+            NotImplementedError("gridded nope"),
+            from_call=2,
+        )
+        with pytest.raises(NotImplementedError, match="gridded nope"):
+            nwm.download(progress_bar=False, errors="warn")
+
+    def test_invalid_policy_rejected(self, make_nwm):
+        """An unrecognised errors= value is refused before any request."""
+        with pytest.raises(ValueError, match="errors"):
+            make_nwm().download(progress_bar=False, errors="explode")

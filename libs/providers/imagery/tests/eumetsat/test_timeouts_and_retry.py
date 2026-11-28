@@ -246,7 +246,7 @@ def test_failed_bad_request_fails_fast_without_retry(fake_eumdac, tmp_path):
     backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
     cfg = TailorConfig()
     with pytest.raises(RuntimeError, match="FAILED"):
-        backend.download(progress_bar=False, tailor=cfg)
+        backend.download(progress_bar=False, tailor=cfg, errors="raise")
     assert len(fake_eumdac.tailor.submitted) == 1
 
 
@@ -263,7 +263,7 @@ def test_failed_infra_marker_exhausts_retry_budget(fake_eumdac, tmp_path, monkey
     backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
     cfg = TailorConfig()
     with pytest.raises(RuntimeError, match="FAILED"):
-        backend.download(progress_bar=False, tailor=cfg)
+        backend.download(progress_bar=False, tailor=cfg, errors="raise")
     assert len(fake_eumdac.tailor.submitted) == be.TAILOR_SUBMIT_RETRIES
     assert all(c.deleted == 1 for c in custs)
 
@@ -277,5 +277,5 @@ def test_killed_is_not_retried_even_with_infra_log(fake_eumdac, tmp_path):
     backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
     cfg = TailorConfig()
     with pytest.raises(RuntimeError, match="KILLED"):
-        backend.download(progress_bar=False, tailor=cfg)
+        backend.download(progress_bar=False, tailor=cfg, errors="raise")
     assert len(fake_eumdac.tailor.submitted) == 1

@@ -361,7 +361,7 @@ def test_tailor_non_done_terminal_raises_and_deletes(fake_eumdac, tmp_path, term
     fake_eumdac.tailor.customisation = cust
     backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
     with pytest.raises(RuntimeError, match=terminal):
-        backend.download(progress_bar=False, tailor=TailorConfig())
+        backend.download(progress_bar=False, tailor=TailorConfig(), errors="raise")
     assert cust.deleted == 1
     assert "boom-in-log" in str(cust.logfile)
 
@@ -373,7 +373,7 @@ def test_tailor_unknown_status_fails_fast(fake_eumdac, tmp_path):
     fake_eumdac.tailor.customisation = cust
     backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
     with pytest.raises(RuntimeError, match="INACTIVE"):
-        backend.download(progress_bar=False, tailor=TailorConfig())
+        backend.download(progress_bar=False, tailor=TailorConfig(), errors="raise")
     assert cust.deleted == 1
 
 
@@ -385,7 +385,7 @@ def test_tailor_timeout_raises_and_deletes(fake_eumdac, tmp_path, monkeypatch):
     fake_eumdac.tailor.customisation = cust
     backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
     with pytest.raises(TimeoutError, match="did not finish"):
-        backend.download(progress_bar=False, tailor=TailorConfig())
+        backend.download(progress_bar=False, tailor=TailorConfig(), errors="raise")
     assert cust.deleted == 1
 
 
@@ -404,7 +404,7 @@ def test_tailor_missing_logfile_uses_placeholder(fake_eumdac, tmp_path):
     fake_eumdac.tailor.customisation = cust
     backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
     with pytest.raises(RuntimeError, match="no customisation log"):
-        backend.download(progress_bar=False, tailor=TailorConfig())
+        backend.download(progress_bar=False, tailor=TailorConfig(), errors="raise")
     assert cust.deleted == 1
 
 
@@ -428,7 +428,7 @@ def test_tailor_delete_failure_does_not_mask_original_error(fake_eumdac, tmp_pat
     fake_eumdac.tailor.customisation = cust
     backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
     with pytest.raises(RuntimeError, match="FAILED"):
-        backend.download(progress_bar=False, tailor=TailorConfig())
+        backend.download(progress_bar=False, tailor=TailorConfig(), errors="raise")
     assert cust.deleted == 1
 
 
@@ -484,7 +484,7 @@ def test_tailor_submit_non_transient_raised_immediately(fake_eumdac, tmp_path):
     fake_eumdac.tailor.submit_errors = [ValueError("Invalid product-ID 'X'")]
     backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
     with pytest.raises(ValueError, match="Invalid product-ID"):
-        backend.download(progress_bar=False, tailor=TailorConfig())
+        backend.download(progress_bar=False, tailor=TailorConfig(), errors="raise")
     assert len(fake_eumdac.tailor.submitted) == 1
 
 
@@ -498,7 +498,7 @@ def test_tailor_submit_transient_exhausted_raises_runtime(
     fake_eumdac.tailor.submit_errors = [RuntimeError("502 Bad Gateway")] * 3
     backend = _backend(fake_eumdac, tmp_path, {"s3-olci-l1-efr": ["OLL1EFR"]})
     with pytest.raises(RuntimeError, match="transient attempts"):
-        backend.download(progress_bar=False, tailor=TailorConfig())
+        backend.download(progress_bar=False, tailor=TailorConfig(), errors="raise")
     assert len(fake_eumdac.tailor.submitted) == 3
 
 

@@ -20,6 +20,7 @@ shipped as package data — the token stays user-supplied.
 
 from __future__ import annotations
 
+from functools import partial
 from pathlib import Path
 from typing import Literal
 
@@ -207,7 +208,11 @@ class IUCN(AbstractDataSource):
         """Fetch every selector's assessments into one DataFrame.
 
         Routes each `variables` entry to the species (two-step) or country
-        v4 path, concatenates the rows, and warns the CC-BY-NC license.
+        v4 path under `self._errors`: a failed selector is logged and its rows
+        are dropped (`"warn"` / `"ignore"`), unless **every** selector failed,
+        in which case the first error is re-raised rather than returning an
+        empty table. Concatenates the surviving selectors' rows and warns the
+        CC-BY-NC license.
 
         Returns:
             pd.DataFrame: The assessment rows, columns per
@@ -216,9 +221,18 @@ class IUCN(AbstractDataSource):
         """
         assert self._auth is not None  # set by _initialize before _fetch_all runs
         token = self._auth.token
-        rows: list[dict] = []
-        for selector in self.vars:
-            rows.extend(self._fetch_selector(token, selector))
+        per_selector_rows, failures = self._run_items(
+            list(self.vars),
+            partial(self._fetch_selector, token),
+            errors=self._errors,
+            label="selector",
+        )
+        if failures and not per_selector_rows:
+            # A whole-request failure (a rejected token, a dead host) fails every
+            # selector identically; re-raise the first rather than report the
+            # outage as an empty table.
+            raise failures[0][1]
+        rows = [row for selector_rows in per_selector_rows for row in selector_rows]
         if rows:
             warn_license(
                 IUCN_LICENSE,
@@ -258,17 +272,32 @@ class IUCN(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
+        errors: str = "warn",
     ) -> pd.DataFrame:
         """Fetch the assessment records and return them as a DataFrame.
 
         Args:
             progress_bar: Accepted for signature parity; the REST shim has
                 no progress bar, so this is a no-op.
+            errors: Partial-failure policy across the independent selectors:
+
+                * `"warn"` (default) — log each failed selector and return the
+                  rows from the selectors that succeeded, with a summary.
+                * `"raise"` — propagate the first selector failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed selectors silently.
+
+                A whole-request failure — a rejected token, a dead host — fails
+                every selector identically, so when every selector fails the
+                first error is re-raised under every policy rather than returned
+                as an empty table. A partial failure (some selectors succeed)
+                still returns the survivors under `"warn"` / `"ignore"`.
 
         Returns:
             pd.DataFrame: The assessment rows. Written to a CSV/Parquet file
                 under `path` when `path` is set and rows are present.
         """
+        self._errors = self.check_errors_policy(errors)
         frame = self._fetch_all()
         if self._user_path and len(frame):
             written = self._write(frame)

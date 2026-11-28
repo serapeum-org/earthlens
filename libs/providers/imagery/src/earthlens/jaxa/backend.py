@@ -36,13 +36,32 @@ from pathlib import Path
 
 from pydantic import SecretStr
 
-from earthlens.base import OutputKind, date_windows, resolve_cadence, to_datetime
+from earthlens.base import (
+    AuthenticationError,
+    OutputKind,
+    date_windows,
+    resolve_cadence,
+    to_datetime,
+)
 from earthlens.base.abstractdatasource import (
     AbstractDataSource,
     TemporalExtent,
 )
 from earthlens.jaxa.auth import JaxaAuth, JaxaCredentials
 from earthlens.jaxa.catalog import Catalog, Dataset, JaxaProtocol
+
+
+def _describe_dataset(dataset: Dataset) -> str:
+    """Render a resolved dataset for the `_run_items` log lines.
+
+    Args:
+        dataset: One resolved catalog row from `self._resolved`.
+
+    Returns:
+        str: The dataset key, quoted.
+    """
+    return repr(getattr(dataset, "key", dataset))
+
 
 #: Maps an `EarthLens(temporal_resolution=...)` value to the pandas
 #: frequency alias used for `self.time.dates`. JAXA's three branches
@@ -302,74 +321,103 @@ class JAXA(AbstractDataSource):
         )
 
     def _api(self) -> list[Path]:
-        """Dispatch to the matching protocol branch.
+        """Dispatch each resolved dataset to the matching protocol branch.
+
+        Runs the one-time auth, then fetches each resolved dataset through
+        `_fetch_dataset` under the backend's `errors=` partial-failure
+        policy (`self._errors`): a dataset whose fetch fails is logged and
+        skipped under `"warn"` / `"ignore"`, propagated under `"raise"`,
+        while an `AuthenticationError` (a whole-service failure, not one
+        dataset's gap) is `fatal=` and propagates under every policy.
 
         Returns:
             list[Path]: One or more written paths per resolved dataset
                 — a COG for `jaxa-earth`, an HDF5 / GeoTIFF / NetCDF
                 product for `gportal` (depending on the mission), or
                 the 10 raw `.DAT.bz2` HSD segments per band per
-                10-minute slot for `ptree`.
+                10-minute slot for `ptree` — with the failed datasets'
+                paths absent under `"warn"` / `"ignore"`.
+
+        Raises:
+            ValueError: If `self._protocol` is not one of the three known
+                protocols (defensive — the constructor already rejects
+                anything else).
         """
-        out_dir = Path(self.path)
         self._auth.configure()
-        written: list[Path] = []
-        if self._protocol == "jaxa-earth":
-            from earthlens.jaxa._jaxa_earth import fetch_jaxa_earth
-
-            for ds in self._resolved:
-                written.extend(
-                    fetch_jaxa_earth(
-                        dataset=ds,
-                        space=self.space,
-                        time=self.time,
-                        resolution=self._resolution,
-                        bands=self._bands_override,
-                        out_dir=out_dir,
-                    )
-                )
-        elif self._protocol == "gportal":
-            from earthlens.jaxa._gportal import fetch_gportal
-
-            for ds in self._resolved:
-                written.extend(
-                    fetch_gportal(
-                        dataset=ds,
-                        space=self.space,
-                        time=self.time,
-                        auth=self._auth,
-                        out_dir=out_dir,
-                    )
-                )
-        elif self._protocol == "ptree":
-            from earthlens.jaxa._ptree import fetch_ptree
-
-            for ds in self._resolved:
-                written.extend(
-                    fetch_ptree(
-                        dataset=ds,
-                        space=self.space,
-                        time=self.time,
-                        auth=self._auth,
-                        out_dir=out_dir,
-                        bands=self._bands_override,
-                    )
-                )
-        else:
+        if self._protocol not in {"jaxa-earth", "gportal", "ptree"}:
             # Defensive: `JaxaProtocol` is a `Literal[...]` and the
             # constructor rejects anything else, so this only fires if a
             # future fourth protocol is added to the literal but not to
-            # `_api`. Failing loud beats silently routing to the last
-            # `else` branch (Round 2 L3).
+            # `_fetch_dataset`. Failing loud beats a silent miss (Round 2 L3).
             raise ValueError(
                 f"unhandled JAXA protocol {self._protocol!r}; add a "
                 "dispatch branch alongside jaxa-earth/gportal/ptree."
             )
+        results, failures = self._run_items(
+            self._resolved,
+            self._fetch_dataset,
+            errors=self._errors,
+            label="dataset",
+            describe=_describe_dataset,
+            fatal=(AuthenticationError,),
+        )
+        if failures and not results:
+            # Every dataset failed — a whole-service outage, not a per-dataset
+            # gap; re-raise rather than return an empty download.
+            raise failures[0][1]
+        written: list[Path] = []
+        for dataset_paths in results:
+            written.extend(dataset_paths)
         return written
+
+    def _fetch_dataset(self, dataset: Dataset) -> list[Path]:
+        """Fetch one resolved dataset via its protocol — the `_run_items` hook.
+
+        Args:
+            dataset: One resolved catalog row from `self._resolved`.
+
+        Returns:
+            list[Path]: The paths written for this dataset.
+        """
+        out_dir = Path(self.path)
+        if self._protocol == "jaxa-earth":
+            from earthlens.jaxa._jaxa_earth import fetch_jaxa_earth
+
+            paths = fetch_jaxa_earth(
+                dataset=dataset,
+                space=self.space,
+                time=self.time,
+                resolution=self._resolution,
+                bands=self._bands_override,
+                out_dir=out_dir,
+            )
+        elif self._protocol == "gportal":
+            from earthlens.jaxa._gportal import fetch_gportal
+
+            paths = fetch_gportal(
+                dataset=dataset,
+                space=self.space,
+                time=self.time,
+                auth=self._auth,
+                out_dir=out_dir,
+            )
+        else:
+            from earthlens.jaxa._ptree import fetch_ptree
+
+            paths = fetch_ptree(
+                dataset=dataset,
+                space=self.space,
+                time=self.time,
+                auth=self._auth,
+                out_dir=out_dir,
+                bands=self._bands_override,
+            )
+        return list(paths)
 
     def download(
         self,
         progress_bar: bool = True,
+        errors: str = "warn",
     ) -> list[Path]:
         """Fetch the requested datasets and return the written paths.
 
@@ -378,10 +426,22 @@ class JAXA(AbstractDataSource):
                 each branch prints its own progress lines today
                 (jaxa-earth via `jaxa.earth`, gportal via the `gportal`
                 SDK, ptree via one segment-path write per FTP transfer).
+            errors: Partial-failure policy across the independent datasets:
+
+                * `"warn"` (default) — log each failed dataset and return the
+                  paths of the datasets that succeeded.
+                * `"raise"` — propagate the first dataset failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed datasets silently.
+
+                A whole-service failure — a rejected credential, a dead host
+                — surfaces as an `AuthenticationError` re-raised under every
+                policy (`fatal=`), never swallowed as an empty result.
 
         Returns:
             list[Path]: One or more files per resolved dataset, in
-                request order.
+                request order (the failed datasets' paths absent under
+                `"warn"` / `"ignore"`).
 
         Examples:
             - Passing `aggregate=` raises because per-date stacks are not
@@ -403,4 +463,5 @@ class JAXA(AbstractDataSource):
                 ```
         """
         del progress_bar
+        self._errors = self.check_errors_policy(errors)
         return self._api()
