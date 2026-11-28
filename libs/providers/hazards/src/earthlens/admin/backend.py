@@ -116,6 +116,12 @@ class AdminBoundaries(AbstractDataSource):
     #: / `end` is legal here.
     REQUIRES_TIME_WINDOW = False
 
+    #: Providers whose license note has already been logged this run. Reset at
+    #: the start of every `download` / `_fetch` so each provider is noted once
+    #: per download; declared here (no shared mutable default) so `_fetch_one`
+    #: can read it with a known type.
+    _logged_licenses: set[str]
+
     def __init__(
         self,
         variables: list[str] | dict[str, list[str]],
@@ -301,10 +307,11 @@ class AdminBoundaries(AbstractDataSource):
     def _fetch(self, products: list[RemoteProduct]) -> list[FeatureCollection]:
         """Resolve and read each product's boundary layer into a FeatureCollection.
 
-        Routes on the dataset's `provider`, builds the source URL (the
-        geoBoundaries two-step resolve happens here), reads it through
-        `read_vector` (pyramids, normalised to EPSG:4326), and logs each
-        source's license once per provider (`G7`).
+        The whole-batch path used by `_api()`; `download` instead drives the
+        per-dataset `_fetch_one` hook through `_search_fetch_each` so a
+        partial-failure policy applies. Lazy so a `limit=` stops the work: a
+        product past the cap is never resolved or read, rather than downloaded
+        and then trimmed away.
 
         Args:
             products: The products returned by `_search`.
@@ -312,23 +319,23 @@ class AdminBoundaries(AbstractDataSource):
         Returns:
             list[FeatureCollection]: One collection per product, in order.
         """
-        logged_licenses: set[str] = set()
-        # Lazy so a `limit=` stops the work: a product past the cap is never
-        # resolved or read, rather than downloaded and then trimmed away.
+        self._logged_licenses = set()
         return self._take_limited(
-            (self._read_product(product, logged_licenses) for product in products),
+            (self._fetch_one(product) for product in products),
             limit=self._limit,
         )
 
-    def _read_product(
-        self, product: RemoteProduct, logged_licenses: set[str]
-    ) -> FeatureCollection:
+    def _fetch_one(self, product: RemoteProduct) -> FeatureCollection:
         """Resolve one product's URL and read its boundary layer.
+
+        Routes on the dataset's `provider`, builds the source URL (the
+        geoBoundaries two-step resolve happens here), reads it through
+        `read_vector` (pyramids, normalised to EPSG:4326), and logs each
+        source's license once per provider (`G7`) via `self._logged_licenses`,
+        which `download` / `_fetch` reset at the start of each run.
 
         Args:
             product: One product from `_search`.
-            logged_licenses: Providers already logged this call; mutated so
-                each provider's license note is emitted once per download.
 
         Returns:
             FeatureCollection: The dataset's features, normalised to EPSG:4326.
@@ -336,9 +343,9 @@ class AdminBoundaries(AbstractDataSource):
         dataset: Dataset = product.metadata["dataset"]
         url = self._resolve_url(dataset)
         logger.info(f"Fetching {dataset.id} from {dataset.provider} ({url})")
-        if dataset.provider not in logged_licenses:
+        if dataset.provider not in self._logged_licenses:
             logger.info(f"{dataset.provider} license: {dataset.license_note}")
-            logged_licenses.add(dataset.provider)
+            self._logged_licenses.add(dataset.provider)
         collection = read_vector(url)
         logger.info(f"{dataset.id}: read {len(collection)} feature(s)")
         return collection
@@ -384,6 +391,7 @@ class AdminBoundaries(AbstractDataSource):
         self,
         progress_bar: bool = True,
         limit: int | None = None,
+        errors: str = "warn",
     ) -> FeatureCollection:
         """Fetch the requested administrative boundaries and return the polygons.
 
@@ -393,18 +401,39 @@ class AdminBoundaries(AbstractDataSource):
         collection (always EPSG:4326).
 
         Args:
-            progress_bar: Accepted for signature parity with the other
-                backends.
+            progress_bar: Show a per-dataset progress bar. Defaults to `True`.
             limit: Cap on the total features returned, across every requested
                 dataset. Applied as each dataset is read, so a dataset past the
                 cap is never fetched. `None` (the default) reads everything.
+            errors: Partial-failure policy across the independent datasets:
+
+                * `"warn"` (default) — log each dataset that fails to read and
+                  return the polygons from the datasets that succeeded, with a
+                  summary.
+                * `"raise"` — propagate the first dataset failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed datasets silently.
+
+                Because every dataset reads from a different public source, a
+                failure usually means one source is down, not the request is
+                wrong. A whole-request failure — every requested dataset fails —
+                re-raises the first error under every policy rather than
+                returning an empty result.
 
         Returns:
             FeatureCollection: The boundary polygons, CRS EPSG:4326. Empty
                 (schema-only) when nothing was fetched.
         """
         self._limit = self.check_limit(limit)
-        collections = self._api()
+        self._errors = self.check_errors_policy(errors)
+        self._logged_licenses = set()
+        collections = self._search_fetch_each(
+            progress_bar=progress_bar,
+            desc="admin datasets",
+            unit="dataset",
+            errors=self._errors,
+            raise_if_all_failed=True,
+        )
         collection = self._combine(collections)
         if len(collection) and self._should_write:
             out_path = self._write(collection)

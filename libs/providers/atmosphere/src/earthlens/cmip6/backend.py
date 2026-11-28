@@ -43,6 +43,11 @@ from earthlens.cmip6.catalog import Catalog
 from earthlens.cmip6.resolver import ResolvedStore, StoreResolver
 
 
+def _describe_store(product: RemoteProduct) -> str:
+    """Render a store product for the `_run_items` log lines (its slug)."""
+    return repr(product.id)
+
+
 class CMIP6(AbstractDataSource):
     """CMIP6 climate-projections backend (raw archive on `gs://cmip6`).
 
@@ -242,13 +247,20 @@ class CMIP6(AbstractDataSource):
 
         For each store: map the `[start, end]` window to an integer time-index
         range (unless `whole_time`), then read the gridded `(variable, time,
-        bbox)` window through pyramids and write it to NetCDF.
+        bbox)` window through pyramids and write it to NetCDF. The per-store
+        writes are independent, so each is run under the `self._errors`
+        partial-failure policy.
 
         Args:
             products: The products from `_search`.
 
         Returns:
-            list[Path]: One written NetCDF path per store, in order.
+            list[Path]: One written NetCDF path per surviving store, in order.
+
+        Raises:
+            Exception: The first store's error when `errors="raise"`, or — under
+                any policy — when **every** store fails (a whole-archive failure
+                re-raised rather than returned as an empty list).
         """
         bbox = self._bbox()
         if bbox is None:
@@ -257,26 +269,42 @@ class CMIP6(AbstractDataSource):
                 f"{self._variable_id}/{self._experiment_id}; pass lat_lim/lon_lim "
                 "to subset (CMIP6 stores can be large)."
             )
-        out: list[Path] = []
-        for product in tqdm(
-            products, disable=not self._show_progress, desc="cmip6", unit="store"
-        ):
-            store: ResolvedStore = product.metadata["store"]
-            time_sel = self._time_selector(store)
-            stem = accessor.store_output_stem(
-                store, self.time.start_date, self.time.end_date
-            )
-            out_path = self.root_dir / f"{stem}.nc"
-            out.append(
-                accessor.write_subset(
-                    store.zstore,
-                    self._variable_id,
-                    bbox=bbox,
-                    time=time_sel,
-                    out_path=out_path,
-                )
-            )
-        return out
+        results, failures = self._run_items(
+            tqdm(products, disable=not self._show_progress, desc="cmip6", unit="store"),
+            self._fetch_one,
+            errors=self._errors,
+            label="store",
+            describe=_describe_store,
+        )
+        if failures and not results:
+            # Every store failed — a whole-archive outage, not a per-store gap.
+            # Re-raise the first error rather than return an empty list.
+            raise failures[0][1]
+        return results
+
+    def _fetch_one(self, product: RemoteProduct) -> Path:
+        """Write one resolved store's bbox/time NetCDF subset.
+
+        Args:
+            product: One `RemoteProduct` from `_search`, carrying the resolved
+                store in `metadata["store"]`.
+
+        Returns:
+            Path: The written NetCDF path for this store.
+        """
+        store: ResolvedStore = product.metadata["store"]
+        time_sel = self._time_selector(store)
+        stem = accessor.store_output_stem(
+            store, self.time.start_date, self.time.end_date
+        )
+        out_path = self.root_dir / f"{stem}.nc"
+        return accessor.write_subset(
+            store.zstore,
+            self._variable_id,
+            bbox=self._bbox(),
+            time=time_sel,
+            out_path=out_path,
+        )
 
     def _time_selector(
         self, store: ResolvedStore
@@ -311,6 +339,7 @@ class CMIP6(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
+        errors: str = "warn",
     ) -> list[Path]:
         """Fetch the requested CMIP6 subset(s) and return the written paths.
 
@@ -320,14 +349,27 @@ class CMIP6(AbstractDataSource):
 
         Args:
             progress_bar: Show a per-store progress bar. Defaults to `True`.
+            errors: Partial-failure policy across the resolved stores:
+
+                * `"warn"` (default) — log each failed store and return the
+                  paths of the stores that succeeded, with a summary.
+                * `"raise"` — propagate the first store failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed stores silently.
+
+                When every store fails — a dead bucket, not a per-store gap —
+                the first error is re-raised under every policy rather than
+                returned as an empty list; a partial failure still returns the
+                survivors under `"warn"`/`"ignore"`.
 
         Returns:
-            list[Path]: The written NetCDF paths, one per resolved store (never
-                empty — a facet tuple that matches no store raises rather than
-                returning an empty list).
+            list[Path]: The written NetCDF paths, one per surviving store (a
+                facet tuple that matches no store raises rather than returning an
+                empty list).
 
         Raises:
             ValueError: If the facet tuple matches no store.
         """
         self._show_progress = progress_bar
+        self._errors = self.check_errors_policy(errors)
         return self._api_via_search_fetch()

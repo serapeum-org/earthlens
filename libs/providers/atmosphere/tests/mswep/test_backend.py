@@ -593,3 +593,91 @@ class TestNoDecode:
             text = module.read_text(encoding="utf-8")
             assert "import xarray" not in text, module.name
             assert "import netCDF4" not in text, module.name
+
+
+class _RaiseFromCall:
+    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from `from_call`.
+
+    Hoisted to module scope (no nested functions); holds its own call counter.
+    `from_call=2` fails the second granule (a partial failure); `from_call=1`
+    fails every granule (a whole-service failure).
+    """
+
+    def __init__(self, real_fetch, exc, from_call=2):
+        self._real = real_fetch
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, product):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(product)
+
+
+def _download_quiet(source, **kwargs):
+    """Call download(**kwargs) while suppressing the always-emitted licence warning."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", LicenseWarning)
+        return source.download(progress_bar=False, **kwargs)
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent granules."""
+
+    def _two_granule_backend(self, build, monkeypatch, exc, from_call=2):
+        """A backend over two granules, failing `_fetch_one` from `from_call`."""
+        source = build()
+        assert len(source._search()) == 2, "default build should plan two granules"
+        monkeypatch.setattr(
+            source, "_fetch_one", _RaiseFromCall(source._fetch_one, exc, from_call)
+        )
+        return source
+
+    def test_raise_propagates_first_failure(self, build, monkeypatch):
+        """errors="raise" surfaces a per-granule exception, not the batch summary."""
+        source = self._two_granule_backend(
+            build, monkeypatch, ValueError("granule boom")
+        )
+        with pytest.raises(ValueError, match="granule boom"):
+            _download_quiet(source, errors="raise")
+
+    def test_warn_returns_the_surviving_granule(self, build, monkeypatch):
+        """errors="warn" drops a per-granule failure and returns the survivor's path."""
+        source = self._two_granule_backend(
+            build, monkeypatch, ValueError("granule boom")
+        )
+        paths = _download_quiet(source, errors="warn")
+        assert len(paths) == 1
+        assert paths[0].exists()
+
+    def test_ignore_drops_failures_and_returns_survivor(self, build, monkeypatch):
+        """errors="ignore" drops a per-granule failure silently."""
+        source = self._two_granule_backend(
+            build, monkeypatch, ValueError("granule boom")
+        )
+        assert len(_download_quiet(source, errors="ignore")) == 1
+
+    def test_default_policy_is_warn(self, build, monkeypatch):
+        """Omitting errors= defaults to warn — a per-granule failure is survived."""
+        source = self._two_granule_backend(
+            build, monkeypatch, ValueError("granule boom")
+        )
+        assert len(_download_quiet(source)) == 1
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_granule_failing_raises(self, build, policy, monkeypatch):
+        """When every granule fails, the first error is raised — never a silent empty."""
+        source = self._two_granule_backend(
+            build, monkeypatch, ValueError("all granules down"), from_call=1
+        )
+        with pytest.raises(ValueError, match="all granules down"):
+            _download_quiet(source, errors=policy)
+
+    def test_invalid_policy_rejected(self, build):
+        """An unrecognised errors= value is refused before any request."""
+        source = build()
+        with pytest.raises(ValueError, match="errors"):
+            _download_quiet(source, errors="explode")

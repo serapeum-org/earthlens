@@ -1652,16 +1652,18 @@ class AbstractDataSource(ABC):
         — while single-shot backends propagate the error.
 
         The backends whose batch is a genuine loop over independent items
-        (`chc`, `cmems`, `ecmwf`, `fdsn`, `nwp`, `radar`, `soilgrids`) make
-        that policy caller-controllable with an explicit
+        make that policy caller-controllable with an explicit
         `errors="warn" | "raise" | "ignore"` argument, routed through
-        `check_errors_policy` and `_run_items`. A backend whose
-        `download` does not take `errors=` has nothing to apply it to — it
-        issues one request, or its loop needs per-failure recovery the
-        shared helper cannot express (chc re-opens its FTP session between
-        failed dates). So **check the backend's own `download` signature**
-        rather than assuming; `_search_fetch_each` also takes
-        `errors=` for backends composed from it.
+        `check_errors_policy` and one of the two shared loops: the eager
+        `_run_items` (`chc`, `cmems`, `ecmwf`, `fdsn`, `nwp`, `radar`,
+        `soilgrids`) or the search-and-fetch-each `_search_fetch_each`
+        (`firms`, `sensor_community`). A backend whose `download` does not
+        take `errors=` has nothing to apply it to — it issues one request,
+        or its loop needs per-failure recovery the shared helper cannot
+        express (chc re-opens its FTP session between failed dates). So
+        **check the backend's own `download` signature** rather than
+        assuming; `_search_fetch_each` takes `errors=` for backends
+        composed from it.
         """
 
     def _api(self, *args: Any, **kwargs: Any) -> Any:
@@ -2335,6 +2337,7 @@ class AbstractDataSource(ABC):
         desc: str | None = None,
         unit: str = "item",
         errors: str | None = None,
+        raise_if_all_failed: bool = False,
         label: str = "product",
     ) -> list[Any]:
         """C3 composition with an optional per-product `tqdm` progress bar.
@@ -2356,6 +2359,14 @@ class AbstractDataSource(ABC):
                 `download` accepts `errors=`. `None` — the default —
                 propagates the first failure, which is what a caller that
                 never opted into a policy already expects.
+            raise_if_all_failed: When `True`, re-raise the first failure if
+                `errors` let the batch continue (`"warn"`/`"ignore"`) but
+                **every** attempted product failed and none survived. This
+                is the type-agnostic way to tell a whole-service failure (a
+                rejected credential, an exhausted quota, a dead host — which
+                fails every product identically) from a per-product gap:
+                partial failures still return the survivors, but a total
+                failure is reported as the error, never as an empty result.
             label: Noun for the `_run_items` log lines when a policy
                 is in force.
 
@@ -2409,6 +2420,13 @@ class AbstractDataSource(ABC):
             )
         finally:
             iterator.close()
+        if raise_if_all_failed and failures and not results:
+            # A whole-service failure (bad credential, quota, dead host) fails
+            # every product identically, so `warn`/`ignore` would otherwise
+            # report the outage as an empty result. Re-raise the first failure
+            # rather than return nothing; a partial failure (some survived) is
+            # left to the policy.
+            raise failures[0][1]
         if failures and policy == "warn":
             # Counted against the products actually attempted, not the whole
             # planned list: a cap can end the sweep early, and "3 of 400 failed"

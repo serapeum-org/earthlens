@@ -1559,7 +1559,7 @@ class TestExportViaBatch:
         gee.client.export_image.next_task_states = ["FAILED"]
         gee.client.export_image.next_task_error = "out of quota"
         with pytest.raises(RuntimeError, match="ended FAILED: out of quota"):
-            gee.download(progress_bar=False)
+            gee.download(progress_bar=False, errors="raise")
 
     def test_task_is_started_and_polled(self, make_gee):
         """`wait_for_task` calls `task.start()` and then polls `task.status()`."""
@@ -1981,7 +1981,7 @@ class TestApi:
             scale=30.0,
         )
         with pytest.raises(ValueError, match=r"32,?768-px") as caught:
-            gee.download(progress_bar=False)
+            gee.download(progress_bar=False, errors="raise")
         message = str(caught.value)
         # The message names the estimated dimensions and the per-axis cap the
         # request tripped, and offers a way out rather than only refusing.
@@ -2095,7 +2095,7 @@ class TestAutoSplit:
         """`auto_split=False` (the default) preserves the historical guard."""
         gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=30.0)
         with pytest.raises(ValueError, match="auto_split=True"):
-            gee.download(progress_bar=False)
+            gee.download(progress_bar=False, errors="raise")
 
     def test_ctor_arg_persists(self, make_gee):
         """`auto_split=True` is captured on the instance."""
@@ -5468,3 +5468,112 @@ class TestPreview:
         )
         with pytest.raises(ValueError, match="single dataset"):
             gee.preview()
+
+
+class _RaiseFromCall:
+    """A `_download_dataset` stand-in raising `exc` from the `from_call`-th call.
+
+    Holds its own call counter; `from_call=2` fails the second dataset (a
+    partial failure), `from_call=1` fails every dataset (a whole-service
+    failure).
+    """
+
+    def __init__(self, real, exc, from_call=2):
+        self._real = real
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, *args, **kwargs):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(*args, **kwargs)
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent datasets."""
+
+    _TWO = {"USGS/SRTMGL1_003": ["elevation"], "NASA/NASADEM_HGT/001": ["elevation"]}
+
+    def _two_dataset_gee(self, make_gee, monkeypatch, exc, from_call=2):
+        """A GEE over two DEM datasets, raising `exc` from `from_call`."""
+        # Keep the surviving dataset on the Earth Engine getDownloadURL path
+        # (faked) rather than the EEDAI reader, which needs a real key file.
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
+        gee = make_gee(variables=self._TWO)
+        monkeypatch.setattr(
+            gee,
+            "_download_dataset",
+            _RaiseFromCall(gee._download_dataset, exc, from_call),
+        )
+        return gee
+
+    def test_raise_propagates_first_failure(self, make_gee, monkeypatch):
+        """errors="raise" surfaces a per-dataset exception, not the batch summary."""
+        gee = self._two_dataset_gee(make_gee, monkeypatch, ValueError("dataset boom"))
+        with pytest.raises(ValueError, match="dataset boom"):
+            gee.download(progress_bar=False, errors="raise")
+
+    def test_warn_returns_the_surviving_dataset(self, make_gee, monkeypatch):
+        """errors="warn" drops a non-fatal per-dataset failure and returns survivors."""
+        gee = self._two_dataset_gee(make_gee, monkeypatch, ValueError("dataset boom"))
+        results = gee.download(progress_bar=False, errors="warn")
+        assert len(results) >= 1, (
+            f"expected the surviving dataset's outputs, got {results}"
+        )
+
+    def test_ignore_drops_failures_and_returns_survivor(self, make_gee, monkeypatch):
+        """errors="ignore" drops a non-fatal per-dataset failure silently."""
+        gee = self._two_dataset_gee(make_gee, monkeypatch, ValueError("dataset boom"))
+        results = gee.download(progress_bar=False, errors="ignore")
+        assert len(results) >= 1
+
+    def test_default_policy_is_warn(self, make_gee, monkeypatch):
+        """Omitting errors= defaults to warn — a non-fatal dataset failure survives."""
+        gee = self._two_dataset_gee(make_gee, monkeypatch, ValueError("dataset boom"))
+        results = gee.download(progress_bar=False)
+        assert len(results) >= 1
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_auth_error_propagates_under_any_policy(
+        self, make_gee, monkeypatch, policy
+    ):
+        """A whole-service AuthenticationError propagates even under warn/ignore."""
+        from earthlens.gee.backend import AuthenticationError
+
+        gee = self._two_dataset_gee(
+            make_gee, monkeypatch, AuthenticationError("key revoked"), from_call=1
+        )
+        with pytest.raises(AuthenticationError, match="key revoked"):
+            gee.download(progress_bar=False, errors=policy)
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_dataset_failing_raises_non_fatal(
+        self, make_gee, monkeypatch, policy
+    ):
+        """When every dataset fails, the first error is raised, never empty."""
+        gee = self._two_dataset_gee(
+            make_gee, monkeypatch, ValueError("all datasets down"), from_call=1
+        )
+        with pytest.raises(ValueError, match="all datasets down"):
+            gee.download(progress_bar=False, errors=policy)
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_bucket_failing_raises_non_fatal(self, make_gee, monkeypatch, policy):
+        """When every time-bucket of a dataset fails, the per-bucket guard re-raises."""
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
+        gee = make_gee(variables={"USGS/SRTMGL1_003": ["elevation"]})
+        monkeypatch.setattr(
+            gee,
+            "_api_for_unit",
+            _RaiseFromCall(gee._api_for_unit, ValueError("all buckets down"), 1),
+        )
+        with pytest.raises(ValueError, match="all buckets down"):
+            gee.download(progress_bar=False, errors=policy)
+
+    def test_invalid_policy_rejected(self, make_gee):
+        """An unrecognised errors= value is refused before any export."""
+        with pytest.raises(ValueError, match="errors"):
+            make_gee().download(progress_bar=False, errors="explode")

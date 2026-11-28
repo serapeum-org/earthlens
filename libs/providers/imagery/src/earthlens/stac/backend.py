@@ -36,6 +36,7 @@ from shapely.geometry import box, shape
 from earthlens.base import (
     CADENCE_ALIASES,
     AbstractDataSource,
+    AuthenticationError,
     LazyClientMixin,
     OutputKind,
     RemoteProduct,
@@ -569,21 +570,61 @@ class STAC(LazyClientMixin, AbstractDataSource):
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
         """Mosaic the matched items per `(collection, date)` and write COGs.
 
-        For each group: per requested band, collect the **signed** hrefs of the
-        tiles covering the bbox — resolved through the signer's preferred
-        `alternate-assets` mirror where it has one, since an endpoint's canonical
-        href is not always the copy its credentials can read — reproject
-        mismatched-CRS tiles to a common CRS
-        (`merge_rasters` does not reproject), mosaic, stack the bands, crop to
-        the AOI, and write one COG. The merge / stack calls run inside
-        `CloudConfig(extra=signer.gdal_env())` because those helpers read URLs
-        directly and have no signer hook.
+        Fetches each `(collection, date, bbox)` group through `_fetch_group`
+        under the backend's `errors=` partial-failure policy (`self._errors`):
+        a group whose mosaic / write fails is logged and skipped under
+        `"warn"` / `"ignore"`, propagated under `"raise"`, while an
+        `AuthenticationError` (a whole-endpoint credential failure, not one
+        group's gap) is `fatal=` and propagates under every policy.
 
         Args:
             products: The list returned by `_search`.
 
         Returns:
-            The written COG paths, one per `(collection, date)` group.
+            The written COG paths, one per `(collection, date)` group (the
+            failed groups' paths absent under `"warn"` / `"ignore"`).
+        """
+        # (collection_key, date, half index, path) for each written COG, so
+        # download(aggregate=) can group + window them without re-parsing names.
+        self._written = []
+        self._multi = len(self._aoi_bboxes) > 1
+        assert self._catalog is not None  # set in _initialize
+        assert self._endpoint is not None  # resolved in _initialize
+        results, failures = self._run_items(
+            list(_group_products(products)),
+            self._fetch_group,
+            errors=self._errors,
+            label="mosaic",
+            describe=_describe_group,
+            fatal=(AuthenticationError,),
+        )
+        if failures and not results:
+            # Every mosaic failed — a whole-service outage, not a per-mosaic
+            # gap; re-raise rather than report it as an empty download.
+            raise failures[0][1]
+        logger.info(f"STAC download: {len(results)} COG(s) written to {self.root_dir}")
+        return results
+
+    def _fetch_group(
+        self, item: tuple[tuple[str, str, tuple], list[RemoteProduct]]
+    ) -> Path:
+        """Mosaic + write one `(collection, date, bbox)` group — the `_run_items` hook.
+
+        For the group: per requested band, collect the **signed** hrefs of the
+        tiles covering the bbox — resolved through the signer's preferred
+        `alternate-assets` mirror where it has one, since an endpoint's canonical
+        href is not always the copy its credentials can read — reproject
+        mismatched-CRS tiles to a common CRS (`merge_rasters` does not
+        reproject), mosaic, stack the bands, crop to the AOI, and write one COG.
+        The merge / stack calls run inside `CloudConfig(extra=signer.gdal_env())`
+        because those helpers read URLs directly and have no signer hook.
+
+        Args:
+            item: One `((collection_key, date, bbox_key), group)` pair from
+                `_group_products`.
+
+        Returns:
+            Path: The written COG for this group.
         """
         from pyramids.base.remote import CloudConfig
         from pyramids.dataset.cog import write_cog
@@ -592,86 +633,78 @@ class STAC(LazyClientMixin, AbstractDataSource):
 
         from earthlens.stac.signers import alternate_preference_for
 
-        out: list[Path] = []
-        # (collection_key, date, half index, path) for each written COG, so
-        # download(aggregate=) can group + window them without re-parsing names.
-        self._written = []
-        multi = len(self._aoi_bboxes) > 1
-        assert self._catalog is not None  # set in _initialize
-        assert self._endpoint is not None  # resolved in _initialize
-        for (collection_key, date, bbox_key), group in _group_products(products):
-            # Per-collection signer (e.g. requester-pays for usgs-landsat) — its
-            # GDAL env must be active for the remote reads inside merge_rasters.
-            signer = self._signer_for(collection_key)
-            # Which `alternate-assets` mirror this signer must read instead of the
-            # asset's canonical href. Requester-pays Landsat publishes a canonical
-            # HTTPS href that 302s to the EROS login (unreadable with an AWS key
-            # pair) alongside a readable `s3://` alternate; `None` keeps the
-            # canonical href, and resolved_href falls back to it for any asset
-            # that publishes no such alternate.
-            alternate = alternate_preference_for(signer)
-            with CloudConfig(extra=signer.gdal_env()):
-                idx = self._aoi_bboxes.index(bbox_key) if multi else 0
-                assets = group[0].metadata["assets"]
-                band_paths: list[Path] = []
-                target_crs = self._target_crs(group)
-                nodata = self._nodata_for(collection_key, assets)
-                # Endpoint-namespaced keys contain "/"; flatten for filenames so
-                # they don't create phantom subdirectories.
-                safe_key = safe_filename(collection_key)
-                # Only the item lookup takes the endpoint's own key (CDSE splits
-                # Sentinel-2 per resolution, so `B04` is `B04_10m` there).
-                # `assets` itself stays in the catalog's naming, so the nodata
-                # lookup and the written band names still match. Resolved once
-                # for the whole list, which is the shape resolve_assets takes.
-                item_keys = self._catalog.resolve_assets(
-                    self._endpoint, collection_key, assets
-                )
-                for band, item_key in zip(assets, item_keys, strict=True):
-                    # resolved_href resolves the asset href and applies the
-                    # signer's sign_href (SAS graft / CDSE /vsis3 rewrite /
-                    # no-op for requester-pays); _to_vsi then normalises a
-                    # left-over s3:// to the GDAL /vsis3/ path.
-                    hrefs = [
-                        _to_vsi(
-                            resolved_href(
-                                p.metadata["item"],
-                                item_key,
-                                signer=signer,
-                                alternate=alternate,
-                            )
+        (collection_key, date, bbox_key), group = item
+        multi = self._multi
+        # Per-collection signer (e.g. requester-pays for usgs-landsat) — its
+        # GDAL env must be active for the remote reads inside merge_rasters.
+        signer = self._signer_for(collection_key)
+        # Which `alternate-assets` mirror this signer must read instead of the
+        # asset's canonical href. Requester-pays Landsat publishes a canonical
+        # HTTPS href that 302s to the EROS login (unreadable with an AWS key
+        # pair) alongside a readable `s3://` alternate; `None` keeps the
+        # canonical href, and resolved_href falls back to it for any asset
+        # that publishes no such alternate.
+        alternate = alternate_preference_for(signer)
+        with CloudConfig(extra=signer.gdal_env()):
+            idx = self._aoi_bboxes.index(bbox_key) if multi else 0
+            assets = group[0].metadata["assets"]
+            band_paths: list[Path] = []
+            target_crs = self._target_crs(group)
+            nodata = self._nodata_for(collection_key, assets)
+            # Endpoint-namespaced keys contain "/"; flatten for filenames so
+            # they don't create phantom subdirectories.
+            safe_key = safe_filename(collection_key)
+            # Only the item lookup takes the endpoint's own key (CDSE splits
+            # Sentinel-2 per resolution, so `B04` is `B04_10m` there).
+            # `assets` itself stays in the catalog's naming, so the nodata
+            # lookup and the written band names still match. Resolved once
+            # for the whole list, which is the shape resolve_assets takes.
+            item_keys = cast("Catalog", self._catalog).resolve_assets(
+                cast("str", self._endpoint), collection_key, assets
+            )
+            for band, item_key in zip(assets, item_keys, strict=True):
+                # resolved_href resolves the asset href and applies the
+                # signer's sign_href (SAS graft / CDSE /vsis3 rewrite /
+                # no-op for requester-pays); _to_vsi then normalises a
+                # left-over s3:// to the GDAL /vsis3/ path.
+                hrefs = [
+                    _to_vsi(
+                        resolved_href(
+                            p.metadata["item"],
+                            item_key,
+                            signer=signer,
+                            alternate=alternate,
                         )
-                        for p in group
-                    ]
-                    tmp = Path(self.root_dir) / f".{safe_key}_{band}_{date}_{idx}.tif"
-                    # merge_rasters mosaics the tiles and, when dst_crs is given,
-                    # reprojects mismatched-CRS tiles onto one grid in a single
-                    # pass (multi-UTM Sentinel-2). A single tile is handled too.
-                    merge_rasters(
-                        [str(h) for h in hrefs],
-                        str(tmp),
-                        method="last",
-                        dst_crs=target_crs,
-                        no_data_value=nodata,
                     )
-                    band_paths.append(tmp)
-                stacked = self._stack_bands(band_paths, list(assets), nodata)
-                # One COG per (collection, date); a crossing AOI yields one per
-                # half, suffixed _part0 (eastern) / _part1 (western).
-                part = f"_part{idx}" if multi else ""
-                target = Path(self.root_dir) / f"{safe_key}_{date}{part}.tif"
-                # crop wants the bbox as a keyword in an explicit CRS; the AOI
-                # is WGS84 while the mosaic is in the tiles' native CRS. A
-                # polygon aoi= masks to the exact shape (see crop_to_aoi).
-                write_cog(
-                    crop_to_aoi(stacked, self.space, bbox=list(bbox_key), touch=True),
-                    str(target),
+                    for p in group
+                ]
+                tmp = Path(self.root_dir) / f".{safe_key}_{band}_{date}_{idx}.tif"
+                # merge_rasters mosaics the tiles and, when dst_crs is given,
+                # reprojects mismatched-CRS tiles onto one grid in a single
+                # pass (multi-UTM Sentinel-2). A single tile is handled too.
+                merge_rasters(
+                    [str(h) for h in hrefs],
+                    str(tmp),
+                    method="last",
+                    dst_crs=target_crs,
+                    no_data_value=nodata,
                 )
-            out.append(target)
-            self._written.append((collection_key, date, idx, target))
-            _cleanup(band_paths)
-        logger.info(f"STAC download: {len(out)} COG(s) written to {self.root_dir}")
-        return out
+                band_paths.append(tmp)
+            stacked = self._stack_bands(band_paths, list(assets), nodata)
+            # One COG per (collection, date); a crossing AOI yields one per
+            # half, suffixed _part0 (eastern) / _part1 (western).
+            part = f"_part{idx}" if multi else ""
+            target = Path(self.root_dir) / f"{safe_key}_{date}{part}.tif"
+            # crop wants the bbox as a keyword in an explicit CRS; the AOI
+            # is WGS84 while the mosaic is in the tiles' native CRS. A
+            # polygon aoi= masks to the exact shape (see crop_to_aoi).
+            write_cog(
+                crop_to_aoi(stacked, self.space, bbox=list(bbox_key), touch=True),
+                str(target),
+            )
+        self._written.append((collection_key, date, idx, target))
+        _cleanup(band_paths)
+        return target
 
     def _signer_for(self, collection_key: str) -> Any:
         """Return the signer to read `collection_key`'s assets with.
@@ -807,6 +840,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
+        errors: str = "warn",
     ) -> list[Path]:
         """Search, mosaic, and write one COG per `(collection, date)`.
 
@@ -817,6 +851,18 @@ class STAC(LazyClientMixin, AbstractDataSource):
                 When set, the per-date COGs are reduced per time window into
                 per-window COGs (see `_aggregate_cogs`) and the per-date
                 intermediates are removed.
+            errors: Partial-failure policy across the independent
+                `(collection, date)` mosaics:
+
+                * `"warn"` (default) — log each failed mosaic and return the
+                  COGs of the mosaics that succeeded.
+                * `"raise"` — propagate the first mosaic failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed mosaics silently.
+
+                A whole-endpoint failure — a rejected credential, a dead host
+                — surfaces as an `AuthenticationError` re-raised under every
+                policy (`fatal=`), never swallowed as an empty result.
 
         Returns:
             The written COG paths: one per `(collection, date)` when `aggregate`
@@ -833,6 +879,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
                 returns the empty list, and `search` / `count` / `preview` never
                 raise for any of these.
         """
+        self._errors = self.check_errors_policy(errors)
         paths = self._api_via_search_fetch()
         if not paths and self._budget_exhausted:
             where = ", ".join(f"{key} {bbox}" for key, bbox in self._budget_exhausted)
@@ -1162,6 +1209,22 @@ def _to_vsi(href: str) -> str:
     if href.startswith("s3://"):
         return "/vsis3/" + href[len("s3://") :]
     return href
+
+
+def _describe_group(
+    item: tuple[tuple[str, str, tuple], list[RemoteProduct]],
+) -> str:
+    """Render one `(collection, date, bbox)` group for the `_run_items` log.
+
+    Args:
+        item: One `((collection_key, date, bbox_key), group)` pair from
+            `_group_products`.
+
+    Returns:
+        str: The collection key and date, quoted.
+    """
+    (collection_key, date, _bbox_key), _group = item
+    return repr(f"{collection_key} {date}")
 
 
 def _group_products(

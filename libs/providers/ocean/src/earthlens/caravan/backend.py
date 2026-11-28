@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import hashlib
 import zipfile
+from functools import partial
 from io import BytesIO
 from pathlib import Path
 from typing import Any, cast
@@ -71,6 +72,19 @@ DEFAULT_MIN_INTERVAL = 1.0
 #: Selecting more than this many catchments is legal but slow, so it is called
 #: out before the reads start rather than discovered as a stall.
 _LARGE_SELECTION = 25
+
+
+def _describe_pair(pair: tuple[RemoteProduct, bytes]) -> str:
+    """Render a `(product, blob)` pair for the `_run_items` log lines.
+
+    Args:
+        pair: A catchment's `RemoteProduct` and its member bytes.
+
+    Returns:
+        str: The catchment's gauge id.
+    """
+    product, _ = pair
+    return str(product.id)
 
 
 class Caravan(AbstractDataSource):
@@ -568,36 +582,6 @@ class Caravan(AbstractDataSource):
                 columns.append(column)
         return columns
 
-    def _fetch(self, products: list[RemoteProduct]) -> list[pd.DataFrame]:
-        """Read every selected catchment and normalise to the long schema.
-
-        Widens the inherited `-> list[Path]` contract: a tabular backend
-        returns in-memory frames, not written files.
-
-        The two transports want opposite strategies, so this branches on which
-        one is in play. A ZIP member is an independent ranged read, so the
-        catchments are consumed **lazily** and a `limit=` genuinely stops the
-        fetch early instead of paying for reads it then discards. A tar has to
-        be scanned sequentially, so there every wanted member is pulled in one
-        pass and the cap is applied afterwards — re-scanning a 29 GB stream per
-        catchment would be far worse than over-reading.
-
-        Args:
-            products: The list returned by `_search`.
-
-        Returns:
-            list[pd.DataFrame]: One frame per catchment, in the same order.
-                A catchment the archive turns out not to hold is logged and
-                skipped rather than failing the whole request.
-        """
-        archive = self._open_archive()
-        if self.archive_file.is_range_readable:
-            frames = self._fetch_limited(products, self._limit)
-        else:
-            frames = self._fetch_sequential(archive, products)
-        self._log_transfer(archive)
-        return [frame for frame in frames if frame is not None]
-
     def _fetch_one(self, product: RemoteProduct) -> pd.DataFrame:
         """Read one catchment from a range-readable archive.
 
@@ -629,17 +613,22 @@ class Caravan(AbstractDataSource):
     ) -> list[pd.DataFrame]:
         """Read every catchment out of a tar archive in one streaming pass.
 
+        A member the sequential scan never found is "no data" — logged and
+        skipped, kept distinct from a genuine parse failure, which the
+        `errors=` policy (`self._errors`) governs through the shared
+        `_run_items` loop.
+
         Args:
             archive: The opened tar archive.
             products: The list returned by `_search`.
 
         Returns:
-            list[pd.DataFrame]: One frame per readable catchment.
+            list[pd.DataFrame]: One frame per readable, parseable catchment.
         """
         members = [str(p.metadata["member"]) for p in products if p.metadata["member"]]
         blobs = archive.read_many(members)
         columns = self._requested_columns()
-        frames: list[pd.DataFrame] = []
+        pairs: list[tuple[RemoteProduct, bytes]] = []
         for product in products:
             blob = blobs.get(str(product.metadata["member"]))
             if blob is None:
@@ -648,8 +637,34 @@ class Caravan(AbstractDataSource):
                     f"member could not be read; skipping."
                 )
                 continue
-            frames.append(self._to_frame(product.id, blob, columns))
+            pairs.append((product, blob))
+        frames, failed = self._run_items(
+            pairs,
+            partial(self._frame_from_pair, columns=columns),
+            errors=self._errors,
+            label="catchment",
+            describe=_describe_pair,
+        )
+        if failed and not frames:
+            # Every catchment failed to parse — a whole-archive problem, not a
+            # per-catchment gap; re-raise rather than return an empty result.
+            raise failed[0][1]
         return frames
+
+    def _frame_from_pair(
+        self, pair: tuple[RemoteProduct, bytes], *, columns: list[str]
+    ) -> pd.DataFrame:
+        """Parse one `(product, blob)` pair into the long schema.
+
+        Args:
+            pair: A catchment's `RemoteProduct` and its member bytes.
+            columns: The archive column names to keep.
+
+        Returns:
+            pandas.DataFrame: The catchment's rows within the request window.
+        """
+        product, blob = pair
+        return self._to_frame(product.id, blob, columns)
 
     def _log_transfer(self, archive: _helpers.CaravanArchive) -> None:
         """Report what the request actually cost on the wire.
@@ -829,7 +844,10 @@ class Caravan(AbstractDataSource):
         )
 
     def download(
-        self, progress_bar: bool = True, limit: int | None = None
+        self,
+        progress_bar: bool = True,
+        limit: int | None = None,
+        errors: str = "warn",
     ) -> pd.DataFrame:
         """Fetch the selected catchments and return them as one long frame.
 
@@ -838,6 +856,19 @@ class Caravan(AbstractDataSource):
                 backends. Members are read individually and the cost is
                 dominated by the archive index, so no bar is shown.
             limit: Cap on the total rows returned. `None` returns everything.
+            errors: Partial-failure policy across the independent catchments:
+
+                * `"warn"` (default) — log each failed catchment and return the
+                  rows from the catchments that succeeded.
+                * `"raise"` — propagate the first catchment failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed catchments silently.
+
+                A catchment the archive lists but cannot read is "no data" —
+                skipped with a warning, not an `errors=` failure. For the
+                range-readable transport a whole-archive failure (every
+                catchment failing) re-raises the first error under every policy
+                rather than returning an empty frame.
 
         Returns:
             pandas.DataFrame: `[gauge_id, date, <requested variables>]`, one
@@ -847,9 +878,11 @@ class Caravan(AbstractDataSource):
 
         Raises:
             ValueError: On an unbounded request, an unknown catchment id, an
-                unknown variable, or a release needing `allow_full_download`.
+                unknown variable, a release needing `allow_full_download`, or
+                an unrecognised `errors` policy.
         """
         self._limit = self.check_limit(limit)
+        self._errors = self.check_errors_policy(errors)
         # Re-resolved per download so a caller who reassigns `vars` between
         # calls is not served the previous request's columns.
         self._columns = None
@@ -914,9 +947,31 @@ class Caravan(AbstractDataSource):
         self.close()
 
     def _api(self) -> list[pd.DataFrame]:
-        """Run the search then fetch steps.
+        """Run the search then fetch steps, routed by the archive transport.
+
+        A range-readable ZIP is read catchment-by-catchment: each is an
+        independent ranged read, so the catchments are fetched **lazily** under
+        the caller's `errors=` policy (`self._errors`) via `_search_fetch_each`,
+        and a `limit=` genuinely stops the sweep early. A whole-service failure
+        (every catchment failing) re-raises rather than returning an empty
+        frame (`raise_if_all_failed`). A tar must be scanned in one sequential
+        pass, so there every wanted member is pulled at once and parsed under
+        the same policy (`_fetch_sequential`).
 
         Returns:
-            list[pd.DataFrame]: One frame per selected catchment.
+            list[pd.DataFrame]: One frame per selected catchment. A catchment
+                the archive turns out not to hold is logged and skipped rather
+                than failing the request.
         """
-        return self._api_via_search_fetch()
+        archive = self._open_archive()
+        if self.archive_file.is_range_readable:
+            frames = self._search_fetch_each(
+                errors=self._errors,
+                raise_if_all_failed=True,
+                label="catchment",
+            )
+        else:
+            products = self._search()
+            frames = self._fetch_sequential(archive, products) if products else []
+        self._log_transfer(archive)
+        return [frame for frame in frames if frame is not None]

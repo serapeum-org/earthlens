@@ -74,13 +74,13 @@ dependencies = [
     # exactly such an in-memory stack; below 0.73.0 it had to spill the
     # scenes to COGs first (#1336).
     #
-    # Upper cap <0.81 is a TEMPORARY workaround for serapeum-org/pyramids-core#1655:
+    # Upper cap <0.81.0 is a TEMPORARY workaround for serapeum-org/pyramids-core#1655:
     # 0.81+ routed every reduce path through a lazy-backend hook
     # (`read_raster_array_lazy`) that no released `pyramids-lazy` provides, so a
     # clean install (wheel-test, or any `pip install earthlens`) resolving 0.81+
     # cannot run `reduce_time`. 0.80.x reduces on numpy with no lazy backend. Lift
     # the cap once a `pyramids-lazy` compatible with 0.81+ is published.
-    "pyramids-core >=0.80.0,<0.81",
+    "pyramids-core >=0.80.0,<0.81.0",
 ]
 
 [project.optional-dependencies]
@@ -108,7 +108,7 @@ gee = ["earthengine-api >=1.7.26", "google-api-python-client >=2.0", "google-clo
 jaxa = ["jaxa.earth >=0.1.6,<0.2", "gportal >=0.4,<0.5", "paramiko >=3.1,<4"]
 openeo = ["openeo >=0.54"]
 sentinel-hub = ["sentinelhub >=3.11.5"]
-stac = ["pyramids-core[stac] >=0.80.0,<0.81"]  # <0.81: pyramids-core#1655
+stac = ["pyramids-core[stac] >=0.80.0,<0.81.0"]  # <0.81.0: pyramids-core#1655
 # digitalearth is the visualization ORCHESTRATOR for the whole stack: it reads
 # pyramids objects and composes the render across its four backend tiers
 # (matplotlib / HoloViz / PyVista / MapLibre), delegating the drawing itself to

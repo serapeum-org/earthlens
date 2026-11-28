@@ -38,7 +38,7 @@ from __future__ import annotations
 import datetime as dt
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import pandas as pd
 from loguru import logger
@@ -141,6 +141,11 @@ def normalize_channel(token: str) -> str:
     if match is None:
         return token.upper()
     return f"C{int(match.group(1)):02d}"
+
+
+def _describe_granule(product: RemoteProduct) -> str:
+    """Render a granule product for the `_run_items` log lines (its key name)."""
+    return repr(product.id)
 
 
 class GOES(AbstractDataSource):
@@ -404,25 +409,58 @@ class GOES(AbstractDataSource):
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
         """Download each granule whole to `self.root_dir` (unsigned boto3).
 
+        The per-granule downloads are independent, so each is run under the
+        `self._errors` partial-failure policy.
+
         Args:
             products: The granules from `_search`.
 
         Returns:
-            list[Path]: The written NetCDF paths, in order.
+            list[Path]: The written NetCDF paths of the granules that
+                succeeded, in order.
+
+        Raises:
+            Exception: The first granule's error when `errors="raise"`, or —
+                under any policy — when **every** granule fails (a whole-service
+                failure re-raised rather than returned as an empty list).
         """
-        client = self._client()
-        out: list[Path] = []
-        for product in tqdm(
-            products, disable=not self._show_progress, desc="goes", unit="granule"
-        ):
-            dest = self.root_dir / product.id
-            download_key(client, product.metadata["bucket"], product.href, dest)
-            out.append(dest)
-        return out
+        results, failures = self._run_items(
+            tqdm(
+                products,
+                disable=not self._show_progress,
+                desc="goes",
+                unit="granule",
+            ),
+            self._fetch_one,
+            errors=self._errors,
+            label="granule",
+            describe=_describe_granule,
+        )
+        if failures and not results:
+            # Every granule failed — a dead S3 endpoint, not a per-granule gap.
+            # Re-raise the first error rather than return an empty list.
+            raise failures[0][1]
+        return results
+
+    def _fetch_one(self, product: RemoteProduct) -> Path:
+        """Download one ABI granule whole to `self.root_dir`.
+
+        Args:
+            product: One `RemoteProduct` from `_search`.
+
+        Returns:
+            Path: The written NetCDF path for this granule.
+        """
+        dest = self.root_dir / product.id
+        download_key(
+            self._client(), product.metadata["bucket"], cast("str", product.href), dest
+        )
+        return dest
 
     def download(
         self,
         progress_bar: bool = True,
+        errors: str = "warn",
     ) -> list[Path]:
         """Fetch the in-window ABI granules and return the written paths.
 
@@ -434,10 +472,23 @@ class GOES(AbstractDataSource):
         Args:
             progress_bar: Show a per-granule progress bar. Defaults to
                 `True`.
+            errors: Partial-failure policy across the independent granules:
+
+                * `"warn"` (default) — log each failed granule and return the
+                  paths of the granules that succeeded, with a summary.
+                * `"raise"` — propagate the first granule failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed granules silently.
+
+                When every granule fails — a dead S3 endpoint, not a per-granule
+                gap — the first error is re-raised under every policy rather than
+                returned as an empty list; a partial failure still returns the
+                survivors under `"warn"`/`"ignore"`.
 
         Returns:
             list[Path]: The written granule paths, or an empty list when
                 nothing in the window was available.
         """
         self._show_progress = progress_bar
+        self._errors = self.check_errors_policy(errors)
         return self._api_via_search_fetch()

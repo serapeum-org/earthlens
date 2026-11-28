@@ -554,6 +554,9 @@ class Bathymetry(AbstractDataSource):
     ) -> list[Path]:
         """Fetch the DEM subset(s) as written GeoTIFF(s).
 
+        This backend issues a single request, so it exposes no `errors=`
+        partial-failure policy.
+
         Args:
             progress_bar: Accepted for signature parity; one request per call.
 

@@ -225,21 +225,50 @@ class OBIS(AbstractDataSource):
             "size": self._size,
         }
 
-    def _iter_selector_frames(self) -> Iterator[pd.DataFrame]:
+    def _fetch_selector(self, selector: str) -> pd.DataFrame:
+        """Search OBIS for one species selector and return its raw frame.
+
+        Args:
+            selector: One `variables` entry — a friendly catalog key or a
+                `species:<scientific name>` explicit name.
+
+        Returns:
+            pandas.DataFrame: The raw occurrence rows for the selector.
+        """
+        from pyobis import occurrences
+
+        name = self._catalog.resolve_scientific_name(selector)
+        return occurrences.search(**self._plan_search(name)).execute()
+
+    def _iter_selector_frames(
+        self, failures: list[tuple[str, BaseException]]
+    ) -> Iterator[pd.DataFrame]:
         """Yield one occurrence frame per requested selector, lazily.
 
         Lazy so a `limit=` can stop the search: a selector past the cap is never
         sent to OBIS, which is the difference between capping the result and
-        capping the work.
+        capping the work. Each selector is fetched under the `errors=` policy
+        (`self._errors`) through the shared `_iter_items` loop, so one selector
+        failing is logged and skipped (`"warn"`/`"ignore"`) or propagated
+        (`"raise"`) without the eager materialisation `_run_items` would force.
+
+        Args:
+            failures: Accumulator the caller owns; each skipped selector's
+                `(id, exception)` is appended so the caller can tell an
+                all-failed sweep from a genuinely empty one.
 
         Yields:
             pandas.DataFrame: The raw occurrence rows for one selector.
         """
-        from pyobis import occurrences
-
-        for selector in self.vars:
-            name = self._catalog.resolve_scientific_name(selector)
-            yield occurrences.search(**self._plan_search(name)).execute()
+        yield from self._iter_items(
+            self.vars,
+            self._fetch_selector,
+            errors=self._errors,
+            label="selector",
+            describe=None,
+            on_failure=None,
+            failures=failures,
+        )
 
     def _fetch_all(self) -> FeatureCollection:
         """Search every requested species and map the rows to a FeatureCollection.
@@ -254,7 +283,14 @@ class OBIS(AbstractDataSource):
             FeatureCollection: The occurrence points, CRS `EPSG:4326`;
                 empty (schema-only) when nothing matched.
         """
-        frames = self._take_limited(self._iter_selector_frames(), limit=self._limit)
+        failures: list[tuple[str, BaseException]] = []
+        frames = self._take_limited(
+            self._iter_selector_frames(failures), limit=self._limit
+        )
+        if failures and not frames:
+            # Every selector failed — a whole-service outage, not a per-selector
+            # gap; re-raise rather than report it as an empty result (ARC-9a).
+            raise failures[0][1]
         if not frames:
             combined = pd.DataFrame()
         elif len(frames) > 1:
@@ -284,6 +320,7 @@ class OBIS(AbstractDataSource):
         self,
         progress_bar: bool = True,
         limit: int | None = None,
+        errors: str = "warn",
     ) -> FeatureCollection:
         """Run the occurrence search and return the points FeatureCollection.
 
@@ -298,6 +335,18 @@ class OBIS(AbstractDataSource):
                 features than the cap. `None` (the default) fetches everything,
                 which for a broad taxon over a wide bbox is bounded only by
                 memory.
+            errors: Partial-failure policy across the independent species
+                selectors:
+
+                * `"warn"` (default) — log each failed selector and return the
+                  occurrences from the selectors that succeeded.
+                * `"raise"` — propagate the first selector failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed selectors silently.
+
+                The policy governs a selector's OBIS search failing; it does
+                not change how a selector that simply matched nothing is
+                handled (that is an empty frame, not a failure).
 
         Returns:
             FeatureCollection: The occurrence points, CRS `EPSG:4326`.
@@ -306,9 +355,11 @@ class OBIS(AbstractDataSource):
 
         Raises:
             TypeError: If `limit` is neither `None` nor an `int`.
-            ValueError: If `limit` is less than 1.
+            ValueError: If `limit` is less than 1, or `errors` is not a
+                recognised policy.
         """
         self._limit = self.check_limit(limit)
+        self._errors = self.check_errors_policy(errors)
         collection = self._fetch_all()
         if self._user_path and len(collection):
             written = self._write(collection)

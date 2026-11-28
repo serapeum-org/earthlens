@@ -527,7 +527,8 @@ class FLODIS(AbstractDataSource):
         """Fetch the selected FLODIS table and return it.
 
         Runs the download + filter, writes the result to `path` as a CSV, and
-        returns it.
+        returns it. It issues a single request, so it has no partial-failure
+        policy and takes no `errors=` argument.
 
         Args:
             progress_bar: Whether to draw a download progress bar. Passed through

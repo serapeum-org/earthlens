@@ -892,3 +892,114 @@ class TestNodataOnRealPyramids:
         values = np.asarray(cropped.read_array())
         assert values.size > 0, "the crop came back empty"
         assert (values == 0).any(), "dry-land zeros were dropped as no-data"
+
+
+class _RaiseFromCall:
+    """A `_fetch_group` stand-in: delegate to the real one, raise `exc` from `from_call`.
+
+    Holds its own call counter; `from_call=2` fails the second group (a partial
+    failure), `from_call=1` fails every group (a whole-endpoint failure).
+    """
+
+    def __init__(self, real, exc, from_call=2):
+        self._real = real
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, item):
+        """Delegate until `from_call`, then raise `exc` on that group onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(item)
+
+
+@pytest.mark.stac
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent (collection, date) mosaics."""
+
+    def _two_group_stac(self, fake_pyramids, tmp_path, monkeypatch, exc, from_call=2):
+        """A STAC backend over two dated groups, raising `exc` from `from_call`."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item("a", "2024-01-05", {"B04": "https://h/a.tif"}),
+            make_item("b", "2024-01-20", {"B04": "https://h/b.tif"}),
+        ]
+        stac = _build_stac(
+            tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]}
+        )
+        monkeypatch.setattr(
+            stac, "_fetch_group", _RaiseFromCall(stac._fetch_group, exc, from_call)
+        )
+        return stac
+
+    def test_raise_propagates_first_failure(self, fake_pyramids, tmp_path, monkeypatch):
+        """errors="raise" surfaces a per-mosaic exception, not the batch summary."""
+        stac = self._two_group_stac(
+            fake_pyramids, tmp_path, monkeypatch, ValueError("mosaic boom")
+        )
+        with pytest.raises(ValueError, match="mosaic boom"):
+            stac.download(errors="raise")
+
+    def test_warn_returns_the_surviving_mosaic(
+        self, fake_pyramids, tmp_path, monkeypatch
+    ):
+        """errors="warn" drops a non-fatal per-mosaic failure and returns survivors."""
+        stac = self._two_group_stac(
+            fake_pyramids, tmp_path, monkeypatch, ValueError("mosaic boom")
+        )
+        paths = stac.download(errors="warn")
+        assert len(paths) == 1, f"expected the one surviving mosaic, got {paths}"
+
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, fake_pyramids, tmp_path, monkeypatch
+    ):
+        """errors="ignore" drops a non-fatal per-mosaic failure silently."""
+        stac = self._two_group_stac(
+            fake_pyramids, tmp_path, monkeypatch, ValueError("mosaic boom")
+        )
+        paths = stac.download(errors="ignore")
+        assert len(paths) == 1
+
+    def test_default_policy_is_warn(self, fake_pyramids, tmp_path, monkeypatch):
+        """Omitting errors= defaults to warn — a non-fatal mosaic failure survives."""
+        stac = self._two_group_stac(
+            fake_pyramids, tmp_path, monkeypatch, ValueError("mosaic boom")
+        )
+        paths = stac.download()
+        assert len(paths) == 1
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_auth_error_propagates_under_any_policy(
+        self, fake_pyramids, tmp_path, monkeypatch, policy
+    ):
+        """A whole-endpoint AuthenticationError propagates even under warn/ignore."""
+        from earthlens.base import AuthenticationError
+
+        stac = self._two_group_stac(
+            fake_pyramids, tmp_path, monkeypatch, AuthenticationError("creds gone"), 1
+        )
+        with pytest.raises(AuthenticationError, match="creds gone"):
+            stac.download(errors=policy)
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_mosaic_failing_raises_non_fatal(
+        self, fake_pyramids, tmp_path, monkeypatch, policy
+    ):
+        """When every mosaic fails, the first error is raised, never empty."""
+        stac = self._two_group_stac(
+            fake_pyramids, tmp_path, monkeypatch, ValueError("all mosaics down"), 1
+        )
+        with pytest.raises(ValueError, match="all mosaics down"):
+            stac.download(errors=policy)
+
+    def test_invalid_policy_rejected(self, fake_pyramids, tmp_path):
+        """An unrecognised errors= value is refused before any request."""
+        fake_pyramids.items_by_collection["sentinel-2-c1-l2a"] = [
+            make_item("a", "2024-01-05", {"B04": "https://h/a.tif"})
+        ]
+        stac = _build_stac(
+            tmp_path, endpoint="earth-search", variables={"sentinel-2-l2a": ["B04"]}
+        )
+        with pytest.raises(ValueError, match="errors"):
+            stac.download(errors="explode")

@@ -299,6 +299,89 @@ def test_no_bare_gpd_read_file_in_source():
         assert "geopandas.read_file(" not in text
 
 
+class _RaiseFromCall:
+    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from `from_call`.
+
+    Hoisted to module scope (no nested-function definitions); holds its own call
+    counter. `from_call=2` fails the second dataset (a partial failure);
+    `from_call=1` fails every dataset (a whole-request failure).
+    """
+
+    def __init__(self, real, exc, from_call: int = 2):
+        self._real = real
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, product):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(product)
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent datasets."""
+
+    def _two_dataset_backend(self, fake_read, monkeypatch, exc, from_call: int = 2):
+        """A backend over two datasets whose second read raises `exc`."""
+        backend = _make_backend(variables=["cgaz:adm0", "cgaz:adm1"])
+        monkeypatch.setattr(
+            backend, "_fetch_one", _RaiseFromCall(backend._fetch_one, exc, from_call)
+        )
+        return backend
+
+    def test_raise_propagates_first_failure(self, fake_read, monkeypatch):
+        """errors="raise" surfaces a per-dataset exception, not the summary."""
+        backend = self._two_dataset_backend(
+            fake_read, monkeypatch, ValueError("dataset boom")
+        )
+        with pytest.raises(ValueError, match="dataset boom"):
+            backend.download(progress_bar=False, errors="raise")
+
+    def test_warn_returns_the_surviving_dataset(self, fake_read, monkeypatch):
+        """errors="warn" drops a failed dataset and returns the survivor's polygons."""
+        backend = self._two_dataset_backend(
+            fake_read, monkeypatch, ValueError("dataset boom")
+        )
+        result = backend.download(progress_bar=False, errors="warn")
+        assert len(result) == 2, (
+            f"expected the one surviving dataset's 2 polygons, got {len(result)}"
+        )
+
+    def test_ignore_drops_failures_and_returns_survivor(self, fake_read, monkeypatch):
+        """errors="ignore" drops a failed dataset silently."""
+        backend = self._two_dataset_backend(
+            fake_read, monkeypatch, ValueError("dataset boom")
+        )
+        result = backend.download(progress_bar=False, errors="ignore")
+        assert len(result) == 2
+
+    def test_default_policy_is_warn(self, fake_read, monkeypatch):
+        """Omitting errors= defaults to warn — a failed dataset is survived."""
+        backend = self._two_dataset_backend(
+            fake_read, monkeypatch, ValueError("dataset boom")
+        )
+        result = backend.download(progress_bar=False)
+        assert len(result) == 2
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_dataset_failing_raises(self, fake_read, policy, monkeypatch):
+        """When every dataset fails, the first error is raised — never a silent empty."""
+        backend = self._two_dataset_backend(
+            fake_read, monkeypatch, ValueError("all datasets down"), from_call=1
+        )
+        with pytest.raises(ValueError, match="all datasets down"):
+            backend.download(progress_bar=False, errors=policy)
+
+    def test_invalid_policy_rejected(self):
+        """An unrecognised errors= value is refused before any read."""
+        backend = _make_backend(variables=["cgaz:adm0"])
+        with pytest.raises(ValueError, match="errors"):
+            backend.download(progress_bar=False, errors="explode")
+
+
 class TestLimitStopsTheWork:
     """A `limit=` must stop reading datasets, not trim the combined collection.
 

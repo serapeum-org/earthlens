@@ -318,10 +318,10 @@ class OpenEO(AbstractDataSource):
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
         """Build, execute, and download one output file per product.
 
-        For each product: build its `DataCube`, then either download it
-        synchronously (`execute="sync"`, size-capped) or run a polled batch job
-        (`execute="batch"`). The output format is the recipe's `output_format`
-        when set, else the backend's `output_format`.
+        The whole-list fetch; `download` drives the request through
+        `_search_fetch_each` / `_fetch_one` so it can honour the `errors=`
+        partial-failure policy and a per-recipe progress bar. This remains
+        the direct batch form.
 
         Args:
             products: The list returned by `_search`.
@@ -329,41 +329,76 @@ class OpenEO(AbstractDataSource):
         Returns:
             The written file paths, one per product (request key order).
         """
+        return [self._fetch_one(product) for product in products]
+
+    def _fetch_one(self, product: RemoteProduct) -> Path:
+        """Build, execute, and download one product's output cube.
+
+        Builds the product's `DataCube`, then either downloads it
+        synchronously (`execute="sync"`, size-capped) or runs a polled
+        batch job (`execute="batch"`). The output format is the recipe's
+        `output_format` when set, else the backend's `output_format`.
+
+        Args:
+            product: One `RemoteProduct` from `_search`.
+
+        Returns:
+            Path: The written output file for this recipe key.
+        """
         assert self._auth is not None  # set in _initialize before any download
         conn = self._auth.connection()
-        out: list[Path] = []
-        for product in products:
-            resolved: ResolvedGraph = product.metadata["resolved"]
-            cube = self._build_cube(conn, product.id, resolved)
-            out_format = resolved.output_format or self._output_format
-            suffix = OUTPUT_FORMATS[out_format]
-            target = Path(self.root_dir) / f"{safe_filename(product.id)}.{suffix}"
-            if self._execute == "batch":
-                job = cube.create_job(out_format=out_format)
-                job.start_and_wait().get_results().download_file(str(target))
-            else:
-                cube.download(str(target), format=out_format)
-            out.append(target)
-        return out
+        resolved: ResolvedGraph = product.metadata["resolved"]
+        cube = self._build_cube(conn, product.id, resolved)
+        out_format = resolved.output_format or self._output_format
+        suffix = OUTPUT_FORMATS[out_format]
+        target = Path(self.root_dir) / f"{safe_filename(product.id)}.{suffix}"
+        if self._execute == "batch":
+            job = cube.create_job(out_format=out_format)
+            job.start_and_wait().get_results().download_file(str(target))
+        else:
+            cube.download(str(target), format=out_format)
+        return target
 
     def download(
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
+        errors: str = "warn",
     ) -> list[Path]:
         """Build the process graph(s), execute server-side, and download outputs.
 
         Args:
-            progress_bar: Reserved for parity with the other backends.
+            progress_bar: Show a per-recipe progress bar over the outputs.
             aggregate: Optional aggregation request. Accepted (not rejected)
                 because `OUTPUT_KIND` is `"raster"`; translated into a
                 server-side `aggregate_temporal_period` node in each graph.
+            errors: Partial-failure policy across the independent recipe keys:
+
+                * `"warn"` (default) — log each failed recipe and return the
+                  outputs of the recipes that succeeded.
+                * `"raise"` — propagate the first recipe failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed recipes silently.
+
+                A whole-service failure — a rejected credential, a dead
+                backend — fails every recipe identically; when every recipe
+                fails the first error is re-raised under every policy
+                (`raise_if_all_failed`), never returned as an empty result.
 
         Returns:
-            The downloaded file paths, one per requested key.
+            The downloaded file paths, one per requested key (the failed
+            recipes' paths absent under `"warn"` / `"ignore"`).
         """
         self._aggregate = aggregate
-        paths = self._api_via_search_fetch()
+        self._errors = self.check_errors_policy(errors)
+        paths = self._search_fetch_each(
+            progress_bar=progress_bar,
+            desc="openEO recipes",
+            unit="recipe",
+            errors=self._errors,
+            raise_if_all_failed=True,
+            label="recipe",
+        )
         logger.info(f"openEO download: {len(paths)} file(s) written to {self.root_dir}")
         return paths
 

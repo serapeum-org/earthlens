@@ -34,9 +34,13 @@ requires-python = ">=3.11.5,<4"
 # unconditionally-registered console script. No provider SDK belongs here —
 # those live in the thematic provider distributions' own dependencies.
 dependencies = [
-    # <0.81 cap: serapeum-org/pyramids-core#1655 (0.81+ needs an unreleased
-    # pyramids-lazy backend for reduce). Lift when that backend ships.
-    "pyramids-core >=0.80.0,<0.81",
+    # Capped below 0.81.0: pyramids-core 0.81+ moved its lazy/dask backend out
+    # into a separate `pyramids-lazy` package, and no released pyramids-lazy yet
+    # implements the API 0.81/0.82 call (the gee reducers and worldpop's
+    # cross-year aggregate raise OptionalPackageDoesNotExist). Lift the cap once
+    # a compatible pyramids-lazy ships and earthlens declares it. Tracked
+    # upstream in serapeum-org/pyramids-core#1655.
+    "pyramids-core >=0.80.0,<0.81.0",
     "geopandas >=1.0.0",
     "joblib >=1.5.0",
     "loguru >=0.7.3",

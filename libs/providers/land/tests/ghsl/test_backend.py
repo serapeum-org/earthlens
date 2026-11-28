@@ -9,11 +9,32 @@ import numpy as np
 import pytest
 
 from earthlens.aggregate import AggregationConfig
-from earthlens.base import close_quietly
+from earthlens.base import RemoteProduct, close_quietly
 from earthlens.ghsl import backend as backend_mod
 from earthlens.ghsl.backend import GHSL, _epsg_int
 
 from .conftest import make_tiny_tif
+
+
+class _RaiseFromCall:
+    """A `_fetch_product` stand-in: return `survivor` until `from_call`, then raise.
+
+    Module-level (no nested defs); holds its own call counter. `from_call=2`
+    fails the second `(product, epoch)` item; `from_call=1` fails every item.
+    """
+
+    def __init__(self, survivor, exc, from_call=2):
+        self._survivor = survivor
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, rp):
+        """Return the survivor path, then raise `exc` from `from_call` onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._survivor
 
 
 def _build(tmp_path: Path, variables, **kw) -> GHSL:
@@ -660,3 +681,64 @@ class TestLegendlessCategorical:
         out = g.download(progress_bar=False)
         assert patched_io[-1]["resampling"] == "nearest neighbor"
         assert out and not out[0].with_suffix(".legend.json").exists()
+
+
+@pytest.mark.ghsl
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent (product, epoch) items."""
+
+    def _two_item_backend(self, tmp_path, monkeypatch, stub):
+        """A GHSL whose search yields two items, each fetched through `stub`."""
+        g = _build(tmp_path, ["GHS_POP"])
+        products = [
+            RemoteProduct(id="GHS_POP_E2015"),
+            RemoteProduct(id="GHS_POP_E2020"),
+        ]
+        monkeypatch.setattr(g, "_search", lambda: list(products))
+        monkeypatch.setattr(g, "_fetch_product", stub)
+        return g
+
+    def test_raise_propagates_first_failure(self, tmp_path, monkeypatch):
+        """errors="raise" surfaces a per-item exception."""
+        stub = _RaiseFromCall(tmp_path / "a.tif", ValueError("item boom"))
+        g = self._two_item_backend(tmp_path, monkeypatch, stub)
+        with pytest.raises(ValueError, match="item boom"):
+            g.download(progress_bar=False, errors="raise")
+
+    def test_warn_returns_surviving_item(self, tmp_path, monkeypatch):
+        """errors="warn" drops the failed item and returns the survivor."""
+        survivor = tmp_path / "a.tif"
+        stub = _RaiseFromCall(survivor, ValueError("item boom"))
+        g = self._two_item_backend(tmp_path, monkeypatch, stub)
+        assert g.download(progress_bar=False, errors="warn") == [survivor]
+
+    def test_ignore_returns_surviving_item(self, tmp_path, monkeypatch):
+        """errors="ignore" drops the failed item silently and returns the survivor."""
+        survivor = tmp_path / "a.tif"
+        stub = _RaiseFromCall(survivor, ValueError("item boom"))
+        g = self._two_item_backend(tmp_path, monkeypatch, stub)
+        assert g.download(progress_bar=False, errors="ignore") == [survivor]
+
+    def test_default_policy_is_warn(self, tmp_path, monkeypatch):
+        """Omitting errors= defaults to warn — the failed item is survived."""
+        survivor = tmp_path / "a.tif"
+        stub = _RaiseFromCall(survivor, ValueError("item boom"))
+        g = self._two_item_backend(tmp_path, monkeypatch, stub)
+        assert g.download(progress_bar=False) == [survivor]
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_item_failing_raises(self, tmp_path, monkeypatch, policy):
+        """When every item fails, the first error is raised — never a silent empty."""
+        stub = _RaiseFromCall(
+            tmp_path / "a.tif", ValueError("all items down"), from_call=1
+        )
+        g = self._two_item_backend(tmp_path, monkeypatch, stub)
+        with pytest.raises(ValueError, match="all items down"):
+            g.download(progress_bar=False, errors=policy)
+
+    def test_invalid_policy_rejected(self, tmp_path, monkeypatch):
+        """An unrecognised errors= value is refused."""
+        stub = _RaiseFromCall(tmp_path / "a.tif", ValueError("item boom"))
+        g = self._two_item_backend(tmp_path, monkeypatch, stub)
+        with pytest.raises(ValueError, match="errors"):
+            g.download(progress_bar=False, errors="explode")

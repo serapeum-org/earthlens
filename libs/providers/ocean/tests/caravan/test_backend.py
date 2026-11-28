@@ -629,3 +629,134 @@ class TestMergedGeometry:
         source.download()
 
         assert source.geometry is made[0]
+
+
+class _RaiseFromCall:
+    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from `from_call`.
+
+    Hoisted to module scope (no nested-function definitions); holds its own call
+    counter. `from_call=2` fails the second catchment (a partial failure);
+    `from_call=1` fails every catchment (a whole-archive failure).
+    """
+
+    def __init__(self, real, exc, from_call=2):
+        self._real = real
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, product):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(product)
+
+
+def _raise_runtime(*args: Any, **kwargs: Any) -> pd.DataFrame:
+    """A `_to_frame` stand-in that always fails, for the all-failed guard."""
+    raise RuntimeError("tar parse down")
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent catchments."""
+
+    def _two_catchment_source(self, catalog, tmp_path, monkeypatch, exc, from_call=2):
+        """A range-readable source over two catchments, failing from `from_call`."""
+        source = _source(catalog, tmp_path, gauge_ids=["dk_1", "dk_2"])
+        monkeypatch.setattr(
+            source, "_fetch_one", _RaiseFromCall(source._fetch_one, exc, from_call)
+        )
+        return source
+
+    def test_raise_propagates_first_failure(self, catalog, tmp_path, monkeypatch):
+        """errors="raise" surfaces a per-catchment exception, not a batch summary."""
+        source = self._two_catchment_source(
+            catalog, tmp_path, monkeypatch, ValueError("catchment boom")
+        )
+        with pytest.raises(ValueError, match="catchment boom"):
+            source.download(errors="raise")
+
+    def test_warn_returns_the_surviving_catchment(self, catalog, tmp_path, monkeypatch):
+        """errors="warn" drops a non-fatal per-catchment failure, keeps survivors."""
+        source = self._two_catchment_source(
+            catalog, tmp_path, monkeypatch, ValueError("catchment boom")
+        )
+        frame = source.download(errors="warn")
+        assert list(frame["gauge_id"].unique()) == ["dk_1"]
+
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, catalog, tmp_path, monkeypatch
+    ):
+        """errors="ignore" drops a non-fatal per-catchment failure silently."""
+        source = self._two_catchment_source(
+            catalog, tmp_path, monkeypatch, ValueError("catchment boom")
+        )
+        assert list(source.download(errors="ignore")["gauge_id"].unique()) == ["dk_1"]
+
+    def test_default_policy_is_warn(self, catalog, tmp_path, monkeypatch):
+        """Omitting errors= defaults to warn — the surviving catchment is kept."""
+        source = self._two_catchment_source(
+            catalog, tmp_path, monkeypatch, ValueError("catchment boom")
+        )
+        assert list(source.download()["gauge_id"].unique()) == ["dk_1"]
+
+    def test_every_catchment_failing_raises(self, catalog, tmp_path, monkeypatch):
+        """When every catchment fails, the first error is raised, never an empty frame."""
+        source = self._two_catchment_source(
+            catalog,
+            tmp_path,
+            monkeypatch,
+            ValueError("whole archive down"),
+            from_call=1,
+        )
+        with pytest.raises(ValueError, match="whole archive down"):
+            source.download(errors="warn")
+
+    def test_an_unreadable_member_is_not_an_errors_failure(
+        self, catalog, tmp_path, monkeypatch
+    ):
+        """A missing-member KeyError skip is 'no data', distinct from errors=."""
+        source = _source(catalog, tmp_path, gauge_ids=["dk_1", "dk_2"])
+        archive = source._open_archive()
+        original = archive.read
+
+        def _explode(member: str) -> bytes:
+            if member.endswith("dk_1.csv"):
+                raise KeyError(member)
+            return original(member)
+
+        archive.read = _explode  # type: ignore[method-assign]
+        # Even under errors="raise" the skip stays a skip — it never reaches the
+        # policy, so the survivor dk_2 comes back.
+        frame = source.download(errors="raise")
+        assert list(frame["gauge_id"].unique()) == ["dk_2"]
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_the_tar_path_every_catchment_failing_raises(
+        self, catalog, tmp_path, monkeypatch, policy
+    ):
+        """On the tar transport, every catchment failing re-raises, not empty."""
+        tarball = tmp_path / "fixture.tar.gz"
+        tarball.write_bytes(build_tar(header=LEGACY_HEADER))
+        monkeypatch.setattr(
+            "earthlens.caravan._helpers.ensure_archive", lambda *a, **k: tarball
+        )
+        source = _source(
+            catalog,
+            tmp_path,
+            dataset="big",
+            allow_full_download=True,
+            gauge_ids=["dk_1", "dk_2"],
+        )
+        # Every member parses to a failure (a whole-archive problem), so the
+        # sequential reader's guard re-raises under warn/ignore rather than
+        # returning an empty frame.
+        monkeypatch.setattr(source, "_to_frame", _raise_runtime)
+        with pytest.raises(RuntimeError, match="tar parse down"):
+            source.download(errors=policy)
+
+    def test_invalid_policy_rejected(self, catalog, tmp_path):
+        """An unrecognised errors= value is refused before any read."""
+        with pytest.raises(ValueError, match="errors"):
+            _source(catalog, tmp_path).download(errors="explode")

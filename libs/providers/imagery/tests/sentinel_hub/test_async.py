@@ -15,6 +15,8 @@ import pytest
 
 from earthlens.sentinel_hub.backend import SentinelHub
 
+from .test_backend import _RaiseFromCall
+
 pytestmark = pytest.mark.sentinel_hub
 
 _S3 = {"bucket": "s3://my-bucket/out", "iam_role_arn": "arn:aws:iam::1:role/r"}
@@ -91,3 +93,18 @@ class TestAsyncFetch:
         )
         with pytest.raises(ValueError, match="Async Processing API"):
             backend.download()
+
+
+@pytest.mark.parametrize("policy", ["warn", "ignore"])
+def test_every_product_failing_raises_non_fatal(
+    fake_sh, output_dir: Path, monkeypatch, policy
+):
+    """When every async product fails, the first error is raised, never empty."""
+    backend = _medium_backend(output_dir, api="async", batch_output=_S3)
+    monkeypatch.setattr(
+        backend,
+        "_async_one",
+        _RaiseFromCall(backend._async_one, ValueError("all async down"), 1),
+    )
+    with pytest.raises(ValueError, match="all async down"):
+        backend.download(errors=policy)

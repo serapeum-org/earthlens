@@ -52,6 +52,7 @@ no key is given, an interactive `ee.Authenticate()` against an explicit
 from __future__ import annotations
 
 import datetime as dt
+import functools
 import gc
 import math
 import os
@@ -979,6 +980,31 @@ def _epoch_millis(when: dt.datetime) -> int:
     """
     utc = when if when.tzinfo else when.replace(tzinfo=dt.UTC)
     return int(utc.timestamp() * 1000)
+
+
+def _describe_dataset_item(item: tuple[str, list[str]]) -> str:
+    """Render one `(asset_id, bands)` request item for the `_run_items` log.
+
+    Args:
+        item: One `(asset_id, bands)` pair from `self.vars`.
+
+    Returns:
+        str: The asset id and its requested bands.
+    """
+    asset_id, bands = item
+    return f"{asset_id} [{','.join(bands)}]"
+
+
+def _describe_work_unit(unit: Any) -> str:
+    """Render one composite / export time-bucket for the `_run_items` log.
+
+    Args:
+        unit: A work unit carrying a `.when` bucket timestamp.
+
+    Returns:
+        str: The bucket timestamp, quoted.
+    """
+    return repr(getattr(unit, "when", unit))
 
 
 def _validate_filters(
@@ -1954,12 +1980,29 @@ class GEE(LazyClientMixin, AbstractDataSource):
         )
 
     def download(
-        self, progress_bar: bool = True, *, materialize: bool | None = None
+        self,
+        progress_bar: bool = True,
+        *,
+        materialize: bool | None = None,
+        errors: str = "warn",
     ) -> list[Path | str | TaskInfo | GeoDataFrame] | DownloadResult:
         """Download every requested band-set of every requested dataset.
 
         Args:
             progress_bar: Show a per-bucket `tqdm` bar. Defaults to `True`.
+            errors: Partial-failure policy across the independent
+                `(dataset, band-set, time-bucket)` exports:
+
+                * `"warn"` (default) — log each failed dataset / bucket and
+                  return the outputs that succeeded.
+                * `"raise"` — propagate the first failure, for a pipeline
+                  that must fail fast.
+                * `"ignore"` — drop failed datasets / buckets silently.
+
+                A whole-service failure — a rejected service account, a dead
+                Earth Engine — surfaces as an `AuthenticationError` re-raised
+                under every policy (`fatal=`), never swallowed as an empty
+                result.
 
         Returns:
             One entry per `(dataset, band-set, time-bucket)`. The
@@ -2057,16 +2100,29 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 "its vector/tabular result directly rather than reading pixels back "
                 "from disk. Drop materialize=, or drop the sampler."
             )
+        self._errors = self.check_errors_policy(errors)
         # Trigger the lazy Earth Engine auth/init before any `ee` call.
         _ = self.client
         self._cog_warned = False  # the cog= notice is once per run, not per object
         self._property_filter_warned = set()  # same, for the property_filter notice
-        outputs: list[Path | str | TaskInfo | GeoDataFrame] = []
         assert isinstance(
             self.vars, dict
         )  # GEE always uses the {asset_id: [band]} form
-        for asset_id, bands in self.vars.items():
-            outputs.extend(self._download_dataset(asset_id, list(bands), progress_bar))
+        results, failures = self._run_items(
+            list(self.vars.items()),
+            functools.partial(self._download_item, progress_bar=progress_bar),
+            errors=self._errors,
+            label="dataset",
+            describe=_describe_dataset_item,
+            fatal=(AuthenticationError,),
+        )
+        if failures and not results:
+            # Every dataset failed — a whole-request failure, not a per-dataset
+            # gap; re-raise rather than return an empty download (ARC-9a).
+            raise failures[0][1]
+        outputs: list[Path | str | TaskInfo | GeoDataFrame] = []
+        for dataset_outputs in results:
+            outputs.extend(dataset_outputs)
         written = outputs
         # The vector/tabular path already holds in-memory GeoDataFrames (or
         # table TaskInfos), so it never goes through `_materialise`, which reads
@@ -2504,6 +2560,21 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 artifacts.append(Artifact(kind=self.OUTPUT_KIND, task=entry))
         return DownloadResult(artifacts=tuple(artifacts))
 
+    def _download_item(
+        self, item: tuple[str, list[str]], *, progress_bar: bool
+    ) -> list[Path | str | TaskInfo | GeoDataFrame]:
+        """Download one `(asset_id, bands)` request item — the `_run_items` hook.
+
+        Args:
+            item: One `(asset_id, bands)` pair from `self.vars`.
+            progress_bar: Show the per-bucket `tqdm` bar.
+
+        Returns:
+            This dataset's downloaded outputs (see `_download_dataset`).
+        """
+        asset_id, bands = item
+        return self._download_dataset(asset_id, list(bands), progress_bar)
+
     def _download_dataset(
         self, asset_id: str, bands: list[str], progress_bar: bool = True
     ) -> list[Path | str | TaskInfo | GeoDataFrame]:
@@ -2583,17 +2654,43 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     )
                 ]
             return sampled
-        return [
-            self._api(
-                unit.payload,
-                var_info,
-                bands,
-                unit.when,
-                unit.bucket_start,
-                unit.bucket_end,
-            )
-            for unit in iterator
-        ]
+        results, failures = self._run_items(
+            list(iterator),
+            functools.partial(self._api_for_unit, var_info=var_info, bands=bands),
+            errors=self._errors,
+            label="bucket",
+            describe=_describe_work_unit,
+            fatal=(AuthenticationError,),
+        )
+        if failures and not results:
+            # Every time-bucket for this dataset failed — re-raise so the
+            # dataset-level loop records it as a failed dataset rather than a
+            # silent empty result.
+            raise failures[0][1]
+        return results
+
+    def _api_for_unit(
+        self, unit: Any, *, var_info: Dataset, bands: list[str]
+    ) -> Path | str | TaskInfo | GeoDataFrame:
+        """Export one composited time-bucket via `_api` — the `_run_items` hook.
+
+        Args:
+            unit: A work unit carrying `payload` / `when` / `bucket_start` /
+                `bucket_end` for one time bucket.
+            var_info: The resolved catalog entry for the dataset.
+            bands: The requested band ids.
+
+        Returns:
+            The export result for this bucket (see `_api`).
+        """
+        return self._api(
+            unit.payload,
+            var_info,
+            bands,
+            unit.when,
+            unit.bucket_start,
+            unit.bucket_end,
+        )
 
     def _sample_payload(
         self,

@@ -199,3 +199,94 @@ def test_api_composes_search_fetch(backend, stub_accessor):
     paths = backend._api()
     assert len(paths) == 1
     assert paths[0].exists()
+
+
+class _RaiseFromCall:
+    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from `from_call`.
+
+    Hoisted to module scope (no nested functions); holds its own call counter.
+    `from_call=2` fails the second store (a partial failure); `from_call=1`
+    fails every store (a whole-archive failure).
+    """
+
+    def __init__(self, real_fetch, exc, from_call=2):
+        self._real = real_fetch
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, product):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(product)
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the resolved stores."""
+
+    def _two_store_backend(self, resolver, tmp_path, monkeypatch, exc, from_call=2):
+        """A backend over two stores (gn + gr), failing `_fetch_one` from `from_call`."""
+        b = _make(resolver, tmp_path, grid_label=None)
+        assert len(b._search()) == 2, "grid_label=None should fan out to two stores"
+        monkeypatch.setattr(
+            b, "_fetch_one", _RaiseFromCall(b._fetch_one, exc, from_call)
+        )
+        return b
+
+    def test_raise_propagates_first_failure(
+        self, resolver, tmp_path, stub_accessor, monkeypatch
+    ):
+        """errors="raise" surfaces a per-store exception, not the batch summary."""
+        b = self._two_store_backend(
+            resolver, tmp_path, monkeypatch, ValueError("store boom")
+        )
+        with pytest.raises(ValueError, match="store boom"):
+            b.download(progress_bar=False, errors="raise")
+
+    def test_warn_returns_the_surviving_store(
+        self, resolver, tmp_path, stub_accessor, monkeypatch
+    ):
+        """errors="warn" drops a per-store failure and returns the survivor's path."""
+        b = self._two_store_backend(
+            resolver, tmp_path, monkeypatch, ValueError("store boom")
+        )
+        paths = b.download(progress_bar=False, errors="warn")
+        assert len(paths) == 1
+        assert paths[0].exists()
+
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, resolver, tmp_path, stub_accessor, monkeypatch
+    ):
+        """errors="ignore" drops a per-store failure silently."""
+        b = self._two_store_backend(
+            resolver, tmp_path, monkeypatch, ValueError("store boom")
+        )
+        assert len(b.download(progress_bar=False, errors="ignore")) == 1
+
+    def test_default_policy_is_warn(
+        self, resolver, tmp_path, stub_accessor, monkeypatch
+    ):
+        """Omitting errors= defaults to warn — a per-store failure is survived."""
+        b = self._two_store_backend(
+            resolver, tmp_path, monkeypatch, ValueError("store boom")
+        )
+        assert len(b.download(progress_bar=False)) == 1
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_store_failing_raises(
+        self, resolver, tmp_path, stub_accessor, policy, monkeypatch
+    ):
+        """When every store fails, the first error is raised — never a silent empty."""
+        b = self._two_store_backend(
+            resolver, tmp_path, monkeypatch, ValueError("all stores down"), from_call=1
+        )
+        with pytest.raises(ValueError, match="all stores down"):
+            b.download(progress_bar=False, errors=policy)
+
+    def test_invalid_policy_rejected(self, resolver, tmp_path, stub_accessor):
+        """An unrecognised errors= value is refused before any request."""
+        b = _make(resolver, tmp_path)
+        with pytest.raises(ValueError, match="errors"):
+            b.download(progress_bar=False, errors="explode")

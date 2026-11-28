@@ -346,6 +346,9 @@ class USGSWater(AbstractDataSource):
     ) -> pd.DataFrame:
         """Fetch the selected service, write the table, and return it.
 
+        USGS Water issues one bulk `dataretrieval` call per service today, so
+        there is no per-item partial-failure policy (no `errors=` argument).
+
         Args:
             progress_bar: Accepted for signature parity with the other
                 backends. USGS Water issues one bulk `dataretrieval`

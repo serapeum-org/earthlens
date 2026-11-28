@@ -481,6 +481,11 @@ class ASF(AbstractDataSource):
     ) -> list[Path]:
         """Run the search/stack + download and return the written paths.
 
+        This is a single request, with no per-item partial-failure policy:
+        the download hands the whole product set to `asf_search`'s own
+        parallel batch downloader, which exposes no per-item hook, so there
+        is no `errors=` argument (unlike the multi-item imagery backends).
+
         Args:
             progress_bar: Accepted for facade-compatibility; not
                 used (the SDK manages its own per-file progress).

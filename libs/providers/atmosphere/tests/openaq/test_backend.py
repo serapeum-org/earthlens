@@ -319,6 +319,103 @@ class TestDownload:
         assert all(isinstance(frame, pd.DataFrame) for frame in frames)
 
 
+class _RaiseFromCall:
+    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from `from_call`.
+
+    Hoisted to module scope (no nested functions); holds its own call counter.
+    `from_call=2` fails the second sensor (a partial failure); `from_call=1`
+    fails every sensor (a whole-service failure).
+    """
+
+    def __init__(self, real_fetch, exc, from_call=2):
+        self._real = real_fetch
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, product):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(product)
+
+
+@pytest.mark.openaq
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent sensors."""
+
+    def _two_sensor_backend(self, tmp_path, fake_openaq, monkeypatch, exc, from_call=2):
+        """A backend over two pm25 sensors, failing `_fetch_one` from `from_call`."""
+        fake_openaq.locations = {
+            "results": [
+                _location(station_id=1, sensors=[_sensor(sensor_id=10)]),
+                _location(station_id=2, lat=34.2, sensors=[_sensor(sensor_id=11)]),
+            ]
+        }
+        backend = _backend(tmp_path)
+        assert len(backend._search()) == 2, "two sensors should yield two products"
+        monkeypatch.setattr(
+            backend, "_fetch_one", _RaiseFromCall(backend._fetch_one, exc, from_call)
+        )
+        return backend
+
+    def test_raise_propagates_first_failure(self, tmp_path, fake_openaq, monkeypatch):
+        """errors="raise" surfaces a per-sensor exception, not the batch summary."""
+        backend = self._two_sensor_backend(
+            tmp_path, fake_openaq, monkeypatch, ValueError("sensor boom")
+        )
+        with pytest.raises(ValueError, match="sensor boom"):
+            backend.download(progress_bar=False, errors="raise")
+
+    def test_warn_returns_the_surviving_sensor(
+        self, tmp_path, fake_openaq, monkeypatch
+    ):
+        """errors="warn" drops a per-sensor failure and returns the survivor's rows."""
+        backend = self._two_sensor_backend(
+            tmp_path, fake_openaq, monkeypatch, ValueError("sensor boom")
+        )
+        df = backend.download(progress_bar=False, errors="warn")
+        assert len(df) == 1, "the one surviving sensor's measurement"
+
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, tmp_path, fake_openaq, monkeypatch
+    ):
+        """errors="ignore" drops a per-sensor failure silently."""
+        backend = self._two_sensor_backend(
+            tmp_path, fake_openaq, monkeypatch, ValueError("sensor boom")
+        )
+        assert len(backend.download(progress_bar=False, errors="ignore")) == 1
+
+    def test_default_policy_is_warn(self, tmp_path, fake_openaq, monkeypatch):
+        """Omitting errors= defaults to warn — a per-sensor failure is survived."""
+        backend = self._two_sensor_backend(
+            tmp_path, fake_openaq, monkeypatch, ValueError("sensor boom")
+        )
+        assert len(backend.download(progress_bar=False)) == 1
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_sensor_failing_raises(
+        self, tmp_path, fake_openaq, policy, monkeypatch
+    ):
+        """When every sensor fails, the first error is raised — never a silent empty."""
+        backend = self._two_sensor_backend(
+            tmp_path,
+            fake_openaq,
+            monkeypatch,
+            ValueError("all sensors down"),
+            from_call=1,
+        )
+        with pytest.raises(ValueError, match="all sensors down"):
+            backend.download(progress_bar=False, errors=policy)
+
+    def test_invalid_policy_rejected(self, tmp_path, fake_openaq):
+        """An unrecognised errors= value is refused before any request."""
+        backend = _backend(tmp_path)
+        with pytest.raises(ValueError, match="errors"):
+            backend.download(progress_bar=False, errors="explode")
+
+
 @pytest.mark.openaq
 class TestHelpers:
     """Module-level schema and row helpers."""

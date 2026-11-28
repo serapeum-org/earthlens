@@ -56,6 +56,7 @@ from pydantic import SecretStr
 from earthlens.base import (
     CADENCE_ALIASES,
     AbstractDataSource,
+    AuthenticationError,
     OutputKind,
     RemoteProduct,
     TemporalExtent,
@@ -196,6 +197,19 @@ def _bounded_http_calls(method: Callable[_P, _R]) -> Callable[_P, _R]:
             return method(*args, **kwargs)
 
     return wrapper
+
+
+def _describe_product(product: RemoteProduct) -> str:
+    """Render a product id for the `_run_items` log lines.
+
+    Args:
+        product: One `RemoteProduct` from `_search`.
+
+    Returns:
+        str: The product id, quoted — the raw `eumdac` handle in
+            `metadata` is far too verbose for a log line.
+    """
+    return repr(product.id)
 
 
 class EUMETSAT(AbstractDataSource):
@@ -474,11 +488,10 @@ class EUMETSAT(AbstractDataSource):
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
         """Stream every product `_search` returned to a local file.
 
-        Each `eumdac` product is opened (`Product.open()` — a streaming
-        context manager) and copied to `self.root_dir / <id>`, where the
-        product id is reduced to a safe basename (`safe_product_filename`)
-        so a server-supplied id with a path separator cannot write outside
-        the output directory.
+        The whole-list fetch; `download` drives the native branch through
+        `_search_fetch_each` / `_fetch_one` so it can honour the `errors=`
+        partial-failure policy and a per-product progress bar. This remains
+        the direct batch form.
 
         Args:
             products: The products from `_search`.
@@ -487,25 +500,41 @@ class EUMETSAT(AbstractDataSource):
             list[Path]: Local paths of every fetched product, in search
                 order.
         """
-        out_paths: list[Path] = []
-        for rp in products:
-            product = rp.metadata["product"]
-            target = self.root_dir / safe_product_filename(str(product))
-            with product.open() as src, open(target, "wb") as dst:
-                shutil.copyfileobj(src, dst)
-            out_paths.append(target)
-        return out_paths
+        return [self._fetch_one(rp) for rp in products]
+
+    @_bounded_http_calls
+    def _fetch_one(self, product: RemoteProduct) -> Path:
+        """Stream one product to a local file.
+
+        The `eumdac` product is opened (`Product.open()` — a streaming
+        context manager) and copied to `self.root_dir / <id>`, where the
+        product id is reduced to a safe basename (`safe_product_filename`)
+        so a server-supplied id with a path separator cannot write outside
+        the output directory.
+
+        Args:
+            product: One `RemoteProduct` from `_search`.
+
+        Returns:
+            Path: Local path of the fetched product.
+        """
+        handle = product.metadata["product"]
+        target = self.root_dir / safe_product_filename(str(handle))
+        with handle.open() as src, open(target, "wb") as dst:
+            shutil.copyfileobj(src, dst)
+        return target
 
     def download(
         self,
         progress_bar: bool = True,
         tailor: TailorConfig | None = None,
+        errors: str = "warn",
     ) -> list[Path]:
         """Search the Data Store and return product paths (native or tailored).
 
-        With no `tailor=`, composes `_search` and `_fetch` to pull every
-        product matching the request bbox + window to `self.root_dir` as
-        whole native products (unchanged behaviour).
+        With no `tailor=`, composes `_search` and `_fetch_one` to pull
+        every product matching the request bbox + window to
+        `self.root_dir` as whole native products.
 
         With `tailor=TailorConfig(...)`, each matching product is routed
         through EUMETSAT **Data Tailor** (server-side subset / reproject /
@@ -520,30 +549,47 @@ class EUMETSAT(AbstractDataSource):
         The two knobs compose — tailor server-side here, then reduce the
         result client-side with pyramids.
 
-        The tailor branch is **fail-fast per batch**: if one product's
-        customisation fails, the error propagates and paths already streamed
-        for earlier products are not returned (their files remain on disk).
-        This mirrors the native fetch; keep batches small when a partial
-        result would be costly to recompute.
-
         Args:
-            progress_bar: Reserved for parity with the other backends;
-                `eumdac`'s streaming download has no built-in bar.
+            progress_bar: Show a per-product progress bar over the native
+                fetch (the tailor branch has no per-product bar).
             tailor: Optional `TailorConfig` routing the request through
                 Data Tailor. `None` (the default) keeps the native fetch.
+            errors: Partial-failure policy across the independent products:
+
+                * `"warn"` (default) — log each failed product and return the
+                  paths of the products that succeeded.
+                * `"raise"` — propagate the first product failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed products silently.
+
+                A whole-service failure — a rejected OAuth2 key, an
+                exhausted quota, a dead host — fails every product
+                identically; the native branch re-raises the first error
+                when every product fails (never a silent empty result), and
+                the tailor branch re-raises an `AuthenticationError` under
+                every policy (`fatal=`).
 
         Returns:
             list[Path]: The native product paths, or — when `tailor=` is
-                given — the customised output paths.
+                given — the customised output paths (the failed products'
+                paths absent under `"warn"` / `"ignore"`).
 
         Raises:
             ValueError: When `tailor=` names a dataset that is not
                 Data-Tailor-eligible (`G5`).
         """
+        self._errors = self.check_errors_policy(errors)
         self._show_progress = progress_bar
         if tailor is not None:
             return self._tailor(tailor)
-        return self._api_via_search_fetch()
+        return self._search_fetch_each(
+            progress_bar=progress_bar,
+            desc="EUMETSAT products",
+            unit="product",
+            errors=self._errors,
+            raise_if_all_failed=True,
+            label="product",
+        )
 
     @_bounded_http_calls
     def _tailor(self, tailor: TailorConfig) -> list[Path]:
@@ -580,10 +626,27 @@ class EUMETSAT(AbstractDataSource):
         self._auth.configure()
         datatailor = self._auth.datatailor()
         products = self._search()
-        out_paths: list[Path] = []
         used_dirs: set[str] = set()
-        for rp in products:
-            out_paths.extend(self._tailor_one(rp, tailor, datatailor, used_dirs))
+        results, failures = self._run_items(
+            products,
+            functools.partial(
+                self._tailor_one,
+                tailor=tailor,
+                datatailor=datatailor,
+                used_dirs=used_dirs,
+            ),
+            errors=self._errors,
+            label="product",
+            describe=_describe_product,
+            fatal=(AuthenticationError,),
+        )
+        if failures and not results:
+            # Every product's tailor job failed — a whole-service outage, not a
+            # per-product gap; re-raise rather than return an empty download.
+            raise failures[0][1]
+        out_paths: list[Path] = []
+        for product_paths in results:
+            out_paths.extend(product_paths)
         return out_paths
 
     @staticmethod

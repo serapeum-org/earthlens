@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from earthlens.base import AuthenticationError
 from earthlens.earthdata import EarthData
 
 pytestmark = [pytest.mark.earthdata, pytest.mark.integration]
@@ -395,3 +396,100 @@ class TestAggregate:
         monkeypatch.setattr("builtins.__import__", _block_earthaccess)
         with pytest.raises(ImportError, match=r"earthlens\[earthdata\]"):
             obj._search()
+
+
+class _RaiseFromGroup:
+    """A `_fetch_group` stand-in: delegate to the real one, raise from `from_call`.
+
+    Holds its own call counter; `from_call=2` fails the second dataset group (a
+    partial failure), `from_call=1` fails every group (a whole-service failure).
+    """
+
+    def __init__(self, real_fetch, exc, from_call=2):
+        self._real = real_fetch
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, group):
+        """Delegate until `from_call`, then raise `exc` on that group onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(group)
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent dataset groups."""
+
+    _TWO = {"GPM_3IMERGHHL_07": ["precipitation"], "GPM_3IMERGM_07": ["precipitation"]}
+
+    def _two_group_backend(self, tmp_path, monkeypatch, exc, from_call=2):
+        """A backend over two raster datasets, raising `exc` from `from_call`."""
+        obj = _make(tmp_path, self._TWO)
+        monkeypatch.setattr(
+            obj, "_fetch_group", _RaiseFromGroup(obj._fetch_group, exc, from_call)
+        )
+        return obj
+
+    def test_raise_propagates_first_failure(
+        self, fake_earthaccess, edl_env, tmp_path, monkeypatch
+    ):
+        """errors="raise" surfaces a per-group exception, not the batch summary."""
+        obj = self._two_group_backend(tmp_path, monkeypatch, ValueError("group boom"))
+        with pytest.raises(ValueError, match="group boom"):
+            obj.download(progress_bar=False, errors="raise")
+
+    def test_warn_returns_the_surviving_group(
+        self, fake_earthaccess, edl_env, tmp_path, monkeypatch
+    ):
+        """errors="warn" drops a non-fatal per-group failure and returns survivors."""
+        obj = self._two_group_backend(tmp_path, monkeypatch, ValueError("group boom"))
+        paths = obj.download(progress_bar=False, errors="warn")
+        assert len(paths) == len(fake_earthaccess.granules), (
+            f"expected the surviving group's granules, got {len(paths)}"
+        )
+
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, fake_earthaccess, edl_env, tmp_path, monkeypatch
+    ):
+        """errors="ignore" drops a non-fatal per-group failure silently."""
+        obj = self._two_group_backend(tmp_path, monkeypatch, ValueError("group boom"))
+        paths = obj.download(progress_bar=False, errors="ignore")
+        assert len(paths) == len(fake_earthaccess.granules)
+
+    def test_default_policy_is_warn(
+        self, fake_earthaccess, edl_env, tmp_path, monkeypatch
+    ):
+        """Omitting errors= defaults to warn — a non-fatal group failure is survived."""
+        obj = self._two_group_backend(tmp_path, monkeypatch, ValueError("group boom"))
+        paths = obj.download(progress_bar=False)
+        assert len(paths) == len(fake_earthaccess.granules)
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_auth_error_propagates_under_any_policy(
+        self, fake_earthaccess, edl_env, tmp_path, monkeypatch, policy
+    ):
+        """A whole-service AuthenticationError propagates even under warn/ignore."""
+        obj = self._two_group_backend(
+            tmp_path, monkeypatch, AuthenticationError("EDL down"), from_call=1
+        )
+        with pytest.raises(AuthenticationError, match="EDL down"):
+            obj.download(progress_bar=False, errors=policy)
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_group_failing_raises_non_fatal(
+        self, fake_earthaccess, edl_env, tmp_path, monkeypatch, policy
+    ):
+        """When every dataset group fails, the first error is raised, never empty."""
+        obj = self._two_group_backend(
+            tmp_path, monkeypatch, ValueError("all groups down"), from_call=1
+        )
+        with pytest.raises(ValueError, match="all groups down"):
+            obj.download(progress_bar=False, errors=policy)
+
+    def test_invalid_policy_rejected(self, fake_earthaccess, edl_env, tmp_path):
+        """An unrecognised errors= value is refused before any request."""
+        obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]})
+        with pytest.raises(ValueError, match="errors"):
+            obj.download(progress_bar=False, errors="explode")

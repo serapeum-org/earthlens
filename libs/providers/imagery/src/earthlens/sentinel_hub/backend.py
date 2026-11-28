@@ -25,6 +25,7 @@ it maps to the Statistical `aggregation_interval`), so demoting the instance to
 
 from __future__ import annotations
 
+import functools
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
@@ -34,6 +35,7 @@ from pydantic import SecretStr
 from earthlens.base import (
     CADENCE_ALIASES,
     AbstractDataSource,
+    AuthenticationError,
     OutputKind,
     RemoteProduct,
     TemporalExtent,
@@ -63,6 +65,18 @@ _VALID_MOSAICKING_ORDERS: tuple[str, ...] = ("mostRecent", "leastRecent", "least
 
 #: Default per-pixel scene selection passed to `SentinelHubRequest.input_data`.
 _DEFAULT_MOSAICKING_ORDER = "mostRecent"
+
+
+def _describe_product(product: RemoteProduct) -> str:
+    """Render a product id for the `_run_items` log lines across the planes.
+
+    Args:
+        product: One `RemoteProduct` from `_search`.
+
+    Returns:
+        str: The product id (the collection / recipe key), quoted.
+    """
+    return repr(product.id)
 
 
 class SentinelHub(AbstractDataSource):
@@ -493,15 +507,41 @@ class SentinelHub(AbstractDataSource):
         sh_bbox = self._bbox()
         size = self._request_size()
         self._guard_process_size(size)
-        out: list[Path] = []
-        for product in products:
-            resolved: ResolvedRequest = product.metadata["resolved"]
-            out.append(
-                self._render_process_tile(
-                    sentinelhub, resolved, sh_bbox, size, str(self.root_dir)
-                )
-            )
-        return out
+        results, failures = self._run_items(
+            products,
+            functools.partial(
+                self._process_one, sentinelhub=sentinelhub, sh_bbox=sh_bbox, size=size
+            ),
+            errors=self._errors,
+            label="product",
+            describe=_describe_product,
+            fatal=(AuthenticationError,),
+        )
+        if failures and not results:
+            # Every product failed — a whole-service outage (a rejected
+            # credential, a dead endpoint), not a per-product gap; re-raise
+            # rather than report it as an empty download (ARC-9a).
+            raise failures[0][1]
+        return results
+
+    def _process_one(
+        self, product: RemoteProduct, *, sentinelhub: Any, sh_bbox: Any, size: tuple
+    ) -> Path:
+        """Render one product synchronously via the Process API — the loop hook.
+
+        Args:
+            product: One `RemoteProduct` from `_search`.
+            sentinelhub: The imported `sentinelhub` module.
+            sh_bbox: The request `BBox`.
+            size: The `(width, height)` render size.
+
+        Returns:
+            Path: The written GeoTIFF for this product.
+        """
+        resolved: ResolvedRequest = product.metadata["resolved"]
+        return self._render_process_tile(
+            sentinelhub, resolved, sh_bbox, size, str(self.root_dir)
+        )
 
     def _render_process_tile(
         self,
@@ -614,38 +654,83 @@ class SentinelHub(AbstractDataSource):
         sh_bbox = self._bbox()
         size = self._request_size()
         self._guard_async_size(size)
-        out: list[str] = []
-        for product in products:
-            resolved: ResolvedRequest = product.metadata["resolved"]
-            evalscript = self._read_evalscript(resolved)
-            request = sentinelhub.AsyncProcessRequest(
-                evalscript=evalscript,
-                input_data=[self._build_input_data(sentinelhub, resolved)],
-                responses=[
-                    sentinelhub.AsyncProcessRequest.output_response(
-                        "default", sentinelhub.MimeType.TIFF
-                    )
-                ],
+        results, failures = self._run_items(
+            products,
+            functools.partial(
+                self._async_one,
+                sentinelhub=sentinelhub,
+                cfg=cfg,
                 delivery=delivery,
-                bbox=sh_bbox,
+                bucket_uri=bucket_uri,
+                sh_bbox=sh_bbox,
                 size=size,
-                config=cfg,
-            )
-            # AsyncProcessRequest.get_data submits the job and returns the
-            # submission JSON, which carries the async request id; poll on that
-            # id (NOT the delivery URL — get_async_running_status resolves
-            # `…/async/process/{id}`).
-            request_id = _async_request_id(request.get_data(save_data=False))
-            if request_id is not None:
-                _wait_for_async(sentinelhub, [request_id], cfg)
-            else:
-                logger.warning(
-                    "Sentinel Hub async: could not determine the request id from "
-                    "the submission response; skipping the completion poll."
+            ),
+            errors=self._errors,
+            label="product",
+            describe=_describe_product,
+            fatal=(AuthenticationError,),
+        )
+        if failures and not results:
+            # Every product failed — a whole-service outage (a rejected
+            # credential, a dead endpoint), not a per-product gap; re-raise
+            # rather than report it as an empty download (ARC-9a).
+            raise failures[0][1]
+        logger.info(f"Sentinel Hub async: delivered {len(results)} object(s) to S3")
+        return results
+
+    def _async_one(
+        self,
+        product: RemoteProduct,
+        *,
+        sentinelhub: Any,
+        cfg: Any,
+        delivery: Any,
+        bucket_uri: Any,
+        sh_bbox: Any,
+        size: tuple,
+    ) -> str:
+        """Submit + poll one Async Processing request — the loop hook.
+
+        Args:
+            product: One `RemoteProduct` from `_search`.
+            sentinelhub: The imported `sentinelhub` module.
+            cfg: The resolved SH config.
+            delivery: The S3 delivery `AccessSpecification`.
+            bucket_uri: The configured delivery prefix, returned per product.
+            sh_bbox: The request `BBox`.
+            size: The `(width, height)` render size.
+
+        Returns:
+            str: The S3 delivery prefix for this product.
+        """
+        resolved: ResolvedRequest = product.metadata["resolved"]
+        evalscript = self._read_evalscript(resolved)
+        request = sentinelhub.AsyncProcessRequest(
+            evalscript=evalscript,
+            input_data=[self._build_input_data(sentinelhub, resolved)],
+            responses=[
+                sentinelhub.AsyncProcessRequest.output_response(
+                    "default", sentinelhub.MimeType.TIFF
                 )
-            out.append(str(bucket_uri))
-        logger.info(f"Sentinel Hub async: delivered {len(out)} object(s) to S3")
-        return out
+            ],
+            delivery=delivery,
+            bbox=sh_bbox,
+            size=size,
+            config=cfg,
+        )
+        # AsyncProcessRequest.get_data submits the job and returns the
+        # submission JSON, which carries the async request id; poll on that
+        # id (NOT the delivery URL — get_async_running_status resolves
+        # `…/async/process/{id}`).
+        request_id = _async_request_id(request.get_data(save_data=False))
+        if request_id is not None:
+            _wait_for_async(sentinelhub, [request_id], cfg)
+        else:
+            logger.warning(
+                "Sentinel Hub async: could not determine the request id from "
+                "the submission response; skipping the completion poll."
+            )
+        return str(bucket_uri)
 
     def _fetch_tiling(self, products: list[RemoteProduct]) -> list[Path]:
         """Render an oversized AOI by local tiling + mosaic (no S3 needed).
@@ -697,46 +782,88 @@ class SentinelHub(AbstractDataSource):
                     "re-tile finer."
                 )
             tile_specs.append((sh_bbox, tile_size))
-        out: list[Path] = []
-        for product in products:
-            resolved: ResolvedRequest = product.metadata["resolved"]
-            tile_dir = Path(self.root_dir) / f"_tiles_{safe_filename(product.id)}"
-            tile_dir.mkdir(parents=True, exist_ok=True)
-            tile_paths: list[str] = []
-            for index, (sh_bbox, tile_size) in enumerate(tile_specs):
-                rendered = self._render_process_tile(
-                    sentinelhub,
-                    resolved,
-                    sh_bbox,
-                    tile_size,
-                    str(tile_dir / str(index)),
-                )
-                tile_paths.append(str(rendered))
-            merged = Path(self.root_dir) / f"{safe_filename(product.id)}.tif"
-            # Carry the first tile's own no-data marker onto the mosaic
-            # explicitly -- None when it declares none, asking for no marker
-            # at all rather than a stray literal like the string "none".
-            first_tile = Dataset.read_file(tile_paths[0])
-            try:
-                tile_no_data = first_tile.no_data_value
-            finally:
-                # Release before the tiles are removed: a live handle keeps a
-                # Windows lock and the cleanup below would fail silently.
-                first_tile.close()
-            fill = (
-                tile_no_data[0]
-                if isinstance(tile_no_data, (list, tuple))
-                else tile_no_data
-            )
-            merge_rasters(
-                tile_paths,
-                str(merged),
-                no_data_value=fill,
-            )
-            shutil.rmtree(tile_dir, ignore_errors=True)
-            out.append(merged)
+        results, failures = self._run_items(
+            products,
+            functools.partial(
+                self._tiling_one,
+                sentinelhub=sentinelhub,
+                tile_specs=tile_specs,
+                dataset_cls=Dataset,
+                merge=merge_rasters,
+                rmtree=shutil.rmtree,
+            ),
+            errors=self._errors,
+            label="product",
+            describe=_describe_product,
+            fatal=(AuthenticationError,),
+        )
+        if failures and not results:
+            # Every product failed — a whole-service outage (a rejected
+            # credential, a dead endpoint), not a per-product gap; re-raise
+            # rather than report it as an empty download (ARC-9a).
+            raise failures[0][1]
         logger.info(f"Sentinel Hub tiling: merged {len(tiles)} tile(s) per product")
-        return out
+        return results
+
+    def _tiling_one(
+        self,
+        product: RemoteProduct,
+        *,
+        sentinelhub: Any,
+        tile_specs: list,
+        dataset_cls: Any,
+        merge: Any,
+        rmtree: Any,
+    ) -> Path:
+        """Render + mosaic one product's tiles into a GeoTIFF — the loop hook.
+
+        Args:
+            product: One `RemoteProduct` from `_search`.
+            sentinelhub: The imported `sentinelhub` module.
+            tile_specs: The pre-sized `(bbox, size)` tiles shared by every
+                product.
+            dataset_cls: `pyramids.dataset.Dataset`, injected to avoid a
+                re-import.
+            merge: `pyramids.dataset.merge.merge_rasters`, injected likewise.
+            rmtree: `shutil.rmtree`, injected likewise.
+
+        Returns:
+            Path: The merged GeoTIFF for this product.
+        """
+        resolved: ResolvedRequest = product.metadata["resolved"]
+        tile_dir = Path(self.root_dir) / f"_tiles_{safe_filename(product.id)}"
+        tile_dir.mkdir(parents=True, exist_ok=True)
+        tile_paths: list[str] = []
+        for index, (sh_bbox, tile_size) in enumerate(tile_specs):
+            rendered = self._render_process_tile(
+                sentinelhub,
+                resolved,
+                sh_bbox,
+                tile_size,
+                str(tile_dir / str(index)),
+            )
+            tile_paths.append(str(rendered))
+        merged = Path(self.root_dir) / f"{safe_filename(product.id)}.tif"
+        # Carry the first tile's own no-data marker onto the mosaic
+        # explicitly -- None when it declares none, asking for no marker
+        # at all rather than a stray literal like the string "none".
+        first_tile = dataset_cls.read_file(tile_paths[0])
+        try:
+            tile_no_data = first_tile.no_data_value
+        finally:
+            # Release before the tiles are removed: a live handle keeps a
+            # Windows lock and the cleanup below would fail silently.
+            first_tile.close()
+        fill = (
+            tile_no_data[0] if isinstance(tile_no_data, (list, tuple)) else tile_no_data
+        )
+        merge(
+            tile_paths,
+            str(merged),
+            no_data_value=fill,
+        )
+        rmtree(tile_dir, ignore_errors=True)
+        return merged
 
     def _fetch_batch(self, products: list[RemoteProduct]) -> list[str]:
         """Render a very large AOI via the Batch Processing API, tiled to S3.
@@ -789,47 +916,95 @@ class SentinelHub(AbstractDataSource):
         )
         output = client.raster_output(delivery=delivery)
         sh_bbox = self._bbox()
-        out: list[str] = []
-        for product in products:
-            resolved: ResolvedRequest = product.metadata["resolved"]
-            base = sentinelhub.SentinelHubRequest(
-                evalscript=self._read_evalscript(resolved),
-                input_data=[self._build_input_data(sentinelhub, resolved)],
-                responses=[
-                    sentinelhub.SentinelHubRequest.output_response(
-                        "default", sentinelhub.MimeType.TIFF
-                    )
-                ],
-                bbox=sh_bbox,
-                config=cfg,
-            )
-            batch_request = client.create(base, input=tiling, output=output)
-            # Analyse first so the tile count / cost is known before committing
-            # the (potentially continental, costly) job. start_analysis only
-            # *starts* the analysis phase, so wait for it to finish before
-            # reading cost_PU (otherwise the guard below sees None and is a no-op).
-            client.start_analysis(batch_request)
-            sentinelhub.monitor_batch_process_analysis(batch_request, client)
-            batch_request = client.get_request(batch_request)
-            cost_pu = getattr(batch_request, "cost_PU", None)
-            logger.info(
-                f"Sentinel Hub batch: analysed {product.id!r} (cost_PU={cost_pu})"
-            )
-            if (
-                max_cost_pu is not None
-                and cost_pu is not None
-                and cost_pu > max_cost_pu
-            ):
-                raise ValueError(
-                    f"batch analysis estimates cost_PU={cost_pu} for {product.id!r}, "
-                    f"which exceeds batch_output['max_cost_pu']={max_cost_pu}; raise "
-                    "the limit or shrink the request/resolution."
+        results, failures = self._run_items(
+            products,
+            functools.partial(
+                self._batch_one,
+                sentinelhub=sentinelhub,
+                client=client,
+                cfg=cfg,
+                tiling=tiling,
+                output=output,
+                sh_bbox=sh_bbox,
+                url=url,
+                max_cost_pu=max_cost_pu,
+            ),
+            errors=self._errors,
+            label="product",
+            describe=_describe_product,
+            fatal=(AuthenticationError,),
+        )
+        if failures and not results:
+            # Every product failed — a whole-service outage (a rejected
+            # credential, a dead endpoint), not a per-product gap; re-raise
+            # rather than report it as an empty download (ARC-9a).
+            raise failures[0][1]
+        logger.info(f"Sentinel Hub batch: {len(results)} job(s) delivered to S3")
+        return results
+
+    def _batch_one(
+        self,
+        product: RemoteProduct,
+        *,
+        sentinelhub: Any,
+        client: Any,
+        cfg: Any,
+        tiling: Any,
+        output: Any,
+        sh_bbox: Any,
+        url: Any,
+        max_cost_pu: Any,
+    ) -> str:
+        """Create, analyse, cost-guard and run one batch job — the loop hook.
+
+        Args:
+            product: One `RemoteProduct` from `_search`.
+            sentinelhub: The imported `sentinelhub` module.
+            client: The `BatchProcessClient`.
+            cfg: The resolved SH config.
+            tiling: The server-side tiling-grid input.
+            output: The raster output spec.
+            sh_bbox: The request `BBox`.
+            url: The S3 delivery prefix, returned per product.
+            max_cost_pu: Optional `cost_PU` ceiling the analysis must not exceed.
+
+        Returns:
+            str: The S3 delivery prefix for this product.
+
+        Raises:
+            ValueError: When the analysed `cost_PU` exceeds `max_cost_pu`.
+        """
+        resolved: ResolvedRequest = product.metadata["resolved"]
+        base = sentinelhub.SentinelHubRequest(
+            evalscript=self._read_evalscript(resolved),
+            input_data=[self._build_input_data(sentinelhub, resolved)],
+            responses=[
+                sentinelhub.SentinelHubRequest.output_response(
+                    "default", sentinelhub.MimeType.TIFF
                 )
-            client.start_job(batch_request)
-            sentinelhub.monitor_batch_process_job(batch_request, client)
-            out.append(str(url))
-        logger.info(f"Sentinel Hub batch: {len(out)} job(s) delivered to S3")
-        return out
+            ],
+            bbox=sh_bbox,
+            config=cfg,
+        )
+        batch_request = client.create(base, input=tiling, output=output)
+        # Analyse first so the tile count / cost is known before committing
+        # the (potentially continental, costly) job. start_analysis only
+        # *starts* the analysis phase, so wait for it to finish before
+        # reading cost_PU (otherwise the guard below sees None and is a no-op).
+        client.start_analysis(batch_request)
+        sentinelhub.monitor_batch_process_analysis(batch_request, client)
+        batch_request = client.get_request(batch_request)
+        cost_pu = getattr(batch_request, "cost_PU", None)
+        logger.info(f"Sentinel Hub batch: analysed {product.id!r} (cost_PU={cost_pu})")
+        if max_cost_pu is not None and cost_pu is not None and cost_pu > max_cost_pu:
+            raise ValueError(
+                f"batch analysis estimates cost_PU={cost_pu} for {product.id!r}, "
+                f"which exceeds batch_output['max_cost_pu']={max_cost_pu}; raise "
+                "the limit or shrink the request/resolution."
+            )
+        client.start_job(batch_request)
+        sentinelhub.monitor_batch_process_job(batch_request, client)
+        return str(url)
 
     def _statistical_evalscript(self, resolved: ResolvedRequest) -> str:
         """Resolve the evalscript for a Statistical request (must emit `dataMask`).
@@ -887,57 +1062,99 @@ class SentinelHub(AbstractDataSource):
         cfg = self._config()
         interval = self._statistical_interval()
         geometries = _iter_geometries(self._geometry)
-        out: list[Path] = []
-        for product in products:
-            resolved: ResolvedRequest = product.metadata["resolved"]
-            evalscript = self._statistical_evalscript(resolved)
-            collection = cdse_collection(resolved.sh_collection, cfg.sh_base_url)
-            rows: list[dict] = []
-            for feature_id, geom in geometries:
-                # Size the sampling grid in pixels from the geometry's WGS84
-                # bounds via bbox_to_dimensions (which converts metres -> px with
-                # latitude). Passing `resolution=` here would be read in the
-                # geometry CRS units (degrees), so a metre value collapses to a
-                # single pixel and the server rejects the effective resolution.
-                geom_bbox = sentinelhub.BBox(
-                    _geometry_bounds(geom), crs=sentinelhub.CRS.WGS84
-                )
-                size = sentinelhub.bbox_to_dimensions(
-                    geom_bbox, resolution=self._resolution
-                )
-                aggregation = sentinelhub.SentinelHubStatistical.aggregation(
-                    evalscript=evalscript,
-                    time_interval=self._time_interval(),
-                    aggregation_interval=interval,
-                    size=size,
-                )
-                input_kwargs: dict[str, Any] = {}
-                if self._maxcc is not None:
-                    input_kwargs["maxcc"] = self._maxcc
-                request = sentinelhub.SentinelHubStatistical(
-                    aggregation=aggregation,
-                    input_data=[
-                        sentinelhub.SentinelHubStatistical.input_data(
-                            collection, **input_kwargs
-                        )
-                    ],
-                    geometry=sentinelhub.Geometry(geom, crs=sentinelhub.CRS.WGS84),
-                    calculations=_STAT_CALCULATIONS,
-                    config=cfg,
-                )
-                payload = request.get_data()[0]
-                rows.extend(_flatten_statistics(payload, feature_id=feature_id))
-            if not rows:
-                logger.warning(
-                    f"Sentinel Hub statistical: no data returned for "
-                    f"{product.id!r} over the request geometry + window "
-                    "(empty table written)."
-                )
-            target = Path(self.root_dir) / f"{safe_filename(product.id)}.csv"
-            _stats_frame(rows).to_csv(target, index=False)
-            out.append(target)
-        logger.info(f"Sentinel Hub statistical: wrote {len(out)} table(s)")
-        return out
+        results, failures = self._run_items(
+            products,
+            functools.partial(
+                self._statistical_one,
+                sentinelhub=sentinelhub,
+                cfg=cfg,
+                interval=interval,
+                geometries=geometries,
+            ),
+            errors=self._errors,
+            label="product",
+            describe=_describe_product,
+            fatal=(AuthenticationError,),
+        )
+        if failures and not results:
+            # Every product failed — a whole-service outage (a rejected
+            # credential, a dead endpoint), not a per-product gap; re-raise
+            # rather than report it as an empty download (ARC-9a).
+            raise failures[0][1]
+        logger.info(f"Sentinel Hub statistical: wrote {len(results)} table(s)")
+        return results
+
+    def _statistical_one(
+        self,
+        product: RemoteProduct,
+        *,
+        sentinelhub: Any,
+        cfg: Any,
+        interval: str,
+        geometries: list,
+    ) -> Path:
+        """Compute + write one product's zonal-stats table — the loop hook.
+
+        The inner per-geometry loop is intentionally kept here (out of the
+        `errors=` scope): a failure of one geometry aborts the product.
+
+        Args:
+            product: One `RemoteProduct` from `_search`.
+            sentinelhub: The imported `sentinelhub` module.
+            cfg: The resolved SH config.
+            interval: The Statistical `aggregation_interval`.
+            geometries: The `(feature_id, geom)` pairs to sample.
+
+        Returns:
+            Path: The written CSV for this product.
+        """
+        resolved: ResolvedRequest = product.metadata["resolved"]
+        evalscript = self._statistical_evalscript(resolved)
+        collection = cdse_collection(resolved.sh_collection, cfg.sh_base_url)
+        rows: list[dict] = []
+        for feature_id, geom in geometries:
+            # Size the sampling grid in pixels from the geometry's WGS84
+            # bounds via bbox_to_dimensions (which converts metres -> px with
+            # latitude). Passing `resolution=` here would be read in the
+            # geometry CRS units (degrees), so a metre value collapses to a
+            # single pixel and the server rejects the effective resolution.
+            geom_bbox = sentinelhub.BBox(
+                _geometry_bounds(geom), crs=sentinelhub.CRS.WGS84
+            )
+            size = sentinelhub.bbox_to_dimensions(
+                geom_bbox, resolution=self._resolution
+            )
+            aggregation = sentinelhub.SentinelHubStatistical.aggregation(
+                evalscript=evalscript,
+                time_interval=self._time_interval(),
+                aggregation_interval=interval,
+                size=size,
+            )
+            input_kwargs: dict[str, Any] = {}
+            if self._maxcc is not None:
+                input_kwargs["maxcc"] = self._maxcc
+            request = sentinelhub.SentinelHubStatistical(
+                aggregation=aggregation,
+                input_data=[
+                    sentinelhub.SentinelHubStatistical.input_data(
+                        collection, **input_kwargs
+                    )
+                ],
+                geometry=sentinelhub.Geometry(geom, crs=sentinelhub.CRS.WGS84),
+                calculations=_STAT_CALCULATIONS,
+                config=cfg,
+            )
+            payload = request.get_data()[0]
+            rows.extend(_flatten_statistics(payload, feature_id=feature_id))
+        if not rows:
+            logger.warning(
+                f"Sentinel Hub statistical: no data returned for "
+                f"{product.id!r} over the request geometry + window "
+                "(empty table written)."
+            )
+        target = Path(self.root_dir) / f"{safe_filename(product.id)}.csv"
+        _stats_frame(rows).to_csv(target, index=False)
+        return target
 
     def _fetch_batch_statistical(self, products: list[RemoteProduct]) -> list[Path]:
         """Compute zonal stats over a huge `FeatureCollection` via Batch Statistical.
@@ -959,8 +1176,6 @@ class SentinelHub(AbstractDataSource):
             ValueError: When `batch_output` is missing its `input_features` or
                 output bucket, or the evalscript lacks a `dataMask` band.
         """
-        from sentinelhub.aws import AwsBatchStatisticalResults
-
         sentinelhub = import_sentinelhub()
         if not self._batch_output:
             raise ValueError(
@@ -980,55 +1195,112 @@ class SentinelHub(AbstractDataSource):
         cfg = self._config()
         interval = self._statistical_interval()
         client = sentinelhub.SentinelHubBatchStatistical(config=cfg)
-        out: list[Path] = []
-        for product in products:
-            resolved: ResolvedRequest = product.metadata["resolved"]
-            evalscript = self._statistical_evalscript(resolved)
-            aggregation = sentinelhub.SentinelHubStatistical.aggregation(
-                evalscript=evalscript,
-                time_interval=self._time_interval(),
-                aggregation_interval=interval,
-                resolution=(self._resolution, self._resolution),
-            )
-            input_kwargs: dict[str, Any] = {}
-            if self._maxcc is not None:
-                input_kwargs["maxcc"] = self._maxcc
-            batch_request = client.create(
-                input_features=client.s3_specification(url=features_url, **spec),
-                input_data=[
-                    sentinelhub.SentinelHubStatistical.input_data(
-                        cdse_collection(resolved.sh_collection, cfg.sh_base_url),
-                        **input_kwargs,
-                    )
-                ],
-                aggregation=aggregation,
-                calculations=_STAT_CALCULATIONS,
-                output=client.s3_specification(url=output_url, **spec),
-            )
-            client.start_analysis(batch_request)
-            client.start_job(batch_request)
-            sentinelhub.monitor_batch_statistical_job(batch_request, cfg)
-            results = AwsBatchStatisticalResults(
-                batch_request,
+        results, failures = self._run_items(
+            products,
+            functools.partial(
+                self._batch_statistical_one,
+                sentinelhub=sentinelhub,
+                client=client,
+                cfg=cfg,
+                interval=interval,
+                spec=spec,
+                features_url=features_url,
+                output_url=output_url,
                 feature_ids=feature_ids,
-                data_folder=str(self.root_dir),
-                config=cfg,
-            )
-            payloads = results.get_data(save_data=True)
-            rows: list[dict] = []
-            ids = feature_ids if feature_ids is not None else range(len(payloads))
-            for feature_id, payload in zip(ids, payloads):
-                rows.extend(_flatten_statistics(payload, feature_id=feature_id))
-            target = Path(self.root_dir) / f"{safe_filename(product.id)}.csv"
-            _stats_frame(rows).to_csv(target, index=False)
-            out.append(target)
-        logger.info(f"Sentinel Hub batch-statistical: wrote {len(out)} table(s)")
-        return out
+            ),
+            errors=self._errors,
+            label="product",
+            describe=_describe_product,
+            fatal=(AuthenticationError,),
+        )
+        if failures and not results:
+            # Every product failed — a whole-service outage (a rejected
+            # credential, a dead endpoint), not a per-product gap; re-raise
+            # rather than report it as an empty download (ARC-9a).
+            raise failures[0][1]
+        logger.info(f"Sentinel Hub batch-statistical: wrote {len(results)} table(s)")
+        return results
+
+    def _batch_statistical_one(
+        self,
+        product: RemoteProduct,
+        *,
+        sentinelhub: Any,
+        client: Any,
+        cfg: Any,
+        interval: str,
+        spec: dict,
+        features_url: Any,
+        output_url: Any,
+        feature_ids: Any,
+    ) -> Path:
+        """Run + collect one product's batch-statistical job — the loop hook.
+
+        The inner per-feature flatten loop is kept here (out of the `errors=`
+        scope).
+
+        Args:
+            product: One `RemoteProduct` from `_search`.
+            sentinelhub: The imported `sentinelhub` module.
+            client: The `SentinelHubBatchStatistical` client.
+            cfg: The resolved SH config.
+            interval: The Statistical `aggregation_interval`.
+            spec: The remaining `batch_output` spec (minus the popped keys).
+            features_url: The S3 GeoPackage of input features.
+            output_url: The S3 output bucket.
+            feature_ids: Optional subset of feature ids to retrieve.
+
+        Returns:
+            Path: The written CSV for this product.
+        """
+        from sentinelhub.aws import AwsBatchStatisticalResults
+
+        resolved: ResolvedRequest = product.metadata["resolved"]
+        evalscript = self._statistical_evalscript(resolved)
+        aggregation = sentinelhub.SentinelHubStatistical.aggregation(
+            evalscript=evalscript,
+            time_interval=self._time_interval(),
+            aggregation_interval=interval,
+            resolution=(self._resolution, self._resolution),
+        )
+        input_kwargs: dict[str, Any] = {}
+        if self._maxcc is not None:
+            input_kwargs["maxcc"] = self._maxcc
+        batch_request = client.create(
+            input_features=client.s3_specification(url=features_url, **spec),
+            input_data=[
+                sentinelhub.SentinelHubStatistical.input_data(
+                    cdse_collection(resolved.sh_collection, cfg.sh_base_url),
+                    **input_kwargs,
+                )
+            ],
+            aggregation=aggregation,
+            calculations=_STAT_CALCULATIONS,
+            output=client.s3_specification(url=output_url, **spec),
+        )
+        client.start_analysis(batch_request)
+        client.start_job(batch_request)
+        sentinelhub.monitor_batch_statistical_job(batch_request, cfg)
+        results = AwsBatchStatisticalResults(
+            batch_request,
+            feature_ids=feature_ids,
+            data_folder=str(self.root_dir),
+            config=cfg,
+        )
+        payloads = results.get_data(save_data=True)
+        rows: list[dict] = []
+        ids = feature_ids if feature_ids is not None else range(len(payloads))
+        for feature_id, payload in zip(ids, payloads):
+            rows.extend(_flatten_statistics(payload, feature_id=feature_id))
+        target = Path(self.root_dir) / f"{safe_filename(product.id)}.csv"
+        _stats_frame(rows).to_csv(target, index=False)
+        return target
 
     def download(
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
+        errors: str = "warn",
     ) -> list[Any]:
         """Build the request(s), render server-side, and collect the output.
 
@@ -1036,12 +1308,28 @@ class SentinelHub(AbstractDataSource):
             progress_bar: Reserved for parity with the other backends.
             aggregate: Optional aggregation request. Accepted (not rejected)
                 because `OUTPUT_KIND` is `"mixed"`; applied per plane in C10.
+            errors: Partial-failure policy across the independent collection /
+                recipe keys on every plane:
+
+                * `"warn"` (default) — log each failed key and return the
+                  outputs of the keys that succeeded.
+                * `"raise"` — propagate the first key failure, for a pipeline
+                  that must fail fast.
+                * `"ignore"` — drop failed keys silently.
+
+                A whole-service failure — a rejected CDSE OAuth client, a dead
+                host — surfaces as an `AuthenticationError` re-raised under
+                every policy (`fatal=`), never swallowed as an empty result.
+                The inner per-geometry / per-window loops are unaffected: a
+                failure there still aborts its key.
 
         Returns:
             The written raster paths / table paths / S3 URIs, depending on the
-            resolved plane.
+            resolved plane (the failed keys' outputs absent under `"warn"` /
+            `"ignore"`).
         """
         self._aggregate = aggregate
+        self._errors = self.check_errors_policy(errors)
         plane = self._resolve_plane()
         if aggregate is not None and plane in RASTER_APIS:
             results = self._aggregate_windows(aggregate)

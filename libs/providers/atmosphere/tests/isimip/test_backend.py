@@ -397,6 +397,89 @@ class TestMisc:
         assert b._client_or_build() is sentinel
 
 
+class _RaiseFromCall:
+    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from `from_call`.
+
+    Hoisted to module scope (no nested functions); holds its own call counter.
+    `from_call=2` fails the second dataset (a partial failure); `from_call=1`
+    fails every dataset (a whole-service failure).
+    """
+
+    def __init__(self, real_fetch, exc, from_call=2):
+        self._real = real_fetch
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, product):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(product)
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent datasets."""
+
+    def _two_dataset_backend(self, make_backend, monkeypatch, exc, from_call=2):
+        """A backend over two variables (pr + tas), failing `_fetch_one` from `from_call`."""
+        b = make_backend(variables=["pr", "tas"])
+        assert len(b._search()) == 2, "two variables should fan out to two datasets"
+        monkeypatch.setattr(
+            b, "_fetch_one", _RaiseFromCall(b._fetch_one, exc, from_call)
+        )
+        return b
+
+    def test_raise_propagates_first_failure(self, make_backend, monkeypatch):
+        """errors="raise" surfaces a per-dataset exception, not the batch summary."""
+        b = self._two_dataset_backend(
+            make_backend, monkeypatch, ValueError("dataset boom")
+        )
+        with pytest.raises(ValueError, match="dataset boom"):
+            b.download(progress_bar=False, errors="raise")
+
+    def test_warn_returns_the_surviving_dataset(self, make_backend, monkeypatch):
+        """errors="warn" drops a per-dataset failure and returns the survivor's paths."""
+        b = self._two_dataset_backend(
+            make_backend, monkeypatch, ValueError("dataset boom")
+        )
+        out = b.download(progress_bar=False, errors="warn")
+        assert len(out) == 1
+        assert out[0].exists()
+
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, make_backend, monkeypatch
+    ):
+        """errors="ignore" drops a per-dataset failure silently."""
+        b = self._two_dataset_backend(
+            make_backend, monkeypatch, ValueError("dataset boom")
+        )
+        assert len(b.download(progress_bar=False, errors="ignore")) == 1
+
+    def test_default_policy_is_warn(self, make_backend, monkeypatch):
+        """Omitting errors= defaults to warn — a per-dataset failure is survived."""
+        b = self._two_dataset_backend(
+            make_backend, monkeypatch, ValueError("dataset boom")
+        )
+        assert len(b.download(progress_bar=False)) == 1
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_dataset_failing_raises(self, make_backend, policy, monkeypatch):
+        """When every dataset fails, the first error is raised — never a silent empty."""
+        b = self._two_dataset_backend(
+            make_backend, monkeypatch, ValueError("all datasets down"), from_call=1
+        )
+        with pytest.raises(ValueError, match="all datasets down"):
+            b.download(progress_bar=False, errors=policy)
+
+    def test_invalid_policy_rejected(self, make_backend):
+        """An unrecognised errors= value is refused before any request."""
+        b = make_backend()
+        with pytest.raises(ValueError, match="errors"):
+            b.download(progress_bar=False, errors="explode")
+
+
 class TestNoXarray:
     """Conformance: the package never imports a NetCDF decoder."""
 

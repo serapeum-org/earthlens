@@ -316,19 +316,19 @@ class TestThePerAxisCapAppliesHereToo:
         """Before the request goes out, with our message rather than theirs."""
         gee = _gee(make_gee, engine="pixels", **self.WIDE)
         with pytest.raises(ValueError, match="same per-axis cap"):
-            gee.download(progress_bar=False)
+            gee.download(progress_bar=False, errors="raise")
 
     def test_the_refusal_quotes_the_grid_and_the_remedies(self, make_gee, fake_reader):
         """A caller can act on it: the size, and the four ways out."""
         gee = _gee(make_gee, engine="pixels", **self.WIDE)
         with pytest.raises(ValueError, match="auto_split=True"):
-            gee.download(progress_bar=False)
+            gee.download(progress_bar=False, errors="raise")
 
     def test_nothing_is_posted_when_it_is_refused(self, make_gee, fake_reader):
         """The point of checking first: no request, no partial file."""
         gee = _gee(make_gee, engine="pixels", **self.WIDE)
         with pytest.raises(ValueError):
-            gee.download(progress_bar=False)
+            gee.download(progress_bar=False, errors="raise")
         assert gee.client.compute_pixels_calls == []
 
     def test_auto_split_tiles_it_instead(self, make_gee, fake_reader, monkeypatch):
@@ -449,7 +449,7 @@ class TestThePerAxisCapAppliesHereToo:
         )
         gee = _gee(make_gee, engine="pixels", auto_split=True, **self.WIDE)
         with pytest.raises(ValueError, match="still over Earth Engine's"):
-            gee.download(progress_bar=False)
+            gee.download(progress_bar=False, errors="raise")
 
     def test_a_request_within_the_cap_is_untouched(self, make_gee, fake_reader):
         """One request, no tiling, for the ordinary case."""

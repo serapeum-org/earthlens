@@ -44,9 +44,9 @@ from __future__ import annotations
 
 import functools
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from pathlib import Path
-from typing import TypeVar, cast
+from typing import Any, TypeVar, cast
 
 from loguru import logger
 
@@ -92,6 +92,55 @@ def _with_retries(
             time.sleep(base_delay * 2**attempt)
     # Final attempt (or the only one when attempts <= 1): let it raise.
     return call()
+
+
+def _capture(
+    fn: Callable[[_T], Path], item: _T
+) -> tuple[Path | None, BaseException | None]:
+    """Run `fn(item)`, returning `(result, None)` or `(None, exception)`.
+
+    The parallel fetch path runs every resource download to completion on a
+    thread pool before the policy loop sees a result, so a failing download is
+    captured here instead of aborting the whole pool; `_PrecomputedFetch`
+    re-raises it in product order so `_run_items` can apply the policy.
+
+    Args:
+        fn: The per-item download callable.
+        item: The product to hand it.
+
+    Returns:
+        `(path, None)` on success, or `(None, exception)` when `fn` raised.
+    """
+    try:
+        outcome: tuple[Path | None, BaseException | None] = (fn(item), None)
+    except Exception as exc:  # noqa: BLE001 - the policy decides its fate later
+        outcome = (None, exc)
+    return outcome
+
+
+class _PrecomputedFetch:
+    """Replay a parallel fetch's captured outcomes as a `_run_items` `fn`.
+
+    Keyed by product identity so the policy loop — calling this once per
+    product, in order — gets that product's download result, or re-raises the
+    exception the thread pool captured for it.
+    """
+
+    def __init__(
+        self,
+        outcomes: Iterable[
+            tuple[RemoteProduct, tuple[Path | None, BaseException | None]]
+        ],
+    ) -> None:
+        """Index the `(product, outcome)` pairs by product identity."""
+        self._by_id = {id(product): outcome for product, outcome in outcomes}
+
+    def __call__(self, product: RemoteProduct) -> Path:
+        """Return the product's captured path, or re-raise its captured error."""
+        result, exc = self._by_id[id(product)]
+        if exc is not None:
+            raise exc
+        return cast("Path", result)
 
 
 class HDX(AbstractDataSource):
@@ -406,23 +455,61 @@ class HDX(AbstractDataSource):
         Args:
             products: The products from `_search`.
 
+        A per-resource download failure is handled under the `errors=` policy
+        recorded by `download` (`self._errors`): `"warn"` (the default) logs it
+        and returns the resources that succeeded, `"raise"` propagates the first
+        one, `"ignore"` drops it silently — so one unreachable resource no
+        longer aborts a multi-resource dataset.
+
+        Args:
+            products: The products from `_search`.
+
         Returns:
-            list[Path]: Local paths of every downloaded resource, in
+            list[Path]: Local paths of every resource that downloaded, in
                 product order. Empty list when `products` is empty.
         """
-        if self._cores > 1 and len(products) > 1:
-            from joblib import Parallel, delayed
-
-            out_paths = Parallel(n_jobs=self._cores, prefer="threads")(
-                delayed(self._download_one)(product) for product in products
-            )
-        else:
-            out_paths = [self._download_one(product) for product in products]
+        fetch: Callable[[RemoteProduct], Path] = (
+            self._download_parallel(products)
+            if self._cores > 1 and len(products) > 1
+            else self._download_one
+        )
+        out_paths, failures = self._run_items(
+            products, fetch, errors=self._errors, label="resource"
+        )
+        if failures and not out_paths:
+            # Every resource failed — a whole-service outage, not a per-resource
+            # gap; re-raise rather than report it as an empty download (ARC-9a).
+            raise failures[0][1]
         logger.info(
             f"HDX download summary: {len(out_paths)} resource file(s) written "
             f"to {self.root_dir}"
         )
         return cast("list[Path]", out_paths)
+
+    def _download_parallel(
+        self, products: list[RemoteProduct]
+    ) -> Callable[[RemoteProduct], Path]:
+        """Download every resource on a thread pool, returning a replay `fn`.
+
+        `_run_items` applies the policy one resource at a time, but the thread
+        pool has to run every download before that loop sees a result, so each
+        download's outcome is captured here (not raised) and replayed in product
+        order by the returned callable — preserving parallelism while letting
+        `_run_items` apply the same policy it would on the sequential path.
+
+        Args:
+            products: The products from `_search`.
+
+        Returns:
+            A `product -> Path` callable replaying each download's captured
+            outcome, re-raising the captured exception for one that failed.
+        """
+        from joblib import Parallel, delayed
+
+        outcomes = Parallel(n_jobs=self._cores, prefer="threads")(
+            delayed(_capture)(self._download_one, product) for product in products
+        )
+        return _PrecomputedFetch(zip(products, outcomes))
 
     def _download_one(self, product: RemoteProduct) -> Path:
         """Download one product's resource into its per-dataset subdir.
@@ -447,6 +534,7 @@ class HDX(AbstractDataSource):
         self,
         progress_bar: bool = True,
         read: bool = False,
+        errors: str = "warn",
     ) -> list[Path] | list:
         """Resolve the requested datasets and download their resources.
 
@@ -468,26 +556,71 @@ class HDX(AbstractDataSource):
                 (which provides `read_resource`); on an older pyramids it
                 is rejected with a clear upgrade message. Defaults to
                 `False` (return paths).
+            errors: Partial-failure policy across the independent resources
+                (a resource is one CKAN file):
+
+                * `"warn"` (default) — log each resource that fails and return
+                  the ones that succeeded, with a summary.
+                * `"raise"` — propagate the first resource failure, for a
+                  pipeline that must fail fast.
+                * `"ignore"` — drop failed resources silently.
+
+                With `read=True` the policy covers the read step too, so a
+                resource that downloads but fails to parse drops the same
+                single slot. A resource that simply matched no filter is not a
+                failure — `_search` never lists it.
 
         Returns:
-            list[Path]: Local paths of every downloaded resource, in
+            list[Path]: Local paths of every resource that downloaded, in
                 dataset/resource order — when `read=False` (default).
-            list: One read pyramids object per resource (a
-                `Dataset` / `FeatureCollection` / `DataFrame`), in the
+            list: One read pyramids object per resource that downloaded and
+                read (a `Dataset` / `FeatureCollection` / `DataFrame`), in the
                 same order — when `read=True`.
         """
+        self._errors = self.check_errors_policy(errors)
         if not read:
-            return self._api_via_search_fetch()
+            result: list = self._api_via_search_fetch()
+        else:
+            read_resource = self._load_reader()
+            products = self._search()
+            if not products:
+                result = []
+            else:
+                objects, failures = self._run_items(
+                    products,
+                    functools.partial(
+                        self._fetch_and_read_one, read_resource=read_resource
+                    ),
+                    errors=self._errors,
+                    label="resource",
+                )
+                if failures and not objects:
+                    # Every resource failed — a whole-service outage, not a
+                    # per-resource gap; re-raise rather than return empty.
+                    raise failures[0][1]
+                result = objects
+        return result
 
-        read_resource = self._load_reader()
-        products = self._search()
-        if not products:
-            return []
-        paths = self._fetch(products)
-        return [
-            read_resource(path, fmt=product.metadata.get("format") or None)
-            for path, product in zip(paths, products)
-        ]
+    def _fetch_and_read_one(
+        self, product: RemoteProduct, read_resource: Callable[..., Any]
+    ) -> Any:
+        """Download one resource and read it into its pyramids type.
+
+        The per-resource unit for `download(read=True)`: a failure in either the
+        download or the read drops exactly this resource's slot under the
+        `errors=` policy, keeping the returned objects aligned with the
+        resources that succeeded.
+
+        Args:
+            product: A product from `_search`.
+            read_resource: The `pyramids.read_resource` callable.
+
+        Returns:
+            Any: The read pyramids object — a `Dataset` (raster), a
+                `FeatureCollection` (vector), or a `DataFrame` (tabular).
+        """
+        path = self._download_one(product)
+        return read_resource(path, fmt=product.metadata.get("format") or None)
 
     @staticmethod
     def _load_reader():

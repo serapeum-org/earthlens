@@ -1188,3 +1188,171 @@ class TestLimitStopsTheWork:
         )
         with pytest.raises(ValueError, match="USDM .vector. transport only"):
             spei.download(progress_bar=False, limit=5)
+
+
+class _RaiseFromCall:
+    """A per-period fetch stand-in: delegate to `real`, raise `exc` from `from_call`.
+
+    Hoisted to module scope (no nested functions); variadic so it stands in for
+    either `_fetch_usdm_period` (called with a bbox kwarg via functools.partial)
+    or `_fetch_wcs_one`. `from_call=2` fails the second period (a partial
+    failure); `from_call=1` fails every period (a whole-service failure).
+    """
+
+    def __init__(self, real_fetch, exc, from_call=2):
+        self._real = real_fetch
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, *args, **kwargs):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(*args, **kwargs)
+
+
+class _WriteDummy:
+    """A `_fetch_wcs_one` stand-in writing a distinct dummy .tif and returning it.
+
+    Hoisted to module scope (no nested functions); variadic so the
+    functools.partial `bbox=` kwarg is tolerated. Each call writes a new
+    `edo_<n>.tif` so a survivor is a real, existing path.
+    """
+
+    def __init__(self, directory):
+        self._dir = directory
+        self._n = 0
+
+    def __call__(self, *args, **kwargs):
+        """Write a new dummy GeoTIFF and return its path."""
+        self._n += 1
+        path = self._dir / f"edo_{self._n}.tif"
+        path.write_bytes(b"II*\x00")
+        return path
+
+
+class TestErrorsPolicyUsdm:
+    """`errors=` partial-failure policy across the independent USDM weeks."""
+
+    def _two_week_backend(self, tmp_path, monkeypatch, exc, from_call=2):
+        """A USDM backend over two weeks, failing `_fetch_usdm_period` from `from_call`."""
+        monkeypatch.setattr(backend_module, "_http_get_json", lambda url: _USDM_PAYLOAD)
+        backend = Drought(
+            start="2026-06-10",
+            end="2026-06-23",
+            lat_lim=[30.0, 40.0],
+            lon_lim=[-95.0, -85.0],
+            dataset="usdm",
+            path=str(tmp_path),
+            today=dt.date(2026, 6, 23),
+        )
+        assert len(backend._search()) == 2, "the two-week window should plan two weeks"
+        monkeypatch.setattr(
+            backend,
+            "_fetch_usdm_period",
+            _RaiseFromCall(backend._fetch_usdm_period, exc, from_call),
+        )
+        return backend
+
+    def test_raise_propagates_first_failure(self, tmp_path, monkeypatch):
+        """errors="raise" surfaces a per-week exception, not the batch summary."""
+        backend = self._two_week_backend(tmp_path, monkeypatch, ValueError("week boom"))
+        with pytest.raises(ValueError, match="week boom"):
+            backend.download(progress_bar=False, errors="raise")
+
+    def test_warn_returns_the_surviving_week(self, tmp_path, monkeypatch):
+        """errors="warn" drops a per-week failure and returns the survivor's polygons."""
+        backend = self._two_week_backend(tmp_path, monkeypatch, ValueError("week boom"))
+        fc = backend.download(progress_bar=False, errors="warn")
+        assert len(fc) > 0, "the surviving week's polygons should be returned"
+
+    def test_ignore_drops_failures_and_returns_survivor(self, tmp_path, monkeypatch):
+        """errors="ignore" drops a per-week failure silently."""
+        backend = self._two_week_backend(tmp_path, monkeypatch, ValueError("week boom"))
+        assert len(backend.download(progress_bar=False, errors="ignore")) > 0
+
+    def test_default_policy_is_warn(self, tmp_path, monkeypatch):
+        """Omitting errors= defaults to warn — a per-week failure is survived."""
+        backend = self._two_week_backend(tmp_path, monkeypatch, ValueError("week boom"))
+        assert len(backend.download(progress_bar=False)) > 0
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_week_failing_raises(self, tmp_path, policy, monkeypatch):
+        """When every week fails, the first error is raised — never a silent empty."""
+        backend = self._two_week_backend(
+            tmp_path, monkeypatch, ValueError("all weeks down"), from_call=1
+        )
+        with pytest.raises(ValueError, match="all weeks down"):
+            backend.download(progress_bar=False, errors=policy)
+
+    def test_invalid_policy_rejected(self, tmp_path, monkeypatch):
+        """An unrecognised errors= value is refused before any request."""
+        monkeypatch.setattr(backend_module, "_http_get_json", lambda url: _USDM_PAYLOAD)
+        backend = Drought(
+            start="2026-06-23",
+            end="2026-06-23",
+            lat_lim=[30.0, 40.0],
+            lon_lim=[-95.0, -85.0],
+            dataset="usdm",
+            path=str(tmp_path),
+            today=dt.date(2026, 6, 23),
+        )
+        with pytest.raises(ValueError, match="errors"):
+            backend.download(progress_bar=False, errors="explode")
+
+
+class TestErrorsPolicyWcs:
+    """`errors=` partial-failure policy across the independent EDO/GDO periods."""
+
+    def _multi_period_backend(self, tmp_path, monkeypatch, exc, from_call=2):
+        """An EDO backend over several periods, failing `_fetch_wcs_one` from `from_call`."""
+        backend = Drought(
+            start="2025-12-01",
+            end="2025-12-31",
+            lat_lim=[40.0, 50.0],
+            lon_lim=[5.0, 15.0],
+            dataset="edo-spaST",
+            path=str(tmp_path),
+        )
+        assert len(backend._search()) >= 2, "the window should plan several periods"
+        monkeypatch.setattr(
+            backend,
+            "_fetch_wcs_one",
+            _RaiseFromCall(_WriteDummy(tmp_path), exc, from_call),
+        )
+        return backend
+
+    def test_raise_propagates_first_failure(self, tmp_path, monkeypatch):
+        """errors="raise" surfaces a per-period exception, not the batch summary."""
+        backend = self._multi_period_backend(
+            tmp_path, monkeypatch, ValueError("period boom")
+        )
+        with pytest.raises(ValueError, match="period boom"):
+            backend.download(progress_bar=False, errors="raise")
+
+    def test_warn_returns_the_surviving_period(self, tmp_path, monkeypatch):
+        """errors="warn" drops a per-period failure and returns the survivor's path."""
+        backend = self._multi_period_backend(
+            tmp_path, monkeypatch, ValueError("period boom")
+        )
+        paths = backend.download(progress_bar=False, errors="warn")
+        assert len(paths) == 1
+        assert paths[0].exists()
+
+    def test_ignore_drops_failures_and_returns_survivor(self, tmp_path, monkeypatch):
+        """errors="ignore" drops a per-period failure silently."""
+        backend = self._multi_period_backend(
+            tmp_path, monkeypatch, ValueError("period boom")
+        )
+        assert len(backend.download(progress_bar=False, errors="ignore")) == 1
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_period_failing_raises(self, tmp_path, policy, monkeypatch):
+        """When every period fails, the first error is raised — never a silent empty."""
+        backend = self._multi_period_backend(
+            tmp_path, monkeypatch, ValueError("all periods down"), from_call=1
+        )
+        with pytest.raises(ValueError, match="all periods down"):
+            backend.download(progress_bar=False, errors=policy)

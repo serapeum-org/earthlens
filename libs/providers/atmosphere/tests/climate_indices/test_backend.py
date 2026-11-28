@@ -402,3 +402,100 @@ def test_no_xarray_in_subpackage() -> None:
         text = py.read_text()
         assert "import xarray" not in text, py.name
         assert "xr." not in text, py.name
+
+
+class _RaiseFromCall:
+    """A `_fetch_one` stand-in: delegate to the real one, raise `exc` from `from_call`.
+
+    Hoisted to module scope (no nested functions); holds its own call counter.
+    `from_call=2` fails the second index (a partial failure); `from_call=1`
+    fails every index (a whole-service failure).
+    """
+
+    def __init__(self, real_fetch, exc, from_call=2):
+        self._real = real_fetch
+        self._exc = exc
+        self._from_call = from_call
+        self._calls = 0
+
+    def __call__(self, product):
+        """Delegate until `from_call`, then raise `exc` on that call onward."""
+        self._calls += 1
+        if self._calls >= self._from_call:
+            raise self._exc
+        return self._real(product)
+
+
+class TestErrorsPolicy:
+    """`errors=` partial-failure policy across the independent index ids."""
+
+    def _two_index_backend(self, tmp_path, monkeypatch, exc, from_call=2):
+        """A backend over two indices, failing `_fetch_one` from `from_call`."""
+        source = ClimateIndices(
+            start="2000-01-01",
+            end="2001-12-31",
+            variables=["oni", "amo"],
+            path=tmp_path,
+        )
+        monkeypatch.setattr(
+            source, "_fetch_one", _RaiseFromCall(source._fetch_one, exc, from_call)
+        )
+        return source
+
+    def test_raise_propagates_first_failure(
+        self, fake_http, tmp_path: Path, monkeypatch
+    ):
+        """errors="raise" surfaces a per-index exception, not the batch summary."""
+        source = self._two_index_backend(
+            tmp_path, monkeypatch, ValueError("index boom")
+        )
+        with pytest.raises(ValueError, match="index boom"):
+            source.download(errors="raise")
+
+    def test_warn_returns_the_surviving_index(
+        self, fake_http, tmp_path: Path, monkeypatch
+    ):
+        """errors="warn" drops a per-index failure and returns the survivor's rows."""
+        source = self._two_index_backend(
+            tmp_path, monkeypatch, ValueError("index boom")
+        )
+        df = source.download(errors="warn")
+        assert set(df["index"].unique()) == {"oni"}
+        assert len(df) == 24
+
+    def test_ignore_drops_failures_and_returns_survivor(
+        self, fake_http, tmp_path: Path, monkeypatch
+    ):
+        """errors="ignore" drops a per-index failure silently."""
+        source = self._two_index_backend(
+            tmp_path, monkeypatch, ValueError("index boom")
+        )
+        df = source.download(errors="ignore")
+        assert set(df["index"].unique()) == {"oni"}
+
+    def test_default_policy_is_warn(self, fake_http, tmp_path: Path, monkeypatch):
+        """Omitting errors= defaults to warn — a per-index failure is survived."""
+        source = self._two_index_backend(
+            tmp_path, monkeypatch, ValueError("index boom")
+        )
+        df = source.download()
+        assert set(df["index"].unique()) == {"oni"}
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore"])
+    def test_every_index_failing_raises(
+        self, fake_http, tmp_path: Path, policy: str, monkeypatch
+    ):
+        """When every index fails, the first error is raised — never a silent empty."""
+        source = self._two_index_backend(
+            tmp_path, monkeypatch, ValueError("all indices down"), from_call=1
+        )
+        with pytest.raises(ValueError, match="all indices down"):
+            source.download(errors=policy)
+
+    def test_invalid_policy_rejected(self, fake_http, tmp_path: Path):
+        """An unrecognised errors= value is refused before any request."""
+        source = ClimateIndices(
+            start="2000-01-01", end="2001-12-31", variables=["oni"], path=tmp_path
+        )
+        with pytest.raises(ValueError, match="errors"):
+            source.download(errors="explode")
